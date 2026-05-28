@@ -5,6 +5,7 @@ import { FPS, INTRO_DURATION } from "./lib/constants";
 import { getTimelinePath, loadTimelineFromFile } from "./lib/utils";
 import { HireScanVideo, HIRESCAN_TOTAL_FRAMES } from "./HireScan";
 import { HireScanAd, HIRESCAN_AD_FRAMES } from "./HireScanAd";
+import { HireScanAdV2, CINEMATIC_FRAMES } from "./HireScanAdV2";
 
 export const RemotionRoot: React.FC = () => {
   const staticFiles = getStaticFiles();
@@ -30,6 +31,15 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1920}
         durationInFrames={HIRESCAN_AD_FRAMES}
+      />
+
+      <Composition
+        id="HireScanAdV2"
+        component={HireScanAdV2}
+        fps={30}
+        width={1080}
+        height={1920}
+        durationInFrames={CINEMATIC_FRAMES}
       />
 
       {timelines.map((storyName) => (
