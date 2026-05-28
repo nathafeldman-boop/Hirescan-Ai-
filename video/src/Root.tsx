@@ -4,6 +4,7 @@ import { AIVideo, aiVideoSchema } from "./components/AIVideo";
 import { FPS, INTRO_DURATION } from "./lib/constants";
 import { getTimelinePath, loadTimelineFromFile } from "./lib/utils";
 import { HireScanVideo, HIRESCAN_TOTAL_FRAMES } from "./HireScan";
+import { HireScanAd, HIRESCAN_AD_FRAMES } from "./HireScanAd";
 
 export const RemotionRoot: React.FC = () => {
   const staticFiles = getStaticFiles();
@@ -20,6 +21,15 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         durationInFrames={HIRESCAN_TOTAL_FRAMES}
+      />
+
+      <Composition
+        id="HireScanAd"
+        component={HireScanAd}
+        fps={30}
+        width={1080}
+        height={1920}
+        durationInFrames={HIRESCAN_AD_FRAMES}
       />
 
       {timelines.map((storyName) => (
