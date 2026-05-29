@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TruthCheck — Préview</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#09090b;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── Layout ── */
+.page{display:none;min-height:100vh;flex-direction:column}
+.page.active{display:flex}
+
+/* ── Glows ── */
+.glow-wrap{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.glow{position:absolute;border-radius:50%;filter:blur(80px)}
+.g1{top:-160px;left:-160px;width:384px;height:384px;background:rgba(76,29,149,.18)}
+.g2{top:-80px;right:0;width:320px;height:320px;background:rgba(131,24,67,.13)}
+.g3{bottom:0;left:50%;transform:translateX(-50%);width:600px;height:240px;background:rgba(23,37,84,.10)}
+
+/* ── Glass ── */
+.glass{background:rgba(255,255,255,.04);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08)}
+
+/* ══════════════════════════
+   HOME
+══════════════════════════ */
+#home{position:relative;overflow:hidden}
+.container{position:relative;z-index:10;max-width:896px;margin:0 auto;padding:80px 16px}
+
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);font-size:13px;color:#a1a1aa;margin-bottom:32px}
+.badge-dot{width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse 2s infinite}
+
+h1{font-size:clamp(48px,8vw,72px);font-weight:900;letter-spacing:-.03em;margin-bottom:24px;line-height:1}
+.t-white{background:linear-gradient(90deg,#fff,#d4d4d8,#a1a1aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.t-color{background:linear-gradient(90deg,#a78bfa,#f472b6,#fb7185);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:clamp(16px,2.5vw,20px);color:#71717a;max-width:480px;margin:0 auto 0;line-height:1.6}
+.subtitle strong{color:#fff;font-weight:500}
+.hero{text-align:center;margin-bottom:64px;animation:fadeIn .5s ease-out}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+.card{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);text-decoration:none;display:block;cursor:pointer;transition:transform .3s,border-color .3s,box-shadow .3s;animation:slideUp .4s ease-out both}
+.card:hover{transform:scale(1.02);border-color:rgba(255,255,255,.20);box-shadow:0 25px 50px rgba(0,0,0,.5)}
+.card-bg{position:absolute;inset:0;opacity:.6;transition:opacity .3s}
+.card:hover .card-bg{opacity:.8}
+.card-ov{position:absolute;inset:0;background:rgba(9,9,11,.40)}
+.card-glow{position:absolute;inset:0;opacity:0;transition:opacity .5s;pointer-events:none}
+.card:hover .card-glow{opacity:1}
+.card-body{position:relative;padding:28px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.emoji{font-size:clamp(32px,5vw,44px)}
+.q-badge{font-size:11px;color:#71717a;background:rgba(255,255,255,.05);padding:4px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08)}
+.card-title{font-size:clamp(17px,2.5vw,21px);font-weight:700;color:#fff;margin-bottom:8px;line-height:1.3}
+.card-desc{font-size:14px;color:#71717a;margin-bottom:22px;line-height:1.6}
+.cta{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;padding:8px 16px;border-radius:10px;transition:gap .2s}
+.card:hover .cta{gap:12px}
+.cta-arrow{width:16px;height:16px;transition:transform .2s}
+.card:hover .cta-arrow{transform:translateX(4px)}
+
+.c1 .card-bg{background:linear-gradient(135deg,rgba(127,29,29,.8),rgba(124,45,18,.8))}
+.c1 .card-glow{background:radial-gradient(ellipse at 50% 0%,rgba(239,68,68,.13) 0%,transparent 70%)}
+.c1 .cta{color:#ef4444}
+.c2 .card-bg{background:linear-gradient(135deg,rgba(46,16,101,.8),rgba(23,37,84,.8))}
+.c2 .card-glow{background:radial-gradient(ellipse at 50% 0%,rgba(139,92,246,.13) 0%,transparent 70%)}
+.c2 .cta{color:#8b5cf6}
+.c3 .card-bg{background:linear-gradient(135deg,rgba(131,24,67,.8),rgba(136,19,55,.8))}
+.c3 .card-glow{background:radial-gradient(ellipse at 50% 0%,rgba(236,72,153,.13) 0%,transparent 70%)}
+.c3 .cta{color:#ec4899}
+.c4 .card-bg{background:linear-gradient(135deg,rgba(6,78,59,.8),rgba(19,78,74,.8))}
+.c4 .card-glow{background:radial-gradient(ellipse at 50% 0%,rgba(16,185,129,.13) 0%,transparent 70%)}
+.c4 .cta{color:#10b981}
+.card:nth-child(1){animation-delay:0ms}
+.card:nth-child(2){animation-delay:100ms}
+.card:nth-child(3){animation-delay:200ms}
+.card:nth-child(4){animation-delay:300ms}
+
+.footer-note{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:48px}
+.footer-note p{text-align:center;font-size:12px;color:#3f3f46}
+.stats-link{font-size:12px;color:#52525b;display:inline-flex;align-items:center;gap:6px;text-decoration:none;transition:color .2s;cursor:pointer}
+.stats-link:hover{color:#a1a1aa}
+
+/* ══════════════════════════
+   QUIZ
+══════════════════════════ */
+#quiz{background:#09090b;overflow:hidden}
+.quiz-header{position:sticky;top:0;z-index:20;background:rgba(9,9,11,.8);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.05)}
+.quiz-header-inner{max-width:672px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.back-btn{color:#71717a;font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:none;transition:color .2s;flex-shrink:0}
+.back-btn:hover{color:#fff}
+.quiz-title-bar{flex:1;text-align:center;font-size:13px;font-weight:500;color:#d4d4d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-counter{font-size:13px;color:#71717a;flex-shrink:0;font-variant-numeric:tabular-nums}
+.progress-track{height:3px;background:rgba(255,255,255,.05)}
+.progress-bar{height:100%;transition:width .5s ease-out;border-radius:2px}
+
+.quiz-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px}
+.quiz-card{width:100%;max-width:672px;transition:opacity .3s,transform .3s}
+.quiz-card.out{opacity:0;transform:translateY(16px)}
+
+.question-box{border-radius:16px;padding:24px 28px;margin-bottom:20px}
+.q-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.q-text{font-size:clamp(17px,2.5vw,21px);font-weight:600;color:#fff;line-height:1.5}
+
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.opt{width:100%;text-align:left;padding:14px 18px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);color:#a1a1aa;font-size:15px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;font-family:inherit}
+.opt:hover{border-color:rgba(255,255,255,.20);color:#e4e4e7;background:rgba(255,255,255,.05)}
+.opt.selected{color:#fff}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.radio svg{width:11px;height:11px;display:none}
+.opt.selected .radio{border-color:var(--accent);background:var(--accent)}
+.opt.selected .radio svg{display:block}
+
+.next-btn{width:100%;padding:15px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s;background:rgba(255,255,255,.05);color:#71717a}
+.next-btn.ready{color:#fff}
+
+/* ══════════════════════════
+   RESULTS
+══════════════════════════ */
+#results{background:#09090b;overflow:hidden}
+.results-glow{position:fixed;inset:0;pointer-events:none}
+.results-header{position:relative;z-index:10;border-bottom:1px solid rgba(255,255,255,.05)}
+.results-header-inner{max-width:672px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.results-body{position:relative;z-index:10;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px}
+.results-card{width:100%;max-width:448px;animation:fadeIn .5s ease-out}
+
+.quiz-subtitle{text-align:center;font-size:13px;color:#71717a;margin-bottom:28px}
+.circle-wrap{display:flex;justify-content:center;margin-bottom:28px}
+.circle-container{position:relative}
+.circle-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.pct-num{font-size:48px;font-weight:900;font-variant-numeric:tabular-nums}
+
+.tier-badge{display:flex;justify-content:center;margin-bottom:16px}
+.tier-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:999px;font-size:14px;font-weight:600;border:1px solid}
+
+.msg-card{border-radius:16px;padding:22px;margin-bottom:22px;text-align:center}
+.msg-card p{color:#d4d4d8;line-height:1.7;font-size:15px}
+
+.share-pill{display:flex;align-items:center;gap:10px;border-radius:12px;padding:12px 16px;margin-bottom:22px}
+.share-pill svg{flex-shrink:0;color:#71717a}
+.share-pill span{font-size:12px;color:#52525b;flex:1}
+.share-pill .saved{font-size:11px;color:#10b981;flex-shrink:0}
+
+.score-bar-wrap{border-radius:12px;padding:14px;margin-bottom:28px}
+.score-bar-labels{display:flex;justify-content:space-between;font-size:11px;color:#71717a;margin-bottom:8px}
+.score-bar-track{height:8px;background:rgba(255,255,255,.05);border-radius:999px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:999px;transition:width 1s ease-out .3s}
+.tier-emojis{display:flex;justify-content:space-between;margin-top:8px;font-size:13px}
+
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.action-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:all .2s;color:#71717a;font-family:inherit;text-decoration:none}
+.action-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff}
+.action-btn svg{width:20px;height:20px}
+.action-btn span{font-size:11px;font-weight:600}
+
+/* ══════════════════════════
+   STATS
+══════════════════════════ */
+#stats-page{background:#09090b;overflow:hidden}
+.stats-wrap{position:relative;z-index:10;max-width:896px;margin:0 auto;padding:40px 16px}
+.stats-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:12px}
+.stats-left .back-link{font-size:13px;color:#52525b;display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:none;margin-bottom:12px;font-family:inherit;transition:color .2s}
+.stats-left .back-link:hover{color:#fff}
+.stats-left h2{font-size:28px;font-weight:900;color:#fff}
+.stats-left p{font-size:13px;color:#52525b;margin-top:4px}
+.stats-right{text-align:right}
+.big-num{font-size:40px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+.big-label{font-size:12px;color:#52525b}
+
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:28px}
+@media(max-width:600px){.stats-grid{grid-template-columns:1fr}}
+.stat-card{border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,.05)}
+.stat-card-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.stat-emoji{font-size:28px}
+.stat-card-title{font-size:13px;font-weight:700;color:#fff;line-height:1.3}
+.stat-card-sub{font-size:11px;color:#52525b;margin-top:2px}
+.avg-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.avg-label{font-size:12px;color:#71717a}
+.avg-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dist-label{font-size:10px;color:#52525b;width:44px;flex-shrink:0}
+.dist-track{flex:1;height:14px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.dist-fill{height:100%;border-radius:3px;transition:width .7s ease-out}
+.dist-count{font-size:10px;color:#52525b;width:16px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+.no-data{font-size:13px;color:#3f3f46;text-align:center;padding:24px 0}
+
+.recent-card{border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,.05)}
+.recent-card h3{font-size:13px;font-weight:700;color:#fff;margin-bottom:14px}
+.recent-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;transition:background .2s;cursor:pointer}
+.recent-item:hover{background:rgba(255,255,255,.04)}
+.ri-left{display:flex;align-items:center;gap:12px}
+.ri-emoji{font-size:20px}
+.ri-title{font-size:13px;color:#a1a1aa}
+.ri-right{display:flex;align-items:center;gap:8px}
+.ri-score{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ── Animations ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<!-- ═══════ HOME ═══════ -->
+<div id="home" class="page active">
+  <div class="glow-wrap"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div></div>
+  <div class="container">
+    <div class="hero">
+      <div class="badge"><span class="badge-dot"></span>30 questions · Résultats instantanés · 100% gratuit</div>
+      <h1><span class="t-white">Truth</span><span class="t-color">Check</span></h1>
+      <p class="subtitle">Découvre les <strong>vérités cachées</strong> qui t'entourent. Des questionnaires honnêtes pour des réponses claires.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card c1" onclick="startQuiz('infidelite')">
+        <div class="card-bg"></div><div class="card-ov"></div><div class="card-glow"></div>
+        <div class="card-body">
+          <div class="card-head"><span class="emoji">💔</span><span class="q-badge">30 questions</span></div>
+          <h2 class="card-title">Mon/Ma partenaire me trompe ?</h2>
+          <p class="card-desc">30 questions pour analyser les comportements suspects dans ta relation.</p>
+          <div class="cta" style="color:#ef4444">Commencer le test <svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+        </div>
+      </div>
+
+      <div class="card c2" onclick="startQuiz('adopte')">
+        <div class="card-bg"></div><div class="card-ov"></div><div class="card-glow"></div>
+        <div class="card-body">
+          <div class="card-head"><span class="emoji">🧬</span><span class="q-badge">30 questions</span></div>
+          <h2 class="card-title">Suis-je adopté(e) ?</h2>
+          <p class="card-desc">30 questions pour analyser les indices qui pourraient révéler une adoption.</p>
+          <div class="cta" style="color:#8b5cf6">Commencer le test <svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+        </div>
+      </div>
+
+      <div class="card c3" onclick="startQuiz('amoureux')">
+        <div class="card-bg"></div><div class="card-ov"></div><div class="card-glow"></div>
+        <div class="card-body">
+          <div class="card-head"><span class="emoji">💕</span><span class="q-badge">30 questions</span></div>
+          <h2 class="card-title">Suis-je amoureux/amoureuse ?</h2>
+          <p class="card-desc">30 questions pour savoir si ce que tu ressens, c'est vraiment de l'amour.</p>
+          <div class="cta" style="color:#ec4899">Commencer le test <svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+        </div>
+      </div>
+
+      <div class="card c4" onclick="startQuiz('vrais-amis')">
+        <div class="card-bg"></div><div class="card-ov"></div><div class="card-glow"></div>
+        <div class="card-body">
+          <div class="card-head"><span class="emoji">👥</span><span class="q-badge">30 questions</span></div>
+          <h2 class="card-title">Mes amis sont-ils vrais ?</h2>
+          <p class="card-desc">30 questions pour identifier les faux amis et ceux qui te méritent vraiment.</p>
+          <div class="cta" style="color:#10b981">Commencer le test <svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <p>Ces questionnaires sont à titre indicatif et ne remplacent pas une conversation sincère.</p>
+      <span class="stats-link" onclick="showStats()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Voir les statistiques
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ QUIZ ═══════ -->
+<div id="quiz" class="page">
+  <div class="quiz-header">
+    <div class="quiz-header-inner">
+      <button class="back-btn" onclick="goHome()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Accueil
+      </button>
+      <div class="quiz-title-bar" id="quiz-title-bar">💔 Mon/Ma partenaire me trompe ?</div>
+      <div class="q-counter" id="q-counter">1/30</div>
+    </div>
+    <div class="progress-track"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="quiz-body">
+    <div class="quiz-card" id="quiz-card">
+      <div class="question-box glass" id="question-box">
+        <div class="q-label" id="q-label">Question 1</div>
+        <p class="q-text" id="q-text">...</p>
+      </div>
+      <div class="options" id="options-list"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQuestion()">Question suivante →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ RESULTS ═══════ -->
+<div id="results" class="page">
+  <div class="results-glow" id="results-glow"></div>
+  <div class="results-header">
+    <div class="results-header-inner">
+      <button class="back-btn" onclick="goHome()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Accueil
+      </button>
+      <span style="font-size:13px;font-weight:500;color:#d4d4d8" id="res-header-title">💔 Résultats</span>
+      <div style="width:64px"></div>
+    </div>
+  </div>
+
+  <div class="results-body">
+    <div class="results-card">
+      <p class="quiz-subtitle" id="res-quiz-title">Mon/Ma partenaire me trompe ?</p>
+
+      <!-- SVG circle -->
+      <div class="circle-wrap">
+        <div class="circle-container">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <defs>
+              <linearGradient id="cg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" id="cg-stop1"/>
+                <stop offset="100%" id="cg-stop2"/>
+              </linearGradient>
+            </defs>
+            <circle cx="90" cy="90" r="72" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
+            <circle id="circle-prog" cx="90" cy="90" r="72" fill="none" stroke="url(#cg)"
+              stroke-width="10" stroke-dasharray="452.39" stroke-dashoffset="452.39"
+              stroke-linecap="round" transform="rotate(-90 90 90)"
+              style="transition:stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)"/>
+          </svg>
+          <div class="circle-center">
+            <span class="pct-num" id="pct-display">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tier-badge">
+        <div class="tier-chip" id="tier-chip">✅ Rien d'alarmant</div>
+      </div>
+
+      <div class="msg-card glass">
+        <p id="tier-msg">...</p>
+      </div>
+
+      <div class="share-pill glass">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        <span id="share-id-text">/share/abc12345...</span>
+        <span class="saved">Sauvegardé ✓</span>
+      </div>
+
+      <div class="score-bar-wrap glass">
+        <div class="score-bar-labels">
+          <span>0%</span>
+          <span id="score-label" style="color:#a1a1aa;font-weight:500">Ton score : 0%</span>
+          <span>100%</span>
+        </div>
+        <div class="score-bar-track"><div class="score-bar-fill" id="score-bar-fill" style="width:0%"></div></div>
+        <div class="tier-emojis" id="tier-emojis"></div>
+      </div>
+
+      <div class="actions">
+        <button class="action-btn" id="retry-btn" onclick="retryQuiz()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Refaire</span>
+        </button>
+        <button class="action-btn" id="share-btn" onclick="handleShare()">
+          <svg id="share-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+          <span id="share-label">Partager</span>
+        </button>
+        <button class="action-btn" onclick="goHome()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Accueil</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STATS ═══════ -->
+<div id="stats-page" class="page">
+  <div class="glow-wrap"><div class="glow g1"></div><div class="glow g3"></div></div>
+  <div class="stats-wrap">
+    <div class="stats-top">
+      <div class="stats-left">
+        <button class="back-link" onclick="goHome()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Accueil
+        </button>
+        <h2>📊 Statistiques</h2>
+        <p>Données en temps réel sur les quiz TruthCheck</p>
+      </div>
+      <div class="stats-right">
+        <div class="big-num" id="stats-total">0</div>
+        <div class="big-label">quiz complétés</div>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="recent-card glass" id="recent-card" style="display:none">
+      <h3>Derniers résultats</h3>
+      <div id="recent-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const QUIZZES = {
+  infidelite:{
+    title:'Mon/Ma partenaire me trompe ?', emoji:'💔', accent:'#ef4444',
+    tiers:[
+      {min:0,max:20,emoji:'✅',title:'Rien d\'alarmant',msg:'Les signaux que tu décris sont rassurants. Aucun indicateur significatif d\'infidélité n\'est détecté. La confiance est au cœur de votre relation.',color:'#34d399'},
+      {min:20,max:40,emoji:'🤔',title:'Quelques doutes',msg:'Il y a quelques petits signaux d\'alerte, mais rien d\'alarmant. Une discussion ouverte et honnête pourrait clarifier tes doutes.',color:'#facc15'},
+      {min:40,max:60,emoji:'⚠️',title:'Signaux préoccupants',msg:'Il y a suffisamment de signaux pour être préoccupé(e). Fais confiance à ton instinct et trouve le courage d\'en parler directement.',color:'#fb923c'},
+      {min:60,max:80,emoji:'🚨',title:'Forte probabilité',msg:'Les signaux sont nombreux et concordants. Ces comportements sont typiques d\'une infidélité. Tu mérites la vérité.',color:'#f87171'},
+      {min:80,max:101,emoji:'💥',title:'Presque certain(e)',msg:'Les indicateurs sont très forts et convergent vers une seule conclusion. Tu mérites une relation basée sur la vérité et le respect.',color:'#ef4444'},
+    ],
+    questions:[
+      {q:'Est-ce que ton/ta partenaire protège davantage son téléphone depuis quelque temps ?',opts:['Non, rien de spécial','Il/Elle le retourne parfois face contre table','Il/Elle change souvent de code et évite mon regard','Son téléphone est toujours verrouillé et il/elle panique si je m\'approche']},
+      {q:'Est-ce que ton/ta partenaire rentre plus tard que d\'habitude sans explication claire ?',opts:['Non, ses horaires sont réguliers','De temps en temps, mais ça se justifie','Souvent, avec des excuses vagues','Très souvent, les histoires changent à chaque fois']},
+      {q:'As-tu remarqué un changement dans votre vie intime ?',opts:['Aucun changement notable','Légèrement moins présent(e) qu\'avant','Nettement moins d\'intérêt de sa part','Notre vie intime est quasi inexistante depuis peu']},
+      {q:'Est-ce que ton/ta partenaire est devenu(e) plus distant(e) émotionnellement ?',opts:['Non, on est toujours aussi proches','Un peu moins disponible mais ça va','Il/Elle semble souvent dans ses pensées','On ne se parle presque plus vraiment']},
+      {q:'As-tu trouvé des messages, photos ou appels suspects ?',opts:['Non, jamais','Un message ambigu sans suite','Plusieurs échanges qui m\'ont semblé bizarres','Des preuves évidentes que j\'ai découvertes']},
+      {q:'Est-ce que ton/ta partenaire s\'habille ou prend soin de lui/elle différemment ?',opts:['Aucun changement','Un peu plus soigné(e) en certaines occasions','Beaucoup plus soucieux/soucieuse de son apparence','Transformation totale : nouveau style, nouveau parfum']},
+      {q:'Est-ce que ton/ta partenaire te ment ou t\'a menti sur sa localisation ?',opts:['Jamais, on se fait confiance','Un petit mensonge sans importance','Des incohérences dans ses histoires','Plusieurs mensonges flagrants sur où il/elle était']},
+      {q:'Ton/ta partenaire a-t-il/elle de nouvelles amitiés mystérieuses ?',opts:['Non, je connais tous ses amis','Un ou deux nouveaux contacts normaux','Des "collègues" dont je n\'ai jamais entendu parler avant','Des contacts mystérieux avec qui il/elle passe beaucoup de temps']},
+      {q:'Est-ce que ton/ta partenaire est devenu(e) irritable sans raison ?',opts:['Non, il/elle est d\'humeur stable','Parfois nerveux/nerveuse pour un rien','Souvent agressif/agressive quand je pose des questions','Très défensif/défensive dès que j\'aborde certains sujets']},
+      {q:'Ton/ta partenaire travaille-t-il/elle plus que d\'habitude ?',opts:['Non, emploi du temps normal','Quelques heures sup de temps en temps','Régulièrement des sorties tardives liées au "travail"','Constamment absent(e) pour des raisons professionnelles douteuses']},
+    ]
+  },
+  adopte:{
+    title:'Suis-je adopté(e) ?', emoji:'🧬', accent:'#8b5cf6',
+    tiers:[
+      {min:0,max:20,emoji:'👨‍👩‍👧',title:'Très peu probable',msg:'Rien ne semble indiquer que tu sois adopté(e). Ta famille biologique semble bien être la tienne.',color:'#a78bfa'},
+      {min:20,max:40,emoji:'🤷',title:'Quelques interrogations',msg:'Quelques petites interrogations existent, mais rien d\'alarmant. La plupart des familles ont leurs petits mystères.',color:'#60a5fa'},
+      {min:40,max:60,emoji:'🔍',title:'Mérite réflexion',msg:'Plusieurs éléments méritent réflexion. Un test ADN ou une conversation honnête avec tes parents pourrait te donner la paix de l\'esprit.',color:'#facc15'},
+      {min:60,max:80,emoji:'🧩',title:'Indices sérieux',msg:'Plusieurs indices concordants suggèrent une possible adoption. Tu mérites de connaître toute la vérité sur tes origines.',color:'#fb923c'},
+      {min:80,max:101,emoji:'📋',title:'Très probable',msg:'Les indices sont nombreux et concordants. Quelles que soient tes origines, tu mérites de connaître toute la vérité.',color:'#c084fc'},
+    ],
+    questions:[
+      {q:'Te ressembles-tu physiquement à tes deux parents ?',opts:['Oui, on me dit souvent qu\'on voit la ressemblance','Un peu, mais les traits varient','Assez peu, je me distingue nettement de mes parents','Je ne ressemble vraiment ni à ma mère ni à mon père']},
+      {q:'As-tu la même couleur de peau, d\'yeux ou de cheveux que tes parents ?',opts:['Oui, tout concorde','Quelques légères différences explicables','Différences notables qui nécessitent des explications','Différences très marquées et inexpliquées']},
+      {q:'Y a-t-il des photos de ta mère enceinte de toi ?',opts:['Oui, plein d\'albums photo','Quelques photos','Très peu, mais ça peut s\'expliquer','Aucune photo de grossesse ni de naissance']},
+      {q:'As-tu accès à ton carnet de santé ou ton acte de naissance ?',opts:['Oui, je les ai vus','Je sais où ils sont mais je ne les ai pas regardés','On m\'a dit qu\'ils sont quelque part mais je ne les trouve pas','Ces documents semblent introuvables ou ont "disparu"']},
+      {q:'Tes parents ont-ils refusé de répondre à des questions sur ta naissance ?',opts:['Non, ils répondent toujours clairement','Parfois un peu évasifs mais ça se justifie','Souvent mal à l\'aise quand j\'aborde le sujet','Esquivent systématiquement ou se contredisent']},
+      {q:'As-tu eu un sentiment inexpliqué de ne pas "appartenir" à ta famille ?',opts:['Non, je me sens tout à fait à ma place','Parfois une légère étrangeté','Souvent un sentiment d\'être différent(e) sans raison claire','Un fort sentiment d\'être extérieur(e) à ma famille depuis toujours']},
+      {q:'Est-ce que ta personnalité ou tes goûts sont très différents de ceux de ta famille ?',opts:['Non, j\'ai beaucoup de traits en commun','Quelques différences normales','Assez différent(e) en valeurs et intérêts','Je me sens radicalement différent(e) de toute ma famille']},
+      {q:'Ta famille évite-t-elle certains sujets liés à ta petite enfance ?',opts:['Non, on en parle librement','Légère pudeur sur certains souvenirs','Certaines périodes semblent floues ou peu documentées','Ma naissance et petite enfance sont un sujet tabou']},
+      {q:'As-tu des questionnements profonds sur "qui tu es vraiment" ?',opts:['Non, jamais','Rarement, et ça passe vite','Parfois des questionnements sur mon identité','Souvent une obsession pour mes vraies origines']},
+      {q:'As-tu déjà envisagé sérieusement que tu pourrais être adopté(e) ?',opts:['Non, cette idée ne m\'a jamais traversé l\'esprit','Y ai pensé une fois en rigolant','Cette question me préoccupe parfois sérieusement','Je suis convaincu(e) que je suis adopté(e)']},
+    ]
+  },
+  amoureux:{
+    title:'Suis-je amoureux/amoureuse ?', emoji:'💕', accent:'#ec4899',
+    tiers:[
+      {min:0,max:20,emoji:'😊',title:'Pas (encore) l\'amour',msg:'Ce n\'est probablement pas de l\'amour, plutôt de la sympathie ou de l\'amitié. Et c\'est déjà super !',color:'#38bdf8'},
+      {min:20,max:40,emoji:'🌸',title:'Quelque chose se développe',msg:'Tu ressens quelque chose d\'assez fort, mais ce n\'est peut-être pas encore l\'amour au sens plein. Les sentiments sont en train de se développer.',color:'#f9a8d4'},
+      {min:40,max:60,emoji:'💓',title:'Les signes sont là',msg:'Les signes sont là ! Tu sembles bien accroché(e). L\'amour est peut-être en train de naître.',color:'#f472b6'},
+      {min:60,max:80,emoji:'❤️',title:'Tu es amoureux/amoureuse',msg:'Tu es clairement amoureux/amoureuse ! Ces sentiments sont forts et sincères. La question n\'est plus de savoir si tu l\'aimes !',color:'#fb7185'},
+      {min:80,max:101,emoji:'🔥',title:'Éperdument amoureux/amoureuse',msg:'Tu es éperdument, profondément amoureux/amoureuse ! Qu\'est-ce que tu attends pour le/la lui dire ?!',color:'#f43f5e'},
+    ],
+    questions:[
+      {q:'Est-ce que tu penses à cette personne plusieurs fois par jour ?',opts:['Non, rarement','Oui, de temps en temps','Souvent, plusieurs fois par jour','Constamment, c\'est difficile de penser à autre chose']},
+      {q:'Est-ce que tu souris spontanément quand tu reçois un message de cette personne ?',opts:['Non, c\'est neutre','Parfois selon le contexte','Souvent sans pouvoir m\'en empêcher','Toujours, un grand sourire bête incontrôlable']},
+      {q:'Est-ce que tu ressens des papillons en présence de cette personne ?',opts:['Non, pas spécialement','Légère excitation parfois','Souvent une nervosité agréable','Toujours, le cœur s\'emballe automatiquement']},
+      {q:'Est-ce que tu t\'intéresses sincèrement à ses goûts et passions ?',opts:['Peu, comme pour n\'importe qui','Oui, un peu plus qu\'à l\'habitude','Beaucoup, j\'essaie même de partager ses intérêts','Je mémorise tout et m\'intéresse passionnément à tout ce qui le/la touche']},
+      {q:'Est-ce que tu ressens de la jalousie quand tu le/la vois avec d\'autres personnes ?',opts:['Non, aucunement','Un léger inconfort parfois','Oui, un sentiment désagréable','Très jaloux/jalouse, ça me ronge vraiment']},
+      {q:'Est-ce que tu prends davantage soin de ton apparence avant de le/la voir ?',opts:['Non, je suis pareil(le) avec tout le monde','Un peu plus attentif/attentive','Oui, je m\'y prépare avec soin','Je passe un temps considérable uniquement pour lui/elle']},
+      {q:'Est-ce que tu rougis ou bégaies en sa présence ?',opts:['Non, je suis totalement à l\'aise','Parfois un peu intimidé(e)','Souvent, je perds mes mots','Toujours, c\'est ingérable tellement je suis gêné(e)']},
+      {q:'As-tu envie de partager tes joies et tes peines en premier avec cette personne ?',opts:['Non, j\'ai d\'autres personnes pour ça','Parfois il/elle est le/la premier(e) que j\'appelle','Souvent, il/elle est ma référence principale','Toujours, c\'est à lui/elle que je pense instinctivement']},
+      {q:'Est-ce que tu mémorises des détails que cette personne a mentionnés ?',opts:['Non, comme pour tout le monde','Quelques détails importants','Beaucoup de petits détails','Tout : anniversaires, plats préférés, anecdotes, habitudes']},
+      {q:'Si tu pouvais, passerais-tu toutes tes soirées avec cette personne ?',opts:['Non, j\'ai besoin de ma solitude','Parfois ce serait sympa','Oui, souvent','Sans hésitation, je voudrais ne jamais le/la quitter']},
+    ]
+  },
+  'vrais-amis':{
+    title:'Mes amis sont-ils vrais ?', emoji:'👥', accent:'#10b981',
+    tiers:[
+      {min:0,max:20,emoji:'🤝',title:'Vrai(e) ami(e)',msg:'Tu as de la chance ! Cette personne semble être un(e) vrai(e) ami(e) sincère et fiable. Chéris cette amitié.',color:'#34d399'},
+      {min:20,max:40,emoji:'😊',title:'Amitié correcte',msg:'Quelques petites imperfections normales dans toute amitié. Dans l\'ensemble, cette relation semble saine et bien intentionnée.',color:'#2dd4bf'},
+      {min:40,max:60,emoji:'🤨',title:'Amitié à questionner',msg:'Cette amitié mérite d\'être questionnée. Certains comportements ne sont pas ceux d\'un(e) vrai(e) ami(e).',color:'#facc15'},
+      {min:60,max:80,emoji:'⚠️',title:'Relation toxique',msg:'Attention ! Cette personne présente beaucoup de comportements toxiques. Prends du recul et protège-toi.',color:'#fb923c'},
+      {min:80,max:101,emoji:'🚩',title:'Faux/Fausse ami(e)',msg:'Ce n\'est pas un(e) vrai(e) ami(e). Tu mérites des personnes qui te respectent et te valorisent.',color:'#f87171'},
+    ],
+    questions:[
+      {q:'Quand tu traverses une période difficile, cet(te) ami(e) est-il/elle présent(e) ?',opts:['Toujours là pour moi sans que j\'aie besoin de demander','Disponible la plupart du temps','Rarement disponible quand j\'en ai besoin','Jamais vraiment là dans les moments importants']},
+      {q:'Est-ce que votre relation est équilibrée ?',opts:['Oui, c\'est très équilibré','Légèrement déséquilibré parfois','Je donne souvent plus que je ne reçois','Je donne tout et reçois très peu en retour']},
+      {q:'Cet(te) ami(e) parle-t-il/elle de toi dans ton dos ?',opts:['Jamais à ma connaissance','Un commentaire déplacé relayé une fois','Plusieurs fois on m\'a rapporté des choses','Régulièrement, je sais qu\'il/elle dit du mal de moi']},
+      {q:'Cet(te) ami(e) est-il/elle sincèrement heureux/heureuse de tes succès ?',opts:['Toujours, il/elle célèbre mes victoires','Généralement oui','Parfois une attitude froide lors de mes réussites','Jalousie évidente quand je réussis']},
+      {q:'Est-ce qu\'il/elle garde tes secrets ?',opts:['Toujours, je lui fais confiance à 100%','Généralement oui','Un secret a déjà été révélé une fois','Mes confidences finissent souvent par être connues']},
+      {q:'Cet(te) ami(e) te contacte-t-il/elle sans que tu sois à l\'initiative ?',opts:['Souvent, l\'initiative est bien partagée','Parfois de son côté','Rarement, c\'est presque toujours moi qui commence','Jamais, si je n\'écris pas, plus aucune nouvelle']},
+      {q:'Cet(te) ami(e) te critique-t-il/elle en public ?',opts:['Non, toujours respectueux/respectueuse et discret(e)','Parfois un commentaire maladroit','M\'a déjà critiqué(e) devant d\'autres personnes','Me rabaisse souvent en public']},
+      {q:'Cet(te) ami(e) te contacte-t-il/elle seulement quand il/elle a besoin de quelque chose ?',opts:['Non, il/elle prend des nouvelles naturellement','Parfois ses messages coïncident avec des demandes','Souvent, je remarque un schéma','Toujours, il/elle n\'appelle que pour demander un service']},
+      {q:'Est-ce que tu te sens à l\'aise de lui dire quand quelque chose te dérange ?',opts:['Totalement, on peut tout se dire','Avec quelques précautions','Difficile, j\'ai peur de sa réaction','Impossible, ça finit toujours mal']},
+      {q:'Dans l\'ensemble, cette amitié t\'apporte-t-elle du bien-être ou de la souffrance ?',opts:['Oui, c\'est une amitié épanouissante','Un peu des deux, mais globalement positive','Plus de souffrance que de bien-être','Cette amitié me pèse plus qu\'elle ne m\'apporte']},
+    ]
+  }
+};
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentQuiz = null;
+let currentQ = 0;
+let totalScore = 0;
+let selectedOpt = null;
+let savedResults = [];
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome(){ showPage('home'); }
+
+// ══════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════
+function startQuiz(slug){
+  currentQuiz = QUIZZES[slug];
+  currentQ = 0;
+  totalScore = 0;
+  selectedOpt = null;
+  renderQuestion();
+  showPage('quiz');
+}
+
+function renderQuestion(){
+  const quiz = currentQuiz;
+  const q = quiz.questions[currentQ];
+  const total = quiz.questions.length;
+  const progress = (currentQ / total) * 100;
+
+  document.getElementById('quiz-title-bar').textContent = quiz.emoji+' '+quiz.title;
+  document.getElementById('q-counter').textContent = (currentQ+1)+'/'+total;
+  document.getElementById('progress-bar').style.width = progress+'%';
+  document.getElementById('progress-bar').style.background = `linear-gradient(90deg,${quiz.accent}88,${quiz.accent})`;
+  document.getElementById('q-label').textContent = 'Question '+(currentQ+1);
+  document.getElementById('q-label').style.color = quiz.accent;
+  document.getElementById('q-text').textContent = q.q;
+
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+  q.opts.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.style.setProperty('--accent', quiz.accent);
+    btn.innerHTML = `<span class="radio"><svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></span>${opt}`;
+    btn.onclick = ()=>selectOpt(i);
+    list.appendChild(btn);
+  });
+
+  selectedOpt = null;
+  updateNextBtn();
+}
+
+function selectOpt(i){
+  selectedOpt = i;
+  document.querySelectorAll('.opt').forEach((el,idx)=>{
+    el.classList.toggle('selected', idx===i);
+    if(idx===i){
+      el.style.borderColor = currentQuiz.accent;
+      el.style.backgroundColor = currentQuiz.accent+'18';
+      el.style.boxShadow = `0 0 20px ${currentQuiz.accent}20`;
+    } else {
+      el.style.borderColor = '';
+      el.style.backgroundColor = '';
+      el.style.boxShadow = '';
+    }
+  });
+  updateNextBtn();
+}
+
+function updateNextBtn(){
+  const btn = document.getElementById('next-btn');
+  const isLast = currentQ === currentQuiz.questions.length - 1;
+  btn.textContent = isLast ? 'Voir mes résultats →' : 'Question suivante →';
+  if(selectedOpt !== null){
+    btn.classList.add('ready');
+    btn.style.background = `linear-gradient(135deg,${currentQuiz.accent}cc,${currentQuiz.accent})`;
+    btn.style.boxShadow = `0 4px 24px ${currentQuiz.accent}40`;
+    btn.style.color = '#fff';
+  } else {
+    btn.classList.remove('ready');
+    btn.style.background = 'rgba(255,255,255,0.05)';
+    btn.style.boxShadow = '';
+    btn.style.color = '#71717a';
+  }
+}
+
+function nextQuestion(){
+  if(selectedOpt===null) return;
+  const score = selectedOpt; // 0=0pts, 1=1pt, 2=2pts, 3=3pts
+  totalScore += score;
+
+  if(currentQ === currentQuiz.questions.length - 1){
+    const maxScore = currentQuiz.questions.length * 3;
+    const pct = Math.round((totalScore / maxScore) * 100);
+    showResults(pct);
+  } else {
+    const card = document.getElementById('quiz-card');
+    card.classList.add('out');
+    setTimeout(()=>{
+      currentQ++;
+      selectedOpt = null;
+      renderQuestion();
+      card.classList.remove('out');
+    }, 320);
+  }
+}
+
+// ══════════════════════════════════════════
+// RESULTS
+// ══════════════════════════════════════════
+function getTier(quiz, pct){
+  return quiz.tiers.find(t=>pct>=t.min && pct<t.max) || quiz.tiers[quiz.tiers.length-1];
+}
+
+function showResults(pct){
+  const quiz = currentQuiz;
+  const tier = getTier(quiz, pct);
+  const CIRC = 452.39;
+
+  // Save to local history
+  const id = 'id_'+Math.random().toString(36).slice(2,10);
+  savedResults.unshift({id, quizSlug:Object.keys(QUIZZES).find(k=>QUIZZES[k]===quiz), score:pct, title:quiz.title, emoji:quiz.emoji});
+
+  // Header
+  document.getElementById('res-header-title').textContent = quiz.emoji+' Résultats';
+  document.getElementById('res-quiz-title').textContent = quiz.title;
+
+  // Glow
+  document.getElementById('results-glow').style.background =
+    `radial-gradient(ellipse at 50% 30%,${tier.color}18 0%,transparent 60%)`;
+
+  // Circle gradient
+  document.getElementById('cg-stop1').style.stopColor = tier.color+'88';
+  document.getElementById('cg-stop2').style.stopColor = tier.color;
+
+  // Reset circle
+  const circle = document.getElementById('circle-prog');
+  circle.style.transition = 'none';
+  circle.style.strokeDashoffset = CIRC;
+
+  // Tier
+  const chip = document.getElementById('tier-chip');
+  chip.textContent = tier.emoji+' '+tier.title;
+  chip.style.color = tier.color;
+  chip.style.borderColor = tier.color+'40';
+  chip.style.backgroundColor = tier.color+'15';
+
+  document.getElementById('tier-msg').textContent = tier.msg;
+
+  // Score bar
+  document.getElementById('score-label').textContent = 'Ton score : '+pct+'%';
+  const fill = document.getElementById('score-bar-fill');
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  fill.style.background = `linear-gradient(90deg,${tier.color}66,${tier.color})`;
+
+  // Tier emojis
+  document.getElementById('tier-emojis').innerHTML = quiz.tiers.map(t=>`<span title="${t.title}">${t.emoji}</span>`).join('');
+
+  // Share pill
+  document.getElementById('share-id-text').textContent = '/share/'+id;
+
+  // Pct number
+  document.getElementById('pct-display').style.color = tier.color;
+  document.getElementById('pct-display').textContent = '0%';
+
+  showPage('results');
+
+  // Animate after paint
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    circle.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)';
+    circle.style.strokeDashoffset = CIRC*(1-pct/100);
+
+    fill.style.transition = 'width 1s ease-out 0.3s';
+    fill.style.width = pct+'%';
+
+    // Counter
+    const dur=1500, start=performance.now();
+    function step(now){
+      const p=Math.min((now-start)/dur,1);
+      const e=1-Math.pow(1-p,3);
+      document.getElementById('pct-display').textContent=Math.floor(e*pct)+'%';
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }));
+}
+
+function retryQuiz(){
+  currentQ=0; totalScore=0; selectedOpt=null;
+  renderQuestion();
+  showPage('quiz');
+}
+
+function handleShare(){
+  const btn = document.getElementById('share-btn');
+  const icon = document.getElementById('share-icon');
+  const label = document.getElementById('share-label');
+  label.textContent = 'Copié !';
+  btn.style.color = '#10b981';
+  icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+  setTimeout(()=>{ label.textContent='Partager'; btn.style.color=''; icon.innerHTML='<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>'; }, 2000);
+}
+
+// ══════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════
+function showStats(){
+  renderStats();
+  showPage('stats-page');
+}
+
+function renderStats(){
+  document.getElementById('stats-total').textContent = savedResults.length;
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = '';
+
+  Object.entries(QUIZZES).forEach(([slug,quiz])=>{
+    const results = savedResults.filter(r=>r.quizSlug===slug);
+    const count = results.length;
+    const avg = count>0 ? Math.round(results.reduce((s,r)=>s+r.score,0)/count) : 0;
+    const dist = [0,0,0,0,0];
+    results.forEach(r=>{ dist[Math.min(4,Math.floor(r.score/20))]++; });
+    const max = Math.max(...dist,1);
+    const tier = getTier(quiz,avg);
+    const labels = ['0–20%','20–40%','40–60%','60–80%','80–100%'];
+
+    const card = document.createElement('div');
+    card.className = 'stat-card glass';
+    card.innerHTML = `
+      <div class="stat-card-head">
+        <span class="stat-emoji">${quiz.emoji}</span>
+        <div>
+          <div class="stat-card-title">${quiz.title}</div>
+          <div class="stat-card-sub">${count} résultat${count!==1?'s':''}</div>
+        </div>
+      </div>
+      ${count>0 ? `
+        <div class="avg-row">
+          <span class="avg-label">Score moyen</span>
+          <span class="avg-val" style="color:${tier.color}">${avg}% ${tier.emoji}</span>
+        </div>
+        ${dist.map((v,i)=>`
+          <div class="dist-row">
+            <span class="dist-label">${labels[i]}</span>
+            <div class="dist-track"><div class="dist-fill" style="width:${(v/max)*100}%;background:${quiz.accent}cc"></div></div>
+            <span class="dist-count">${v}</span>
+          </div>
+        `).join('')}
+      ` : '<p class="no-data">Aucun résultat pour l\'instant</p>'}
+    `;
+    grid.appendChild(card);
+  });
+
+  const recentCard = document.getElementById('recent-card');
+  const recentList = document.getElementById('recent-list');
+  if(savedResults.length>0){
+    recentCard.style.display='block';
+    recentList.innerHTML = savedResults.slice(0,6).map(r=>{
+      const quiz = QUIZZES[r.quizSlug];
+      const tier = getTier(quiz, r.score);
+      return `<div class="recent-item" onclick="replayResult('${r.quizSlug}',${r.score})">
+        <div class="ri-left"><span class="ri-emoji">${r.emoji}</span><span class="ri-title">${r.title}</span></div>
+        <div class="ri-right">
+          <span class="ri-score" style="color:${tier.color}">${r.score}%</span>
+          <span>${tier.emoji}</span>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#3f3f46"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    recentCard.style.display='none';
+  }
+}
+
+function replayResult(slug, score){
+  currentQuiz = QUIZZES[slug];
+  showResults(score);
+}
+</script>
+</body>
+</html>
