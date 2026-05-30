@@ -105,50 +105,30 @@ export default function QuizClient({ quiz }: Props) {
           </div>
 
           {/* Options */}
-          <div className="space-y-3 mb-8">
+          <div className="space-y-3 mb-8" style={{ '--quiz-accent': quiz.accentColor } as React.CSSProperties}>
             {question.options.map((option, i) => {
               const isSelected = selected === i;
               return (
                 <button
                   key={i}
                   onClick={() => handleSelect(i)}
-                  className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 text-sm sm:text-base font-medium ${
-                    isSelected
-                      ? 'border-opacity-100 text-white'
-                      : 'border-white/8 text-zinc-400 hover:border-white/20 hover:text-zinc-200 bg-white/2 hover:bg-white/5'
-                  }`}
-                  style={
-                    isSelected
-                      ? {
-                          borderColor: quiz.accentColor,
-                          backgroundColor: `${quiz.accentColor}18`,
-                          color: 'white',
-                          boxShadow: `0 0 20px ${quiz.accentColor}20`,
-                        }
-                      : {}
-                  }
+                  className={`quiz-neuo${isSelected ? ' quiz-neuo-selected' : ''}`}
                 >
-                  <span className="flex items-center gap-3">
-                    <span
-                      className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-200`}
-                      style={
-                        isSelected
-                          ? { borderColor: quiz.accentColor, backgroundColor: quiz.accentColor }
-                          : { borderColor: 'rgba(255,255,255,0.2)' }
-                      }
-                    >
-                      {isSelected && (
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </span>
-                    {option.text}
+                  <span
+                    className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-200"
+                    style={
+                      isSelected
+                        ? { borderColor: quiz.accentColor, backgroundColor: quiz.accentColor }
+                        : { borderColor: 'rgba(255,255,255,0.2)' }
+                    }
+                  >
+                    {isSelected && (
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
                   </span>
+                  {option.text}
                 </button>
               );
             })}
