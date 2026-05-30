@@ -22,6 +22,36 @@ interface Answers {
 const STEPS = ['firstName', 'age', 'gender', 'situation', 'quizSlug'] as const;
 type Step = typeof STEPS[number];
 
+/** Inner markup shared by every glow-btn */
+function GlowInner({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <div className="btn-text">{children}</div>
+      <div className="a l" />
+      <div className="a r" />
+      <div className="a t" />
+      <div className="a b" />
+      <div className="btn-backdrop" />
+    </>
+  );
+}
+
+/** SVG filter required for the edge-glow effect */
+function SvgFilters() {
+  return (
+    <svg width="0" height="0" style={{ position: 'absolute' }}>
+      <defs>
+        <filter id="unopaq" colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15"
+          />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
 export default function OnboardingClient() {
   const router = useRouter();
   const [step, setStep] = useState<number>(0);
@@ -67,6 +97,8 @@ export default function OnboardingClient() {
 
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col relative overflow-hidden">
+      <SvgFilters />
+
       <div className="pointer-events-none fixed inset-0">
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-900/15 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-900/10 rounded-full blur-3xl" />
@@ -142,21 +174,20 @@ export default function OnboardingClient() {
                 </span>{' '}
                 ?
               </h2>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {QUIZ_CHOICES.map((choice) => (
                   <button
                     key={choice.slug}
                     onClick={() => advance(choice.slug)}
-                    className="glow-btn w-full flex items-center gap-4 px-5 py-4 text-left"
+                    className="glow-btn"
                   >
-                    <span className="text-2xl flex-shrink-0">{choice.emoji}</span>
-                    <span className="font-bold">{choice.label}</span>
-                    <svg
-                      className="w-4 h-4 ml-auto flex-shrink-0 opacity-60"
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <GlowInner>
+                      <span className="text-2xl flex-shrink-0">{choice.emoji}</span>
+                      <span className="font-semibold">{choice.label}</span>
+                      <svg className="w-4 h-4 ml-auto flex-shrink-0 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </GlowInner>
                   </button>
                 ))}
               </div>
@@ -199,9 +230,11 @@ function TextStep({
       <button
         onClick={() => onNext(local)}
         disabled={!local.trim()}
-        className="glow-btn w-full py-4"
+        className="glow-btn justify-center"
       >
-        Continuer →
+        <GlowInner>
+          <span className="w-full text-center font-bold">Continuer →</span>
+        </GlowInner>
       </button>
     </div>
   );
@@ -221,14 +254,16 @@ function ChoiceStep({
       <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
         {question}
       </h2>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         {options.map((opt) => (
           <button
             key={opt}
             onClick={() => onSelect(opt)}
-            className="glow-btn w-full px-5 py-4 text-left"
+            className="glow-btn"
           >
-            {opt}
+            <GlowInner>
+              <span className="font-semibold">{opt}</span>
+            </GlowInner>
           </button>
         ))}
       </div>
