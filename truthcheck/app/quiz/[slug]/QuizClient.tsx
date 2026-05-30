@@ -66,10 +66,33 @@ export default function QuizClient({ quiz }: Props) {
 
   const greeting = session.firstName ? `, ${session.firstName}` : '';
 
+  const isInfidelite = quiz.slug === 'infidelite';
+
   return (
-    <main className="min-h-screen bg-[#09090b] flex flex-col">
+    <main
+      className="min-h-screen flex flex-col"
+      style={
+        isInfidelite
+          ? {
+              backgroundImage: 'url(/infidelite-bg.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center top',
+              backgroundAttachment: 'fixed',
+            }
+          : { backgroundColor: '#09090b' }
+      }
+    >
+      {/* Dark overlay for infidelite */}
+      {isInfidelite && (
+        <div className="fixed inset-0 z-0 pointer-events-none" style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(9,9,11,0.75) 40%, rgba(9,9,11,0.92) 100%)',
+        }} />
+      )}
+
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-[#09090b]/80 backdrop-blur-md border-b border-white/5">
+      <header className="sticky top-0 z-20 backdrop-blur-md border-b border-white/5"
+        style={{ background: isInfidelite ? 'rgba(9,9,11,0.6)' : 'rgba(9,9,11,0.8)' }}
+      >
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link
             href="/onboarding"
@@ -105,7 +128,7 @@ export default function QuizClient({ quiz }: Props) {
       </header>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
         <div
           className={`w-full max-w-2xl transition-all duration-300 ${
             transitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
