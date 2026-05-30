@@ -301,8 +301,24 @@ export default function ResultsClient({ quiz }: Props) {
                   <button
                     onClick={handleStripeCheckout}
                     disabled={isCheckingOut}
-                    className="w-full py-4 rounded-2xl font-black text-white text-lg mb-3 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
+                    className="w-full font-black text-white text-base mb-3 disabled:opacity-50"
+                    style={{
+                      fontSize: '16px',
+                      padding: '.95rem 1rem',
+                      cursor: isCheckingOut ? 'not-allowed' : 'pointer',
+                      transform: 'perspective(200px) rotateX(15deg)',
+                      borderRadius: '5px',
+                      border: 'none',
+                      borderBottom: '2px solid rgba(70,135,252,1)',
+                      background: 'linear-gradient(0deg, rgba(63,94,251,1) 0%, rgba(70,135,252,1) 100%)',
+                      boxShadow: 'rgba(63,94,251,.2) 0px 40px 29px 0px',
+                      willChange: 'transform',
+                      transition: 'all .3s',
+                    }}
+                    onMouseEnter={e => { if (!isCheckingOut) (e.currentTarget as HTMLButtonElement).style.transform = 'perspective(180px) rotateX(30deg) translateY(2px)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'perspective(200px) rotateX(15deg)'; }}
+                    onMouseDown={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'perspective(170px) rotateX(36deg) translateY(5px)'; }}
+                    onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'perspective(180px) rotateX(30deg) translateY(2px)'; }}
                   >
                     {isCheckingOut ? (
                       <span className="flex items-center justify-center gap-2">
