@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const QUIZ_CHOICES = [
-  { slug: 'infidelite', label: 'Mon/Ma partenaire me trompe ?', emoji: '💔' },
-  { slug: 'adopte',     label: 'Suis-je adopté(e) ?',           emoji: '🔍' },
-  { slug: 'amoureux',  label: 'Suis-je vraiment amoureux ?',     emoji: '💫' },
-  { slug: 'vrais-amis',label: 'Sont-ils mes vrais amis ?',        emoji: '🫂' },
-  { slug: 'orientation',label: 'Quelle est mon orientation ?',   emoji: '🌈' },
+  { slug: 'infidelite',  label: 'Mon/Ma partenaire me trompe ?', emoji: '💔' },
+  { slug: 'adopte',      label: 'Suis-je adopté(e) ?',           emoji: '🔍' },
+  { slug: 'amoureux',   label: 'Suis-je vraiment amoureux ?',     emoji: '💫' },
+  { slug: 'vrais-amis', label: 'Sont-ils mes vrais amis ?',        emoji: '🫂' },
+  { slug: 'orientation', label: 'Quelle est mon orientation ?',   emoji: '🌈' },
 ];
 
 interface Answers {
@@ -49,7 +49,6 @@ export default function OnboardingClient() {
         setTransitioning(false);
       }, 300);
     } else {
-      // Save session and go to quiz
       fetch('/api/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,7 +63,7 @@ export default function OnboardingClient() {
     advance(value.trim());
   }
 
-  const progress = ((step) / STEPS.length) * 100;
+  const progress = (step / STEPS.length) * 100;
 
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col relative overflow-hidden">
@@ -75,12 +74,10 @@ export default function OnboardingClient() {
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 pt-6">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-black">
-            <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
-            <span className="text-white">Secret</span>
-          </span>
-        </div>
+        <span className="text-xl font-black">
+          <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
+          <span className="text-white">Secret</span>
+        </span>
         <span className="text-xs text-zinc-600">{step + 1} / {STEPS.length}</span>
       </header>
 
@@ -89,10 +86,7 @@ export default function OnboardingClient() {
         <div className="h-1 bg-white/5 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${progress}%`,
-              background: 'linear-gradient(90deg, #8b5cf6, #ec4899)',
-            }}
+            style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #8b5cf6, #ec4899)' }}
           />
         </div>
       </div>
@@ -119,7 +113,6 @@ export default function OnboardingClient() {
             <ChoiceStep
               question={`Quel âge as-tu, ${answers.firstName || 'toi'} ?`}
               options={['- de 18 ans', '18–24 ans', '25–34 ans', '35–44 ans', '45 ans et +']}
-              accent="#8b5cf6"
               onSelect={advance}
             />
           )}
@@ -127,7 +120,6 @@ export default function OnboardingClient() {
             <ChoiceStep
               question="Tu t'identifies comme ?"
               options={['Un homme', 'Une femme', 'Non-binaire', 'Je préfère ne pas dire']}
-              accent="#ec4899"
               onSelect={advance}
             />
           )}
@@ -135,7 +127,6 @@ export default function OnboardingClient() {
             <ChoiceStep
               question="Quelle est ta situation actuelle ?"
               options={['En couple', 'Célibataire', 'Compliqué', 'Je ne sais pas']}
-              accent="#f43f5e"
               onSelect={advance}
             />
           )}
@@ -145,20 +136,25 @@ export default function OnboardingClient() {
                 Dernière question
               </p>
               <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
-                Pourquoi veux-tu utiliser <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">UrSecret</span> ?
+                Pourquoi veux-tu utiliser{' '}
+                <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
+                  UrSecret
+                </span>{' '}
+                ?
               </h2>
-              <div className="space-y-3">
+              <div className="flex flex-col gap-4">
                 {QUIZ_CHOICES.map((choice) => (
                   <button
                     key={choice.slug}
                     onClick={() => advance(choice.slug)}
-                    className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl border border-white/8 bg-white/3 hover:bg-white/8 hover:border-violet-500/40 transition-all duration-200 text-left group"
+                    className="glow-btn w-full flex items-center gap-4 px-5 py-4 text-left"
                   >
-                    <span className="text-2xl">{choice.emoji}</span>
-                    <span className="text-white font-medium group-hover:text-violet-200 transition-colors">
-                      {choice.label}
-                    </span>
-                    <svg className="w-4 h-4 text-zinc-700 group-hover:text-violet-400 ml-auto transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span className="text-2xl flex-shrink-0">{choice.emoji}</span>
+                    <span className="font-bold">{choice.label}</span>
+                    <svg
+                      className="w-4 h-4 ml-auto flex-shrink-0 opacity-60"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -198,13 +194,12 @@ function TextStep({
         onKeyDown={(e) => { if (e.key === 'Enter') onNext(local); }}
         placeholder={placeholder}
         maxLength={40}
-        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg placeholder-zinc-600 outline-none focus:border-violet-500/60 focus:bg-white/8 transition-all mb-4"
+        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg placeholder-zinc-600 outline-none focus:border-violet-500/60 focus:bg-white/8 transition-all mb-6"
       />
       <button
         onClick={() => onNext(local)}
         disabled={!local.trim()}
-        className="w-full py-4 rounded-2xl font-bold text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-        style={{ background: local.trim() ? 'linear-gradient(135deg, #8b5cf6, #ec4899)' : undefined, backgroundColor: local.trim() ? undefined : 'rgba(255,255,255,0.05)' }}
+        className="glow-btn w-full py-4"
       >
         Continuer →
       </button>
@@ -215,12 +210,10 @@ function TextStep({
 function ChoiceStep({
   question,
   options,
-  accent,
   onSelect,
 }: {
   question: string;
   options: string[];
-  accent: string;
   onSelect: (v: string) => void;
 }) {
   return (
@@ -228,17 +221,12 @@ function ChoiceStep({
       <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
         {question}
       </h2>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-4">
         {options.map((opt) => (
           <button
             key={opt}
             onClick={() => onSelect(opt)}
-            className="w-full px-5 py-4 rounded-2xl border border-white/8 bg-white/3 hover:bg-white/8 transition-all duration-200 text-left font-medium text-zinc-300 hover:text-white"
-            style={{
-              '--hover-border': `${accent}50`,
-            } as React.CSSProperties}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = `${accent}50`; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
+            className="glow-btn w-full px-5 py-4 text-left"
           >
             {opt}
           </button>
