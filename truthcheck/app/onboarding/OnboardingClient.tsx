@@ -87,6 +87,12 @@ export default function OnboardingClient() {
         setTransitioning(false);
       }, 300);
     } else {
+      sessionStorage.setItem('ursecret_session', JSON.stringify({
+        firstName: newAnswers.firstName,
+        age: newAnswers.age,
+        gender: newAnswers.gender,
+        situation: newAnswers.situation,
+      }));
       fetch('/api/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

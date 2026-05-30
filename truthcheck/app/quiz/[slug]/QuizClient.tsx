@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import type { Quiz } from '@/lib/quizzes';
+import type { Quiz, QuizSession } from '@/lib/quizzes';
+import { selectQuestions } from '@/lib/quizzes';
 
 interface Props {
   quiz: Quiz;
@@ -11,14 +12,29 @@ interface Props {
 
 export default function QuizClient({ quiz }: Props) {
   const router = useRouter();
+  const [session, setSession] = useState<QuizSession>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
 
-  const question = quiz.questions[currentIndex];
-  const progress = (currentIndex / quiz.questions.length) * 100;
-  const isLast = currentIndex === quiz.questions.length - 1;
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('ursecret_session');
+      if (raw) setSession(JSON.parse(raw));
+    } catch {
+      // sessionStorage unavailable
+    }
+  }, []);
+
+  const questions = useMemo(
+    () => selectQuestions(quiz.questions, session),
+    [quiz.questions, session]
+  );
+
+  const question = questions[currentIndex];
+  const progress = (currentIndex / questions.length) * 100;
+  const isLast = currentIndex === questions.length - 1;
 
   function handleSelect(optionIndex: number) {
     if (transitioning) return;
@@ -34,7 +50,7 @@ export default function QuizClient({ quiz }: Props) {
 
     setTimeout(() => {
       if (isLast) {
-        const maxScore = quiz.questions.length * 3;
+        const maxScore = questions.length * 3;
         const percentage = Math.round((newTotal / maxScore) * 100);
         router.push(`/quiz/${quiz.slug}/results?score=${percentage}`);
       } else {
@@ -45,6 +61,10 @@ export default function QuizClient({ quiz }: Props) {
       }
     }, 350);
   }
+
+  if (!question) return null;
+
+  const greeting = session.firstName ? `, ${session.firstName}` : '';
 
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col">
@@ -68,7 +88,7 @@ export default function QuizClient({ quiz }: Props) {
           </div>
 
           <span className="text-sm text-zinc-500 tabular-nums">
-            {currentIndex + 1}/{quiz.questions.length}
+            {currentIndex + 1}/{questions.length}
           </span>
         </div>
 
@@ -97,7 +117,7 @@ export default function QuizClient({ quiz }: Props) {
               className="text-xs font-semibold uppercase tracking-widest mb-4"
               style={{ color: quiz.accentColor }}
             >
-              Question {currentIndex + 1}
+              Question {currentIndex + 1}{greeting}
             </div>
             <p className="text-xl sm:text-2xl font-semibold text-white leading-relaxed">
               {question.text}

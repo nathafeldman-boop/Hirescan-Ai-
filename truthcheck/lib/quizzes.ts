@@ -6,6 +6,18 @@ export interface QuizOption {
 export interface QuizQuestion {
   text: string;
   options: QuizOption[];
+  tags?: {
+    genders?: string[];
+    situations?: string[];
+    ageGroups?: string[];
+  };
+}
+
+export interface QuizSession {
+  firstName?: string;
+  age?: string;
+  gender?: string;
+  situation?: string;
 }
 
 export interface ResultTier {
@@ -312,6 +324,151 @@ const quizzes: Quiz[] = [
           { text: 'Oui, mais avec quelques petits doutes', score: 1 },
           { text: 'De moins en moins, j\'ai du mal à le/la croire', score: 2 },
           { text: 'Non, la confiance est brisée', score: 3 },
+        ],
+      },
+      {
+        text: 'Ta partenaire a-t-elle des conversations régulières avec un ami masculin particulier en dehors de ta présence ?',
+        options: [
+          { text: 'Non, ses amitiés sont transparentes', score: 0 },
+          { text: 'Elle a des amis garçons mais ça me semble normal', score: 1 },
+          { text: 'Il y en a un qu\'elle mentionne souvent sans que je le connaisse bien', score: 2 },
+          { text: 'Elle cache des échanges fréquents avec un garçon en particulier', score: 3 },
+        ],
+        tags: { genders: ['Un homme'] },
+      },
+      {
+        text: 'Ton partenaire a-t-il des échanges fréquents avec une collègue féminine en dehors des horaires de travail ?',
+        options: [
+          { text: 'Non, ses contacts professionnels restent dans le cadre du travail', score: 0 },
+          { text: 'Parfois, mais dans un cadre professionnel', score: 1 },
+          { text: 'Il y a une collègue dont il parle souvent et à qui il écrit tard', score: 2 },
+          { text: 'Il cache clairement ses échanges avec une personne du travail', score: 3 },
+        ],
+        tags: { genders: ['Une femme'] },
+      },
+      {
+        text: 'Y a-t-il une personne dans l\'entourage de ton/ta partenaire dont la présence te dérange intuitivement ?',
+        options: [
+          { text: 'Non, je me sens bien avec tous ses proches', score: 0 },
+          { text: 'Un léger inconfort sans raison précise', score: 1 },
+          { text: 'Une personne en particulier dont je ne suis pas rassuré(e)', score: 2 },
+          { text: 'Oui, et mon instinct me dit clairement que quelque chose se passe', score: 3 },
+        ],
+        tags: { genders: ['Non-binaire', 'Je préfère ne pas dire'] },
+      },
+      {
+        text: 'Avez-vous arrêté de vous raconter les détails de votre journée comme vous le faisiez avant ?',
+        options: [
+          { text: 'Non, on se raconte toujours tout', score: 0 },
+          { text: 'Un peu moins, mais c\'est normal après un moment', score: 1 },
+          { text: 'Les conversations sont devenues plus superficielles', score: 2 },
+          { text: 'On ne partage presque plus rien sur nos journées', score: 3 },
+        ],
+        tags: { situations: ['En couple'] },
+      },
+      {
+        text: 'Ton/ta partenaire annule-t-il/elle des plans communs plus souvent ces derniers temps ?',
+        options: [
+          { text: 'Non, il/elle est toujours là comme prévu', score: 0 },
+          { text: 'Quelques fois, avec des raisons valables', score: 1 },
+          { text: 'Régulièrement, avec des explications vagues', score: 2 },
+          { text: 'Systématiquement, et les excuses changent à chaque fois', score: 3 },
+        ],
+        tags: { situations: ['En couple'] },
+      },
+      {
+        text: 'Les tensions actuelles dans votre relation te semblent-elles liées à une présence extérieure ?',
+        options: [
+          { text: 'Non, nos tensions viennent de nous deux', score: 0 },
+          { text: 'J\'ai parfois ce soupçon mais sans preuve', score: 1 },
+          { text: 'Quelques signes me laissent penser qu\'il y a quelqu\'un d\'autre', score: 2 },
+          { text: 'J\'en suis presque certain(e), les indices s\'accumulent', score: 3 },
+        ],
+        tags: { situations: ['Compliqué'] },
+      },
+      {
+        text: 'La personne que tu fréquentes adopte-t-elle des comportements que tu ne comprends pas ou qui te semblent suspects ?',
+        options: [
+          { text: 'Non, tout me semble clair et honnête', score: 0 },
+          { text: 'Quelques zones d\'ombre sans gravité', score: 1 },
+          { text: 'Des comportements que j\'ai du mal à m\'expliquer', score: 2 },
+          { text: 'Des attitudes clairement suspectes qui me préoccupent', score: 3 },
+        ],
+        tags: { situations: ['Célibataire', 'Je ne sais pas'] },
+      },
+      {
+        text: 'Ton/ta partenaire a-t-il/elle radicalement changé de cercle d\'amis ou de fréquentations ces derniers mois ?',
+        options: [
+          { text: 'Non, ses amis sont les mêmes', score: 0 },
+          { text: 'Il/Elle a de nouveaux amis mais ça me paraît normal', score: 1 },
+          { text: 'Un groupe entier de nouvelles fréquentations que je ne connais pas', score: 2 },
+          { text: 'Il/Elle a délaissé ses anciens amis pour des gens que je n\'ai jamais rencontrés', score: 3 },
+        ],
+        tags: { ageGroups: ['- de 18 ans', '18–24 ans'] },
+      },
+      {
+        text: 'Est-ce que le travail sert souvent de prétexte pour des absences prolongées et imprévues ?',
+        options: [
+          { text: 'Non, son travail a des horaires stables', score: 0 },
+          { text: 'Occasionnellement, mais les heures sup\' font partie de son métier', score: 1 },
+          { text: 'De plus en plus souvent, les urgences professionnelles se multiplient', score: 2 },
+          { text: 'Le travail justifie des absences à toutes heures, c\'est devenu un alibi permanent', score: 3 },
+        ],
+        tags: { ageGroups: ['25–34 ans'] },
+      },
+      {
+        text: 'Ton/ta partenaire a-t-il/elle renoué avec d\'anciens amis ou un ex sans t\'en informer spontanément ?',
+        options: [
+          { text: 'Non, il/elle me parle ouvertement de ses retrouvailles', score: 0 },
+          { text: 'Il/Elle me l\'a dit après coup, mais sans se cacher', score: 1 },
+          { text: 'J\'ai appris des retrouvailles par hasard, pas par lui/elle', score: 2 },
+          { text: 'Je découvre régulièrement des contacts anciens qu\'il/elle me cache délibérément', score: 3 },
+        ],
+        tags: { ageGroups: ['35–44 ans', '45 ans et +'] },
+      },
+      {
+        text: 'Est-ce que ton/ta partenaire répond différemment à ses messages quand tu es dans la pièce ?',
+        options: [
+          { text: 'Non, il/elle répond normalement devant moi', score: 0 },
+          { text: 'Il/Elle attend parfois d\'être seul(e), mais ce n\'est pas systématique', score: 1 },
+          { text: 'Souvent, il/elle prend ses distances pour répondre', score: 2 },
+          { text: 'Il/Elle sort de la pièce ou cache son écran dès qu\'un message arrive', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu surpris(e) ton/ta partenaire à mentir sur un détail qui semblait sans importance ?',
+        options: [
+          { text: 'Jamais, il/elle est toujours cohérent(e)', score: 0 },
+          { text: 'Une fois, mais c\'était vraiment anodin', score: 1 },
+          { text: 'Plusieurs fois, et les explications ne collent pas', score: 2 },
+          { text: 'Les petits mensonges se multiplient, ce qui me fait douter de tout', score: 3 },
+        ],
+      },
+      {
+        text: 'Est-ce que ton/ta partenaire exprime plus d\'irritabilité envers toi sans raison apparente ?',
+        options: [
+          { text: 'Non, son humeur reste stable', score: 0 },
+          { text: 'Un peu plus stressé(e) qu\'avant, mais ça reste gérable', score: 1 },
+          { text: 'Oui, des disputes pour des riens sont devenues fréquentes', score: 2 },
+          { text: 'Il/Elle semble chercher les occasions pour me faire des reproches', score: 3 },
+        ],
+      },
+      {
+        text: 'Ressens-tu que ton/ta partenaire est moins investi(e) dans la construction de votre avenir commun ?',
+        options: [
+          { text: 'Non, on projette encore beaucoup ensemble', score: 0 },
+          { text: 'Un léger manque d\'enthousiasme, mais rien d\'alarmant', score: 1 },
+          { text: 'Il/Elle évite de parler du futur ou change de sujet', score: 2 },
+          { text: 'Il/Elle parle du futur au singulier, plus au pluriel', score: 3 },
+        ],
+      },
+      {
+        text: 'Est-ce que ton/ta partenaire parle beaucoup d\'une personne en particulier, positivement ou négativement ?',
+        options: [
+          { text: 'Non, aucun prénom qui revient de façon obsessionnelle', score: 0 },
+          { text: 'Un collègue ou ami mentionné normalement', score: 1 },
+          { text: 'Un prénom revient souvent dans les conversations', score: 2 },
+          { text: 'Il/Elle parle constamment de cette personne, même quand ça n\'a pas de rapport', score: 3 },
         ],
       },
     ],
@@ -639,6 +796,148 @@ const quizzes: Quiz[] = [
           { text: 'Je suis convaincu(e) que je suis adopté(e)', score: 3 },
         ],
       },
+      {
+        text: 'Y a-t-il des histoires familiales que ton père raconte différemment de ta mère ?',
+        options: [
+          { text: 'Non, leurs récits se complètent normalement', score: 0 },
+          { text: 'De légères différences de mémoire, comme dans toutes les familles', score: 1 },
+          { text: 'Des contradictions sur certains événements précis', score: 2 },
+          { text: 'Des versions très différentes, surtout sur les événements entourant ma naissance', score: 3 },
+        ],
+        tags: { genders: ['Un homme'] },
+      },
+      {
+        text: 'As-tu des traits physiques ou de personnalité que ni ta mère ni ton père ne partagent ?',
+        options: [
+          { text: 'Non, je me reconnais dans les deux', score: 0 },
+          { text: 'Quelques différences, mais c\'est le cas dans beaucoup de familles', score: 1 },
+          { text: 'Je ressemble à un côté de la famille mais pas à l\'autre', score: 2 },
+          { text: 'Je ne ressemble vraiment à aucun des deux, ni physiquement ni de caractère', score: 3 },
+        ],
+        tags: { genders: ['Une femme'] },
+      },
+      {
+        text: 'As-tu entamé des recherches indépendantes sur tes origines ou envisages-tu de le faire ?',
+        options: [
+          { text: 'Non, je n\'ai pas ce besoin', score: 0 },
+          { text: 'J\'y pense parfois mais sans y avoir donné suite', score: 1 },
+          { text: 'J\'ai commencé à chercher quelques informations discrètement', score: 2 },
+          { text: 'J\'ai déjà entrepris des recherches sérieuses', score: 3 },
+        ],
+        tags: { situations: ['Célibataire'] },
+      },
+      {
+        text: 'Ton/ta partenaire ou ses proches ont-ils jamais remarqué que tu ne ressembles pas à ta famille ?',
+        options: [
+          { text: 'Non, personne n\'en a jamais fait la remarque', score: 0 },
+          { text: 'On a commenté une différence sans y attacher d\'importance', score: 1 },
+          { text: 'Plusieurs personnes l\'ont remarqué, ce qui m\'a interpellé', score: 2 },
+          { text: 'C\'est une remarque récurrente dans mon entourage', score: 3 },
+        ],
+        tags: { situations: ['En couple', 'Compliqué'] },
+      },
+      {
+        text: 'Tes parents réagissent-ils de façon inhabituelle quand tu poses des questions directes sur ta naissance ?',
+        options: [
+          { text: 'Non, ils répondent facilement', score: 0 },
+          { text: 'Ils sont parfois évasifs mais pas plus que sur d\'autres sujets', score: 1 },
+          { text: 'Ils changent de sujet ou deviennent mal à l\'aise', score: 2 },
+          { text: 'Ils s\'agitent ou refusent catégoriquement d\'en parler', score: 3 },
+        ],
+        tags: { ageGroups: ['- de 18 ans', '18–24 ans'] },
+      },
+      {
+        text: 'As-tu eu facilement accès à tous tes documents d\'état civil originaux comme ton acte de naissance ?',
+        options: [
+          { text: 'Oui, sans aucune difficulté', score: 0 },
+          { text: 'Un peu de délai, mais rien d\'anormal', score: 1 },
+          { text: 'On me les a donnés avec réticence ou de façon incomplète', score: 2 },
+          { text: 'Ces documents sont introuvables ou on refuse de me les montrer', score: 3 },
+        ],
+        tags: { ageGroups: ['25–34 ans', '35–44 ans'] },
+      },
+      {
+        text: 'As-tu découvert tardivement des informations sur ton passé que ta famille t\'avait cachées ?',
+        options: [
+          { text: 'Non, je ne pense pas avoir de secrets de famille majeurs', score: 0 },
+          { text: 'Des informations mineures découvertes par hasard', score: 1 },
+          { text: 'Des révélations surprenantes sur mes origines ou mon histoire', score: 2 },
+          { text: 'Des informations importantes cachées intentionnellement pendant des années', score: 3 },
+        ],
+        tags: { ageGroups: ['45 ans et +'] },
+      },
+      {
+        text: 'As-tu trouvé chez toi des documents rangés à l\'écart ou apparemment dissimulés ?',
+        options: [
+          { text: 'Non, les documents de famille sont accessibles', score: 0 },
+          { text: 'Des papiers anciens rangés normalement', score: 1 },
+          { text: 'Des enveloppes ou dossiers auxquels je n\'avais pas accès', score: 2 },
+          { text: 'Des documents clairement cachés que j\'ai découverts par accident', score: 3 },
+        ],
+      },
+      {
+        text: 'Y a-t-il des membres de la famille dont on évite soigneusement de parler ?',
+        options: [
+          { text: 'Non, tous les membres sont mentionnés librement', score: 0 },
+          { text: 'Un parent éloigné dont on parle peu sans raison claire', score: 1 },
+          { text: 'Un sujet tabou autour de certains membres de la famille', score: 2 },
+          { text: 'Des proches dont le nom provoque un malaise évident quand je l\'évoque', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu un groupe sanguin incompatible avec celui de tes deux parents ?',
+        options: [
+          { text: 'Non, ou je n\'ai jamais vérifié et ça ne m\'inquiète pas', score: 0 },
+          { text: 'Je ne connais pas les groupes sanguins de mes parents', score: 1 },
+          { text: 'Il y a une incompatibilité théorique que j\'ai remarquée', score: 2 },
+          { text: 'Mon groupe sanguin est biologiquement impossible avec les deux parents déclarés', score: 3 },
+        ],
+      },
+      {
+        text: 'Des membres de ta famille ont-ils déjà commenté combien tu es différent(e) de tous les autres ?',
+        options: [
+          { text: 'Non, jamais de façon significative', score: 0 },
+          { text: 'Des taquineries légères sur une ressemblance lointaine', score: 1 },
+          { text: 'Des remarques régulières sur combien je suis différent(e)', score: 2 },
+          { text: 'Des commentaires récurrents sur le fait que je ne ressemble à personne dans la famille', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu réalisé ou envisages-tu de faire un test ADN pour en savoir plus sur tes origines ?',
+        options: [
+          { text: 'Non, je n\'en ressens pas le besoin', score: 0 },
+          { text: 'J\'y ai pensé par curiosité sans lien avec un doute profond', score: 1 },
+          { text: 'J\'envisage sérieusement d\'en faire un pour vérifier', score: 2 },
+          { text: 'Je l\'ai fait ou je suis en attente de résultats', score: 3 },
+        ],
+      },
+      {
+        text: 'N\'as-tu jamais vu de photos de ta mère visiblement enceinte de toi dans les albums de famille ?',
+        options: [
+          { text: 'Si, il y en a plusieurs', score: 0 },
+          { text: 'Il y en a peu, mais les grossesses étaient peu photographiées à l\'époque', score: 1 },
+          { text: 'Je n\'en ai pas trouvé malgré mes recherches', score: 2 },
+          { text: 'Aucune photo de grossesse n\'existe et on change de sujet quand j\'en parle', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu des prédispositions médicales héréditaires absentes de tout l\'arbre familial connu ?',
+        options: [
+          { text: 'Non, mon profil médical est cohérent avec ma famille', score: 0 },
+          { text: 'Quelques petites différences sans caractère alarmant', score: 1 },
+          { text: 'Des prédispositions qui ne s\'expliquent pas par l\'hérédité connue', score: 2 },
+          { text: 'Des conditions médicales héréditaires absentes de tout l\'arbre familial', score: 3 },
+        ],
+      },
+      {
+        text: 'Tes grands-parents et oncles/tantes traitent-ils tous les enfants de la famille exactement de la même façon ?',
+        options: [
+          { text: 'Oui, tout le monde est traité pareil', score: 0 },
+          { text: 'De légères préférences naturelles selon les affinités', score: 1 },
+          { text: 'Je ressens parfois que je suis traité(e) un peu différemment', score: 2 },
+          { text: 'La différence de traitement entre moi et les autres est notable et inexpliquée', score: 3 },
+        ],
+      },
     ],
     resultTiers: [
       {
@@ -962,6 +1261,148 @@ const quizzes: Quiz[] = [
           { text: 'Parfois ce serait sympa', score: 1 },
           { text: 'Oui, souvent', score: 2 },
           { text: 'Sans hésitation, je voudrais ne jamais le/la quitter', score: 3 },
+        ],
+      },
+      {
+        text: 'Deviens-tu facilement jaloux/jalouse quand d\'autres personnes s\'approchent d\'elle ?',
+        options: [
+          { text: 'Non, je lui fais pleinement confiance', score: 0 },
+          { text: 'Une légère pointe de jalousie parfois, vite oubliée', score: 1 },
+          { text: 'Oui, et ça m\'occupe l\'esprit un moment', score: 2 },
+          { text: 'La jalousie est devenue envahissante', score: 3 },
+        ],
+        tags: { genders: ['Un homme'] },
+      },
+      {
+        text: 'Ressens-tu une pointe d\'inquiétude quand il est entouré d\'autres filles ?',
+        options: [
+          { text: 'Non, ça ne me dérange absolument pas', score: 0 },
+          { text: 'Légèrement, mais je sais que c\'est peu rationnel', score: 1 },
+          { text: 'Oui, ça me préoccupe et j\'y pense plus qu\'il ne le faudrait', score: 2 },
+          { text: 'Je cherche à contrôler ses fréquentations féminines', score: 3 },
+        ],
+        tags: { genders: ['Une femme'] },
+      },
+      {
+        text: 'Depuis que vous êtes ensemble, ton attachement pour lui/elle a-t-il grandi plutôt que de s\'estomper ?',
+        options: [
+          { text: 'Non, la passion du début a naturellement diminué', score: 0 },
+          { text: 'C\'est stable, ni en hausse ni en baisse', score: 1 },
+          { text: 'Oui, je l\'apprécie davantage au fil du temps', score: 2 },
+          { text: 'Mon attachement est de plus en plus fort, parfois ça me surprend moi-même', score: 3 },
+        ],
+        tags: { situations: ['En couple'] },
+      },
+      {
+        text: 'Espères-tu secrètement que cette personne remarque tes efforts pour être présent(e) ?',
+        options: [
+          { text: 'Non, j\'agis naturellement sans arrière-pensée', score: 0 },
+          { text: 'Parfois, j\'espère qu\'elle voit que je fais attention', score: 1 },
+          { text: 'Oui, j\'adapte mes actions pour qu\'elle remarque', score: 2 },
+          { text: 'Je calcule souvent mes comportements pour créer une impression sur elle', score: 3 },
+        ],
+        tags: { situations: ['Célibataire'] },
+      },
+      {
+        text: 'Malgré les complications de votre situation, reviens-tu naturellement vers cette personne ?',
+        options: [
+          { text: 'Non, je m\'en éloigne quand ça devient compliqué', score: 0 },
+          { text: 'Je reviens parfois, mais sans certitude', score: 1 },
+          { text: 'Oui, quelque chose me ramène toujours vers elle', score: 2 },
+          { text: 'Même quand je décide de m\'éloigner, je ne tiens pas longtemps', score: 3 },
+        ],
+        tags: { situations: ['Compliqué'] },
+      },
+      {
+        text: 'Est-ce que cette personne te semble différente des autres avec qui tu as été avant ?',
+        options: [
+          { text: 'Non, c\'est une relation normale comme les autres', score: 0 },
+          { text: 'Un peu différente, mais peut-être juste parce que c\'est récent', score: 1 },
+          { text: 'Oui, quelque chose est clairement différent sans que je sache l\'expliquer', score: 2 },
+          { text: 'C\'est incomparable avec tout ce que j\'ai vécu avant', score: 3 },
+        ],
+        tags: { ageGroups: ['- de 18 ans', '18–24 ans'] },
+      },
+      {
+        text: 'Cette personne réveille-t-elle en toi des émotions que tu pensais avoir perdues ?',
+        options: [
+          { text: 'Non, rien de particulier', score: 0 },
+          { text: 'Quelques émotions agréables mais rien de révélateur', score: 1 },
+          { text: 'Oui, elle me fait ressentir des choses que je ne ressentais plus', score: 2 },
+          { text: 'Elle a réveillé une partie de moi que je croyais définitivement endormie', score: 3 },
+        ],
+        tags: { ageGroups: ['35–44 ans', '45 ans et +'] },
+      },
+      {
+        text: 'T\'intéresses-tu sincèrement à ce qui la/le préoccupe, même quand ça ne te concerne pas directement ?',
+        options: [
+          { text: 'Non, je peine à m\'intéresser à ses soucis', score: 0 },
+          { text: 'Parfois, quand le sujet m\'interpelle aussi', score: 1 },
+          { text: 'Oui, j\'essaie de vraiment comprendre ce qu\'elle vit', score: 2 },
+          { text: 'Ses préoccupations deviennent les miennes automatiquement', score: 3 },
+        ],
+      },
+      {
+        text: 'Te projettes-tu dans un avenir partagé avec cette personne, même vaguement ?',
+        options: [
+          { text: 'Non, je vis le moment présent sans me projeter', score: 0 },
+          { text: 'Parfois une image fugace, sans y attacher d\'importance', score: 1 },
+          { text: 'Oui, des scénarios futurs me viennent naturellement', score: 2 },
+          { text: 'Je me retrouve souvent à imaginer notre vie à deux en détail', score: 3 },
+        ],
+      },
+      {
+        text: 'Est-ce qu\'elle/il te fait vraiment rire, pas juste sourire poliment ?',
+        options: [
+          { text: 'Non, notre humour n\'est pas vraiment compatible', score: 0 },
+          { text: 'Parfois, pour certaines choses', score: 1 },
+          { text: 'Oui, souvent, et ça me surprend parfois', score: 2 },
+          { text: 'Elle est la personne qui me fait le plus rire dans ma vie', score: 3 },
+        ],
+      },
+      {
+        text: 'Trouves-tu ses défauts attendrissants plutôt qu\'agaçants ?',
+        options: [
+          { text: 'Non, ses défauts me dérangent comme ceux de n\'importe qui', score: 0 },
+          { text: 'Ça dépend du défaut et du moment', score: 1 },
+          { text: 'La plupart du temps, ses imperfections me semblent touchantes', score: 2 },
+          { text: 'Je trouve ses défauts presque aussi séduisants que ses qualités', score: 3 },
+        ],
+      },
+      {
+        text: 'Modifies-tu ton comportement ou prends-tu soin de toi davantage pour lui/elle plaire ?',
+        options: [
+          { text: 'Non, je reste exactement pareil(le) qu\'avant', score: 0 },
+          { text: 'Un petit effort de temps en temps', score: 1 },
+          { text: 'Oui, je fais attention à mon image ou à certaines attitudes', score: 2 },
+          { text: 'J\'ai adopté de nouvelles habitudes principalement pour être mieux à ses yeux', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu du mal à te concentrer sur autre chose quand il/elle te manque ?',
+        options: [
+          { text: 'Non, l\'absence ne m\'affecte pas particulièrement', score: 0 },
+          { text: 'Un peu, mais je retrouve ma concentration', score: 1 },
+          { text: 'Oui, son absence laisse un vide difficile à ignorer', score: 2 },
+          { text: 'Son absence envahit mes pensées au point de me distraire vraiment', score: 3 },
+        ],
+      },
+      {
+        text: 'Lui fais-tu naturellement confiance, sans effort conscient ?',
+        options: [
+          { text: 'Non, la confiance ne vient pas naturellement', score: 0 },
+          { text: 'Partiellement, mais avec quelques réserves', score: 1 },
+          { text: 'Oui, je lui fais confiance sans vraiment avoir à y réfléchir', score: 2 },
+          { text: 'La confiance que je lui accorde me surprend moi-même par son intensité', score: 3 },
+        ],
+      },
+      {
+        text: 'Ressens-tu de la tendresse pour lui/elle même sans raison particulière ?',
+        options: [
+          { text: 'Non, mes sentiments sont conditionnels', score: 0 },
+          { text: 'Parfois, dans des moments précis', score: 1 },
+          { text: 'Oui, régulièrement et spontanément', score: 2 },
+          { text: 'Une tendresse profonde et constante qui ne demande aucune raison', score: 3 },
         ],
       },
     ],
@@ -1289,6 +1730,148 @@ const quizzes: Quiz[] = [
           { text: 'Cette amitié me pèse plus qu\'elle ne m\'apporte', score: 3 },
         ],
       },
+      {
+        text: 'Cet(te) ami(e) respecte-t-il/elle ta relation de couple sans chercher à s\'y immiscer ?',
+        options: [
+          { text: 'Toujours, il/elle respecte pleinement ma vie amoureuse', score: 0 },
+          { text: 'Généralement oui, avec quelques taquineries inoffensives', score: 1 },
+          { text: 'Parfois il/elle critique mon/ma partenaire ou sème le doute', score: 2 },
+          { text: 'Il/Elle cherche souvent à s\'interposer dans ma relation', score: 3 },
+        ],
+        tags: { situations: ['En couple', 'Compliqué'] },
+      },
+      {
+        text: 'Cet(te) ami(e) te soutient-il/elle sans te faire sentir "en retard" dans la vie ?',
+        options: [
+          { text: 'Toujours, il/elle valorise mon chemin de vie tel qu\'il est', score: 0 },
+          { text: 'Généralement oui, même si parfois maladroit(e)', score: 1 },
+          { text: 'Parfois des remarques sur mon mode de vie qui me mettent mal à l\'aise', score: 2 },
+          { text: 'Souvent des commentaires condescendants sur mes choix de vie', score: 3 },
+        ],
+        tags: { situations: ['Célibataire'] },
+      },
+      {
+        text: 'Cette amitié va-t-elle au-delà des sorties et des moments festifs ?',
+        options: [
+          { text: 'Oui, on parle de vraies choses au-delà du fun', score: 0 },
+          { text: 'La plupart du temps, on se connecte aussi sur des sujets profonds', score: 1 },
+          { text: 'Rarement, notre lien tient surtout aux occasions sociales', score: 2 },
+          { text: 'Non, si on ne sort pas ensemble, l\'amitié n\'existe presque pas', score: 3 },
+        ],
+        tags: { ageGroups: ['- de 18 ans', '18–24 ans'] },
+      },
+      {
+        text: 'Votre amitié a-t-elle survécu à des changements importants dans vos vies (déménagement, travail, enfants) ?',
+        options: [
+          { text: 'Oui, on a traversé ces changements et on est restés proches', score: 0 },
+          { text: 'La plupart des transitions, avec quelques périodes de distance normales', score: 1 },
+          { text: 'Certains changements ont créé un fossé qui ne s\'est jamais refermé', score: 2 },
+          { text: 'Il/Elle est absent(e) à chaque grande transition dans ma vie', score: 3 },
+        ],
+        tags: { ageGroups: ['25–34 ans', '35–44 ans'] },
+      },
+      {
+        text: 'Avez-vous traversé ensemble des épreuves de vie significatives (deuil, maladie, divorce) ?',
+        options: [
+          { text: 'Oui, on s\'est soutenu(e)s à travers de vraies difficultés', score: 0 },
+          { text: 'Quelques épreuves partagées, avec un soutien correct', score: 1 },
+          { text: 'Il/Elle était absent(e) lors d\'une épreuve importante', score: 2 },
+          { text: 'Cette personne n\'a jamais été là dans mes moments les plus difficiles', score: 3 },
+        ],
+        tags: { ageGroups: ['45 ans et +'] },
+      },
+      {
+        text: 'Cet ami respecte-t-il tes décisions importantes sans chercher à les influencer contre ton gré ?',
+        options: [
+          { text: 'Toujours, il respecte pleinement mon autonomie', score: 0 },
+          { text: 'Généralement oui, même s\'il donne parfois son avis', score: 1 },
+          { text: 'Parfois il essaie d\'orienter mes choix selon ses préférences', score: 2 },
+          { text: 'Souvent, il cherche à contrôler ou influencer mes décisions importantes', score: 3 },
+        ],
+        tags: { genders: ['Un homme'] },
+      },
+      {
+        text: 'Cette amie est-elle sincèrement heureuse pour toi lors de tes réussites, sans jalousie ?',
+        options: [
+          { text: 'Toujours, ma réussite est aussi la sienne', score: 0 },
+          { text: 'En général oui, même s\'il y a parfois une légère compétition inconsciente', score: 1 },
+          { text: 'Je sens parfois une rivalité déguisée en encouragement', score: 2 },
+          { text: 'Sa jalousie est évidente face à mes succès, elle les minimise ou les dénigre', score: 3 },
+        ],
+        tags: { genders: ['Une femme'] },
+      },
+      {
+        text: 'Cet(te) ami(e) te dit-il/elle la vérité même quand ce n\'est pas ce que tu veux entendre ?',
+        options: [
+          { text: 'Toujours, avec bienveillance et honnêteté', score: 0 },
+          { text: 'En général oui, mais avec beaucoup de précautions', score: 1 },
+          { text: 'Il/Elle préfère se taire plutôt que me blesser', score: 2 },
+          { text: 'Il/Elle ne m\'a jamais dit une vérité difficile, même quand j\'en avais besoin', score: 3 },
+        ],
+      },
+      {
+        text: 'Cet(te) ami(e) te défend-il/elle quand des personnes parlent de toi en mal en ton absence ?',
+        options: [
+          { text: 'Toujours, il/elle prend ma défense sans que je le demande', score: 0 },
+          { text: 'La plupart du temps', score: 1 },
+          { text: 'Rarement, il/elle reste neutre ou se tait', score: 2 },
+          { text: 'Jamais, ou pire, il/elle acquiesce aux critiques', score: 3 },
+        ],
+      },
+      {
+        text: 'Cet(te) ami(e) se souvient-il/elle des détails importants que tu lui as confiés ?',
+        options: [
+          { text: 'Oui, il/elle retient des choses dont je lui ai parlé il y a longtemps', score: 0 },
+          { text: 'La plupart des choses importantes', score: 1 },
+          { text: 'Rarement, j\'ai l\'impression de répéter les mêmes choses', score: 2 },
+          { text: 'Jamais, ce que je lui confie semble ne pas l\'intéresser vraiment', score: 3 },
+        ],
+      },
+      {
+        text: 'Cet(te) ami(e) cherche-t-il/elle à passer du temps avec toi ou seulement quand c\'est pratique ?',
+        options: [
+          { text: 'Il/Elle fait des efforts pour me voir même quand ce n\'est pas pratique', score: 0 },
+          { text: 'La plupart du temps oui', score: 1 },
+          { text: 'Principalement quand ça l\'arrange', score: 2 },
+          { text: 'Seulement quand ça lui convient parfaitement, jamais d\'effort de sa part', score: 3 },
+        ],
+      },
+      {
+        text: 'Est-ce que tu te sens libre d\'être toi-même sans te censurer en sa présence ?',
+        options: [
+          { text: 'Totalement, je suis 100% moi-même', score: 0 },
+          { text: 'Presque toujours à l\'aise', score: 1 },
+          { text: 'Je dois parfois filtrer ce que je dis ou fais', score: 2 },
+          { text: 'Je joue souvent un rôle pour lui plaire ou éviter des conflits', score: 3 },
+        ],
+      },
+      {
+        text: 'Cet(te) ami(e) t\'inclut-il/elle dans les grands moments de sa vie (nouvelles importantes, événements) ?',
+        options: [
+          { text: 'Toujours, je fais partie de ses moments importants', score: 0 },
+          { text: 'La plupart du temps', score: 1 },
+          { text: 'Parfois j\'apprends les grandes nouvelles par d\'autres', score: 2 },
+          { text: 'Rarement inclus(e) dans les moments qui comptent pour lui/elle', score: 3 },
+        ],
+      },
+      {
+        text: 'Est-ce que votre amitié se remet naturellement après une dispute ou un silence ?',
+        options: [
+          { text: 'Oui, on revient toujours l\'un vers l\'autre naturellement', score: 0 },
+          { text: 'En général oui, après un moment', score: 1 },
+          { text: 'Les tensions durent longtemps avant de se dissiper vraiment', score: 2 },
+          { text: 'Les disputes laissent des cicatrices durables ou ne se résolvent jamais', score: 3 },
+        ],
+      },
+      {
+        text: 'En situation d\'urgence ou de détresse réelle, cet(te) ami(e) serait-il/elle disponible pour toi ?',
+        options: [
+          { text: 'Oui, je sais que je peux compter sur lui/elle dans les pires moments', score: 0 },
+          { text: 'Probablement oui pour les vraies urgences', score: 1 },
+          { text: 'Je n\'en suis pas sûr(e), il/elle n\'a jamais été très réactif/réactive', score: 2 },
+          { text: 'Non, il/elle ne serait pas là dans une vraie crise', score: 3 },
+        ],
+      },
     ],
     resultTiers: [
       {
@@ -1614,6 +2197,148 @@ const quizzes: Quiz[] = [
           { text: 'Non, je pense que ce n\'est pas qui je suis', score: 3 },
         ],
       },
+      {
+        text: 'En tant qu\'homme, as-tu déjà ressenti une attirance physique pour un autre homme ?',
+        options: [
+          { text: 'Non, jamais de façon significative', score: 0 },
+          { text: 'Une fois ou deux, peut-être par curiosité passagère', score: 1 },
+          { text: 'Oui, plusieurs fois avec différentes personnes', score: 2 },
+          { text: 'Oui, régulièrement et de façon très claire', score: 3 },
+        ],
+        tags: { genders: ['Un homme'] },
+      },
+      {
+        text: 'En tant que femme, as-tu déjà ressenti une attirance romantique ou physique pour une autre femme ?',
+        options: [
+          { text: 'Non, jamais réellement', score: 0 },
+          { text: 'Une légère curiosité une ou deux fois', score: 1 },
+          { text: 'Oui, plusieurs fois avec des femmes différentes', score: 2 },
+          { text: 'Oui, c\'est quelque chose que je ressens régulièrement', score: 3 },
+        ],
+        tags: { genders: ['Une femme'] },
+      },
+      {
+        text: 'La relation que tu vis actuellement correspond-elle à l\'attirance que tu ressens profondément ?',
+        options: [
+          { text: 'Oui, pleinement et sans réserve', score: 0 },
+          { text: 'En grande partie, avec quelques zones floues', score: 1 },
+          { text: 'Pas vraiment, il y a une tension entre ce que je vis et ce que je ressens', score: 2 },
+          { text: 'Non, je sens un décalage profond entre ma relation et mon attirance réelle', score: 3 },
+        ],
+        tags: { situations: ['En couple'] },
+      },
+      {
+        text: 'Quand tu te projettes dans une future relation idéale, quel est le genre de la personne imaginée ?',
+        options: [
+          { text: 'Clairement quelqu\'un du sexe opposé', score: 0 },
+          { text: 'Principalement quelqu\'un du sexe opposé', score: 1 },
+          { text: 'Peu importe le genre, tant que la connexion est vraie', score: 2 },
+          { text: 'Quelqu\'un du même genre', score: 3 },
+        ],
+        tags: { situations: ['Célibataire'] },
+      },
+      {
+        text: 'Les catégories binaires d\'orientation (hétéro, gay) te semblent-elles suffisantes pour te décrire ?',
+        options: [
+          { text: 'Oui, elles me correspondent parfaitement', score: 0 },
+          { text: 'Elles correspondent à peu près, avec quelques nuances', score: 1 },
+          { text: 'Oui, je me sens à la frontière entre plusieurs catégories', score: 2 },
+          { text: 'Complètement insuffisantes, aucune étiquette standard ne me décrit vraiment', score: 3 },
+        ],
+        tags: { genders: ['Non-binaire', 'Je préfère ne pas dire'] },
+      },
+      {
+        text: 'Les étiquettes d\'orientation que tu connais reflètent-elles bien ce que tu ressens en ce moment ?',
+        options: [
+          { text: 'Oui, je sais très bien ce que je suis', score: 0 },
+          { text: 'En grande partie, même si tout n\'est pas encore clair', score: 1 },
+          { text: 'Pas vraiment, je me sens encore en exploration', score: 2 },
+          { text: 'Non, ce que je ressens ne se range pas dans les étiquettes courantes', score: 3 },
+        ],
+        tags: { ageGroups: ['- de 18 ans', '18–24 ans'] },
+      },
+      {
+        text: 'Ton orientation t\'a-t-elle semblé évoluer ou se nuancer au fil des années ?',
+        options: [
+          { text: 'Non, elle a toujours été claire et stable', score: 0 },
+          { text: 'Légèrement nuancée avec le temps, mais sans changement fondamental', score: 1 },
+          { text: 'Oui, j\'ai ressenti des évolutions notables dans mes attirances', score: 2 },
+          { text: 'Oui, ce que je ressens aujourd\'hui est très différent de ce que je croyais être', score: 3 },
+        ],
+        tags: { ageGroups: ['25–34 ans', '35–44 ans', '45 ans et +'] },
+      },
+      {
+        text: 'L\'attirance que tu ressens varie-t-elle selon le genre de la personne (émotionnellement ou physiquement) ?',
+        options: [
+          { text: 'Non, elle ne s\'applique qu\'aux personnes du sexe opposé', score: 0 },
+          { text: 'Principalement pour le sexe opposé, mais avec quelques exceptions', score: 1 },
+          { text: 'Elle varie selon les personnes sans distinction claire de genre', score: 2 },
+          { text: 'L\'attirance pour le même genre est bien présente, tant physiquement qu\'émotionnellement', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà eu du mal à t\'identifier aux conversations sur l\'amour hétérosexuel autour de toi ?',
+        options: [
+          { text: 'Non, je m\'y reconnais pleinement', score: 0 },
+          { text: 'Très rarement, sans que ça me préoccupe', score: 1 },
+          { text: 'Parfois, un léger décalage que je n\'arrive pas à expliquer', score: 2 },
+          { text: 'Souvent, comme si ces conversations ne me concernaient pas vraiment', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà ressenti de l\'anxiété ou de la confusion en essayant de comprendre ton orientation ?',
+        options: [
+          { text: 'Non, ça n\'a jamais été source de confusion', score: 0 },
+          { text: 'Une légère incertitude passagère', score: 1 },
+          { text: 'Oui, quelques périodes de questionnement intense', score: 2 },
+          { text: 'Oui, c\'est un sujet qui génère beaucoup de stress et d\'interrogation en moi', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu un modèle clair en tête de ce à quoi ressemblerait ta relation amoureuse idéale ?',
+        options: [
+          { text: 'Oui, c\'est clairement une relation hétérosexuelle classique', score: 0 },
+          { text: 'Plutôt une relation hétérosexuelle, mais sans rigidité absolue', score: 1 },
+          { text: 'Mon modèle idéal n\'est pas défini par le genre de l\'autre personne', score: 2 },
+          { text: 'Mon modèle idéal implique quelqu\'un du même genre', score: 3 },
+        ],
+      },
+      {
+        text: 'Est-ce que tu te sens à l\'aise pour parler de tes attirances avec des personnes de confiance ?',
+        options: [
+          { text: 'Oui, totalement, il n\'y a rien à cacher', score: 0 },
+          { text: 'Oui, même si certains sujets restent délicats', score: 1 },
+          { text: 'Difficilement, je garde une partie de mes ressentis pour moi', score: 2 },
+          { text: 'Non, je n\'ose pas en parler par peur du jugement', score: 3 },
+        ],
+      },
+      {
+        text: 'Penses-tu que ton orientation peut évoluer avec le temps, ou la vois-tu comme quelque chose de fixe ?',
+        options: [
+          { text: 'Fixe, j\'en suis certain(e)', score: 0 },
+          { text: 'Globalement stable avec quelques nuances possibles', score: 1 },
+          { text: 'Je crois qu\'elle peut évoluer, et c\'est ce qui se passe pour moi', score: 2 },
+          { text: 'Pour moi, l\'orientation est fluide et je le vis ainsi', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà consciemment exploré ou cherché à mieux comprendre ton attirance pour le même genre ?',
+        options: [
+          { text: 'Non, il n\'y avait rien à explorer', score: 0 },
+          { text: 'Par curiosité intellectuelle, sans lien avec un questionnement personnel', score: 1 },
+          { text: 'Oui, j\'ai cherché à comprendre certaines pensées ou réactions', score: 2 },
+          { text: 'Oui, activement, via des lectures, des expériences ou des discussions', score: 3 },
+        ],
+      },
+      {
+        text: 'La représentation de personnages LGBTQ+ dans les médias te touche-t-elle personnellement ?',
+        options: [
+          { text: 'Non, je la vois comme celle de n\'importe quel personnage', score: 0 },
+          { text: 'Elle me touche comme toute représentation de diversité humaine', score: 1 },
+          { text: 'Parfois, certaines représentations me parlent d\'une façon particulière', score: 2 },
+          { text: 'Oui, je m\'y identifie souvent et me sens représenté(e)', score: 3 },
+        ],
+      },
     ],
     resultTiers: [
       {
@@ -1662,6 +2387,25 @@ const quizzes: Quiz[] = [
 
 export function getAllQuizzes(): Quiz[] {
   return quizzes;
+}
+
+export function selectQuestions(questions: QuizQuestion[], session: QuizSession = {}): QuizQuestion[] {
+  const untagged = questions.filter((q) => !q.tags);
+  const tagged = questions.filter((q) => !!q.tags);
+
+  const matching = tagged.filter((q) => {
+    const { genders, situations, ageGroups } = q.tags!;
+    return (
+      (!genders || !session.gender || genders.includes(session.gender)) &&
+      (!situations || !session.situation || situations.includes(session.situation)) &&
+      (!ageGroups || !session.age || ageGroups.includes(session.age))
+    );
+  });
+  const nonMatching = tagged.filter((q) => !matching.includes(q));
+
+  // 25 universal + up to 5 personalized (matching profile first, then fallback)
+  const personalized = [...matching, ...nonMatching].slice(0, 5);
+  return [...untagged.slice(0, 25), ...personalized];
 }
 
 export function getQuizBySlug(slug: string): Quiz | undefined {
