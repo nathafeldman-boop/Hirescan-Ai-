@@ -345,7 +345,7 @@ export default function IntroAnimation({ onComplete }: Props) {
           onClick={onComplete}
           className="mt-5 text-white/25 text-sm hover:text-white/50 transition-colors"
         >
-          Voir la landing page
+          Passer →
         </button>
       </div>
     </div>
