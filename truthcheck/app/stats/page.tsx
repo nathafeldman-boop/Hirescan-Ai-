@@ -44,14 +44,14 @@ export default async function StatsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div>
-            <Link href="/" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm mb-3">
+            <Link href="/onboarding" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm mb-3">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Accueil
             </Link>
             <h1 className="text-3xl font-black text-white">📊 Statistiques</h1>
-            <p className="text-zinc-500 text-sm mt-1">Données en temps réel sur les quiz TruthCheck</p>
+            <p className="text-zinc-500 text-sm mt-1">Données en temps réel sur les quiz UrSecret</p>
           </div>
           <div className="text-right">
             <div className="text-4xl font-black text-white tabular-nums">{total.toLocaleString('fr-FR')}</div>

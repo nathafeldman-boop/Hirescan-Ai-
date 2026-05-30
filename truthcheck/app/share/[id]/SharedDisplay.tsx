@@ -54,11 +54,13 @@ export default function SharedDisplay({ quiz, score, date, shareId }: Props) {
 
       <header className="relative z-10 border-b border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
+          <Link href="/onboarding" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            TruthCheck
+            <span className="font-semibold">
+              <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>Secret
+            </span>
           </Link>
           <span className="text-xs text-zinc-600">Résultat partagé · {date}</span>
         </div>

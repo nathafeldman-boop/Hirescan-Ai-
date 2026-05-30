@@ -52,13 +52,13 @@ export default function QuizClient({ quiz }: Props) {
       <header className="sticky top-0 z-20 bg-[#09090b]/80 backdrop-blur-md border-b border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link
-            href="/"
+            href="/onboarding"
             className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Accueil
+            Retour
           </Link>
 
           <div className="flex-1 text-center">

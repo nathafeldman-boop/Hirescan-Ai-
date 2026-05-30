@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'TruthCheck — Découvre les vérités cachées',
-  description: 'Des questionnaires de 30 questions pour découvrir les vérités qui t\'entourent. Infidélité, adoption, amour, vrais amis.',
+  title: 'UrSecret — Tes vraies réponses',
+  description: 'Des questionnaires précis pour découvrir les vérités que tu ressens. 100% anonyme.',
   openGraph: {
-    title: 'TruthCheck',
-    description: 'Découvre les vérités cachées qui t\'entourent',
+    title: 'UrSecret',
+    description: 'Tes vraies réponses. Rien que la vérité.',
     type: 'website',
   },
 };

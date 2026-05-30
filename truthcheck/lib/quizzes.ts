@@ -1333,6 +1333,331 @@ const quizzes: Quiz[] = [
       },
     ],
   },
+  {
+    slug: 'orientation',
+    title: 'Quelle est mon orientation ?',
+    subtitle: 'Explore ton attirance sincère',
+    description: '30 questions pour explorer honnêtement ton attirance et mieux te comprendre.',
+    emoji: '🌈',
+    gradientFrom: 'from-violet-950/80',
+    gradientTo: 'to-pink-950/80',
+    borderColor: 'border-violet-800/30',
+    accentColor: '#a78bfa',
+    questions: [
+      {
+        text: 'Quand tu imagines une relation romantique idéale, qui vois-tu à tes côtés ?',
+        options: [
+          { text: 'Quelqu\'un du sexe opposé, sans hésitation', score: 0 },
+          { text: 'Principalement quelqu\'un du sexe opposé', score: 1 },
+          { text: 'Cela dépend de la personne, pas du genre', score: 2 },
+          { text: 'Quelqu\'un du même genre que moi', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà ressenti une attirance romantique pour quelqu\'un du même genre ?',
+        options: [
+          { text: 'Jamais', score: 0 },
+          { text: 'Une fois, peut-être par curiosité', score: 1 },
+          { text: 'Oui, plusieurs fois avec différentes personnes', score: 2 },
+          { text: 'Oui, c\'est mon attirance principale', score: 3 },
+        ],
+      },
+      {
+        text: 'Quand tu regardes un film ou une série, à qui t\'identifies-tu le plus ?',
+        options: [
+          { text: 'Au personnage hétérosexuel sans me poser de questions', score: 0 },
+          { text: 'Principalement aux personnages hétéros mais parfois aux autres', score: 1 },
+          { text: 'Je m\'identifie à plein de personnages différents peu importe leur orientation', score: 2 },
+          { text: 'Surtout aux personnages LGBTQ+', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà eu des rêves romantiques ou sensuels impliquant quelqu\'un du même genre ?',
+        options: [
+          { text: 'Non, jamais', score: 0 },
+          { text: 'Très rarement, sans signification pour moi', score: 1 },
+          { text: 'Parfois, et cela m\'a surpris(e)', score: 2 },
+          { text: 'Régulièrement et c\'est quelque chose que j\'apprécie', score: 3 },
+        ],
+      },
+      {
+        text: 'Comment te sens-tu en présence d\'une personne du même genre très attirante ?',
+        options: [
+          { text: 'Rien de spécial, comme avec n\'importe qui', score: 0 },
+          { text: 'Une légère admiration, sans plus', score: 1 },
+          { text: 'Une certaine fascination que je ne m\'explique pas toujours', score: 2 },
+          { text: 'Une attirance claire, similaire à ce que je ressens pour le sexe opposé', score: 3 },
+        ],
+      },
+      {
+        text: 'Quand tu envisages l\'avenir, tu te vois...',
+        options: [
+          { text: 'Avec quelqu\'un du sexe opposé', score: 0 },
+          { text: 'Probablement avec quelqu\'un du sexe opposé', score: 1 },
+          { text: 'Avec n\'importe qui tant qu\'il y a une vraie connexion', score: 2 },
+          { text: 'Avec quelqu\'un du même genre', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà eu envie d\'explorer une relation ou une expérience avec quelqu\'un du même genre ?',
+        options: [
+          { text: 'Non, l\'idée ne m\'attire pas', score: 0 },
+          { text: 'Par curiosité intellectuelle seulement', score: 1 },
+          { text: 'Oui, j\'y ai pensé sérieusement', score: 2 },
+          { text: 'Oui et je l\'ai déjà exploré ou je souhaite vraiment le faire', score: 3 },
+        ],
+      },
+      {
+        text: 'Quand tu vois un couple de même genre dans la rue, ta première réaction est...',
+        options: [
+          { text: 'Indifférence totale, comme n\'importe quel couple', score: 0 },
+          { text: 'Légère curiosité', score: 1 },
+          { text: 'Une certaine fascination ou une identification subtile', score: 2 },
+          { text: 'Une sorte d\'écho à ce que je ressens', score: 3 },
+        ],
+      },
+      {
+        text: 'L\'identité ou le genre d\'une personne joue-t-il un rôle dans ton attirance ?',
+        options: [
+          { text: 'Oui, je ne suis attiré(e) que par le sexe opposé', score: 0 },
+          { text: 'Principalement, mais il y a des exceptions rares', score: 1 },
+          { text: 'Non, la personne compte plus que son genre', score: 2 },
+          { text: 'Non, je peux être attiré(e) par des personnes de tout genre', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà cherché des informations ou du contenu lié à l\'homosexualité ou à la bisexualité pour toi-même ?',
+        options: [
+          { text: 'Non, jamais pour moi-même', score: 0 },
+          { text: 'Peut-être par curiosité générale', score: 1 },
+          { text: 'Oui, pour mieux comprendre ce que je ressentais', score: 2 },
+          { text: 'Oui, régulièrement pour explorer mon identité', score: 3 },
+        ],
+      },
+      {
+        text: 'Quand tu penses à l\'intimité physique, tu penses plutôt à...',
+        options: [
+          { text: 'Quelqu\'un du sexe opposé uniquement', score: 0 },
+          { text: 'Surtout quelqu\'un du sexe opposé', score: 1 },
+          { text: 'Cela varie selon les personnes, pas le genre', score: 2 },
+          { text: 'Quelqu\'un du même genre', score: 3 },
+        ],
+      },
+      {
+        text: 'T\'es-tu déjà senti(e) différent(e) ou "pas à ta place" parmi tes amis concernant l\'attirance ?',
+        options: [
+          { text: 'Non, je me sens totalement normal(e)', score: 0 },
+          { text: 'Très rarement, sans trop y penser', score: 1 },
+          { text: 'Parfois, j\'ai du mal à m\'identifier à leurs centres d\'intérêt', score: 2 },
+          { text: 'Souvent, mes attirances semblent différentes des leurs', score: 3 },
+        ],
+      },
+      {
+        text: 'Comment décris-tu ta réaction face à du contenu romantique ou érotique impliquant des personnes du même genre ?',
+        options: [
+          { text: 'Indifférence ou malaise', score: 0 },
+          { text: 'Curiosité neutre', score: 1 },
+          { text: 'Un certain intérêt que je ne peux pas totalement ignorer', score: 2 },
+          { text: 'Attirance claire et naturelle', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà eu peur ou honte de certaines de tes pensées concernant ton orientation ?',
+        options: [
+          { text: 'Non, mes pensées semblent "normales"', score: 0 },
+          { text: 'Très rarement, juste une légère gêne', score: 1 },
+          { text: 'Parfois, j\'ai du mal à les accepter', score: 2 },
+          { text: 'Oui, j\'ai vécu une lutte intérieure à ce sujet', score: 3 },
+        ],
+      },
+      {
+        text: 'Penses-tu parfois que tu pourrais être bisexuel(le) ou gay ?',
+        options: [
+          { text: 'Non, cette idée ne me correspond pas', score: 0 },
+          { text: 'Ça m\'a traversé l\'esprit sans conviction', score: 1 },
+          { text: 'Je me pose cette question sérieusement', score: 2 },
+          { text: 'Oui, je pense que c\'est ce que je suis', score: 3 },
+        ],
+      },
+      {
+        text: 'Quand quelqu\'un du même genre te montre de l\'intérêt romantique, tu ressens...',
+        options: [
+          { text: 'Gêne ou cela me laisse indifférent(e)', score: 0 },
+          { text: 'Surprise mais pas de sentiment particulier', score: 1 },
+          { text: 'Une légère excitation ou intérêt que tu n\'attendais pas', score: 2 },
+          { text: 'De la fierté et de l\'attraction réciproque', score: 3 },
+        ],
+      },
+      {
+        text: 'Est-ce que tu trouves certaines personnes du même genre "belles" dans un sens qui dépasse l\'admiration ?',
+        options: [
+          { text: 'Non, c\'est de l\'admiration neutre', score: 0 },
+          { text: 'Parfois, mais sans attirance particulière', score: 1 },
+          { text: 'Oui, une beauté qui m\'attire subtilement', score: 2 },
+          { text: 'Oui, clairement et régulièrement', score: 3 },
+        ],
+      },
+      {
+        text: 'L\'étiquette "hétérosexuel(le)" te correspond-elle pleinement ?',
+        options: [
+          { text: 'Oui, totalement', score: 0 },
+          { text: 'En grande partie oui', score: 1 },
+          { text: 'Je me sens plus entre deux', score: 2 },
+          { text: 'Non, elle ne me définit pas', score: 3 },
+        ],
+      },
+      {
+        text: 'Quand tu as une attirance pour quelqu\'un, c\'est généralement...',
+        options: [
+          { text: 'Systématiquement pour quelqu\'un du sexe opposé', score: 0 },
+          { text: 'Très majoritairement du sexe opposé', score: 1 },
+          { text: 'Environ égal entre les deux genres', score: 2 },
+          { text: 'Majoritairement ou exclusivement pour quelqu\'un du même genre', score: 3 },
+        ],
+      },
+      {
+        text: 'Imaginons que tu te retrouves seul(e) avec quelqu\'un du même genre qui te plait vraiment. Tu penses...',
+        options: [
+          { text: 'Rien de romantique ne passerait par la tête', score: 0 },
+          { text: 'Je serais mal à l\'aise avec cette idée', score: 1 },
+          { text: 'L\'idée ne m\'est pas désagréable', score: 2 },
+          { text: 'J\'aimerais que quelque chose se passe', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu déjà confié à quelqu\'un tes doutes concernant ton orientation sexuelle ?',
+        options: [
+          { text: 'Non, pas de doutes à confier', score: 0 },
+          { text: 'Non, mais j\'y ai pensé sans doutes réels', score: 1 },
+          { text: 'Pas encore, mais j\'en ai besoin', score: 2 },
+          { text: 'Oui, je l\'ai fait ou j\'ai très envie de le faire', score: 3 },
+        ],
+      },
+      {
+        text: 'Comment tu te sens en lisant ou regardant des histoires d\'amour entre personnes du même genre ?',
+        options: [
+          { text: 'C\'est une belle histoire mais ça ne me concerne pas', score: 0 },
+          { text: 'Cela me touche comme n\'importe quelle belle histoire', score: 1 },
+          { text: 'Cela me touche de façon particulière, comme si ça me parlait', score: 2 },
+          { text: 'Je m\'y retrouve et cela m\'émeut profondément', score: 3 },
+        ],
+      },
+      {
+        text: 'Dans tes fantasmes les plus intimes, les personnes du même genre apparaissent...',
+        options: [
+          { text: 'Jamais', score: 0 },
+          { text: 'Très rarement', score: 1 },
+          { text: 'Assez souvent', score: 2 },
+          { text: 'Régulièrement ou principalement', score: 3 },
+        ],
+      },
+      {
+        text: 'Si tu pouvais choisir ton orientation sans jugement social, tu choisirais...',
+        options: [
+          { text: 'D\'être hétérosexuel(le)', score: 0 },
+          { text: 'D\'être principalement hétérosexuel(le)', score: 1 },
+          { text: 'D\'être bisexuel(le)', score: 2 },
+          { text: 'D\'être gay ou lesbien(ne)', score: 3 },
+        ],
+      },
+      {
+        text: 'La communauté LGBTQ+ te semble...',
+        options: [
+          { text: 'Une communauté sympathique mais qui ne me concerne pas', score: 0 },
+          { text: 'Intéressante, je la respecte pleinement', score: 1 },
+          { text: 'Un endroit où je pourrais me sentir compris(e)', score: 2 },
+          { text: 'Une communauté dont je fais ou voudrais faire partie', score: 3 },
+        ],
+      },
+      {
+        text: 'As-tu du mal à définir clairement ton orientation en ce moment ?',
+        options: [
+          { text: 'Non, c\'est très clair pour moi', score: 0 },
+          { text: 'Très légèrement, mais pas vraiment', score: 1 },
+          { text: 'Oui, je me pose des questions', score: 2 },
+          { text: 'Oui, c\'est une vraie source d\'interrogation', score: 3 },
+        ],
+      },
+      {
+        text: 'Ton regard sur la même personne change-t-il selon que tu t\'imagines une relation amicale vs romantique avec elle ?',
+        options: [
+          { text: 'Seulement si c\'est une personne du sexe opposé', score: 0 },
+          { text: 'Principalement si c\'est une personne du sexe opposé', score: 1 },
+          { text: 'Cela arrive avec des personnes des deux genres', score: 2 },
+          { text: 'C\'est souvent le cas avec des personnes du même genre', score: 3 },
+        ],
+      },
+      {
+        text: 'Si tu devais noter ton attirance pour les personnes du même genre de 0 à 10, tu choisirais...',
+        options: [
+          { text: '0 – absolument aucune', score: 0 },
+          { text: '1 à 3 – très faible ou ambiguë', score: 1 },
+          { text: '4 à 6 – modérée et bien présente', score: 2 },
+          { text: '7 à 10 – forte, similaire à mon attirance habituelle', score: 3 },
+        ],
+      },
+      {
+        text: 'Quand tu t\'imagines embrasser quelqu\'un du même genre...',
+        options: [
+          { text: 'L\'idée me met mal à l\'aise ou me laisse froid(e)', score: 0 },
+          { text: 'C\'est étrange à imaginer', score: 1 },
+          { text: 'Ce serait quelque chose que j\'aimerais peut-être tenter', score: 2 },
+          { text: 'C\'est quelque chose que je désire', score: 3 },
+        ],
+      },
+      {
+        text: 'En toute honnêteté, te définirais-tu comme une personne hétérosexuelle ?',
+        options: [
+          { text: 'Oui, complètement et sans aucun doute', score: 0 },
+          { text: 'Oui, probablement', score: 1 },
+          { text: 'Je ne suis plus tout à fait sûr(e)', score: 2 },
+          { text: 'Non, je pense que ce n\'est pas qui je suis', score: 3 },
+        ],
+      },
+    ],
+    resultTiers: [
+      {
+        min: 0, max: 20,
+        emoji: '🏳️',
+        title: 'Hétérosexuel(le)',
+        message: 'Tes réponses indiquent une attirance clairement orientée vers le sexe opposé. Tu es à l\'aise avec ton orientation et c\'est tout à fait naturel. La diversité des orientations fait partie de la beauté humaine.',
+        color: 'text-blue-400',
+        glowColor: '#60a5fa',
+      },
+      {
+        min: 20, max: 40,
+        emoji: '💭',
+        title: 'Principalement hétéro',
+        message: 'Tu es majoritairement attiré(e) par le sexe opposé, mais il existe quelques nuances. Il est normal de ressentir une légère curiosité sans que cela remette en cause ton orientation. La sexualité est un spectre.',
+        color: 'text-teal-400',
+        glowColor: '#2dd4bf',
+      },
+      {
+        min: 40, max: 60,
+        emoji: '🌈',
+        title: 'Bisexuel(le) / En exploration',
+        message: 'Tes réponses suggèrent une attirance qui ne se limite pas à un seul genre. Tu pourrais te retrouver dans la bisexualité ou simplement être en exploration. Prends le temps d\'explorer sans pression.',
+        color: 'text-violet-400',
+        glowColor: '#a78bfa',
+      },
+      {
+        min: 60, max: 80,
+        emoji: '🏳️‍🌈',
+        title: 'Probablement gay/lesbien(ne)',
+        message: 'Tes réponses pointent fortement vers une attirance principale pour le même genre. Il est possible que tu sois gay ou lesbien(ne). Sache que tu n\'es pas seul(e) dans ce chemin.',
+        color: 'text-pink-400',
+        glowColor: '#f472b6',
+      },
+      {
+        min: 80, max: 101,
+        emoji: '💜',
+        title: 'Gay / Lesbien(ne)',
+        message: 'Tes réponses indiquent très clairement une attirance pour le même genre. Que ce soit une confirmation ou une découverte, sache que c\'est une part magnifique de qui tu es. Tu mérites d\'être toi-même, pleinement.',
+        color: 'text-purple-400',
+        glowColor: '#c084fc',
+      },
+    ],
+  },
 ];
 
 export function getAllQuizzes(): Quiz[] {

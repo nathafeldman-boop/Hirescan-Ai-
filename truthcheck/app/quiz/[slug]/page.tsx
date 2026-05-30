@@ -12,6 +12,7 @@ export function generateStaticParams() {
     { slug: 'adopte' },
     { slug: 'amoureux' },
     { slug: 'vrais-amis' },
+    { slug: 'orientation' },
   ];
 }
 

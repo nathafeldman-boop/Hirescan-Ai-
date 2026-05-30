@@ -11,5 +11,17 @@ model QuizResult {
   id        String   @id @default(cuid())
   quizSlug  String
   score     Int
+  paid      Boolean  @default(false)
+  sessionId String?
+  createdAt DateTime @default(now())
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  firstName String?
+  age       String?
+  gender    String?
+  situation String?
+  quizSlug  String
   createdAt DateTime @default(now())
 }
