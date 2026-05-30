@@ -112,14 +112,14 @@ export default function QuizClient({ quiz }: Props) {
                 <button
                   key={i}
                   onClick={() => handleSelect(i)}
-                  className={`quiz-neuo${isSelected ? ' quiz-neuo-selected' : ''}`}
+                  className={`quiz-opt${isSelected ? ' quiz-opt-selected' : ''}`}
                 >
                   <span
                     className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-200"
                     style={
                       isSelected
                         ? { borderColor: quiz.accentColor, backgroundColor: quiz.accentColor }
-                        : { borderColor: 'rgba(255,255,255,0.2)' }
+                        : { borderColor: 'rgba(255,255,255,0.3)' }
                     }
                   >
                     {isSelected && (

@@ -22,17 +22,14 @@ interface Answers {
 const STEPS = ['firstName', 'age', 'gender', 'situation', 'quizSlug'] as const;
 type Step = typeof STEPS[number];
 
-/** Inner markup shared by every glow-btn */
-function GlowInner({ children }: { children: React.ReactNode }) {
+/** Inner markup for ob-pill buttons */
+function ObPillInner({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <div className="btn-text">{children}</div>
-      <div className="a l" />
-      <div className="a r" />
-      <div className="a t" />
-      <div className="a b" />
-      <div className="btn-backdrop" />
-    </>
+    <div className="ob-pill-outer">
+      <div className="ob-pill-inner">
+        <span className="ob-pill-text">{children}</span>
+      </div>
+    </div>
   );
 }
 
@@ -190,15 +187,15 @@ export default function OnboardingClient() {
                   <button
                     key={choice.slug}
                     onClick={() => advance(choice.slug)}
-                    className="glow-btn"
+                    className="ob-pill"
                   >
-                    <GlowInner>
+                    <ObPillInner>
                       <span className="text-2xl flex-shrink-0">{choice.emoji}</span>
-                      <span className="font-semibold">{choice.label}</span>
-                      <svg className="w-4 h-4 ml-auto flex-shrink-0 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <span>{choice.label}</span>
+                      <svg className="w-4 h-4 ml-auto flex-shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                    </GlowInner>
+                    </ObPillInner>
                   </button>
                 ))}
               </div>
@@ -276,11 +273,11 @@ function ChoiceStep({
           <button
             key={opt}
             onClick={() => onSelect(opt)}
-            className="glow-btn"
+            className="ob-pill"
           >
-            <GlowInner>
-              <span className="font-semibold">{opt}</span>
-            </GlowInner>
+            <ObPillInner>
+              <span>{opt}</span>
+            </ObPillInner>
           </button>
         ))}
       </div>
