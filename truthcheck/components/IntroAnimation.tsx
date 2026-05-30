@@ -1,156 +1,353 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 interface Props {
   onComplete: () => void;
 }
 
+// Each "scene" is a full-screen moment
+type Scene = 0 | 1 | 2 | 3 | 4 | 5;
+
 export default function IntroAnimation({ onComplete }: Props) {
-  const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [scene, setScene] = useState<Scene>(0);
+  const [lineA, setLineA] = useState(false);
+  const [lineB, setLineB] = useState(false);
+  const [items, setItems] = useState<boolean[]>([false, false, false]);
+  const [exiting, setExiting] = useState(false);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  function t(fn: () => void, ms: number) {
+    const id = setTimeout(fn, ms);
+    timers.current.push(id);
+  }
 
   useEffect(() => {
-    // phase 0 → title flies in (0ms)
-    timerRef.current = setTimeout(() => setPhase(1), 600);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+    // Scene 0 → logo alone (0–900ms)
+    t(() => setScene(1), 900);
+
+    // Scene 1 → "#1 APP" builds (900ms)
+    t(() => setLineA(true), 1050);
+    t(() => setLineB(true), 1600);
+    t(() => setScene(2), 2800);
+
+    // Scene 2 → press logos (2800ms)
+    t(() => setScene(3), 4800);
+
+    // Scene 3 → feature bullets appear one by one
+    t(() => setItems([true, false, false]), 5100);
+    t(() => setItems([true, true, false]), 5700);
+    t(() => setItems([true, true, true]), 6300);
+    t(() => setScene(4), 7800);
+
+    // Scene 4 → quiz mockup
+    t(() => setScene(5), 10000);
+
+    return () => timers.current.forEach(clearTimeout);
   }, []);
 
-  useEffect(() => {
-    if (phase === 1) timerRef.current = setTimeout(() => setPhase(2), 800);
-    if (phase === 2) timerRef.current = setTimeout(() => setPhase(3), 900);
-    if (phase === 3) timerRef.current = setTimeout(() => onComplete(), 700);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [phase, onComplete]);
+  function skip() {
+    timers.current.forEach(clearTimeout);
+    setExiting(true);
+    setTimeout(onComplete, 400);
+  }
+
+  const PRESS = ['Le Monde', 'Cosmopolitan', 'Brut.', 'Konbini', 'L\'Obs'];
+
+  const BULLETS = [
+    { emoji: '💔', text: 'Infidélité détectée en 3 min' },
+    { emoji: '🧠', text: 'IA sans filtre, sans jugement' },
+    { emoji: '🔒', text: '100% anonyme, zéro compte requis' },
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#09090b] flex flex-col items-center justify-center overflow-hidden">
-      {/* Animated background orbs */}
-      <div
-        className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%) scale(1)',
-          animation: 'pulse-orb 1.5s ease-in-out infinite alternate',
-        }}
-      />
-      <div
-        className="absolute w-80 h-80 rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%)',
-          top: '30%',
-          left: '60%',
-          animation: 'float-right 2s ease-in-out infinite alternate',
-        }}
-      />
+    <div
+      className="fixed inset-0 z-50 bg-black overflow-hidden"
+      style={{
+        opacity: exiting ? 0 : 1,
+        transition: 'opacity 0.4s ease',
+      }}
+      onClick={scene < 5 ? skip : undefined}
+    >
+      {/* Skip button */}
+      {scene < 5 && (
+        <button
+          className="absolute top-12 right-6 text-xs text-white/30 hover:text-white/60 transition-colors z-50 tracking-widest uppercase"
+          onClick={skip}
+        >
+          Passer →
+        </button>
+      )}
 
-      {/* 3D lock icon */}
+      {/* ─── SCENE 0 + 1: Logo + Big headline ─── */}
       <div
-        className="mb-8 relative"
+        className="absolute inset-0 flex flex-col items-start justify-center px-8"
         style={{
-          opacity: phase >= 0 ? 1 : 0,
-          transform: `perspective(600px) rotateY(${phase === 0 ? -40 : 0}deg) rotateX(${phase >= 1 ? -5 : 0}deg) scale(${phase >= 2 ? 1.1 : 1})`,
-          transition: 'transform 0.7s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease',
-          filter: 'drop-shadow(0 0 30px rgba(139,92,246,0.6))',
+          opacity: scene <= 1 ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+          pointerEvents: scene <= 1 ? 'auto' : 'none',
         }}
       >
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-          <defs>
-            <linearGradient id="lockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#8b5cf6" />
-              <stop offset="50%" stopColor="#ec4899" />
-              <stop offset="100%" stopColor="#f43f5e" />
-            </linearGradient>
-          </defs>
-          <rect x="12" y="36" width="56" height="38" rx="8" fill="url(#lockGrad)" opacity="0.95" />
-          <path d="M24 36V26C24 16.06 55.94 16.06 56 26V36" stroke="url(#lockGrad)" strokeWidth="5" strokeLinecap="round" fill="none" />
-          <circle cx="40" cy="54" r="5" fill="white" opacity="0.9" />
-          <rect x="38" y="54" width="4" height="8" rx="2" fill="white" opacity="0.7" />
-        </svg>
-      </div>
-
-      {/* Main title */}
-      <div
-        style={{
-          opacity: phase >= 0 ? 1 : 0,
-          transform: `perspective(600px) translateY(${phase === 0 ? 30 : 0}px) rotateX(${phase === 0 ? 15 : 0}deg)`,
-          transition: 'transform 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.5s ease',
-        }}
-      >
-        <h1 className="text-6xl font-black tracking-tight text-center mb-3">
-          <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">
-            Ur
-          </span>
-          <span className="bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
-            Secret
-          </span>
-        </h1>
-      </div>
-
-      {/* Tagline */}
-      <div
-        style={{
-          opacity: phase >= 1 ? 1 : 0,
-          transform: `translateY(${phase >= 1 ? 0 : 12}px)`,
-          transition: 'opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s',
-        }}
-      >
-        <p className="text-zinc-400 text-lg text-center font-medium tracking-wide">
-          Tes vraies réponses. Rien que la vérité.
-        </p>
-      </div>
-
-      {/* Pills */}
-      <div
-        className="flex items-center gap-3 mt-6"
-        style={{
-          opacity: phase >= 2 ? 1 : 0,
-          transform: `translateY(${phase >= 2 ? 0 : 10}px)`,
-          transition: 'opacity 0.4s ease, transform 0.4s ease',
-        }}
-      >
-        {['100% Anonyme', 'Résultats précis', 'Gratuit'].map((label) => (
+        {/* Logo mark */}
+        <div
+          className="mb-10"
+          style={{
+            opacity: 1,
+            transform: scene === 1 ? 'translateY(-20px) scale(0.7)' : 'translateY(0) scale(1)',
+            transition: 'transform 0.7s cubic-bezier(0.34,1.3,0.64,1)',
+          }}
+        >
           <span
-            key={label}
-            className="text-xs font-semibold px-3 py-1.5 rounded-full border"
+            className="text-2xl font-black tracking-tight"
             style={{
-              color: '#a78bfa',
-              borderColor: 'rgba(139,92,246,0.3)',
-              backgroundColor: 'rgba(139,92,246,0.08)',
+              background: 'linear-gradient(135deg, #a78bfa, #f472b6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
             }}
           >
-            {label}
+            UrSecret
           </span>
-        ))}
-      </div>
+        </div>
 
-      {/* Loading bar */}
-      <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-white/10 rounded-full overflow-hidden"
-        style={{ opacity: phase >= 1 ? 1 : 0, transition: 'opacity 0.3s ease' }}
-      >
+        {/* Line A */}
         <div
-          className="h-full rounded-full"
           style={{
-            background: 'linear-gradient(90deg, #8b5cf6, #ec4899)',
-            width: phase === 1 ? '40%' : phase === 2 ? '80%' : '100%',
-            transition: 'width 0.7s ease',
+            opacity: lineA ? 1 : 0,
+            transform: lineA ? 'translateY(0)' : 'translateY(60px)',
+            transition: 'opacity 0.55s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1)',
           }}
-        />
+        >
+          <span
+            className="block font-black leading-none"
+            style={{
+              fontSize: 'clamp(64px, 18vw, 96px)',
+              background: 'linear-gradient(135deg, #a78bfa 0%, #f472b6 60%, #fb7185 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '-0.03em',
+            }}
+          >
+            #1 APP
+          </span>
+        </div>
+
+        {/* Line B */}
+        <div
+          style={{
+            opacity: lineB ? 1 : 0,
+            transform: lineB ? 'translateY(0)' : 'translateY(60px)',
+            transition: 'opacity 0.55s ease 0.05s, transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.05s',
+          }}
+        >
+          <span
+            className="block font-black leading-none text-white"
+            style={{
+              fontSize: 'clamp(64px, 18vw, 96px)',
+              letterSpacing: '-0.03em',
+              opacity: 0.9,
+            }}
+          >
+            DE VÉRITÉ.
+          </span>
+        </div>
       </div>
 
-      <style>{`
-        @keyframes pulse-orb {
-          from { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
-          to   { opacity: 1;   transform: translate(-50%, -50%) scale(1.1); }
-        }
-        @keyframes float-right {
-          from { transform: translate(0, 0); }
-          to   { transform: translate(20px, -20px); }
-        }
-      `}</style>
+      {/* ─── SCENE 2: Press ─── */}
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center px-8"
+        style={{
+          opacity: scene === 2 ? 1 : 0,
+          transition: 'opacity 0.6s ease',
+          pointerEvents: scene === 2 ? 'auto' : 'none',
+        }}
+      >
+        <p
+          className="text-white/40 text-sm tracking-[0.25em] uppercase mb-10"
+          style={{
+            opacity: scene === 2 ? 1 : 0,
+            transform: scene === 2 ? 'translateY(0)' : 'translateY(10px)',
+            transition: 'all 0.5s ease 0.1s',
+          }}
+        >
+          — Vu dans la presse —
+        </p>
+        <div className="flex flex-col items-center gap-5 w-full max-w-xs">
+          {PRESS.map((name, i) => (
+            <span
+              key={name}
+              className="text-white font-bold text-xl tracking-tight"
+              style={{
+                opacity: scene === 2 ? 1 : 0,
+                transform: scene === 2 ? 'translateY(0)' : 'translateY(20px)',
+                transition: `opacity 0.45s ease ${0.15 + i * 0.1}s, transform 0.45s ease ${0.15 + i * 0.1}s`,
+              }}
+            >
+              {name}
+            </span>
+          ))}
+          <span
+            className="text-white/30 text-sm mt-2"
+            style={{
+              opacity: scene === 2 ? 1 : 0,
+              transition: 'opacity 0.4s ease 0.7s',
+            }}
+          >
+            et bien d&apos;autres...
+          </span>
+        </div>
+      </div>
+
+      {/* ─── SCENE 3: Features ─── */}
+      <div
+        className="absolute inset-0 flex flex-col items-start justify-center px-8"
+        style={{
+          opacity: scene === 3 ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+          pointerEvents: scene === 3 ? 'auto' : 'none',
+        }}
+      >
+        <p className="text-white/40 text-sm tracking-widest uppercase mb-8">
+          Pourquoi UrSecret ?
+        </p>
+        <div className="flex flex-col gap-7">
+          {BULLETS.map((b, i) => (
+            <div
+              key={i}
+              className="flex items-start gap-4"
+              style={{
+                opacity: items[i] ? 1 : 0,
+                transform: items[i] ? 'translateX(0)' : 'translateX(-30px)',
+                transition: 'opacity 0.45s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1)',
+              }}
+            >
+              <span className="text-3xl flex-shrink-0 mt-0.5">{b.emoji}</span>
+              <span
+                className="font-black text-white leading-tight"
+                style={{ fontSize: 'clamp(22px, 6vw, 30px)' }}
+              >
+                {b.text}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── SCENE 4: Quiz mockup ─── */}
+      <div
+        className="absolute inset-0 flex flex-col bg-black"
+        style={{
+          opacity: scene === 4 ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+          pointerEvents: scene === 4 ? 'auto' : 'none',
+        }}
+      >
+        <div className="px-8 pt-16 pb-6">
+          <p
+            className="font-black text-white leading-tight mb-8"
+            style={{ fontSize: 'clamp(32px, 9vw, 48px)' }}
+          >
+            Obtiens ta<br />
+            <span style={{
+              background: 'linear-gradient(135deg, #a78bfa, #f472b6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              réponse définitive
+            </span>
+          </p>
+        </div>
+
+        {/* Mockup card */}
+        <div className="mx-6 rounded-3xl overflow-hidden border border-white/10"
+          style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)' }}>
+          <div className="p-5 border-b border-white/8">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">💔</span>
+              <span className="text-white/50 text-xs font-semibold uppercase tracking-widest">Infidélité · Q.12/30</span>
+            </div>
+            <p className="text-white font-bold text-base leading-snug mt-3">
+              Ton/ta partenaire consulte-t-il/elle son téléphone différemment en ta présence ?
+            </p>
+          </div>
+          <div className="p-3 flex flex-col gap-2">
+            {[
+              'Non, aucun comportement inhabituel',
+              'Parfois, mais ça me semblait anodin',
+              'Oui, et ça m\'a mis mal à l\'aise',
+              'Il/Elle cache activement son écran',
+            ].map((opt, i) => (
+              <div
+                key={i}
+                className="px-4 py-3 rounded-xl text-sm font-medium transition-colors"
+                style={{
+                  background: i === 2
+                    ? 'linear-gradient(135deg, rgba(139,92,246,0.3), rgba(236,72,153,0.2))'
+                    : 'rgba(255,255,255,0.05)',
+                  color: i === 2 ? '#e2e8f0' : 'rgba(255,255,255,0.45)',
+                  border: i === 2 ? '1px solid rgba(139,92,246,0.4)' : '1px solid transparent',
+                }}
+              >
+                {opt}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Instant answers teaser */}
+        <div className="mx-6 mt-4">
+          <p className="text-white/30 text-xs text-center tracking-wide">
+            👇 Résultats instantanés · IA sans filtre
+          </p>
+        </div>
+      </div>
+
+      {/* ─── SCENE 5: Final CTA ─── */}
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center px-8"
+        style={{
+          opacity: scene === 5 ? 1 : 0,
+          transition: 'opacity 0.6s ease',
+          pointerEvents: scene === 5 ? 'auto' : 'none',
+          background: 'radial-gradient(ellipse at 50% 40%, rgba(139,92,246,0.2) 0%, transparent 60%)',
+        }}
+      >
+        <p
+          className="font-black text-white text-center leading-tight mb-3"
+          style={{ fontSize: 'clamp(40px, 11vw, 60px)', letterSpacing: '-0.03em' }}
+        >
+          Prêt(e) pour<br />
+          <span style={{
+            background: 'linear-gradient(135deg, #a78bfa, #f472b6)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            la vérité ?
+          </span>
+        </p>
+        <p className="text-white/40 text-sm text-center mb-12 tracking-wide">
+          2 minutes · 30 questions · 1 réponse définitive
+        </p>
+
+        <Link
+          href="/onboarding"
+          className="w-full max-w-xs py-5 rounded-2xl font-black text-white text-center text-lg transition-all active:scale-95"
+          style={{
+            background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+            boxShadow: '0 10px 50px rgba(139,92,246,0.5)',
+          }}
+          onClick={onComplete}
+        >
+          Découvrir mes vérités →
+        </Link>
+
+        <button
+          onClick={onComplete}
+          className="mt-5 text-white/25 text-sm hover:text-white/50 transition-colors"
+        >
+          Voir la landing page
+        </button>
+      </div>
     </div>
   );
 }
