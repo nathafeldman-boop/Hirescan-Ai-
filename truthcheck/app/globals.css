@@ -333,3 +333,164 @@ body {
 .option-press {
   animation: option-select 0.2s ease-out;
 }
+
+/* Dexter button — onboarding "Continuer" */
+.dxt-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.dxt-btn {
+  cursor: pointer;
+  position: relative;
+  width: 220px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  border: solid 2px #bda049;
+  border-style: outset;
+  background-color: #37363e;
+  overflow: visible;
+  box-shadow:
+    inset 1px 1px 3px #0002, inset 2px 2px 6px #0002,
+    inset 4px 4px 12px #0002, inset 6px 6px 24px #0002,
+    1px 1px 2px 0 #000, 1px 1px 3px 0 #fff6,
+    2px 2px 4px 1px #fb02, -1px -1px 2px -1px #000,
+    -2px -2px 4px 1px #000;
+}
+
+.dxt-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dxt-fabric {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  filter: url(#linen);
+  pointer-events: none;
+}
+
+.dxt-btn::before {
+  content: '';
+  position: absolute;
+  inset: -18px;
+  border-radius: 14px;
+  background-color: rgb(24, 26, 26);
+  filter: url(#bump);
+  z-index: -1;
+}
+
+.dxt-btn::after {
+  content: '';
+  position: absolute;
+  inset: -19px;
+  border-radius: 15px;
+  border: 1px solid #0004;
+  border-bottom-color: #0008;
+  box-shadow:
+    inset 1px 1px 1px #ffc6, inset 1px 3px 3px #ffc6,
+    inset 1px 5px 5px #0006, inset 1px 7px 7px #0006,
+    0 4px 6px -3px #0004, 0 12px 8px -8px #0007;
+  z-index: -1;
+}
+
+.dxt-txt {
+  position: absolute;
+  z-index: 2;
+  color: #fff;
+  font-family: Garamond, Georgia, serif;
+  font-size: 1.35em;
+  font-weight: bold;
+  font-style: italic;
+  text-shadow: 0 1px 1px #555;
+  transition: opacity 300ms ease;
+  opacity: 1;
+  white-space: nowrap;
+}
+
+.dxt-txt2 { opacity: 0; }
+.dxt-btn:focus .dxt-txt1 { opacity: 0; }
+.dxt-btn:focus .dxt-txt2 { opacity: 1; }
+
+.dxt-dot {
+  position: absolute;
+  top: -11px;
+  right: 0;
+  width: 6px;
+  height: 4px;
+  border-radius: 1px;
+  border: 1px solid #fff5;
+  box-shadow:
+    0 0 1px 0 rgba(255, 42, 9, 0),
+    0 0 6px 0 rgba(255, 42, 9, 0),
+    0 0 12px 1px rgba(255, 42, 9, 0);
+  background-color: #fff1;
+}
+
+.dxt-btn:focus .dxt-dot {
+  animation: dxt-pulse 1s ease infinite;
+}
+
+@keyframes dxt-pulse {
+  50% {
+    box-shadow:
+      0 0 1px 0 rgba(255, 42, 9, 1),
+      0 0 6px 0 rgba(255, 42, 9, 1),
+      0 0 12px 1px rgba(255, 42, 9, 1);
+    background-color: rgb(255, 42, 9);
+  }
+}
+
+.dxt-shadow {
+  z-index: -2;
+  position: absolute;
+  bottom: -36px;
+  width: 120%;
+  height: 12px;
+  background: linear-gradient(to bottom, #000, 50%, #0000);
+  filter: blur(7px);
+  opacity: 0.25;
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.dxt-shadow::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background-color: #00000015;
+}
+
+.dxt-shadow.left {
+  background-color: #aa001555;
+  transform: skewX(-70deg) translateX(-18px);
+}
+
+.dxt-shadow.right {
+  transform: skewX(70deg) translateX(18px) scaleY(1);
+}
+
+.dxt-light {
+  position: absolute;
+  left: 20%;
+  top: -32px;
+  width: 150px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #fa5;
+  filter: blur(24px);
+  z-index: 1;
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.dxt-btn:hover .dxt-light { opacity: 0.5; }
+.dxt-btn:hover .dxt-shadow.left { transform: skewX(-75deg) translateX(-34px); }
+.dxt-btn:hover .dxt-shadow.right { transform: skewX(75deg) translateX(34px) scaleY(1.1); }
+.dxt-btn:hover .dxt-shadow { opacity: 0.4; }

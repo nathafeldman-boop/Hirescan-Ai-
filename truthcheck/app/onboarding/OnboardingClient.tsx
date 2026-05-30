@@ -36,7 +36,7 @@ function GlowInner({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** SVG filter required for the edge-glow effect */
+/** SVG filters: edge-glow (#unopaq) + Dexter button (#linen, #bump) */
 function SvgFilters() {
   return (
     <svg width="0" height="0" style={{ position: 'absolute' }}>
@@ -46,6 +46,17 @@ function SvgFilters() {
             type="matrix"
             values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15"
           />
+        </filter>
+        <filter id="linen" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.75 0.35" numOctaves={4} stitchTiles="stitch" result="noise" />
+          <feColorMatrix type="saturate" values="0" in="noise" result="gray" />
+          <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="blend" />
+          <feComposite in="blend" in2="SourceGraphic" operator="in" />
+        </filter>
+        <filter id="bump" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves={4} seed={3} result="noise" />
+          <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise" />
+          <feBlend in="SourceGraphic" in2="grayNoise" mode="soft-light" />
         </filter>
       </defs>
     </svg>
@@ -227,15 +238,21 @@ function TextStep({
         maxLength={40}
         className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg placeholder-zinc-600 outline-none focus:border-violet-500/60 focus:bg-white/8 transition-all mb-6"
       />
-      <button
-        onClick={() => onNext(local)}
-        disabled={!local.trim()}
-        className="glow-btn justify-center"
-      >
-        <GlowInner>
-          <span className="w-full text-center font-bold">Continuer →</span>
-        </GlowInner>
-      </button>
+      <div className="dxt-wrap">
+        <button
+          onClick={() => onNext(local)}
+          disabled={!local.trim()}
+          className="dxt-btn"
+        >
+          <div className="dxt-fabric" />
+          <span className="dxt-txt dxt-txt1">Continuer</span>
+          <span className="dxt-txt dxt-txt2">→ Allons-y</span>
+          <div className="dxt-dot" />
+          <div className="dxt-shadow left" />
+          <div className="dxt-shadow right" />
+          <div className="dxt-light" />
+        </button>
+      </div>
     </div>
   );
 }
