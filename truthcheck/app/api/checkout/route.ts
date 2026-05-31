@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, origin } = await req.json();
+    const { resultId, quizSlug, score, origin } = await req.json();
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
     const priceId = process.env.STRIPE_PRICE_ID;
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
             currency: 'eur',
             product_data: {
               name: 'UrSecret Premium',
-              description: 'Accès illimité à toutes tes analyses et résultats',
+              description: 'Ton score + analyse complète personnalisée',
             },
             unit_amount: 499,
             recurring: { interval: 'month' as const },
@@ -34,14 +34,20 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         };
 
+    // Cancel URL returns user to their results page
+    const cancelUrl = quizSlug && score !== undefined
+      ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
+      : `${baseUrl}/quizzes`;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [lineItem],
       allow_promotion_codes: true,
-      metadata: { resultId: resultId ?? '' },
+      customer_creation: 'always',
+      metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '' },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`,
-      cancel_url: `${baseUrl}/quiz/${resultId ?? ''}`,
+      cancel_url: cancelUrl,
     });
 
     return NextResponse.json({ url: session.url });
