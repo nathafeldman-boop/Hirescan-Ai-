@@ -2,65 +2,68 @@ name: Ping Search Engines + Archive
 on:
   push:
     branches: [main]
+  schedule:
+    # Every day at 08:00 UTC — keeps all search engines fed automatically
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      # --- IMMEDIATE (no wait needed) ---
+      - name: Wait for Vercel (only on push, not cron)
+        if: github.event_name == 'push'
+        run: sleep 100
 
       - name: Ping Google sitemap
         run: |
           curl -s "https://www.google.com/ping?sitemap=https://ursecret.vercel.app/sitemap.xml" \
-            -o /dev/null -w "Google sitemap ping: %{http_code}\n"
+            -o /dev/null -w "Google sitemap: %{http_code}\n"
 
-      - name: Submit to IndexNow (Bing + Yandex + others)
+      - name: Submit to IndexNow (covers Bing + Yandex + Ecosia + DuckDuckGo + Brave + Seznam)
         run: |
+          PAYLOAD='{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}'
           curl -s -X POST "https://api.indexnow.org/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d '{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}' \
-            -w "\nIndexNow: %{http_code}\n"
-
-      - name: Submit to Bing directly
-        run: |
+            -d "$PAYLOAD" -w "\nIndexNow hub: %{http_code}\n"
           curl -s -X POST "https://www.bing.com/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d '{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}' \
-            -w "\nBing: %{http_code}\n"
-
-      - name: Submit to Yandex
-        run: |
+            -d "$PAYLOAD" -w "\nBing: %{http_code}\n"
           curl -s -X POST "https://yandex.com/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d '{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}' \
-            -w "\nYandex: %{http_code}\n"
+            -d "$PAYLOAD" -w "\nYandex: %{http_code}\n"
+          curl -s -X POST "https://search.seznam.cz/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$PAYLOAD" -w "\nSeznam: %{http_code}\n" || true
 
-      - name: PubSubHubbub hub ping (Google Feed reader infrastructure)
+      - name: PubSubHubbub ping (Google Feed infrastructure)
         run: |
           curl -s -X POST "https://pubsubhubbub.appspot.com/" \
             -d "hub.mode=publish&hub.url=https://ursecret.vercel.app/sitemap.xml" \
-            -w "\nPubSubHubbub: %{http_code}\n"
+            -w "\nPubSubHubbub sitemap: %{http_code}\n"
+          curl -s -X POST "https://pubsubhubbub.appspot.com/" \
+            -d "hub.mode=publish&hub.url=https://ursecret.vercel.app/feed.xml" \
+            -w "\nPubSubHubbub feed: %{http_code}\n"
 
-      # --- WAYBACK MACHINE (no auth required, creates indexed backlinks on archive.org) ---
-
-      - name: Archive homepage on Wayback Machine
+      - name: Ping-O-Matic XML-RPC (notifies 20+ aggregators at once)
         run: |
-          curl -s -X POST "https://web.archive.org/save/https://ursecret.vercel.app" \
-            -H "Accept: application/json" --max-time 30 \
-            -w "\nArchive /: %{http_code}\n" || true
+          curl -s -X POST "http://rpc.pingomatic.com/" \
+            -H "Content-Type: text/xml" \
+            -d '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.extendedPing</methodName><params><param><value><string>UrSecret — Tes vraies réponses</string></value></param><param><value><string>https://ursecret.vercel.app</string></value></param><param><value><string>https://ursecret.vercel.app/sitemap.xml</string></value></param></params></methodCall>' \
+            -w "\nPing-o-Matic: %{http_code}\n" || true
 
-      - name: Archive /quizzes
+      - name: Archive all pages on Wayback Machine (creates permanent indexed backlinks)
         run: |
-          curl -s -X POST "https://web.archive.org/save/https://ursecret.vercel.app/quizzes" \
-            -H "Accept: application/json" --max-time 30 \
-            -w "\nArchive /quizzes: %{http_code}\n" || true
-
-      - name: Archive quiz pages
-        run: |
-          for slug in infidelite adopte amoureux vrais-amis orientation; do
-            curl -s -X POST "https://web.archive.org/save/https://ursecret.vercel.app/quiz/${slug}" \
+          for url in \
+            "https://ursecret.vercel.app" \
+            "https://ursecret.vercel.app/quizzes" \
+            "https://ursecret.vercel.app/quiz/infidelite" \
+            "https://ursecret.vercel.app/quiz/adopte" \
+            "https://ursecret.vercel.app/quiz/amoureux" \
+            "https://ursecret.vercel.app/quiz/vrais-amis" \
+            "https://ursecret.vercel.app/quiz/orientation"; do
+            curl -s -X POST "https://web.archive.org/save/${url}" \
               -H "Accept: application/json" --max-time 30 \
-              -w "\nArchive /quiz/${slug}: %{http_code}\n" || true
-            sleep 3
+              -w "\nArchive ${url}: %{http_code}\n" || true
+            sleep 4
           done
