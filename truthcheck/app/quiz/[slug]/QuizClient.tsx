@@ -10,6 +10,14 @@ interface Props {
   quiz: Quiz;
 }
 
+const INFIDELITE_SLIDES = [
+  '/infidelite-bg-1.jpg',
+  '/infidelite-bg-2.jpg',
+  '/infidelite-bg-3.jpg',
+  '/infidelite-bg-4.jpg',
+  '/infidelite-bg-5.jpg',
+];
+
 export default function QuizClient({ quiz }: Props) {
   const router = useRouter();
   const [session, setSession] = useState<QuizSession>({});
@@ -17,6 +25,7 @@ export default function QuizClient({ quiz }: Props) {
   const [totalScore, setTotalScore] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
+  const [bgIndex, setBgIndex] = useState(0);
 
   useEffect(() => {
     try {
@@ -26,6 +35,16 @@ export default function QuizClient({ quiz }: Props) {
       // sessionStorage unavailable
     }
   }, []);
+
+  const isInfidelite = quiz.slug === 'infidelite';
+
+  useEffect(() => {
+    if (!isInfidelite) return;
+    const id = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % INFIDELITE_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [isInfidelite]);
 
   const questions = useMemo(
     () => selectQuestions(quiz.questions, session),
@@ -66,32 +85,42 @@ export default function QuizClient({ quiz }: Props) {
 
   const greeting = session.firstName ? `, ${session.firstName}` : '';
 
-  const isInfidelite = quiz.slug === 'infidelite';
-
   return (
-    <main
-      className="min-h-screen flex flex-col"
-      style={
-        isInfidelite
-          ? {
-              backgroundImage: 'url(/infidelite-bg.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center top',
-              backgroundAttachment: 'fixed',
-            }
-          : { backgroundColor: '#09090b' }
-      }
-    >
-      {/* Dark overlay for infidelite */}
+    <main className="min-h-screen flex flex-col" style={isInfidelite ? {} : { backgroundColor: '#09090b' }}>
+
+      {/* Slideshow background — infidélité only */}
       {isInfidelite && (
-        <div className="fixed inset-0 z-0 pointer-events-none" style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(9,9,11,0.75) 40%, rgba(9,9,11,0.92) 100%)',
-        }} />
+        <>
+          {INFIDELITE_SLIDES.map((src, i) => (
+            <div
+              key={src}
+              className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${src})`,
+                opacity: i === bgIndex ? 1 : 0,
+                transition: 'opacity 1.2s ease-in-out',
+                zIndex: 0,
+              }}
+            />
+          ))}
+          {/* Dark overlay */}
+          <div
+            className="fixed inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(9,9,11,0.7) 35%, rgba(9,9,11,0.88) 100%)',
+              zIndex: 1,
+            }}
+          />
+        </>
       )}
 
       {/* Header */}
-      <header className="sticky top-0 z-20 backdrop-blur-md border-b border-white/5"
-        style={{ background: isInfidelite ? 'rgba(9,9,11,0.6)' : 'rgba(9,9,11,0.8)' }}
+      <header
+        className="sticky top-0 backdrop-blur-md border-b border-white/5"
+        style={{
+          background: isInfidelite ? 'rgba(9,9,11,0.55)' : 'rgba(9,9,11,0.8)',
+          zIndex: 20,
+        }}
       >
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link
@@ -128,7 +157,7 @@ export default function QuizClient({ quiz }: Props) {
       </header>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8" style={{ position: 'relative', zIndex: 10 }}>
         <div
           className={`w-full max-w-2xl transition-all duration-300 ${
             transitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
