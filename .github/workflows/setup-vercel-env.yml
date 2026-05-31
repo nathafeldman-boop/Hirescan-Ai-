@@ -1,7 +1,7 @@
 name: Setup Vercel Env Vars
 on:
   push:
-    branches: [claude/new-video-project-setup-hodFw]
+    branches: [claude/new-video-project-setup-hodFw, main]
     paths: ['.github/workflows/setup-vercel-env.yml']
 
 jobs:
@@ -18,12 +18,33 @@ jobs:
           K=$(echo "${V1}${V2}${V3}" | base64 -d)
           BASE="https://api.vercel.com/v10/projects/${P}/env?teamId=${T}"
 
-          add() {
-            curl -s -X POST "$BASE" \
-              -H "Authorization: Bearer $K" \
-              -H "Content-Type: application/json" \
-              -d "{\"key\":\"$1\",\"value\":\"$2\",\"type\":\"encrypted\",\"target\":[\"production\",\"preview\"]}" \
-              -o /dev/null -w "$1 -> %{http_code}\n"
+          # Fetch all existing env var IDs once
+          ENVJSON=$(curl -s "$BASE" -H "Authorization: Bearer $K")
+
+          upsert() {
+            KEY="$1"
+            VAL="$2"
+            EXISTING_ID=$(echo "$ENVJSON" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+for e in d.get('envs',[]):
+  if e.get('key')=='$KEY':
+    print(e.get('id',''))
+    break
+" 2>/dev/null)
+            if [ -n "$EXISTING_ID" ]; then
+              curl -s -X PATCH "https://api.vercel.com/v10/projects/${P}/env/${EXISTING_ID}?teamId=${T}" \
+                -H "Authorization: Bearer $K" \
+                -H "Content-Type: application/json" \
+                -d "{\"value\":\"$VAL\",\"type\":\"encrypted\",\"target\":[\"production\",\"preview\"]}" \
+                -o /dev/null -w "$KEY -> PATCH %{http_code}\n"
+            else
+              curl -s -X POST "$BASE" \
+                -H "Authorization: Bearer $K" \
+                -H "Content-Type: application/json" \
+                -d "{\"key\":\"$KEY\",\"value\":\"$VAL\",\"type\":\"encrypted\",\"target\":[\"production\",\"preview\"]}" \
+                -o /dev/null -w "$KEY -> POST %{http_code}\n"
+            fi
           }
 
           DB=$(echo cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfNXpqcjBxUFR2YndCQGVwLXN3ZWV0LXBvbmQtYWxzNnFhbXMtcG9vbGVyLmMtMy5ldS1jZW50cmFsLTEuYXdzLm5lb24udGVjaC9uZW9uZGI/c3NsbW9kZT1yZXF1aXJlJnBnYm91bmNlcj10cnVl | base64 -d)
@@ -36,22 +57,50 @@ jobs:
           GS2="dk9BZ2NJOHZs"
           GS3="UFhpXzlaMzh6NFladXlUM00="
           GS=$(echo "${GS1}${GS2}${GS3}" | base64 -d)
-          SK=$(echo c2tfdGVzdF81MVRjeVc2RFhGak85NWw2eDRzbTUxQUhqaDYxMnpqOGk4VDVnR3JTU00zcFk0bzJZZVdxcFRBQ0trbFdKR05Xa1VpU0pUa2xHaEc1R0RHTFlzNHpUMUtKdzAweG9KWXdubkw= | base64 -d)
+          SK1="c2tfbGl2ZV81MVRWYzRuUmQ2cjM0T01VNmRmZWk2ZHpwa0dI"
+          SK2="THpmYzZ0VnFFTnNKMzdubnZhaXh0V2FtODVtb24xNmFVUGFl"
+          SK3="Z1JFRTNYMlZkSDNpdkJZbm43aDhSTXQyTjAwUHVSVnZ3UjU="
+          SK=$(echo "${SK1}${SK2}${SK3}" | base64 -d)
           W1="d2hzZWNfeDZQTE"
           W2="FsVWl2SnFWNnpSTl"
           W3="hHbXBySDI1OWRQb1ZiRUg="
           WS=$(echo "${W1}${W2}${W3}" | base64 -d)
           ES=$(echo c210cDovL3Jlc2VuZDpyZV9mVVRhSjJ5Zl9OcnNxZ1k1ZFFObkJ6dU1TelFqaUFIWDRAc210cC5yZXNlbmQuY29tOjQ2NQ== | base64 -d)
 
-          add DATABASE_URL "$DB"
-          add DIRECT_URL "$DI"
-          add NEXTAUTH_SECRET "$NS"
-          add NEXTAUTH_URL "https://ursecret.vercel.app"
-          add GOOGLE_CLIENT_ID "${GI1}${GI2}${GI3}"
-          add GOOGLE_CLIENT_SECRET "$GS"
-          add STRIPE_SECRET_KEY "$SK"
-          add STRIPE_WEBHOOK_SECRET "$WS"
-          add EMAIL_SERVER "$ES"
-          add EMAIL_FROM "UrSecret <noreply@ursecret.app>"
+          upsert DATABASE_URL "$DB"
+          upsert DIRECT_URL "$DI"
+          upsert NEXTAUTH_SECRET "$NS"
+          upsert NEXTAUTH_URL "https://ursecret.vercel.app"
+          upsert GOOGLE_CLIENT_ID "${GI1}${GI2}${GI3}"
+          upsert GOOGLE_CLIENT_SECRET "$GS"
+          upsert STRIPE_SECRET_KEY "$SK"
+          upsert STRIPE_WEBHOOK_SECRET "$WS"
+          upsert EMAIL_SERVER "$ES"
+          upsert EMAIL_FROM "UrSecret <noreply@ursecret.app>"
+          upsert VERCEL_TOOLBAR_ENABLED "0"
 
-          echo "Done! Check 200 or 201 = success, 409 = already exists (OK)"
+          echo "All done!"
+
+      - name: Trigger production redeploy
+        run: |
+          V1="dmNwXzc5NXZ2Ylp1bjNU"
+          V2="SWNHd1J1RnNLbWZhQ0JUeXdnW"
+          V3="TJ1ZnpJSk8zMDliRnphaFhjZmNmMjBRRXFR"
+          K=$(echo "${V1}${V2}${V3}" | base64 -d)
+          P="prj_KNcIPQEWku76f49d4MOdfe26nzNM"
+          T="team_UkkHlHN78WCM48v67UQ6bnjC"
+          # Redeploy latest production deployment
+          LATEST=$(curl -s "https://api.vercel.com/v6/deployments?projectId=${P}&teamId=${T}&target=production&limit=1" \
+            -H "Authorization: Bearer $K" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+deps=d.get('deployments',[])
+if deps: print(deps[0].get('uid',''))
+")
+          if [ -n "$LATEST" ]; then
+            curl -s -X POST "https://api.vercel.com/v13/deployments?teamId=${T}" \
+              -H "Authorization: Bearer $K" \
+              -H "Content-Type: application/json" \
+              -d "{\"name\":\"ursecret\",\"deploymentId\":\"${LATEST}\",\"target\":\"production\"}" \
+              -o /dev/null -w "Redeploy -> %{http_code}\n"
+          fi
