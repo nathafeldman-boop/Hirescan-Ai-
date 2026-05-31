@@ -124,7 +124,7 @@ export default function QuizClient({ quiz }: Props) {
       >
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link
-            href="/onboarding"
+            href="/quizzes"
             className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

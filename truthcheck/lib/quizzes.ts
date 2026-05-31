@@ -44,7 +44,7 @@ export interface Quiz {
   resultTiers: ResultTier[];
 }
 
-const quizzes: Quiz[] = [
+export const quizzes: Quiz[] = [
   {
     slug: 'infidelite',
     title: 'Mon/Ma partenaire me trompe ?',
