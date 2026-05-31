@@ -10,13 +10,22 @@ interface Props {
   quiz: Quiz;
 }
 
-const INFIDELITE_SLIDES = [
-  '/infidelite-bg-1.jpg',
-  '/infidelite-bg-2.jpg',
-  '/infidelite-bg-3.jpg',
-  '/infidelite-bg-4.jpg',
-  '/infidelite-bg-5.jpg',
-];
+const QUIZ_SLIDES: Record<string, string[]> = {
+  infidelite: [
+    '/infidelite-bg-1.jpg',
+    '/infidelite-bg-2.jpg',
+    '/infidelite-bg-3.jpg',
+    '/infidelite-bg-4.jpg',
+    '/infidelite-bg-5.jpg',
+  ],
+  adopte: [
+    '/adopte-bg-1.jpg',
+    '/adopte-bg-2.jpg',
+    '/adopte-bg-3.jpg',
+    '/adopte-bg-4.jpg',
+    '/adopte-bg-5.jpg',
+  ],
+};
 
 export default function QuizClient({ quiz }: Props) {
   const router = useRouter();
@@ -36,15 +45,16 @@ export default function QuizClient({ quiz }: Props) {
     }
   }, []);
 
-  const isInfidelite = quiz.slug === 'infidelite';
+  const slides = QUIZ_SLIDES[quiz.slug] ?? null;
 
   useEffect(() => {
-    if (!isInfidelite) return;
+    if (!slides) return;
+    setBgIndex(0);
     const id = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % INFIDELITE_SLIDES.length);
+      setBgIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(id);
-  }, [isInfidelite]);
+  }, [quiz.slug, slides?.length]);
 
   const questions = useMemo(
     () => selectQuestions(quiz.questions, session),
@@ -86,12 +96,12 @@ export default function QuizClient({ quiz }: Props) {
   const greeting = session.firstName ? `, ${session.firstName}` : '';
 
   return (
-    <main className="min-h-screen flex flex-col" style={isInfidelite ? {} : { backgroundColor: '#09090b' }}>
+    <main className="min-h-screen flex flex-col" style={slides ? {} : { backgroundColor: '#09090b' }}>
 
-      {/* Slideshow background — infidélité only */}
-      {isInfidelite && (
+      {/* Slideshow background */}
+      {slides && (
         <>
-          {INFIDELITE_SLIDES.map((src, i) => (
+          {slides.map((src, i) => (
             <div
               key={src}
               className="fixed inset-0 bg-cover bg-center bg-no-repeat"
@@ -118,7 +128,7 @@ export default function QuizClient({ quiz }: Props) {
       <header
         className="sticky top-0 backdrop-blur-md border-b border-white/5"
         style={{
-          background: isInfidelite ? 'rgba(9,9,11,0.55)' : 'rgba(9,9,11,0.8)',
+          background: slides ? 'rgba(9,9,11,0.55)' : 'rgba(9,9,11,0.8)',
           zIndex: 20,
         }}
       >
