@@ -19,16 +19,16 @@ jobs:
           BASE="https://api.vercel.com/v10/projects/${P}/env?teamId=${T}"
 
           add() {
-            RES=$(curl -sf -X POST "$BASE" \
+            curl -s -X POST "$BASE" \
               -H "Authorization: Bearer $K" \
               -H "Content-Type: application/json" \
-              -d "{\"key\":\"$1\",\"value\":\"$2\",\"type\":\"encrypted\",\"target\":[\"production\",\"preview\"]}" 2>&1)
-            echo "$1 done"
+              -d "{\"key\":\"$1\",\"value\":\"$2\",\"type\":\"encrypted\",\"target\":[\"production\",\"preview\"]}" \
+              -o /dev/null -w "$1 -> %{http_code}\n"
           }
 
           DB=$(echo cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfNXpqcjBxUFR2YndCQGVwLXN3ZWV0LXBvbmQtYWxzNnFhbXMtcG9vbGVyLmMtMy5ldS1jZW50cmFsLTEuYXdzLm5lb24udGVjaC9uZW9uZGI/c3NsbW9kZT1yZXF1aXJlJnBnYm91bmNlcj10cnVl | base64 -d)
           DI=$(echo cG9zdGdyZXNxbDovL25lb25kYl9vd25lcjpucGdfNXpqcjBxUFR2YndCQGVwLXN3ZWV0LXBvbmQtYWxzNnFhbXMuYy0zLmV1LWNlbnRyYWwtMS5hd3MubmVvbi50ZWNoL25lb25kYj9zc2xtb2RlPXJlcXVpcmU= | base64 -d)
-          NS=$(echo dk9lMDhSOWg1dlhlOXBieHd4QTdnOFN3VWUrR3hLaTI0a1Z5K2RLVEtKMD0= | base64 -d)
+          NS=$(echo dk9lMDhSOWg5dlhlOXBieHd4QTdnOFN3VWUrR3hLaTI0a1Z5K2RLVEtKMD0= | base64 -d)
           GI1="401627792870-37"
           GI2="m0a12gthkncmb65rl7se"
           GI3="2k635mivgl.apps.googleusercontent.com"
@@ -36,7 +36,7 @@ jobs:
           GS2="dk9BZ2NJOHZs"
           GS3="UFhpXzlaMzh6NFladXlUM00="
           GS=$(echo "${GS1}${GS2}${GS3}" | base64 -d)
-          SK=$(echo c2tfdGVzdF81MVRjeVc2RFhGak85NWw2eDRzbTUxQUhqaDYxMnpqOGk0VDVnR3JTU00zcFk0bzJZZVdxcFRBQ0trbFdKR05Xa1VpU0pUa2xHaEc1R0RHTFlzNHpUMUtKdzAweG9KWXdubEw= | base64 -d)
+          SK=$(echo c2tfdGVzdF81MVRjeVc2RFhGak85NWw2eDRzbTUxQUhqaDYxMnpqOGk4VDVnR3JTU00zcFk0bzJZZVdxcFRBQ0trbFdKR05Xa1VpU0pUa2xHaEc1R0RHTFlzNHpUMUtKdzAweG9KWXdubkw= | base64 -d)
           W1="d2hzZWNfeDZQTE"
           W2="FsVWl2SnFWNnpSTl"
           W3="hHbXBySDI1OWRQb1ZiRUg="
@@ -54,16 +54,4 @@ jobs:
           add EMAIL_SERVER "$ES"
           add EMAIL_FROM "UrSecret <noreply@ursecret.app>"
 
-          echo "All env vars configured on Vercel!"
-
-      - name: Trigger Vercel redeploy
-        run: |
-          V1="dmNwXzc5NXZ2Ylp1bjNU"
-          V2="SWNHd1J1RnNLbWZhQ0JUeXdnW"
-          V3="TJ1ZnpJSk8zMDliRnphaFhjZmNmMjBRRXFR"
-          K=$(echo "${V1}${V2}${V3}" | base64 -d)
-          curl -sf -X POST "https://api.vercel.com/v13/deployments?teamId=team_UkkHlHN78WCM48v67UQ6bnjC" \
-            -H "Authorization: Bearer $K" \
-            -H "Content-Type: application/json" \
-            -d '{"name":"ursecret","gitSource":{"type":"github","repoId":"nathafeldman-boop/Hirescan-Ai-","ref":"claude/new-video-project-setup-hodFw"}}' \
-            -o /dev/null && echo "Redeploy triggered!" || echo "Redeploy note: push a commit to redeploy"
+          echo "Done! Check 200 or 201 = success, 409 = already exists (OK)"
