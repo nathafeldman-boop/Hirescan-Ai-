@@ -32,6 +32,13 @@ const QUIZ_SLIDES: Record<string, string[]> = {
     '/amoureux-bg-4.jpg',
     '/amoureux-bg-5.jpg',
   ],
+  'vrais-amis': [
+    '/vrais-amis-bg-1.jpg',
+    '/vrais-amis-bg-2.jpg',
+    '/vrais-amis-bg-3.jpg',
+    '/vrais-amis-bg-4.jpg',
+    '/vrais-amis-bg-5.jpg',
+  ],
 };
 
 export default function QuizClient({ quiz }: Props) {
