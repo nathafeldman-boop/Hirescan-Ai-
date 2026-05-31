@@ -1,0 +1,22 @@
+import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'UrSecret — Tes vraies réponses',
+  description: 'Des questionnaires précis pour découvrir les vérités que tu ressens. 100% anonyme.',
+  openGraph: {
+    title: 'UrSecret',
+    description: 'Tes vraies réponses. Rien que la vérité.',
+    type: 'website',
+  },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="fr">
+      <body className="min-h-screen bg-[#09090b] text-white antialiased">
+        {children}
+      </body>
+    </html>
+  );
+}
