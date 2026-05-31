@@ -21,6 +21,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Kill Vercel toolbar — targets all known variants of the injected element */
+vercel-toolbar,
+#__vercel-toolbar,
+#__vercel-toolbar-wrapper,
+[id^="vercel-toolbar"],
+[class*="vercel-toolbar"],
+[data-vercel-toolbar] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* Glassmorphism utility */
 .glass {
   background: rgba(255, 255, 255, 0.04);
