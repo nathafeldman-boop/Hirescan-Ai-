@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /analyze
+Disallow: /share/
+
+Sitemap: https://ursecret.vercel.app/sitemap.xml

@@ -113,9 +113,47 @@ export default function OnboardingClient() {
     <main className="min-h-screen bg-[#09090b] flex flex-col relative overflow-hidden">
       <SvgFilters />
 
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-900/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-900/10 rounded-full blur-3xl" />
+      {/* Neon ambient background */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        {/* Subtle grid */}
+        <div
+          className="neon-grid absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(139,92,246,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.07) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+          }}
+        />
+        {/* Scanline */}
+        <div
+          className="neon-scan absolute left-0 right-0 h-[2px]"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.3), rgba(236,72,153,0.2), transparent)' }}
+        />
+        {/* Orb 1 — violet top-left */}
+        <div
+          className="neon-orb-1 absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.28) 0%, transparent 68%)', filter: 'blur(36px)' }}
+        />
+        {/* Orb 2 — pink bottom-right */}
+        <div
+          className="neon-orb-2 absolute -bottom-24 -right-24 w-[480px] h-[480px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(236,72,153,0.22) 0%, transparent 68%)', filter: 'blur(44px)' }}
+        />
+        {/* Orb 3 — cyan mid-right */}
+        <div
+          className="neon-orb-3 absolute top-[35%] right-[-8%] w-[280px] h-[280px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.18) 0%, transparent 70%)', filter: 'blur(52px)' }}
+        />
+        {/* Orb 4 — indigo bottom-left */}
+        <div
+          className="neon-orb-4 absolute bottom-[20%] left-[5%] w-[320px] h-[320px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)', filter: 'blur(48px)' }}
+        />
+        {/* Vignette */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(9,9,11,0.7) 100%)' }}
+        />
       </div>
 
       {/* Header */}

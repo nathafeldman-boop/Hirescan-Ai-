@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1000" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="50%" stop-color="#1a0530"/>
+      <stop offset="100%" stop-color="#0d0118"/>
+    </linearGradient>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+    <linearGradient id="btngrad" x1="0" y1="0" x2="1000" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="25%" cy="25%" r="50%">
+      <stop offset="0%" stop-color="rgba(139,92,246,0.4)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="75%" cy="75%" r="50%">
+      <stop offset="0%" stop-color="rgba(236,72,153,0.35)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <filter id="blur1">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="rgba(139,92,246,0.6)"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="1000" fill="url(#bg)"/>
+
+  <!-- Ambient glows -->
+  <circle cx="200" cy="200" r="350" fill="url(#glow1)" filter="url(#blur1)"/>
+  <circle cx="800" cy="800" r="320" fill="url(#glow2)" filter="url(#blur1)"/>
+
+  <!-- Grid lines -->
+  <g opacity="0.06" stroke="#8b5cf6" stroke-width="1">
+    <line x1="0" y1="125" x2="1000" y2="125"/>
+    <line x1="0" y1="250" x2="1000" y2="250"/>
+    <line x1="0" y1="375" x2="1000" y2="375"/>
+    <line x1="0" y1="500" x2="1000" y2="500"/>
+    <line x1="0" y1="625" x2="1000" y2="625"/>
+    <line x1="0" y1="750" x2="1000" y2="750"/>
+    <line x1="0" y1="875" x2="1000" y2="875"/>
+    <line x1="125" y1="0" x2="125" y2="1000"/>
+    <line x1="250" y1="0" x2="250" y2="1000"/>
+    <line x1="375" y1="0" x2="375" y2="1000"/>
+    <line x1="500" y1="0" x2="500" y2="1000"/>
+    <line x1="625" y1="0" x2="625" y2="1000"/>
+    <line x1="750" y1="0" x2="750" y2="1000"/>
+    <line x1="875" y1="0" x2="875" y2="1000"/>
+  </g>
+
+  <!-- Lock icon container -->
+  <rect x="380" y="290" width="240" height="240" rx="72" fill="url(#btngrad)" filter="url(#shadow)"/>
+  <!-- Shine overlay -->
+  <rect x="380" y="290" width="240" height="120" rx="72" fill="rgba(255,255,255,0.18)"/>
+
+  <!-- Lock shackle -->
+  <path d="M460 390v-28a40 40 0 0 1 80 0v28" stroke="white" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <!-- Lock body -->
+  <rect x="440" y="390" width="120" height="84" rx="22" fill="white" opacity="0.95"/>
+  <!-- Keyhole circle -->
+  <circle cx="500" cy="422" r="13" fill="url(#btngrad)"/>
+  <!-- Keyhole slot -->
+  <rect x="494" y="430" width="12" height="20" rx="6" fill="url(#btngrad)"/>
+
+  <!-- Brand name -->
+  <text x="500" y="596" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="900" font-size="120">
+    <tspan fill="url(#grad)">Ur</tspan><tspan fill="white">Secret</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text x="500" y="654" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="400" font-size="30" fill="rgba(161,161,170,0.8)" letter-spacing="1">
+    Tes vraies réponses.
+  </text>
+
+  <!-- Bottom pill -->
+  <rect x="330" y="710" width="340" height="56" rx="28" fill="url(#btngrad)" opacity="0.85"/>
+  <text x="500" y="745" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="22" fill="white">
+    100% anonyme
+  </text>
+</svg>
