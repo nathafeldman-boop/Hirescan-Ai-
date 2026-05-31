@@ -23,11 +23,36 @@ export async function POST(req: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
     const resultId = session.metadata?.resultId;
+    const customerId = session.customer as string | null;
+    const email = session.customer_details?.email;
+
+    // Mark the quiz result as paid
     if (resultId) {
       await prisma.quizResult.update({
         where: { id: resultId },
         data: { paid: true },
-      });
+      }).catch(() => {});
+    }
+
+    // Upgrade user tier to premium
+    if (email) {
+      await prisma.user.updateMany({
+        where: { email },
+        data: { tier: 'premium' },
+      }).catch(() => {});
+    }
+  }
+
+  if (event.type === 'customer.subscription.deleted') {
+    const sub = event.data.object as Stripe.Subscription;
+    const customerId = sub.customer as string;
+    // Find customer email from Stripe and downgrade
+    const customer = await stripe.customers.retrieve(customerId).catch(() => null);
+    if (customer && !customer.deleted && customer.email) {
+      await prisma.user.updateMany({
+        where: { email: customer.email },
+        data: { tier: 'free' },
+      }).catch(() => {});
     }
   }
 
