@@ -1,4 +1,4 @@
-name: Ping Search Engines
+name: Ping Search Engines + Archive
 on:
   push:
     branches: [main]
@@ -8,67 +8,59 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Vercel to go live
-        run: sleep 100
+      # --- IMMEDIATE (no wait needed) ---
 
       - name: Ping Google sitemap
         run: |
           curl -s "https://www.google.com/ping?sitemap=https://ursecret.vercel.app/sitemap.xml" \
             -o /dev/null -w "Google sitemap ping: %{http_code}\n"
 
-      - name: Submit all URLs via IndexNow (Bing + Yandex + others)
+      - name: Submit to IndexNow (Bing + Yandex + others)
         run: |
           curl -s -X POST "https://api.indexnow.org/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d '{
-              "host": "ursecret.vercel.app",
-              "key": "ursecret-idx-7a2b8c9d",
-              "keyLocation": "https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt",
-              "urlList": [
-                "https://ursecret.vercel.app",
-                "https://ursecret.vercel.app/quizzes",
-                "https://ursecret.vercel.app/quiz/infidelite",
-                "https://ursecret.vercel.app/quiz/adopte",
-                "https://ursecret.vercel.app/quiz/amoureux",
-                "https://ursecret.vercel.app/quiz/vrais-amis",
-                "https://ursecret.vercel.app/quiz/orientation"
-              ]
-            }' -w "\nIndexNow: %{http_code}\n"
+            -d '{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}' \
+            -w "\nIndexNow: %{http_code}\n"
 
       - name: Submit to Bing directly
         run: |
           curl -s -X POST "https://www.bing.com/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d '{
-              "host": "ursecret.vercel.app",
-              "key": "ursecret-idx-7a2b8c9d",
-              "keyLocation": "https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt",
-              "urlList": [
-                "https://ursecret.vercel.app",
-                "https://ursecret.vercel.app/quizzes",
-                "https://ursecret.vercel.app/quiz/infidelite",
-                "https://ursecret.vercel.app/quiz/adopte",
-                "https://ursecret.vercel.app/quiz/amoureux",
-                "https://ursecret.vercel.app/quiz/vrais-amis",
-                "https://ursecret.vercel.app/quiz/orientation"
-              ]
-            }' -w "\nBing direct: %{http_code}\n"
+            -d '{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}' \
+            -w "\nBing: %{http_code}\n"
 
-      - name: Submit to Yandex directly
+      - name: Submit to Yandex
         run: |
           curl -s -X POST "https://yandex.com/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d '{
-              "host": "ursecret.vercel.app",
-              "key": "ursecret-idx-7a2b8c9d",
-              "keyLocation": "https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt",
-              "urlList": [
-                "https://ursecret.vercel.app",
-                "https://ursecret.vercel.app/quizzes",
-                "https://ursecret.vercel.app/quiz/infidelite",
-                "https://ursecret.vercel.app/quiz/adopte",
-                "https://ursecret.vercel.app/quiz/amoureux",
-                "https://ursecret.vercel.app/quiz/vrais-amis",
-                "https://ursecret.vercel.app/quiz/orientation"
-              ]
-            }' -w "\nYandex: %{http_code}\n"
+            -d '{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}' \
+            -w "\nYandex: %{http_code}\n"
+
+      - name: PubSubHubbub hub ping (Google Feed reader infrastructure)
+        run: |
+          curl -s -X POST "https://pubsubhubbub.appspot.com/" \
+            -d "hub.mode=publish&hub.url=https://ursecret.vercel.app/sitemap.xml" \
+            -w "\nPubSubHubbub: %{http_code}\n"
+
+      # --- WAYBACK MACHINE (no auth required, creates indexed backlinks on archive.org) ---
+
+      - name: Archive homepage on Wayback Machine
+        run: |
+          curl -s -X POST "https://web.archive.org/save/https://ursecret.vercel.app" \
+            -H "Accept: application/json" --max-time 30 \
+            -w "\nArchive /: %{http_code}\n" || true
+
+      - name: Archive /quizzes
+        run: |
+          curl -s -X POST "https://web.archive.org/save/https://ursecret.vercel.app/quizzes" \
+            -H "Accept: application/json" --max-time 30 \
+            -w "\nArchive /quizzes: %{http_code}\n" || true
+
+      - name: Archive quiz pages
+        run: |
+          for slug in infidelite adopte amoureux vrais-amis orientation; do
+            curl -s -X POST "https://web.archive.org/save/https://ursecret.vercel.app/quiz/${slug}" \
+              -H "Accept: application/json" --max-time 30 \
+              -w "\nArchive /quiz/${slug}: %{http_code}\n" || true
+            sleep 3
+          done
