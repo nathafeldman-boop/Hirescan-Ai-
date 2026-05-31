@@ -362,6 +362,15 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
           )}
 
+          {/* Continuer — hub de tous les quizzes */}
+          <Link
+            href="/quizzes"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-black text-white text-base mb-4 transition-all active:scale-[0.98]"
+            style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}
+          >
+            Continuer →
+          </Link>
+
           {/* Actions */}
           {!showPaywall && (
             <div className="grid grid-cols-3 gap-3">
