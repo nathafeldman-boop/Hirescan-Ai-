@@ -102,51 +102,30 @@ export default function ResultsClient({ quiz }: Props) {
 
   const tier = getResultTier(quiz, score);
 
-  const [displayScore, setDisplayScore] = useState(0);
   const [strokeOffset, setStrokeOffset] = useState(CIRCUMFERENCE);
   const [shareId, setShareId] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [showPaywall, setShowPaywall] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const hasSaved = useRef(false);
 
   const analysis = buildAnalysis(quiz, score, tier.title);
 
-  // Save result to DB once on mount
   useEffect(() => {
     if (hasSaved.current) return;
     hasSaved.current = true;
-
     fetch('/api/results', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ quizSlug: quiz.slug, score }),
     })
       .then((r) => r.json())
-      .then((data: { id?: string }) => {
-        if (data.id) setShareId(data.id);
-      })
+      .then((data: { id?: string }) => { if (data.id) setShareId(data.id); })
       .catch(() => {});
   }, [quiz.slug, score]);
 
-  // Animate circle + counter, then show paywall
+  // Animate the circle ring (blurred, for FOMO)
   useEffect(() => {
-    const timer = setTimeout(() => setStrokeOffset(CIRCUMFERENCE * (1 - score / 100)), 200);
-
-    const duration = 1500;
-    let start: number | null = null;
-    const raf = requestAnimationFrame(function step(ts) {
-      if (!start) start = ts;
-      const progress = Math.min((ts - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplayScore(Math.floor(eased * score));
-      if (progress < 1) requestAnimationFrame(step);
-    });
-
-    // Show paywall after animation ends
-    const paywallTimer = setTimeout(() => setShowPaywall(true), 2200);
-
-    return () => { clearTimeout(timer); cancelAnimationFrame(raf); clearTimeout(paywallTimer); };
+    const t = setTimeout(() => setStrokeOffset(CIRCUMFERENCE * (1 - score / 100)), 300);
+    return () => clearTimeout(t);
   }, [score]);
 
   async function handleStripeCheckout() {
@@ -155,7 +134,12 @@ export default function ResultsClient({ quiz }: Props) {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resultId: shareId, origin: window.location.origin }),
+        body: JSON.stringify({
+          resultId: shareId,
+          quizSlug: quiz.slug,
+          score,
+          origin: window.location.origin,
+        }),
       });
       const data = await res.json() as { url?: string; error?: string };
       if (data.url) {
@@ -170,28 +154,19 @@ export default function ResultsClient({ quiz }: Props) {
     }
   }
 
-  function handleShare() {
-    const url = shareId
-      ? `${window.location.origin}/share/${shareId}`
-      : window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
-
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col relative overflow-hidden">
+      {/* Ambient glow */}
       <div className="pointer-events-none fixed inset-0">
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-15"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-10"
           style={{ backgroundColor: tier.glowColor }}
         />
       </div>
 
       <header className="relative z-10 border-b border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/onboarding" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
+          <Link href={`/quiz/${quiz.slug}`} className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -202,13 +177,13 @@ export default function ResultsClient({ quiz }: Props) {
         </div>
       </header>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md animate-fade-in">
-          <p className="text-center text-zinc-500 text-sm mb-8">{quiz.title}</p>
+      <div className="relative z-10 flex-1 flex flex-col items-center px-4 py-8">
+        <div className="w-full max-w-md">
+          <p className="text-center text-zinc-500 text-sm mb-6">{quiz.title}</p>
 
-          {/* Circle */}
-          <div className="flex justify-center mb-8">
-            <div className="relative">
+          {/* Blurred score circle — creates FOMO, score not readable */}
+          <div className="flex justify-center mb-6 relative">
+            <div style={{ filter: 'blur(12px)', opacity: 0.5, pointerEvents: 'none' }}>
               <svg width="180" height="180" viewBox="0 0 180 180">
                 <defs>
                   <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -224,198 +199,147 @@ export default function ResultsClient({ quiz }: Props) {
                   strokeLinecap="round" transform="rotate(-90 90 90)"
                   style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
                 />
+                <text x="90" y="98" textAnchor="middle" fill={tier.glowColor} fontSize="42" fontWeight="900">??%</text>
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-5xl font-black tabular-nums" style={{ color: tier.glowColor }}>
-                  {displayScore}%
-                </span>
+            </div>
+            {/* Lock icon overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl"
+                style={{ background: 'linear-gradient(135deg, #8b5cf6dd, #ec4899dd)', backdropFilter: 'blur(4px)' }}
+              >
+                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
               </div>
             </div>
           </div>
 
-          {/* Tier badge */}
-          <div className="flex justify-center mb-4">
-            <span
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold border"
-              style={{ color: tier.glowColor, borderColor: `${tier.glowColor}40`, backgroundColor: `${tier.glowColor}15` }}
-            >
-              <span>{tier.emoji}</span>
-              {tier.title}
+          {/* "Results ready" badge */}
+          <div className="flex justify-center mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-white/5 border border-white/10 text-zinc-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Tes résultats sont prêts
             </span>
           </div>
 
-          {/* Score bar */}
-          <div className="glass rounded-xl p-4 mb-6">
-            <div className="flex justify-between text-xs text-zinc-500 mb-2">
-              <span>0%</span>
-              <span className="text-zinc-400 font-medium">Ton score : {score}%</span>
-              <span>100%</span>
+          {/* Main paywall card */}
+          <div
+            className="rounded-2xl p-6 mb-6 border border-white/10"
+            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.08))' }}
+          >
+            <div className="text-center mb-5">
+              <h2 className="text-2xl font-black text-white mb-2">Débloque ton analyse</h2>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Ton score exact + une analyse personnalisée de 10 points t&apos;attendent.
+                Moins cher qu&apos;un café par mois.
+              </p>
             </div>
-            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-1000"
-                style={{ width: `${score}%`, background: `linear-gradient(90deg, ${tier.glowColor}66, ${tier.glowColor})`, transitionDelay: '300ms' }}
-              />
+
+            {/* What you get */}
+            <div className="space-y-2 mb-5">
+              {[
+                'Ton score précis sur 100',
+                'Ton niveau parmi 5 catégories',
+                'Analyse de 10 points personnalisée',
+                'Accès à tous les autres quizzes',
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2 text-sm text-zinc-300">
+                  <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </div>
+              ))}
             </div>
-            <div className="flex justify-between text-xs text-zinc-600 mt-2">
-              {quiz.resultTiers.map((t, i) => <span key={i} title={t.title}>{t.emoji}</span>)}
+
+            {/* Stripe CTA */}
+            <button
+              onClick={handleStripeCheckout}
+              disabled={isCheckingOut}
+              className="w-full py-4 rounded-xl font-black text-white text-base mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
+              style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 24px rgba(139,92,246,0.4)' }}
+            >
+              {isCheckingOut ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Redirection…
+                </span>
+              ) : (
+                '4,99€ / mois — Voir mes résultats ✦'
+              )}
+            </button>
+
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-zinc-600">ou</span>
+              <div className="h-px flex-1 bg-white/10" />
             </div>
+
+            {/* PayPal */}
+            <a
+              href="https://www.paypal.com/paypalme/ursecret/4.99"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-[#003087] hover:bg-[#001f5c] text-white transition-all duration-200 mb-4"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.144 19.532l1.049-6.667H6.189L7.238 6.2h6.924c2.16 0 3.646.52 4.461 1.559.375.483.607 1.003.697 1.56.091.557.046 1.229-.136 2.015l-.016.062c-.504 2.198-2.006 3.297-4.506 3.297h-1.394l-.74 4.839H7.144zm3.506-7.53h1.25c.964 0 1.618-.197 1.963-.59.205-.234.35-.617.437-1.148l.014-.086c.086-.536.055-.91-.094-1.121-.178-.25-.61-.375-1.295-.375H11.7l-.55 3.32z"/>
+              </svg>
+              Payer via PayPal
+            </a>
+
+            <p className="text-center text-[11px] text-zinc-600">
+              Annulable à tout moment · Paiement 100% sécurisé
+            </p>
           </div>
 
-          {/* Analysis + Message — blurred with paywall */}
-          <div className="relative mb-8">
-            <div
-              className="glass rounded-2xl p-6 space-y-3 transition-all duration-700"
-              style={{ filter: showPaywall ? 'blur(8px)' : 'none', userSelect: showPaywall ? 'none' : 'auto', pointerEvents: showPaywall ? 'none' : 'auto' }}
-            >
-              <p className="text-zinc-200 font-semibold leading-relaxed">{tier.message}</p>
-              <div className="border-t border-white/8 pt-3 space-y-2">
-                {analysis.map((line, i) => (
-                  <p key={i} className="text-zinc-400 text-sm leading-relaxed">{line}</p>
+          {/* Blurred preview of what's waiting */}
+          <div className="relative rounded-2xl overflow-hidden border border-white/5" style={{ pointerEvents: 'none' }}>
+            <div style={{ filter: 'blur(7px)', userSelect: 'none' }}>
+              {/* Tier badge preview */}
+              <div className="flex justify-center pt-4 pb-2 bg-black/40">
+                <span
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold border"
+                  style={{ color: tier.glowColor, borderColor: `${tier.glowColor}40`, backgroundColor: `${tier.glowColor}15` }}
+                >
+                  <span>{tier.emoji}</span>
+                  {tier.title}
+                </span>
+              </div>
+
+              {/* Score bar preview */}
+              <div className="px-4 pb-3 bg-black/40">
+                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${score}%`, background: `linear-gradient(90deg, ${tier.glowColor}66, ${tier.glowColor})` }} />
+                </div>
+              </div>
+
+              {/* Analysis lines preview */}
+              <div className="p-4 bg-black/40 space-y-2">
+                <p className="text-zinc-200 font-semibold text-sm">{tier.message}</p>
+                {analysis.slice(0, 3).map((line, i) => (
+                  <p key={i} className="text-zinc-400 text-xs leading-relaxed">{line}</p>
                 ))}
               </div>
             </div>
 
-            {/* Paywall overlay */}
-            {showPaywall && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl px-6 py-8"
-                style={{ background: 'linear-gradient(to bottom, rgba(9,9,11,0.7) 0%, rgba(9,9,11,0.97) 40%)' }}
-              >
-                <div className="text-center max-w-xs">
-                  <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
-                  >
-                    <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-
-                  <h3 className="text-xl font-black text-white mb-2">
-                    Débloque ton analyse complète
-                  </h3>
-                  <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-                    Tes résultats détaillés + une analyse de 10 points personnalisée t&apos;attendent.
-                    Moins cher qu&apos;un café par mois.
-                  </p>
-
-                  <button
-                    onClick={handleStripeCheckout}
-                    disabled={isCheckingOut}
-                    className="gradient-btn mb-3"
-                  >
-                    <div className="wrap">
-                      <p>
-                        {isCheckingOut ? (
-                          <span className="label-default flex items-center gap-2">
-                            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            Redirection…
-                          </span>
-                        ) : (
-                          <>
-                            <span className="label-default">4,99€ / mois — Voir mes résultats ✦</span>
-                            <span className="label-hover">Accéder maintenant →</span>
-                          </>
-                        )}
-                      </p>
-                    </div>
-                  </button>
-
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <div className="h-px flex-1 bg-white/10" />
-                    <span className="text-xs text-zinc-600">ou</span>
-                    <div className="h-px flex-1 bg-white/10" />
-                  </div>
-
-                  <a
-                    href={`https://www.paypal.com/paypalme/ursecret/4.99`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-[#003087] hover:bg-[#001f5c] text-white transition-all duration-200 mb-4"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7.144 19.532l1.049-6.667H6.189L7.238 6.2h6.924c2.16 0 3.646.52 4.461 1.559.375.483.607 1.003.697 1.56.091.557.046 1.229-.136 2.015l-.016.062c-.504 2.198-2.006 3.297-4.506 3.297h-1.394l-.74 4.839H7.144zm3.506-7.53h1.25c.964 0 1.618-.197 1.963-.59.205-.234.35-.617.437-1.148l.014-.086c.086-.536.055-.91-.094-1.121-.178-.25-.61-.375-1.295-.375H11.7l-.55 3.32z"/>
-                    </svg>
-                    Payer via PayPal
-                  </a>
-
-                  <p className="text-[10px] text-zinc-600">
-                    Annulable à tout moment · 100% sécurisé · Sans engagement
-                  </p>
-                </div>
-              </div>
-            )}
+            {/* Gradient fade over the blurred preview */}
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to bottom, rgba(9,9,11,0.3) 0%, rgba(9,9,11,0.85) 100%)' }}
+            />
           </div>
 
-          {/* Share link */}
-          {shareId && !showPaywall && (
-            <div className="glass rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
-              <svg className="w-4 h-4 text-zinc-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-              </svg>
-              <span className="text-xs text-zinc-500 truncate flex-1">
-                /share/{shareId}
-              </span>
-              <span className="text-[10px] text-emerald-500 shrink-0">Sauvegardé ✓</span>
-            </div>
-          )}
-
-          {/* Continuer — hub de tous les quizzes */}
-          <Link
-            href="/quizzes"
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-black text-white text-base mb-4 transition-all active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}
-          >
-            Continuer →
-          </Link>
-
-          {/* Actions */}
-          {!showPaywall && (
-            <div className="grid grid-cols-3 gap-3">
-              <Link
-                href={`/quiz/${quiz.slug}`}
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/15 transition-all text-zinc-400 hover:text-white"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span className="text-xs font-medium">Refaire</span>
-              </Link>
-
-              <button
-                onClick={handleShare}
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/15 transition-all text-zinc-400 hover:text-white"
-              >
-                {copied ? (
-                  <>
-                    <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-xs font-medium text-emerald-400">Copié !</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    <span className="text-xs font-medium">Partager</span>
-                  </>
-                )}
-              </button>
-
-              <Link
-                href="/onboarding"
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/15 transition-all text-zinc-400 hover:text-white"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span className="text-xs font-medium">Accueil</span>
-              </Link>
-            </div>
-          )}
+          {/* Refaire le quiz link */}
+          <div className="mt-6 text-center">
+            <Link href={`/quiz/${quiz.slug}`} className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+              Refaire le quiz
+            </Link>
+          </div>
         </div>
       </div>
     </main>
