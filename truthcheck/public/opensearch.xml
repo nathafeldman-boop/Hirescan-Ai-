@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>UrSecret</ShortName>
+  <Description>Questionnaires anonymes — couple, amis, famille</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Language>fr</Language>
+  <Image width="16" height="16" type="image/svg+xml">https://ursecret.vercel.app/favicon.svg</Image>
+  <Url type="text/html" template="https://ursecret.vercel.app/quizzes"/>
+  <moz:SearchForm>https://ursecret.vercel.app/quizzes</moz:SearchForm>
+</OpenSearchDescription>

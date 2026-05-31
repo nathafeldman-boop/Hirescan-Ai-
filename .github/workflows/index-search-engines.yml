@@ -1,58 +1,92 @@
-name: Ping Search Engines + Archive
+name: 24/7 SEO — Ping All Search Engines
 on:
   push:
     branches: [main]
   schedule:
-    # Every day at 08:00 UTC — keeps all search engines fed automatically
+    # Every day at 08:00 UTC
     - cron: '0 8 * * *'
+    # Extra run midday to catch timezone peaks
+    - cron: '0 14 * * *'
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Vercel (only on push, not cron)
+      - name: Wait for Vercel (push only)
         if: github.event_name == 'push'
         run: sleep 100
 
-      - name: Ping Google sitemap
+      # ── GOOGLE ──────────────────────────────────────────────────────────────
+      - name: Google — Sitemap ping
         run: |
           curl -s "https://www.google.com/ping?sitemap=https://ursecret.vercel.app/sitemap.xml" \
             -o /dev/null -w "Google sitemap: %{http_code}\n"
 
-      - name: Submit to IndexNow (covers Bing + Yandex + Ecosia + DuckDuckGo + Brave + Seznam)
+      # ── INDEXNOW (covers Bing/Yandex/Ecosia/DuckDuckGo/Brave/Seznam/Naver) ─
+      - name: IndexNow — All engines
         run: |
-          PAYLOAD='{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation"]}'
-          curl -s -X POST "https://api.indexnow.org/indexnow" \
-            -H "Content-Type: application/json; charset=utf-8" \
-            -d "$PAYLOAD" -w "\nIndexNow hub: %{http_code}\n"
-          curl -s -X POST "https://www.bing.com/indexnow" \
-            -H "Content-Type: application/json; charset=utf-8" \
-            -d "$PAYLOAD" -w "\nBing: %{http_code}\n"
-          curl -s -X POST "https://yandex.com/indexnow" \
-            -H "Content-Type: application/json; charset=utf-8" \
-            -d "$PAYLOAD" -w "\nYandex: %{http_code}\n"
-          curl -s -X POST "https://search.seznam.cz/indexnow" \
-            -H "Content-Type: application/json; charset=utf-8" \
-            -d "$PAYLOAD" -w "\nSeznam: %{http_code}\n" || true
+          PAYLOAD='{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation","https://ursecret.vercel.app/feed.xml"]}'
+          for endpoint in \
+            "https://api.indexnow.org/indexnow" \
+            "https://www.bing.com/indexnow" \
+            "https://yandex.com/indexnow" \
+            "https://search.seznam.cz/indexnow" \
+            "https://indexnow.applebot.apple.com/indexnow"; do
+            curl -s -X POST "$endpoint" \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -d "$PAYLOAD" -w "\n$(basename $endpoint | cut -d. -f1): %{http_code}\n" || true
+            sleep 1
+          done
 
-      - name: PubSubHubbub ping (Google Feed infrastructure)
+      # ── PUBSUBHUBBUB (Google Feed + RSS hubs) ───────────────────────────────
+      - name: PubSubHubbub — All hubs
         run: |
-          curl -s -X POST "https://pubsubhubbub.appspot.com/" \
-            -d "hub.mode=publish&hub.url=https://ursecret.vercel.app/sitemap.xml" \
-            -w "\nPubSubHubbub sitemap: %{http_code}\n"
-          curl -s -X POST "https://pubsubhubbub.appspot.com/" \
-            -d "hub.mode=publish&hub.url=https://ursecret.vercel.app/feed.xml" \
-            -w "\nPubSubHubbub feed: %{http_code}\n"
+          for url in \
+            "https://ursecret.vercel.app/sitemap.xml" \
+            "https://ursecret.vercel.app/feed.xml"; do
+            for hub in \
+              "https://pubsubhubbub.appspot.com/" \
+              "https://pubsubhubbub.superfeedr.com/"; do
+              curl -s -X POST "$hub" \
+                -d "hub.mode=publish&hub.url=${url}" \
+                -w "\n$hub → $url: %{http_code}\n" || true
+            done
+          done
 
-      - name: Ping-O-Matic XML-RPC (notifies 20+ aggregators at once)
+      # ── PING-O-MATIC (XML-RPC — notifies 20+ aggregators at once) ───────────
+      - name: Ping-O-Matic
         run: |
           curl -s -X POST "http://rpc.pingomatic.com/" \
             -H "Content-Type: text/xml" \
-            -d '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.extendedPing</methodName><params><param><value><string>UrSecret — Tes vraies réponses</string></value></param><param><value><string>https://ursecret.vercel.app</string></value></param><param><value><string>https://ursecret.vercel.app/sitemap.xml</string></value></param></params></methodCall>' \
-            -w "\nPing-o-Matic: %{http_code}\n" || true
+            -d '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.extendedPing</methodName><params><param><value><string>UrSecret — Tes vraies réponses</string></value></param><param><value><string>https://ursecret.vercel.app</string></value></param><param><value><string>https://ursecret.vercel.app/feed.xml</string></value></param><param><value><string>https://ursecret.vercel.app/sitemap.xml</string></value></param></params></methodCall>' \
+            -w "\nPing-O-Matic: %{http_code}\n" --max-time 15 || true
 
-      - name: Archive all pages on Wayback Machine (creates permanent indexed backlinks)
+      # ── ADDITIONAL PING SERVICES ─────────────────────────────────────────────
+      - name: Additional ping services
+        run: |
+          # Blogsearch (legacy but still crawled)
+          curl -s "http://blogsearch.google.com/ping/RPC2" \
+            --data '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.ping</methodName><params><param><value>UrSecret</value></param><param><value>https://ursecret.vercel.app</value></param></params></methodCall>' \
+            -H "Content-Type: text/xml" -w "\nBlogsearch: %{http_code}\n" || true
+
+          # Feed aggregators
+          for url in \
+            "http://ping.feedburner.com/api/ping?v=1&url=https://ursecret.vercel.app/feed.xml" \
+            "http://api.moreover.com/ping?u=https://ursecret.vercel.app/feed.xml"; do
+            curl -s "$url" -o /dev/null -w "\n$url: %{http_code}\n" --max-time 10 || true
+          done
+
+      # ── BRAVE SEARCH GOGGLES (public submission) ─────────────────────────────
+      - name: Submit to Brave Webmaster
+        run: |
+          curl -s -X POST "https://api.search.brave.com/webmaster/v1/site" \
+            -H "Content-Type: application/json" \
+            -d '{"url":"https://ursecret.vercel.app"}' \
+            -w "\nBrave: %{http_code}\n" --max-time 10 || true
+
+      # ── WAYBACK MACHINE (permanent indexed backlinks on archive.org) ──────────
+      - name: Wayback Machine — Archive all pages
         run: |
           for url in \
             "https://ursecret.vercel.app" \
@@ -61,9 +95,20 @@ jobs:
             "https://ursecret.vercel.app/quiz/adopte" \
             "https://ursecret.vercel.app/quiz/amoureux" \
             "https://ursecret.vercel.app/quiz/vrais-amis" \
-            "https://ursecret.vercel.app/quiz/orientation"; do
+            "https://ursecret.vercel.app/quiz/orientation" \
+            "https://ursecret.vercel.app/feed.xml" \
+            "https://ursecret.vercel.app/sitemap.xml"; do
             curl -s -X POST "https://web.archive.org/save/${url}" \
               -H "Accept: application/json" --max-time 30 \
               -w "\nArchive ${url}: %{http_code}\n" || true
-            sleep 4
+            sleep 3
           done
+
+      # ── COMMON CRAWL (ping via cc-index) ────────────────────────────────────
+      - name: Notify Common Crawl
+        run: |
+          curl -s "https://index.commoncrawl.org/collinfo.json" -o /dev/null \
+            -w "\nCommon Crawl alive: %{http_code}\n" || true
+          # Ping the sitemap to ensure it's indexed by Common Crawl's open index
+          curl -s "https://index.commoncrawl.org/?url=https://ursecret.vercel.app&output=json" \
+            -o /dev/null -w "\nCommon Crawl check: %{http_code}\n" --max-time 15 || true

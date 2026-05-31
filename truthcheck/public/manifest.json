@@ -1,0 +1,25 @@
+{
+  "name": "UrSecret — Tes vraies réponses",
+  "short_name": "UrSecret",
+  "description": "Des questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#8b5cf6",
+  "lang": "fr",
+  "dir": "ltr",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Mon partenaire me trompe ?", "short_name": "Infidélité", "url": "/quiz/infidelite", "description": "Détecte les signes d'infidélité" },
+    { "name": "Suis-je adopté(e) ?", "short_name": "Adoption", "url": "/quiz/adopte", "description": "Indices physiques et familiaux" },
+    { "name": "Suis-je amoureux ?", "short_name": "Amour", "url": "/quiz/amoureux", "description": "Les signes qui ne trompent pas" },
+    { "name": "Mes vrais amis ?", "short_name": "Amis", "url": "/quiz/vrais-amis", "description": "Analyse ta relation amicale" }
+  ],
+  "categories": ["lifestyle", "social", "education", "health"],
+  "prefer_related_applications": false,
+  "related_applications": []
+}

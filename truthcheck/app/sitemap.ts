@@ -3,48 +3,14 @@ import { MetadataRoute } from 'next';
 const BASE_URL = 'https://ursecret.vercel.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
   return [
-    {
-      url: BASE_URL,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/quizzes`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/quiz/infidelite`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.85,
-    },
-    {
-      url: `${BASE_URL}/quiz/adopte`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/quiz/amoureux`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/quiz/vrais-amis`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/quiz/orientation`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
+    { url: BASE_URL,                              lastModified: now, changeFrequency: 'daily',  priority: 1    },
+    { url: `${BASE_URL}/quizzes`,                 lastModified: now, changeFrequency: 'daily',  priority: 0.95 },
+    { url: `${BASE_URL}/quiz/infidelite`,         lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
+    { url: `${BASE_URL}/quiz/adopte`,             lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
+    { url: `${BASE_URL}/quiz/amoureux`,           lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
+    { url: `${BASE_URL}/quiz/vrais-amis`,         lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
+    { url: `${BASE_URL}/quiz/orientation`,        lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
   ];
 }
