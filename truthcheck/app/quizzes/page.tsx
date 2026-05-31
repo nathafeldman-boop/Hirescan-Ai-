@@ -1,13 +1,21 @@
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
 
+const iconGradients: Record<string, string> = {
+  infidelite:   'linear-gradient(145deg, #7f1d1d 0%, #2c0909 55%, #0d0202 100%)',
+  adopte:       'linear-gradient(145deg, #3730a3 0%, #1e1b4b 55%, #06050e 100%)',
+  amoureux:     'linear-gradient(145deg, #9d174d 0%, #4a0d26 55%, #14020c 100%)',
+  'vrais-amis': 'linear-gradient(145deg, #065f46 0%, #022c20 55%, #01090a 100%)',
+  orientation:  'linear-gradient(145deg, #6d28d9 0%, #4c1d5e 55%, #1a020e 100%)',
+};
+
 export default function QuizzesPage() {
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col">
-      {/* Ambient glow */}
+      {/* Ambient glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet-600/10 rounded-full blur-[80px]" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-pink-600/8 rounded-full blur-[80px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[280px] bg-violet-600/10 rounded-full blur-[80px]" />
+        <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-pink-600/8 rounded-full blur-[80px]" />
       </div>
 
       {/* Header */}
@@ -39,55 +47,43 @@ export default function QuizzesPage() {
             </h1>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {quizzes.map((quiz) => (
               <Link
                 key={quiz.slug}
                 href={`/quiz/${quiz.slug}`}
-                className="group relative rounded-2xl border border-white/8 overflow-hidden transition-all duration-300 hover:border-white/20 hover:scale-[1.02] active:scale-[0.99]"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
+                className="group flex items-center gap-4 p-4 rounded-[20px] transition-all duration-150 active:scale-[0.98]"
+                style={{
+                  background: '#141418',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}
               >
-                {/* Accent glow on hover */}
+                {/* Icon */}
                 <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at 20% 50%, ${quiz.accentColor}18 0%, transparent 70%)` }}
-                />
-
-                <div className="relative p-5 flex items-center gap-4">
-                  {/* Emoji badge */}
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                    style={{ background: `${quiz.accentColor}20`, border: `1px solid ${quiz.accentColor}30` }}
-                  >
-                    {quiz.emoji}
-                  </div>
-
-                  {/* Text */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-bold text-base leading-snug mb-1">{quiz.title}</p>
-                    <p className="text-zinc-500 text-xs leading-relaxed">{quiz.subtitle}</p>
-                  </div>
-
-                  {/* Arrow */}
-                  <svg
-                    className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                    style={{ color: quiz.accentColor }}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  className="w-[60px] h-[60px] rounded-[16px] flex items-center justify-center text-[28px] flex-shrink-0"
+                  style={{ background: iconGradients[quiz.slug] ?? `${quiz.accentColor}30` }}
+                >
+                  {quiz.emoji}
                 </div>
 
-                {/* Bottom accent bar */}
-                <div
-                  className="h-px w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `linear-gradient(90deg, transparent, ${quiz.accentColor}60, transparent)` }}
-                />
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-bold text-[15px] leading-snug">{quiz.title}</p>
+                  <p className="text-zinc-500 text-[13px] mt-[3px] leading-relaxed">{quiz.subtitle}</p>
+                </div>
+
+                {/* Chevron */}
+                <svg
+                  className="w-[18px] h-[18px] flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                  style={{ color: quiz.accentColor }}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
             ))}
           </div>
 
-          {/* Footer hint */}
           <p className="text-center text-zinc-600 text-xs mt-10 tracking-wide">
             🔒 100% anonyme · Zéro compte requis
           </p>
