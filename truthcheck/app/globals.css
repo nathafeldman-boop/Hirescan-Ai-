@@ -241,38 +241,41 @@ body {
 .ob-pill:active .ob-pill-inner { transform: scale(0.975); }
 .ob-pill:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* TimTrayler dark neumorphic — quiz options */
+/* Quiz options — glassmorphism transparent */
 .quiz-opt {
-  --quiz-hover: 16px 16px 33px #121212, -16px -16px 33px #303030;
   width: 100%;
   text-align: left;
   display: flex;
   align-items: center;
   gap: 0.85rem;
   padding: 0.9rem 1.25rem;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 1.1em;
   font-weight: 700;
   letter-spacing: 0.05em;
   font-size: 15px;
   color: #fff;
   cursor: pointer;
-  background-color: #212121;
-  transition: box-shadow 0.3s ease-in-out, transform 0.1s ease-in-out, letter-spacing 0.1s ease-in-out;
-  box-shadow: 13px 13px 10px #1c1c1c, -13px -13px 10px #262626;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.1s ease, box-shadow 0.25s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 
 .quiz-opt:hover:not(.quiz-opt-selected) {
-  box-shadow: var(--quiz-hover);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 .quiz-opt:active {
   transform: scale(0.98);
-  box-shadow: var(--quiz-hover);
 }
 
 .quiz-opt-selected {
-  box-shadow: var(--quiz-hover), var(--quiz-accent, #8b5cf6) 0px 0px 30px 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--quiz-accent, rgba(139, 92, 246, 0.7));
+  box-shadow: 0 0 20px var(--quiz-accent, rgba(139, 92, 246, 0.35)), 0 2px 12px rgba(0,0,0,0.2);
   letter-spacing: 0.08em;
 }
 
