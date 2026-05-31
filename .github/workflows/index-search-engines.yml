@@ -3,10 +3,12 @@ on:
   push:
     branches: [main]
   schedule:
-    # Every day at 08:00 UTC
+    # Morning run — 08:00 UTC (10h Paris)
     - cron: '0 8 * * *'
-    # Extra run midday to catch timezone peaks
+    # Midday run — 14:00 UTC (16h Paris)
     - cron: '0 14 * * *'
+    # Evening run — 20:00 UTC (22h Paris) — peak European traffic
+    - cron: '0 20 * * *'
   workflow_dispatch:
 
 jobs:
@@ -18,21 +20,24 @@ jobs:
         run: sleep 100
 
       # ── GOOGLE ──────────────────────────────────────────────────────────────
-      - name: Google — Sitemap ping
+      - name: Google — Sitemap + News Sitemap ping
         run: |
           curl -s "https://www.google.com/ping?sitemap=https://ursecret.vercel.app/sitemap.xml" \
             -o /dev/null -w "Google sitemap: %{http_code}\n"
+          curl -s "https://www.google.com/ping?sitemap=https://ursecret.vercel.app/news-sitemap.xml" \
+            -o /dev/null -w "Google news-sitemap: %{http_code}\n"
 
       # ── INDEXNOW (covers Bing/Yandex/Ecosia/DuckDuckGo/Brave/Seznam/Naver) ─
       - name: IndexNow — All engines
         run: |
-          PAYLOAD='{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation","https://ursecret.vercel.app/feed.xml"]}'
+          PAYLOAD='{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation","https://ursecret.vercel.app/feed.xml","https://ursecret.vercel.app/atom.xml","https://ursecret.vercel.app/news-sitemap.xml"]}'
           for endpoint in \
             "https://api.indexnow.org/indexnow" \
             "https://www.bing.com/indexnow" \
             "https://yandex.com/indexnow" \
             "https://search.seznam.cz/indexnow" \
-            "https://indexnow.applebot.apple.com/indexnow"; do
+            "https://indexnow.applebot.apple.com/indexnow" \
+            "https://indexnow.infovista.com/indexnow"; do
             curl -s -X POST "$endpoint" \
               -H "Content-Type: application/json; charset=utf-8" \
               -d "$PAYLOAD" -w "\n$(basename $endpoint | cut -d. -f1): %{http_code}\n" || true
@@ -40,11 +45,13 @@ jobs:
           done
 
       # ── PUBSUBHUBBUB (Google Feed + RSS hubs) ───────────────────────────────
-      - name: PubSubHubbub — All hubs
+      - name: PubSubHubbub — All hubs × All feeds
         run: |
           for url in \
             "https://ursecret.vercel.app/sitemap.xml" \
-            "https://ursecret.vercel.app/feed.xml"; do
+            "https://ursecret.vercel.app/feed.xml" \
+            "https://ursecret.vercel.app/atom.xml" \
+            "https://ursecret.vercel.app/news-sitemap.xml"; do
             for hub in \
               "https://pubsubhubbub.appspot.com/" \
               "https://pubsubhubbub.superfeedr.com/"; do
@@ -52,6 +59,16 @@ jobs:
                 -d "hub.mode=publish&hub.url=${url}" \
                 -w "\n$hub → $url: %{http_code}\n" || true
             done
+          done
+
+      # ── FEEDLY (major RSS aggregator — free, no auth) ────────────────────────
+      - name: Feedly — Feed subscription ping
+        run: |
+          for feed in \
+            "https://ursecret.vercel.app/feed.xml" \
+            "https://ursecret.vercel.app/atom.xml"; do
+            curl -s "https://cloud.feedly.com/v3/feeds/feed%2F$(python3 -c "import urllib.parse; print(urllib.parse.quote('${feed}', safe=''))")" \
+              -o /dev/null -w "\nFeedly ping ${feed}: %{http_code}\n" --max-time 10 || true
           done
 
       # ── PING-O-MATIC (XML-RPC — notifies 20+ aggregators at once) ───────────
@@ -62,15 +79,24 @@ jobs:
             -d '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.extendedPing</methodName><params><param><value><string>UrSecret — Tes vraies réponses</string></value></param><param><value><string>https://ursecret.vercel.app</string></value></param><param><value><string>https://ursecret.vercel.app/feed.xml</string></value></param><param><value><string>https://ursecret.vercel.app/sitemap.xml</string></value></param></params></methodCall>' \
             -w "\nPing-O-Matic: %{http_code}\n" --max-time 15 || true
 
-      # ── ADDITIONAL PING SERVICES ─────────────────────────────────────────────
-      - name: Additional ping services
+      # ── ADDITIONAL XML-RPC PING SERVICES ────────────────────────────────────
+      - name: XML-RPC ping services
         run: |
-          # Blogsearch (legacy but still crawled)
-          curl -s "http://blogsearch.google.com/ping/RPC2" \
-            --data '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.ping</methodName><params><param><value>UrSecret</value></param><param><value>https://ursecret.vercel.app</value></param></params></methodCall>' \
-            -H "Content-Type: text/xml" -w "\nBlogsearch: %{http_code}\n" || true
+          XMLRPC='<?xml version="1.0"?><methodCall><methodName>weblogUpdates.ping</methodName><params><param><value>UrSecret</value></param><param><value>https://ursecret.vercel.app</value></param></params></methodCall>'
 
-          # Feed aggregators
+          for endpoint in \
+            "http://rpc.weblogs.com/RPC2" \
+            "http://ping.blo.gs/" \
+            "http://ping.feedburner.com/" \
+            "http://blogsearch.google.com/ping/RPC2" \
+            "http://rpc.twingly.com/"; do
+            curl -s -X POST "$endpoint" \
+              -H "Content-Type: text/xml" \
+              -d "$XMLRPC" \
+              -w "\n$endpoint: %{http_code}\n" --max-time 10 || true
+          done
+
+          # Feed aggregators (GET)
           for url in \
             "http://ping.feedburner.com/api/ping?v=1&url=https://ursecret.vercel.app/feed.xml" \
             "http://api.moreover.com/ping?u=https://ursecret.vercel.app/feed.xml"; do
@@ -97,11 +123,13 @@ jobs:
             "https://ursecret.vercel.app/quiz/vrais-amis" \
             "https://ursecret.vercel.app/quiz/orientation" \
             "https://ursecret.vercel.app/feed.xml" \
-            "https://ursecret.vercel.app/sitemap.xml"; do
+            "https://ursecret.vercel.app/atom.xml" \
+            "https://ursecret.vercel.app/sitemap.xml" \
+            "https://ursecret.vercel.app/news-sitemap.xml"; do
             curl -s -X POST "https://web.archive.org/save/${url}" \
               -H "Accept: application/json" --max-time 30 \
               -w "\nArchive ${url}: %{http_code}\n" || true
-            sleep 3
+            sleep 2
           done
 
       # ── COMMON CRAWL (ping via cc-index) ────────────────────────────────────
@@ -109,6 +137,20 @@ jobs:
         run: |
           curl -s "https://index.commoncrawl.org/collinfo.json" -o /dev/null \
             -w "\nCommon Crawl alive: %{http_code}\n" || true
-          # Ping the sitemap to ensure it's indexed by Common Crawl's open index
           curl -s "https://index.commoncrawl.org/?url=https://ursecret.vercel.app&output=json" \
             -o /dev/null -w "\nCommon Crawl check: %{http_code}\n" --max-time 15 || true
+
+      # ── SITEMAP INDEX (submit to more crawlers directly) ──────────────────────
+      - name: Extra crawler submissions
+        run: |
+          # DuckDuckGo uses Bing index — already covered by IndexNow
+          # Ecosia uses Bing index — already covered by IndexNow
+          # Qwant uses Bing index — already covered by IndexNow
+
+          # Mojeek (independent UK crawler — accepts sitemap GET pings)
+          curl -s "https://www.mojeek.com/submit/?url=https://ursecret.vercel.app/sitemap.xml" \
+            -o /dev/null -w "\nMojeek: %{http_code}\n" --max-time 10 || true
+
+          # Sogou (Chinese search engine)
+          curl -s "http://zhanzhang.sogou.com/index.php/discovery/index?url=https://ursecret.vercel.app" \
+            -o /dev/null -w "\nSogou: %{http_code}\n" --max-time 10 || true

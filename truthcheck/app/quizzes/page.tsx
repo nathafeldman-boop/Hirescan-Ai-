@@ -1,5 +1,63 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
+
+const BASE = 'https://ursecret.vercel.app';
+
+export const metadata: Metadata = {
+  title: 'Tous les quizzes — UrSecret',
+  description: '5 questionnaires anonymes : infidélité, adoption, amour, amitié, orientation sexuelle. Résultats instantanés, 100% gratuit, zéro compte requis.',
+  keywords: ['quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'UrSecret'],
+  openGraph: {
+    title: 'Tous les quizzes | UrSecret',
+    description: '5 questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille.',
+    url: `${BASE}/quizzes`,
+    siteName: 'UrSecret',
+    locale: 'fr_FR',
+    type: 'website',
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrSecret — Tous les quizzes' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tous les quizzes | UrSecret',
+    description: '5 questionnaires anonymes. 100% gratuit.',
+    images: ['/api/og'],
+  },
+  alternates: { canonical: `${BASE}/quizzes` },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'UrSecret', item: BASE },
+        { '@type': 'ListItem', position: 2, name: 'Quizzes', item: `${BASE}/quizzes` },
+      ],
+    },
+    {
+      '@type': 'ItemList',
+      name: 'Tous les quizzes UrSecret',
+      description: 'Questionnaires anonymes pour découvrir la vérité sur tes relations',
+      numberOfItems: 5,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, url: `${BASE}/quiz/infidelite`,  name: 'Mon/Ma partenaire me trompe ?' },
+        { '@type': 'ListItem', position: 2, url: `${BASE}/quiz/adopte`,      name: 'Suis-je adopté(e) ?' },
+        { '@type': 'ListItem', position: 3, url: `${BASE}/quiz/amoureux`,    name: 'Suis-je vraiment amoureux/amoureuse ?' },
+        { '@type': 'ListItem', position: 4, url: `${BASE}/quiz/vrais-amis`,  name: 'Sont-ils mes vrais amis ?' },
+        { '@type': 'ListItem', position: 5, url: `${BASE}/quiz/orientation`, name: 'Quelle est mon orientation ?' },
+      ],
+    },
+    {
+      '@type': 'WebPage',
+      name: 'Tous les quizzes UrSecret',
+      url: `${BASE}/quizzes`,
+      inLanguage: 'fr',
+      isPartOf: { '@id': `${BASE}/#website` },
+    },
+  ],
+};
 
 const iconGradients: Record<string, string> = {
   infidelite:   'linear-gradient(145deg, #7f1d1d 0%, #2c0909 55%, #0d0202 100%)',
@@ -10,6 +68,15 @@ const iconGradients: Record<string, string> = {
 };
 
 export default function QuizzesPage() {
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <QuizzesContent />
+    </>
+  );
+}
+
+function QuizzesContent() {
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col">
       {/* Ambient glows */}

@@ -3,6 +3,11 @@ Allow: /
 Disallow: /api/
 Disallow: /dashboard
 Disallow: /analyze
-Disallow: /share/
 
+# Sitemaps
 Sitemap: https://ursecret.vercel.app/sitemap.xml
+Sitemap: https://ursecret.vercel.app/news-sitemap.xml
+
+# Feeds
+# RSS:  https://ursecret.vercel.app/feed.xml
+# Atom: https://ursecret.vercel.app/atom.xml

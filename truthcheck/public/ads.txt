@@ -1,0 +1,4 @@
+# ads.txt — UrSecret
+# This site does not currently serve programmatic advertising.
+# Unauthorized use of this domain for ad targeting is prohibited.
+placeholder.example.com, placeholder, DIRECT, placeholder
