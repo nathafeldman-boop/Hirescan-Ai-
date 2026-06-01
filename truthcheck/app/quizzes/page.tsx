@@ -1,98 +1,163 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
 
+const BASE = 'https://ursecret.vercel.app';
+
+export const metadata: Metadata = {
+  title: 'Tous les quizzes — UrSecret',
+  description: '15 questionnaires anonymes : infidélité, narcissisme, manipulation, burnout, dépression, amour, amitié et plus. Résultats instantanés, 100% gratuit, zéro compte requis.',
+  keywords: ['quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'suis-je narcissique', 'suis-je manipulé', 'burnout test', 'UrSecret'],
+  openGraph: {
+    title: 'Tous les quizzes | UrSecret',
+    description: '15 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
+    url: `${BASE}/quizzes`,
+    siteName: 'UrSecret',
+    locale: 'fr_FR',
+    type: 'website',
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrSecret — Tous les quizzes' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tous les quizzes | UrSecret',
+    description: '15 questionnaires anonymes. 100% gratuit.',
+    images: ['/api/og'],
+  },
+  alternates: { canonical: `${BASE}/quizzes` },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'UrSecret', item: BASE },
+        { '@type': 'ListItem', position: 2, name: 'Quizzes', item: `${BASE}/quizzes` },
+      ],
+    },
+    {
+      '@type': 'ItemList',
+      name: 'Tous les quizzes UrSecret',
+      description: 'Questionnaires anonymes pour découvrir la vérité sur toi-même, tes relations et ta famille',
+      numberOfItems: 15,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1,  url: `${BASE}/quiz/infidelite`,       name: 'Mon/Ma partenaire me trompe ?' },
+        { '@type': 'ListItem', position: 2,  url: `${BASE}/quiz/adopte`,           name: 'Suis-je adopté(e) ?' },
+        { '@type': 'ListItem', position: 3,  url: `${BASE}/quiz/amoureux`,         name: 'Suis-je vraiment amoureux/amoureuse ?' },
+        { '@type': 'ListItem', position: 4,  url: `${BASE}/quiz/vrais-amis`,       name: 'Sont-ils mes vrais amis ?' },
+        { '@type': 'ListItem', position: 5,  url: `${BASE}/quiz/orientation`,      name: 'Quelle est mon orientation ?' },
+        { '@type': 'ListItem', position: 6,  url: `${BASE}/quiz/narcissique`,      name: 'Suis-je narcissique ?' },
+        { '@type': 'ListItem', position: 7,  url: `${BASE}/quiz/mon-ex`,           name: 'Mon ex veut-il/elle revenir ?' },
+        { '@type': 'ListItem', position: 8,  url: `${BASE}/quiz/manipule`,         name: 'Suis-je manipulé(e) ?' },
+        { '@type': 'ListItem', position: 9,  url: `${BASE}/quiz/rompre`,           name: 'Dois-je rompre ?' },
+        { '@type': 'ListItem', position: 10, url: `${BASE}/quiz/jaloux`,           name: 'Suis-je trop jaloux/jalouse ?' },
+        { '@type': 'ListItem', position: 11, url: `${BASE}/quiz/relation-toxique`, name: 'Ma relation est-elle toxique ?' },
+        { '@type': 'ListItem', position: 12, url: `${BASE}/quiz/crush`,            name: 'Mon crush ressent-il/elle quelque chose ?' },
+        { '@type': 'ListItem', position: 13, url: `${BASE}/quiz/burnout`,          name: 'Suis-je en burnout ?' },
+        { '@type': 'ListItem', position: 14, url: `${BASE}/quiz/depression`,       name: 'Ai-je des signes de dépression ?' },
+        { '@type': 'ListItem', position: 15, url: `${BASE}/quiz/vrai-amour`,       name: 'Est-ce le vrai amour ?' },
+      ],
+    },
+    {
+      '@type': 'WebPage',
+      name: 'Tous les quizzes UrSecret',
+      url: `${BASE}/quizzes`,
+      inLanguage: 'fr',
+      isPartOf: { '@id': `${BASE}/#website` },
+    },
+  ],
+};
+
 export default function QuizzesPage() {
   return (
-    <main className="min-h-screen bg-[#09090b] flex flex-col">
-      {/* Ambient glow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet-600/10 rounded-full blur-[80px]" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-pink-600/8 rounded-full blur-[80px]" />
-      </div>
-
-      {/* Header */}
-      <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <span className="text-xl font-black">
-            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Ur
-            </span>
-            <span className="text-white">Secret</span>
-          </span>
-          <span className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Choisis ton quiz</span>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <main className="min-h-screen bg-[#09090b] flex flex-col">
+        {/* Ambient glow */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet-600/10 rounded-full blur-[80px]" />
+          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-pink-600/8 rounded-full blur-[80px]" />
         </div>
-      </header>
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center px-4 py-10">
-        <div className="w-full max-w-md">
-
-          <div className="text-center mb-10">
-            <p className="text-xs text-zinc-500 uppercase tracking-[0.2em] font-semibold mb-3">
-              30 questions · Résultats instantanés
-            </p>
-            <h1 className="text-3xl font-black text-white leading-tight">
-              Quelle vérité veux-tu
-              <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                {' '}découvrir ?
+        {/* Header */}
+        <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">
+          <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+            <span className="text-xl font-black">
+              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Ur
               </span>
-            </h1>
+              <span className="text-white">Secret</span>
+            </span>
+            <span className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Choisis ton quiz</span>
           </div>
+        </header>
 
-          <div className="flex flex-col gap-4">
-            {quizzes.map((quiz) => (
-              <Link
-                key={quiz.slug}
-                href={`/quiz/${quiz.slug}`}
-                className="group relative rounded-2xl border border-white/8 overflow-hidden transition-all duration-300 hover:border-white/20 hover:scale-[1.02] active:scale-[0.99]"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
-              >
-                {/* Accent glow on hover */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at 20% 50%, ${quiz.accentColor}18 0%, transparent 70%)` }}
-                />
+        {/* Content */}
+        <div className="relative z-10 flex-1 flex flex-col items-center px-4 py-10">
+          <div className="w-full max-w-md">
 
-                <div className="relative p-5 flex items-center gap-4">
-                  {/* Emoji badge */}
+            <div className="text-center mb-10">
+              <p className="text-xs text-zinc-500 uppercase tracking-[0.2em] font-semibold mb-3">
+                30 questions · Résultats instantanés
+              </p>
+              <h1 className="text-3xl font-black text-white leading-tight">
+                Quelle vérité veux-tu
+                <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  {' '}découvrir ?
+                </span>
+              </h1>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {quizzes.map((quiz) => (
+                <Link
+                  key={quiz.slug}
+                  href={`/quiz/${quiz.slug}`}
+                  className="group relative rounded-2xl border border-white/8 overflow-hidden transition-all duration-300 hover:border-white/20 hover:scale-[1.02] active:scale-[0.99]"
+                  style={{ background: 'rgba(255,255,255,0.03)' }}
+                >
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                    style={{ background: `${quiz.accentColor}20`, border: `1px solid ${quiz.accentColor}30` }}
-                  >
-                    {quiz.emoji}
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    style={{ background: `radial-gradient(ellipse at 20% 50%, ${quiz.accentColor}18 0%, transparent 70%)` }}
+                  />
+
+                  <div className="relative p-5 flex items-center gap-4">
+                    <div
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                      style={{ background: `${quiz.accentColor}20`, border: `1px solid ${quiz.accentColor}30` }}
+                    >
+                      {quiz.emoji}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-bold text-base leading-snug mb-1">{quiz.title}</p>
+                      <p className="text-zinc-500 text-xs leading-relaxed">{quiz.subtitle}</p>
+                    </div>
+
+                    <svg
+                      className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+                      style={{ color: quiz.accentColor }}
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
 
-                  {/* Text */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-bold text-base leading-snug mb-1">{quiz.title}</p>
-                    <p className="text-zinc-500 text-xs leading-relaxed">{quiz.subtitle}</p>
-                  </div>
+                  <div
+                    className="h-px w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ background: `linear-gradient(90deg, transparent, ${quiz.accentColor}60, transparent)` }}
+                  />
+                </Link>
+              ))}
+            </div>
 
-                  {/* Arrow */}
-                  <svg
-                    className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                    style={{ color: quiz.accentColor }}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-
-                {/* Bottom accent bar */}
-                <div
-                  className="h-px w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `linear-gradient(90deg, transparent, ${quiz.accentColor}60, transparent)` }}
-                />
-              </Link>
-            ))}
+            <p className="text-center text-zinc-600 text-xs mt-10 tracking-wide">
+              🔒 100% anonyme · Zéro compte requis
+            </p>
           </div>
-
-          {/* Footer hint */}
-          <p className="text-center text-zinc-600 text-xs mt-10 tracking-wide">
-            🔒 100% anonyme · Zéro compte requis
-          </p>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
