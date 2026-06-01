@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
+import QuizIcon from '@/components/QuizIcon';
 
 const BASE = 'https://ursecret.vercel.app';
 
@@ -121,10 +122,10 @@ export default function QuizzesPage() {
 
                   <div className="relative p-5 flex items-center gap-4">
                     <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
                       style={{ background: `${quiz.accentColor}20`, border: `1px solid ${quiz.accentColor}30` }}
                     >
-                      {quiz.emoji}
+                      <QuizIcon slug={quiz.slug} size={32} color={quiz.accentColor} className="mx-auto" />
                     </div>
 
                     <div className="flex-1 min-w-0">

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import QuizIcon from './QuizIcon';
 
 const QUIZZES = [
   { slug: 'infidelite',  emoji: '💔', label: 'Infidélité',   desc: 'Il/elle te trompe vraiment ?',      color: '#f43f5e' },
@@ -115,7 +116,7 @@ export default function LandingPage() {
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
                   style={{ background: `radial-gradient(circle at 30% 30%, ${q.color}18 0%, transparent 60%)` }} />
                 <div className="relative z-10">
-                  <div className="text-4xl mb-4">{q.emoji}</div>
+                  <div className="mb-4"><QuizIcon slug={q.slug} size={40} color={q.color} /></div>
                   <h3 className="text-white font-black text-lg mb-1">{q.label}</h3>
                   <p className="text-zinc-500 text-sm">{q.desc}</p>
                   <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold transition-colors duration-200"
@@ -142,7 +143,10 @@ export default function LandingPage() {
                 style={{ background: 'radial-gradient(circle at 30% 30%, rgba(139,92,246,0.12) 0%, transparent 60%)' }} />
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="text-4xl">📸</span>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: '#8b5cf6', background: 'rgba(139,92,246,0.15)' }}>IA</span>
                 </div>
                 <h3 className="text-white font-black text-lg mb-1">Rizz Analyzer</h3>
@@ -164,12 +168,44 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { icon: '🔒', title: 'Zéro données',     desc: 'Aucun compte requis. Tes réponses ne sont jamais stockées ni partagées.',    color: '#8b5cf6' },
-              { icon: '🧠', title: 'IA sans filtre',   desc: "Claude analyse tes réponses avec une précision clinique. Pas de complaisance.", color: '#ec4899' },
-              { icon: '⚡', title: 'Résultat en 3 min', desc: '30 questions ciblées, un score précis, un message qui te parle vraiment.',    color: '#f59e0b' },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                ),
+                title: 'Zéro données',
+                desc: 'Aucun compte requis. Tes réponses ne sont jamais stockées ni partagées.',
+                color: '#8b5cf6',
+              },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2C7 2 4 5.5 4 9c0 2.4 1.2 4.5 3 5.7V17h10v-2.3C18.8 13.5 20 11.4 20 9c0-3.5-3-7-8-7z" />
+                    <line x1="8" y1="17" x2="16" y2="17" />
+                    <line x1="9" y1="20" x2="15" y2="20" />
+                    <line x1="12" y1="7" x2="12" y2="13" strokeOpacity="0.4" />
+                    <line x1="9" y1="10" x2="15" y2="10" strokeOpacity="0.4" />
+                  </svg>
+                ),
+                title: 'IA sans filtre',
+                desc: "Claude analyse tes réponses avec une précision clinique. Pas de complaisance.",
+                color: '#ec4899',
+              },
+              {
+                icon: (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                ),
+                title: 'Résultat en 3 min',
+                desc: '30 questions ciblées, un score précis, un message qui te parle vraiment.',
+                color: '#f59e0b',
+              },
             ].map((f) => (
               <div key={f.title} className="glass rounded-2xl p-6 border border-white/8">
-                <div className="text-3xl mb-4">{f.icon}</div>
+                <div className="mb-4">{f.icon}</div>
                 <h3 className="text-white font-bold text-base mb-2">{f.title}</h3>
                 <p className="text-zinc-500 text-sm leading-relaxed">{f.desc}</p>
               </div>

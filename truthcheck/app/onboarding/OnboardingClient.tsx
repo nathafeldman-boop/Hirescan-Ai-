@@ -3,6 +3,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
+import QuizIcon from '@/components/QuizIcon';
+
+const QUIZ_COLORS: Record<string, string> = {
+  infidelite: '#f43f5e',
+  adopte: '#8b5cf6',
+  amoureux: '#ec4899',
+  'vrais-amis': '#06b6d4',
+  orientation: '#10b981',
+};
 
 const QUIZ_CHOICES = [
   { slug: 'infidelite',  label: 'Mon/Ma partenaire me trompe ?', emoji: '💔' },
@@ -124,7 +133,7 @@ export default function OnboardingClient() {
                     <div className="ob-pill-outer">
                       <div className="ob-pill-inner">
                         <span className="ob-pill-text">
-                          <span className="text-2xl flex-shrink-0">{choice.emoji}</span>
+                          <QuizIcon slug={choice.slug} size={28} color={QUIZ_COLORS[choice.slug] ?? '#8b5cf6'} />
                           <span>{choice.label}</span>
                           <svg className="w-4 h-4 ml-auto flex-shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
