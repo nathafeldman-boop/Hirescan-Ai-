@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
+import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 
 const BASE = 'https://ursecret.vercel.app';
 
@@ -74,11 +75,7 @@ export default function QuizzesPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <main className="min-h-screen bg-[#09090b] flex flex-col">
-        {/* Ambient glow */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet-600/10 rounded-full blur-[80px]" />
-          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-pink-600/8 rounded-full blur-[80px]" />
-        </div>
+        <UrSecretAnimatedBg />
 
         {/* Header */}
         <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">
