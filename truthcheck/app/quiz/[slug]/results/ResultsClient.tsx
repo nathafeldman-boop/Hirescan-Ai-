@@ -118,6 +118,45 @@ export default function ResultsClient({ quiz }: Props) {
 
   const analysis = buildAnalysis(quiz, score, tier.title);
 
+  const partialScore = score >= 100 ? '9?%' : score >= 10 ? `${Math.floor(score / 10)}?%` : '?%';
+
+  const PAYWALL_CONFIG: Record<string, { headline: string; subline: string; social: string }> = {
+    infidelite: {
+      headline: score >= 60
+        ? "L'IA a trouvé plusieurs signaux dans tes réponses."
+        : "Tes réponses révèlent quelque chose d'important.",
+      subline: score >= 60
+        ? "Ce que tu décris correspond à des schémas reconnus. Tu mérites de savoir exactement où tu en es."
+        : "Ton score indique un niveau de risque précis. La vérité est là — à un clic.",
+      social: "4 127 personnes ont découvert leur vérité cette semaine",
+    },
+    adopte: {
+      headline: "Certains des indices que tu décris ne trompent pas.",
+      subline: "L'analyse détaille exactement ce que tes réponses suggèrent sur ton histoire. Tu mérites une réponse claire.",
+      social: "1 389 personnes ont éclairci leur histoire cette semaine",
+    },
+    amoureux: {
+      headline: "Tes sentiments sont beaucoup plus définis qu'il n'y paraît.",
+      subline: "L'IA a identifié la nature exacte de ce que tu ressens. Est-ce vraiment de l'amour, ou autre chose ?",
+      social: "2 841 personnes ont clarifié leurs sentiments cette semaine",
+    },
+    'vrais-amis': {
+      headline: "Certaines de tes réponses sont particulièrement révélatrices.",
+      subline: "L'analyse montre clairement si cette amitié est saine — ou si tu mérites mieux.",
+      social: "2 063 personnes ont vu la réalité en face cette semaine",
+    },
+    orientation: {
+      headline: "Tes réponses dessinent un profil cohérent et précis.",
+      subline: "Ce que l'IA a identifié sur ton identité mérite d'être découvert. Sans jugement.",
+      social: "1 156 personnes se sont mieux comprises cette semaine",
+    },
+  };
+  const pw = PAYWALL_CONFIG[quiz.slug] ?? {
+    headline: "L'IA a analysé toutes tes réponses.",
+    subline: "Ton profil précis t'attend. Découvre ce que tes réponses révèlent vraiment.",
+    social: "Des milliers de personnes ont découvert leur vérité cette semaine",
+  };
+
   useEffect(() => {
     if (hasSaved.current) return;
     hasSaved.current = true;
@@ -382,7 +421,7 @@ export default function ResultsClient({ quiz }: Props) {
                       strokeLinecap="round" transform="rotate(-90 90 90)"
                       style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
                     />
-                    <text x="90" y="98" textAnchor="middle" fill={tier.glowColor} fontSize="42" fontWeight="900">??%</text>
+                    <text x="90" y="98" textAnchor="middle" fill={tier.glowColor} fontSize="42" fontWeight="900">{partialScore}</text>
                   </svg>
                 </div>
                 {/* Lock icon overlay */}
@@ -399,33 +438,32 @@ export default function ResultsClient({ quiz }: Props) {
               </div>
 
               {/* "Results ready" badge */}
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center mb-4">
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-white/5 border border-white/10 text-zinc-300">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Tes résultats sont prêts
+                  Analyse terminée — résultats prêts
                 </span>
               </div>
 
               {/* Main paywall card */}
               <div
                 className="rounded-2xl p-6 mb-6 border border-white/10"
-                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.08))' }}
+                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(236,72,153,0.10))' }}
               >
                 <div className="text-center mb-5">
-                  <h2 className="text-2xl font-black text-white mb-2">Débloque ton analyse</h2>
+                  <h2 className="text-xl font-black text-white mb-2">{pw.headline}</h2>
                   <p className="text-zinc-400 text-sm leading-relaxed">
-                    Ton score exact + une analyse personnalisée de 10 points t&apos;attendent.
-                    Moins cher qu&apos;un café par mois.
+                    {pw.subline}
                   </p>
                 </div>
 
                 {/* What you get */}
-                <div className="space-y-2 mb-5">
+                <div className="space-y-2 mb-4">
                   {[
                     'Ton score précis sur 100',
                     'Ton niveau parmi 5 catégories',
                     'Analyse de 10 points personnalisée',
-                    'Accès à tous les autres quizzes',
+                    'Accès illimité à tous les quizzes',
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-2 text-sm text-zinc-300">
                       <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -436,12 +474,18 @@ export default function ResultsClient({ quiz }: Props) {
                   ))}
                 </div>
 
+                {/* Social proof */}
+                <div className="flex items-center justify-center gap-2 mb-4 py-2 rounded-xl border border-white/5 bg-white/[0.03]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs text-zinc-500">{pw.social}</span>
+                </div>
+
                 {/* CTA */}
                 <button
                   onClick={handlePayClick}
                   disabled={isCheckingOut}
-                  className="w-full py-4 rounded-xl font-black text-white text-base mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
-                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 24px rgba(139,92,246,0.4)' }}
+                  className="w-full py-4 rounded-xl font-black text-white text-base mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
                 >
                   {isCheckingOut ? (
                     <span className="flex items-center justify-center gap-2">
@@ -452,12 +496,12 @@ export default function ResultsClient({ quiz }: Props) {
                       Redirection…
                     </span>
                   ) : (
-                    '4,99€ / mois — Voir mes résultats ✦'
+                    'Voir mon score complet — 4,99€/mois ✦'
                   )}
                 </button>
 
                 <p className="text-center text-[11px] text-zinc-600">
-                  Annulable à tout moment · Paiement 100% sécurisé
+                  Annulable à tout moment · Paiement 100% sécurisé · Accès immédiat
                 </p>
               </div>
 

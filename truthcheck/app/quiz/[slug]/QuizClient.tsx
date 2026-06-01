@@ -51,6 +51,7 @@ export default function QuizClient({ quiz }: Props) {
   const [selected, setSelected] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
+  const [showMidHook, setShowMidHook] = useState(false);
 
   useEffect(() => {
     try {
@@ -93,11 +94,22 @@ export default function QuizClient({ quiz }: Props) {
     const score = question.options[selected].score;
     const newTotal = totalScore + score;
 
+    const MID_HOOK_INDEX = Math.floor(questions.length / 2) - 1;
+
     setTimeout(() => {
       if (isLast) {
         const maxScore = questions.length * 3;
         const percentage = Math.round((newTotal / maxScore) * 100);
         router.push(`/quiz/${quiz.slug}/results?score=${percentage}`);
+      } else if (currentIndex === MID_HOOK_INDEX) {
+        setShowMidHook(true);
+        setTimeout(() => {
+          setShowMidHook(false);
+          setTotalScore(newTotal);
+          setCurrentIndex((prev) => prev + 1);
+          setSelected(null);
+          setTransitioning(false);
+        }, 2200);
       } else {
         setTotalScore(newTotal);
         setCurrentIndex((prev) => prev + 1);
@@ -113,6 +125,30 @@ export default function QuizClient({ quiz }: Props) {
 
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#09090b' }}>
+
+      {/* Mid-quiz AI analysis overlay */}
+      {showMidHook && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(9,9,11,0.96)', backdropFilter: 'blur(4px)' }}>
+          <div className="text-center px-6">
+            <div className="text-5xl mb-5" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>🧠</div>
+            <p className="text-white font-black text-2xl mb-2">L&apos;IA analyse tes réponses…</p>
+            <p className="text-zinc-500 text-sm mb-6">Un profil commence à se dessiner</p>
+            <div className="flex justify-center gap-2">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{
+                    backgroundColor: quiz.accentColor,
+                    animation: 'bounce 0.8s ease-in-out infinite',
+                    animationDelay: `${i * 0.18}s`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Slideshow background (legacy slugs with images) */}
       {slides ? (

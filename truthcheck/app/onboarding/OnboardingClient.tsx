@@ -20,7 +20,7 @@ interface Answers {
   quizSlug: string;
 }
 
-const STEPS = ['firstName', 'age', 'gender', 'situation', 'quizSlug'] as const;
+const STEPS = ['quizSlug', 'firstName', 'age', 'gender', 'situation'] as const;
 type Step = typeof STEPS[number];
 
 export default function OnboardingClient() {
@@ -62,6 +62,7 @@ export default function OnboardingClient() {
         body: JSON.stringify(newAnswers),
       }).catch(() => {});
       router.push(`/quiz/${newAnswers.quizSlug}`);
+      // Note: quizSlug is set at step 0 so it's available at push time
     }
   }
 
@@ -105,47 +106,14 @@ export default function OnboardingClient() {
         }}
       >
         <div className="w-full max-w-md">
-          {currentStep === 'firstName' && (
-            <TextStep
-              question="Comment tu t'appelles ?"
-              placeholder="Ton prénom..."
-              value={answers.firstName}
-              onNext={handleTextNext}
-            />
-          )}
-          {currentStep === 'age' && (
-            <ChoiceStep
-              question={`Quel âge as-tu, ${answers.firstName || 'toi'} ?`}
-              options={['- de 18 ans', '18–24 ans', '25–34 ans', '35–44 ans', '45 ans et +']}
-              onSelect={advance}
-            />
-          )}
-          {currentStep === 'gender' && (
-            <ChoiceStep
-              question="Tu t'identifies comme ?"
-              options={['Un homme', 'Une femme', 'Non-binaire', 'Je préfère ne pas dire']}
-              onSelect={advance}
-            />
-          )}
-          {currentStep === 'situation' && (
-            <ChoiceStep
-              question="Quelle est ta situation actuelle ?"
-              options={['En couple', 'Célibataire', 'Compliqué', 'Je ne sais pas']}
-              onSelect={advance}
-            />
-          )}
           {currentStep === 'quizSlug' && (
             <div>
-              <p className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-3 text-center">
-                Dernière question
-              </p>
-              <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
-                Pourquoi veux-tu utiliser{' '}
-                <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-                  UrSecret
-                </span>{' '}
-                ?
+              <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-3 leading-snug">
+                Qu&apos;est-ce qui te préoccupe en ce moment ?
               </h2>
+              <p className="text-zinc-500 text-sm text-center mb-8">
+                L&apos;IA va analyser ta situation — sans filtre, sans jugement.
+              </p>
               <div className="flex flex-col gap-3">
                 {QUIZ_CHOICES.map((choice) => (
                   <button
@@ -167,6 +135,40 @@ export default function OnboardingClient() {
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+          {currentStep === 'firstName' && (
+            <TextStep
+              question="C'est courageux de faire face à ça. Comment tu t'appelles ?"
+              placeholder="Ton prénom..."
+              value={answers.firstName}
+              onNext={handleTextNext}
+            />
+          )}
+          {currentStep === 'age' && (
+            <ChoiceStep
+              question={`Quel âge as-tu, ${answers.firstName || 'toi'} ?`}
+              options={['- de 18 ans', '18–24 ans', '25–34 ans', '35–44 ans', '45 ans et +']}
+              onSelect={advance}
+            />
+          )}
+          {currentStep === 'gender' && (
+            <ChoiceStep
+              question="Tu t'identifies comme ?"
+              options={['Un homme', 'Une femme', 'Non-binaire', 'Je préfère ne pas dire']}
+              onSelect={advance}
+            />
+          )}
+          {currentStep === 'situation' && (
+            <div>
+              <p className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-3 text-center">
+                Dernière étape
+              </p>
+              <ChoiceStep
+                question="Quelle est ta situation actuelle ?"
+                options={['En couple', 'Célibataire', 'Compliqué', 'Je ne sais pas']}
+                onSelect={advance}
+              />
             </div>
           )}
         </div>
