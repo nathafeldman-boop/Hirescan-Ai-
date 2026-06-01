@@ -5,11 +5,11 @@ import { useState, useEffect } from 'react';
 import QuizIcon from './QuizIcon';
 
 const QUIZZES = [
-  { slug: 'infidelite',  emoji: '💔', label: 'Infidélité',   desc: 'Il/elle te trompe vraiment ?',      color: '#f43f5e' },
-  { slug: 'adopte',      emoji: '👶', label: 'Adopté(e) ?',  desc: 'Tu es vraiment de cette famille ?', color: '#8b5cf6' },
-  { slug: 'amoureux',    emoji: '💘', label: 'Amoureux/se',  desc: "C'est de l'amour ou pas ?",         color: '#ec4899' },
-  { slug: 'vrais-amis',  emoji: '🤝', label: 'Vrais amis',   desc: 'Ils sont vraiment là pour toi ?',   color: '#06b6d4' },
-  { slug: 'orientation', emoji: '🌈', label: 'Orientation',  desc: 'Tu te connais vraiment ?',          color: '#10b981' },
+  { slug: 'infidelite',  emoji: '💔', label: 'Il/elle te cache quelque chose ?',    desc: 'Les signaux que tu ignores peut-être',          color: '#f43f5e' },
+  { slug: 'adopte',      emoji: '👶', label: 'Ta famille te dit tout sur toi ?',    desc: 'Les indices que personne n\'ose mentionner',     color: '#8b5cf6' },
+  { slug: 'amoureux',    emoji: '💘', label: "C'est vraiment de l'amour ?",         desc: 'Amour vrai ou simple illusion',                 color: '#ec4899' },
+  { slug: 'vrais-amis',  emoji: '🤝', label: 'Seraient-ils là si ça allait mal ?', desc: 'Ce que les vrais amis font vraiment',           color: '#06b6d4' },
+  { slug: 'orientation', emoji: '🌈', label: 'Es-tu attiré(e) par le même sexe ?', desc: 'Explore ton attirance sans filtre ni jugement', color: '#10b981' },
 ];
 
 const STATS = [

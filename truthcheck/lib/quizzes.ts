@@ -47,8 +47,8 @@ export interface Quiz {
 export const quizzes: Quiz[] = [
   {
     slug: 'infidelite',
-    title: 'Mon/Ma partenaire me trompe ?',
-    subtitle: 'Détecte les signes d\'infidélité',
+    title: 'Est-ce que ton/ta partenaire te cache quelque chose ?',
+    subtitle: 'Les signaux que tu ignores peut-être',
     description: '30 questions pour analyser les comportements suspects dans ta relation.',
     emoji: '💔',
     gradientFrom: 'from-red-950/80',
@@ -785,8 +785,8 @@ export const quizzes: Quiz[] = [
   },
   {
     slug: 'adopte',
-    title: 'Suis-je adopté(e) ?',
-    subtitle: 'Indices physiques, comportementaux et familiaux',
+    title: 'Ta famille te dit-elle vraiment tout sur tes origines ?',
+    subtitle: 'Les indices que personne n\'ose mentionner',
     description: '30 questions pour analyser les indices qui pourraient révéler une adoption.',
     emoji: '🧬',
     gradientFrom: 'from-violet-950/80',
@@ -1522,8 +1522,8 @@ export const quizzes: Quiz[] = [
   },
   {
     slug: 'amoureux',
-    title: 'Suis-je amoureux/amoureuse ?',
-    subtitle: 'Les signes qui ne trompent pas',
+    title: 'Ce que tu ressens, c\'est vraiment de l\'amour ?',
+    subtitle: 'La différence entre l\'amour vrai et l\'illusion',
     description: '30 questions pour savoir si ce que tu ressens, c\'est vraiment de l\'amour.',
     emoji: '💕',
     gradientFrom: 'from-pink-950/80',
@@ -2259,8 +2259,8 @@ export const quizzes: Quiz[] = [
   },
   {
     slug: 'vrais-amis',
-    title: 'Mes amis sont-ils vrais ?',
-    subtitle: 'Trahison, loyauté et faux semblants',
+    title: 'Tes amis seraient-ils là si tu avais vraiment besoin d\'eux ?',
+    subtitle: 'Ce que les vrais amis font vraiment',
     description: '30 questions pour identifier les faux amis et ceux qui te méritent vraiment.',
     emoji: '👥',
     gradientFrom: 'from-emerald-950/80',
@@ -2996,8 +2996,8 @@ export const quizzes: Quiz[] = [
   },
   {
     slug: 'orientation',
-    title: 'Quelle est mon orientation ?',
-    subtitle: 'Explore ton attirance sincère',
+    title: 'Es-tu attiré(e) par le même sexe que toi ?',
+    subtitle: 'Explore ton attirance sans filtre ni jugement',
     description: '30 questions pour explorer honnêtement ton attirance et mieux te comprendre.',
     emoji: '🌈',
     gradientFrom: 'from-violet-950/80',
@@ -3734,8 +3734,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 6 : NARCISSIQUE ─────────────────────────────────────────────────
   {
     slug: 'narcissique',
-    title: 'Suis-je narcissique ?',
-    subtitle: 'Traits de personnalité et empathie',
+    title: 'Les gens t\'évitent-ils sans que tu saches pourquoi ?',
+    subtitle: 'Ce que tes comportements disent vraiment de toi',
     description: '30 questions pour évaluer si tu présentes des traits narcissiques dans tes relations.',
     emoji: '🪞',
     gradientFrom: 'from-amber-950/80',
@@ -3781,8 +3781,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 7 : MON EX ──────────────────────────────────────────────────────
   {
     slug: 'mon-ex',
-    title: 'Mon ex veut-il/elle revenir ?',
-    subtitle: 'Analyse les signaux de ton ex',
+    title: 'Ton ex pense encore à toi — mais ose-t-il/elle le dire ?',
+    subtitle: 'Décode les signaux que tu n\'arrives pas à lire',
     description: '30 questions pour décoder les comportements de ton ex et savoir s\'il/elle veut renouer.',
     emoji: '💭',
     gradientFrom: 'from-blue-950/80',
@@ -3827,8 +3827,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 8 : MANIPULÉ(E) ─────────────────────────────────────────────────
   {
     slug: 'manipule',
-    title: 'Suis-je manipulé(e) ?',
-    subtitle: 'Détecte la manipulation dans tes relations',
+    title: 'Cette personne te contrôle sans que tu t\'en rendes compte ?',
+    subtitle: 'Les techniques de manipulation que personne ne voit',
     description: '30 questions pour identifier si quelqu\'un dans ta vie te manipule émotionnellement.',
     emoji: '🎭',
     gradientFrom: 'from-purple-950/80',
@@ -3873,8 +3873,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 9 : DOIS-JE ROMPRE ──────────────────────────────────────────────
   {
     slug: 'rompre',
-    title: 'Dois-je rompre ?',
-    subtitle: 'Analyse la santé de ta relation',
+    title: 'Ta relation te rend-elle plus heureux/heureuse ou plus seul(e) ?',
+    subtitle: 'La vérité que tu repousses depuis trop longtemps',
     description: '30 questions pour t\'aider à décider si ta relation mérite d\'être poursuivie.',
     emoji: '💔',
     gradientFrom: 'from-rose-950/80',
@@ -3919,8 +3919,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 10 : JALOUX ─────────────────────────────────────────────────────
   {
     slug: 'jaloux',
-    title: 'Suis-je trop jaloux/jalouse ?',
-    subtitle: 'Évalue ton niveau de jalousie',
+    title: 'Ta jalousie va-t-elle détruire ta relation sans que tu le veuilles ?',
+    subtitle: 'Ce niveau de jalousie est-il normal ou dangereux',
     description: '30 questions pour savoir si ta jalousie est saine ou problématique dans ta relation.',
     emoji: '😤',
     gradientFrom: 'from-orange-950/80',
@@ -3965,8 +3965,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 11 : RELATION TOXIQUE ───────────────────────────────────────────
   {
     slug: 'relation-toxique',
-    title: 'Ma relation est-elle toxique ?',
-    subtitle: 'Évalue la santé de ta relation',
+    title: 'Est-ce que cette relation te détruit lentement ?',
+    subtitle: 'Les 7 signes qu\'on refuse toujours de voir',
     description: '30 questions pour identifier si ta relation présente des schémas toxiques.',
     emoji: '🚫',
     gradientFrom: 'from-red-950/80',
@@ -4011,8 +4011,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 12 : CRUSH ──────────────────────────────────────────────────────
   {
     slug: 'crush',
-    title: 'Mon crush ressent-il/elle quelque chose ?',
-    subtitle: 'Décrypte les signaux de ton crush',
+    title: 'Ton crush pense à toi autant que tu penses à lui/elle ?',
+    subtitle: 'Ces signaux discrets qui ne mentent jamais',
     description: '30 questions pour savoir si ton crush t\'aime secrètement.',
     emoji: '💌',
     gradientFrom: 'from-pink-950/80',
@@ -4056,8 +4056,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 13 : BURNOUT ────────────────────────────────────────────────────
   {
     slug: 'burnout',
-    title: 'Suis-je en burnout ?',
-    subtitle: 'Évalue ton niveau d\'épuisement professionnel',
+    title: 'Ton corps t\'envoie un signal d\'alarme que tu ignores ?',
+    subtitle: 'Les symptômes du burnout avant qu\'il soit trop tard',
     description: '30 questions pour identifier si tu es en état de burnout ou en voie de l\'être.',
     emoji: '💤',
     gradientFrom: 'from-slate-950/80',
@@ -4102,8 +4102,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 14 : DÉPRESSION ─────────────────────────────────────────────────
   {
     slug: 'depression',
-    title: 'Ai-je des signes de dépression ?',
-    subtitle: 'Évalue ton état émotionnel et mental',
+    title: 'Ce que tu ressens chaque matin, c\'est normal ou pas ?',
+    subtitle: 'La frontière entre la tristesse et quelque chose de plus grave',
     description: '30 questions pour identifier si tu présentes des signes qui méritent une attention médicale.',
     emoji: '😔',
     gradientFrom: 'from-indigo-950/80',
@@ -4147,8 +4147,8 @@ export const quizzes: Quiz[] = [
   // ─── QUIZ 15 : VRAI AMOUR ─────────────────────────────────────────────────
   {
     slug: 'vrai-amour',
-    title: 'Est-ce le vrai amour ?',
-    subtitle: 'Analyse la profondeur de tes sentiments',
+    title: 'Ce que tu vis, c\'est de l\'amour ou juste de l\'attachement ?',
+    subtitle: 'Beaucoup confondent les deux — et le payent cher',
     description: '30 questions pour savoir si ce que tu ressens est un amour véritable et durable.',
     emoji: '❤️‍🔥',
     gradientFrom: 'from-red-950/80',
