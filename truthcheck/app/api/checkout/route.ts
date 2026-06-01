@@ -7,6 +7,9 @@ function getStripe() {
   return new Stripe(key, { apiVersion: '2024-06-20' });
 }
 
+const ONE_TIME_PRODUCT_ID = 'prod_UcjiAfAioyc6WM';
+const ONE_TIME_PRICE_CENTS = 199; // €1.99
+
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
   if (!stripe) {
@@ -14,9 +17,37 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail, oneTime } = await req.json();
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
+    const cancelUrl = quizSlug && score !== undefined
+      ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
+      : `${baseUrl}/quizzes`;
+
+    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+
+    // ── One-time purchase: unlock just this result ──
+    if (oneTime) {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: 'eur',
+            product: ONE_TIME_PRODUCT_ID,
+            unit_amount: ONE_TIME_PRICE_CENTS,
+          },
+          quantity: 1,
+        }],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', oneTime: 'true' },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      return NextResponse.json({ url: session.url });
+    }
+
+    // ── Subscription ──
     const priceId = process.env.STRIPE_PRICE_ID;
 
     const lineItem = priceId
@@ -34,18 +65,13 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         };
 
-    // Cancel URL returns user to their results page
-    const cancelUrl = quizSlug && score !== undefined
-      ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
-      : `${baseUrl}/quizzes`;
-
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [lineItem],
       allow_promotion_codes: true,
       ...(userEmail ? { customer_email: userEmail } : {}),
       metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '' },
-      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`,
+      success_url: successUrl,
       cancel_url: cancelUrl,
     });
 

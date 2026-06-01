@@ -113,8 +113,12 @@ export default function ResultsClient({ quiz }: Props) {
   const [authEmail, setAuthEmail] = useState('');
   const [authSent, setAuthSent] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [exitCountdown, setExitCountdown] = useState(30);
   const hasSaved = useRef(false);
   const pendingCheckoutRef = useRef(false);
+  const exitTriggered = useRef(false);
+  const paywallRef = useRef<HTMLDivElement>(null);
 
   const analysis = buildAnalysis(quiz, score, tier.title);
 
@@ -195,16 +199,68 @@ export default function ResultsClient({ quiz }: Props) {
     return () => clearTimeout(t);
   }, [score]);
 
+  // Auto-scroll to paywall after results load
+  useEffect(() => {
+    if (isPremium) return;
+    const t = setTimeout(() => {
+      paywallRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 1400);
+    return () => clearTimeout(t);
+  }, [isPremium]);
+
+  // Exit intent — desktop (mouse leaves top) + mobile (tab switch)
+  useEffect(() => {
+    if (isPremium) return;
+    const trigger = () => {
+      if (!exitTriggered.current) {
+        exitTriggered.current = true;
+        setShowExitModal(true);
+      }
+    };
+    const onMouseLeave = (e: MouseEvent) => { if (e.clientY <= 0) trigger(); };
+    const onVisibility = () => { if (document.visibilityState === 'hidden') trigger(); };
+    document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [isPremium]);
+
+  // Exit modal countdown
+  useEffect(() => {
+    if (!showExitModal) return;
+    setExitCountdown(30);
+    const id = setInterval(() => {
+      setExitCountdown((prev) => {
+        if (prev <= 1) { clearInterval(id); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [showExitModal]);
+
   // After returning from OAuth/magic-link, auto-trigger checkout if user had clicked pay
   useEffect(() => {
     if (!session?.user || pendingCheckoutRef.current) return;
     let flag = false;
-    try { flag = sessionStorage.getItem('pending_checkout') === '1'; } catch {}
+    let checkoutType = 'sub';
+    try {
+      flag = sessionStorage.getItem('pending_checkout') === '1';
+      checkoutType = sessionStorage.getItem('pending_checkout_type') ?? 'sub';
+    } catch {}
     if (!flag) return;
-    try { sessionStorage.removeItem('pending_checkout'); } catch {}
+    try {
+      sessionStorage.removeItem('pending_checkout');
+      sessionStorage.removeItem('pending_checkout_type');
+    } catch {}
     pendingCheckoutRef.current = true;
     if ((session.user as { tier?: string }).tier !== 'premium') {
-      void doCheckout(session.user.email ?? undefined);
+      if (checkoutType === 'onetime') {
+        void doOneTimeCheckout(session.user.email ?? undefined);
+      } else {
+        void doCheckout(session.user.email ?? undefined);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.email]);
@@ -236,13 +292,56 @@ export default function ResultsClient({ quiz }: Props) {
     }
   }
 
+  async function doOneTimeCheckout(email?: string) {
+    setIsCheckingOut(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resultId: shareId,
+          quizSlug: quiz.slug,
+          score,
+          origin: window.location.origin,
+          userEmail: email ?? session?.user?.email ?? undefined,
+          oneTime: true,
+        }),
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error ?? 'Erreur de paiement');
+        setIsCheckingOut(false);
+      }
+    } catch {
+      alert('Erreur réseau. Réessaie.');
+      setIsCheckingOut(false);
+    }
+  }
+
   function handlePayClick() {
     if (!session?.user) {
-      try { sessionStorage.setItem('pending_checkout', '1'); } catch {}
+      try {
+        sessionStorage.setItem('pending_checkout', '1');
+        sessionStorage.setItem('pending_checkout_type', 'sub');
+      } catch {}
       setShowAuthModal(true);
       return;
     }
     void doCheckout();
+  }
+
+  function handleOneTimeClick() {
+    if (!session?.user) {
+      try {
+        sessionStorage.setItem('pending_checkout', '1');
+        sessionStorage.setItem('pending_checkout_type', 'onetime');
+      } catch {}
+      setShowAuthModal(true);
+      return;
+    }
+    void doOneTimeCheckout();
   }
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
@@ -256,6 +355,50 @@ export default function ResultsClient({ quiz }: Props) {
           style={{ backgroundColor: tier.glowColor }}
         />
       </div>
+
+      {/* Exit intent modal */}
+      {showExitModal && !isPremium && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.93)', backdropFilter: 'blur(10px)' }}
+        >
+          <div className="w-full max-w-sm rounded-3xl p-6 border border-white/10" style={{ background: '#111113' }}>
+            <div className="text-center mb-5">
+              <div className="text-4xl mb-3">⏳</div>
+              <h2 className="text-white font-black text-xl mb-1">Tu pars sans voir ton résultat ?</h2>
+              <p className="text-zinc-500 text-sm leading-relaxed">
+                Ton analyse disparaît dans{' '}
+                <span className="font-black tabular-nums" style={{ color: tier.glowColor }}>
+                  {exitCountdown}s
+                </span>
+              </p>
+            </div>
+            <div className="space-y-3">
+              <button
+                onClick={() => { setShowExitModal(false); void doCheckout(); }}
+                disabled={isCheckingOut}
+                className="w-full py-4 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
+              >
+                Voir mon score — 4,99€/mois ✦
+              </button>
+              <button
+                onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
+                disabled={isCheckingOut}
+                className="w-full py-3 rounded-xl font-semibold text-zinc-200 text-sm bg-white/[0.06] hover:bg-white/10 border border-white/12 transition-all disabled:opacity-60"
+              >
+                Juste ce résultat — 1,99€ (paiement unique)
+              </button>
+              <button
+                onClick={() => setShowExitModal(false)}
+                className="w-full py-2 text-xs text-zinc-700 hover:text-zinc-500 transition-colors"
+              >
+                Ignorer mon résultat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Auth modal */}
       {showAuthModal && (
@@ -422,7 +565,7 @@ export default function ResultsClient({ quiz }: Props) {
             </>
           ) : (
             /* ── FREE: paywall ── */
-            <>
+            <div ref={paywallRef}>
               {/* Blurred score circle */}
               <div className="flex justify-center mb-6 relative">
                 <div style={{ filter: 'blur(12px)', opacity: 0.5, pointerEvents: 'none' }}>
@@ -550,8 +693,17 @@ export default function ResultsClient({ quiz }: Props) {
                   )}
                 </button>
 
+                {/* One-time option */}
+                <button
+                  onClick={handleOneTimeClick}
+                  disabled={isCheckingOut}
+                  className="w-full py-3 rounded-xl font-semibold text-zinc-400 text-sm border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] hover:text-zinc-200 transition-all active:scale-[0.98] mb-3 disabled:opacity-60"
+                >
+                  Juste ce résultat — 1,99€ (paiement unique)
+                </button>
+
                 <p className="text-center text-[11px] text-zinc-600">
-                  Annulable à tout moment · Paiement 100% sécurisé · Accès immédiat
+                  Abonnement annulable à tout moment · Paiement 100% sécurisé
                 </p>
               </div>
 
@@ -584,7 +736,7 @@ export default function ResultsClient({ quiz }: Props) {
                   style={{ background: 'linear-gradient(to bottom, rgba(9,9,11,0.3) 0%, rgba(9,9,11,0.85) 100%)' }}
                 />
               </div>
-            </>
+            </div>
           )}
 
           {/* Viral share section */}
