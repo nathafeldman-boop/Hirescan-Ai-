@@ -1,3 +1,4 @@
 {
-  "rootDirectory": "truthcheck"
+  "rootDirectory": "truthcheck",
+  "toolbarEnabled": false
 }

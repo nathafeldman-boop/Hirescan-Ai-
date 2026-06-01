@@ -2,6 +2,5 @@
   "framework": "nextjs",
   "buildCommand": "npx prisma db push && npx prisma generate && next build",
   "installCommand": "npm install",
-  "outputDirectory": ".next",
-  "toolbarEnabled": false
+  "outputDirectory": ".next"
 }
