@@ -2,8 +2,12 @@
 
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
+
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -12,7 +16,7 @@ export default function LoginPage() {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
-    await signIn('email', { email, callbackUrl: '/dashboard', redirect: false });
+    await signIn('email', { email, callbackUrl, redirect: false });
     setSent(true);
     setLoading(false);
   }
@@ -45,7 +49,7 @@ export default function LoginPage() {
             <>
               {/* Google */}
               <button
-                onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+                onClick={() => signIn('google', { callbackUrl })}
                 className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

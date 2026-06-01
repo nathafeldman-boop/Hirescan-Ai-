@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail } = await req.json();
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
     const priceId = process.env.STRIPE_PRICE_ID;
@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
       mode: 'subscription',
       line_items: [lineItem],
       allow_promotion_codes: true,
+      ...(userEmail ? { customer_email: userEmail } : {}),
       metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '' },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`,
       cancel_url: cancelUrl,
