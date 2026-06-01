@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { Quiz, QuizSession } from '@/lib/quizzes';
 import { selectQuestions } from '@/lib/quizzes';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
+import QuizAtmosphereBg from '@/components/QuizAtmosphereBg';
 
 interface Props {
   quiz: Quiz;
@@ -137,8 +138,8 @@ export default function QuizClient({ quiz }: Props) {
           />
         </>
       ) : (
-        /* Animated UrSecret logo background for all other quizzes */
-        <UrSecretAnimatedBg accentColor={quiz.accentColor} />
+        /* Atmospheric theme background for new quizzes */
+        <QuizAtmosphereBg slug={quiz.slug} />
       )}
 
       {/* Header */}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 
 const QUIZ_CHOICES = [
   { slug: 'infidelite',  label: 'Mon/Ma partenaire me trompe ?', emoji: '💔' },
@@ -21,44 +22,6 @@ interface Answers {
 
 const STEPS = ['firstName', 'age', 'gender', 'situation', 'quizSlug'] as const;
 type Step = typeof STEPS[number];
-
-/** Inner markup for ob-pill buttons */
-function ObPillInner({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="ob-pill-outer">
-      <div className="ob-pill-inner">
-        <span className="ob-pill-text">{children}</span>
-      </div>
-    </div>
-  );
-}
-
-/** SVG filters: edge-glow (#unopaq) + Dexter button (#linen, #bump) */
-function SvgFilters() {
-  return (
-    <svg width="0" height="0" style={{ position: 'absolute' }}>
-      <defs>
-        <filter id="unopaq" colorInterpolationFilters="sRGB">
-          <feColorMatrix
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15"
-          />
-        </filter>
-        <filter id="linen" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.75 0.35" numOctaves={4} stitchTiles="stitch" result="noise" />
-          <feColorMatrix type="saturate" values="0" in="noise" result="gray" />
-          <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="blend" />
-          <feComposite in="blend" in2="SourceGraphic" operator="in" />
-        </filter>
-        <filter id="bump" x="-10%" y="-10%" width="120%" height="120%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves={4} seed={3} result="noise" />
-          <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise" />
-          <feBlend in="SourceGraphic" in2="grayNoise" mode="soft-light" />
-        </filter>
-      </defs>
-    </svg>
-  );
-}
 
 export default function OnboardingClient() {
   const router = useRouter();
@@ -110,13 +73,8 @@ export default function OnboardingClient() {
   const progress = (step / STEPS.length) * 100;
 
   return (
-    <main className="min-h-screen bg-[#09090b] flex flex-col relative overflow-hidden">
-      <SvgFilters />
-
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-900/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-900/10 rounded-full blur-3xl" />
-      </div>
+    <main className="min-h-screen flex flex-col relative overflow-hidden" style={{ backgroundColor: '#09090b' }}>
+      <UrSecretAnimatedBg />
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 pt-6">
@@ -195,13 +153,17 @@ export default function OnboardingClient() {
                     onClick={() => advance(choice.slug)}
                     className="ob-pill"
                   >
-                    <ObPillInner>
-                      <span className="text-2xl flex-shrink-0">{choice.emoji}</span>
-                      <span>{choice.label}</span>
-                      <svg className="w-4 h-4 ml-auto flex-shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </ObPillInner>
+                    <div className="ob-pill-outer">
+                      <div className="ob-pill-inner">
+                        <span className="ob-pill-text">
+                          <span className="text-2xl flex-shrink-0">{choice.emoji}</span>
+                          <span>{choice.label}</span>
+                          <svg className="w-4 h-4 ml-auto flex-shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -247,13 +209,7 @@ function TextStep({
           disabled={!local.trim()}
           className="dxt-btn"
         >
-          <div className="dxt-fabric" />
-          <span className="dxt-txt dxt-txt1">Continuer</span>
-          <span className="dxt-txt dxt-txt2">→ Allons-y</span>
-          <div className="dxt-dot" />
-          <div className="dxt-shadow left" />
-          <div className="dxt-shadow right" />
-          <div className="dxt-light" />
+          Continuer
         </button>
       </div>
     </div>
@@ -281,9 +237,13 @@ function ChoiceStep({
             onClick={() => onSelect(opt)}
             className="ob-pill"
           >
-            <ObPillInner>
-              <span>{opt}</span>
-            </ObPillInner>
+            <div className="ob-pill-outer">
+              <div className="ob-pill-inner">
+                <span className="ob-pill-text">
+                  <span>{opt}</span>
+                </span>
+              </div>
+            </div>
           </button>
         ))}
       </div>
