@@ -30,7 +30,7 @@ jobs:
       # ── INDEXNOW (covers Bing/Yandex/Ecosia/DuckDuckGo/Brave/Seznam/Naver) ─
       - name: IndexNow — All engines
         run: |
-          PAYLOAD='{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation","https://ursecret.vercel.app/feed.xml","https://ursecret.vercel.app/atom.xml","https://ursecret.vercel.app/news-sitemap.xml"]}'
+          PAYLOAD='{"host":"ursecret.vercel.app","key":"ursecret-idx-7a2b8c9d","keyLocation":"https://ursecret.vercel.app/ursecret-idx-7a2b8c9d.txt","urlList":["https://ursecret.vercel.app","https://ursecret.vercel.app/quizzes","https://ursecret.vercel.app/quiz/infidelite","https://ursecret.vercel.app/quiz/adopte","https://ursecret.vercel.app/quiz/amoureux","https://ursecret.vercel.app/quiz/vrais-amis","https://ursecret.vercel.app/quiz/orientation","https://ursecret.vercel.app/quiz/narcissique","https://ursecret.vercel.app/quiz/mon-ex","https://ursecret.vercel.app/quiz/manipule","https://ursecret.vercel.app/quiz/rompre","https://ursecret.vercel.app/quiz/jaloux","https://ursecret.vercel.app/quiz/relation-toxique","https://ursecret.vercel.app/quiz/crush","https://ursecret.vercel.app/quiz/burnout","https://ursecret.vercel.app/quiz/depression","https://ursecret.vercel.app/quiz/vrai-amour","https://ursecret.vercel.app/feed.xml","https://ursecret.vercel.app/atom.xml","https://ursecret.vercel.app/news-sitemap.xml"]}'
           for endpoint in \
             "https://api.indexnow.org/indexnow" \
             "https://www.bing.com/indexnow" \
@@ -122,6 +122,16 @@ jobs:
             "https://ursecret.vercel.app/quiz/amoureux" \
             "https://ursecret.vercel.app/quiz/vrais-amis" \
             "https://ursecret.vercel.app/quiz/orientation" \
+            "https://ursecret.vercel.app/quiz/narcissique" \
+            "https://ursecret.vercel.app/quiz/mon-ex" \
+            "https://ursecret.vercel.app/quiz/manipule" \
+            "https://ursecret.vercel.app/quiz/rompre" \
+            "https://ursecret.vercel.app/quiz/jaloux" \
+            "https://ursecret.vercel.app/quiz/relation-toxique" \
+            "https://ursecret.vercel.app/quiz/crush" \
+            "https://ursecret.vercel.app/quiz/burnout" \
+            "https://ursecret.vercel.app/quiz/depression" \
+            "https://ursecret.vercel.app/quiz/vrai-amour" \
             "https://ursecret.vercel.app/feed.xml" \
             "https://ursecret.vercel.app/atom.xml" \
             "https://ursecret.vercel.app/sitemap.xml" \

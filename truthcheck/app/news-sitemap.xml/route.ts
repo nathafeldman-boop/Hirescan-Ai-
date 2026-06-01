@@ -1,11 +1,21 @@
 const BASE = 'https://ursecret.vercel.app';
 
 const quizzes = [
-  { slug: 'infidelite',  title: 'Mon/Ma partenaire me trompe ?' },
-  { slug: 'adopte',      title: 'Suis-je adopté(e) ?' },
-  { slug: 'amoureux',    title: 'Suis-je vraiment amoureux/amoureuse ?' },
-  { slug: 'vrais-amis',  title: 'Sont-ils mes vrais amis ?' },
-  { slug: 'orientation', title: 'Quelle est mon orientation ?' },
+  { slug: 'infidelite',      title: 'Mon/Ma partenaire me trompe ?' },
+  { slug: 'adopte',          title: 'Suis-je adopté(e) ?' },
+  { slug: 'amoureux',        title: 'Suis-je vraiment amoureux/amoureuse ?' },
+  { slug: 'vrais-amis',      title: 'Sont-ils mes vrais amis ?' },
+  { slug: 'orientation',     title: 'Quelle est mon orientation ?' },
+  { slug: 'narcissique',     title: 'Suis-je narcissique ?' },
+  { slug: 'mon-ex',          title: 'Mon ex veut-il/elle revenir ?' },
+  { slug: 'manipule',        title: 'Suis-je manipulé(e) ?' },
+  { slug: 'rompre',          title: 'Dois-je rompre ?' },
+  { slug: 'jaloux',          title: 'Suis-je trop jaloux/jalouse ?' },
+  { slug: 'relation-toxique', title: 'Ma relation est-elle toxique ?' },
+  { slug: 'crush',           title: 'Mon crush ressent-il/elle quelque chose ?' },
+  { slug: 'burnout',         title: 'Suis-je en burnout ?' },
+  { slug: 'depression',      title: 'Ai-je des signes de dépression ?' },
+  { slug: 'vrai-amour',      title: 'Est-ce le vrai amour ?' },
 ];
 
 export function GET() {

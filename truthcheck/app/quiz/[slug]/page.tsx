@@ -5,6 +5,12 @@ import QuizClient from './QuizClient';
 
 const BASE = 'https://ursecret.vercel.app';
 
+const ALL_SLUGS = [
+  'infidelite', 'adopte', 'amoureux', 'vrais-amis', 'orientation',
+  'narcissique', 'mon-ex', 'manipule', 'rompre', 'jaloux',
+  'relation-toxique', 'crush', 'burnout', 'depression', 'vrai-amour',
+];
+
 const faqData: Record<string, { q: string; a: string }[]> = {
   infidelite: [
     { q: 'Comment savoir si mon/ma partenaire me trompe ?', a: "Les signaux incluent des changements de comportement soudains, une protection accrue du téléphone, des absences inexpliquées, moins d'intimité et une distance émotionnelle. Notre quiz analyse 30 comportements précis." },
@@ -41,6 +47,76 @@ const faqData: Record<string, { q: string; a: string }[]> = {
     { q: "Ce quiz peut-il m'aider à comprendre mon orientation ?", a: "Notre quiz n'a pas pour vocation de vous étiqueter, mais d'aider à explorer vos attirances de façon structurée et anonyme. Il peut être un point de départ pour une réflexion personnelle." },
     { q: "L'orientation sexuelle peut-elle changer ?", a: "Oui, certaines personnes vivent une évolution de leur orientation au fil du temps. C'est un phénomène documenté. L'identité sexuelle est fluide pour beaucoup." },
   ],
+  narcissique: [
+    { q: 'Comment savoir si je suis narcissique ?', a: "Le narcissisme se caractérise par un besoin excessif d'admiration, un manque d'empathie, un sentiment de supériorité et une sensibilité extrême à la critique. Notre quiz évalue ces traits sur 30 questions." },
+    { q: 'Quelle est la différence entre confiance en soi et narcissisme ?', a: "La confiance en soi est stable et n'a pas besoin de validation externe. Le narcissisme repose sur la supériorité vis-à-vis des autres et un besoin constant de reconnaissance." },
+    { q: 'Le narcissisme peut-il se soigner ?', a: "Oui, avec un accompagnement psychothérapeutique adapté. La thérapie cognitivo-comportementale et la psychothérapie analytique peuvent aider à développer plus d'empathie et réduire les comportements problématiques." },
+    { q: 'Peut-on être un peu narcissique sans avoir une personnalité narcissique ?', a: "Oui, le narcissisme est un spectre. Avoir certains traits ne signifie pas avoir un trouble de la personnalité narcissique (TPN). Ce quiz évalue la présence et l'intensité de ces traits." },
+    { q: "Qu'est-ce que la blessure narcissique ?", a: "La blessure narcissique désigne la réaction violente d'une personne narcissique face à une critique ou un rejet. Elle peut se manifester par de la colère, du mépris ou de la honte intense." },
+  ],
+  'mon-ex': [
+    { q: 'Comment savoir si mon ex veut revenir ?', a: "Les signaux incluent des contacts fréquents sans raison, la nostalgie affichée, la jalousie face à vos nouvelles fréquentations, et les tentatives de se retrouver. Notre quiz analyse 30 comportements précis." },
+    { q: 'Est-ce que mon ex qui me like sur les réseaux veut revenir ?', a: "Les interactions sur les réseaux peuvent signaler un attachement mais ne prouvent pas une volonté de retour. Elles doivent être combinées à d'autres signaux pour être significatives." },
+    { q: 'Combien de temps faut-il pour qu\'un ex tourne la page ?', a: "Il n'existe pas de délai universel. Cela dépend de la durée de la relation, de la raison de la rupture et du profil de chaque personne. Certains mettent des semaines, d'autres des années." },
+    { q: 'Faut-il reprendre contact avec un ex ?', a: "Cela dépend de vos motivations. Si c'est pour clore quelque chose ou par nostalgie sincère, cela peut être pertinent. Si c'est par peur de la solitude, mieux vaut y réfléchir à deux fois." },
+    { q: 'Est-il possible de renouer avec un ex avec succès ?', a: "Oui, certains couples se reforment avec succès, surtout si les raisons de la rupture ont réellement changé. La communication honnête est essentielle pour que le retour ne reproduise pas les mêmes schémas." },
+  ],
+  manipule: [
+    { q: 'Comment savoir si je suis manipulé(e) ?', a: "Les signes incluent : sentiment constant de culpabilité, doutes sur votre propre perception, isolement progressif, épuisement émotionnel après les interactions, et peur des réactions de l'autre." },
+    { q: "Qu'est-ce que le gaslighting ?", a: "Le gaslighting est une technique de manipulation qui consiste à faire douter quelqu'un de sa propre réalité, mémoire ou perceptions. La victime finit par ne plus faire confiance à son propre jugement." },
+    { q: 'Que faire si je suis manipulé(e) ?', a: "Cherchez du soutien auprès d'un proche de confiance ou d'un professionnel. Documentez les comportements. Posez des limites claires. Dans les cas graves, éloignez-vous de la situation." },
+    { q: 'La manipulation est-elle toujours consciente ?', a: "Pas nécessairement. Certaines personnes manipulent sans en être pleinement conscientes, souvent par insécurité. Cela ne rend pas les comportements moins nocifs pour la victime." },
+    { q: 'Comment se remettre d\'une relation manipulatrice ?', a: "La récupération demande du temps. Un soutien psychologique professionnel est souvent nécessaire pour reconstruire l'estime de soi et la confiance dans son propre jugement." },
+  ],
+  rompre: [
+    { q: 'Comment savoir si je dois rompre ?', a: "Les signaux incluent : une tristesse chronique, le sentiment de ne plus être soi-même, l'absence de projets communs, un manque de respect persistant, et l'idéalisation d'une vie sans l'autre." },
+    { q: 'Est-il normal d\'avoir peur de rompre ?', a: "Oui, la peur de la solitude, du changement ou de blesser l'autre sont des réactions humaines. Mais rester par peur plutôt que par amour n'est sain ni pour toi ni pour ton/ta partenaire." },
+    { q: 'Faut-il essayer une thérapie de couple avant de rompre ?', a: "Dans de nombreux cas, oui. La thérapie de couple peut aider à clarifier si les problèmes sont solvables ou si la séparation est la meilleure option pour les deux parties." },
+    { q: 'Comment rompre sans blesser l\'autre ?', a: "Une rupture fait toujours mal. L'important est d'être honnête, respectueux(se), et de choisir le bon moment et lieu. Évitez les ruptures par message et expliquez vos raisons clairement." },
+    { q: 'Comment se remettre d\'une rupture ?', a: "Accordez-vous du temps, entourez-vous de proches, reprenez des activités qui vous font du bien. Un soutien psychologique peut aider dans les ruptures difficiles. Le deuil d'une relation est réel et légitime." },
+  ],
+  jaloux: [
+    { q: 'Comment savoir si ma jalousie est excessive ?', a: "La jalousie devient excessive quand elle vous pousse à surveiller, contrôler ou accuser votre partenaire sans preuves, ou quand elle cause des disputes régulières et affecte votre bien-être." },
+    { q: 'Quelles sont les causes de la jalousie ?', a: "La jalousie excessive naît souvent d'une faible estime de soi, de blessures passées (trahisons, abandons), d'un style d'attachement anxieux ou d'une insécurité profonde." },
+    { q: 'La jalousie peut-elle être saine ?', a: "Une jalousie légère et ponctuelle, exprimée sans comportements de contrôle, peut témoigner d'un attachement. Elle devient problématique quand elle pousse à des comportements envahissants." },
+    { q: 'Comment gérer la jalousie ?', a: "Travaillez sur l'estime de soi, communiquez ouvertement avec votre partenaire, et si nécessaire, consultez un thérapeute pour explorer les sources profondes de votre insécurité." },
+    { q: 'La jalousie peut-elle détruire une relation ?', a: "Oui, une jalousie non gérée peut créer un climat d'étouffement qui finit par pousser le/la partenaire à partir. Elle peut aussi devenir une prophétie auto-réalisatrice." },
+  ],
+  'relation-toxique': [
+    { q: 'Comment reconnaître une relation toxique ?', a: "Une relation toxique se caractérise par un manque de respect, des comportements de contrôle, une communication destructrice, de la jalousie excessive, des cycles de rupture-réconciliation et une détérioration de l'estime de soi." },
+    { q: 'Peut-on changer une relation toxique ?', a: "Oui, si les deux parties reconnaissent les problèmes et s'engagent réellement à changer, souvent avec l'aide d'un thérapeute. Mais si une seule personne fait des efforts, le changement est rare." },
+    { q: 'Pourquoi est-il difficile de quitter une relation toxique ?', a: "La dépendance émotionnelle, la peur de la solitude, la manipulation et les cycles de réconciliation créent des liens très forts qui rendent la séparation difficile malgré la souffrance." },
+    { q: 'Quelle est la différence entre une relation difficile et toxique ?', a: "Une relation difficile a des problèmes mais les deux partenaires se respectent et cherchent des solutions. Une relation toxique a un schéma de comportements nocifs persistants qui détruisent progressivement l'estime de soi." },
+    { q: 'Que faire si je suis dans une relation toxique ?', a: "Parlez à un proche ou un professionnel, documentez les comportements, posez des limites. Si votre sécurité est en jeu, cherchez de l'aide immédiatement auprès des autorités ou d'associations spécialisées." },
+  ],
+  crush: [
+    { q: 'Comment savoir si mon crush m\'aime en secret ?', a: "Les signaux incluent : regards prolongés, recherche de proximité physique, attention particulière à vos paroles, nervosité en votre présence, et efforts pour se retrouver dans le même endroit que vous." },
+    { q: 'Comment interpréter les regards de mon crush ?', a: "Un regard prolongé, un sourire accompagné d'un regard fuyant par timidité, ou des coups d'œil répétés vers vous dans un groupe sont souvent des signaux d'intérêt romantique." },
+    { q: 'Faut-il avouer ses sentiments à son crush ?', a: "Oser exprimer ses sentiments est souvent libérateur. Si vous ressentez beaucoup de signaux positifs, le risque en vaut souvent la chandelle. L'incertitude peut durer indéfiniment sans action." },
+    { q: 'Comment se comporter avec son crush ?', a: "Soyez naturel(le), montrez de l'intérêt sincère pour lui/elle, créez des occasions de passer du temps ensemble, et osez l'humour et la légèreté pour créer une connexion." },
+    { q: 'Est-ce que les amis peuvent voir l\'attirance entre deux personnes ?', a: "Oui, les observateurs extérieurs remarquent souvent des dynamiques que les personnes concernées minimisent. Si plusieurs personnes de votre entourage le suggèrent, c'est souvent significatif." },
+  ],
+  burnout: [
+    { q: 'Comment savoir si je suis en burnout ?', a: "Le burnout se manifeste par un épuisement persistant, du cynisme envers le travail, une efficacité réduite, des symptômes physiques et une difficulté à déconnecter. Notre quiz évalue ces 5 dimensions clés." },
+    { q: 'Quelle est la différence entre le stress et le burnout ?', a: "Le stress est une réponse temporaire à une surcharge. Le burnout est un état d'épuisement chronique profond qui touche l'énergie, les émotions et la motivation de façon durable." },
+    { q: 'Que faire si je suis en burnout ?', a: "Consultez un médecin en priorité. Un arrêt de travail peut être nécessaire. La psychothérapie aide à comprendre les causes. Des changements dans l'organisation du travail sont souvent indispensables." },
+    { q: 'Le burnout peut-il toucher quelqu\'un qui aime son travail ?', a: "Oui, paradoxalement les personnes les plus investies et perfectionnistes sont souvent plus à risque. L'engagement excessif sans limites est un facteur de risque important." },
+    { q: 'Combien de temps dure un burnout ?', a: "La récupération varie de quelques semaines à plusieurs mois ou années selon la sévérité. Une intervention précoce est essentielle pour éviter un burnout profond aux conséquences durables." },
+  ],
+  depression: [
+    { q: 'Comment savoir si je suis déprimé(e) ?', a: "La dépression se caractérise par une tristesse persistante, une perte d'intérêt, un manque d'énergie, des troubles du sommeil et de l'appétit, une faible estime de soi et des difficultés à se concentrer, durant plus de deux semaines." },
+    { q: 'Quelle est la différence entre tristesse et dépression ?', a: "La tristesse est une émotion normale et passagère. La dépression est un trouble persistant qui affecte le fonctionnement quotidien, dure plusieurs semaines et ne répond pas aux mêmes stratégies." },
+    { q: 'Ce quiz peut-il diagnostiquer une dépression ?', a: "Non, ce quiz n'est pas un outil de diagnostic médical. Il peut vous aider à identifier des signes et vous encourager à consulter un professionnel si nécessaire. Seul un médecin peut diagnostiquer une dépression." },
+    { q: 'Que faire si je pense être déprimé(e) ?', a: "Consultez un médecin généraliste ou un psychiatre. Ne restez pas seul(e) avec ça. La dépression est une maladie qui se traite efficacement avec un accompagnement adapté (thérapie, médicaments si nécessaire)." },
+    { q: "Où appeler en cas de pensées suicidaires ?", a: "En France, appelez le 3114, le numéro national de prévention du suicide, disponible 24h/24 et 7j/7. Des professionnels sont là pour vous écouter et vous aider." },
+  ],
+  'vrai-amour': [
+    { q: 'Comment savoir si c\'est le vrai amour ?', a: "Le vrai amour se distingue par une acceptation inconditionnelle, l'envie du bonheur de l'autre, un sentiment de sécurité et de liberté d'être soi-même, et une attraction qui dépasse le physique." },
+    { q: 'Quelle est la différence entre l\'amour et la passion ?', a: "La passion est intense mais souvent éphémère, centrée sur l'excitation et le désir. L'amour véritable intègre la passion mais y ajoute la confiance, le respect et l'engagement durable." },
+    { q: 'Peut-on aimer vraiment quelqu\'un dès le début de la relation ?', a: "On peut ressentir un coup de foudre et des sentiments forts très tôt. Mais l'amour profond se construit avec le temps, la connaissance réelle de l'autre et l'épreuve des difficultés partagées." },
+    { q: "Peut-on confondre amour et dépendance affective ?", a: "Oui. La dépendance affective ressemble à l'amour mais est centrée sur la peur de la perte plutôt que le vrai bien-être de l'autre. Un thérapeute peut aider à distinguer les deux." },
+    { q: 'Le vrai amour nécessite-t-il des efforts ?', a: "Oui, l'amour durable demande un engagement actif : communication, respect des besoins de l'autre, et travail commun sur les difficultés. L'amour n'est pas seulement un sentiment, c'est aussi une décision quotidienne." },
+  ],
 };
 
 interface PageProps {
@@ -48,13 +124,7 @@ interface PageProps {
 }
 
 export function generateStaticParams() {
-  return [
-    { slug: 'infidelite' },
-    { slug: 'adopte' },
-    { slug: 'amoureux' },
-    { slug: 'vrais-amis' },
-    { slug: 'orientation' },
-  ];
+  return ALL_SLUGS.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -104,14 +174,14 @@ export default function QuizPage({ params }: PageProps) {
           { '@type': 'ListItem', position: 3, name: quiz.title, item: `${BASE}/quiz/${quiz.slug}` },
         ],
       },
-      {
+      ...(faqs.length > 0 ? [{
         '@type': 'FAQPage',
         mainEntity: faqs.map(({ q, a }) => ({
           '@type': 'Question',
           name: q,
           acceptedAnswer: { '@type': 'Answer', text: a },
         })),
-      },
+      }] : []),
       {
         '@type': 'WebPage',
         name: quiz.title,

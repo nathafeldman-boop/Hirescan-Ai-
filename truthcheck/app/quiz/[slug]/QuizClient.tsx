@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Quiz, QuizSession } from '@/lib/quizzes';
 import { selectQuestions } from '@/lib/quizzes';
+import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 
 interface Props {
   quiz: Quiz;
@@ -110,10 +111,10 @@ export default function QuizClient({ quiz }: Props) {
   const greeting = session.firstName ? `, ${session.firstName}` : '';
 
   return (
-    <main className="min-h-screen flex flex-col" style={slides ? {} : { backgroundColor: '#09090b' }}>
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#09090b' }}>
 
-      {/* Slideshow background */}
-      {slides && (
+      {/* Slideshow background (legacy slugs with images) */}
+      {slides ? (
         <>
           {slides.map((src, i) => (
             <div
@@ -127,7 +128,6 @@ export default function QuizClient({ quiz }: Props) {
               }}
             />
           ))}
-          {/* Dark overlay */}
           <div
             className="fixed inset-0 pointer-events-none"
             style={{
@@ -136,6 +136,9 @@ export default function QuizClient({ quiz }: Props) {
             }}
           />
         </>
+      ) : (
+        /* Animated UrSecret logo background for all other quizzes */
+        <UrSecretAnimatedBg accentColor={quiz.accentColor} />
       )}
 
       {/* Header */}

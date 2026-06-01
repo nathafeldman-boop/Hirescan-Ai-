@@ -79,13 +79,6 @@ for e in d.get('envs',[]):
           upsert EMAIL_FROM "UrSecret <noreply@ursecret.app>"
           upsert VERCEL_TOOLBAR_ENABLED "0"
 
-          # Disable toolbar at project level via Vercel API
-          curl -s -X PATCH "https://api.vercel.com/v9/projects/${P}?teamId=${T}" \
-            -H "Authorization: Bearer $K" \
-            -H "Content-Type: application/json" \
-            -d '{"live":false}' \
-            -o /dev/null -w "Project toolbar disabled: %{http_code}\n"
-
           echo "All done!"
 
       - name: Trigger production redeploy
