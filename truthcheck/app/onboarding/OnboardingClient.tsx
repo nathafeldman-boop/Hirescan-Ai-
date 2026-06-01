@@ -14,11 +14,11 @@ const QUIZ_COLORS: Record<string, string> = {
 };
 
 const QUIZ_CHOICES = [
-  { slug: 'infidelite',  label: 'Mon/Ma partenaire me trompe ?', emoji: '💔' },
-  { slug: 'adopte',      label: 'Suis-je adopté(e) ?',           emoji: '🔍' },
-  { slug: 'amoureux',   label: 'Suis-je vraiment amoureux ?',     emoji: '💫' },
-  { slug: 'vrais-amis', label: 'Sont-ils mes vrais amis ?',        emoji: '🫂' },
-  { slug: 'orientation', label: 'Quelle est mon orientation ?',   emoji: '🌈' },
+  { slug: 'infidelite',  label: 'Il/elle me cache quelque chose ?',    emoji: '💔' },
+  { slug: 'adopte',      label: 'Ma famille me dit-elle tout ?',        emoji: '🔍' },
+  { slug: 'amoureux',    label: 'C\'est vraiment de l\'amour ?',        emoji: '💫' },
+  { slug: 'vrais-amis',  label: 'Seraient-ils là si ça allait mal ?',   emoji: '🫂' },
+  { slug: 'orientation', label: 'Es-tu attiré(e) par le même sexe ?',   emoji: '🌈' },
 ];
 
 interface Answers {
