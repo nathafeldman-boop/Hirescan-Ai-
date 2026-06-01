@@ -273,25 +273,6 @@ export default function ResultsClient({ quiz }: Props) {
               )}
             </button>
 
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs text-zinc-600">ou</span>
-              <div className="h-px flex-1 bg-white/10" />
-            </div>
-
-            {/* PayPal */}
-            <a
-              href="https://www.paypal.com/paypalme/ursecret/4.99"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-[#003087] hover:bg-[#001f5c] text-white transition-all duration-200 mb-4"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7.144 19.532l1.049-6.667H6.189L7.238 6.2h6.924c2.16 0 3.646.52 4.461 1.559.375.483.607 1.003.697 1.56.091.557.046 1.229-.136 2.015l-.016.062c-.504 2.198-2.006 3.297-4.506 3.297h-1.394l-.74 4.839H7.144zm3.506-7.53h1.25c.964 0 1.618-.197 1.963-.59.205-.234.35-.617.437-1.148l.014-.086c.086-.536.055-.91-.094-1.121-.178-.25-.61-.375-1.295-.375H11.7l-.55 3.32z"/>
-              </svg>
-              Payer via PayPal
-            </a>
-
             <p className="text-center text-[11px] text-zinc-600">
               Annulable à tout moment · Paiement 100% sécurisé
             </p>
