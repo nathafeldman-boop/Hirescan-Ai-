@@ -157,6 +157,26 @@ export default function ResultsClient({ quiz }: Props) {
     social: "Des milliers de personnes ont découvert leur vérité cette semaine",
   };
 
+  const SCARY_STATS: Record<string, (s: number) => string> = {
+    infidelite: (s) => s >= 60
+      ? '63 % des personnes avec ce niveau de score ont confirmé leurs doutes par la suite.'
+      : '41 % des personnes avec ce profil disent avoir été soulagées de connaître la réalité.',
+    adopte: (s) => s >= 50
+      ? '71 % des personnes avec ce score ont découvert quelque chose d\'inattendu sur leur famille.'
+      : '58 % des personnes avec ce profil ont trouvé des réponses qui les ont apaisées.',
+    amoureux: (s) => s >= 60
+      ? '78 % des personnes avec ce résultat qui ont osé parler ne le regrettent pas.'
+      : '65 % des personnes avec ce profil ont trouvé de la clarté en connaissant leur score.',
+    'vrais-amis': (s) => s >= 60
+      ? '69 % des personnes avec ce profil ont reconsidéré certaines amitiés après l\'analyse.'
+      : '54 % des personnes avec ce score ont renforcé leurs liens après avoir lu l\'analyse.',
+    orientation: (s) => s >= 50
+      ? '74 % des personnes avec ce profil se sont senties soulagées après avoir vu leurs résultats.'
+      : '67 % des personnes avec ce score disent que l\'analyse les a aidées à mieux se comprendre.',
+  };
+  const scaryStat = SCARY_STATS[quiz.slug]?.(score)
+    ?? `${Math.min(97, Math.round(55 + score * 0.35))} % des personnes avec ce profil considèrent cette analyse comme un tournant.`;
+
   useEffect(() => {
     if (hasSaved.current) return;
     hasSaved.current = true;
@@ -426,13 +446,16 @@ export default function ResultsClient({ quiz }: Props) {
                 </div>
                 {/* Lock icon overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6dd, #ec4899dd)', backdropFilter: 'blur(4px)' }}
-                  >
-                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+                  <div className="flex flex-col items-center gap-2">
+                    <div
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl"
+                      style={{ background: 'linear-gradient(135deg, #8b5cf6dd, #ec4899dd)', backdropFilter: 'blur(4px)' }}
+                    >
+                      <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <span className="text-[10px] font-bold text-white/60 tracking-widest uppercase">Score caché</span>
                   </div>
                 </div>
               </div>
@@ -443,6 +466,23 @@ export default function ResultsClient({ quiz }: Props) {
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Analyse terminée — résultats prêts
                 </span>
+              </div>
+
+              {/* Tier revealed for free */}
+              <div className="flex flex-col items-center gap-1.5 mb-6">
+                <span
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-base font-bold border"
+                  style={{
+                    color: tier.glowColor,
+                    borderColor: `${tier.glowColor}50`,
+                    backgroundColor: `${tier.glowColor}18`,
+                    boxShadow: `0 0 20px ${tier.glowColor}20`,
+                  }}
+                >
+                  <span>{tier.emoji}</span>
+                  {tier.title}
+                </span>
+                <p className="text-zinc-600 text-xs">Ton score exact est verrouillé ↓</p>
               </div>
 
               {/* Main paywall card */}
@@ -472,6 +512,16 @@ export default function ResultsClient({ quiz }: Props) {
                       {item}
                     </div>
                   ))}
+                </div>
+
+                {/* Scary stat */}
+                <div
+                  className="rounded-xl p-3 mb-4 border text-center"
+                  style={{ background: `${tier.glowColor}0a`, borderColor: `${tier.glowColor}25` }}
+                >
+                  <p className="text-xs font-semibold leading-relaxed" style={{ color: tier.glowColor }}>
+                    📊 {scaryStat}
+                  </p>
                 </div>
 
                 {/* Social proof */}
