@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import type { DuoQuiz } from '@/lib/duoQuizzes';
-import { decodeDuoAnswers, encodeDuoAnswers, compareDuoAnswers } from '@/lib/duoQuizzes';
+import { decodeDuoAnswers, encodeDuoAnswers, compareDuoAnswers, getDuoInsight } from '@/lib/duoQuizzes';
 
 interface Props {
   quiz: DuoQuiz;
@@ -159,7 +159,7 @@ export default function DuoCompareClient({ quiz }: Props) {
   if (phase === 'results') {
     const comparison = compareDuoAnswers(partnerAnswers, answers);
     const agreementPct = Math.round((comparison.aligned / quiz.questions.length) * 100);
-    const insight = quiz.insight(agreementPct);
+    const insight = getDuoInsight(quiz.slug, agreementPct);
 
     const insightColor =
       agreementPct >= 70 ? '#10b981' : agreementPct >= 40 ? '#f59e0b' : '#ef4444';
