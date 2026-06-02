@@ -11,7 +11,6 @@ export interface DuoQuiz {
   emoji: string;
   accentColor: string;
   questions: DuoQuestion[];
-  insight: (agreement: number) => string; // overall insight based on % agreement
 }
 
 export const duoQuizzes: DuoQuiz[] = [
@@ -114,14 +113,6 @@ export const duoQuizzes: DuoQuiz[] = [
         ],
       },
     ],
-    insight: (a) =>
-      a >= 80
-        ? "Vous communiquez de façon très alignée. C'est un socle solide — rare et précieux."
-        : a >= 60
-        ? "Quelques décalages dans votre façon de communiquer, mais rien d'insurmontable. La clé : en parler."
-        : a >= 40
-        ? "Vous avez des styles de communication assez différents. Ces divergences méritent d'être mises sur la table."
-        : "Vous communiquez de façon très différente. Ce n'est pas un problème — mais l'ignorer en serait un.",
   },
   {
     slug: 'duo-compatibilite',
@@ -222,14 +213,6 @@ export const duoQuizzes: DuoQuiz[] = [
         ],
       },
     ],
-    insight: (a) =>
-      a >= 80
-        ? "Vos projections de vie sont très alignées. Vous ne vous êtes pas choisi par hasard."
-        : a >= 60
-        ? "Quelques différences dans vos visions mais les fondations semblent compatibles. Parlez des divergences."
-        : a >= 40
-        ? "Vos visions de vie divergent sur plusieurs points importants. Ces sujets méritent une vraie conversation."
-        : "Vos chemins de vie sont assez différents. Ce n'est pas rédhibitoire — mais ignorer ces divergences serait une erreur.",
   },
   {
     slug: 'duo-investissement',
@@ -330,14 +313,6 @@ export const duoQuizzes: DuoQuiz[] = [
         ],
       },
     ],
-    insight: (a) =>
-      a >= 80
-        ? "Vous semblez investis de façon très similaire. C'est un équilibre rare qui mérite d'être reconnu."
-        : a >= 60
-        ? "Quelques différences dans votre niveau d'investissement, mais rien d'alarmant si vous en êtes conscients."
-        : a >= 40
-        ? "Un déséquilibre se dessine dans cette relation. Ces divergences méritent une conversation honnête."
-        : "Le déséquilibre est significant. Savoir qui donne plus est la première étape pour en parler vraiment.",
   },
   {
     slug: 'duo-resilience',
@@ -438,14 +413,6 @@ export const duoQuizzes: DuoQuiz[] = [
         ],
       },
     ],
-    insight: (a) =>
-      a >= 80
-        ? "Vous avez une vision très similaire de la solidité de votre lien. C'est un fondement précieux."
-        : a >= 60
-        ? "Quelques divergences dans votre perception de la résilience de votre couple — en parler renforce."
-        : a >= 40
-        ? "Vous ne voyez pas la solidité de votre relation de la même façon. Ces différences méritent attention."
-        : "Vos perceptions de la solidité de votre lien sont très différentes. C'est une conversation importante à avoir.",
   },
   {
     slug: 'duo-amour',
@@ -546,7 +513,48 @@ export const duoQuizzes: DuoQuiz[] = [
         ],
       },
     ],
-    insight: (a) =>
+  },
+];
+
+export function getDuoQuiz(slug: string): DuoQuiz | undefined {
+  return duoQuizzes.find((q) => q.slug === slug);
+}
+
+export function getDuoInsight(slug: string, agreement: number): string {
+  const map: Record<string, (a: number) => string> = {
+    'duo-communication': (a) =>
+      a >= 80
+        ? "Vous communiquez de façon très alignée. C'est un socle solide — rare et précieux."
+        : a >= 60
+        ? "Quelques décalages dans votre façon de communiquer, mais rien d'insurmontable. La clé : en parler."
+        : a >= 40
+        ? "Vous avez des styles de communication assez différents. Ces divergences méritent d'être mises sur la table."
+        : "Vous communiquez de façon très différente. Ce n'est pas un problème — mais l'ignorer en serait un.",
+    'duo-compatibilite': (a) =>
+      a >= 80
+        ? "Vos projections de vie sont très alignées. Vous ne vous êtes pas choisi par hasard."
+        : a >= 60
+        ? "Quelques différences dans vos visions mais les fondations semblent compatibles. Parlez des divergences."
+        : a >= 40
+        ? "Vos visions de vie divergent sur plusieurs points importants. Ces sujets méritent une vraie conversation."
+        : "Vos chemins de vie sont assez différents. Ce n'est pas rédhibitoire — mais ignorer ces divergences serait une erreur.",
+    'duo-investissement': (a) =>
+      a >= 80
+        ? "Vous semblez investis de façon très similaire. C'est un équilibre rare qui mérite d'être reconnu."
+        : a >= 60
+        ? "Quelques différences dans votre niveau d'investissement, mais rien d'alarmant si vous en êtes conscients."
+        : a >= 40
+        ? "Un déséquilibre se dessine dans cette relation. Ces divergences méritent une conversation honnête."
+        : "Le déséquilibre est significant. Savoir qui donne plus est la première étape pour en parler vraiment.",
+    'duo-resilience': (a) =>
+      a >= 80
+        ? "Vous avez une vision très similaire de la solidité de votre lien. C'est un fondement précieux."
+        : a >= 60
+        ? "Quelques divergences dans votre perception de la résilience de votre couple — en parler renforce."
+        : a >= 40
+        ? "Vous ne voyez pas la solidité de votre relation de la même façon. Ces différences méritent attention."
+        : "Vos perceptions de la solidité de votre lien sont très différentes. C'est une conversation importante à avoir.",
+    'duo-amour': (a) =>
       a >= 80
         ? "Vous semblez ressentir avec la même intensité. Cette symétrie émotionnelle est un cadeau rare."
         : a >= 60
@@ -554,11 +562,15 @@ export const duoQuizzes: DuoQuiz[] = [
         : a >= 40
         ? "Il y a un décalage dans l'intensité de ce que vous ressentez. En avoir conscience aide à mieux se comprendre."
         : "L'asymétrie émotionnelle est réelle et significative. Pas un problème en soi — mais en parler franchement est essentiel.",
-  },
-];
-
-export function getDuoQuiz(slug: string): DuoQuiz | undefined {
-  return duoQuizzes.find((q) => q.slug === slug);
+  };
+  return (
+    map[slug]?.(agreement) ??
+    (agreement >= 70
+      ? "Vous êtes bien alignés — c'est plus rare qu'il n'y paraît."
+      : agreement >= 40
+      ? "Quelques divergences à explorer ensemble."
+      : "Des différences importantes à mettre sur la table.")
+  );
 }
 
 export function encodeDuoAnswers(answers: number[]): string {
