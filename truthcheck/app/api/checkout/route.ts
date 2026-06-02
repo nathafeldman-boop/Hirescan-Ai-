@@ -8,7 +8,8 @@ function getStripe() {
 }
 
 const ONE_TIME_PRODUCT_ID = 'prod_UcjiAfAioyc6WM';
-const ONE_TIME_PRICE_CENTS = 199; // €1.99
+const ONE_TIME_PRICE_CENTS = 499; // €4.99
+const ANNUAL_PRICE_CENTS = 2999;  // €29.99/year (set STRIPE_ANNUAL_PRICE_ID env var in Vercel)
 
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail, oneTime } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual } = await req.json();
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
     const cancelUrl = quizSlug && score !== undefined
@@ -25,6 +26,35 @@ export async function POST(req: NextRequest) {
       : `${baseUrl}/quizzes`;
 
     const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+
+    // ── Annual subscription ──
+    if (annual) {
+      const annualPriceId = process.env.STRIPE_ANNUAL_PRICE_ID;
+      const annualLineItem = annualPriceId
+        ? { price: annualPriceId, quantity: 1 }
+        : {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: 'UrSecret Premium — Accès Annuel',
+                description: 'Score + analyse complète + 18 quiz illimités',
+              },
+              unit_amount: ANNUAL_PRICE_CENTS,
+              recurring: { interval: 'year' as const },
+            },
+            quantity: 1,
+          };
+      const annualSession = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [annualLineItem],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', annual: 'true' },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      return NextResponse.json({ url: annualSession.url });
+    }
 
     // ── One-time purchase: unlock just this result ──
     if (oneTime) {
@@ -59,7 +89,7 @@ export async function POST(req: NextRequest) {
               name: 'UrSecret Premium',
               description: 'Ton score + analyse complète personnalisée',
             },
-            unit_amount: 499,
+            unit_amount: 999, // €9.99/month — update STRIPE_PRICE_ID in Vercel to match
             recurring: { interval: 'month' as const },
           },
           quantity: 1,

@@ -52,6 +52,8 @@ export default function QuizClient({ quiz }: Props) {
   const [transitioning, setTransitioning] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
   const [showMidHook, setShowMidHook] = useState(false);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
 
   useEffect(() => {
     try {
@@ -100,7 +102,16 @@ export default function QuizClient({ quiz }: Props) {
       if (isLast) {
         const maxScore = questions.length * 3;
         const percentage = Math.round((newTotal / maxScore) * 100);
-        router.push(`/quiz/${quiz.slug}/results?score=${percentage}`);
+        setShowAnalysis(true);
+        let prog = 0;
+        const iv = setInterval(() => {
+          prog += 2;
+          setAnalysisProgress(prog);
+          if (prog >= 100) {
+            clearInterval(iv);
+            router.push(`/quiz/${quiz.slug}/results?score=${percentage}`);
+          }
+        }, 70);
       } else if (currentIndex === MID_HOOK_INDEX) {
         setShowMidHook(true);
         setTimeout(() => {
@@ -125,6 +136,36 @@ export default function QuizClient({ quiz }: Props) {
 
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#09090b' }}>
+
+      {/* End-of-quiz analysis screen (Noom-style sunk cost + anticipation) */}
+      {showAnalysis && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: '#09090b' }}>
+          <div className="text-center px-6 w-full max-w-sm">
+            <div className="text-6xl mb-6" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>🧠</div>
+            <h2 className="text-white font-black text-2xl mb-2">Analyse en cours…</h2>
+            <p className="text-zinc-500 text-sm mb-8">
+              {analysisProgress < 35
+                ? 'Calibration de ton profil…'
+                : analysisProgress < 65
+                ? 'Analyse des patterns…'
+                : analysisProgress < 90
+                ? 'Génération de ton rapport…'
+                : 'Finalisation…'}
+            </p>
+            <div className="w-full bg-white/5 rounded-full h-2.5 mb-3 overflow-hidden">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${analysisProgress}%`,
+                  background: `linear-gradient(90deg, ${quiz.accentColor}88, ${quiz.accentColor})`,
+                  transition: 'width 0.07s linear',
+                }}
+              />
+            </div>
+            <p className="text-xs text-zinc-600 tabular-nums font-mono">{analysisProgress}%</p>
+          </div>
+        </div>
+      )}
 
       {/* Mid-quiz AI analysis overlay */}
       {showMidHook && (
