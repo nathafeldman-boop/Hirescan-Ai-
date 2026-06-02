@@ -786,6 +786,25 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
           </div>
 
+          {/* Mode Duo CTA */}
+          <div
+            className="mt-4 rounded-2xl p-5 text-center"
+            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.10))', border: '1px solid rgba(139,92,246,0.28)' }}
+          >
+            <p className="text-2xl mb-2">👫</p>
+            <p className="text-white font-black text-sm mb-1">Mode Duo — Teste avec ton/ta partenaire</p>
+            <p className="text-zinc-500 text-xs leading-relaxed mb-4">
+              Chacun répond de son côté. L&apos;IA compare vos réponses et révèle vos vraies divergences.
+            </p>
+            <Link
+              href="/duo"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.35)' }}
+            >
+              Découvrir le Mode Duo →
+            </Link>
+          </div>
+
           {/* Other quizzes */}
           <div className="mt-4 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
             <p className="text-xs text-zinc-500 text-center mb-3">Essaie un autre quiz</p>
