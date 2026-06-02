@@ -5,6 +5,12 @@ import Providers from './Providers';
 export const metadata: Metadata = {
   title: 'UrSecret — Tes vraies réponses',
   description: 'Des questionnaires précis pour découvrir les vérités que tu ressens. 100% anonyme.',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
+  manifest: '/manifest.json',
   openGraph: {
     title: 'UrSecret',
     description: 'Tes vraies réponses. Rien que la vérité.',
