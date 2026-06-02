@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { getQuizBySlug } from '@/lib/quizzes';
 import QuizClient from './QuizClient';
 
@@ -216,10 +217,26 @@ export default function QuizPage({ params }: PageProps) {
     ],
   };
 
+  const hasGuide = ['style-attachement', 'langages-amour', 'gaslight', 'burnout', 'depression', 'narcissique', 'infidelite', 'manipule', 'relation-toxique'].includes(quiz.slug);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <QuizClient quiz={quiz} />
+      {/* Hidden but crawlable FAQ for SEO */}
+      <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }} aria-hidden="true">
+        {hasGuide && (
+          <Link href={`/tests/${quiz.slug}`}>
+            Guide complet : {quiz.title}
+          </Link>
+        )}
+        {faqs.map(({ q, a }, i) => (
+          <div key={i}>
+            <h2>{q}</h2>
+            <p>{a}</p>
+          </div>
+        ))}
+      </div>
     </>
   );
 }
