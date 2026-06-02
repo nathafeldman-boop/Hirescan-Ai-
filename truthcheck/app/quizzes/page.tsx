@@ -9,11 +9,11 @@ const BASE = 'https://ursecret.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Tous les quizzes — UrSecret',
-  description: '15 questionnaires anonymes : infidélité, narcissisme, manipulation, burnout, dépression, amour, amitié et plus. Résultats instantanés, 100% gratuit, zéro compte requis.',
-  keywords: ['quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'suis-je narcissique', 'suis-je manipulé', 'burnout test', 'UrSecret'],
+  description: '18 questionnaires anonymes : style d\'attachement, langages de l\'amour, gaslighting, infidélité, narcissisme, manipulation, burnout, dépression, amour, amitié et plus. Résultats instantanés, 100% gratuit.',
+  keywords: ['quiz style attachement', 'langages de l\'amour test', 'suis-je gaslighté', 'quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'suis-je narcissique', 'suis-je manipulé', 'burnout test', 'UrSecret'],
   openGraph: {
     title: 'Tous les quizzes | UrSecret',
-    description: '15 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
+    description: '18 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
     url: `${BASE}/quizzes`,
     siteName: 'UrSecret',
     locale: 'fr_FR',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Tous les quizzes | UrSecret',
-    description: '15 questionnaires anonymes. 100% gratuit.',
+    description: '18 questionnaires anonymes. 100% gratuit.',
     images: ['/api/og'],
   },
   alternates: { canonical: `${BASE}/quizzes` },
@@ -43,7 +43,7 @@ const jsonLd = {
       '@type': 'ItemList',
       name: 'Tous les quizzes UrSecret',
       description: 'Questionnaires anonymes pour découvrir la vérité sur toi-même, tes relations et ta famille',
-      numberOfItems: 15,
+      numberOfItems: 18,
       itemListElement: [
         { '@type': 'ListItem', position: 1,  url: `${BASE}/quiz/infidelite`,       name: 'Mon/Ma partenaire me trompe ?' },
         { '@type': 'ListItem', position: 2,  url: `${BASE}/quiz/adopte`,           name: 'Suis-je adopté(e) ?' },
@@ -59,7 +59,10 @@ const jsonLd = {
         { '@type': 'ListItem', position: 12, url: `${BASE}/quiz/crush`,            name: 'Mon crush ressent-il/elle quelque chose ?' },
         { '@type': 'ListItem', position: 13, url: `${BASE}/quiz/burnout`,          name: 'Suis-je en burnout ?' },
         { '@type': 'ListItem', position: 14, url: `${BASE}/quiz/depression`,       name: 'Ai-je des signes de dépression ?' },
-        { '@type': 'ListItem', position: 15, url: `${BASE}/quiz/vrai-amour`,       name: 'Est-ce le vrai amour ?' },
+        { '@type': 'ListItem', position: 15, url: `${BASE}/quiz/vrai-amour`,          name: 'Est-ce le vrai amour ?' },
+        { '@type': 'ListItem', position: 16, url: `${BASE}/quiz/style-attachement`,  name: 'Quel est ton style d\'attachement ?' },
+        { '@type': 'ListItem', position: 17, url: `${BASE}/quiz/langages-amour`,     name: 'Quel est ton langage de l\'amour ?' },
+        { '@type': 'ListItem', position: 18, url: `${BASE}/quiz/gaslight`,           name: 'Suis-je victime de gaslighting ?' },
       ],
     },
     {

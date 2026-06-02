@@ -845,12 +845,15 @@ export default function ResultsClient({ quiz }: Props) {
             <p className="text-xs text-zinc-500 text-center mb-3">Essaie un autre quiz</p>
             <div className="flex flex-wrap gap-2 justify-center">
               {[
+                { slug: 'style-attachement', label: '🫀 Style attachement' },
+                { slug: 'langages-amour', label: '💌 Langages amour' },
+                { slug: 'gaslight', label: '🫧 Gaslighting ?' },
                 { slug: 'narcissique', label: '🪞 Narcissique ?' },
                 { slug: 'manipule', label: '🎭 Manipulé(e) ?' },
-                { slug: 'crush', label: '💌 Mon crush ?' },
+                { slug: 'crush', label: '💘 Mon crush ?' },
                 { slug: 'burnout', label: '💤 Burnout ?' },
                 { slug: 'rompre', label: '💔 Rompre ?' },
-              ].filter(q => q.slug !== quiz.slug).slice(0, 4).map((q) => (
+              ].filter(q => q.slug !== quiz.slug).slice(0, 5).map((q) => (
                 <Link
                   key={q.slug}
                   href={`/quiz/${q.slug}`}

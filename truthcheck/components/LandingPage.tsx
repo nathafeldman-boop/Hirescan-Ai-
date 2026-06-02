@@ -5,11 +5,11 @@ import { useState, useEffect } from 'react';
 import QuizIcon from './QuizIcon';
 
 const QUIZZES = [
+  { slug: 'style-attachement', emoji: '🫀', label: 'Quel est ton style d\'attachement ?', desc: 'Sécure, anxieux, évitant — tu dois savoir',      color: '#6366f1' },
+  { slug: 'langages-amour',    emoji: '💌', label: 'Quel est ton langage de l\'amour ?',  desc: 'Celui que ton/ta partenaire ne parle peut-être pas', color: '#ec4899' },
+  { slug: 'gaslight',          emoji: '🫧', label: 'Est-ce qu\'on te fait douter de toi ?', desc: 'Ce qu\'on t\'a peut-être appris à normaliser', color: '#7c3aed' },
   { slug: 'infidelite',  emoji: '💔', label: 'Il/elle te cache quelque chose ?',    desc: 'Les signaux que tu ignores peut-être',          color: '#f43f5e' },
-  { slug: 'adopte',      emoji: '👶', label: 'Ta famille te dit tout sur toi ?',    desc: 'Les indices que personne n\'ose mentionner',     color: '#8b5cf6' },
   { slug: 'amoureux',    emoji: '💘', label: "C'est vraiment de l'amour ?",         desc: 'Amour vrai ou simple illusion',                 color: '#ec4899' },
-  { slug: 'vrais-amis',  emoji: '🤝', label: 'Seraient-ils là si ça allait mal ?', desc: 'Ce que les vrais amis font vraiment',           color: '#06b6d4' },
-  { slug: 'orientation', emoji: '🌈', label: 'Es-tu attiré(e) par le même sexe ?', desc: 'Explore ton attirance sans filtre ni jugement', color: '#10b981' },
 ];
 
 const STATS = [
@@ -64,23 +64,29 @@ export default function LandingPage() {
             <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
             100% Anonyme · IA intégrée · Gratuit
           </div>
-          <h1 className="text-6xl sm:text-7xl font-black tracking-tight leading-none mb-6">
-            <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">Discover</span>
-            <br /><span className="text-white">your truth.</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/8 text-violet-300 text-xs font-semibold mb-6 tracking-wide uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+            18 quizzes · 100% anonyme · Gratuit
+          </div>
+          <h1 className="text-5xl sm:text-7xl font-black tracking-tight leading-none mb-6">
+            <span className="text-white">Tu mérites</span>
+            <br /><span className="bg-gradient-to-r from-violet-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">la vérité.</span>
           </h1>
-          <p className="text-zinc-400 text-lg sm:text-xl max-w-xl mx-auto leading-relaxed mb-10">
-            Des questionnaires brutalement honnêtes sur l&apos;amour, les amis, la famille et toi-même.
-            L&apos;IA analyse tes vraies réponses — sans filtre.
+          <p className="text-zinc-400 text-lg sm:text-xl max-w-xl mx-auto leading-relaxed mb-3">
+            Est-ce qu&apos;on te ment ? Est-ce que c&apos;est de l&apos;amour ? Est-ce que tu es gaslighté(e) ?
+          </p>
+          <p className="text-zinc-600 text-base max-w-lg mx-auto leading-relaxed mb-10">
+            18 questionnaires anonymes qui te donnent les réponses que les gens autour de toi n&apos;osent pas.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/onboarding"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base transition-all hover:scale-105 active:scale-95"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6cc, #ec4899cc)', boxShadow: '0 8px 32px rgba(139,92,246,0.4)' }}>
-              Découvre tes vérités →
+            <Link href="/quizzes"
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl font-black text-base transition-all hover:scale-105 active:scale-95"
+              style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 32px rgba(139,92,246,0.4)' }}>
+              Voir tous les quiz →
             </Link>
-            <Link href="/quiz/infidelite"
+            <Link href="/quiz/style-attachement"
               className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all">
-              Essayer un quiz
+              🫀 Quiz Attachement
             </Link>
           </div>
           <div className="flex items-center justify-center gap-8 mt-14">
@@ -97,8 +103,8 @@ export default function LandingPage() {
       <section className="relative z-10 py-16 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-black text-white mb-3">5 vérités qui changent tout</h2>
-            <p className="text-zinc-500">Choisis le sujet qui te brûle les lèvres</p>
+            <h2 className="text-3xl font-black text-white mb-3">Les quiz les plus partagés</h2>
+            <p className="text-zinc-500">Choisis le sujet que tu n&apos;oses pas aborder en vrai</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {QUIZZES.map((q, i) => (
