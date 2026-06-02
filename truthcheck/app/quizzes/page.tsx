@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
+import { duoQuizzes } from '@/lib/duoQuizzes';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 import QuizIcon from '@/components/QuizIcon';
 
@@ -106,6 +107,39 @@ export default function QuizzesPage() {
                 </span>
               </h1>
             </div>
+
+            {/* Mode Duo banner */}
+            <Link
+              href="/duo"
+              className="group relative rounded-2xl overflow-hidden mb-6 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
+              style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(236,72,153,0.15))', border: '1px solid rgba(139,92,246,0.35)' }}
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(139,92,246,0.2) 0%, transparent 70%)' }} />
+              <div className="relative p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
+                  style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.4)' }}>
+                  👫
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-white font-black text-base">Mode Duo</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                      style={{ background: 'rgba(236,72,153,0.25)', color: '#f472b6', border: '1px solid rgba(236,72,153,0.4)' }}>
+                      Nouveau
+                    </span>
+                  </div>
+                  <p className="text-zinc-400 text-xs leading-relaxed">
+                    Chacun répond de son côté · L&apos;IA compare vos réponses · 5 quiz couple
+                  </p>
+                </div>
+                <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+                  style={{ color: '#a78bfa' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.6), transparent)' }} />
+            </Link>
 
             <div className="flex flex-col gap-4">
               {quizzes.map((quiz) => (
