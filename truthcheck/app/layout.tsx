@@ -11,10 +11,18 @@ export const metadata: Metadata = {
     apple: '/favicon.svg',
   },
   manifest: '/manifest.json',
+  verification: {
+    google: [
+      'I8y7x7GMiFMyPn3Y8kpjSNQ-wJEEkLBB5ENx1Q5GI1A',
+      '-dq9UWE1VHRVHgWUyp6OHvWHfuZ3gnIQqgJAfL6qa3Q',
+    ],
+  },
   openGraph: {
     title: 'UrSecret',
     description: 'Tes vraies réponses. Rien que la vérité.',
     type: 'website',
+    siteName: 'UrSecret',
+    locale: 'fr_FR',
   },
 };
 

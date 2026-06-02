@@ -5,5 +5,5 @@ import IntroAnimation from '@/components/IntroAnimation';
 
 export default function HomeClient() {
   const router = useRouter();
-  return <IntroAnimation onComplete={() => router.push('/onboarding')} />;
+  return <IntroAnimation onComplete={() => router.push('/quizzes')} />;
 }
