@@ -5,15 +5,15 @@ import { duoQuizzes } from '@/lib/duoQuizzes';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 import QuizIcon from '@/components/QuizIcon';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 export const metadata: Metadata = {
   title: 'Tous les quizzes — UrSecret',
-  description: '18 questionnaires anonymes : style d\'attachement, langages de l\'amour, gaslighting, infidélité, narcissisme, manipulation, burnout, dépression, amour, amitié et plus. Résultats instantanés, 100% gratuit.',
-  keywords: ['quiz style attachement', 'langages de l\'amour test', 'suis-je gaslighté', 'quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'suis-je narcissique', 'suis-je manipulé', 'burnout test', 'UrSecret'],
+  description: '15 questionnaires anonymes : infidélité, narcissisme, manipulation, burnout, dépression, amour, amitié et plus. Résultats instantanés, 100% gratuit, zéro compte requis.',
+  keywords: ['quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'suis-je narcissique', 'suis-je manipulé', 'burnout test', 'UrSecret'],
   openGraph: {
     title: 'Tous les quizzes | UrSecret',
-    description: '18 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
+    description: '15 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
     url: `${BASE}/quizzes`,
     siteName: 'UrSecret',
     locale: 'fr_FR',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Tous les quizzes | UrSecret',
-    description: '18 questionnaires anonymes. 100% gratuit.',
+    description: '15 questionnaires anonymes. 100% gratuit.',
     images: ['/api/og'],
   },
   alternates: { canonical: `${BASE}/quizzes` },
@@ -43,7 +43,7 @@ const jsonLd = {
       '@type': 'ItemList',
       name: 'Tous les quizzes UrSecret',
       description: 'Questionnaires anonymes pour découvrir la vérité sur toi-même, tes relations et ta famille',
-      numberOfItems: 18,
+      numberOfItems: 15,
       itemListElement: [
         { '@type': 'ListItem', position: 1,  url: `${BASE}/quiz/infidelite`,       name: 'Mon/Ma partenaire me trompe ?' },
         { '@type': 'ListItem', position: 2,  url: `${BASE}/quiz/adopte`,           name: 'Suis-je adopté(e) ?' },
@@ -59,10 +59,7 @@ const jsonLd = {
         { '@type': 'ListItem', position: 12, url: `${BASE}/quiz/crush`,            name: 'Mon crush ressent-il/elle quelque chose ?' },
         { '@type': 'ListItem', position: 13, url: `${BASE}/quiz/burnout`,          name: 'Suis-je en burnout ?' },
         { '@type': 'ListItem', position: 14, url: `${BASE}/quiz/depression`,       name: 'Ai-je des signes de dépression ?' },
-        { '@type': 'ListItem', position: 15, url: `${BASE}/quiz/vrai-amour`,          name: 'Est-ce le vrai amour ?' },
-        { '@type': 'ListItem', position: 16, url: `${BASE}/quiz/style-attachement`,  name: 'Quel est ton style d\'attachement ?' },
-        { '@type': 'ListItem', position: 17, url: `${BASE}/quiz/langages-amour`,     name: 'Quel est ton langage de l\'amour ?' },
-        { '@type': 'ListItem', position: 18, url: `${BASE}/quiz/gaslight`,           name: 'Suis-je victime de gaslighting ?' },
+        { '@type': 'ListItem', position: 15, url: `${BASE}/quiz/vrai-amour`,       name: 'Est-ce le vrai amour ?' },
       ],
     },
     {
@@ -142,6 +139,39 @@ export default function QuizzesPage() {
                 </svg>
               </div>
               <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.6), transparent)' }} />
+            </Link>
+
+            {/* Personnalité 16 types banner */}
+            <Link
+              href="/quiz/personnalite"
+              className="group relative rounded-2xl overflow-hidden mb-6 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
+              style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(167,139,250,0.15))', border: '1px solid rgba(99,102,241,0.35)' }}
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.2) 0%, transparent 70%)' }} />
+              <div className="relative p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
+                  style={{ background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)' }}>
+                  🧠
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-white font-black text-base">Test de Personnalité 16 Types</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                      style={{ background: 'rgba(99,102,241,0.25)', color: '#a78bfa', border: '1px solid rgba(99,102,241,0.4)' }}>
+                      Gratuit
+                    </span>
+                  </div>
+                  <p className="text-zinc-400 text-xs leading-relaxed">
+                    24 questions · INFJ, ENFP, INTJ et 13 autres · Résultat instantané
+                  </p>
+                </div>
+                <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+                  style={{ color: '#a78bfa' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.6), transparent)' }} />
             </Link>
 
             <div className="flex flex-col gap-4">

@@ -1,6 +1,11 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://ursecret.vercel.app';
+const BASE_URL = 'https://ursecret.site';
+
+const ALL_MBTI_TYPES = [
+  'intj','intp','entj','entp','infj','infp','enfj','enfp',
+  'istj','isfj','estj','esfj','istp','isfp','estp','esfp',
+];
 
 const QUIZ_SLUGS = [
   'infidelite', 'adopte', 'amoureux', 'vrais-amis', 'orientation',
@@ -22,10 +27,12 @@ const DUO_SLUGS = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   return [
-    { url: BASE_URL,               lastModified: now, changeFrequency: 'daily',  priority: 1    },
-    { url: `${BASE_URL}/quizzes`,  lastModified: now, changeFrequency: 'daily',  priority: 0.95 },
-    { url: `${BASE_URL}/duo`,       lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
-    { url: `${BASE_URL}/tests`,    lastModified: now, changeFrequency: 'weekly', priority: 0.88 },
+    { url: BASE_URL,                             lastModified: now, changeFrequency: 'daily',  priority: 1    },
+    { url: `${BASE_URL}/quizzes`,                lastModified: now, changeFrequency: 'daily',  priority: 0.95 },
+    { url: `${BASE_URL}/quiz/personnalite`,       lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE_URL}/types`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.93 },
+    { url: `${BASE_URL}/duo`,                    lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
+    { url: `${BASE_URL}/tests`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.88 },
     ...QUIZ_SLUGS.map((slug) => ({
       url: `${BASE_URL}/quiz/${slug}`,
       lastModified: now,
@@ -43,6 +50,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.85,
+    })),
+    ...ALL_MBTI_TYPES.map((type) => ({
+      url: `${BASE_URL}/types/${type}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.9,
     })),
     { url: `${BASE_URL}/mentions-legales`,           lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
     { url: `${BASE_URL}/politique-confidentialite`,  lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },

@@ -1,30 +1,31 @@
 import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 export const metadata: Metadata = {
-  title: 'UrSecret — Quiz & Tests Psychologiques Gratuits · France',
-  description: 'Découvre la vérité sur ton couple, tes amis et ta famille. 18 tests psychologiques anonymes et gratuits : style d\'attachement, langages de l\'amour, gaslighting, burnout, dépression, narcissisme. Résultats instantanés.',
+  title: 'UrSecret — Tes vraies réponses',
+  description: 'Découvre la vérité sur ton couple, tes amis et ta famille. 15 questionnaires anonymes et précis : infidélité, narcissisme, manipulation, burnout, dépression, amour véritable et plus. Résultats instantanés.',
   keywords: [
-    'quiz psychologique gratuit france', 'test style attachement', 'test langages amour', 'test gaslighting',
-    'quiz infidélité', 'suis-je narcissique', 'suis-je manipulé', 'test burnout', 'test dépression',
-    'quiz anonyme france', 'test psychologique français', 'questionnaire couple', 'UrSecret',
+    'quiz infidélité', 'suis-je adopté', 'suis-je amoureux', 'vrais amis', 'orientation sexuelle',
+    'suis-je narcissique', 'mon ex veut revenir', 'suis-je manipulé', 'dois-je rompre',
+    'suis-je jaloux', 'relation toxique', 'mon crush', 'burnout', 'dépression', 'vrai amour',
+    'quiz anonyme', 'test psychologique', 'questionnaire couple', 'UrSecret',
   ],
   alternates: { canonical: BASE },
   openGraph: {
-    title: 'UrSecret — Quiz & Tests Psychologiques Gratuits',
-    description: '18 tests psychologiques anonymes : style d\'attachement, langages de l\'amour, gaslighting, burnout et plus. 100% gratuit.',
+    title: 'UrSecret — Tes vraies réponses',
+    description: '15 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
     url: BASE,
     siteName: 'UrSecret',
     locale: 'fr_FR',
     type: 'website',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrSecret — Tests Psychologiques Gratuits' }],
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrSecret — Tes vraies réponses' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'UrSecret — Tests Psychologiques Gratuits',
-    description: '18 tests psy anonymes. 100% gratuit. France.',
+    title: 'UrSecret — Tes vraies réponses',
+    description: '15 quiz anonymes. 100% gratuit.',
     images: ['/api/og'],
   },
 };

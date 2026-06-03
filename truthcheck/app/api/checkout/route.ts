@@ -7,9 +7,12 @@ function getStripe() {
   return new Stripe(key, { apiVersion: '2024-06-20' });
 }
 
-const ONE_TIME_PRODUCT_ID = 'prod_UcjiAfAioyc6WM';
-const ONE_TIME_PRICE_CENTS = 499; // €4.99
-const ANNUAL_PRICE_CENTS = 2999;  // €29.99/year (set STRIPE_ANNUAL_PRICE_ID env var in Vercel)
+const ONE_TIME_PRODUCT_ID  = 'prod_UcjiAfAioyc6WM';  // accès unique quiz €4.99
+const ANNUAL_PRODUCT_ID    = 'prod_UdST3jqJxR36mM';  // abonnement annuel €29.99
+const MONTHLY_PRODUCT_ID   = 'prod_UdSUvUH7Y6iJXq';  // abonnement mensuel €9.99
+const ONE_TIME_PRICE_CENTS = 499;   // €4.99
+const ANNUAL_PRICE_CENTS   = 2999;  // €29.99/year
+const RAPPORT_PRICE_CENTS  = 1999;  // €19.99 — rapport MBTI
 
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
@@ -18,14 +21,42 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode } = await req.json();
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
     const cancelUrl = quizSlug && score !== undefined
       ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
-      : `${baseUrl}/quizzes`;
+      : typeCode
+        ? `${baseUrl}/types/${typeCode.toLowerCase()}`
+        : `${baseUrl}/quizzes`;
 
-    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+    const successUrl = typeCode
+      ? `${baseUrl}/types/${typeCode.toLowerCase()}?unlocked=true&session_id={CHECKOUT_SESSION_ID}`
+      : `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+
+    // ── MBTI Rapport one-time ──
+    if (rapport && typeCode) {
+      const rapportSession = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `Rapport Complet ${typeCode} — UrSecret`,
+              description: `Analyse approfondie du type ${typeCode} : amour, carrière, forces, compatibilité`,
+            },
+            unit_amount: RAPPORT_PRICE_CENTS,
+          },
+          quantity: 1,
+        }],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        metadata: { typeCode, rapport: 'true' },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      return NextResponse.json({ url: rapportSession.url });
+    }
 
     // ── Annual subscription ──
     if (annual) {
@@ -35,10 +66,7 @@ export async function POST(req: NextRequest) {
         : {
             price_data: {
               currency: 'eur',
-              product_data: {
-                name: 'UrSecret Premium — Accès Annuel',
-                description: 'Score + analyse complète + 18 quiz illimités',
-              },
+              product: ANNUAL_PRODUCT_ID,
               unit_amount: ANNUAL_PRICE_CENTS,
               recurring: { interval: 'year' as const },
             },
@@ -77,7 +105,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ url: session.url });
     }
 
-    // ── Subscription ──
+    // ── Monthly subscription ──
     const priceId = process.env.STRIPE_PRICE_ID;
 
     const lineItem = priceId
@@ -85,11 +113,8 @@ export async function POST(req: NextRequest) {
       : {
           price_data: {
             currency: 'eur',
-            product_data: {
-              name: 'UrSecret Premium',
-              description: 'Ton score + analyse complète personnalisée',
-            },
-            unit_amount: 999, // €9.99/month — update STRIPE_PRICE_ID in Vercel to match
+            product: MONTHLY_PRODUCT_ID,
+            unit_amount: 999,
             recurring: { interval: 'month' as const },
           },
           quantity: 1,

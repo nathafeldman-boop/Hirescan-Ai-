@@ -1,4 +1,4 @@
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 const quizzes = [
   { slug: 'infidelite',       title: 'Mon/Ma partenaire me trompe ? — Quiz infidélité',      keywords: 'infidélité,trompe,partenaire,quiz,signaux,trahison,couple' },

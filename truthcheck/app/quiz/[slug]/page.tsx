@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { getQuizBySlug } from '@/lib/quizzes';
 import QuizClient from './QuizClient';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 const ALL_SLUGS = [
   'infidelite', 'adopte', 'amoureux', 'vrais-amis', 'orientation',

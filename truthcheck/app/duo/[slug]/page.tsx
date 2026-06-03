@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { duoQuizzes } from '@/lib/duoQuizzes';
 import DuoQuizClient from './DuoQuizClient';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 const ALL_DUO_SLUGS = [
   'duo-communication',
@@ -45,13 +45,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default function DuoQuizPage({ params }: PageProps) {
   const quiz = duoQuizzes.find((q) => q.slug === params.slug);
   if (!quiz) notFound();
-  return (
-    <>
-      <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }} aria-hidden="true">
-        <h1>{quiz.emoji} {quiz.title} — Mode Duo Couple</h1>
-        <p>{quiz.description}</p>
-      </div>
-      <DuoQuizClient quiz={quiz} />
-    </>
-  );
+  return <DuoQuizClient quiz={quiz} />;
 }

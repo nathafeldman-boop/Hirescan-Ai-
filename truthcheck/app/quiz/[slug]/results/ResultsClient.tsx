@@ -122,15 +122,6 @@ export default function ResultsClient({ quiz }: Props) {
 
   const analysis = buildAnalysis(quiz, score, tier.title);
 
-  const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
-  const [timeLeft, setTimeLeft] = useState(15 * 60);
-
-  const formatTime = (secs: number) => {
-    const m = Math.floor(secs / 60).toString().padStart(2, '0');
-    const s = (secs % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
   const partialScore = score >= 100 ? '9?%' : score >= 10 ? `${Math.floor(score / 10)}?%` : '?%';
 
   const PAYWALL_CONFIG: Record<string, { headline: string; subline: string; social: string }> = {
@@ -249,15 +240,6 @@ export default function ResultsClient({ quiz }: Props) {
     return () => clearInterval(id);
   }, [showExitModal]);
 
-  // Offer expiry countdown (15 min)
-  useEffect(() => {
-    if (isPremium) return;
-    const id = setInterval(() => {
-      setTimeLeft((prev) => Math.max(0, prev - 1));
-    }, 1000);
-    return () => clearInterval(id);
-  }, [isPremium]);
-
   // After returning from OAuth/magic-link, auto-trigger checkout if user had clicked pay
   useEffect(() => {
     if (!session?.user || pendingCheckoutRef.current) return;
@@ -276,8 +258,6 @@ export default function ResultsClient({ quiz }: Props) {
     if ((session.user as { tier?: string }).tier !== 'premium') {
       if (checkoutType === 'onetime') {
         void doOneTimeCheckout(session.user.email ?? undefined);
-      } else if (checkoutType === 'annual') {
-        void doAnnualCheckout(session.user.email ?? undefined);
       } else {
         void doCheckout(session.user.email ?? undefined);
       }
@@ -340,48 +320,16 @@ export default function ResultsClient({ quiz }: Props) {
     }
   }
 
-  async function doAnnualCheckout(email?: string) {
-    setIsCheckingOut(true);
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resultId: shareId,
-          quizSlug: quiz.slug,
-          score,
-          origin: window.location.origin,
-          userEmail: email ?? session?.user?.email ?? undefined,
-          annual: true,
-        }),
-      });
-      const data = await res.json() as { url?: string; error?: string };
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error ?? 'Erreur de paiement');
-        setIsCheckingOut(false);
-      }
-    } catch {
-      alert('Erreur réseau. Réessaie.');
-      setIsCheckingOut(false);
-    }
-  }
-
   function handlePayClick() {
     if (!session?.user) {
       try {
         sessionStorage.setItem('pending_checkout', '1');
-        sessionStorage.setItem('pending_checkout_type', selectedPlan === 'annual' ? 'annual' : 'sub');
+        sessionStorage.setItem('pending_checkout_type', 'sub');
       } catch {}
       setShowAuthModal(true);
       return;
     }
-    if (selectedPlan === 'annual') {
-      void doAnnualCheckout();
-    } else {
-      void doCheckout();
-    }
+    void doCheckout();
   }
 
   function handleOneTimeClick() {
@@ -427,19 +375,19 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
             <div className="space-y-3">
               <button
-                onClick={() => { setShowExitModal(false); handlePayClick(); }}
+                onClick={() => { setShowExitModal(false); void doCheckout(); }}
                 disabled={isCheckingOut}
                 className="w-full py-4 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
               >
-                Voir mon analyse — {selectedPlan === 'annual' ? '€29.99/an' : '€9.99/mois'} ✦
+                Voir mon score — 4,99€/mois ✦
               </button>
               <button
                 onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
                 disabled={isCheckingOut}
                 className="w-full py-3 rounded-xl font-semibold text-zinc-200 text-sm bg-white/[0.06] hover:bg-white/10 border border-white/12 transition-all disabled:opacity-60"
               >
-                Juste ce résultat — 4,99€ (paiement unique)
+                Juste ce résultat — 1,99€ (paiement unique)
               </button>
               <button
                 onClick={() => setShowExitModal(false)}
@@ -681,184 +629,82 @@ export default function ResultsClient({ quiz }: Props) {
               </div>
 
               {/* Main paywall card */}
-              <div className="rounded-2xl mb-6 border border-white/10 overflow-hidden"
-                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.08))' }}>
-
-                {/* Countdown timer bar */}
-                <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between"
-                  style={{ background: 'rgba(0,0,0,0.35)' }}>
-                  <span className="text-xs text-zinc-500">⏰ Offre spéciale expire dans</span>
-                  <span className="text-base font-black tabular-nums font-mono"
-                    style={{ color: timeLeft < 300 ? '#ef4444' : '#a78bfa' }}>
-                    {formatTime(timeLeft)}
-                  </span>
+              <div
+                className="rounded-2xl p-6 mb-6 border border-white/10"
+                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(236,72,153,0.10))' }}
+              >
+                <div className="text-center mb-5">
+                  <h2 className="text-xl font-black text-white mb-2">{pw.headline}</h2>
+                  <p className="text-zinc-400 text-sm leading-relaxed">
+                    {pw.subline}
+                  </p>
                 </div>
 
-                <div className="p-5">
-                  {/* Headline */}
-                  <div className="text-center mb-5">
-                    <h2 className="text-xl font-black text-white mb-2">{pw.headline}</h2>
-                    <p className="text-zinc-400 text-sm leading-relaxed">{pw.subline}</p>
-                  </div>
-
-                  {/* Plan selector */}
-                  <div className="space-y-2.5 mb-5">
-                    {/* Annual plan — primary */}
-                    <button
-                      onClick={() => setSelectedPlan('annual')}
-                      className="w-full rounded-xl p-4 text-left relative transition-all"
-                      style={{
-                        border: `2px solid ${selectedPlan === 'annual' ? '#8b5cf6' : 'rgba(255,255,255,0.10)'}`,
-                        background: selectedPlan === 'annual' ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.03)',
-                      }}
-                    >
-                      <div className="absolute -top-2.5 left-4">
-                        <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full"
-                          style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', color: 'white' }}>
-                          ⭐ Plus populaire
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 mt-1">
-                        <div className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
-                          style={{ borderColor: selectedPlan === 'annual' ? '#8b5cf6' : 'rgba(255,255,255,0.3)' }}>
-                          {selectedPlan === 'annual' && (
-                            <div className="w-2 h-2 rounded-full" style={{ background: '#8b5cf6' }} />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-baseline gap-2 flex-wrap">
-                            <span className="text-white font-black text-lg">€29.99</span>
-                            <span className="text-zinc-400 text-sm">/an</span>
-                            <span className="text-zinc-600 text-xs line-through">€119.88</span>
-                          </div>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-emerald-400 text-xs font-bold">= €0.58/semaine</span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-black"
-                              style={{ background: 'rgba(16,185,129,0.2)', color: '#34d399' }}>
-                              ÉCONOMISE 75%
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-
-                    {/* Monthly plan — anchor */}
-                    <button
-                      onClick={() => setSelectedPlan('monthly')}
-                      className="w-full rounded-xl p-3.5 text-left transition-all"
-                      style={{
-                        border: `2px solid ${selectedPlan === 'monthly' ? 'rgba(139,92,246,0.6)' : 'rgba(255,255,255,0.08)'}`,
-                        background: selectedPlan === 'monthly' ? 'rgba(139,92,246,0.08)' : 'rgba(255,255,255,0.02)',
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
-                          style={{ borderColor: selectedPlan === 'monthly' ? '#8b5cf6' : 'rgba(255,255,255,0.3)' }}>
-                          {selectedPlan === 'monthly' && (
-                            <div className="w-2 h-2 rounded-full" style={{ background: '#8b5cf6' }} />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-zinc-300 font-bold text-base">€9.99</span>
-                            <span className="text-zinc-500 text-sm">/mois</span>
-                          </div>
-                          <span className="text-zinc-600 text-xs">Annulable à tout moment</span>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* What you unlock */}
-                  <div className="space-y-2 mb-4">
-                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest font-semibold mb-2">Ce que tu débloques</p>
-                    {[
-                      'Ton score exact sur 100',
-                      'Analyse psychologique personnalisée (10 points)',
-                      'Ce que tes réponses révèlent vraiment',
-                      'Plan d\'action adapté à ton profil',
-                      '18 quiz illimités + Mode Duo couple',
-                    ].map((item) => (
-                      <div key={item} className="flex items-center gap-2 text-sm text-zinc-300">
-                        <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Scary stat */}
-                  <div className="rounded-xl p-3 mb-4 border text-center"
-                    style={{ background: `${tier.glowColor}0a`, borderColor: `${tier.glowColor}25` }}>
-                    <p className="text-xs font-semibold leading-relaxed" style={{ color: tier.glowColor }}>
-                      📊 {scaryStat}
-                    </p>
-                  </div>
-
-                  {/* Social proof */}
-                  <div className="flex items-center justify-center gap-2 mb-4 py-2 rounded-xl border border-white/5 bg-white/[0.03]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs text-zinc-500">{pw.social}</span>
-                  </div>
-
-                  {/* Main CTA */}
-                  <button
-                    onClick={handlePayClick}
-                    disabled={isCheckingOut}
-                    className="w-full py-4 rounded-xl font-black text-white text-base mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
-                  >
-                    {isCheckingOut ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Redirection…
-                      </span>
-                    ) : selectedPlan === 'annual' ? (
-                      'Voir mon analyse complète — €29.99/an ✦'
-                    ) : (
-                      'Voir mon analyse complète — €9.99/mois ✦'
-                    )}
-                  </button>
-
-                  {/* One-time option */}
-                  <button
-                    onClick={handleOneTimeClick}
-                    disabled={isCheckingOut}
-                    className="w-full py-3 rounded-xl font-semibold text-zinc-400 text-sm border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] hover:text-zinc-200 transition-all active:scale-[0.98] mb-4 disabled:opacity-60"
-                  >
-                    Juste ce résultat — 4,99€ (paiement unique)
-                  </button>
-
-                  {/* Guarantee */}
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-base">🛡️</span>
-                    <span className="text-xs text-zinc-400 font-medium">Satisfait ou remboursé 7 jours</span>
-                  </div>
-                </div>
-
-                {/* Testimonials */}
-                <div className="border-t border-white/5 px-5 pt-4 pb-5 space-y-3">
-                  <p className="text-[10px] text-zinc-600 text-center uppercase tracking-widest font-semibold">Ce qu&apos;ils en pensent</p>
+                {/* What you get */}
+                <div className="space-y-2 mb-4">
                   {[
-                    { text: "J'étais choquée de voir à quel point l'analyse était précise 😱", name: "Sarah M." },
-                    { text: "Ça m'a fait comprendre pourquoi mes relations se passaient toujours pareil.", name: "Lucas D." },
-                    { text: "Le score en lui-même valait déjà le coup 😅", name: "Camille R." },
-                  ].map((t, i) => (
-                    <div key={i} className="rounded-xl p-3 border border-white/5 bg-white/[0.02]">
-                      <div className="flex items-center gap-0.5 mb-1.5">
-                        {Array(5).fill(0).map((_, j) => (
-                          <span key={j} className="text-yellow-400 text-xs">★</span>
-                        ))}
-                      </div>
-                      <p className="text-zinc-300 text-xs leading-relaxed mb-1">&ldquo;{t.text}&rdquo;</p>
-                      <p className="text-zinc-600 text-[10px]">— {t.name}</p>
+                    'Ton score précis sur 100',
+                    'Ton niveau parmi 5 catégories',
+                    'Analyse de 10 points personnalisée',
+                    'Accès illimité à tous les quizzes',
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-2 text-sm text-zinc-300">
+                      <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {item}
                     </div>
                   ))}
                 </div>
+
+                {/* Scary stat */}
+                <div
+                  className="rounded-xl p-3 mb-4 border text-center"
+                  style={{ background: `${tier.glowColor}0a`, borderColor: `${tier.glowColor}25` }}
+                >
+                  <p className="text-xs font-semibold leading-relaxed" style={{ color: tier.glowColor }}>
+                    📊 {scaryStat}
+                  </p>
+                </div>
+
+                {/* Social proof */}
+                <div className="flex items-center justify-center gap-2 mb-4 py-2 rounded-xl border border-white/5 bg-white/[0.03]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs text-zinc-500">{pw.social}</span>
+                </div>
+
+                {/* CTA */}
+                <button
+                  onClick={handlePayClick}
+                  disabled={isCheckingOut}
+                  className="w-full py-4 rounded-xl font-black text-white text-base mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
+                >
+                  {isCheckingOut ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Redirection…
+                    </span>
+                  ) : (
+                    'Voir mon score complet — 4,99€/mois ✦'
+                  )}
+                </button>
+
+                {/* One-time option */}
+                <button
+                  onClick={handleOneTimeClick}
+                  disabled={isCheckingOut}
+                  className="w-full py-3 rounded-xl font-semibold text-zinc-400 text-sm border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] hover:text-zinc-200 transition-all active:scale-[0.98] mb-3 disabled:opacity-60"
+                >
+                  Juste ce résultat — 1,99€ (paiement unique)
+                </button>
+
+                <p className="text-center text-[11px] text-zinc-600">
+                  Abonnement annulable à tout moment · Paiement 100% sécurisé
+                </p>
               </div>
 
               {/* Blurred preview */}
@@ -907,7 +753,7 @@ export default function ResultsClient({ quiz }: Props) {
                 </div>
               </div>
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`👀 Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''}... Tu penses faire mieux que moi ?\n\nFais le quiz ici (sans regarder mes réponses 😏) :\nhttps://ursecret.vercel.app/quiz/${quiz.slug}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`👀 Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''}... Tu penses faire mieux que moi ?\n\nFais le quiz ici (sans regarder mes réponses 😏) :\nhttps://ursecret.site/quiz/${quiz.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all active:scale-[0.98]"
@@ -923,7 +769,7 @@ export default function ResultsClient({ quiz }: Props) {
               <p className="text-[11px] text-zinc-600 uppercase tracking-widest font-semibold mb-3 text-center">Partager mon résultat</p>
               <div className="flex gap-2">
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://ursecret.vercel.app/quiz/${quiz.slug}`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://ursecret.site/quiz/${quiz.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
@@ -933,7 +779,7 @@ export default function ResultsClient({ quiz }: Props) {
                   WA
                 </a>
                 <a
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 👀 Tu penses faire mieux ?\n\nhttps://ursecret.vercel.app/quiz/${quiz.slug}`)}`}
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 👀 Tu penses faire mieux ?\n\nhttps://ursecret.site/quiz/${quiz.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
@@ -944,11 +790,11 @@ export default function ResultsClient({ quiz }: Props) {
                 </a>
                 <button
                   onClick={() => {
-                    const msg = `J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://ursecret.vercel.app/quiz/${quiz.slug}`;
+                    const msg = `J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://ursecret.site/quiz/${quiz.slug}`;
                     if (navigator.share) {
-                      void navigator.share({ title: quiz.title, text: msg, url: `https://ursecret.vercel.app/quiz/${quiz.slug}` });
+                      void navigator.share({ title: quiz.title, text: msg, url: `https://ursecret.site/quiz/${quiz.slug}` });
                     } else {
-                      navigator.clipboard.writeText(`https://ursecret.vercel.app/quiz/${quiz.slug}`).catch(() => {});
+                      navigator.clipboard.writeText(`https://ursecret.site/quiz/${quiz.slug}`).catch(() => {});
                       const btn = document.getElementById('copy-btn');
                       if (btn) { btn.textContent = '✓ Copié'; setTimeout(() => { if (btn) btn.textContent = 'Copier'; }, 2000); }
                     }
@@ -977,7 +823,7 @@ export default function ResultsClient({ quiz }: Props) {
                 </div>
               </div>
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes sans tricher 👀\n\nhttps://ursecret.vercel.app/duo`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes sans tricher 👀\n\nhttps://ursecret.site/duo`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98] mb-2"
@@ -999,15 +845,12 @@ export default function ResultsClient({ quiz }: Props) {
             <p className="text-xs text-zinc-500 text-center mb-3">Essaie un autre quiz</p>
             <div className="flex flex-wrap gap-2 justify-center">
               {[
-                { slug: 'style-attachement', label: '🫀 Style attachement' },
-                { slug: 'langages-amour', label: '💌 Langages amour' },
-                { slug: 'gaslight', label: '🫧 Gaslighting ?' },
                 { slug: 'narcissique', label: '🪞 Narcissique ?' },
                 { slug: 'manipule', label: '🎭 Manipulé(e) ?' },
-                { slug: 'crush', label: '💘 Mon crush ?' },
+                { slug: 'crush', label: '💌 Mon crush ?' },
                 { slug: 'burnout', label: '💤 Burnout ?' },
                 { slug: 'rompre', label: '💔 Rompre ?' },
-              ].filter(q => q.slug !== quiz.slug).slice(0, 5).map((q) => (
+              ].filter(q => q.slug !== quiz.slug).slice(0, 4).map((q) => (
                 <Link
                   key={q.slug}
                   href={`/quiz/${q.slug}`}
