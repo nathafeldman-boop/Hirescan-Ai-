@@ -2,13 +2,19 @@
 // 4 dimensions × 6 questions = 24 questions total
 // E/I · S/N · T/F · J/P
 
+export type MbtiPole = 'E' | 'I' | 'S' | 'N' | 'T' | 'F' | 'J' | 'P';
+
 export interface MbtiQuestion {
   id: number;
   dimension: 'EI' | 'SN' | 'TF' | 'JP';
   text: string;
-  optionA: { text: string; pole: 'E' | 'S' | 'T' | 'J' };
-  optionB: { text: string; pole: 'I' | 'N' | 'F' | 'P' };
+  optionA: { text: string; pole: MbtiPole };
+  optionB: { text: string; pole: MbtiPole };
+  optionC: { text: string; pole: MbtiPole };
+  optionD: { text: string; pole: MbtiPole };
 }
+
+export type QuizAnswer = 'A' | 'B' | 'C' | 'D';
 
 export interface MbtiType {
   code: string;
@@ -32,92 +38,215 @@ export interface MbtiType {
 
 export const mbtiQuestions: MbtiQuestion[] = [
   // ── E vs I ──
-  { id: 1,  dimension: 'EI', text: 'En soirée entre amis, tu te sens plutôt…',
-    optionA: { text: 'Rechargé(e) et stimulé(e) par les échanges', pole: 'E' },
-    optionB: { text: 'Épuisé(e) et tu as envie de rentrer', pole: 'I' } },
-  { id: 2,  dimension: 'EI', text: 'Pour travailler efficacement, tu préfères…',
-    optionA: { text: 'Un open space, ça me stimule', pole: 'E' },
-    optionB: { text: 'Être seul(e) dans un espace calme', pole: 'I' } },
-  { id: 3,  dimension: 'EI', text: 'Après une journée chargée, tu te ressources…',
-    optionA: { text: 'En sortant voir du monde', pole: 'E' },
-    optionB: { text: 'En restant seul(e) chez toi', pole: 'I' } },
-  { id: 4,  dimension: 'EI', text: 'Face à un groupe d\'inconnus, tu…',
-    optionA: { text: 'Vas naturellement vers les autres', pole: 'E' },
-    optionB: { text: 'Attends qu\'on t\'approche d\'abord', pole: 'I' } },
-  { id: 5,  dimension: 'EI', text: 'Tes meilleures idées viennent…',
-    optionA: { text: 'En échangeant avec d\'autres', pole: 'E' },
-    optionB: { text: 'En réfléchissant seul(e)', pole: 'I' } },
-  { id: 6,  dimension: 'EI', text: 'Comment tu te décrirais spontanément ?',
-    optionA: { text: 'Expressif(ve) et sociable', pole: 'E' },
-    optionB: { text: 'Réservé(e) et introspectif(ve)', pole: 'I' } },
+  {
+    id: 1, dimension: 'EI',
+    text: 'En soirée entre amis, tu te sens plutôt…',
+    optionA: { text: 'Rechargé(e) — j\'aurais pu rester encore des heures', pole: 'E' },
+    optionB: { text: 'Stimulé(e), même si j\'ai besoin de pauses', pole: 'E' },
+    optionC: { text: 'Un peu épuisé(e), mais content(e) d\'y être allé(e)', pole: 'I' },
+    optionD: { text: 'Vraiment drainé(e), j\'avais hâte de rentrer', pole: 'I' },
+  },
+  {
+    id: 2, dimension: 'EI',
+    text: 'Pour travailler efficacement, tu préfères…',
+    optionA: { text: 'Un open space animé — ça me stimule vraiment', pole: 'E' },
+    optionB: { text: 'Un peu d\'animation, ça aide ma concentration', pole: 'E' },
+    optionC: { text: 'Un environnement calme, les bruits me distraient', pole: 'I' },
+    optionD: { text: 'Un isolement total — seul(e), je suis 10× plus productif(ve)', pole: 'I' },
+  },
+  {
+    id: 3, dimension: 'EI',
+    text: 'Après une journée chargée, tu te ressources…',
+    optionA: { text: 'En rejoignant des amis — c\'est exactement ce dont j\'ai besoin', pole: 'E' },
+    optionB: { text: 'En faisant une activité sociale légère', pole: 'E' },
+    optionC: { text: 'Chez toi avec une personne de confiance', pole: 'I' },
+    optionD: { text: 'Seul(e) dans le silence complet', pole: 'I' },
+  },
+  {
+    id: 4, dimension: 'EI',
+    text: 'Face à un groupe d\'inconnus, tu…',
+    optionA: { text: 'Fonces vers les autres — j\'adore rencontrer de nouvelles personnes', pole: 'E' },
+    optionB: { text: 'Te mêles naturellement à la conversation', pole: 'E' },
+    optionC: { text: 'Attends qu\'on t\'approche ou rejoins un petit groupe', pole: 'I' },
+    optionD: { text: 'Restes en retrait et observes avant de parler', pole: 'I' },
+  },
+  {
+    id: 5, dimension: 'EI',
+    text: 'Tes meilleures idées viennent…',
+    optionA: { text: 'En brainstorming — l\'échange les fait exploser', pole: 'E' },
+    optionB: { text: 'Souvent après avoir parlé du sujet avec quelqu\'un', pole: 'E' },
+    optionC: { text: 'Après une réflexion solitaire ou une lecture', pole: 'I' },
+    optionD: { text: 'Dans le silence total de ta tête, seul(e)', pole: 'I' },
+  },
+  {
+    id: 6, dimension: 'EI',
+    text: 'Comment tu te décrirais spontanément ?',
+    optionA: { text: 'Très expressif(ve) et à l\'aise partout', pole: 'E' },
+    optionB: { text: 'Assez sociable, même si j\'ai mes moments solo', pole: 'E' },
+    optionC: { text: 'Plutôt réservé(e), j\'aime mes bulles', pole: 'I' },
+    optionD: { text: 'Introverti(e) — le monde extérieur m\'épuise vite', pole: 'I' },
+  },
 
   // ── S vs N ──
-  { id: 7,  dimension: 'SN', text: 'En résolvant un problème, tu te concentres sur…',
-    optionA: { text: 'Les faits concrets et ce qui est prouvé', pole: 'S' },
-    optionB: { text: 'Les possibilités et schémas sous-jacents', pole: 'N' } },
-  { id: 8,  dimension: 'SN', text: 'Tu fais plus confiance à…',
-    optionA: { text: 'Ton expérience et tes sens', pole: 'S' },
-    optionB: { text: 'Ton intuition et tes pressentiments', pole: 'N' } },
-  { id: 9,  dimension: 'SN', text: 'Face à une nouvelle tâche, tu préfères…',
-    optionA: { text: 'Des instructions claires étape par étape', pole: 'S' },
-    optionB: { text: 'Comprendre le concept global et improviser', pole: 'N' } },
-  { id: 10, dimension: 'SN', text: 'Ce qui t\'intéresse le plus dans un projet…',
-    optionA: { text: 'Le comment : l\'exécution pratique', pole: 'S' },
-    optionB: { text: 'Le pourquoi : le sens et la vision', pole: 'N' } },
-  { id: 11, dimension: 'SN', text: 'Tu es plutôt quelqu\'un de…',
-    optionA: { text: 'Réaliste et ancré(e) dans le présent', pole: 'S' },
-    optionB: { text: 'Imaginatif(ve) et tourné(e) vers l\'avenir', pole: 'N' } },
-  { id: 12, dimension: 'SN', text: 'Dans une conversation, tu retiens surtout…',
-    optionA: { text: 'Les faits et détails précis', pole: 'S' },
-    optionB: { text: 'Les connexions et le sens global', pole: 'N' } },
+  {
+    id: 7, dimension: 'SN',
+    text: 'En résolvant un problème, tu te concentres sur…',
+    optionA: { text: 'Les faits concrets et les données vérifiables', pole: 'S' },
+    optionB: { text: 'Ce qui a déjà prouvé son efficacité dans la pratique', pole: 'S' },
+    optionC: { text: 'Les connexions et patterns qui se répètent', pole: 'N' },
+    optionD: { text: 'Les possibilités et l\'horizon au-delà du problème', pole: 'N' },
+  },
+  {
+    id: 8, dimension: 'SN',
+    text: 'Tu fais plus confiance à…',
+    optionA: { text: 'L\'expérience directe et ce que tes sens confirment', pole: 'S' },
+    optionB: { text: 'Les méthodes éprouvées et les retours d\'expérience', pole: 'S' },
+    optionC: { text: 'Tes pressentiments qui se révèlent souvent justes', pole: 'N' },
+    optionD: { text: 'Ton intuition, même contre l\'évidence apparente', pole: 'N' },
+  },
+  {
+    id: 9, dimension: 'SN',
+    text: 'Face à une nouvelle tâche, tu préfères…',
+    optionA: { text: 'Des instructions détaillées, étape par étape', pole: 'S' },
+    optionB: { text: 'Un exemple concret de ce qui a bien fonctionné', pole: 'S' },
+    optionC: { text: 'Comprendre le concept global avant de te lancer', pole: 'N' },
+    optionD: { text: 'Explorer librement sans cadre trop rigide', pole: 'N' },
+  },
+  {
+    id: 10, dimension: 'SN',
+    text: 'Ce qui t\'intéresse le plus dans un projet…',
+    optionA: { text: 'Les résultats mesurables et l\'exécution concrète', pole: 'S' },
+    optionB: { text: 'La mise en œuvre pratique et les détails techniques', pole: 'S' },
+    optionC: { text: 'Le sens et la vision d\'ensemble derrière tout ça', pole: 'N' },
+    optionD: { text: 'Les possibilités inexplorées et l\'innovation', pole: 'N' },
+  },
+  {
+    id: 11, dimension: 'SN',
+    text: 'Tu es plutôt quelqu\'un de…',
+    optionA: { text: 'Ancré(e) dans le présent et très pragmatique', pole: 'S' },
+    optionB: { text: 'Réaliste, qui juge par ce qui s\'est prouvé', pole: 'S' },
+    optionC: { text: 'Toujours en train de penser à "et si…"', pole: 'N' },
+    optionD: { text: 'Attiré(e) par les idées abstraites et les théories', pole: 'N' },
+  },
+  {
+    id: 12, dimension: 'SN',
+    text: 'Dans une conversation, tu retiens surtout…',
+    optionA: { text: 'Les faits précis et les chiffres mentionnés', pole: 'S' },
+    optionB: { text: 'La timeline et les détails concrets', pole: 'S' },
+    optionC: { text: 'Le message derrière les mots', pole: 'N' },
+    optionD: { text: 'Les schémas et les implications à long terme', pole: 'N' },
+  },
 
   // ── T vs F ──
-  { id: 13, dimension: 'TF', text: 'En prenant une décision difficile, tu te bases sur…',
-    optionA: { text: 'La logique et l\'analyse objective', pole: 'T' },
-    optionB: { text: 'Tes valeurs et l\'impact humain', pole: 'F' } },
-  { id: 14, dimension: 'TF', text: 'Face à un conflit, tu cherches d\'abord…',
-    optionA: { text: 'La solution logique, même si elle dérange', pole: 'T' },
-    optionB: { text: 'L\'harmonie et que tout le monde se sente bien', pole: 'F' } },
-  { id: 15, dimension: 'TF', text: 'Quand un ami a tort, tu…',
-    optionA: { text: 'Le lui dis franchement', pole: 'T' },
-    optionB: { text: 'Trouves une façon douce d\'aborder le sujet', pole: 'F' } },
-  { id: 16, dimension: 'TF', text: 'Ce qui compte le plus dans une décision…',
-    optionA: { text: 'Que ce soit juste et cohérent', pole: 'T' },
-    optionB: { text: 'Que tout le monde soit à l\'aise', pole: 'F' } },
-  { id: 17, dimension: 'TF', text: 'On te décrit plutôt comme…',
-    optionA: { text: 'Rationnel(le) et objectif(ve)', pole: 'T' },
-    optionB: { text: 'Empathique et chaleureux(se)', pole: 'F' } },
-  { id: 18, dimension: 'TF', text: 'La critique est utile si elle est…',
-    optionA: { text: 'Honnête, même si c\'est dur à entendre', pole: 'T' },
-    optionB: { text: 'Bienveillante et respectueuse des émotions', pole: 'F' } },
+  {
+    id: 13, dimension: 'TF',
+    text: 'En prenant une décision difficile, tu te bases sur…',
+    optionA: { text: 'La logique pure — les faits, les chiffres, la raison', pole: 'T' },
+    optionB: { text: 'Une analyse objective des avantages et inconvénients', pole: 'T' },
+    optionC: { text: 'Tes valeurs personnelles et l\'impact sur les autres', pole: 'F' },
+    optionD: { text: 'Comment tu te sentiras une fois la décision prise', pole: 'F' },
+  },
+  {
+    id: 14, dimension: 'TF',
+    text: 'Face à un conflit, tu cherches d\'abord…',
+    optionA: { text: 'La solution la plus logique, même si ça dérange', pole: 'T' },
+    optionB: { text: 'À comprendre objectivement qui a raison', pole: 'T' },
+    optionC: { text: 'L\'harmonie — que tout le monde se sente bien', pole: 'F' },
+    optionD: { text: 'À valider les émotions de chacun avant de résoudre', pole: 'F' },
+  },
+  {
+    id: 15, dimension: 'TF',
+    text: 'Quand un ami a tort, tu…',
+    optionA: { text: 'Le lui dis directement — l\'honnêteté d\'abord', pole: 'T' },
+    optionB: { text: 'Pointes les incohérences de façon factuelle', pole: 'T' },
+    optionC: { text: 'Trouves une façon douce pour aborder le sujet', pole: 'F' },
+    optionD: { text: 'Évites de le blesser, même au prix d\'un petit mensonge', pole: 'F' },
+  },
+  {
+    id: 16, dimension: 'TF',
+    text: 'Ce qui compte le plus dans une décision…',
+    optionA: { text: 'Que ce soit logiquement justifiable', pole: 'T' },
+    optionB: { text: 'Que les conséquences soient cohérentes avec les faits', pole: 'T' },
+    optionC: { text: 'Que tout le monde soit à l\'aise avec le résultat', pole: 'F' },
+    optionD: { text: 'Que ça soit en accord avec mes valeurs profondes', pole: 'F' },
+  },
+  {
+    id: 17, dimension: 'TF',
+    text: 'On te décrit plutôt comme…',
+    optionA: { text: 'Rationnel(le) et parfois froid(e) en apparence', pole: 'T' },
+    optionB: { text: 'Objectif(ve) et direct(e) dans ta communication', pole: 'T' },
+    optionC: { text: 'Chaleureux(se) et attentif(ve) aux autres', pole: 'F' },
+    optionD: { text: 'Très empathique — tu ressens facilement les émotions', pole: 'F' },
+  },
+  {
+    id: 18, dimension: 'TF',
+    text: 'La critique est utile si elle est…',
+    optionA: { text: 'Précise et honnête, peu importe si c\'est dur', pole: 'T' },
+    optionB: { text: 'Factuelle et constructive', pole: 'T' },
+    optionC: { text: 'Bienveillante et respectueuse des émotions', pole: 'F' },
+    optionD: { text: 'Enveloppée avec soin pour protéger l\'autre', pole: 'F' },
+  },
 
   // ── J vs P ──
-  { id: 19, dimension: 'JP', text: 'Ton espace de travail et ton agenda sont…',
-    optionA: { text: 'Organisés, structurés, planifiés', pole: 'J' },
-    optionB: { text: 'Flexibles, tu t\'adaptes au fil de l\'eau', pole: 'P' } },
-  { id: 20, dimension: 'JP', text: 'Face à un projet important, tu…',
-    optionA: { text: 'Planifies en avance et tu suis le plan', pole: 'J' },
-    optionB: { text: 'Gardes tes options ouvertes et improvises', pole: 'P' } },
-  { id: 21, dimension: 'JP', text: 'Quand un projet est terminé, tu ressens…',
-    optionA: { text: 'Du soulagement — c\'est fini, enfin !', pole: 'J' },
-    optionB: { text: 'De l\'ennui — tu passes déjà à autre chose', pole: 'P' } },
-  { id: 22, dimension: 'JP', text: 'Tes délais, tu…',
-    optionA: { text: 'Les respectes toujours, tu anticipes', pole: 'J' },
-    optionB: { text: 'Travailles souvent à la dernière minute', pole: 'P' } },
-  { id: 23, dimension: 'JP', text: 'Ta liste de tâches est…',
-    optionA: { text: 'Détaillée et mise à jour régulièrement', pole: 'J' },
-    optionB: { text: 'Approximative ou inexistante', pole: 'P' } },
-  { id: 24, dimension: 'JP', text: 'Tu te décrirais plutôt comme…',
-    optionA: { text: 'Méthodique et structuré(e)', pole: 'J' },
-    optionB: { text: 'Spontané(e) et adaptable', pole: 'P' } },
+  {
+    id: 19, dimension: 'JP',
+    text: 'Ton espace de travail et ton agenda sont…',
+    optionA: { text: 'Impeccablement organisés et structurés', pole: 'J' },
+    optionB: { text: 'Assez planifiés — j\'aime avoir un cadre clair', pole: 'J' },
+    optionC: { text: 'Variables — parfois ordonnés, parfois non', pole: 'P' },
+    optionD: { text: 'Flexibles et souvent improvisés au fil de l\'eau', pole: 'P' },
+  },
+  {
+    id: 20, dimension: 'JP',
+    text: 'Face à un projet important, tu…',
+    optionA: { text: 'Planifies chaque étape en avance et tu t\'y tiens', pole: 'J' },
+    optionB: { text: 'Crées un plan mais restes adaptable dans les détails', pole: 'J' },
+    optionC: { text: 'Gardes tes options ouvertes le plus longtemps possible', pole: 'P' },
+    optionD: { text: 'Improvises selon l\'élan du moment', pole: 'P' },
+  },
+  {
+    id: 21, dimension: 'JP',
+    text: 'Quand un projet est terminé, tu ressens…',
+    optionA: { text: 'Un profond soulagement — enfin, c\'est fini !', pole: 'J' },
+    optionB: { text: 'De la satisfaction d\'avoir coché toutes les cases', pole: 'J' },
+    optionC: { text: 'Déjà l\'envie de passer à autre chose', pole: 'P' },
+    optionD: { text: 'Une légère nostalgie — tu aimais le process ouvert', pole: 'P' },
+  },
+  {
+    id: 22, dimension: 'JP',
+    text: 'Tes délais, tu…',
+    optionA: { text: 'Les anticipes toujours en finissant en avance', pole: 'J' },
+    optionB: { text: 'Les respectes — c\'est une question de principe', pole: 'J' },
+    optionC: { text: 'Travailles souvent dans les dernières heures', pole: 'P' },
+    optionD: { text: 'Livres à la dernière seconde — la pression te booste', pole: 'P' },
+  },
+  {
+    id: 23, dimension: 'JP',
+    text: 'Ta liste de tâches est…',
+    optionA: { text: 'Détaillée, priorisée et mise à jour régulièrement', pole: 'J' },
+    optionB: { text: 'Existante, même si pas toujours suivie à la lettre', pole: 'J' },
+    optionC: { text: 'Approximative — quelques points-clés seulement', pole: 'P' },
+    optionD: { text: 'Inexistante — tu gères tout de tête, au moment voulu', pole: 'P' },
+  },
+  {
+    id: 24, dimension: 'JP',
+    text: 'Tu te décrirais plutôt comme…',
+    optionA: { text: 'Très méthodique — tu aimes les systèmes clairs', pole: 'J' },
+    optionB: { text: 'Plutôt organisé(e), même si tu sais t\'adapter', pole: 'J' },
+    optionC: { text: 'Assez spontané(e) — tu vis au jour le jour', pole: 'P' },
+    optionD: { text: 'Totalement imprévisible — la routine te tue', pole: 'P' },
+  },
 ];
 
-export function computeMbtiType(answers: Record<number, 'A' | 'B'>): string {
+export function computeMbtiType(answers: Record<number, QuizAnswer>): string {
   let E = 0, I = 0, S = 0, N = 0, T = 0, F = 0, J = 0, P = 0;
   for (const q of mbtiQuestions) {
     const ans = answers[q.id];
     if (!ans) continue;
-    const pole = ans === 'A' ? q.optionA.pole : q.optionB.pole;
+    const pole = ans === 'A' ? q.optionA.pole
+               : ans === 'B' ? q.optionB.pole
+               : ans === 'C' ? q.optionC.pole
+               : q.optionD.pole;
     if (pole === 'E') E++;
     else if (pole === 'I') I++;
     else if (pole === 'S') S++;

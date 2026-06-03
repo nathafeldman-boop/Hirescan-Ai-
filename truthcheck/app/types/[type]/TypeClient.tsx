@@ -257,106 +257,115 @@ export default function TypeClient({ type }: Props) {
         </div>
       )}
 
-      <div className="mt-10 space-y-6">
-        {/* Free: traits */}
-        <Section title="Tes traits de personnalité" accent={type.accentColor}>
-          <div className="flex flex-wrap gap-2">
-            {type.traits.map(t => (
-              <span key={t} className="px-3 py-1.5 rounded-full text-xs font-medium border"
-                style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
-                {t}
-              </span>
-            ))}
-          </div>
-        </Section>
+      {/* ── PAYWALL — zero teaser, like Truity ── */}
+      <div className="mt-8 space-y-5">
 
-        {/* Free: short description */}
-        <Section title="Qui es-tu vraiment ?" accent={type.accentColor}>
-          <p className="text-zinc-400 text-sm leading-relaxed">{type.shortDesc}</p>
-        </Section>
-
-        {/* Paywall — abonnement */}
-        <div className="relative rounded-2xl overflow-hidden border border-violet-500/30">
-          <div className="px-6 py-5 blur-sm select-none pointer-events-none" aria-hidden>
-            <h2 className="text-base font-bold text-white mb-2">Ton rapport complet {type.name}</h2>
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              En amour, au travail, tes forces, tes angles morts, ta croissance personnelle — et des exemples de
-              célébrités qui partagent ton type. Un rapport de 2000+ mots sur qui tu es vraiment...
-            </p>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/90 to-[#09090b]/60 flex flex-col items-center justify-center p-6 text-center">
-            <div className="text-3xl mb-3">🔓</div>
-            <h3 className="text-lg font-black text-white mb-1">Débloque ton rapport {type.code}</h3>
-            <p className="text-sm text-zinc-400 mb-1 max-w-xs">
-              Rapport complet <span className="text-white font-semibold">+ les 15 tests UrSecret</span>
-            </p>
-            <p className="text-xs text-zinc-500 mb-5">Amour · Carrière · Forces · Angles morts · Compatibilité</p>
-            <button
-              onClick={() => handleUnlock(false)}
-              disabled={loading}
-              className="w-full max-w-xs px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-105 disabled:opacity-60"
-              style={{ background: `linear-gradient(135deg, ${type.accentColor}, #a78bfa)` }}
-            >
-              {loading ? 'Chargement…' : `Débloquer — ${MONTHLY_PRICE}/mois`}
-            </button>
-            <button
-              onClick={() => handleUnlock(true)}
-              disabled={loading}
-              className="mt-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors disabled:opacity-60"
-            >
-              ou {ANNUAL_PRICE}/an — économise 75% ✦
-            </button>
-            <p className="text-xs text-zinc-600 mt-3">🛡️ Satisfait ou remboursé 7 jours · Annulable à tout moment</p>
-          </div>
-        </div>
-
-        {/* Forces — floutées */}
+        {/* Blurred preview */}
         <div className="relative rounded-2xl overflow-hidden border border-white/10">
-          <div className="px-6 py-5 blur-sm select-none pointer-events-none" aria-hidden>
-            <h2 className="text-base font-bold text-white mb-3">Tes forces</h2>
-            <ul className="space-y-2">
-              {type.strengths.map(s => (
-                <li key={s} className="flex gap-2 text-sm text-zinc-400"><span className="text-green-400 mt-0.5">✓</span>{s}</li>
+          <div className="px-6 py-6 blur-sm select-none pointer-events-none" aria-hidden>
+            <h2 className="text-base font-bold text-white mb-3">Rapport complet {type.code}</h2>
+            <p className="text-zinc-400 text-sm leading-relaxed mb-4">
+              {type.shortDesc}
+            </p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {type.traits.map(t => (
+                <span key={t} className="px-3 py-1 rounded-full text-xs font-medium bg-white/5 border border-white/10 text-zinc-400">{t}</span>
               ))}
-            </ul>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">Inclus dans ton rapport</p>
+              {['En amour — comment tu aimes vraiment', 'Au travail — ton potentiel caché', 'Tes 5 forces cachées', 'Tes angles morts à corriger', 'Célébrités de ton type', 'Compatibilité relationnelle'].map(item => (
+                <div key={item} className="flex gap-2 text-sm text-zinc-400">
+                  <span className="text-violet-400 mt-0.5">✓</span>{item}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/80 to-transparent flex items-end justify-center pb-6">
-            <button onClick={() => handleUnlock(false)}
-              className="px-5 py-2.5 rounded-lg text-xs font-bold text-white border border-white/20 hover:bg-white/10 transition-all">
-              Voir mes forces et faiblesses →
-            </button>
+
+          {/* Gradient fade */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(9,9,11,0) 0%, rgba(9,9,11,0.85) 50%, rgba(9,9,11,1) 100%)' }} />
+        </div>
+
+        {/* Main paywall CTA */}
+        <div className="rounded-2xl p-6 border text-center"
+          style={{ borderColor: `${type.accentColor}35`, background: `linear-gradient(135deg, ${type.accentColor}08, rgba(139,92,246,0.06))` }}>
+          <div className="text-4xl mb-3">🔒</div>
+          <h3 className="text-xl font-black text-white mb-2">Débloque ton rapport {type.code}</h3>
+          <p className="text-sm text-zinc-400 mb-1 max-w-xs mx-auto">
+            Rapport complet <span className="text-white font-semibold">+ les 15 tests UrSecret</span>
+          </p>
+          <p className="text-xs text-zinc-500 mb-6">Amour · Carrière · Forces · Angles morts · Compatibilité</p>
+
+          {/* Monthly CTA */}
+          <button
+            onClick={() => handleUnlock(false)}
+            disabled={loading}
+            className="w-full max-w-sm mx-auto block px-7 py-4 rounded-2xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 mb-3"
+            style={{
+              background: `linear-gradient(135deg, ${type.accentColor}, #a78bfa)`,
+              boxShadow: `0 4px 24px ${type.accentColor}40, 0 8px 40px rgba(139,92,246,0.25)`,
+            }}
+          >
+            {loading ? 'Chargement…' : `Débloquer — ${MONTHLY_PRICE}/mois`}
+          </button>
+
+          {/* Annual */}
+          <button
+            onClick={() => handleUnlock(true)}
+            disabled={loading}
+            className="w-full max-w-sm mx-auto block px-7 py-3 rounded-xl font-semibold text-zinc-200 text-sm bg-white/6 hover:bg-white/10 border border-white/12 transition-all disabled:opacity-60"
+          >
+            ou {ANNUAL_PRICE}/an — économise 75% ✦
+          </button>
+
+          <p className="text-xs text-zinc-600 mt-4">🛡️ Satisfait ou remboursé 7 jours · Annulable à tout moment</p>
+
+          {/* Social proof */}
+          <div className="mt-5 flex items-center justify-center gap-2">
+            <div className="flex -space-x-2">
+              {['🧑', '👩', '🧑‍💼', '👨‍🎓'].map((e, i) => (
+                <span key={i} className="w-7 h-7 rounded-full bg-zinc-800 border-2 border-[#09090b] flex items-center justify-center text-xs">{e}</span>
+              ))}
+            </div>
+            <span className="text-xs text-zinc-500">+3 200 personnes ont débloqué leur rapport cette semaine</span>
           </div>
         </div>
+
+        {/* Blurred sections teaser */}
+        {[
+          { icon: '❤️', title: 'En amour', desc: 'Comment tu aimes, ce qui te bloque, ce dont tu as besoin' },
+          { icon: '💼', title: 'Au travail', desc: 'Ton potentiel caché et les environnements qui te font briller' },
+          { icon: '⚡', title: 'Forces & angles morts', desc: 'Tes 5 super-pouvoirs et les pièges à éviter' },
+        ].map(section => (
+          <div key={section.title} className="relative rounded-2xl overflow-hidden border border-white/8">
+            <div className="px-6 py-5 blur-sm select-none pointer-events-none" aria-hidden>
+              <h2 className="text-base font-bold text-white mb-2">{section.icon} {section.title}</h2>
+              <p className="text-zinc-400 text-sm leading-relaxed">{section.desc}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center"
+              style={{ background: 'linear-gradient(to bottom, rgba(9,9,11,0.2), rgba(9,9,11,0.92))' }}>
+              <button onClick={() => handleUnlock(false)}
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:scale-105"
+                style={{ background: 'rgba(139,92,246,0.25)', border: '1px solid rgba(139,92,246,0.4)' }}>
+                🔓 Débloquer cette section
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Compatible types */}
-      <div className="mt-8 bg-white/5 rounded-2xl p-6 border border-white/10">
-        <h2 className="text-base font-bold text-white mb-4">Compatibilité relationnelle</h2>
-        <p className="text-xs text-zinc-500 mb-4">Types les plus compatibles avec {type.code} :</p>
-        <div className="flex flex-wrap gap-3">
+      {/* Compatible types — visible for SEO, locked for details */}
+      <div className="mt-6 bg-white/3 rounded-2xl p-5 border border-white/8">
+        <h2 className="text-sm font-bold text-zinc-400 mb-3">Compatibilité relationnelle {type.code}</h2>
+        <div className="flex flex-wrap gap-2">
           {type.compatibleWith.map(c => (
             <a key={c} href={`/types/${c.toLowerCase()}`}
-              className="px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-sm font-bold text-zinc-300 hover:text-white hover:border-white/20 transition-all">
+              className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-all">
               {c}
             </a>
           ))}
         </div>
-        <div className="mt-5 pt-4 border-t border-white/5">
-          <p className="text-xs text-zinc-500">Analyse complète de ta compatibilité disponible dans ton rapport.</p>
-          <button onClick={() => handleUnlock(false)} className="mt-3 text-xs font-medium hover:underline" style={{ color: type.accentColor }}>
-            Débloquer mon rapport complet →
-          </button>
-        </div>
-      </div>
-
-      {/* Take the test CTA */}
-      <div className="mt-8 p-5 rounded-2xl border border-white/10 text-center bg-white/3">
-        <p className="text-sm text-zinc-400 mb-3">Tu n&apos;as pas encore passé le test ?</p>
-        <a href="/quiz/personnalite"
-          className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-105"
-          style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)' }}>
-          Passer le test gratuitement →
-        </a>
+        <p className="text-xs text-zinc-600 mt-3">Analyse complète de compatibilité incluse dans le rapport.</p>
       </div>
     </>
   );
