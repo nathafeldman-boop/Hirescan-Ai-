@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { getQuizBySlug } from '@/lib/quizzes';
 import QuizClient from './QuizClient';
 
@@ -9,6 +10,7 @@ const ALL_SLUGS = [
   'infidelite', 'adopte', 'amoureux', 'vrais-amis', 'orientation',
   'narcissique', 'mon-ex', 'manipule', 'rompre', 'jaloux',
   'relation-toxique', 'crush', 'burnout', 'depression', 'vrai-amour',
+  'style-attachement', 'langages-amour', 'gaslight',
 ];
 
 const faqData: Record<string, { q: string; a: string }[]> = {
@@ -117,6 +119,27 @@ const faqData: Record<string, { q: string; a: string }[]> = {
     { q: "Peut-on confondre amour et dépendance affective ?", a: "Oui. La dépendance affective ressemble à l'amour mais est centrée sur la peur de la perte plutôt que le vrai bien-être de l'autre. Un thérapeute peut aider à distinguer les deux." },
     { q: 'Le vrai amour nécessite-t-il des efforts ?', a: "Oui, l'amour durable demande un engagement actif : communication, respect des besoins de l'autre, et travail commun sur les difficultés. L'amour n'est pas seulement un sentiment, c'est aussi une décision quotidienne." },
   ],
+  'style-attachement': [
+    { q: 'Quels sont les 4 styles d\'attachement ?', a: "Les 4 styles d'attachement identifiés par la psychologie sont : sécure (à l'aise avec la proximité et l'autonomie), anxieux (peur de l'abandon, besoin de réassurance), évitant (peur de la dépendance, distance émotionnelle), et désorganisé (mélange anxiété-évitement, souvent lié à des traumatismes)." },
+    { q: 'Comment se forme le style d\'attachement ?', a: "Le style d'attachement se forme dans l'enfance à travers les interactions avec les figures d'attachement (parents, proches). Des relations précoces sécurisantes favorisent un attachement sécure. Les traumatismes ou négligences favorisent les styles insécures." },
+    { q: 'Peut-on changer son style d\'attachement ?', a: "Oui, absolument. Avec un travail thérapeutique, des relations sécurisantes et de la prise de conscience, il est possible d'évoluer vers un attachement plus sécure. C'est un processus long mais réel." },
+    { q: 'Quel style d\'attachement est compatible avec qui ?', a: "Les personnes à attachement sécure sont généralement compatibles avec tous les styles. Deux personnes anxieuses peuvent créer une dynamique fusionnelle. Un anxieux et un évitant forment souvent une relation 'poursuite-retrait' douloureuse." },
+    { q: 'L\'attachement évitant signifie-t-il qu\'on ne veut pas d\'amour ?', a: "Non. Les personnes à attachement évitant veulent de l'amour autant que les autres mais ont appris à se protéger en maintenant de la distance. Ce n'est pas un manque de sentiment, c'est une stratégie de protection inconsciente." },
+  ],
+  'langages-amour': [
+    { q: 'Quels sont les 5 langages de l\'amour ?', a: "Les 5 langages de l\'amour identifiés par Gary Chapman sont : les mots d'affirmation (compliments, déclarations), les actes de service (faire des choses pour l'autre), la réception de cadeaux, le temps de qualité (présence totale), et le toucher physique (câlins, contact)." },
+    { q: 'Comment savoir quel est mon langage de l\'amour ?', a: "Observez comment vous exprimez naturellement votre amour, ce qui vous touche le plus quand quelqu'un vous aime, et ce dont l'absence vous blesse le plus. Ces trois indicateurs révèlent votre langage principal." },
+    { q: 'Est-il possible d\'avoir plusieurs langages de l\'amour principaux ?', a: "Oui, beaucoup de personnes ont un langage principal et un secondaire. L'important est de connaître vos priorités pour communiquer vos besoins à votre partenaire." },
+    { q: 'Que faire si mon partenaire et moi n\'avons pas le même langage ?', a: "C'est très courant. La clé est de communiquer clairement vos besoins et d'apprendre à exprimer de l'amour dans le langage de l'autre, même si ce n'est pas le vôtre naturellement." },
+    { q: 'Le langage de l\'amour peut-il changer avec le temps ?', a: "Oui, il peut évoluer selon les phases de vie. Les nouveaux parents peuvent valoriser davantage les actes de service. Les périodes de stress peuvent amplifier le besoin de mots d'affirmation." },
+  ],
+  gaslight: [
+    { q: 'Qu\'est-ce que le gaslighting ?', a: "Le gaslighting est une forme de manipulation psychologique dans laquelle une personne amène l'autre à douter de sa propre réalité, mémoire, perceptions ou santé mentale. C'est une tactique de contrôle particulièrement destructrice car elle érode progressivement la confiance en soi." },
+    { q: 'Comment reconnaître si je suis victime de gaslighting ?', a: "Les signes incluent : douter constamment de votre propre mémoire, vous sentir 'fou/folle', vous excuser en permanence, sentir que vous êtes trop sensible, vous sentir moins confiant(e) qu'avant, et constater que les faits 'changent' selon votre partenaire." },
+    { q: 'Le gaslighting est-il toujours intentionnel ?', a: "Pas nécessairement. Certaines personnes gaslightent inconsciemment, souvent par peur du conflit ou par mécanisme de défense. Intentionnel ou non, les effets sur la victime sont les mêmes." },
+    { q: 'Que faire si je suis victime de gaslighting ?', a: "Documentez les événements par écrit, cherchez une perspective extérieure de confiance, consultez un thérapeute, et prenez de la distance si nécessaire. Dans les cas graves, une ligne d'aide ou des associations spécialisées peuvent vous soutenir." },
+    { q: 'Le gaslighting peut-il détruire durablement la confiance en soi ?', a: "Oui, surtout si le gaslighting dure depuis longtemps. Mais la reconstruction est possible avec un accompagnement professionnel. Reconnaître que vous avez été manipulé(e) est la première étape vers la guérison." },
+  ],
 };
 
 interface PageProps {
@@ -194,10 +217,27 @@ export default function QuizPage({ params }: PageProps) {
     ],
   };
 
+  const hasGuide = ['style-attachement', 'langages-amour', 'gaslight', 'burnout', 'depression', 'narcissique', 'infidelite', 'manipule', 'relation-toxique'].includes(quiz.slug);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <QuizClient quiz={quiz} />
+      {/* Server-rendered SEO content: H1 + FAQ visible to Google crawlers */}
+      <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }} aria-hidden="true">
+        <h1>{quiz.emoji} {quiz.title} — {quiz.subtitle}</h1>
+        {hasGuide && (
+          <Link href={`/tests/${quiz.slug}`}>
+            Guide complet : {quiz.title}
+          </Link>
+        )}
+        {faqs.map(({ q, a }, i) => (
+          <div key={i}>
+            <h2>{q}</h2>
+            <p>{a}</p>
+          </div>
+        ))}
+      </div>
     </>
   );
 }
