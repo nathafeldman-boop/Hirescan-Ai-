@@ -45,5 +45,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default function DuoQuizPage({ params }: PageProps) {
   const quiz = duoQuizzes.find((q) => q.slug === params.slug);
   if (!quiz) notFound();
-  return <DuoQuizClient quiz={quiz} />;
+  return (
+    <>
+      <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }} aria-hidden="true">
+        <h1>{quiz.emoji} {quiz.title} — Mode Duo Couple</h1>
+        <p>{quiz.description}</p>
+      </div>
+      <DuoQuizClient quiz={quiz} />
+    </>
+  );
 }

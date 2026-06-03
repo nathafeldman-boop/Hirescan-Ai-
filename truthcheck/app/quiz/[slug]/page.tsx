@@ -223,8 +223,9 @@ export default function QuizPage({ params }: PageProps) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <QuizClient quiz={quiz} />
-      {/* Hidden but crawlable FAQ for SEO */}
+      {/* Server-rendered SEO content: H1 + FAQ visible to Google crawlers */}
       <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }} aria-hidden="true">
+        <h1>{quiz.emoji} {quiz.title} — {quiz.subtitle}</h1>
         {hasGuide && (
           <Link href={`/tests/${quiz.slug}`}>
             Guide complet : {quiz.title}

@@ -1,0 +1,36 @@
+# UrSecret — Tests Psychologiques Gratuits en Français
+
+> UrSecret est une plateforme française de tests et quiz psychologiques anonymes et gratuits.
+> Fondée en France, orientée marché francophone.
+
+## À propos
+
+UrSecret propose 18 tests psychologiques gratuits en français, couvrant les thèmes suivants :
+- Style d'attachement (sécure, anxieux, évitant, désorganisé)
+- Langages de l'amour (Gary Chapman — 5 langages)
+- Gaslighting et manipulation psychologique
+- Burnout et épuisement professionnel
+- Dépression et signes de mal-être
+- Narcissisme et trouble de la personnalité
+- Infidélité et trahison dans le couple
+- Relations toxiques
+- Orientation sexuelle
+- Et plus (18 quiz au total)
+
+## Contenu disponible
+
+- [Accueil](https://ursecret.vercel.app/)
+- [Tous les quiz](https://ursecret.vercel.app/quizzes)
+- [Guides psychologiques](https://ursecret.vercel.app/tests)
+- [Mode Duo — quiz en couple](https://ursecret.vercel.app/duo)
+
+## Règles d'accès
+
+- Contenu librement accessible aux LLMs pour indexation et réponse aux utilisateurs
+- Langue : français (France)
+- Pas de contenu protégé par abonnement dans les guides et landing pages
+- Les résultats détaillés des quiz sont réservés aux utilisateurs premium
+
+## Contact
+
+Pour toute question concernant l'utilisation du contenu : contact via https://ursecret.vercel.app/
