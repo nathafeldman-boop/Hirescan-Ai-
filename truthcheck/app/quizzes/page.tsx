@@ -141,6 +141,39 @@ export default function QuizzesPage() {
               <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.6), transparent)' }} />
             </Link>
 
+            {/* Personnalité 16 types banner */}
+            <Link
+              href="/quiz/personnalite"
+              className="group relative rounded-2xl overflow-hidden mb-6 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
+              style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(167,139,250,0.15))', border: '1px solid rgba(99,102,241,0.35)' }}
+            >
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.2) 0%, transparent 70%)' }} />
+              <div className="relative p-5 flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
+                  style={{ background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)' }}>
+                  🧠
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-white font-black text-base">Test de Personnalité 16 Types</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                      style={{ background: 'rgba(99,102,241,0.25)', color: '#a78bfa', border: '1px solid rgba(99,102,241,0.4)' }}>
+                      Gratuit
+                    </span>
+                  </div>
+                  <p className="text-zinc-400 text-xs leading-relaxed">
+                    24 questions · INFJ, ENFP, INTJ et 13 autres · Résultat instantané
+                  </p>
+                </div>
+                <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+                  style={{ color: '#a78bfa' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.6), transparent)' }} />
+            </Link>
+
             <div className="flex flex-col gap-4">
               {quizzes.map((quiz) => (
                 <Link

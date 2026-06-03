@@ -8,7 +8,9 @@ function getStripe() {
 }
 
 const ONE_TIME_PRODUCT_ID = 'prod_UcjiAfAioyc6WM';
-const ONE_TIME_PRICE_CENTS = 199; // €1.99
+const ONE_TIME_PRICE_CENTS = 499;   // €4.99
+const ANNUAL_PRICE_CENTS = 2999;    // €29.99/year
+const RAPPORT_PRICE_CENTS = 1999;   // €19.99 — MBTI full rapport
 
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
@@ -17,14 +19,71 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail, oneTime } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode } = await req.json();
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
     const cancelUrl = quizSlug && score !== undefined
       ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
-      : `${baseUrl}/quizzes`;
+      : typeCode
+        ? `${baseUrl}/types/${typeCode.toLowerCase()}`
+        : `${baseUrl}/quizzes`;
 
-    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+    const successUrl = typeCode
+      ? `${baseUrl}/types/${typeCode.toLowerCase()}?unlocked=true&session_id={CHECKOUT_SESSION_ID}`
+      : `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+
+    // ── MBTI Rapport one-time ──
+    if (rapport && typeCode) {
+      const rapportSession = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `Rapport Complet ${typeCode} — UrSecret`,
+              description: `Analyse approfondie du type ${typeCode} : amour, carrière, forces, compatibilité`,
+            },
+            unit_amount: RAPPORT_PRICE_CENTS,
+          },
+          quantity: 1,
+        }],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        metadata: { typeCode, rapport: 'true' },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      return NextResponse.json({ url: rapportSession.url });
+    }
+
+    // ── Annual subscription ──
+    if (annual) {
+      const annualPriceId = process.env.STRIPE_ANNUAL_PRICE_ID;
+      const annualLineItem = annualPriceId
+        ? { price: annualPriceId, quantity: 1 }
+        : {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: 'UrSecret Premium — Accès Annuel',
+                description: 'Score + analyse complète + tous les quiz illimités',
+              },
+              unit_amount: ANNUAL_PRICE_CENTS,
+              recurring: { interval: 'year' as const },
+            },
+            quantity: 1,
+          };
+      const annualSession = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [annualLineItem],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', annual: 'true' },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      return NextResponse.json({ url: annualSession.url });
+    }
 
     // ── One-time purchase: unlock just this result ──
     if (oneTime) {
@@ -47,7 +106,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ url: session.url });
     }
 
-    // ── Subscription ──
+    // ── Monthly subscription ──
     const priceId = process.env.STRIPE_PRICE_ID;
 
     const lineItem = priceId
@@ -59,7 +118,7 @@ export async function POST(req: NextRequest) {
               name: 'UrSecret Premium',
               description: 'Ton score + analyse complète personnalisée',
             },
-            unit_amount: 499,
+            unit_amount: 999, // €9.99/month
             recurring: { interval: 'month' as const },
           },
           quantity: 1,
