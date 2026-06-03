@@ -37,34 +37,34 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
 
   const ACTIONS = [
     {
-      href: '/analyze',
-      emoji: '📸',
-      label: 'Analyser un screenshot',
-      desc: 'Obtiens 5 réponses parfaites',
+      href: '/quiz/personnalite',
+      emoji: '🧠',
+      label: 'Test de personnalité',
+      desc: 'Découvre ton type MBTI en 5 min',
       color: '#8b5cf6',
-      badge: user.tier === 'free' ? '5/mois' : '∞',
+      badge: 'Gratuit',
     },
     {
-      href: '/onboarding',
-      emoji: '❓',
-      label: 'Questionnaire',
-      desc: 'Explore tes vérités cachées',
+      href: '/types',
+      emoji: '🔍',
+      label: 'Les 16 types',
+      desc: 'Explore tous les profils',
       color: '#ec4899',
       badge: null,
     },
     {
-      href: '/chat',
-      emoji: '🤖',
-      label: 'Chat IA',
-      desc: 'Entraîne-toi avec un perso',
+      href: '/onboarding',
+      emoji: '❓',
+      label: 'Questionnaires',
+      desc: 'Explore tes vérités cachées',
       color: '#06b6d4',
-      badge: 'Bientôt',
+      badge: null,
     },
     {
-      href: '/coach',
-      emoji: '🎯',
-      label: 'Coach Dating',
-      desc: 'Optimise ton profil',
+      href: '#',
+      emoji: '📸',
+      label: 'Analyse photo',
+      desc: 'Bientôt disponible',
       color: '#10b981',
       badge: 'Bientôt',
     },
@@ -150,10 +150,10 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
             </span>
             {user.tier === 'free' && (
               <Link
-                href="/pricing"
+                href="/quiz/personnalite"
                 className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
               >
-                Passer Pro →
+                Passer Premium →
               </Link>
             )}
           </div>

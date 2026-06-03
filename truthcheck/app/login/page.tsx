@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 
 function LoginContent() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/quiz/personnalite';
 
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);

@@ -92,5 +92,11 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      if (url.startsWith(baseUrl)) return url;
+      // Si OAuth renvoie vers un domaine inattendu → quiz
+      return `${baseUrl}/quiz/personnalite`;
+    },
   },
 };
