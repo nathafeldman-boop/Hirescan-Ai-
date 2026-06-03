@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode } = await req.json();
+    const affiliateSlug = req.cookies.get('urs_ref')?.value ?? '';
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
     const cancelUrl = quizSlug && score !== undefined
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
         }],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { typeCode, rapport: 'true' },
+        metadata: { typeCode, rapport: 'true', affiliateSlug },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
         line_items: [annualLineItem],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', annual: 'true' },
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', annual: 'true', affiliateSlug },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
         }],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', oneTime: 'true' },
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', oneTime: 'true', affiliateSlug },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest) {
       line_items: [lineItem],
       allow_promotion_codes: true,
       ...(userEmail ? { customer_email: userEmail } : {}),
-      metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '' },
+      metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', affiliateSlug },
       success_url: successUrl,
       cancel_url: cancelUrl,
     });

@@ -41,6 +41,23 @@ export async function POST(req: NextRequest) {
         data: { tier: 'premium' },
       }).catch(() => {});
     }
+
+    // Record affiliate conversion
+    const affiliateSlug = session.metadata?.affiliateSlug;
+    if (affiliateSlug) {
+      const affiliate = await prisma.affiliate.findUnique({ where: { slug: affiliateSlug } }).catch(() => null);
+      if (affiliate) {
+        const amountCents = session.amount_total ?? 0;
+        await prisma.affiliateConversion.create({
+          data: {
+            affiliateId: affiliate.id,
+            amountCents,
+            commissionCents: Math.round(amountCents * affiliate.commissionPct / 100),
+            stripeSessionId: session.id,
+          },
+        }).catch(() => {});
+      }
+    }
   }
 
   if (event.type === 'customer.subscription.deleted') {
