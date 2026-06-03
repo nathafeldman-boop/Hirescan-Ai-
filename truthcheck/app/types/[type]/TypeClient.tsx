@@ -12,10 +12,11 @@ const MONTHLY_PRICE = '9,99 €';
 const ANNUAL_PRICE = '29,99 €';
 
 export default function TypeClient({ type }: Props) {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
 
   const [loading, setLoading] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authEmail, setAuthEmail] = useState('');
   const [authSent, setAuthSent] = useState(false);
@@ -83,7 +84,33 @@ export default function TypeClient({ type }: Props) {
     void doCheckout(annual);
   }, [isPremium, session?.user, doCheckout]);
 
+  // Refresh session + show spinner when returning from Stripe payment
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('unlocked') === 'true') {
+      setUnlocking(true);
+      window.history.replaceState({}, '', window.location.pathname);
+      void updateSession().finally(() => setUnlocking(false));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
+
+  // Spinner pendant la validation du paiement Stripe
+  if (unlocking) {
+    return (
+      <div className="mt-16 flex flex-col items-center justify-center gap-4 text-center">
+        <div className="text-5xl animate-pulse">🔓</div>
+        <h2 className="text-xl font-black text-white">Validation du paiement…</h2>
+        <p className="text-zinc-400 text-sm">Quelques secondes, on débloque ton rapport.</p>
+        <div className="w-48 h-1.5 bg-white/8 rounded-full overflow-hidden mt-2">
+          <div className="h-full rounded-full animate-pulse" style={{ width: '70%', background: 'linear-gradient(to right,#7c3aed,#ec4899)' }} />
+        </div>
+      </div>
+    );
+  }
 
   // ─────────────────────────────────────────────────────────────
   // PREMIUM : rapport complet révélé + accès aux 15 tests UrSecret
@@ -345,9 +372,10 @@ export default function TypeClient({ type }: Props) {
             <div className="absolute inset-0 flex items-center justify-center"
               style={{ background: 'linear-gradient(to bottom, rgba(9,9,11,0.2), rgba(9,9,11,0.92))' }}>
               <button onClick={() => handleUnlock(false)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:scale-105"
+                disabled={loading}
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:scale-105 disabled:opacity-60 disabled:pointer-events-none"
                 style={{ background: 'rgba(139,92,246,0.25)', border: '1px solid rgba(139,92,246,0.4)' }}>
-                🔓 Débloquer cette section
+                {loading ? '…' : '🔓 Débloquer cette section'}
               </button>
             </div>
           </div>
