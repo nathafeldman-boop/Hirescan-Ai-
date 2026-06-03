@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { duoQuizzes } from '@/lib/duoQuizzes';
 import DuoCompareClient from './DuoCompareClient';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 interface PageProps {
   params: { slug: string };

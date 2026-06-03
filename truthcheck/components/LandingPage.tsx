@@ -194,7 +194,7 @@ export default function LandingPage() {
                     Commencer le Mode Duo →
                   </Link>
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent('🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes — sans tricher 👀\n\nhttps://ursecret.vercel.app/duo')}`}
+                    href={`https://wa.me/?text=${encodeURIComponent('🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes — sans tricher 👀\n\nhttps://ursecret.site/duo')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-6 py-3 rounded-xl font-bold text-sm text-center flex items-center justify-center gap-2 transition-all active:scale-95"

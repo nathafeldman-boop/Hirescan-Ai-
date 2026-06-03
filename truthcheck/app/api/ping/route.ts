@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 const INDEXNOW_KEY = 'ursecretidx2025';
 
 const ALL_URLS = [
@@ -54,7 +54,7 @@ export async function GET() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json; charset=utf-8' },
       body: JSON.stringify({
-        host: 'ursecret.vercel.app',
+        host: 'ursecret.site',
         key: INDEXNOW_KEY,
         keyLocation: `${BASE}/${INDEXNOW_KEY}.txt`,
         urlList: ALL_URLS,
@@ -87,7 +87,7 @@ export async function GET() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json; charset=utf-8' },
       body: JSON.stringify({
-        host: 'ursecret.vercel.app',
+        host: 'ursecret.site',
         key: INDEXNOW_KEY,
         keyLocation: `${BASE}/${INDEXNOW_KEY}.txt`,
         urlList: ALL_URLS,

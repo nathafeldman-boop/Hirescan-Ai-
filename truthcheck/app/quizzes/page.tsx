@@ -5,7 +5,7 @@ import { duoQuizzes } from '@/lib/duoQuizzes';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 import QuizIcon from '@/components/QuizIcon';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 export const metadata: Metadata = {
   title: 'Tous les quizzes — UrSecret',

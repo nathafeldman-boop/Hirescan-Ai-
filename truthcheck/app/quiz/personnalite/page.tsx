@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Test de Personnalité 16 Types — Découvre ton Profil en 5 min',
   description: "Test de personnalité gratuit basé sur les 16 types psychologiques. 24 questions, résultat instantané. Le test le plus fiable en français — 2,3 millions de Français l'ont déjà passé.",
   keywords: ['test de personnalité', '16 types de personnalité', 'mbti français', 'test psychologique gratuit', 'type de personnalité', 'quel est mon profil'],
-  alternates: { canonical: 'https://ursecret.vercel.app/quiz/personnalite' },
+  alternates: { canonical: 'https://ursecret.site/quiz/personnalite' },
   openGraph: {
     title: 'Test de Personnalité 16 Types — UrSecret',
     description: 'Découvre ton type de personnalité en 24 questions. Gratuit, instantané, en français.',

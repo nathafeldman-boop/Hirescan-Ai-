@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { duoQuizzes } from '@/lib/duoQuizzes';
 import DuoQuizClient from './DuoQuizClient';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://ursecret.site';
 
 const ALL_DUO_SLUGS = [
   'duo-communication',
