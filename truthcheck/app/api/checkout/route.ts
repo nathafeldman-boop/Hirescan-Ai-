@@ -7,10 +7,10 @@ function getStripe() {
   return new Stripe(key, { apiVersion: '2024-06-20' });
 }
 
-const ONE_TIME_PRODUCT_ID  = 'prod_UcjiAfAioyc6WM';  // accès unique quiz €4.99
+const ONE_TIME_PRODUCT_ID  = 'prod_UcjiAfAioyc6WM';  // juste le résultat €1.99
 const ANNUAL_PRODUCT_ID    = 'prod_UdST3jqJxR36mM';  // abonnement annuel €29.99
 const MONTHLY_PRODUCT_ID   = 'prod_UdSUvUH7Y6iJXq';  // abonnement mensuel €9.99
-const ONE_TIME_PRICE_CENTS = 499;   // €4.99
+const ONE_TIME_PRICE_CENTS = 199;   // €1.99
 const ANNUAL_PRICE_CENTS   = 2999;  // €29.99/year
 const RAPPORT_PRICE_CENTS  = 1999;  // €19.99 — rapport MBTI
 

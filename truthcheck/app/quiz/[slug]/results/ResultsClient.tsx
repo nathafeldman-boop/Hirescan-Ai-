@@ -380,7 +380,7 @@ export default function ResultsClient({ quiz }: Props) {
                 className="w-full py-4 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
               >
-                Voir mon score — 4,99€/mois ✦
+                Voir mon score — 9,99€/mois ✦
               </button>
               <button
                 onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
@@ -689,7 +689,7 @@ export default function ResultsClient({ quiz }: Props) {
                       Redirection…
                     </span>
                   ) : (
-                    'Voir mon score complet — 4,99€/mois ✦'
+                    'Voir mon score complet — 9,99€/mois ✦'
                   )}
                 </button>
 

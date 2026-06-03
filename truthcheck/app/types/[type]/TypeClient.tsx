@@ -8,7 +8,7 @@ interface Props {
   type: MbtiType;
 }
 
-const MONTHLY_PRICE = '4,99 €';
+const MONTHLY_PRICE = '9,99 €';
 const ANNUAL_PRICE = '29,99 €';
 
 export default function TypeClient({ type }: Props) {
@@ -304,7 +304,7 @@ export default function TypeClient({ type }: Props) {
               disabled={loading}
               className="mt-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors disabled:opacity-60"
             >
-              ou {ANNUAL_PRICE}/an — économise 50% ✦
+              ou {ANNUAL_PRICE}/an — économise 75% ✦
             </button>
             <p className="text-xs text-zinc-600 mt-3">🛡️ Satisfait ou remboursé 7 jours · Annulable à tout moment</p>
           </div>
