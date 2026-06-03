@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import PersonnaliteClient from './PersonnaliteClient';
+import UserMenu from '@/components/UserMenu';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -105,7 +106,10 @@ export default function PersonnalitePage() {
               <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
               <span className="text-white">Secret</span>
             </Link>
-            <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">Voir les 16 types →</Link>
+            <div className="flex items-center gap-3">
+              <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">Voir les 16 types →</Link>
+              <UserMenu />
+            </div>
           </div>
         </header>
 

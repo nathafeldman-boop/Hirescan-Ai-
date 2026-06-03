@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import QuizIcon from './QuizIcon';
+import UserMenu from './UserMenu';
 
 const QUIZZES = [
   { slug: 'infidelite',  emoji: '💔', label: 'Il/elle te cache quelque chose ?',    desc: 'Les signaux que tu ignores peut-être',          color: '#f43f5e' },
@@ -46,9 +47,7 @@ export default function LandingPage() {
             <span className="text-white">Secret</span>
           </span>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-zinc-400 hover:text-white text-sm transition-colors px-3 py-1.5">
-              Connexion
-            </Link>
+            <UserMenu />
             <Link href="/onboarding"
               className="text-sm font-bold px-4 py-2 rounded-full transition-all"
               style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 0 20px rgba(139,92,246,0.4)' }}>

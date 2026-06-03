@@ -97,3 +97,25 @@ model UserSession {
   quizSlug  String
   createdAt DateTime @default(now())
 }
+
+model Affiliate {
+  id            String   @id @default(cuid())
+  slug          String   @unique  // e.g. "theo" → urcecret.site/?ref=theo
+  name          String
+  email         String?
+  commissionPct Int      @default(50)
+  createdAt     DateTime @default(now())
+
+  conversions AffiliateConversion[]
+}
+
+model AffiliateConversion {
+  id              String   @id @default(cuid())
+  affiliateId     String
+  amountCents     Int
+  commissionCents Int
+  stripeSessionId String   @unique
+  createdAt       DateTime @default(now())
+
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id])
+}

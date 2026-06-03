@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390">
+<title>UrSecret — Previews TikTok</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+  /* Sélecteur de type */
+  .picker { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: #000; padding: 10px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .picker button { padding: 6px 14px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: #aaa; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; }
+  .picker button.active { color: #fff; border-color: #7c3aed; background: rgba(124,58,237,0.3); }
+
+  /* Phone frame */
+  .phone { width: 390px; min-height: 844px; background: #09090b; color: white; position: relative; overflow: hidden; padding-bottom: 40px; }
+  .phone.hidden { display: none; }
+
+  /* Header */
+  .header { border-bottom: 1px solid rgba(255,255,255,0.06); padding: 16px 16px 14px; display: flex; align-items: center; justify-content: space-between; background: rgba(9,9,11,0.9); }
+  .logo { font-size: 20px; font-weight: 900; }
+  .logo span:first-child { background: linear-gradient(to right,#a78bfa,#f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .back { font-size: 11px; color: #52525b; }
+
+  /* Hero */
+  .hero { text-align: center; padding: 28px 20px 20px; }
+  .emoji { font-size: 64px; margin-bottom: 12px; display: block; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 10px; }
+  .type-title { font-size: 26px; font-weight: 900; margin-bottom: 6px; }
+  .tagline { color: #71717a; font-size: 14px; font-style: italic; }
+
+  /* Breadcrumb */
+  .breadcrumb { padding: 0 20px 16px; font-size: 11px; color: #3f3f46; display: flex; gap: 6px; }
+
+  /* Blurred preview card */
+  .blur-card { margin: 0 16px 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; position: relative; }
+  .blur-inner { padding: 20px; filter: blur(5px); user-select: none; }
+  .blur-inner h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .blur-inner p { font-size: 13px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px; }
+  .traits { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .trait { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #a1a1aa; }
+  .checklist { display: flex; flex-direction: column; gap: 6px; }
+  .check { display: flex; gap: 8px; font-size: 12px; color: #71717a; }
+  .check-icon { color: #7c3aed; flex-shrink: 0; }
+  .fade-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(9,9,11,0) 0%, rgba(9,9,11,0.88) 55%, rgba(9,9,11,1) 100%); }
+
+  /* Paywall CTA */
+  .paywall { margin: 0 16px 12px; border-radius: 18px; padding: 24px 20px; text-align: center; border: 1px solid rgba(139,92,246,0.3); background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(236,72,153,0.05)); }
+  .lock-icon { font-size: 36px; margin-bottom: 10px; }
+  .paywall h3 { font-size: 18px; font-weight: 900; margin-bottom: 6px; }
+  .paywall p { font-size: 13px; color: #71717a; margin-bottom: 4px; }
+  .paywall .highlight { color: #e4e4e7; font-weight: 600; }
+  .paywall .sub { font-size: 11px; color: #52525b; margin-bottom: 18px; }
+  .btn-main { display: block; width: 100%; padding: 15px; border-radius: 14px; font-weight: 900; font-size: 15px; color: white; border: none; cursor: pointer; margin-bottom: 10px; }
+  .btn-annual { display: block; width: 100%; padding: 11px; border-radius: 12px; font-size: 13px; font-weight: 600; color: #d4d4d8; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+  .guarantee { font-size: 11px; color: #3f3f46; margin-top: 12px; }
+  .social-proof { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; }
+  .avatars { display: flex; }
+  .avatar { width: 26px; height: 26px; border-radius: 50%; background: #27272a; border: 2px solid #09090b; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-left: -6px; }
+  .avatar:first-child { margin-left: 0; }
+  .proof-text { font-size: 11px; color: #52525b; }
+
+  /* Blurred sections */
+  .section-card { margin: 0 16px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); overflow: hidden; position: relative; }
+  .section-inner { padding: 20px; filter: blur(4px); user-select: none; }
+  .section-inner h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+  .section-inner p { font-size: 12px; color: #71717a; line-height: 1.6; }
+  .section-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(to bottom, rgba(9,9,11,0.1), rgba(9,9,11,0.93)); }
+  .unlock-btn { padding: 9px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; color: white; background: rgba(139,92,246,0.25); border: 1px solid rgba(139,92,246,0.4); cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="picker" id="picker"></div>
+
+<div style="height:52px"></div>
+
+<!-- ══════════════ INFJ ══════════════ -->
+<div class="phone" id="card-INFJ">
+  <div class="header">
+    <div class="logo"><span>Ur</span><span style="color:white">Secret</span></div>
+    <div class="back">← Tous les types</div>
+  </div>
+  <div class="hero">
+    <span class="emoji">🌙</span>
+    <div class="badge" style="background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.3)">1,5% de la population</div>
+    <div class="type-title">INFJ — L'Avocat</div>
+    <div class="tagline">"Je vois ce que les autres ne voient pas"</div>
+  </div>
+  <div class="breadcrumb">Accueil <span>/</span> Types <span>/</span> <span style="color:#a1a1aa">INFJ</span></div>
+
+  <div class="blur-card">
+    <div class="blur-inner">
+      <h3>Rapport complet INFJ</h3>
+      <p>L'INFJ est le type le plus rare. Visionnaire solitaire, tu portes une profondeur émotionnelle que peu comprennent…</p>
+      <div class="traits">
+        <span class="trait">Empathique</span><span class="trait">Visionnaire</span><span class="trait">Intuitif</span><span class="trait">Idéaliste</span><span class="trait">Discret</span>
+      </div>
+      <div class="checklist">
+        <div class="check"><span class="check-icon">✓</span>En amour — comment tu aimes vraiment</div>
+        <div class="check"><span class="check-icon">✓</span>Au travail — ton potentiel caché</div>
+        <div class="check"><span class="check-icon">✓</span>Tes 5 forces cachées</div>
+        <div class="check"><span class="check-icon">✓</span>Tes angles morts à corriger</div>
+        <div class="check"><span class="check-icon">✓</span>Compatibilité relationnelle</div>
+      </div>
+    </div>
+    <div class="fade-overlay"></div>
+  </div>
+
+  <div class="paywall">
+    <div class="lock-icon">🔒</div>
+    <h3>Débloque ton rapport INFJ</h3>
+    <p class="highlight">Rapport complet + les 15 tests UrSecret</p>
+    <p class="sub">Amour · Carrière · Forces · Angles morts · Compatibilité</p>
+    <button class="btn-main" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);box-shadow:0 4px 24px rgba(124,58,237,0.4)">Débloquer — 9,99 €/mois</button>
+    <button class="btn-annual">ou 29,99 €/an — économise 75% ✦</button>
+    <div class="guarantee">🛡️ Satisfait ou remboursé 7 jours · Annulable à tout moment</div>
+    <div class="social-proof">
+      <div class="avatars">
+        <div class="avatar">🧑</div><div class="avatar">👩</div><div class="avatar">🧑‍💼</div><div class="avatar">👨‍🎓</div>
+      </div>
+      <span class="proof-text">+3 200 personnes ont débloqué leur rapport cette semaine</span>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-inner"><h4>❤️ En amour</h4><p>L'INFJ cherche une connexion profonde ou rien. Tu aimes avec une intensité rare, mais tu te fermes au moindre manque de réciprocité. En couple tu es le pilier émotionnel, souvent au détriment de toi-même…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>💼 Au travail</h4><p>Visionnaire et perfectionniste, tu travailles mieux seul sur des projets qui ont du sens. Les environnements bruyants et superficiels t'épuisent. Ton potentiel réel se révèle dans les rôles…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>⚡ Forces & angles morts</h4><p>Ta plus grande force : tu comprends les gens avant qu'ils se comprennent eux-mêmes. Ton angle mort : tu sacrifies tes propres besoins jusqu'à l'épuisement total…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ ENFP ══════════════ -->
+<div class="phone hidden" id="card-ENFP">
+  <div class="header">
+    <div class="logo"><span>Ur</span><span style="color:white">Secret</span></div>
+    <div class="back">← Tous les types</div>
+  </div>
+  <div class="hero">
+    <span class="emoji">🦋</span>
+    <div class="badge" style="background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)">8% de la population</div>
+    <div class="type-title">ENFP — Le Champion</div>
+    <div class="tagline">"Chaque personne cache un monde entier"</div>
+  </div>
+  <div class="breadcrumb">Accueil <span>/</span> Types <span>/</span> <span style="color:#a1a1aa">ENFP</span></div>
+
+  <div class="blur-card">
+    <div class="blur-inner">
+      <h3>Rapport complet ENFP</h3>
+      <p>L'ENFP est le type le plus spontané et créatif. Tu vois des possibilités là où les autres voient des obstacles…</p>
+      <div class="traits">
+        <span class="trait">Enthousiaste</span><span class="trait">Créatif</span><span class="trait">Empathique</span><span class="trait">Curieux</span><span class="trait">Spontané</span>
+      </div>
+      <div class="checklist">
+        <div class="check"><span class="check-icon">✓</span>En amour — comment tu aimes vraiment</div>
+        <div class="check"><span class="check-icon">✓</span>Au travail — ton potentiel caché</div>
+        <div class="check"><span class="check-icon">✓</span>Tes 5 forces cachées</div>
+        <div class="check"><span class="check-icon">✓</span>Tes angles morts à corriger</div>
+        <div class="check"><span class="check-icon">✓</span>Compatibilité relationnelle</div>
+      </div>
+    </div>
+    <div class="fade-overlay"></div>
+  </div>
+
+  <div class="paywall">
+    <div class="lock-icon">🔒</div>
+    <h3>Débloque ton rapport ENFP</h3>
+    <p class="highlight">Rapport complet + les 15 tests UrSecret</p>
+    <p class="sub">Amour · Carrière · Forces · Angles morts · Compatibilité</p>
+    <button class="btn-main" style="background:linear-gradient(135deg,#db2777,#f472b6);box-shadow:0 4px 24px rgba(236,72,153,0.4)">Débloquer — 9,99 €/mois</button>
+    <button class="btn-annual">ou 29,99 €/an — économise 75% ✦</button>
+    <div class="guarantee">🛡️ Satisfait ou remboursé 7 jours · Annulable à tout moment</div>
+    <div class="social-proof">
+      <div class="avatars">
+        <div class="avatar">🧑</div><div class="avatar">👩</div><div class="avatar">🧑‍💼</div><div class="avatar">👨‍🎓</div>
+      </div>
+      <span class="proof-text">+3 200 personnes ont débloqué leur rapport cette semaine</span>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-inner"><h4>❤️ En amour</h4><p>L'ENFP tombe amoureux vite et intensément. Tu cherches une connexion authentique, pas juste de la routine. Mais tu t'ennuies si la relation devient trop prévisible. Ton plus grand risque…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>💼 Au travail</h4><p>Créatif, inspirant, tu transformes chaque projet en aventure. Mais la routine te tue. Tu as besoin de liberté et de varier les missions. Les métiers qui te correspondent vraiment…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>⚡ Forces & angles morts</h4><p>Ta force : tu donnes envie aux gens de se dépasser. Ton angle mort : tu commences 10 projets et en finis 2. La procrastination et le besoin de validation…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ INTJ ══════════════ -->
+<div class="phone hidden" id="card-INTJ">
+  <div class="header">
+    <div class="logo"><span>Ur</span><span style="color:white">Secret</span></div>
+    <div class="back">← Tous les types</div>
+  </div>
+  <div class="hero">
+    <span class="emoji">🏛️</span>
+    <div class="badge" style="background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3)">2% de la population</div>
+    <div class="type-title">INTJ — L'Architecte</div>
+    <div class="tagline">"Je vois la fin avant que ça commence"</div>
+  </div>
+  <div class="breadcrumb">Accueil <span>/</span> Types <span>/</span> <span style="color:#a1a1aa">INTJ</span></div>
+
+  <div class="blur-card">
+    <div class="blur-inner">
+      <h3>Rapport complet INTJ</h3>
+      <p>L'INTJ est le stratège. Indépendant, déterminé, tu construis ta vie comme un système — et tu détestes l'inefficacité…</p>
+      <div class="traits">
+        <span class="trait">Stratégique</span><span class="trait">Indépendant</span><span class="trait">Ambitieux</span><span class="trait">Rationnel</span><span class="trait">Perfectionniste</span>
+      </div>
+      <div class="checklist">
+        <div class="check"><span class="check-icon">✓</span>En amour — comment tu aimes vraiment</div>
+        <div class="check"><span class="check-icon">✓</span>Au travail — ton potentiel caché</div>
+        <div class="check"><span class="check-icon">✓</span>Tes 5 forces cachées</div>
+        <div class="check"><span class="check-icon">✓</span>Tes angles morts à corriger</div>
+        <div class="check"><span class="check-icon">✓</span>Compatibilité relationnelle</div>
+      </div>
+    </div>
+    <div class="fade-overlay"></div>
+  </div>
+
+  <div class="paywall">
+    <div class="lock-icon">🔒</div>
+    <h3>Débloque ton rapport INTJ</h3>
+    <p class="highlight">Rapport complet + les 15 tests UrSecret</p>
+    <p class="sub">Amour · Carrière · Forces · Angles morts · Compatibilité</p>
+    <button class="btn-main" style="background:linear-gradient(135deg,#4f46e5,#818cf8);box-shadow:0 4px 24px rgba(99,102,241,0.4)">Débloquer — 9,99 €/mois</button>
+    <button class="btn-annual">ou 29,99 €/an — économise 75% ✦</button>
+    <div class="guarantee">🛡️ Satisfait ou remboursé 7 jours · Annulable à tout moment</div>
+    <div class="social-proof">
+      <div class="avatars">
+        <div class="avatar">🧑</div><div class="avatar">👩</div><div class="avatar">🧑‍💼</div><div class="avatar">👨‍🎓</div>
+      </div>
+      <span class="proof-text">+3 200 personnes ont débloqué leur rapport cette semaine</span>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-inner"><h4>❤️ En amour</h4><p>L'INTJ n'aime pas facilement — mais quand ça arrive, c'est pour de vrai. Tu n'as pas besoin de beaucoup de personnes, juste d'une qui te comprend vraiment. Ton plus grand piège en relation…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>💼 Au travail</h4><p>Tu es fait pour diriger ou travailler seul sur des projets complexes. La médiocrité des autres te frustre. Les environnements où tu excelles vraiment sont…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>⚡ Forces & angles morts</h4><p>Ta force : tu vois les solutions que personne ne voit. Ton angle mort : tu passes pour arrogant même quand tu ne l'es pas. Et l'intimité émotionnelle…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ INFP ══════════════ -->
+<div class="phone hidden" id="card-INFP">
+  <div class="header">
+    <div class="logo"><span>Ur</span><span style="color:white">Secret</span></div>
+    <div class="back">← Tous les types</div>
+  </div>
+  <div class="hero">
+    <span class="emoji">🌿</span>
+    <div class="badge" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3)">4% de la population</div>
+    <div class="type-title">INFP — Le Médiateur</div>
+    <div class="tagline">"J'ai des mondes entiers à l'intérieur"</div>
+  </div>
+  <div class="breadcrumb">Accueil <span>/</span> Types <span>/</span> <span style="color:#a1a1aa">INFP</span></div>
+
+  <div class="blur-card">
+    <div class="blur-inner">
+      <h3>Rapport complet INFP</h3>
+      <p>L'INFP vit dans un monde intérieur riche. Idéaliste profond, tu ressens tout plus intensément que les autres…</p>
+      <div class="traits">
+        <span class="trait">Idéaliste</span><span class="trait">Créatif</span><span class="trait">Empathique</span><span class="trait">Introspectif</span><span class="trait">Authentique</span>
+      </div>
+      <div class="checklist">
+        <div class="check"><span class="check-icon">✓</span>En amour — comment tu aimes vraiment</div>
+        <div class="check"><span class="check-icon">✓</span>Au travail — ton potentiel caché</div>
+        <div class="check"><span class="check-icon">✓</span>Tes 5 forces cachées</div>
+        <div class="check"><span class="check-icon">✓</span>Tes angles morts à corriger</div>
+        <div class="check"><span class="check-icon">✓</span>Compatibilité relationnelle</div>
+      </div>
+    </div>
+    <div class="fade-overlay"></div>
+  </div>
+
+  <div class="paywall">
+    <div class="lock-icon">🔒</div>
+    <h3>Débloque ton rapport INFP</h3>
+    <p class="highlight">Rapport complet + les 15 tests UrSecret</p>
+    <p class="sub">Amour · Carrière · Forces · Angles morts · Compatibilité</p>
+    <button class="btn-main" style="background:linear-gradient(135deg,#059669,#34d399);box-shadow:0 4px 24px rgba(16,185,129,0.35)">Débloquer — 9,99 €/mois</button>
+    <button class="btn-annual">ou 29,99 €/an — économise 75% ✦</button>
+    <div class="guarantee">🛡️ Satisfait ou remboursé 7 jours · Annulable à tout moment</div>
+    <div class="social-proof">
+      <div class="avatars">
+        <div class="avatar">🧑</div><div class="avatar">👩</div><div class="avatar">🧑‍💼</div><div class="avatar">👨‍🎓</div>
+      </div>
+      <span class="proof-text">+3 200 personnes ont débloqué leur rapport cette semaine</span>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-inner"><h4>❤️ En amour</h4><p>L'INFP cherche l'âme sœur au sens littéral. Tu ne veux pas juste une relation — tu veux quelqu'un qui comprend tes silences. Et quand tu es blessé, tu te fermes complètement…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>💼 Au travail</h4><p>Tu as besoin que ton travail ait du sens — sinon tu t'éteins. Pas fait pour les environnements compétitifs et froids. Là où tu brilles vraiment…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+  <div class="section-card">
+    <div class="section-inner"><h4>⚡ Forces & angles morts</h4><p>Ta force : tu créés des connexions émotionnelles que les autres ne peuvent pas. Ton angle mort : tu idéalises les gens jusqu'à la déception, et la critique te touche trop…</p></div>
+    <div class="section-overlay"><button class="unlock-btn">🔓 Débloquer cette section</button></div>
+  </div>
+</div>
+
+<script>
+const types = ['INFJ','ENFP','INTJ','INFP'];
+const picker = document.getElementById('picker');
+
+types.forEach((t, i) => {
+  const btn = document.createElement('button');
+  btn.textContent = t;
+  btn.className = i === 0 ? 'active' : '';
+  btn.onclick = () => {
+    types.forEach(t2 => {
+      document.getElementById('card-' + t2).classList.add('hidden');
+      document.querySelectorAll('.picker button')[types.indexOf(t2)].classList.remove('active');
+    });
+    document.getElementById('card-' + t).classList.remove('hidden');
+    btn.classList.add('active');
+    window.scrollTo(0, 52);
+  };
+  picker.appendChild(btn);
+});
+</script>
+</body>
+</html>
