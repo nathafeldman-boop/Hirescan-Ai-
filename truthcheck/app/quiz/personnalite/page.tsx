@@ -2,6 +2,60 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import PersonnaliteClient from './PersonnaliteClient';
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      '@id': 'https://urcecret.site/quiz/personnalite#app',
+      name: 'Test de Personnalité 16 Types — UrSecret',
+      url: 'https://urcecret.site/quiz/personnalite',
+      applicationCategory: 'EducationalApplication',
+      operatingSystem: 'Web',
+      inLanguage: 'fr-FR',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+      description: 'Test de personnalité gratuit basé sur les 16 types psychologiques. 24 questions, résultat instantané.',
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Qu\'est-ce que le test de personnalité 16 types ?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Le test de personnalité 16 types est basé sur la théorie de Carl Jung et identifie votre profil parmi 16 types distincts (INFJ, ENFP, INTJ, etc.) selon 4 dimensions : Extraversion/Introversion, Intuition/Sensation, Pensée/Sentiment, Jugement/Perception.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Combien de temps dure le test de personnalité ?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Le test comprend 24 questions et prend environ 5 minutes. Le résultat est instantané, gratuit et sans inscription.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Quels sont les 16 types de personnalité ?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Les 16 types sont : INTJ, INTP, ENTJ, ENTP (Analystes), INFJ, INFP, ENFJ, ENFP (Diplomates), ISTJ, ISFJ, ESTJ, ESFJ (Sentinelles), ISTP, ISFP, ESTP, ESFP (Explorateurs).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Le test de personnalité est-il fiable ?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Notre test est basé sur le modèle Myers-Briggs (MBTI), l\'un des outils de psychologie les plus utilisés mondialement. Plus de 2,3 millions de Français l\'ont passé. Il est indicatif et non diagnostique.',
+          },
+        },
+      ],
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   title: 'Test de Personnalité 16 Types — Découvre ton Profil en 5 min',
   description: "Test de personnalité gratuit basé sur les 16 types psychologiques. 24 questions, résultat instantané. Le test le plus fiable en français — 2,3 millions de Français l'ont déjà passé.",
@@ -28,6 +82,10 @@ const TYPE_PREVIEW = [
 export default function PersonnalitePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Server-rendered SEO content — hidden visually */}
       <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
         <h1>Test de Personnalité Gratuit — 16 Types Psychologiques en Français</h1>

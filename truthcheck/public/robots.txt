@@ -5,9 +5,5 @@ Disallow: /dashboard
 Disallow: /analyze
 
 # Sitemaps
-Sitemap: https://ursecret.vercel.app/sitemap.xml
-Sitemap: https://ursecret.vercel.app/news-sitemap.xml
-
-# Feeds
-# RSS:  https://ursecret.vercel.app/feed.xml
-# Atom: https://ursecret.vercel.app/atom.xml
+Sitemap: https://urcecret.site/sitemap.xml
+Sitemap: https://urcecret.site/news-sitemap.xml
