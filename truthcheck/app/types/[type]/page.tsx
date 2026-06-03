@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { mbtiTypes, ALL_MBTI_TYPES, MbtiType } from '@/lib/mbti';
 import TypeClient from './TypeClient';
+import UserMenu from '@/components/UserMenu';
 
 export function generateStaticParams() {
   return ALL_MBTI_TYPES.map(code => ({ type: code.toLowerCase() }));
@@ -87,7 +88,10 @@ export default function TypePage({ params }: Props) {
               <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
               <span className="text-white">Secret</span>
             </Link>
-            <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">← Tous les types</Link>
+            <div className="flex items-center gap-3">
+              <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">← Tous les types</Link>
+              <UserMenu />
+            </div>
           </div>
         </header>
 
