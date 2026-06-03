@@ -5,7 +5,7 @@ import { duoQuizzes } from '@/lib/duoQuizzes';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 import QuizIcon from '@/components/QuizIcon';
 
-const BASE = 'https://ursecret.site';
+const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Tous les quizzes — UrSecret',

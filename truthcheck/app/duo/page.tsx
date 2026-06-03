@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { duoQuizzes } from '@/lib/duoQuizzes';
 import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
 
-const BASE = 'https://ursecret.site';
+const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Mode Duo — Testez votre couple | UrSecret',
@@ -73,7 +73,7 @@ export default function DuoPage() {
             </p>
             {/* Viral WhatsApp CTA */}
             <a
-              href={`https://wa.me/?text=${encodeURIComponent('🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes — sans tricher 👀\n\nhttps://ursecret.site/duo')}`}
+              href={`https://wa.me/?text=${encodeURIComponent('🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes — sans tricher 👀\n\nhttps://urcecret.site/duo')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98] mb-2"

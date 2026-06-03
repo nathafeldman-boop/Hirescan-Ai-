@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Les 16 Types de Personnalité — Guide Complet en Français',
   description: 'Découvre les 16 types de personnalité : INFJ, ENFP, INTJ, ISTP et les 12 autres. Guide complet en français : description, amour, carrière, compatibilité. Quel est ton type ?',
   keywords: ['16 types de personnalité', 'types mbti en français', 'INFJ ENFP INTJ', 'personnalité types', 'liste types psychologiques'],
-  alternates: { canonical: 'https://ursecret.site/types' },
+  alternates: { canonical: 'https://urcecret.site/types' },
 };
 
 const GROUPS = [
@@ -28,7 +28,7 @@ export default function TypesPage() {
         '@type': 'ListItem',
         position: i + 1,
         name: `${code} — ${t.name}`,
-        url: `https://ursecret.site/types/${code.toLowerCase()}`,
+        url: `https://urcecret.site/types/${code.toLowerCase()}`,
       };
     }),
   };

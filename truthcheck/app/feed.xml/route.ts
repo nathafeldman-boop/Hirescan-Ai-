@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BASE = 'https://ursecret.site';
+const BASE = 'https://urcecret.site';
 
 const quizzes = [
   { slug: 'infidelite',       title: 'Mon/Ma partenaire me trompe ?',         desc: 'Détecte les signes d\'infidélité — 30 questions anonymes pour analyser les comportements suspects dans ta relation.' },

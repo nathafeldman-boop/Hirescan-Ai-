@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${code} — ${t.name} : Personnalité, Amour & Carrière`,
     description: `Découvre le type de personnalité ${code} (${t.name}). ${t.shortDesc.slice(0, 150)}... Gratuit, en français.`,
     keywords: [`${code} personnalité`, `type ${code}`, `${t.name.toLowerCase()}`, `personnalité ${code} en français`, 'test de personnalité 16 types'],
-    alternates: { canonical: `https://ursecret.site/types/${params.type}` },
+    alternates: { canonical: `https://urcecret.site/types/${params.type}` },
     openGraph: {
       title: `${code} — ${t.name} | UrSecret`,
       description: t.shortDesc.slice(0, 200),
@@ -72,7 +72,7 @@ export default function TypePage({ params }: Props) {
     headline: `${code} — ${type.name} : Type de personnalité complet`,
     description: type.shortDesc,
     author: { '@type': 'Organization', name: 'UrSecret' },
-    publisher: { '@type': 'Organization', name: 'UrSecret', url: 'https://ursecret.site' },
+    publisher: { '@type': 'Organization', name: 'UrSecret', url: 'https://urcecret.site' },
   };
 
   return (

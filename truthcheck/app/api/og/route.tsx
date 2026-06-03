@@ -160,7 +160,7 @@ export async function GET(req: NextRequest) {
           </div>
 
           <div style={{ position: 'absolute', bottom: '32px', fontSize: '18px', color: 'rgba(161,161,170,0.7)', letterSpacing: '0.05em' }}>
-            ursecret.site
+            urcecret.site
           </div>
         </div>
       ),
