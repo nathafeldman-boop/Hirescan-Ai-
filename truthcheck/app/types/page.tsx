@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { mbtiTypes, ALL_MBTI_TYPES } from '@/lib/mbti';
 import UserMenu from '@/components/UserMenu';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export const metadata: Metadata = {
   title: 'Les 16 Types de Personnalité — Guide Complet en Français',
@@ -49,6 +50,7 @@ export default function TypesPage() {
               <Link href="/quiz/personnalite" className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors">
                 Passer le test →
               </Link>
+              <LanguageSwitcher />
               <UserMenu />
             </div>
           </div>

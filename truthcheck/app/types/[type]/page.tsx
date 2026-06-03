@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { mbtiTypes, ALL_MBTI_TYPES, MbtiType } from '@/lib/mbti';
 import TypeClient from './TypeClient';
 import UserMenu from '@/components/UserMenu';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export function generateStaticParams() {
   return ALL_MBTI_TYPES.map(code => ({ type: code.toLowerCase() }));
@@ -90,6 +91,7 @@ export default function TypePage({ params }: Props) {
             </Link>
             <div className="flex items-center gap-3">
               <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">← Tous les types</Link>
+              <LanguageSwitcher />
               <UserMenu />
             </div>
           </div>

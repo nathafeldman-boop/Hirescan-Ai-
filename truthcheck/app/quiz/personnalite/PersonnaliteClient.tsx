@@ -3,15 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { mbtiQuestions, computeMbtiType, MbtiQuestion } from '@/lib/mbti';
+import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
+import { useLang } from '@/contexts/LanguageContext';
+import { ui } from '@/lib/i18n/ui';
 
 const TOTAL = mbtiQuestions.length; // 24
 
-function ProgressBar({ current, total }: { current: number; total: number }) {
+function ProgressBar({ current, total, label }: { current: number; total: number; label: string }) {
   const pct = Math.round((current / total) * 100);
   return (
     <div className="w-full mb-8">
       <div className="flex justify-between text-xs text-zinc-500 mb-2">
-        <span>Question {current}/{total}</span>
+        <span>{label}</span>
         <span>{pct}%</span>
       </div>
       <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -26,13 +29,19 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 type Answers = Record<number, 'A' | 'B'>;
 
-function QuizScreen({ onComplete }: { onComplete: (answers: Answers) => void }) {
+type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
+
+function QuizScreen({ onComplete, questions, t }: {
+  onComplete: (answers: Answers) => void;
+  questions: MbtiQuestion[];
+  t: QuizT;
+}) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [selected, setSelected] = useState<'A' | 'B' | null>(null);
   const [animating, setAnimating] = useState(false);
 
-  const q: MbtiQuestion = mbtiQuestions[current];
+  const q: MbtiQuestion = questions[current];
 
   const handleChoice = (choice: 'A' | 'B') => {
     if (animating) return;
@@ -53,11 +62,11 @@ function QuizScreen({ onComplete }: { onComplete: (answers: Answers) => void }) 
 
   return (
     <div className="max-w-xl mx-auto px-4 py-10">
-      <ProgressBar current={current + 1} total={TOTAL} />
+      <ProgressBar current={current + 1} total={TOTAL} label={t.questionOf(current + 1, TOTAL)} />
 
       <div className="mb-10 text-center">
         <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">
-          {q.dimension === 'EI' ? 'Énergie' : q.dimension === 'SN' ? 'Perception' : q.dimension === 'TF' ? 'Décision' : 'Organisation'}
+          {t.dimLabel[q.dimension]}
         </p>
         <h2 className="text-xl font-bold text-white leading-snug">{q.text}</h2>
       </div>
@@ -87,15 +96,9 @@ function QuizScreen({ onComplete }: { onComplete: (answers: Answers) => void }) 
   );
 }
 
-function AnalysisScreen({ onDone }: { onDone: () => void }) {
+function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState(0);
-  const stages = [
-    'Analyse de tes réponses…',
-    'Calcul de tes dimensions…',
-    'Identification de ton type…',
-    'Génération de ton profil…',
-  ];
 
   useEffect(() => {
     const duration = 3500;
@@ -117,8 +120,8 @@ function AnalysisScreen({ onDone }: { onDone: () => void }) {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
         <div className="text-5xl mb-6">🧠</div>
-        <h2 className="text-xl font-bold text-white mb-2">{stages[stage]}</h2>
-        <p className="text-zinc-500 text-sm mb-8">Ne ferme pas cette page</p>
+        <h2 className="text-xl font-bold text-white mb-2">{t.analysisStages[stage]}</h2>
+        <p className="text-zinc-500 text-sm mb-8">{t.doNotClose}</p>
         <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-100"
@@ -133,8 +136,12 @@ function AnalysisScreen({ onDone }: { onDone: () => void }) {
 
 export default function PersonnaliteClient() {
   const router = useRouter();
+  const { lang } = useLang();
   const [phase, setPhase] = useState<'quiz' | 'analysis' | 'done'>('quiz');
   const [answers, setAnswers] = useState<Answers>({});
+
+  const questions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
+  const t = ui[lang].quiz;
 
   const handleComplete = (ans: Answers) => {
     setAnswers(ans);
@@ -148,8 +155,8 @@ export default function PersonnaliteClient() {
 
   return (
     <main className="min-h-screen bg-[#09090b] text-white">
-      {phase === 'quiz' && <QuizScreen onComplete={handleComplete} />}
-      {(phase === 'analysis' || phase === 'done') && <AnalysisScreen onDone={handleAnalysisDone} />}
+      {phase === 'quiz' && <QuizScreen onComplete={handleComplete} questions={questions} t={t} />}
+      {(phase === 'analysis' || phase === 'done') && <AnalysisScreen onDone={handleAnalysisDone} t={t} />}
     </main>
   );
 }
