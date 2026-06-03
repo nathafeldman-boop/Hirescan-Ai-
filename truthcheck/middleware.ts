@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const BASE = 'https://ursecret.site';
+const BASE = 'https://urcecret.site';
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();

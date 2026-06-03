@@ -753,7 +753,7 @@ export default function ResultsClient({ quiz }: Props) {
                 </div>
               </div>
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`👀 Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''}... Tu penses faire mieux que moi ?\n\nFais le quiz ici (sans regarder mes réponses 😏) :\nhttps://ursecret.site/quiz/${quiz.slug}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`👀 Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''}... Tu penses faire mieux que moi ?\n\nFais le quiz ici (sans regarder mes réponses 😏) :\nhttps://urcecret.site/quiz/${quiz.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all active:scale-[0.98]"
@@ -769,7 +769,7 @@ export default function ResultsClient({ quiz }: Props) {
               <p className="text-[11px] text-zinc-600 uppercase tracking-widest font-semibold mb-3 text-center">Partager mon résultat</p>
               <div className="flex gap-2">
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://ursecret.site/quiz/${quiz.slug}`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://urcecret.site/quiz/${quiz.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
@@ -779,7 +779,7 @@ export default function ResultsClient({ quiz }: Props) {
                   WA
                 </a>
                 <a
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 👀 Tu penses faire mieux ?\n\nhttps://ursecret.site/quiz/${quiz.slug}`)}`}
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Je viens de faire "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 👀 Tu penses faire mieux ?\n\nhttps://urcecret.site/quiz/${quiz.slug}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
@@ -790,11 +790,11 @@ export default function ResultsClient({ quiz }: Props) {
                 </a>
                 <button
                   onClick={() => {
-                    const msg = `J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://ursecret.site/quiz/${quiz.slug}`;
+                    const msg = `J'ai fait "${quiz.title}" sur UrSecret${isPremium ? ` — j'ai eu ${score}%` : ''} 😱 Essaie toi : https://urcecret.site/quiz/${quiz.slug}`;
                     if (navigator.share) {
-                      void navigator.share({ title: quiz.title, text: msg, url: `https://ursecret.site/quiz/${quiz.slug}` });
+                      void navigator.share({ title: quiz.title, text: msg, url: `https://urcecret.site/quiz/${quiz.slug}` });
                     } else {
-                      navigator.clipboard.writeText(`https://ursecret.site/quiz/${quiz.slug}`).catch(() => {});
+                      navigator.clipboard.writeText(`https://urcecret.site/quiz/${quiz.slug}`).catch(() => {});
                       const btn = document.getElementById('copy-btn');
                       if (btn) { btn.textContent = '✓ Copié'; setTimeout(() => { if (btn) btn.textContent = 'Copier'; }, 2000); }
                     }
@@ -823,7 +823,7 @@ export default function ResultsClient({ quiz }: Props) {
                 </div>
               </div>
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes sans tricher 👀\n\nhttps://ursecret.site/duo`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes sans tricher 👀\n\nhttps://urcecret.site/duo`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98] mb-2"

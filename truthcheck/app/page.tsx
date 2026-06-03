@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
 
-const BASE = 'https://ursecret.site';
+const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'UrSecret — Tes vraies réponses',

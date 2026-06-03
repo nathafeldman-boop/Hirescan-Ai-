@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://ursecret.site';
+const BASE_URL = 'https://urcecret.site';
 
 const ALL_MBTI_TYPES = [
   'intj','intp','entj','entp','infj','infp','enfj','enfp',

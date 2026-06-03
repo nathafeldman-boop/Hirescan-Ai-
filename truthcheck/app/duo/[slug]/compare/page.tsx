@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { duoQuizzes } from '@/lib/duoQuizzes';
 import DuoCompareClient from './DuoCompareClient';
 
-const BASE = 'https://ursecret.site';
+const BASE = 'https://urcecret.site';
 
 interface PageProps {
   params: { slug: string };

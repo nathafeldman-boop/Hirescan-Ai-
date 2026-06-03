@@ -5,5 +5,6 @@ import IntroAnimation from '@/components/IntroAnimation';
 
 export default function HomeClient() {
   const router = useRouter();
-  return <IntroAnimation onComplete={() => router.push('/quizzes')} />;
+  // Le test de personnalité est la porte d'entrée (hook d'acquisition façon Truity).
+  return <IntroAnimation onComplete={() => router.push('/quiz/personnalite')} />;
 }
