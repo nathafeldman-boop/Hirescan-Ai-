@@ -27,7 +27,8 @@ function ProgressBar({ current, total, label }: { current: number; total: number
   );
 }
 
-type Answers = Record<number, 'A' | 'B'>;
+type QuizAnswer = 'A' | 'B' | 'C' | 'D';
+type Answers = Record<number, QuizAnswer>;
 
 type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
 
@@ -38,12 +39,12 @@ function QuizScreen({ onComplete, questions, t }: {
 }) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
-  const [selected, setSelected] = useState<'A' | 'B' | null>(null);
+  const [selected, setSelected] = useState<QuizAnswer | null>(null);
   const [animating, setAnimating] = useState(false);
 
   const q: MbtiQuestion = questions[current];
 
-  const handleChoice = (choice: 'A' | 'B') => {
+  const handleChoice = (choice: QuizAnswer) => {
     if (animating) return;
     setSelected(choice);
     setAnimating(true);
@@ -72,13 +73,17 @@ function QuizScreen({ onComplete, questions, t }: {
       </div>
 
       <div className="space-y-3">
-        {(['A', 'B'] as const).map((opt) => {
-          const option = opt === 'A' ? q.optionA : q.optionB;
-          const isSelected = selected === opt;
+        {([
+          { key: 'A' as const, option: q.optionA },
+          { key: 'B' as const, option: q.optionB },
+          ...(q.optionC ? [{ key: 'C' as const, option: q.optionC }] : []),
+          ...(q.optionD ? [{ key: 'D' as const, option: q.optionD }] : []),
+        ]).map(({ key, option }) => {
+          const isSelected = selected === key;
           return (
             <button
-              key={opt}
-              onClick={() => handleChoice(opt)}
+              key={key}
+              onClick={() => handleChoice(key)}
               disabled={animating}
               className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 text-sm font-medium ${
                 isSelected
@@ -86,7 +91,7 @@ function QuizScreen({ onComplete, questions, t }: {
                   : 'border-white/10 bg-white/5 text-zinc-300 hover:border-violet-500/50 hover:bg-white/10'
               }`}
             >
-              <span className="text-zinc-500 mr-3 font-mono text-xs">{opt}</span>
+              <span className="text-zinc-500 mr-3 font-mono text-xs">{key}</span>
               {option.text}
             </button>
           );
