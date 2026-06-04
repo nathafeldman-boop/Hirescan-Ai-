@@ -4,69 +4,34 @@ import PersonnaliteClient from './PersonnaliteClient';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebApplication',
-      '@id': 'https://urcecret.site/quiz/personnalite#app',
-      name: 'Test de Personnalité 16 Types — UrCecret',
-      url: 'https://urcecret.site/quiz/personnalite',
-      applicationCategory: 'EducationalApplication',
-      operatingSystem: 'Web',
-      inLanguage: 'fr-FR',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-      description: 'Test de personnalité gratuit basé sur les 16 types psychologiques. 24 questions, résultat instantané.',
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'Qu\'est-ce que le test de personnalité 16 types ?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Le test de personnalité 16 types est basé sur la théorie de Carl Jung et identifie votre profil parmi 16 types distincts (INFJ, ENFP, INTJ, etc.) selon 4 dimensions : Extraversion/Introversion, Intuition/Sensation, Pensée/Sentiment, Jugement/Perception.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Combien de temps dure le test de personnalité ?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Le test comprend 24 questions et prend environ 5 minutes. Le résultat est instantané, gratuit et sans inscription.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Quels sont les 16 types de personnalité ?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Les 16 types sont : INTJ, INTP, ENTJ, ENTP (Analystes), INFJ, INFP, ENFJ, ENFP (Diplomates), ISTJ, ISFJ, ESTJ, ESFJ (Sentinelles), ISTP, ISFP, ESTP, ESFP (Explorateurs).',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Le test de personnalité est-il fiable ?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Notre test est basé sur le modèle Myers-Briggs (MBTI), l\'un des outils de psychologie les plus utilisés mondialement. Plus de 2,3 millions de Français l\'ont passé. Il est indicatif et non diagnostique.',
-          },
-        },
-      ],
-    },
-  ],
-};
+const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
-  title: 'Test de Personnalité 16 Types — Découvre ton Profil en 5 min',
-  description: "Test de personnalité gratuit basé sur les 16 types psychologiques. 24 questions, résultat instantané. Le test le plus fiable en français — 2,3 millions de Français l'ont déjà passé.",
-  keywords: ['test de personnalité', '16 types de personnalité', 'mbti français', 'test psychologique gratuit', 'type de personnalité', 'quel est mon profil'],
-  alternates: { canonical: 'https://urcecret.site/quiz/personnalite' },
+  title: 'Test MBTI Gratuit — 16 Types de Personnalité en Français',
+  description: 'Test de personnalité MBTI gratuit : 24 questions pour découvrir ton profil parmi les 16 types — INFJ, ENFP, INTJ, INTP, ESFP, ISFJ, ENTJ et plus. Résultat instantané, sans inscription. Le test MBTI le plus complet en français.',
+  keywords: [
+    'test MBTI', 'MBTI gratuit', 'test de personnalité MBTI', '16 types MBTI',
+    'INFJ', 'ENFP', 'INTJ', 'INTP', 'ENFJ', 'ENTP', 'INFP', 'ISFJ',
+    'ESFP', 'ESTJ', 'ISTP', 'ISFP', 'ESTP', 'ENTJ', 'ESFJ', 'ISTJ',
+    'test personnalité gratuit', 'type de personnalité', 'quel est mon type MBTI',
+    'test MBTI en français', 'personnalité Myers Briggs', '16 personnalités',
+    'test psychologique gratuit', 'profil MBTI', 'test introversion extraversion',
+  ],
+  alternates: { canonical: `${BASE}/quiz/personnalite` },
   openGraph: {
-    title: 'Test de Personnalité 16 Types — UrCecret',
-    description: 'Découvre ton type de personnalité en 24 questions. Gratuit, instantané, en français.',
+    title: 'Test MBTI Gratuit — 16 Types de Personnalité | UrCecret',
+    description: 'Découvre ton type MBTI en 24 questions. INFJ, ENFP, INTJ, INTP et 12 autres profils. Gratuit, instantané, en français.',
     type: 'website',
+    url: `${BASE}/quiz/personnalite`,
+    siteName: 'UrCecret',
+    locale: 'fr_FR',
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'Test MBTI Gratuit — UrCecret' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Test MBTI Gratuit — 16 Types de Personnalité',
+    description: 'Découvre ton profil MBTI en 24 questions. Gratuit, instantané.',
+    images: ['/api/og'],
   },
 };
 
@@ -81,22 +46,95 @@ const TYPE_PREVIEW = [
   { code: 'ESFP', name: "L'Animateur", emoji: '🎉', color: '#f59e0b', rarity: '9%' },
 ];
 
+const quizSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Quiz',
+  name: 'Test MBTI Gratuit — 16 Types de Personnalité',
+  description: 'Test de personnalité MBTI gratuit en français. 24 questions pour découvrir ton type parmi les 16 profils psychologiques : INFJ, ENFP, INTJ, INTP, ESFP, ISFJ, ENTJ et plus.',
+  url: `${BASE}/quiz/personnalite`,
+  inLanguage: 'fr',
+  isAccessibleForFree: true,
+  educationalLevel: 'beginner',
+  about: { '@type': 'Thing', name: 'MBTI — Myers-Briggs Type Indicator' },
+  provider: { '@type': 'Organization', name: 'UrCecret', url: BASE },
+  hasPart: [
+    { '@type': 'Question', name: 'Quel est mon type MBTI ?' },
+    { '@type': 'Question', name: 'Suis-je introverti ou extraverti ?' },
+    { '@type': 'Question', name: 'Comment fonctionner avec mon type de personnalité ?' },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Qu\'est-ce que le test MBTI ?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Le MBTI (Myers-Briggs Type Indicator) est un test de personnalité basé sur les travaux de Carl Jung. Il identifie 16 types de personnalité selon 4 dimensions : Extraversion/Introversion, Sensation/Intuition, Pensée/Sentiment, Jugement/Perception.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Quels sont les 16 types MBTI ?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Les 16 types MBTI sont : INFJ, INFP, INTJ, INTP, ISFJ, ISFP, ISTJ, ISTP, ENFJ, ENFP, ENTJ, ENTP, ESFJ, ESFP, ESTJ, ESTP.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Le test MBTI est-il gratuit ?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Oui, le test MBTI UrCecret est entièrement gratuit. 24 questions, résultat instantané, sans inscription ni email requis.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Combien de temps dure le test MBTI ?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Le test MBTI UrCecret comprend 24 questions et dure en moyenne 5 minutes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Quel est le type MBTI le plus rare ?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'L\'INFJ est le type MBTI le plus rare, représentant environ 1 à 2% de la population mondiale.',
+      },
+    },
+  ],
+};
+
 export default function PersonnalitePage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(quizSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+
       {/* Server-rendered SEO content — hidden visually */}
       <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-        <h1>Test de Personnalité Gratuit — 16 Types Psychologiques en Français</h1>
+        <h1>Test MBTI Gratuit — 16 Types de Personnalité en Français</h1>
         <p>
-          Découvre ton type de personnalité parmi les 16 profils psychologiques. Ce test de personnalité gratuit
-          analyse tes préférences sur 4 dimensions : Extraversion/Introversion, Intuition/Sensation,
-          Pensée/Sentiment, Jugement/Perception. En 24 questions et 5 minutes, découvre si tu es INFJ, ENFP,
-          INTJ, ISTP ou l&apos;un des 13 autres types.
+          Test de personnalité MBTI gratuit : découvre ton type parmi les 16 profils psychologiques.
+          24 questions pour savoir si tu es INFJ, ENFP, INTJ, INTP, ESFP ou l&apos;un des 11 autres types MBTI.
+          Résultat instantané, sans inscription.
         </p>
+        <ul>
+          <li>INFJ — L&apos;Avocat (1.5%)</li><li>INFP — Le Médiateur (4%)</li>
+          <li>INTJ — L&apos;Architecte (2%)</li><li>INTP — Le Logicien (3%)</li>
+          <li>ENFJ — Le Protagoniste (2.5%)</li><li>ENFP — Le Champion (8%)</li>
+          <li>ENTJ — Le Commandant (1.8%)</li><li>ENTP — Le Débatteur (3.2%)</li>
+          <li>ISFJ — Le Défenseur (13%)</li><li>ISFP — L&apos;Aventurier (8.8%)</li>
+          <li>ISTJ — L&apos;Inspecteur (11.6%)</li><li>ISTP — Le Virtuose (5.4%)</li>
+          <li>ESFJ — Le Consul (12%)</li><li>ESFP — L&apos;Animateur (8.5%)</li>
+          <li>ESTJ — Le Directeur (8.7%)</li><li>ESTP — L&apos;Entrepreneur (4.3%)</li>
+        </ul>
       </div>
 
       {/* Hero landing page */}
@@ -108,7 +146,7 @@ export default function PersonnalitePage() {
               <span className="text-white">Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
-              <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">Voir les 16 types →</Link>
+              <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">16 types MBTI →</Link>
               <LanguageSwitcher />
               <UserMenu />
             </div>
@@ -123,16 +161,16 @@ export default function PersonnalitePage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-black mb-5 leading-tight">
-            Quel est ton{' '}
+            Test{' '}
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              vrai type
+              MBTI
             </span>
-            {' '}de personnalité ?
+            {' '}Gratuit — Quel est ton type ?
           </h1>
 
           <p className="text-lg text-zinc-400 mb-10 max-w-xl mx-auto leading-relaxed">
-            24 questions · 16 types · Basé sur les dimensions psychologiques E/I, S/N, T/F, J/P.
-            Le test le plus complet en français.
+            24 questions · 16 types de personnalité · INFJ, ENFP, INTJ et plus.
+            Le test MBTI le plus complet en français — résultat instantané.
           </p>
 
           {/* Stats */}

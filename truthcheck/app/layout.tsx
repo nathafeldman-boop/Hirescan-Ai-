@@ -2,23 +2,29 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './Providers';
 
+const BASE = 'https://urcecret.site';
+
 export const metadata: Metadata = {
   title: {
-    default: 'UrCecret — Tes vraies réponses',
+    default: 'UrCecret — Test MBTI Gratuit · 16 Types de Personnalité',
     template: '%s | UrCecret',
   },
-  description: 'Des questionnaires précis pour découvrir les vérités que tu ressens. 100% anonyme.',
-  keywords: ['UrCecret', 'urcecret', 'quiz anonyme', 'test personnalité', 'questionnaire couple', 'quiz psychologique'],
-  authors: [{ name: 'UrCecret', url: 'https://urcecret.site' }],
+  description: 'Découvre ton type de personnalité MBTI parmi les 16 profils psychologiques : INFJ, ENFP, INTJ, INTP, ESFP et plus. Test gratuit, 24 questions, résultat instantané. Le test de personnalité le plus complet en français.',
+  keywords: [
+    'test MBTI', 'MBTI gratuit', 'test de personnalité', '16 types de personnalité',
+    'type MBTI', 'MBTI français', 'test personnalité gratuit', '16 personnalités',
+    'INFJ', 'ENFP', 'INTJ', 'INTP', 'ENFJ', 'ENTP', 'INFP', 'ISFJ',
+    'ESFP', 'ESTJ', 'ISTP', 'ISFP', 'ESTP', 'ENTJ', 'ESFJ', 'ISTJ',
+    'UrCecret', 'urcecret', 'urcecret.site', 'test psychologique',
+    'profil personnalité', 'type personnalité', 'quiz personnalité',
+  ],
+  authors: [{ name: 'UrCecret', url: BASE }],
   creator: 'UrCecret',
   publisher: 'UrCecret',
-  metadataBase: new URL('https://urcecret.site'),
+  metadataBase: new URL(BASE),
   alternates: {
     canonical: '/',
-    languages: {
-      'fr-FR': '/',
-      'en-US': '/',
-    },
+    languages: { 'fr-FR': '/', 'en-US': '/' },
   },
   manifest: '/manifest.json',
   verification: {
@@ -28,17 +34,19 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'UrCecret — Tes vraies réponses',
-    description: 'Tes vraies réponses. Rien que la vérité.',
+    title: 'UrCecret — Test MBTI Gratuit · 16 Types de Personnalité',
+    description: 'Découvre ton type MBTI parmi les 16 profils psychologiques. Test gratuit, 24 questions, résultat instantané.',
     type: 'website',
     siteName: 'UrCecret',
     locale: 'fr_FR',
-    url: 'https://urcecret.site',
+    url: BASE,
   },
   twitter: {
     card: 'summary_large_image',
     site: '@urcecret',
     creator: '@urcecret',
+    title: 'UrCecret — Test MBTI Gratuit',
+    description: 'Découvre ton type de personnalité MBTI. 16 profils · 24 questions · Gratuit.',
   },
   robots: {
     index: true,
@@ -50,6 +58,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 const organizationSchema = {
@@ -57,9 +70,9 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'UrCecret',
   alternateName: ['UrCecret', 'urcecret.site'],
-  url: 'https://urcecret.site',
-  logo: 'https://urcecret.site/favicon.svg',
-  description: 'Questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille.',
+  url: BASE,
+  logo: `${BASE}/favicon.svg`,
+  description: 'Test de personnalité MBTI gratuit — 16 types psychologiques en français.',
   foundingDate: '2024',
   sameAs: [],
 };
@@ -67,16 +80,17 @@ const organizationSchema = {
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
+  '@id': `${BASE}/#website`,
   name: 'UrCecret',
   alternateName: 'urcecret.site',
-  url: 'https://urcecret.site',
-  description: 'Questionnaires anonymes pour découvrir les vérités que tu ressens.',
+  url: BASE,
+  description: 'Test MBTI gratuit — découvre ton type de personnalité parmi 16 profils.',
   inLanguage: ['fr-FR', 'en-US'],
   potentialAction: {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: 'https://urcecret.site/quizzes',
+      urlTemplate: `${BASE}/quiz/personnalite`,
     },
   },
 };

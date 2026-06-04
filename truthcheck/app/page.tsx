@@ -4,29 +4,29 @@ import HomeClient from './HomeClient';
 const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
-  title: 'UrCecret — Tes vraies réponses',
-  description: 'Découvre la vérité sur ton couple, tes amis et ta famille. 15 questionnaires anonymes et précis : infidélité, narcissisme, manipulation, burnout, dépression, amour véritable et plus. Résultats instantanés.',
+  title: 'UrCecret — Test MBTI Gratuit · Découvre ton Type de Personnalité',
+  description: 'Test de personnalité MBTI gratuit en français. 24 questions pour découvrir ton profil parmi les 16 types psychologiques : INFJ, ENFP, INTJ, INTP, ESFP et plus. Résultat instantané, sans inscription.',
   keywords: [
     'UrCecret', 'urcecret', 'urcecret.site',
-    'quiz infidélité', 'suis-je adopté', 'suis-je amoureux', 'vrais amis', 'orientation sexuelle',
-    'suis-je narcissique', 'mon ex veut revenir', 'suis-je manipulé', 'dois-je rompre',
-    'suis-je jaloux', 'relation toxique', 'mon crush', 'burnout', 'dépression', 'vrai amour',
-    'quiz anonyme', 'test psychologique', 'questionnaire couple', 'test de personnalité',
+    'test MBTI', 'MBTI gratuit', 'test de personnalité gratuit', '16 types personnalité',
+    'test personnalité MBTI', 'type MBTI', 'MBTI français', 'personnalité INFJ',
+    'personnalité ENFP', 'personnalité INTJ', 'personnalité INTP', 'quel est mon type MBTI',
+    'test personnalité', 'profil psychologique', 'quiz personnalité', '16 personnalités MBTI',
   ],
   alternates: { canonical: BASE },
   openGraph: {
-    title: 'UrCecret — Tes vraies réponses',
-    description: '15 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
+    title: 'UrCecret — Test MBTI Gratuit · 16 Types de Personnalité',
+    description: 'Découvre ton type de personnalité MBTI en 24 questions. Gratuit, instantané, en français. INFJ, ENFP, INTJ et 13 autres profils.',
     url: BASE,
     siteName: 'UrCecret',
     locale: 'fr_FR',
     type: 'website',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrCecret — Tes vraies réponses' }],
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrCecret — Test MBTI Gratuit' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'UrCecret — Tes vraies réponses',
-    description: '15 quiz anonymes. 100% gratuit.',
+    title: 'UrCecret — Test MBTI Gratuit',
+    description: 'Découvre ton type MBTI. 16 profils · 24 questions · Résultat instantané.',
     images: ['/api/og'],
   },
 };
@@ -34,18 +34,27 @@ export const metadata: Metadata = {
 const landingSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  name: 'UrCecret — Tes vraies réponses',
-  description: 'Découvre la vérité sur ton couple, tes amis et ta famille. 15 questionnaires anonymes et précis.',
-  url: 'https://urcecret.site',
-  isPartOf: { '@type': 'WebSite', name: 'UrCecret', url: 'https://urcecret.site' },
+  name: 'UrCecret — Test MBTI Gratuit',
+  description: 'Test de personnalité MBTI gratuit — découvre ton profil parmi les 16 types psychologiques.',
+  url: BASE,
+  isPartOf: { '@type': 'WebSite', name: 'UrCecret', url: BASE },
   about: {
     '@type': 'Thing',
-    name: 'Tests psychologiques anonymes',
-    description: 'Quiz et questionnaires anonymes sur les relations, la personnalité et le bien-être',
+    name: 'Test de personnalité MBTI',
+    description: 'Test MBTI gratuit : 16 types de personnalité en français, résultat instantané.',
+  },
+  mainEntity: {
+    '@type': 'Quiz',
+    name: 'Test de personnalité MBTI — 16 Types',
+    description: 'Test MBTI gratuit en français. 24 questions pour découvrir ton type parmi INFJ, ENFP, INTJ, INTP, ESFP et 11 autres profils psychologiques.',
+    url: `${BASE}/quiz/personnalite`,
+    educationalLevel: 'beginner',
+    inLanguage: 'fr',
+    isAccessibleForFree: true,
   },
   breadcrumb: {
     '@type': 'BreadcrumbList',
-    itemListElement: [{ '@type': 'ListItem', position: 1, name: 'UrCecret', item: 'https://urcecret.site' }],
+    itemListElement: [{ '@type': 'ListItem', position: 1, name: 'UrCecret', item: BASE }],
   },
 };
 
