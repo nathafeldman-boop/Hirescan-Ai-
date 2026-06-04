@@ -6,7 +6,27 @@ import Link from 'next/link';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-function CheckoutButton({ label, annual, userEmail }: { label: string; annual?: boolean; userEmail?: string | null }) {
+const FREE_PERKS = [
+  'Test de personnalité MBTI (type uniquement)',
+  'Accès aux quiz de base',
+  'Résultats partiels',
+];
+
+const PREMIUM_PERKS = [
+  'Rapport complet de personnalité',
+  'Tous les 15 tests UrCecret illimités',
+  'Analyses détaillées par IA',
+  'Mode Duo illimité',
+  'Résultats instantanés et complets',
+  'Accès anticipé aux nouvelles fonctions',
+];
+
+function CheckoutButton({ label, annual, userEmail, highlighted }: {
+  label: string;
+  annual?: boolean;
+  userEmail?: string | null;
+  highlighted?: boolean;
+}) {
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
@@ -34,12 +54,24 @@ function CheckoutButton({ label, annual, userEmail }: { label: string; annual?: 
     }
   };
 
+  if (highlighted) {
+    return (
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className="w-full py-4 rounded-2xl font-black text-base transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+        style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff', boxShadow: '0 8px 32px rgba(139,92,246,0.45)' }}
+      >
+        {loading ? 'Chargement…' : <><span>✦</span> {label}</>}
+      </button>
+    );
+  }
+
   return (
     <button
       onClick={handleClick}
       disabled={loading}
-      className="w-full py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60"
-      style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
+      className="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:bg-white/10 active:scale-95 disabled:opacity-60 border border-white/15 text-zinc-300"
     >
       {loading ? 'Chargement…' : label}
     </button>
@@ -49,42 +81,12 @@ function CheckoutButton({ label, annual, userEmail }: { label: string; annual?: 
 export default function PricingPage() {
   const { data: session } = useSession();
   const userEmail = session?.user?.email;
-
-  const PLANS = [
-    {
-      name: 'Mensuel',
-      price: '€9,99',
-      period: '/ mois',
-      annual: false,
-      badge: null,
-      perks: [
-        'Accès illimité aux tests',
-        'Rapport complet de personnalité',
-        'Analyses screenshot illimitées',
-        'Mode Duo illimité',
-        'Résultats détaillés IA',
-      ],
-    },
-    {
-      name: 'Annuel',
-      price: '€29,99',
-      period: '/ an',
-      annual: true,
-      badge: '−75%',
-      perks: [
-        'Tout le plan mensuel',
-        'Économisez €89,89 par an',
-        'Accès anticipé aux nouvelles fonctions',
-        'Support prioritaire',
-        'Sans engagement',
-      ],
-    },
-  ];
+  const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
 
   return (
     <main className="min-h-screen bg-[#09090b] text-white">
       <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-black">
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-white">Cecret</span>
@@ -96,68 +98,108 @@ export default function PricingPage() {
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-4 py-1.5 text-xs text-violet-400 font-medium mb-6">
-          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-          Passe à Pro — Accès illimité
+      <div className="max-w-lg mx-auto px-4 py-10">
+
+        {/* Titre */}
+        <div className="text-center mb-8">
+          <p className="text-zinc-500 text-sm mb-2">Débloquer tout UrCecret</p>
+          <h1 className="text-2xl font-black text-white">Choisir ton plan</h1>
         </div>
 
-        <h1 className="text-3xl font-black mb-3">
-          Débloquer tout{' '}
-          <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            UrCecret
-          </span>
-        </h1>
-        <p className="text-zinc-400 text-sm mb-12 max-w-sm mx-auto">
-          Tests illimités, rapports complets, analyses IA. Sans engagement, annulable à tout moment.
-        </p>
-
-        <div className="grid sm:grid-cols-2 gap-4 mb-10">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className="relative rounded-2xl p-6 border text-left"
-              style={
-                plan.annual
-                  ? { border: '1px solid rgba(139,92,246,0.5)', background: 'rgba(139,92,246,0.08)' }
-                  : { border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }
-              }
-            >
-              {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-black px-3 py-1 rounded-full"
-                  style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff' }}>
-                  {plan.badge}
-                </div>
-              )}
-              <div className="mb-4">
-                <p className="text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-1">{plan.name}</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-white">{plan.price}</span>
-                  <span className="text-zinc-500 text-sm">{plan.period}</span>
-                </div>
-              </div>
-              <ul className="space-y-2 mb-6">
-                {plan.perks.map((p) => (
-                  <li key={p} className="flex items-center gap-2 text-sm text-zinc-300">
-                    <span className="text-violet-400">✓</span>
-                    {p}
-                  </li>
-                ))}
-              </ul>
-              <CheckoutButton
-                label={`Choisir ${plan.name}`}
-                annual={plan.annual}
-                userEmail={userEmail}
-              />
+        {/* Plan gratuit — plan actuel */}
+        <div className="rounded-2xl border border-white/10 bg-white/3 p-5 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-white font-bold">Gratuit</p>
+              <p className="text-zinc-500 text-sm">Accès limité</p>
             </div>
-          ))}
+            <div className="text-right">
+              <span className="text-2xl font-black text-white">0 €</span>
+              <p className="text-zinc-600 text-xs">pour toujours</p>
+            </div>
+          </div>
+          <ul className="space-y-2 mb-4">
+            {FREE_PERKS.map((p) => (
+              <li key={p} className="flex items-center gap-2 text-sm text-zinc-500">
+                <span className="text-zinc-600">✓</span>
+                {p}
+              </li>
+            ))}
+          </ul>
+          <div className="w-full py-3 rounded-xl text-center text-sm font-semibold text-zinc-600 bg-white/5 border border-white/5">
+            {isPremium ? 'Ancien plan' : 'Plan actuel'}
+          </div>
         </div>
 
-        <p className="text-zinc-600 text-xs">
+        {/* Plan Premium — recommandé */}
+        <div className="relative rounded-2xl border-2 border-violet-500/60 p-5 mb-2"
+          style={{ background: 'linear-gradient(145deg, rgba(139,92,246,0.12), rgba(236,72,153,0.06))' }}>
+
+          {/* Badge recommandé */}
+          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+            <span className="text-xs font-black px-3 py-1 rounded-full"
+              style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff' }}>
+              ✦ Recommandé
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between mb-4 mt-1">
+            <div>
+              <p className="text-white font-black text-lg">Premium</p>
+              <p className="text-violet-400 text-sm font-medium">Accès illimité</p>
+            </div>
+            <div className="text-right">
+              <span className="text-4xl font-black text-white">9,99 €</span>
+              <p className="text-zinc-400 text-sm">/mois</p>
+            </div>
+          </div>
+
+          <ul className="space-y-2.5 mb-6">
+            {PREMIUM_PERKS.map((p) => (
+              <li key={p} className="flex items-center gap-2.5 text-sm text-zinc-200">
+                <span className="text-violet-400 font-bold flex-shrink-0">✓</span>
+                {p}
+              </li>
+            ))}
+          </ul>
+
+          <CheckoutButton
+            label="Passer à Premium"
+            annual={false}
+            userEmail={userEmail}
+            highlighted
+          />
+        </div>
+
+        {/* Option annuelle */}
+        <div className="rounded-2xl border border-white/10 bg-white/3 p-4 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-white font-bold">Annuel</p>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/20">
+                  −75%
+                </span>
+              </div>
+              <p className="text-zinc-500 text-sm">Soit 2,50 € / mois</p>
+            </div>
+            <div className="text-right">
+              <span className="text-2xl font-black text-white">29,99 €</span>
+              <p className="text-zinc-500 text-xs">/an</p>
+            </div>
+          </div>
+          <CheckoutButton
+            label="Choisir l'annuel — 29,99 €"
+            annual={true}
+            userEmail={userEmail}
+          />
+        </div>
+
+        <p className="text-center text-zinc-600 text-xs mb-6">
           Paiement sécurisé par Stripe · Annulable à tout moment · Aucune surprise
         </p>
 
-        <div className="mt-8">
+        <div className="text-center">
           <Link href="/dashboard" className="text-zinc-500 hover:text-white text-sm transition-colors">
             ← Retour au dashboard
           </Link>

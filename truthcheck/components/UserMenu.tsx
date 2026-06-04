@@ -95,7 +95,7 @@ export default function UserMenu() {
                 </button>
               ) : (
                 <Link
-                  href="/quiz/personnalite"
+                  href="/pricing"
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-2 px-4 py-2.5 text-sm text-violet-400 hover:bg-violet-500/10 transition-colors font-semibold"
                 >
