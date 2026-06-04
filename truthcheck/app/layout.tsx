@@ -5,11 +5,6 @@ import Providers from './Providers';
 export const metadata: Metadata = {
   title: 'UrCecret — Tes vraies réponses',
   description: 'Des questionnaires précis pour découvrir les vérités que tu ressens. 100% anonyme.',
-  icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
-  },
   manifest: '/manifest.json',
   verification: {
     google: [
