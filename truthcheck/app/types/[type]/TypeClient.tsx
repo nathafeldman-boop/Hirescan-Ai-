@@ -11,7 +11,7 @@ interface Props {
   type: MbtiType;
 }
 
-const MONTHLY_PRICE = '4,99 €';
+const MONTHLY_PRICE = '9,99 €';
 const ANNUAL_PRICE = '29,99 €';
 
 export default function TypeClient({ type }: Props) {
@@ -293,14 +293,14 @@ export default function TypeClient({ type }: Props) {
               onClick={() => handleUnlock(false)}
               disabled={loading}
               className="w-full max-w-xs px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-105 disabled:opacity-60"
-              style={{ background: `linear-gradient(135deg, ${type.accentColor}, #a78bfa)` }}
+              style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
             >
               {loading ? t.loading : t.unlockMonthly(MONTHLY_PRICE)}
             </button>
             <button
               onClick={() => handleUnlock(true)}
               disabled={loading}
-              className="mt-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors disabled:opacity-60"
+              className="w-full max-w-xs mt-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 disabled:opacity-60 border border-violet-500/40 text-violet-300 hover:border-violet-400 hover:text-white"
             >
               {t.unlockAnnual(ANNUAL_PRICE)}
             </button>
