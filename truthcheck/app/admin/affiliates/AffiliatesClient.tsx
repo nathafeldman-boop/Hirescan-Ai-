@@ -135,21 +135,33 @@ export default function AffiliatesClient({ initial }: { initial: Affiliate[] }) 
         const commission = a.conversions.reduce((s, c) => s + c.commissionCents, 0);
         const months = groupByMonth(a.conversions);
         const link = `https://urcecret.site/?ref=${a.slug}`;
+        const dashboardLink = `https://urcecret.site/affilie/${a.id}`;
 
         return (
           <div key={a.id} className="bg-white/5 border border-white/10 rounded-2xl p-6">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
-              <div>
+              <div className="flex-1 min-w-0">
                 <h3 className="text-white font-bold text-lg">{a.name}</h3>
                 {a.email && <p className="text-zinc-500 text-xs">{a.email}</p>}
+                {/* Affiliate link */}
                 <div className="flex items-center gap-2 mt-2">
-                  <code className="bg-black/40 text-violet-400 text-xs px-2 py-1 rounded font-mono">{link}</code>
+                  <code className="bg-black/40 text-violet-400 text-xs px-2 py-1 rounded font-mono truncate max-w-[220px]">{link}</code>
                   <button
                     onClick={() => { navigator.clipboard.writeText(link); }}
-                    className="text-xs text-zinc-500 hover:text-white transition-colors"
+                    className="text-xs text-zinc-500 hover:text-white transition-colors flex-shrink-0"
                   >
                     copier
+                  </button>
+                </div>
+                {/* Dashboard link — send this to the influencer */}
+                <div className="flex items-center gap-2 mt-1.5">
+                  <code className="bg-black/40 text-emerald-400 text-xs px-2 py-1 rounded font-mono truncate max-w-[220px]">{dashboardLink}</code>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(dashboardLink); }}
+                    className="text-xs text-zinc-500 hover:text-white transition-colors flex-shrink-0"
+                  >
+                    📊 dashboard
                   </button>
                 </div>
               </div>
