@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import QuizIcon from './QuizIcon';
 import UserMenu from './UserMenu';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const QUIZZES = [
   { slug: 'infidelite',  emoji: '💔', label: 'Il/elle te cache quelque chose ?',    desc: 'Les signaux que tu ignores peut-être',          color: '#f43f5e' },
@@ -47,6 +48,7 @@ export default function LandingPage() {
             <span className="text-white">Secret</span>
           </span>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <UserMenu />
             <Link href="/onboarding"
               className="text-sm font-bold px-4 py-2 rounded-full transition-all"

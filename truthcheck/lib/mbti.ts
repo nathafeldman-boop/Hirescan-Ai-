@@ -10,8 +10,8 @@ export interface MbtiQuestion {
   text: string;
   optionA: { text: string; pole: MbtiPole };
   optionB: { text: string; pole: MbtiPole };
-  optionC: { text: string; pole: MbtiPole };
-  optionD: { text: string; pole: MbtiPole };
+  optionC?: { text: string; pole: MbtiPole };
+  optionD?: { text: string; pole: MbtiPole };
 }
 
 export type QuizAnswer = 'A' | 'B' | 'C' | 'D';
@@ -245,8 +245,9 @@ export function computeMbtiType(answers: Record<number, QuizAnswer>): string {
     if (!ans) continue;
     const pole = ans === 'A' ? q.optionA.pole
                : ans === 'B' ? q.optionB.pole
-               : ans === 'C' ? q.optionC.pole
-               : q.optionD.pole;
+               : ans === 'C' ? q.optionC?.pole
+               : q.optionD?.pole;
+    if (!pole) continue;
     if (pole === 'E') E++;
     else if (pole === 'I') I++;
     else if (pole === 'S') S++;

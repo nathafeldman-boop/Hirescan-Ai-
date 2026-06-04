@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import PersonnaliteClient from './PersonnaliteClient';
 import UserMenu from '@/components/UserMenu';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -108,6 +109,7 @@ export default function PersonnalitePage() {
             </Link>
             <div className="flex items-center gap-3">
               <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">Voir les 16 types →</Link>
+              <LanguageSwitcher />
               <UserMenu />
             </div>
           </div>

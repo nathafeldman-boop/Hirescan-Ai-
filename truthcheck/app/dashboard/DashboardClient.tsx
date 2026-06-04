@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const RIZZ_LEVELS = [
   { min: 0,   max: 200,  label: 'Rookie',      emoji: '🌱', color: '#6b7280' },
@@ -85,6 +86,7 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
             <span className="text-white">Secret</span>
           </h1>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             {user.image && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-white/20" />
@@ -150,8 +152,9 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
             </span>
             {user.tier === 'free' && (
               <Link
-                href="/quiz/personnalite"
-                className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+                href="/pricing"
+                className="text-xs font-semibold px-3 py-1 rounded-full transition-all"
+                style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff' }}
               >
                 Passer Premium →
               </Link>
