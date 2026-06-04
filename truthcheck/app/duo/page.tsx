@@ -45,7 +45,7 @@ export default function DuoPage() {
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Ur
             </span>
-            <span className="text-white">Secret</span>
+            <span className="text-white">Cecret</span>
           </span>
           <span className="text-xs text-zinc-500 font-semibold uppercase tracking-widest">Duo</span>
         </div>

@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
           {/* Brand */}
           <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '24px', gap: '0px' }}>
             <span style={{ fontSize: '28px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
-            <span style={{ fontSize: '28px', fontWeight: '900', color: 'white' }}>Secret</span>
+            <span style={{ fontSize: '28px', fontWeight: '900', color: 'white' }}>Cecret</span>
             {isDuo && <span style={{ fontSize: '14px', fontWeight: '700', color: '#a78bfa', marginLeft: '10px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>· Mode Duo</span>}
           </div>
 
@@ -144,7 +144,7 @@ export async function GET(req: NextRequest) {
 
           <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '32px' }}>
             <span style={{ fontSize: '36px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
-            <span style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>Secret</span>
+            <span style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>Cecret</span>
           </div>
 
           <div style={{ fontSize: '96px', marginBottom: '24px', lineHeight: 1 }}>{meta.emoji}</div>
@@ -196,7 +196,7 @@ export async function GET(req: NextRequest) {
 
         <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '16px' }}>
           <span style={{ fontSize: '88px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent', lineHeight: 1 }}>Ur</span>
-          <span style={{ fontSize: '88px', fontWeight: '900', color: 'white', lineHeight: 1 }}>Secret</span>
+          <span style={{ fontSize: '88px', fontWeight: '900', color: 'white', lineHeight: 1 }}>Cecret</span>
         </div>
 
         <p style={{ fontSize: '26px', color: 'rgba(161,161,170,0.9)', margin: '0 0 40px 0', letterSpacing: '0.02em' }}>

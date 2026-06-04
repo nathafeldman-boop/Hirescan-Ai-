@@ -44,7 +44,7 @@ export default function TypesPage() {
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
               <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-              <span className="text-white">Secret</span>
+              <span className="text-white">Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
               <Link href="/quiz/personnalite" className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors">

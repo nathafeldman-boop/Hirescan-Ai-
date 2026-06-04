@@ -73,7 +73,7 @@ export default function AffilieClient({ affiliate }: { affiliate: Affiliate }) {
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-black">
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-white">Secret</span>
+            <span className="text-white">Cecret</span>
           </Link>
           <span className="text-xs text-zinc-500 font-medium">Programme Affilié</span>
         </div>

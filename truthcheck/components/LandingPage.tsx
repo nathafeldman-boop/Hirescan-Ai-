@@ -45,7 +45,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <span className="text-xl font-black">
             <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
-            <span className="text-white">Secret</span>
+            <span className="text-white">Cecret</span>
           </span>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -325,7 +325,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <span className="text-sm font-black">
             <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
-            <span className="text-zinc-500">Secret</span>
+            <span className="text-zinc-500">Cecret</span>
           </span>
           <p className="text-zinc-600 text-xs">© 2025 · 100% anonyme · Aucune donnée stockée</p>
         </div>

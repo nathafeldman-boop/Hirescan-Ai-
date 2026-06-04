@@ -83,7 +83,7 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
         <header className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-black">
             <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
-            <span className="text-white">Secret</span>
+            <span className="text-white">Cecret</span>
           </h1>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />

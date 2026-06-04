@@ -15,7 +15,7 @@ async function sendVerificationRequest({ identifier: email, url }: SendVerificat
         <!-- Logo -->
         <tr><td align="center" style="padding-bottom:32px">
           <h1 style="margin:0;font-size:32px;font-weight:900;letter-spacing:-1px">
-            <span style="background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Ur</span><span style="color:#ffffff">Secret</span>
+            <span style="background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Ur</span><span style="color:#ffffff">Cecret</span>
           </h1>
         </td></tr>
         <!-- Card -->

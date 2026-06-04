@@ -90,7 +90,7 @@ export default function OnboardingClient() {
       <header className="relative z-10 flex items-center justify-between px-6 pt-6">
         <span className="text-xl font-black">
           <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
-          <span className="text-white">Secret</span>
+          <span className="text-white">Cecret</span>
         </span>
         <span className="text-xs text-zinc-600">{step + 1} / {STEPS.length}</span>
       </header>

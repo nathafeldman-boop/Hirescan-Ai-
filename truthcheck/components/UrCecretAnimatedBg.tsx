@@ -65,7 +65,7 @@ export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: stri
             fontSize: 'clamp(72px, 22vw, 180px)',
             fontWeight: 900,
             color: 'white',
-          }}>Secret</span>
+          }}>Cecret</span>
         </div>
 
         {/* Orbiting rings */}
