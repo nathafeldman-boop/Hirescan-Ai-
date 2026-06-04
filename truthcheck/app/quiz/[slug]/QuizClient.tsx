@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import type { Quiz, QuizSession } from '@/lib/quizzes';
 import { selectQuestions } from '@/lib/quizzes';
 import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
@@ -45,6 +46,7 @@ const QUIZ_SLIDES: Record<string, string[]> = {
 
 export default function QuizClient({ quiz }: Props) {
   const router = useRouter();
+  const { data: authSession, status } = useSession();
   const [session, setSession] = useState<QuizSession>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -54,6 +56,14 @@ export default function QuizClient({ quiz }: Props) {
   const [showMidHook, setShowMidHook] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+    const isPremium = (authSession?.user as { tier?: string } | undefined)?.tier === 'premium';
+    if (!isPremium) {
+      router.replace('/pricing');
+    }
+  }, [status, authSession, router]);
 
   useEffect(() => {
     try {

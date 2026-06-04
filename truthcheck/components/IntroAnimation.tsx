@@ -330,7 +330,7 @@ export default function IntroAnimation({ onComplete }: Props) {
         </p>
 
         <Link
-          href="/onboarding"
+          href="/quiz/personnalite"
           className="w-full max-w-xs py-5 rounded-2xl font-black text-white text-center text-lg transition-all active:scale-95"
           style={{
             background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
@@ -338,7 +338,7 @@ export default function IntroAnimation({ onComplete }: Props) {
           }}
           onClick={onComplete}
         >
-          Découvrir mes vérités →
+          Découvrir ma personnalité →
         </Link>
 
         <button

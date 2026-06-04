@@ -119,3 +119,10 @@ model AffiliateConversion {
 
   affiliate Affiliate @relation(fields: [affiliateId], references: [id])
 }
+
+model TeamRoom {
+  id        String   @id  // 6-char alphanumeric code e.g. "K7P2XQ"
+  slug      String
+  answers   String   // base64-encoded answers from player 1
+  createdAt DateTime @default(now())
+}

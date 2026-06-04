@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { DuoQuiz } from '@/lib/duoQuizzes';
-import { encodeDuoAnswers } from '@/lib/duoQuizzes';
+import { encodeDuoAnswers, encodeTeamCode } from '@/lib/duoQuizzes';
 
 interface Props {
   quiz: DuoQuiz;
@@ -18,7 +18,9 @@ export default function DuoQuizClient({ quiz }: Props) {
   const [selected, setSelected] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [shareLink, setShareLink] = useState('');
+  const [teamCode, setTeamCode] = useState('');
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const question = quiz.questions[currentIndex];
   const progress = (currentIndex / quiz.questions.length) * 100;
@@ -38,7 +40,9 @@ export default function DuoQuizClient({ quiz }: Props) {
       if (isLast) {
         const encoded = encodeDuoAnswers(newAnswers);
         const link = `${window.location.origin}/duo/${quiz.slug}/compare?a=${encoded}`;
+        const code = encodeTeamCode(quiz.slug, newAnswers);
         setShareLink(link);
+        setTeamCode(code);
         setPhase('share');
         setTransitioning(false);
       } else {
@@ -54,6 +58,13 @@ export default function DuoQuizClient({ quiz }: Props) {
     navigator.clipboard.writeText(shareLink).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
+    });
+  }
+
+  function copyCode() {
+    navigator.clipboard.writeText(teamCode).then(() => {
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2200);
     });
   }
 
@@ -86,7 +97,7 @@ export default function DuoQuizClient({ quiz }: Props) {
           </div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-4">
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: quiz.accentColor }} />
-            <span className="text-xs text-zinc-400 font-medium uppercase tracking-widest">Mode Duo</span>
+            <span className="text-xs text-zinc-400 font-medium uppercase tracking-widest">Mode Équipe</span>
           </div>
           <h1 className="text-2xl font-black text-white mb-3 leading-tight">{quiz.title}</h1>
           <p className="text-zinc-400 text-sm leading-relaxed mb-8">{quiz.description}</p>
@@ -121,7 +132,7 @@ export default function DuoQuizClient({ quiz }: Props) {
           </button>
 
           <Link href="/duo" className="block mt-4 text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
-            ← Retour au Mode Duo
+            ← Retour au Mode Équipe
           </Link>
         </div>
       </main>
@@ -133,24 +144,38 @@ export default function DuoQuizClient({ quiz }: Props) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#09090b' }}>
         <div className="w-full max-w-md text-center">
-          <div className="text-5xl mb-5">🔗</div>
+          <div className="text-5xl mb-4">🧩</div>
           <h2 className="text-2xl font-black text-white mb-2">Tes réponses sont prêtes !</h2>
-          <p className="text-zinc-400 text-sm leading-relaxed mb-8">
-            Envoie ce lien à ton/ta partenaire. Quand il/elle aura répondu,
-            vous verrez vos réponses comparées ensemble.
+          <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+            Partage le lien <strong className="text-zinc-200">ou le code</strong> à tes coéquipier(s).
+            Quand ils auront répondu, comparez vos secrets ensemble.
           </p>
 
-          {/* Link box */}
+          {/* Code d'entrée — hero element */}
           <div
-            className="rounded-2xl p-4 mb-4 border text-left"
-            style={{ background: 'rgba(255,255,255,0.04)', borderColor: `${quiz.accentColor}40` }}
+            className="rounded-2xl p-5 mb-4 border text-center"
+            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.06))', borderColor: 'rgba(139,92,246,0.4)' }}
           >
-            <p className="text-xs text-zinc-500 mb-2 uppercase tracking-widest font-semibold">Ton lien personnalisé</p>
-            <p className="text-xs text-zinc-300 break-all font-mono leading-relaxed">{shareLink}</p>
+            <p className="text-xs text-zinc-500 mb-3 uppercase tracking-widest font-semibold">Code d&apos;entrée équipe</p>
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <span
+                className="text-3xl font-black tracking-[0.25em] font-mono"
+                style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+              >
+                {teamCode}
+              </span>
+              <button
+                onClick={copyCode}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border"
+                style={{ borderColor: 'rgba(139,92,246,0.4)', color: codeCopied ? '#a78bfa' : '#71717a', background: 'rgba(139,92,246,0.08)' }}
+              >
+                {codeCopied ? '✓ Copié' : 'Copier'}
+              </button>
+            </div>
+            <p className="text-xs text-zinc-600">Ils entrent ce code sur la page Mode Équipe</p>
           </div>
 
           <div className="space-y-3 mb-6">
-            {/* PRIMARY: WhatsApp — highest conversion */}
             <a
               href={`https://wa.me/?text=${whatsappMsg}`}
               target="_blank"
@@ -165,7 +190,7 @@ export default function DuoQuizClient({ quiz }: Props) {
               onClick={shareNative}
               className="w-full py-3 rounded-xl font-semibold text-sm text-zinc-200 bg-white/[0.06] hover:bg-white/10 border border-white/10 transition-all"
             >
-              📤 Autres options de partage
+              📤 Partager le lien direct
             </button>
             <button
               onClick={copyLink}
@@ -175,19 +200,8 @@ export default function DuoQuizClient({ quiz }: Props) {
             </button>
           </div>
 
-          <div
-            className="rounded-2xl p-4 text-left"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
-          >
-            <p className="text-xs text-zinc-500 mb-1 font-semibold">⚠️ Note importante</p>
-            <p className="text-xs text-zinc-600 leading-relaxed">
-              Tes réponses sont encodées dans le lien. Garde-le privé — ne le partage
-              qu&apos;avec la personne concernée.
-            </p>
-          </div>
-
-          <Link href="/duo" className="block mt-6 text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
-            ← Faire un autre quiz duo
+          <Link href="/duo" className="block mt-4 text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+            ← Retour au Mode Équipe
           </Link>
         </div>
       </main>

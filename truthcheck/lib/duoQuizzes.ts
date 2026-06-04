@@ -585,6 +585,44 @@ export function decodeDuoAnswers(encoded: string): number[] | null {
   }
 }
 
+// ── Team code: compact 6-char stateless code (2 slug + 4 answers) ──────────
+const SLUG_TO_CODE: Record<string, string> = {
+  'duo-communication': 'CO',
+  'duo-compatibilite': 'CA',
+  'duo-investissement': 'IN',
+  'duo-resilience': 'RE',
+  'duo-amour': 'AM',
+};
+const CODE_TO_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(SLUG_TO_CODE).map(([k, v]) => [v, k])
+);
+const B32 = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+export function encodeTeamCode(slug: string, answers: number[]): string {
+  const sc = SLUG_TO_CODE[slug] ?? 'XX';
+  // Pack 10 × 2-bit answers into 20 bits, encode as 4 base32 chars (5 bits each)
+  let bits = 0;
+  for (const a of answers.slice(0, 10)) bits = (bits << 2) | (a & 3);
+  let enc = '';
+  for (let i = 0; i < 4; i++) { enc = B32[bits & 31] + enc; bits >>= 5; }
+  return sc + enc;
+}
+
+export function decodeTeamCode(code: string): { slug: string; answers: number[] } | null {
+  if (code.length !== 6) return null;
+  const slug = CODE_TO_SLUG[code.slice(0, 2).toUpperCase()];
+  if (!slug) return null;
+  let bits = 0;
+  for (const ch of code.slice(2).toUpperCase()) {
+    const idx = B32.indexOf(ch);
+    if (idx === -1) return null;
+    bits = (bits << 5) | idx;
+  }
+  const answers: number[] = [];
+  for (let i = 9; i >= 0; i--) { answers[i] = bits & 3; bits >>= 2; }
+  return { slug, answers };
+}
+
 export function compareDuoAnswers(
   a: number[],
   b: number[],
