@@ -16,7 +16,7 @@ export const mbtiQuestionsEn: MbtiQuestion[] = [
     optionA: { text: 'A lively open office — the buzz energizes me', pole: 'E' },
     optionB: { text: 'Some background activity helps me focus', pole: 'E' },
     optionC: { text: 'A quiet space — noise distracts me', pole: 'I' },
-    optionD: { text: 'Complete isolation — alone I'm 10× more productive', pole: 'I' },
+    optionD: { text: "Complete isolation — alone I'm 10× more productive", pole: 'I' },
   },
   {
     id: 3, dimension: 'EI',
