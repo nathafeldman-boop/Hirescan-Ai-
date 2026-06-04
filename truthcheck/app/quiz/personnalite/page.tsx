@@ -10,7 +10,7 @@ const jsonLd = {
     {
       '@type': 'WebApplication',
       '@id': 'https://urcecret.site/quiz/personnalite#app',
-      name: 'Test de Personnalité 16 Types — UrSecret',
+      name: 'Test de Personnalité 16 Types — UrCecret',
       url: 'https://urcecret.site/quiz/personnalite',
       applicationCategory: 'EducationalApplication',
       operatingSystem: 'Web',
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   keywords: ['test de personnalité', '16 types de personnalité', 'mbti français', 'test psychologique gratuit', 'type de personnalité', 'quel est mon profil'],
   alternates: { canonical: 'https://urcecret.site/quiz/personnalite' },
   openGraph: {
-    title: 'Test de Personnalité 16 Types — UrSecret',
+    title: 'Test de Personnalité 16 Types — UrCecret',
     description: 'Découvre ton type de personnalité en 24 questions. Gratuit, instantané, en français.',
     type: 'website',
   },

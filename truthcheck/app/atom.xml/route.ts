@@ -29,7 +29,7 @@ export function GET() {
     <id>${BASE}/quiz/${q.slug}</id>
     <updated>${now}</updated>
     <summary type="html"><![CDATA[${q.desc}]]></summary>
-    <author><name>UrSecret</name><uri>${BASE}</uri></author>
+    <author><name>UrCecret</name><uri>${BASE}</uri></author>
     <category term="quiz" label="Quiz"/>
     <category term="psychologie" label="Psychologie"/>
     <category term="relations" label="Relations"/>
@@ -37,7 +37,7 @@ export function GET() {
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="fr">
-  <title>UrSecret — Tes vraies réponses</title>
+  <title>UrCecret — Tes vraies réponses</title>
   <subtitle>Des questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille</subtitle>
   <link href="${BASE}/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="${BASE}" rel="alternate" type="text/html"/>
@@ -45,11 +45,11 @@ export function GET() {
   <link href="https://pubsubhubbub.superfeedr.com/" rel="hub"/>
   <id>${BASE}/</id>
   <updated>${now}</updated>
-  <author><name>UrSecret</name><uri>${BASE}</uri></author>
+  <author><name>UrCecret</name><uri>${BASE}</uri></author>
   <icon>${BASE}/favicon.svg</icon>
   <logo>${BASE}/favicon.svg</logo>
-  <rights>© ${year} UrSecret</rights>
-  <generator uri="${BASE}" version="1.0">UrSecret</generator>
+  <rights>© ${year} UrCecret</rights>
+  <generator uri="${BASE}" version="1.0">UrCecret</generator>
 ${entries}
 </feed>`;
 

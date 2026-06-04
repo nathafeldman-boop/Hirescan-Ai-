@@ -1,6 +1,6 @@
 {
-  "name": "UrSecret — Tes vraies réponses",
-  "short_name": "UrSecret",
+  "name": "UrCecret — Tes vraies réponses",
+  "short_name": "UrCecret",
   "description": "Des questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille.",
   "start_url": "/",
   "display": "standalone",

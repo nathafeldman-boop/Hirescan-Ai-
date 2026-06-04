@@ -60,7 +60,7 @@ export default function DuoQuizClient({ quiz }: Props) {
   function shareNative() {
     if (navigator.share) {
       void navigator.share({
-        title: `UrSecret · ${quiz.title}`,
+        title: `UrCecret · ${quiz.title}`,
         text: `🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes — sans tricher 👀\n\nRéponds ici :`,
         url: shareLink,
       });

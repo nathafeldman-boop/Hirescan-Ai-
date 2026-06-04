@@ -160,19 +160,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    keywords: [quiz.title, quiz.subtitle, 'quiz anonyme', 'test psychologique', 'questionnaire', 'résultats instantanés', 'UrSecret'],
+    keywords: [quiz.title, quiz.subtitle, 'quiz anonyme', 'test psychologique', 'questionnaire', 'résultats instantanés', 'UrCecret'],
     openGraph: {
-      title: `${title} | UrSecret`,
+      title: `${title} | UrCecret`,
       description,
       url: `${BASE}/quiz/${quiz.slug}`,
-      siteName: 'UrSecret',
+      siteName: 'UrCecret',
       locale: 'fr_FR',
       type: 'website',
       images: [{ url: `/api/og?quiz=${quiz.slug}`, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} | UrSecret`,
+      title: `${title} | UrCecret`,
       description,
       images: [`/api/og?quiz=${quiz.slug}`],
     },
@@ -192,7 +192,7 @@ export default function QuizPage({ params }: PageProps) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'UrSecret', item: BASE },
+          { '@type': 'ListItem', position: 1, name: 'UrCecret', item: BASE },
           { '@type': 'ListItem', position: 2, name: 'Quizzes', item: `${BASE}/quizzes` },
           { '@type': 'ListItem', position: 3, name: quiz.title, item: `${BASE}/quiz/${quiz.slug}` },
         ],
@@ -212,7 +212,7 @@ export default function QuizPage({ params }: PageProps) {
         url: `${BASE}/quiz/${quiz.slug}`,
         inLanguage: 'fr',
         isPartOf: { '@id': BASE },
-        publisher: { '@type': 'Organization', name: 'UrSecret', url: BASE },
+        publisher: { '@type': 'Organization', name: 'UrCecret', url: BASE },
       },
     ],
   };

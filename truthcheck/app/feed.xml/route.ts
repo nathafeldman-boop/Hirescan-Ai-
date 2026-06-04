@@ -37,7 +37,7 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>UrSecret — Tes vraies réponses</title>
+    <title>UrCecret — Tes vraies réponses</title>
     <link>${BASE}</link>
     <description>Des questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille. 100% anonyme, résultats instantanés.</description>
     <language>fr</language>
@@ -46,7 +46,7 @@ export async function GET() {
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <image>
       <url>${BASE}/favicon.svg</url>
-      <title>UrSecret</title>
+      <title>UrCecret</title>
       <link>${BASE}</link>
     </image>
     ${items}

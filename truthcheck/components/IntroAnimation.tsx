@@ -106,7 +106,7 @@ export default function IntroAnimation({ onComplete }: Props) {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            UrSecret
+            UrCecret
           </span>
         </div>
 
@@ -208,7 +208,7 @@ export default function IntroAnimation({ onComplete }: Props) {
         }}
       >
         <p className="text-white/40 text-sm tracking-widest uppercase mb-8">
-          Pourquoi UrSecret ?
+          Pourquoi UrCecret ?
         </p>
         <div className="flex flex-col gap-7">
           {BULLETS.map((b, i) => (

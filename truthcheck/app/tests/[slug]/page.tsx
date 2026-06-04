@@ -312,7 +312,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: guide.metaTitle,
       description: guide.metaDesc,
       url: `${BASE}/tests/${guide.slug}`,
-      siteName: 'UrSecret',
+      siteName: 'UrCecret',
       locale: 'fr_FR',
       type: 'article',
       images: [{ url: `/api/og?quiz=${guide.slug}`, width: 1200, height: 630, alt: guide.title }],
@@ -337,7 +337,7 @@ export default function TestGuidePage({ params }: PageProps) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'UrSecret', item: BASE },
+          { '@type': 'ListItem', position: 1, name: 'UrCecret', item: BASE },
           { '@type': 'ListItem', position: 2, name: 'Tests', item: `${BASE}/tests` },
           { '@type': 'ListItem', position: 3, name: guide.title, item: `${BASE}/tests/${guide.slug}` },
         ],
@@ -356,7 +356,7 @@ export default function TestGuidePage({ params }: PageProps) {
         description: guide.metaDesc,
         url: `${BASE}/tests/${guide.slug}`,
         inLanguage: 'fr',
-        publisher: { '@type': 'Organization', name: 'UrSecret', url: BASE },
+        publisher: { '@type': 'Organization', name: 'UrCecret', url: BASE },
       },
     ],
   };
@@ -452,7 +452,7 @@ export default function TestGuidePage({ params }: PageProps) {
           {/* Footer CTA */}
           <div className="text-center py-8 border-t border-white/5">
             <p className="text-zinc-500 text-sm mb-4">
-              Découvre aussi les autres tests UrSecret
+              Découvre aussi les autres tests UrCecret
             </p>
             <div className="flex flex-wrap gap-2 justify-center mb-6">
               {[

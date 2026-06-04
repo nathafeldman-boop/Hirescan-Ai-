@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
+import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 import QuizIcon from '@/components/QuizIcon';
 
 const QUIZ_COLORS: Record<string, string> = {
@@ -84,7 +84,7 @@ export default function OnboardingClient() {
 
   return (
     <main className="min-h-screen flex flex-col relative overflow-hidden" style={{ backgroundColor: '#09090b' }}>
-      <UrSecretAnimatedBg />
+      <UrCecretAnimatedBg />
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 pt-6">

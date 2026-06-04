@@ -1,26 +1,26 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { duoQuizzes } from '@/lib/duoQuizzes';
-import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
+import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 
 const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
-  title: 'Mode Duo — Testez votre couple | UrSecret',
+  title: 'Mode Duo — Testez votre couple | UrCecret',
   description: 'Faites le quiz chacun de votre côté et comparez vos réponses. Découvrez ce que vous vous cachez vraiment. Anonyme, gratuit, instantané.',
-  keywords: ['quiz couple', 'test compatibilité couple', 'quiz relation', 'quiz partenaire', 'test amour couple', 'UrSecret duo'],
+  keywords: ['quiz couple', 'test compatibilité couple', 'quiz relation', 'quiz partenaire', 'test amour couple', 'UrCecret duo'],
   openGraph: {
-    title: 'Mode Duo — Testez votre couple | UrSecret',
+    title: 'Mode Duo — Testez votre couple | UrCecret',
     description: 'Chacun répond de son côté. L\'IA compare vos réponses. Découvrez ce que vous vous cachez vraiment.',
     url: `${BASE}/duo`,
-    siteName: 'UrSecret',
+    siteName: 'UrCecret',
     locale: 'fr_FR',
     type: 'website',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrSecret Mode Duo' }],
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrCecret Mode Duo' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mode Duo — Testez votre couple | UrSecret',
+    title: 'Mode Duo — Testez votre couple | UrCecret',
     description: 'Chacun répond de son côté. L\'IA compare. Découvrez la vérité.',
     images: ['/api/og'],
   },
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export default function DuoPage() {
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col">
-      <UrSecretAnimatedBg />
+      <UrCecretAnimatedBg />
 
       {/* Header */}
       <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">

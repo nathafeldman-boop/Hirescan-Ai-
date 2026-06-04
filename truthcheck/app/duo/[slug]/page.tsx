@@ -27,13 +27,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${quiz.emoji} ${quiz.title} — Mode Duo`;
   const description = `${quiz.description} 100% anonyme, résultats instantanés.`;
   return {
-    title: `${title} | UrSecret`,
+    title: `${title} | UrCecret`,
     description,
     openGraph: {
-      title: `${title} | UrSecret`,
+      title: `${title} | UrCecret`,
       description,
       url: `${BASE}/duo/${quiz.slug}`,
-      siteName: 'UrSecret',
+      siteName: 'UrCecret',
       locale: 'fr_FR',
       type: 'website',
       images: [{ url: '/api/og', width: 1200, height: 630, alt: title }],

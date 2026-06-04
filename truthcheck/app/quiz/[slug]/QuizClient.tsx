@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { Quiz, QuizSession } from '@/lib/quizzes';
 import { selectQuestions } from '@/lib/quizzes';
-import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
+import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 import QuizAtmosphereBg from '@/components/QuizAtmosphereBg';
 
 interface Props {

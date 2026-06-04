@@ -4,17 +4,17 @@ import Link from 'next/link';
 const BASE = 'https://ursecret.vercel.app';
 
 export const metadata: Metadata = {
-  title: 'Tests Psychologiques Gratuits 2025 — UrSecret',
+  title: 'Tests Psychologiques Gratuits 2025 — UrCecret',
   description: 'Tests psychologiques gratuits et anonymes : style d\'attachement, langages de l\'amour, gaslighting, burnout, dépression, narcissisme. Résultats instantanés basés sur des critères cliniques.',
   keywords: ['tests psychologiques gratuits', 'test style attachement', 'test langages amour', 'test gaslighting', 'test burnout', 'test dépression', 'test narcissisme', 'psychologie gratuit'],
   openGraph: {
-    title: 'Tests Psychologiques Gratuits | UrSecret',
+    title: 'Tests Psychologiques Gratuits | UrCecret',
     description: 'Tests psychologiques anonymes avec résultats instantanés. Style d\'attachement, langages de l\'amour, burnout, dépression et plus.',
     url: `${BASE}/tests`,
-    siteName: 'UrSecret',
+    siteName: 'UrCecret',
     locale: 'fr_FR',
     type: 'website',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'Tests Psychologiques UrSecret' }],
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'Tests Psychologiques UrCecret' }],
   },
   alternates: { canonical: `${BASE}/tests` },
 };
@@ -38,13 +38,13 @@ export default function TestsPage() {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'UrSecret', item: BASE },
+          { '@type': 'ListItem', position: 1, name: 'UrCecret', item: BASE },
           { '@type': 'ListItem', position: 2, name: 'Tests', item: `${BASE}/tests` },
         ],
       },
       {
         '@type': 'ItemList',
-        name: 'Tests Psychologiques Gratuits UrSecret',
+        name: 'Tests Psychologiques Gratuits UrCecret',
         numberOfItems: testList.length,
         itemListElement: testList.map((t, i) => ({
           '@type': 'ListItem',

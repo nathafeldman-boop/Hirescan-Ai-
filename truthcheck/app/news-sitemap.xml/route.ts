@@ -26,7 +26,7 @@ export function GET() {
     <loc>${BASE}/quiz/${q.slug}</loc>
     <news:news>
       <news:publication>
-        <news:name>UrSecret</news:name>
+        <news:name>UrCecret</news:name>
         <news:language>fr</news:language>
       </news:publication>
       <news:publication_date>${today}</news:publication_date>

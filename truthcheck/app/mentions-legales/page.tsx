@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Mentions Légales',
-  description: 'Mentions légales d\'UrSecret conformément à la loi française LCEN du 21 juin 2004.',
+  description: 'Mentions légales d\'UrCecret conformément à la loi française LCEN du 21 juin 2004.',
   robots: { index: true, follow: false },
   alternates: { canonical: 'https://ursecret.vercel.app/mentions-legales' },
 };
@@ -29,8 +29,8 @@ export default function MentionsLegales() {
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">1. Éditeur du site</h2>
-            <p>Le site UrSecret est édité à titre personnel.</p>
-            <p className="mt-2">Directeur de la publication : Propriétaire du site UrSecret</p>
+            <p>Le site UrCecret est édité à titre personnel.</p>
+            <p className="mt-2">Directeur de la publication : Propriétaire du site UrCecret</p>
             <p className="mt-2">Contact : accessible via le formulaire de contact disponible sur le site.</p>
           </section>
 
@@ -45,12 +45,12 @@ export default function MentionsLegales() {
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">3. Propriété intellectuelle</h2>
-            <p>L&apos;ensemble du contenu du site UrSecret (textes, quiz, analyses, design, code) est protégé par le droit d&apos;auteur. Toute reproduction, même partielle, est interdite sans autorisation préalable.</p>
+            <p>L&apos;ensemble du contenu du site UrCecret (textes, quiz, analyses, design, code) est protégé par le droit d&apos;auteur. Toute reproduction, même partielle, est interdite sans autorisation préalable.</p>
           </section>
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">4. Données personnelles</h2>
-            <p>UrSecret est conçu pour être utilisé de manière <strong className="text-white">100% anonyme</strong>. Aucun compte n&apos;est requis pour accéder aux quiz gratuits. Pour les utilisateurs qui créent un compte (nécessaire pour accéder aux résultats premium), les données collectées sont limitées à l&apos;adresse email.</p>
+            <p>UrCecret est conçu pour être utilisé de manière <strong className="text-white">100% anonyme</strong>. Aucun compte n&apos;est requis pour accéder aux quiz gratuits. Pour les utilisateurs qui créent un compte (nécessaire pour accéder aux résultats premium), les données collectées sont limitées à l&apos;adresse email.</p>
             <p className="mt-2">Pour plus d&apos;informations, consultez notre <Link href="/politique-confidentialite" className="text-violet-400 hover:text-violet-300">Politique de confidentialité</Link>.</p>
           </section>
 
@@ -61,7 +61,7 @@ export default function MentionsLegales() {
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">6. Limitation de responsabilité</h2>
-            <p>Les quiz et tests proposés sur UrSecret sont des outils de découverte de soi à visée informative. Ils ne constituent en aucun cas des diagnostics médicaux ou psychologiques. UrSecret décline toute responsabilité pour les décisions prises sur la base des résultats obtenus.</p>
+            <p>Les quiz et tests proposés sur UrCecret sont des outils de découverte de soi à visée informative. Ils ne constituent en aucun cas des diagnostics médicaux ou psychologiques. UrCecret décline toute responsabilité pour les décisions prises sur la base des résultats obtenus.</p>
             <p className="mt-2">En cas de détresse psychologique, consultez un professionnel de santé ou appelez le <strong className="text-white">3114</strong> (numéro national de prévention du suicide — gratuit, 24h/24).</p>
           </section>
 

@@ -105,7 +105,7 @@ export default function PricingPage() {
         <h1 className="text-3xl font-black mb-3">
           Débloquer tout{' '}
           <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            UrSecret
+            UrCecret
           </span>
         </h1>
         <p className="text-zinc-400 text-sm mb-12 max-w-sm mx-auto">

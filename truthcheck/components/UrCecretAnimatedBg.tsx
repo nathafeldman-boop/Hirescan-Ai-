@@ -1,6 +1,6 @@
 'use client';
 
-export default function UrSecretAnimatedBg({ accentColor }: { accentColor?: string }) {
+export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: string }) {
   const accent = accentColor ?? '#8b5cf6';
 
   return (

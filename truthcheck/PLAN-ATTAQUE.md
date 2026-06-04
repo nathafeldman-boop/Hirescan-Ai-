@@ -1,19 +1,19 @@
 # 🎯 PLAN D'ATTAQUE — Premier abonné ce soir (objectif 30€ MRR)
 
-> Date : 03/06/2026 · Site : https://urcecret.site · Modèle : Truity → UrSecret
+> Date : 03/06/2026 · Site : https://urcecret.site · Modèle : Truity → UrCecret
 
 ---
 
 ## ✅ Ce qui vient d'être mis en place (code poussé)
 
-Le tunnel de conversion façon **Truity** est branché sur UrSecret :
+Le tunnel de conversion façon **Truity** est branché sur UrCecret :
 
 1. **Porte d'entrée = test de personnalité 16 types** (`/quiz/personnalite`)
    La page d'accueil mène directement au test. C'est le hook qui ramène les clients.
 2. **Teaser gratuit** : l'utilisateur passe les 24 questions, découvre son type (INFJ, ENFP…) + un aperçu gratuit.
 3. **Paywall (façon Truity)** : pour voir le rapport complet, il faut **créer un compte puis s'abonner**.
-4. **L'abonnement débloque TOUT** : le rapport complet **+ les 15 tests UrSecret** (couple, manipulation, burnout…).
-   → *Avant de payer = Truity. Après avoir payé = UrSecret.* Exactement le plan.
+4. **L'abonnement débloque TOUT** : le rapport complet **+ les 15 tests UrCecret** (couple, manipulation, burnout…).
+   → *Avant de payer = Truity. Après avoir payé = UrCecret.* Exactement le plan.
 5. **Prix affichés** : **4,99 €/mois** (principal) ou **29,99 €/an** (−50 %).
 
 ---

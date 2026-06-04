@@ -93,7 +93,7 @@ export default function TypeClient({ type }: Props) {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
 
   // ─────────────────────────────────────────────────────────────
-  // PREMIUM : rapport complet révélé + accès aux 15 tests UrSecret
+  // PREMIUM : rapport complet révélé + accès aux 15 tests UrCecret
   // ─────────────────────────────────────────────────────────────
   if (isPremium) {
     return (
@@ -169,7 +169,7 @@ export default function TypeClient({ type }: Props) {
 
         <div className="rounded-2xl p-6 border text-center"
           style={{ borderColor: `${type.accentColor}30`, background: 'linear-gradient(135deg, rgba(139,92,246,0.10), rgba(236,72,153,0.06))' }}>
-          <h3 className="text-lg font-black text-white mb-2">Ton accès UrSecret est ouvert 🔓</h3>
+          <h3 className="text-lg font-black text-white mb-2">Ton accès UrCecret est ouvert 🔓</h3>
           <p className="text-sm text-zinc-400 mb-4 max-w-sm mx-auto">{t.quizzesDesc}</p>
           <a href="/quizzes"
             className="inline-block px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-105"

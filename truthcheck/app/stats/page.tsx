@@ -51,7 +51,7 @@ export default async function StatsPage() {
               Accueil
             </Link>
             <h1 className="text-3xl font-black text-white">📊 Statistiques</h1>
-            <p className="text-zinc-500 text-sm mt-1">Données en temps réel sur les quiz UrSecret</p>
+            <p className="text-zinc-500 text-sm mt-1">Données en temps réel sur les quiz UrCecret</p>
           </div>
           <div className="text-right">
             <div className="text-4xl font-black text-white tabular-nums">{total.toLocaleString('fr-FR')}</div>

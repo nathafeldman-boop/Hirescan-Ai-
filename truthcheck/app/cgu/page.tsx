@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Conditions Générales d\'Utilisation',
-  description: 'Conditions Générales d\'Utilisation d\'UrSecret. Règles d\'utilisation des quiz psychologiques et des abonnements premium.',
+  description: 'Conditions Générales d\'Utilisation d\'UrCecret. Règles d\'utilisation des quiz psychologiques et des abonnements premium.',
   robots: { index: true, follow: false },
   alternates: { canonical: 'https://ursecret.vercel.app/cgu' },
 };
@@ -23,13 +23,13 @@ export default function CGU() {
 
       <div className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-2xl font-black text-white mb-2">Conditions Générales d&apos;Utilisation</h1>
-        <p className="text-zinc-500 text-sm mb-10">En utilisant UrSecret, tu acceptes les présentes CGU. Dernière mise à jour : juin 2025.</p>
+        <p className="text-zinc-500 text-sm mb-10">En utilisant UrCecret, tu acceptes les présentes CGU. Dernière mise à jour : juin 2025.</p>
 
         <div className="space-y-8 text-sm text-zinc-400 leading-relaxed">
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">1. Objet</h2>
-            <p>UrSecret est une plateforme de quiz et tests psychologiques à vocation informative. Les présentes CGU définissent les conditions d&apos;accès et d&apos;utilisation du service.</p>
+            <p>UrCecret est une plateforme de quiz et tests psychologiques à vocation informative. Les présentes CGU définissent les conditions d&apos;accès et d&apos;utilisation du service.</p>
           </section>
 
           <section>
@@ -39,7 +39,7 @@ export default function CGU() {
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">3. Nature du service</h2>
-            <p>Les quiz et analyses proposés par UrSecret sont des <strong className="text-white">outils de découverte de soi à visée informative uniquement</strong>. Ils ne constituent en aucun cas :</p>
+            <p>Les quiz et analyses proposés par UrCecret sont des <strong className="text-white">outils de découverte de soi à visée informative uniquement</strong>. Ils ne constituent en aucun cas :</p>
             <ul className="list-disc list-inside space-y-1 ml-2 mt-2">
               <li>Un diagnostic médical ou psychologique</li>
               <li>Un avis médical ou thérapeutique</li>
@@ -65,7 +65,7 @@ export default function CGU() {
               </div>
               <div>
                 <h3 className="text-zinc-300 font-semibold mb-1">Droit de rétractation</h3>
-                <p>Conformément au Code de la consommation, tu disposes d&apos;un délai de <strong className="text-white">14 jours</strong> pour exercer ton droit de rétractation à compter de la souscription, sans avoir à justifier de motifs. Par ailleurs, UrSecret applique une garantie <strong className="text-white">satisfait ou remboursé 7 jours</strong>.</p>
+                <p>Conformément au Code de la consommation, tu disposes d&apos;un délai de <strong className="text-white">14 jours</strong> pour exercer ton droit de rétractation à compter de la souscription, sans avoir à justifier de motifs. Par ailleurs, UrCecret applique une garantie <strong className="text-white">satisfait ou remboursé 7 jours</strong>.</p>
               </div>
             </div>
           </section>
@@ -82,12 +82,12 @@ export default function CGU() {
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">6. Propriété intellectuelle</h2>
-            <p>L&apos;ensemble des contenus (quiz, analyses, textes, design) est la propriété exclusive d&apos;UrSecret et protégé par le droit d&apos;auteur français et les conventions internationales.</p>
+            <p>L&apos;ensemble des contenus (quiz, analyses, textes, design) est la propriété exclusive d&apos;UrCecret et protégé par le droit d&apos;auteur français et les conventions internationales.</p>
           </section>
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">7. Modification des CGU</h2>
-            <p>UrSecret se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs en compte seront informés par email. La poursuite de l&apos;utilisation du service après modification vaut acceptation des nouvelles CGU.</p>
+            <p>UrCecret se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs en compte seront informés par email. La poursuite de l&apos;utilisation du service après modification vaut acceptation des nouvelles CGU.</p>
           </section>
 
           <section>

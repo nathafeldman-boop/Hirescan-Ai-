@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: [`${code} personnalité`, `type ${code}`, `${t.name.toLowerCase()}`, `personnalité ${code} en français`, 'test de personnalité 16 types'],
     alternates: { canonical: `https://urcecret.site/types/${params.type}` },
     openGraph: {
-      title: `${code} — ${t.name} | UrSecret`,
+      title: `${code} — ${t.name} | UrCecret`,
       description: t.shortDesc.slice(0, 200),
       type: 'article',
     },
@@ -73,8 +73,8 @@ export default function TypePage({ params }: Props) {
     '@type': 'Article',
     headline: `${code} — ${type.name} : Type de personnalité complet`,
     description: type.shortDesc,
-    author: { '@type': 'Organization', name: 'UrSecret' },
-    publisher: { '@type': 'Organization', name: 'UrSecret', url: 'https://urcecret.site' },
+    author: { '@type': 'Organization', name: 'UrCecret' },
+    publisher: { '@type': 'Organization', name: 'UrCecret', url: 'https://urcecret.site' },
   };
 
   return (

@@ -63,9 +63,9 @@ export default async function SuccessPage({
           </svg>
         </div>
 
-        <h1 className="text-3xl font-black text-white mb-3">Bienvenue dans UrSecret Premium ✦</h1>
+        <h1 className="text-3xl font-black text-white mb-3">Bienvenue dans UrCecret Premium ✦</h1>
         <p className="text-zinc-400 mb-8 leading-relaxed">
-          Ton rapport complet et <span className="text-white font-semibold">les 15 tests UrSecret</span> sont
+          Ton rapport complet et <span className="text-white font-semibold">les 15 tests UrCecret</span> sont
           maintenant débloqués. Couple, amitié, manipulation, burnout, amour véritable…
         </p>
 
@@ -84,7 +84,7 @@ export default async function SuccessPage({
             className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
             style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}
           >
-            Découvrir mes 15 tests UrSecret →
+            Découvrir mes 15 tests UrCecret →
           </Link>
         </div>
 

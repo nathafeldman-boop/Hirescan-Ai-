@@ -85,7 +85,7 @@ export default function AffilieClient({ affiliate }: { affiliate: Affiliate }) {
         <div className="text-center pb-2">
           <div className="text-4xl mb-3">👋</div>
           <h1 className="text-2xl font-black text-white mb-1">Bonjour {affiliate.name.split(' ')[0]} !</h1>
-          <p className="text-zinc-500 text-sm">Voici ton tableau de bord affilié UrSecret</p>
+          <p className="text-zinc-500 text-sm">Voici ton tableau de bord affilié UrCecret</p>
         </div>
 
         {/* Affiliate link */}

@@ -7,7 +7,7 @@ import { prisma } from './db';
 async function sendVerificationRequest({ identifier: email, url }: SendVerificationRequestParams) {
   const html = `<!DOCTYPE html>
 <html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion UrSecret</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion UrCecret</title></head>
 <body style="margin:0;padding:0;background:#09090b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#09090b;padding:40px 20px">
     <tr><td align="center">
@@ -22,7 +22,7 @@ async function sendVerificationRequest({ identifier: email, url }: SendVerificat
         <tr><td style="background:#18181b;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:40px 36px">
           <p style="margin:0 0 8px;color:#a1a1aa;font-size:13px;text-transform:uppercase;letter-spacing:1px;font-weight:600">Connexion sécurisée</p>
           <h2 style="margin:0 0 16px;color:#ffffff;font-size:24px;font-weight:800;line-height:1.3">Ton lien de connexion est prêt ✨</h2>
-          <p style="margin:0 0 32px;color:#71717a;font-size:15px;line-height:1.6">Clique sur le bouton ci-dessous pour te connecter à ton compte UrSecret. Ce lien expire dans <strong style="color:#a78bfa">10 minutes</strong>.</p>
+          <p style="margin:0 0 32px;color:#71717a;font-size:15px;line-height:1.6">Clique sur le bouton ci-dessous pour te connecter à ton compte UrCecret. Ce lien expire dans <strong style="color:#a78bfa">10 minutes</strong>.</p>
           <!-- CTA Button -->
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr><td align="center" style="padding-bottom:32px">
@@ -53,9 +53,9 @@ async function sendVerificationRequest({ identifier: email, url }: SendVerificat
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'UrSecret <onboarding@resend.dev>',
+      from: 'UrCecret <onboarding@resend.dev>',
       to: email,
-      subject: '🔐 Ton lien de connexion UrSecret',
+      subject: '🔐 Ton lien de connexion UrCecret',
       html,
     }),
   });

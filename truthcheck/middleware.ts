@@ -12,9 +12,9 @@ export function middleware(request: NextRequest) {
     [
       `<${BASE}/sitemap.xml>; rel="sitemap"`,
       `<${BASE}/news-sitemap.xml>; rel="sitemap"`,
-      `<${BASE}/feed.xml>; rel="alternate"; type="application/rss+xml"; title="UrSecret RSS"`,
-      `<${BASE}/atom.xml>; rel="alternate"; type="application/atom+xml"; title="UrSecret Atom"`,
-      `<${BASE}/opensearch.xml>; rel="search"; type="application/opensearchdescription+xml"; title="UrSecret"`,
+      `<${BASE}/feed.xml>; rel="alternate"; type="application/rss+xml"; title="UrCecret RSS"`,
+      `<${BASE}/atom.xml>; rel="alternate"; type="application/atom+xml"; title="UrCecret Atom"`,
+      `<${BASE}/opensearch.xml>; rel="search"; type="application/opensearchdescription+xml"; title="UrCecret"`,
       `<https://pubsubhubbub.appspot.com/>; rel="hub"`,
       `<https://pubsubhubbub.superfeedr.com/>; rel="hub"`,
     ].join(', ')

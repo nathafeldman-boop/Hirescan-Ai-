@@ -14,13 +14,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!quiz) return {};
   const title = `${quiz.emoji} ${quiz.title} — Résultats Duo`;
   return {
-    title: `${title} | UrSecret`,
+    title: `${title} | UrCecret`,
     description: `Réponds au quiz et compare tes réponses. Découvrez ce que vous vous cachez vraiment.`,
     openGraph: {
-      title: `${title} | UrSecret`,
+      title: `${title} | UrCecret`,
       description: 'Réponds au quiz et compare tes réponses avec ton/ta partenaire.',
       url: `${BASE}/duo/${params.slug}/compare`,
-      siteName: 'UrSecret',
+      siteName: 'UrCecret',
       locale: 'fr_FR',
       type: 'website',
       images: [{ url: '/api/og', width: 1200, height: 630, alt: title }],

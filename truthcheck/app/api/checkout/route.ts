@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `Rapport Complet ${typeCode} — UrSecret`,
+              name: `Rapport Complet ${typeCode} — UrCecret`,
               description: `Analyse approfondie du type ${typeCode} : amour, carrière, forces, compatibilité`,
             },
             unit_amount: RAPPORT_PRICE_CENTS,

@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Politique de Confidentialité',
-  description: 'Politique de confidentialité d\'UrSecret. Comment nous traitons tes données personnelles. Conformité RGPD.',
+  description: 'Politique de confidentialité d\'UrCecret. Comment nous traitons tes données personnelles. Conformité RGPD.',
   robots: { index: true, follow: false },
   alternates: { canonical: 'https://ursecret.vercel.app/politique-confidentialite' },
 };
@@ -29,7 +29,7 @@ export default function PolitiqueConfidentialite() {
 
           <section>
             <h2 className="text-white font-bold text-base mb-3">1. Principe de conception : Privacy by Design</h2>
-            <p>UrSecret est conçu selon le principe du <strong className="text-white">Privacy by Design</strong>. L&apos;utilisation des quiz est <strong className="text-white">100% anonyme</strong> par défaut : aucun compte, aucune adresse email, aucune donnée personnelle n&apos;est requise pour accéder aux quiz gratuits et à leur résultat de base.</p>
+            <p>UrCecret est conçu selon le principe du <strong className="text-white">Privacy by Design</strong>. L&apos;utilisation des quiz est <strong className="text-white">100% anonyme</strong> par défaut : aucun compte, aucune adresse email, aucune donnée personnelle n&apos;est requise pour accéder aux quiz gratuits et à leur résultat de base.</p>
           </section>
 
           <section>

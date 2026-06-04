@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db';
 import AffilieClient from './AffilieClient';
 
 export const metadata: Metadata = {
-  title: 'Mon espace affilié — UrSecret',
+  title: 'Mon espace affilié — UrCecret',
   robots: { index: false },
 };
 

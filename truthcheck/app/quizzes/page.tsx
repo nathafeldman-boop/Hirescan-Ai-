@@ -2,27 +2,27 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
 import { duoQuizzes } from '@/lib/duoQuizzes';
-import UrSecretAnimatedBg from '@/components/UrSecretAnimatedBg';
+import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 import QuizIcon from '@/components/QuizIcon';
 
 const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
-  title: 'Tous les quizzes — UrSecret',
+  title: 'Tous les quizzes — UrCecret',
   description: '15 questionnaires anonymes : infidélité, narcissisme, manipulation, burnout, dépression, amour, amitié et plus. Résultats instantanés, 100% gratuit, zéro compte requis.',
-  keywords: ['quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'suis-je narcissique', 'suis-je manipulé', 'burnout test', 'UrSecret'],
+  keywords: ['quiz anonyme', 'questionnaire psychologique', 'test infidélité', 'test amour', 'orientation sexuelle quiz', 'suis-je adopté', 'vrais amis quiz', 'suis-je narcissique', 'suis-je manipulé', 'burnout test', 'UrCecret'],
   openGraph: {
-    title: 'Tous les quizzes | UrSecret',
+    title: 'Tous les quizzes | UrCecret',
     description: '15 questionnaires anonymes pour découvrir la vérité sur toi-même, ton couple, tes amis et ta famille.',
     url: `${BASE}/quizzes`,
-    siteName: 'UrSecret',
+    siteName: 'UrCecret',
     locale: 'fr_FR',
     type: 'website',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrSecret — Tous les quizzes' }],
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrCecret — Tous les quizzes' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tous les quizzes | UrSecret',
+    title: 'Tous les quizzes | UrCecret',
     description: '15 questionnaires anonymes. 100% gratuit.',
     images: ['/api/og'],
   },
@@ -35,13 +35,13 @@ const jsonLd = {
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'UrSecret', item: BASE },
+        { '@type': 'ListItem', position: 1, name: 'UrCecret', item: BASE },
         { '@type': 'ListItem', position: 2, name: 'Quizzes', item: `${BASE}/quizzes` },
       ],
     },
     {
       '@type': 'ItemList',
-      name: 'Tous les quizzes UrSecret',
+      name: 'Tous les quizzes UrCecret',
       description: 'Questionnaires anonymes pour découvrir la vérité sur toi-même, tes relations et ta famille',
       numberOfItems: 15,
       itemListElement: [
@@ -64,7 +64,7 @@ const jsonLd = {
     },
     {
       '@type': 'WebPage',
-      name: 'Tous les quizzes UrSecret',
+      name: 'Tous les quizzes UrCecret',
       url: `${BASE}/quizzes`,
       inLanguage: 'fr',
       isPartOf: { '@id': `${BASE}/#website` },
@@ -77,7 +77,7 @@ export default function QuizzesPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <main className="min-h-screen bg-[#09090b] flex flex-col">
-        <UrSecretAnimatedBg />
+        <UrCecretAnimatedBg />
 
         {/* Header */}
         <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">

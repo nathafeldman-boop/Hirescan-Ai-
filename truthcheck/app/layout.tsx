@@ -3,7 +3,7 @@ import './globals.css';
 import Providers from './Providers';
 
 export const metadata: Metadata = {
-  title: 'UrSecret — Tes vraies réponses',
+  title: 'UrCecret — Tes vraies réponses',
   description: 'Des questionnaires précis pour découvrir les vérités que tu ressens. 100% anonyme.',
   icons: {
     icon: '/favicon.svg',
@@ -18,10 +18,10 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'UrSecret',
+    title: 'UrCecret',
     description: 'Tes vraies réponses. Rien que la vérité.',
     type: 'website',
-    siteName: 'UrSecret',
+    siteName: 'UrCecret',
     locale: 'fr_FR',
   },
 };
