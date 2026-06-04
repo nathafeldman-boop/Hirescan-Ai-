@@ -135,7 +135,7 @@ export default function AffiliatesClient({ initial }: { initial: Affiliate[] }) 
         const commission = a.conversions.reduce((s, c) => s + c.commissionCents, 0);
         const months = groupByMonth(a.conversions);
         const link = `https://urcecret.site/?ref=${a.slug}`;
-        const dashboardLink = `https://urcecret.site/affilie/${a.id}`;
+        const dashboardLink = `https://urcecret.site/affilie/${a.slug}`;
 
         return (
           <div key={a.id} className="bg-white/5 border border-white/10 rounded-2xl p-6">

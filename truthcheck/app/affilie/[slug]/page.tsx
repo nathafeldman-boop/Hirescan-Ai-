@@ -8,11 +8,11 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-interface Props { params: { id: string } }
+interface Props { params: { slug: string } }
 
 export default async function AffiliePage({ params }: Props) {
   const affiliate = await prisma.affiliate.findUnique({
-    where: { id: params.id },
+    where: { slug: params.slug },
     include: { conversions: { orderBy: { createdAt: 'desc' } } },
   });
 
