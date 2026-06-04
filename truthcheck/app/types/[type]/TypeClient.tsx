@@ -259,87 +259,29 @@ export default function TypeClient({ type }: Props) {
         </div>
       )}
 
-      <div className="mt-10 space-y-6">
-        <Section title={t.sectionTraits} accent={type.accentColor}>
-          <div className="flex flex-wrap gap-2">
-            {localType.traits.map(trait => (
-              <span key={trait} className="px-3 py-1.5 rounded-full text-xs font-medium border"
-                style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
-                {trait}
-              </span>
-            ))}
-          </div>
-        </Section>
-
-        <Section title={t.sectionWhoAreYou} accent={type.accentColor}>
-          <p className="text-zinc-400 text-sm leading-relaxed">{localType.shortDesc}</p>
-        </Section>
-
-        <div className="relative rounded-2xl overflow-hidden border border-violet-500/30">
-          <div className="px-6 py-5 blur-sm select-none pointer-events-none" aria-hidden>
-            <h2 className="text-base font-bold text-white mb-2">{t.blurredReportTitle(localType.name ?? type.name)}</h2>
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              {t.sectionInLove}, {t.sectionAtWork}, {t.sectionStrengths}, {t.sectionWeaknesses}, {t.sectionGrowth}...
-            </p>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/90 to-[#09090b]/60 flex flex-col items-center justify-center p-6 text-center">
-            <div className="text-3xl mb-3">🔓</div>
-            <h3 className="text-lg font-black text-white mb-1">{t.paywallTitle(type.code)}</h3>
-            <p className="text-sm text-zinc-400 mb-1 max-w-xs">
-              {t.paywallSubtitle} <span className="text-white font-semibold">{t.paywallPlus}</span>
-            </p>
-            <p className="text-xs text-zinc-500 mb-5">{t.paywallTagline}</p>
-            <button
-              onClick={() => handleUnlock(false)}
-              disabled={loading}
-              className="w-full max-w-xs px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-105 disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
-            >
-              {loading ? t.loading : t.unlockMonthly(MONTHLY_PRICE)}
-            </button>
-            <button
-              onClick={() => handleUnlock(true)}
-              disabled={loading}
-              className="w-full max-w-xs mt-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 disabled:opacity-60 border border-violet-500/40 text-violet-300 hover:border-violet-400 hover:text-white"
-            >
-              {t.unlockAnnual(ANNUAL_PRICE)}
-            </button>
-            <p className="text-xs text-zinc-600 mt-3">{t.guarantee}</p>
-          </div>
-        </div>
-
-        <div className="relative rounded-2xl overflow-hidden border border-white/10">
-          <div className="px-6 py-5 blur-sm select-none pointer-events-none" aria-hidden>
-            <h2 className="text-base font-bold text-white mb-3">{t.sectionStrengths}</h2>
-            <ul className="space-y-2">
-              {localType.strengths.map(s => (
-                <li key={s} className="flex gap-2 text-sm text-zinc-400"><span className="text-green-400 mt-0.5">✓</span>{s}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/80 to-transparent flex items-end justify-center pb-6">
-            <button onClick={() => handleUnlock(false)}
-              className="px-5 py-2.5 rounded-lg text-xs font-bold text-white border border-white/20 hover:bg-white/10 transition-all">
-              {t.unlockSection}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-8 bg-white/5 rounded-2xl p-6 border border-white/10">
-        <h2 className="text-base font-bold text-white mb-4">{t.sectionCompatibility}</h2>
-        <p className="text-xs text-zinc-500 mb-4">{t.compatibilityTitle(type.code)}</p>
-        <div className="flex flex-wrap gap-3">
-          {type.compatibleWith.map(c => (
-            <a key={c} href={`/types/${c.toLowerCase()}`}
-              className="px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-sm font-bold text-zinc-300 hover:text-white hover:border-white/20 transition-all">
-              {c}
-            </a>
-          ))}
-        </div>
-        <div className="mt-5 pt-4 border-t border-white/5">
-          <p className="text-xs text-zinc-500">{t.compatibilityNote}</p>
-        </div>
+      <div className="mt-6 rounded-2xl border border-violet-500/30 p-6 text-center" style={{ background: 'rgba(139,92,246,0.06)' }}>
+        <div className="text-3xl mb-3">🔓</div>
+        <h3 className="text-lg font-black text-white mb-1">{t.paywallTitle(type.code)}</h3>
+        <p className="text-sm text-zinc-400 mb-1 max-w-xs mx-auto">
+          {t.paywallSubtitle} <span className="text-white font-semibold">{t.paywallPlus}</span>
+        </p>
+        <p className="text-xs text-zinc-500 mb-5">{t.paywallTagline}</p>
+        <button
+          onClick={() => handleUnlock(false)}
+          disabled={loading}
+          className="w-full max-w-xs px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-105 disabled:opacity-60"
+          style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
+        >
+          {loading ? t.loading : t.unlockMonthly(MONTHLY_PRICE)}
+        </button>
+        <button
+          onClick={() => handleUnlock(true)}
+          disabled={loading}
+          className="w-full max-w-xs mt-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 disabled:opacity-60 border border-violet-500/40 text-violet-300 hover:border-violet-400 hover:text-white"
+        >
+          {t.unlockAnnual(ANNUAL_PRICE)}
+        </button>
+        <p className="text-xs text-zinc-600 mt-3">{t.guarantee}</p>
       </div>
     </>
   );
