@@ -49,8 +49,7 @@ export default function IntroAnimation({ onComplete }: Props) {
 
   function skip() {
     timers.current.forEach(clearTimeout);
-    setExiting(true);
-    setTimeout(onComplete, 400);
+    setScene(5);
   }
 
   const PRESS = ['Le Monde', 'Cosmopolitan', 'Brut.', 'Konbini', 'L\'Obs'];
