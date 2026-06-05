@@ -329,17 +329,34 @@ export default function IntroAnimation({ onComplete }: Props) {
           2 minutes · 30 questions · 1 réponse définitive
         </p>
 
-        <Link
-          href="/quiz/personnalite"
-          className="w-full max-w-xs py-5 rounded-2xl font-black text-white text-center text-lg transition-all active:scale-95"
-          style={{
-            background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
-            boxShadow: '0 10px 50px rgba(139,92,246,0.5)',
-          }}
-          onClick={onComplete}
-        >
-          Découvrir ma personnalité →
-        </Link>
+        <div className="w-full max-w-xs flex flex-col gap-3">
+          <Link
+            href="/quiz/personnalite"
+            className="w-full py-4 rounded-2xl font-black text-white text-center text-base transition-all active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 40px rgba(139,92,246,0.5)' }}
+            onClick={onComplete}
+          >
+            🧠 Test de personnalité MBTI
+          </Link>
+
+          <Link
+            href="/quizzes"
+            className="w-full py-3.5 rounded-2xl font-bold text-white text-center text-sm transition-all active:scale-95 border border-white/20 hover:border-white/40"
+            style={{ background: 'rgba(255,255,255,0.06)' }}
+            onClick={onComplete}
+          >
+            💔 Questionnaires vérité
+          </Link>
+
+          <Link
+            href="/duo"
+            className="w-full py-3.5 rounded-2xl font-bold text-white text-center text-sm transition-all active:scale-95 border border-white/20 hover:border-white/40"
+            style={{ background: 'rgba(255,255,255,0.06)' }}
+            onClick={onComplete}
+          >
+            🧩 Mode Équipe
+          </Link>
+        </div>
 
         <button
           onClick={onComplete}

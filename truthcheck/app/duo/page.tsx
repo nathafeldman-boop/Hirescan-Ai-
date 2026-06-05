@@ -42,12 +42,12 @@ export default function DuoPage() {
             </svg>
             Retour
           </Link>
-          <span className="text-xl font-black">
+          <Link href="/" className="text-xl font-black">
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Ur
             </span>
             <span className="text-white">Cecret</span>
-          </span>
+          </Link>
           <span className="text-xs text-zinc-500 font-semibold uppercase tracking-widest">Équipe</span>
         </div>
       </header>

@@ -80,12 +80,12 @@ export default function QuizzesPage() {
         {/* Header */}
         <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <span className="text-xl font-black">
+            <Link href="/" className="text-xl font-black">
               <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Ur
               </span>
               <span className="text-white">Cecret</span>
-            </span>
+            </Link>
             <span className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Choisis ton quiz</span>
           </div>
         </header>
