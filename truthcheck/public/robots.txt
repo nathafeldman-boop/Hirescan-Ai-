@@ -6,4 +6,3 @@ Disallow: /analyze
 
 # Sitemaps
 Sitemap: https://urcecret.site/sitemap.xml
-Sitemap: https://urcecret.site/news-sitemap.xml

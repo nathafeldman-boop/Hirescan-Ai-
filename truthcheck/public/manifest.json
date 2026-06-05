@@ -1,7 +1,7 @@
 {
-  "name": "UrCecret — Tes vraies réponses",
+  "name": "UrCecret — Test MBTI & Quiz Vérité",
   "short_name": "UrCecret",
-  "description": "Des questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille.",
+  "description": "Test de personnalité MBTI gratuit (16 types) + 15 quiz anonymes sur l'infidélité, l'amour et tes amis.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",

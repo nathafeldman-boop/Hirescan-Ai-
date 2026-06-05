@@ -37,8 +37,8 @@ export function GET() {
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="fr">
-  <title>UrCecret — Tes vraies réponses</title>
-  <subtitle>Des questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille</subtitle>
+  <title>UrCecret — Test MBTI Gratuit &amp; Quiz Vérité Anonymes</title>
+  <subtitle>Test de personnalité MBTI gratuit + 15 quiz anonymes sur l'infidélité, l'amour et tes amis</subtitle>
   <link href="${BASE}/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="${BASE}" rel="alternate" type="text/html"/>
   <link href="https://pubsubhubbub.appspot.com/" rel="hub"/>

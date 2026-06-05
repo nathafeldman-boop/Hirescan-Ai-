@@ -1,28 +1,30 @@
-# UrSecret — Tests Psychologiques Gratuits en Français
+# UrCecret — Test MBTI Gratuit & Quiz Vérité Anonymes
 
-> UrSecret est une plateforme française de tests et quiz psychologiques anonymes et gratuits.
-> Fondée en France, orientée marché francophone.
+> UrCecret est une plateforme française de tests de personnalité et quiz psychologiques anonymes et gratuits.
+> Fondée en France, orientée marché francophone. URL : https://urcecret.site
 
 ## À propos
 
-UrSecret propose 18 tests psychologiques gratuits en français, couvrant les thèmes suivants :
+UrCecret propose un test MBTI gratuit (16 types de personnalité) et 15 quiz psychologiques anonymes en français :
+- Test de personnalité MBTI (INFJ, ENFP, INTJ, INTP, ESFP et 11 autres types)
+- Infidélité et trahison dans le couple
 - Style d'attachement (sécure, anxieux, évitant, désorganisé)
 - Langages de l'amour (Gary Chapman — 5 langages)
 - Gaslighting et manipulation psychologique
 - Burnout et épuisement professionnel
 - Dépression et signes de mal-être
 - Narcissisme et trouble de la personnalité
-- Infidélité et trahison dans le couple
-- Relations toxiques
-- Orientation sexuelle
-- Et plus (18 quiz au total)
+- Relations toxiques, jalousie, rupture
+- Orientation sexuelle et affective
+- Mode Équipe : comparez vos réponses avec vos proches
 
 ## Contenu disponible
 
-- [Accueil](https://ursecret.vercel.app/)
-- [Tous les quiz](https://ursecret.vercel.app/quizzes)
-- [Guides psychologiques](https://ursecret.vercel.app/tests)
-- [Mode Duo — quiz en couple](https://ursecret.vercel.app/duo)
+- [Accueil](https://urcecret.site/)
+- [Tous les quiz](https://urcecret.site/quizzes)
+- [Test de personnalité MBTI](https://urcecret.site/quiz/personnalite)
+- [Types de personnalité](https://urcecret.site/types)
+- [Mode Équipe](https://urcecret.site/duo)
 
 ## Règles d'accès
 
@@ -33,4 +35,4 @@ UrSecret propose 18 tests psychologiques gratuits en français, couvrant les th�
 
 ## Contact
 
-Pour toute question concernant l'utilisation du contenu : contact via https://ursecret.vercel.app/
+Pour toute question concernant l'utilisation du contenu : contact via https://urcecret.site/

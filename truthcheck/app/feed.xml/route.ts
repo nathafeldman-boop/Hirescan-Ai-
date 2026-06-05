@@ -37,9 +37,9 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>UrCecret — Tes vraies réponses</title>
+    <title>UrCecret — Test MBTI Gratuit &amp; Quiz Vérité Anonymes</title>
     <link>${BASE}</link>
-    <description>Des questionnaires anonymes pour découvrir la vérité sur ton couple, tes amis et ta famille. 100% anonyme, résultats instantanés.</description>
+    <description>Test de personnalité MBTI gratuit (16 types) + 15 quiz anonymes sur l'infidélité, l'amour et tes amis. Résultats instantanés, sans inscription.</description>
     <language>fr</language>
     <lastBuildDate>${now}</lastBuildDate>
     <atom:link href="${BASE}/feed.xml" rel="self" type="application/rss+xml"/>
