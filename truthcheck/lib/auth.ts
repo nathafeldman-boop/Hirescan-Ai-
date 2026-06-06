@@ -53,7 +53,7 @@ async function sendVerificationRequest({ identifier: email, url }: SendVerificat
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'UrCecret <onboarding@resend.dev>',
+      from: 'UrCecret <noreply@urcecret.site>',
       to: email,
       subject: '🔐 Ton lien de connexion UrCecret',
       html,
