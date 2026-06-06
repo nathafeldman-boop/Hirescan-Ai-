@@ -64,7 +64,7 @@ function fmtDate(iso: string) {
 
 function KpiCard({ label, value, sub, color = '#8b5cf6' }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
-    <div className="rounded-2xl border border-white/8 p-5" style={{ background: 'rgba(255,255,255,0.03)' }}>
+    <div className="glass rounded-2xl p-5">
       <p className="text-xs text-zinc-500 uppercase tracking-widest mb-2">{label}</p>
       <p className="text-2xl font-black text-white mb-1">{value}</p>
       {sub && <p className="text-xs" style={{ color }}>{sub}</p>}
@@ -199,7 +199,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             </div>
 
             {/* Recent users */}
-            <div className="rounded-2xl border border-white/8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <div className="glass rounded-2xl overflow-hidden">
               <div className="px-5 py-4 border-b border-white/5">
                 <p className="text-sm font-semibold text-white">Derniers inscrits</p>
               </div>
@@ -263,7 +263,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               style={{ background: 'rgba(255,255,255,0.04)' }}
             />
 
-            <div className="rounded-2xl border border-white/8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <div className="glass rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -318,7 +318,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <KpiCard label="Unlocks ce mois" value={stats.paidThisMonth} sub={`+${stats.paidToday} aujourd'hui`} color="#34d399" />
             </div>
 
-            <div className="rounded-2xl border border-white/8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <div className="glass rounded-2xl overflow-hidden">
               <div className="px-5 py-4 border-b border-white/5">
                 <p className="text-sm font-semibold text-white">Revenus affiliés par mois</p>
               </div>
@@ -360,7 +360,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <p className="text-zinc-500 text-sm">{stats.totalResults.toLocaleString('fr-FR')} complétions · {stats.paidResults} résultats débloqués</p>
             </div>
 
-            <div className="rounded-2xl border border-white/8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <div className="glass rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -428,7 +428,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <KpiCard label="Commissions dues" value={fmt(totalAffilCommission)} color="#f472b6" />
             </div>
 
-            <div className="rounded-2xl border border-white/8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <div className="glass rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -463,6 +463,15 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <Link
+                href="/admin/affiliates"
+                className="inline-flex items-center gap-1 text-violet-400 hover:text-violet-300 transition-colors text-sm font-semibold"
+              >
+                Gérer les affiliés (créer, supprimer, voir détails) →
+              </Link>
             </div>
           </div>
         )}
