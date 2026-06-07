@@ -11,10 +11,8 @@ const SEQUENCES: { type: string; days: number; template: (name: string | null) =
 ];
 
 export async function GET(req: NextRequest) {
-  // Allow Vercel cron scheduler (header set automatically) or manual call with secret
   const isVercelCron = req.headers.get('x-vercel-cron') === '1';
-  const secret = req.nextUrl.searchParams.get('secret');
-  if (!isVercelCron && secret !== process.env.CRON_SECRET) {
+  if (!isVercelCron) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
