@@ -62,6 +62,7 @@ model User {
   sessions     Session[]
   quizResults  QuizResult[]
   analyses     ScreenshotAnalysis[]
+  emailLogs    EmailLog[]
 }
 
 model QuizResult {
@@ -125,4 +126,15 @@ model TeamRoom {
   slug      String
   answers   String   // base64-encoded answers from player 1
   createdAt DateTime @default(now())
+}
+
+model EmailLog {
+  id     String   @id @default(cuid())
+  userId String
+  type   String   // welcome | day1 | day3 | day7
+  sentAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
 }

@@ -3,6 +3,40 @@ import GoogleProvider from 'next-auth/providers/google';
 import EmailProvider, { SendVerificationRequestParams } from 'next-auth/providers/email';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from './db';
+import { emailWelcome, sendEmail } from './emails';
+
+const OWNER_EMAIL = 'nathabuisseness@gmail.com';
+
+async function onUserCreated(user: { id: string; email?: string | null; name?: string | null }) {
+  if (!user.email) return;
+
+  // Send welcome email + log it
+  try {
+    const { subject, html } = emailWelcome(user.name ?? null);
+    await sendEmail(user.email, subject, html);
+    await prisma.emailLog.create({ data: { userId: user.id, type: 'welcome' } });
+  } catch (e) {
+    console.error('Welcome email failed:', e);
+  }
+
+  // Milestone alert every 30 users
+  try {
+    const count = await prisma.user.count();
+    if (count % 30 === 0) {
+      await sendEmail(
+        OWNER_EMAIL,
+        `🎉 Milestone : ${count} utilisateurs sur UrCecret !`,
+        `<div style="font-family:sans-serif;padding:24px;background:#09090b;color:#fff">
+          <h2 style="color:#a78bfa">🚀 ${count} utilisateurs !</h2>
+          <p style="color:#71717a">Le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</p>
+          <p style="color:#fff">Dernier inscrit : <strong>${user.email}</strong></p>
+        </div>`
+      );
+    }
+  } catch (e) {
+    console.error('Milestone email failed:', e);
+  }
+}
 
 async function sendVerificationRequest({ identifier: email, url }: SendVerificationRequestParams) {
   const html = `<!DOCTYPE html>
@@ -82,6 +116,11 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
     error: '/login',
+  },
+  events: {
+    async createUser({ user }) {
+      await onUserCreated({ id: user.id, email: user.email, name: user.name });
+    },
   },
   callbacks: {
     async session({ session, user }) {
