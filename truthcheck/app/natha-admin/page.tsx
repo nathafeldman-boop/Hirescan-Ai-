@@ -34,6 +34,14 @@ export default async function NathaAdminPage() {
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfMonth } } }),
   ]);
 
+  const [visitsToday, visitsWeek, visitsMonth, visitsTotal, topPages] = await Promise.all([
+    prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
+    prisma.pageView.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+    prisma.pageView.count({ where: { createdAt: { gte: startOfMonth } } }),
+    prisma.pageView.count(),
+    prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 10 }),
+  ]);
+
   const [allConversions, recentUsers, affiliates, quizResults] = await Promise.all([
     prisma.affiliateConversion.findMany({ select: { amountCents: true, commissionCents: true, createdAt: true } }),
     prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 50, select: { id: true, email: true, name: true, tier: true, createdAt: true } }),
@@ -84,6 +92,37 @@ export default async function NathaAdminPage() {
       <p style={S.sub}>
         {now.toLocaleDateString('fr-FR')} — {now.toLocaleTimeString('fr-FR')}
       </p>
+
+      <p style={{ ...S.section, color: '#38bdf8' }}>Visites</p>
+      <div style={S.grid}>
+        <Card label="Total" value={visitsTotal} color="#38bdf8" />
+        <Card label="Ce mois" value={visitsMonth} color="#38bdf8" />
+        <Card label="Cette semaine" value={visitsWeek} color="#38bdf8" />
+        <Card label="Aujourd'hui" value={visitsToday} color="#38bdf8" />
+      </div>
+
+      <p style={{ ...S.section, color: '#38bdf8' }}>Pages les plus visitées</p>
+      <div style={S.table}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={S.th}>Page</th>
+              <th style={S.th}>Visites</th>
+            </tr>
+          </thead>
+          <tbody>
+            {topPages.map(p => (
+              <tr key={p.path}>
+                <td style={{ ...S.td, color: '#e4e4e7', fontFamily: 'monospace', fontSize: 12 }}>{p.path}</td>
+                <td style={{ ...S.td, color: '#38bdf8', fontWeight: 700 }}>{p._count.path}</td>
+              </tr>
+            ))}
+            {topPages.length === 0 && (
+              <tr><td colSpan={2} style={{ ...S.td, textAlign: 'center', color: '#52525b' }}>Aucune visite enregistrée</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <p style={S.section}>Utilisateurs</p>
       <div style={S.grid}>

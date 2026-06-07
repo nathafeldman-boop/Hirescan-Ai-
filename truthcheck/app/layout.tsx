@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './Providers';
+import Tracker from './Tracker';
 
 const BASE = 'https://urcecret.site';
 
@@ -110,7 +111,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="search" type="application/opensearchdescription+xml" title="UrCecret" href="/opensearch.xml" />
       </head>
       <body className="min-h-screen bg-[#09090b] text-white antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          <Tracker />
+          {children}
+        </Providers>
       </body>
     </html>
   );

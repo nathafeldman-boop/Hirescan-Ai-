@@ -138,3 +138,9 @@ model EmailLog {
 
   @@unique([userId, type])
 }
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  createdAt DateTime @default(now())
+}
