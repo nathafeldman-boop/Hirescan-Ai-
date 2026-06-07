@@ -16,15 +16,18 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch {
+  } catch (err) {
+    console.error('[webhook] signature invalide:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'signature invalide' }, { status: 400 });
   }
+
+  console.log('[webhook] event reçu:', event.type);
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
     const resultId = session.metadata?.resultId;
-    const customerId = session.customer as string | null;
     const email = session.customer_details?.email;
+    console.log('[webhook] checkout completed — email:', email, 'resultId:', resultId);
 
     // Mark the quiz result as paid
     if (resultId) {
