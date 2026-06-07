@@ -42,11 +42,24 @@ export default async function NathaAdminPage() {
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 10 }),
   ]);
 
-  const [allConversions, recentUsers, affiliates, quizResults] = await Promise.all([
+  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const prevWeekStart = fourteenDaysAgo;
+  const prevWeekEnd = sevenDaysAgo;
+
+  const [allConversions, recentUsers, affiliates, quizResults, activeUsers, quizScores,
+    usersLastWeek, visitsLastWeek, paidLastWeek] = await Promise.all([
     prisma.affiliateConversion.findMany({ select: { amountCents: true, commissionCents: true, createdAt: true } }),
     prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 50, select: { id: true, email: true, name: true, tier: true, createdAt: true } }),
     prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }),
-    prisma.quizResult.findMany({ select: { quizSlug: true, paid: true } }),
+    prisma.quizResult.findMany({ select: { quizSlug: true, paid: true, score: true } }),
+    // Users who completed a quiz in last 30 days
+    prisma.quizResult.findMany({ where: { createdAt: { gte: startOfMonth } }, select: { userId: true }, distinct: ['userId'] }),
+    // All scores for average
+    prisma.quizResult.findMany({ select: { score: true } }),
+    // Previous week comparisons
+    prisma.user.count({ where: { createdAt: { gte: prevWeekStart, lt: prevWeekEnd } } }),
+    prisma.pageView.count({ where: { createdAt: { gte: prevWeekStart, lt: prevWeekEnd } } }),
+    prisma.quizResult.count({ where: { paid: true, createdAt: { gte: prevWeekStart, lt: prevWeekEnd } } }),
   ]);
 
   const totalRevenueCents = allConversions.reduce((s, c) => s + c.amountCents, 0);
@@ -54,6 +67,25 @@ export default async function NathaAdminPage() {
   const weekRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
   const monthRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
   const yearRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= startOfYear).reduce((s, c) => s + c.amountCents, 0);
+
+  // Business KPIs
+  const MRR_CENTS = premiumUsers * 999;
+  const ARR_CENTS = MRR_CENTS * 12;
+  const arpu = totalUsers > 0 ? totalRevenueCents / totalUsers : 0;
+  const conversionRate = totalUsers > 0 ? ((premiumUsers / totalUsers) * 100).toFixed(1) : '0';
+  const visitToSignup = visitsTotal > 0 ? ((totalUsers / visitsTotal) * 100).toFixed(2) : '0';
+  const avgScore = quizScores.length > 0 ? Math.round(quizScores.reduce((s, r) => s + r.score, 0) / quizScores.length) : 0;
+  const activeUserCount = new Set(activeUsers.map(u => u.userId).filter(Boolean)).size;
+
+  // Week-over-week trends
+  function trend(current: number, previous: number) {
+    if (previous === 0) return current > 0 ? '+∞%' : '—';
+    const pct = ((current - previous) / previous * 100).toFixed(0);
+    return (current >= previous ? '+' : '') + pct + '%';
+  }
+  const trendUsers = trend(newThisWeek, usersLastWeek);
+  const trendVisits = trend(visitsWeek, visitsLastWeek);
+  const trendPaid = trend(paidResults - paidLastWeek, paidLastWeek);
 
   const byQuiz: Record<string, { total: number; paid: number }> = {};
   for (const r of quizResults) {
@@ -92,6 +124,24 @@ export default async function NathaAdminPage() {
       <p style={S.sub}>
         {now.toLocaleDateString('fr-FR')} — {now.toLocaleTimeString('fr-FR')}
       </p>
+
+      <p style={{ ...S.section, color: '#fb923c' }}>KPIs Business</p>
+      <div style={S.grid}>
+        <Card label="MRR estimé" value={fmt(MRR_CENTS)} sub={`${premiumUsers} abonnés × 9,99€`} color="#fb923c" />
+        <Card label="ARR estimé" value={fmt(ARR_CENTS)} color="#fb923c" />
+        <Card label="ARPU" value={fmt(arpu)} sub="revenu / utilisateur" color="#fb923c" />
+        <Card label="Taux premium" value={`${conversionRate}%`} sub="inscrits → payants" color="#fb923c" />
+        <Card label="Visite → inscrit" value={`${visitToSignup}%`} color="#fb923c" />
+        <Card label="Score moyen" value={`${avgScore}/100`} sub="tous quiz" color="#fb923c" />
+        <Card label="Actifs ce mois" value={activeUserCount} sub="ont fait un quiz" color="#fb923c" />
+      </div>
+
+      <p style={{ ...S.section, color: '#a3e635' }}>Tendances (semaine vs semaine préc.)</p>
+      <div style={S.grid}>
+        <Card label="Nouveaux inscrits" value={newThisWeek} sub={trendUsers} color={trendUsers.startsWith('+') ? '#a3e635' : '#f87171'} />
+        <Card label="Visites" value={visitsWeek} sub={trendVisits} color={trendVisits.startsWith('+') ? '#a3e635' : '#f87171'} />
+        <Card label="Ventes" value={paidResults} sub={trendPaid} color={trendPaid.startsWith('+') ? '#a3e635' : '#f87171'} />
+      </div>
 
       <p style={{ ...S.section, color: '#38bdf8' }}>Visites</p>
       <div style={S.grid}>
