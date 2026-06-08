@@ -34,12 +34,17 @@ export default async function NathaAdminPage() {
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfMonth } } }),
   ]);
 
-  const [visitsToday, visitsWeek, visitsMonth, visitsTotal, topPages] = await Promise.all([
+  const [visitsToday, visitsWeek, visitsMonth, visitsTotal, topPages,
+    landingToday, landingWeek, landingMonth, landingTotal] = await Promise.all([
     prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
     prisma.pageView.count({ where: { createdAt: { gte: startOfMonth } } }),
     prisma.pageView.count(),
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 10 }),
+    prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
+    prisma.pageView.count({ where: { path: '/', createdAt: { gte: sevenDaysAgo } } }),
+    prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfMonth } } }),
+    prisma.pageView.count({ where: { path: '/' } }),
   ]);
 
   const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
@@ -149,6 +154,15 @@ export default async function NathaAdminPage() {
         <Card label="Ce mois" value={visitsMonth} color="#38bdf8" />
         <Card label="Cette semaine" value={visitsWeek} color="#38bdf8" />
         <Card label="Aujourd'hui" value={visitsToday} color="#38bdf8" />
+      </div>
+
+      <p style={{ ...S.section, color: '#67e8f9' }}>Visiteurs landing page (coup d&apos;œil sur /)</p>
+      <div style={S.grid}>
+        <Card label="Total" value={landingTotal} color="#67e8f9" />
+        <Card label="Ce mois" value={landingMonth} color="#67e8f9" />
+        <Card label="Cette semaine" value={landingWeek} color="#67e8f9" />
+        <Card label="Aujourd'hui" value={landingToday} color="#67e8f9" />
+        <Card label="% qui s'inscrivent" value={landingTotal > 0 ? `${((totalUsers / landingTotal) * 100).toFixed(2)}%` : '—'} sub="landing → inscrit" color="#67e8f9" />
       </div>
 
       <p style={{ ...S.section, color: '#38bdf8' }}>Pages les plus visitées</p>
