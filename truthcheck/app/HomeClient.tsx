@@ -66,7 +66,7 @@ const STEPS = [
   {
     n: '1',
     title: 'Réponds aux questions',
-    desc: '24 questions pour cerner ta façon de penser, de décider et d'interagir avec le monde.',
+    desc: "24 questions pour cerner ta façon de penser, de décider et d'interagir avec le monde.",
   },
   {
     n: '2',
