@@ -183,7 +183,7 @@ export default function HomeClient() {
                   }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: group.color }}>{type}</div>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
-                      {(group.labels as Record<string, string>)[type]}
+                      {(group.labels as unknown as Record<string, string>)[type]}
                     </div>
                   </Link>
                 ))}
