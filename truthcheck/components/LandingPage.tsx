@@ -87,18 +87,18 @@ export default function LandingPage() {
             <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
             <span className="text-white">Cecret</span>
           </span>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:block"><LanguageSwitcher /></span>
             <UserMenu />
             <Link
               href="/onboarding"
-              className="text-sm font-bold px-5 py-2 rounded-full text-white transition-all hover:scale-105 active:scale-95"
+              className="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all hover:opacity-90 active:scale-95 whitespace-nowrap"
               style={{
                 background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
-                boxShadow: '0 0 20px rgba(124,58,237,0.45)',
+                boxShadow: '0 2px 12px rgba(124,58,237,0.35)',
               }}
             >
-              Commencer →
+              Commencer
             </Link>
           </div>
         </div>
@@ -125,20 +125,24 @@ export default function LandingPage() {
             L&apos;IA analyse tes vraies réponses — sans filtre.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
             <Link
               href="/onboarding"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-white transition-all hover:scale-[1.03] active:scale-95"
+              className="px-7 py-3 rounded-xl font-bold text-[15px] text-white transition-all hover:opacity-90 active:scale-95"
               style={{
-                background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
-                boxShadow: '0 8px 32px rgba(124,58,237,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset',
+                background: 'linear-gradient(135deg, #7c3aed, #db2777)',
+                boxShadow: '0 4px 24px rgba(124,58,237,0.5), 0 1px 0 rgba(255,255,255,0.12) inset',
               }}
             >
               Commencer gratuitement →
             </Link>
             <Link
               href="/quiz"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold text-base text-zinc-300 hover:text-white bg-white/[0.05] hover:bg-white/[0.09] border border-white/10 hover:border-white/20 transition-all"
+              className="px-7 py-3 rounded-xl font-semibold text-[15px] text-zinc-300 hover:text-white transition-all"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }}
             >
               Voir tous les quiz
             </Link>
@@ -274,8 +278,8 @@ export default function LandingPage() {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
                     href="/duo"
-                    className="px-6 py-3 rounded-xl font-black text-white text-sm transition-all hover:scale-105 active:scale-95 text-center"
-                    style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.4)' }}
+                    className="px-6 py-2.5 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90 active:scale-95 text-center"
+                    style={{ background: 'linear-gradient(135deg, #7c3aed, #db2777)', boxShadow: '0 4px 16px rgba(124,58,237,0.4)' }}
                   >
                     Jouer en duo →
                   </Link>
@@ -424,10 +428,10 @@ export default function LandingPage() {
               <p className="text-zinc-400 mb-8 text-base">2 minutes. 30 questions. Une réponse définitive.</p>
               <Link
                 href="/onboarding"
-                className="inline-block px-10 py-4 rounded-2xl font-bold text-base text-white transition-all hover:scale-105 active:scale-95"
+                className="inline-block px-8 py-3 rounded-xl font-bold text-[15px] text-white transition-all hover:opacity-90 active:scale-95"
                 style={{
-                  background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
-                  boxShadow: '0 8px 40px rgba(124,58,237,0.5), 0 0 0 1px rgba(255,255,255,0.06) inset',
+                  background: 'linear-gradient(135deg, #7c3aed, #db2777)',
+                  boxShadow: '0 4px 28px rgba(124,58,237,0.5), 0 1px 0 rgba(255,255,255,0.12) inset',
                 }}
               >
                 Commencer →
