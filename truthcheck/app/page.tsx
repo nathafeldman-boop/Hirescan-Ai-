@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import HomeClient from './HomeClient';
+import LandingPage from '@/components/LandingPage';
 
 const BASE = 'https://urcecret.site';
 
@@ -63,7 +63,7 @@ export default function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(landingSchema) }} />
-      <HomeClient />
+      <LandingPage />
     </>
   );
 }
