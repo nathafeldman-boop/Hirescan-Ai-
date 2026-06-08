@@ -4,93 +4,62 @@ import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 
 export const metadata: Metadata = {
-  title: 'Admin',
+  title: 'Mon tableau de bord',
   robots: { index: false, follow: false },
 };
 
-function fmt(cents: number) {
+function euros(cents: number) {
   return (cents / 100).toFixed(2).replace('.', ',') + ' €';
+}
+
+function pct(a: number, b: number) {
+  if (b === 0) return '—';
+  return ((a / b) * 100).toFixed(1) + '%';
 }
 
 export default async function NathaAdminPage() {
   const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const startOfToday   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const sevenDaysAgo   = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
+  const fourteenAgo    = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const startOfMonth   = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfYear    = new Date(now.getFullYear(), 0, 1);
 
-  const [totalUsers, premiumUsers, newToday, newThisWeek, newThisMonth] = await Promise.all([
+  const [
+    totalUsers, premiumUsers, newToday, newThisWeek, newLastWeek,
+    totalResults, paidResults, paidToday, paidThisWeek, paidLastWeek,
+    visitsToday, visitsWeek, visitsLastWeek, visitsTotal,
+    landingToday, landingTotal,
+    topPages, recentUsers, affiliates, quizResults, allConversions,
+  ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { tier: 'premium' } }),
     prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-    prisma.user.count({ where: { createdAt: { gte: startOfMonth } } }),
-  ]);
-
-  const [totalResults, paidResults, paidToday, paidThisMonth] = await Promise.all([
+    prisma.user.count({ where: { createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
     prisma.quizResult.count(),
     prisma.quizResult.count({ where: { paid: true } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
-    prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfMonth } } }),
-  ]);
-
-  const [visitsToday, visitsWeek, visitsMonth, visitsTotal, topPages,
-    landingToday, landingWeek, landingMonth, landingTotal] = await Promise.all([
+    prisma.quizResult.count({ where: { paid: true, createdAt: { gte: sevenDaysAgo } } }),
+    prisma.quizResult.count({ where: { paid: true, createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
     prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-    prisma.pageView.count({ where: { createdAt: { gte: startOfMonth } } }),
+    prisma.pageView.count({ where: { createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
     prisma.pageView.count(),
-    prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 10 }),
     prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
-    prisma.pageView.count({ where: { path: '/', createdAt: { gte: sevenDaysAgo } } }),
-    prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfMonth } } }),
     prisma.pageView.count({ where: { path: '/' } }),
-  ]);
-
-  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-  const prevWeekStart = fourteenDaysAgo;
-  const prevWeekEnd = sevenDaysAgo;
-
-  const [allConversions, recentUsers, affiliates, quizResults, activeUsers, quizScores,
-    usersLastWeek, visitsLastWeek, paidLastWeek] = await Promise.all([
-    prisma.affiliateConversion.findMany({ select: { amountCents: true, commissionCents: true, createdAt: true } }),
-    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 50, select: { id: true, email: true, name: true, tier: true, createdAt: true } }),
+    prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 8 }),
+    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { email: true, name: true, tier: true, createdAt: true } }),
     prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }),
-    prisma.quizResult.findMany({ select: { quizSlug: true, paid: true, score: true } }),
-    // Users who completed a quiz in last 30 days
-    prisma.quizResult.findMany({ where: { createdAt: { gte: startOfMonth } }, select: { userId: true }, distinct: ['userId'] }),
-    // All scores for average
-    prisma.quizResult.findMany({ select: { score: true } }),
-    // Previous week comparisons
-    prisma.user.count({ where: { createdAt: { gte: prevWeekStart, lt: prevWeekEnd } } }),
-    prisma.pageView.count({ where: { createdAt: { gte: prevWeekStart, lt: prevWeekEnd } } }),
-    prisma.quizResult.count({ where: { paid: true, createdAt: { gte: prevWeekStart, lt: prevWeekEnd } } }),
+    prisma.quizResult.findMany({ select: { quizSlug: true, paid: true } }),
+    prisma.affiliateConversion.findMany({ select: { amountCents: true, createdAt: true } }),
   ]);
 
-  const totalRevenueCents = allConversions.reduce((s, c) => s + c.amountCents, 0);
-  const todayRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
-  const weekRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
-  const monthRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
-  const yearRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= startOfYear).reduce((s, c) => s + c.amountCents, 0);
-
-  // Business KPIs
-  const MRR_CENTS = premiumUsers * 999;
-  const ARR_CENTS = MRR_CENTS * 12;
-  const arpu = totalUsers > 0 ? totalRevenueCents / totalUsers : 0;
-  const conversionRate = totalUsers > 0 ? ((premiumUsers / totalUsers) * 100).toFixed(1) : '0';
-  const visitToSignup = visitsTotal > 0 ? ((totalUsers / visitsTotal) * 100).toFixed(2) : '0';
-  const avgScore = quizScores.length > 0 ? Math.round(quizScores.reduce((s, r) => s + r.score, 0) / quizScores.length) : 0;
-  const activeUserCount = new Set(activeUsers.map(u => u.userId).filter(Boolean)).size;
-
-  // Week-over-week trends
-  function trend(current: number, previous: number) {
-    if (previous === 0) return current > 0 ? '+∞%' : '—';
-    const pct = ((current - previous) / previous * 100).toFixed(0);
-    return (current >= previous ? '+' : '') + pct + '%';
-  }
-  const trendUsers = trend(newThisWeek, usersLastWeek);
-  const trendVisits = trend(visitsWeek, visitsLastWeek);
-  const trendPaid = trend(paidResults - paidLastWeek, paidLastWeek);
+  const revenueToday = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
+  const revenueWeek  = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
+  const revenueMonth = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
+  const revenueTotal = allConversions.reduce((s, c) => s + c.amountCents, 0);
+  const MRR = premiumUsers * 999;
 
   const byQuiz: Record<string, { total: number; paid: number }> = {};
   for (const r of quizResults) {
@@ -100,217 +69,253 @@ export default async function NathaAdminPage() {
   }
   const quizSorted = Object.entries(byQuiz).sort((a, b) => b[1].total - a[1].total);
 
-  const S = {
-    page: { maxWidth: 900, margin: '0 auto', padding: '32px 16px' } as React.CSSProperties,
-    h1: { fontSize: 28, fontWeight: 900, marginBottom: 4, color: '#fff' } as React.CSSProperties,
-    sub: { color: '#52525b', fontSize: 13, marginTop: 0, marginBottom: 32 } as React.CSSProperties,
-    section: { fontSize: 13, fontWeight: 700, color: '#a78bfa', marginBottom: 12, textTransform: 'uppercase' as const, letterSpacing: 1 },
-    grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12, marginBottom: 32 } as React.CSSProperties,
-    card: { background: '#18181b', border: '1px solid #27272a', borderRadius: 12, padding: '14px 18px' } as React.CSSProperties,
-    cardLabel: { margin: 0, color: '#71717a', fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: 1 },
-    cardValue: { margin: '6px 0 0', color: '#fff', fontSize: 20, fontWeight: 900 },
-    cardSub: { margin: '3px 0 0', color: '#a78bfa', fontSize: 11 },
-    table: { background: '#18181b', border: '1px solid #27272a', borderRadius: 12, marginBottom: 32, overflow: 'hidden' } as React.CSSProperties,
-    th: { textAlign: 'left' as const, padding: '8px 14px', color: '#71717a', fontWeight: 600, fontSize: 12, borderBottom: '1px solid #27272a' },
-    td: { padding: '10px 14px', fontSize: 13, borderBottom: '1px solid #27272a' },
+  function arrow(current: number, previous: number) {
+    if (previous === 0) return current > 0 ? '↑' : '';
+    return current >= previous ? '↑' : '↓';
+  }
+  function trendColor(current: number, previous: number) {
+    if (previous === 0) return current > 0 ? '#4ade80' : '#71717a';
+    return current >= previous ? '#4ade80' : '#f87171';
+  }
+
+  const C = {
+    bg: '#09090b',
+    surface: '#111113',
+    border: '#1f1f23',
+    text: '#f4f4f5',
+    muted: '#71717a',
+    green: '#4ade80',
+    blue: '#38bdf8',
+    purple: '#a78bfa',
+    pink: '#f472b6',
+    orange: '#fb923c',
+    yellow: '#fbbf24',
+    red: '#f87171',
   };
 
-  const Card = ({ label, value, sub, color = '#a78bfa' }: { label: string; value: string | number; sub?: string; color?: string }) => (
-    <div style={S.card}>
-      <p style={S.cardLabel}>{label}</p>
-      <p style={S.cardValue}>{value}</p>
-      {sub && <p style={{ ...S.cardSub, color }}>{sub}</p>}
-    </div>
-  );
+  const block = (bg: string, border: string): React.CSSProperties => ({
+    background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: '18px 20px',
+  });
+
+  const label: React.CSSProperties = { color: C.muted, fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8, margin: 0 };
+  const bigNum: React.CSSProperties = { color: C.text, fontSize: 28, fontWeight: 900, margin: '6px 0 0', lineHeight: 1 };
+  const sub: React.CSSProperties = { color: C.muted, fontSize: 12, margin: '4px 0 0' };
 
   return (
-    <div style={S.page}>
-      <h1 style={S.h1}>Dashboard Admin</h1>
-      <p style={S.sub}>
-        {now.toLocaleDateString('fr-FR')} — {now.toLocaleTimeString('fr-FR')}
-      </p>
+    <div style={{ background: C.bg, minHeight: '100vh', color: C.text, fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px 80px' }}>
 
-      <p style={{ ...S.section, color: '#fb923c' }}>KPIs Business</p>
-      <div style={S.grid}>
-        <Card label="MRR estimé" value={fmt(MRR_CENTS)} sub={`${premiumUsers} abonnés × 9,99€`} color="#fb923c" />
-        <Card label="ARR estimé" value={fmt(ARR_CENTS)} color="#fb923c" />
-        <Card label="ARPU" value={fmt(arpu)} sub="revenu / utilisateur" color="#fb923c" />
-        <Card label="Taux premium" value={`${conversionRate}%`} sub="inscrits → payants" color="#fb923c" />
-        <Card label="Visite → inscrit" value={`${visitToSignup}%`} color="#fb923c" />
-        <Card label="Score moyen" value={`${avgScore}/100`} sub="tous quiz" color="#fb923c" />
-        <Card label="Actifs ce mois" value={activeUserCount} sub="ont fait un quiz" color="#fb923c" />
-      </div>
+        {/* Header */}
+        <div style={{ marginBottom: 36 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 900, margin: 0, letterSpacing: -1 }}>
+            <span style={{ background: 'linear-gradient(90deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ color: '#fff' }}>Cecret</span>
+            <span style={{ color: C.muted, fontWeight: 400, fontSize: 16, marginLeft: 12 }}>— tableau de bord</span>
+          </h1>
+          <p style={{ color: C.muted, fontSize: 13, margin: '6px 0 0' }}>
+            {now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à {now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
 
-      <p style={{ ...S.section, color: '#a3e635' }}>Tendances (semaine vs semaine préc.)</p>
-      <div style={S.grid}>
-        <Card label="Nouveaux inscrits" value={newThisWeek} sub={trendUsers} color={trendUsers.startsWith('+') ? '#a3e635' : '#f87171'} />
-        <Card label="Visites" value={visitsWeek} sub={trendVisits} color={trendVisits.startsWith('+') ? '#a3e635' : '#f87171'} />
-        <Card label="Ventes" value={paidResults} sub={trendPaid} color={trendPaid.startsWith('+') ? '#a3e635' : '#f87171'} />
-      </div>
+        {/* ── SECTION 1 : Ce qui s'est passé aujourd'hui ── */}
+        <p style={{ color: C.purple, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Aujourd'hui</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
 
-      <p style={{ ...S.section, color: '#38bdf8' }}>Visites</p>
-      <div style={S.grid}>
-        <Card label="Total" value={visitsTotal} color="#38bdf8" />
-        <Card label="Ce mois" value={visitsMonth} color="#38bdf8" />
-        <Card label="Cette semaine" value={visitsWeek} color="#38bdf8" />
-        <Card label="Aujourd'hui" value={visitsToday} color="#38bdf8" />
-      </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Personnes venues</p>
+            <p style={bigNum}>{visitsToday}</p>
+            <p style={sub}>ont ouvert le site</p>
+          </div>
 
-      <p style={{ ...S.section, color: '#67e8f9' }}>Visiteurs landing page (coup d&apos;œil sur /)</p>
-      <div style={S.grid}>
-        <Card label="Total" value={landingTotal} color="#67e8f9" />
-        <Card label="Ce mois" value={landingMonth} color="#67e8f9" />
-        <Card label="Cette semaine" value={landingWeek} color="#67e8f9" />
-        <Card label="Aujourd'hui" value={landingToday} color="#67e8f9" />
-        <Card label="% qui s'inscrivent" value={landingTotal > 0 ? `${((totalUsers / landingTotal) * 100).toFixed(2)}%` : '—'} sub="landing → inscrit" color="#67e8f9" />
-      </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Sur la page d'accueil</p>
+            <p style={bigNum}>{landingToday}</p>
+            <p style={sub}>ont vu la landing</p>
+          </div>
 
-      <p style={{ ...S.section, color: '#38bdf8' }}>Pages les plus visitées</p>
-      <div style={S.table}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={S.th}>Page</th>
-              <th style={S.th}>Visites</th>
-            </tr>
-          </thead>
-          <tbody>
-            {topPages.map(p => (
-              <tr key={p.path}>
-                <td style={{ ...S.td, color: '#e4e4e7', fontFamily: 'monospace', fontSize: 12 }}>{p.path}</td>
-                <td style={{ ...S.td, color: '#38bdf8', fontWeight: 700 }}>{p._count.path}</td>
-              </tr>
-            ))}
-            {topPages.length === 0 && (
-              <tr><td colSpan={2} style={{ ...S.td, textAlign: 'center', color: '#52525b' }}>Aucune visite enregistrée</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Nouveaux inscrits</p>
+            <p style={bigNum}>{newToday}</p>
+            <p style={sub}>ont créé un compte</p>
+          </div>
 
-      <p style={S.section}>Utilisateurs</p>
-      <div style={S.grid}>
-        <Card label="Total inscrits" value={totalUsers} />
-        <Card label="Premium" value={premiumUsers} sub={`${totalUsers > 0 ? ((premiumUsers / totalUsers) * 100).toFixed(1) : 0}% conversion`} color="#f472b6" />
-        <Card label="Aujourd'hui" value={newToday} />
-        <Card label="Cette semaine" value={newThisWeek} />
-        <Card label="Ce mois" value={newThisMonth} />
-      </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Achats payants</p>
+            <p style={bigNum}>{paidToday}</p>
+            <p style={{ ...sub, color: paidToday > 0 ? C.green : C.muted }}>{paidToday > 0 ? `${euros(paidToday * 199)} encaissés` : 'aucun encore'}</p>
+          </div>
 
-      <p style={{ ...S.section, color: '#fbbf24' }}>Revenus affiliés</p>
-      <div style={S.grid}>
-        <Card label="Total cumulé" value={fmt(totalRevenueCents)} color="#fbbf24" />
-        <Card label="Cette année" value={fmt(yearRevenueCents)} color="#fbbf24" />
-        <Card label="Ce mois" value={fmt(monthRevenueCents)} color="#fbbf24" />
-        <Card label="Cette semaine" value={fmt(weekRevenueCents)} color="#fbbf24" />
-        <Card label="Aujourd'hui" value={fmt(todayRevenueCents)} color="#fbbf24" />
-      </div>
+        </div>
 
-      <p style={{ ...S.section, color: '#34d399' }}>Quiz</p>
-      <div style={S.grid}>
-        <Card label="Complétés" value={totalResults} color="#34d399" />
-        <Card label="Payants total" value={paidResults} color="#34d399" />
-        <Card label="Payants aujourd'hui" value={paidToday} color="#34d399" />
-        <Card label="Payants ce mois" value={paidThisMonth} color="#34d399" />
-      </div>
+        {/* ── SECTION 2 : Cette semaine vs semaine dernière ── */}
+        <p style={{ color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Cette semaine vs semaine dernière</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
 
-      <p style={S.section}>Stats par quiz</p>
-      <div style={S.table}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={S.th}>Quiz</th>
-              <th style={S.th}>Complétés</th>
-              <th style={S.th}>Payants</th>
-              <th style={S.th}>% payant</th>
-            </tr>
-          </thead>
-          <tbody>
-            {quizSorted.map(([slug, data]) => (
-              <tr key={slug}>
-                <td style={{ ...S.td, color: '#e4e4e7' }}>{slug}</td>
-                <td style={{ ...S.td, color: '#fff', fontWeight: 700 }}>{data.total}</td>
-                <td style={{ ...S.td, color: '#34d399' }}>{data.paid}</td>
-                <td style={{ ...S.td, color: '#a1a1aa' }}>
-                  {data.total > 0 ? ((data.paid / data.total) * 100).toFixed(1) : 0}%
-                </td>
-              </tr>
-            ))}
-            {quizSorted.length === 0 && (
-              <tr><td colSpan={4} style={{ ...S.td, textAlign: 'center', color: '#52525b' }}>Aucun résultat</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          {[
+            { label: 'Visiteurs', current: visitsWeek, previous: visitsLastWeek, unit: '' },
+            { label: 'Nouveaux inscrits', current: newThisWeek, previous: newLastWeek, unit: '' },
+            { label: 'Quiz payés', current: paidThisWeek, previous: paidLastWeek, unit: '' },
+          ].map(({ label: l, current, previous, unit }) => (
+            <div key={l} style={block(C.surface, C.border)}>
+              <p style={label}>{l}</p>
+              <p style={{ ...bigNum, color: trendColor(current, previous) }}>
+                {arrow(current, previous)} {current}{unit}
+              </p>
+              <p style={sub}>était {previous}{unit} la sem. d'avant</p>
+            </div>
+          ))}
 
-      <p style={{ ...S.section, color: '#f472b6' }}>Affiliés</p>
-      <div style={S.table}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={S.th}>Nom</th>
-              <th style={S.th}>Slug</th>
-              <th style={S.th}>Ventes</th>
-              <th style={S.th}>CA généré</th>
-              <th style={S.th}>Commission</th>
-            </tr>
-          </thead>
-          <tbody>
-            {affiliates.length === 0 && (
-              <tr><td colSpan={5} style={{ ...S.td, textAlign: 'center', color: '#52525b' }}>Aucun affilié</td></tr>
-            )}
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Argent entré</p>
+            <p style={{ ...bigNum, color: revenueWeek > 0 ? C.green : C.text }}>{euros(revenueWeek)}</p>
+            <p style={sub}>cette semaine (affiliés)</p>
+          </div>
+
+        </div>
+
+        {/* ── SECTION 3 : Argent ── */}
+        <p style={{ color: C.green, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Argent</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
+
+          <div style={{ ...block('rgba(74,222,128,0.06)', 'rgba(74,222,128,0.2)'), gridColumn: '1 / -1' }}>
+            <p style={label}>Revenus mensuels estimés (MRR)</p>
+            <p style={{ ...bigNum, fontSize: 36, color: C.green }}>{euros(MRR)}</p>
+            <p style={sub}>{premiumUsers} abonné{premiumUsers > 1 ? 's' : ''} × 9,99 €/mois</p>
+          </div>
+
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Aujourd'hui</p>
+            <p style={bigNum}>{euros(revenueToday)}</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Ce mois</p>
+            <p style={bigNum}>{euros(revenueMonth)}</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Total cumulé</p>
+            <p style={bigNum}>{euros(revenueTotal)}</p>
+          </div>
+
+        </div>
+
+        {/* ── SECTION 4 : Clients ── */}
+        <p style={{ color: C.pink, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Clients</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
+
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Inscrits au total</p>
+            <p style={bigNum}>{totalUsers}</p>
+            <p style={sub}>ont créé un compte</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Abonnés premium</p>
+            <p style={{ ...bigNum, color: C.pink }}>{premiumUsers}</p>
+            <p style={sub}>{pct(premiumUsers, totalUsers)} des inscrits</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Quiz complétés</p>
+            <p style={bigNum}>{totalResults}</p>
+            <p style={sub}>{paidResults} ont payé</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Visite → inscrit</p>
+            <p style={bigNum}>{pct(totalUsers, landingTotal)}</p>
+            <p style={sub}>sur {landingTotal} vus la home</p>
+          </div>
+
+        </div>
+
+        {/* ── SECTION 5 : Affiliés ── */}
+        <p style={{ color: C.yellow, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Tes affiliés</p>
+        {affiliates.length === 0 ? (
+          <div style={{ ...block(C.surface, C.border), marginBottom: 32, color: C.muted, fontSize: 14 }}>
+            Aucun affilié pour l'instant.
+          </div>
+        ) : (
+          <div style={{ marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {affiliates.map(a => {
               const ca = a.conversions.reduce((s, c) => s + c.amountCents, 0);
               const commission = a.conversions.reduce((s, c) => s + c.commissionCents, 0);
               return (
-                <tr key={a.id}>
-                  <td style={{ ...S.td, color: '#fff', fontWeight: 600 }}>{a.name}</td>
-                  <td style={{ ...S.td, color: '#a78bfa', fontFamily: 'monospace' }}>?ref={a.slug}</td>
-                  <td style={{ ...S.td, color: '#e4e4e7' }}>{a.conversions.length}</td>
-                  <td style={{ ...S.td, color: '#fbbf24', fontWeight: 700 }}>{fmt(ca)}</td>
-                  <td style={{ ...S.td, color: '#f472b6' }}>{fmt(commission)}</td>
-                </tr>
+                <div key={a.id} style={{ ...block(C.surface, C.border), display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+                  <div>
+                    <p style={{ color: C.text, fontWeight: 700, fontSize: 15, margin: 0 }}>{a.name}</p>
+                    <p style={{ color: C.muted, fontSize: 12, margin: '3px 0 0', fontFamily: 'monospace' }}>?ref={a.slug}</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: 24 }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ ...label, marginBottom: 2 }}>Ventes</p>
+                      <p style={{ color: C.text, fontWeight: 900, fontSize: 20, margin: 0 }}>{a.conversions.length}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ ...label, marginBottom: 2 }}>CA généré</p>
+                      <p style={{ color: C.yellow, fontWeight: 900, fontSize: 20, margin: 0 }}>{euros(ca)}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ ...label, marginBottom: 2 }}>À payer</p>
+                      <p style={{ color: C.pink, fontWeight: 900, fontSize: 20, margin: 0 }}>{euros(commission)}</p>
+                    </div>
+                  </div>
+                </div>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        )}
 
-      <p style={{ ...S.section, color: '#60a5fa' }}>50 derniers inscrits</p>
-      <div style={S.table}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={S.th}>#</th>
-              <th style={S.th}>Email</th>
-              <th style={S.th}>Nom</th>
-              <th style={S.th}>Tier</th>
-              <th style={S.th}>Inscrit le</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentUsers.map((u, i) => (
-              <tr key={u.id}>
-                <td style={{ ...S.td, color: '#52525b' }}>{i + 1}</td>
-                <td style={{ ...S.td, color: '#e4e4e7', fontFamily: 'monospace', fontSize: 12 }}>{u.email ?? '—'}</td>
-                <td style={{ ...S.td, color: '#a1a1aa' }}>{u.name ?? '—'}</td>
-                <td style={S.td}>
-                  <span style={{
-                    padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                    background: u.tier === 'premium' ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)',
-                    color: u.tier === 'premium' ? '#a78bfa' : '#71717a',
-                    border: `1px solid ${u.tier === 'premium' ? 'rgba(139,92,246,0.3)' : 'rgba(255,255,255,0.1)'}`,
-                  }}>
-                    {u.tier}
-                  </span>
-                </td>
-                <td style={{ ...S.td, color: '#52525b', fontSize: 12 }}>
-                  {new Date(u.createdAt).toLocaleDateString('fr-FR')}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* ── SECTION 6 : Quiz les plus populaires ── */}
+        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Quiz les plus populaires</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
+          {quizSorted.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun quiz complété pour l'instant.</p>}
+          {quizSorted.map(([slug, data], i) => (
+            <div key={slug} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < quizSorted.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <span style={{ color: C.muted, fontSize: 13, width: 20, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+              <span style={{ flex: 1, color: C.text, fontSize: 14, fontWeight: 600, textTransform: 'capitalize' }}>{slug.replace(/-/g, ' ')}</span>
+              <span style={{ color: C.muted, fontSize: 13 }}>{data.total} fois</span>
+              <span style={{ color: C.green, fontSize: 13, fontWeight: 700, width: 60, textAlign: 'right' }}>{data.paid} payant{data.paid > 1 ? 's' : ''}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* ── SECTION 7 : Pages les plus vues ── */}
+        <p style={{ color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Pages les plus vues</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
+          {topPages.map((p, i) => (
+            <div key={p.path} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < topPages.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <span style={{ color: C.muted, fontSize: 13, width: 20, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+              <span style={{ flex: 1, color: C.text, fontSize: 13, fontFamily: 'monospace' }}>{p.path}</span>
+              <span style={{ color: C.blue, fontSize: 14, fontWeight: 700 }}>{p._count.path}</span>
+            </div>
+          ))}
+          {topPages.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucune visite encore.</p>}
+        </div>
+
+        {/* ── SECTION 8 : Derniers inscrits ── */}
+        <p style={{ color: C.purple, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Derniers inscrits</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
+          {recentUsers.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun inscrit pour l'instant.</p>}
+          {recentUsers.map((u, i) => (
+            <div key={u.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentUsers.length - 1 ? `1px solid ${C.border}` : 'none', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ color: C.text, fontSize: 14, fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {u.name ?? u.email ?? 'Anonyme'}
+                </p>
+                <p style={{ color: C.muted, fontSize: 11, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {u.email} · {new Date(u.createdAt).toLocaleDateString('fr-FR')}
+                </p>
+              </div>
+              <span style={{
+                padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                background: u.tier === 'premium' ? 'rgba(167,139,250,0.15)' : 'rgba(255,255,255,0.05)',
+                color: u.tier === 'premium' ? C.purple : C.muted,
+                border: `1px solid ${u.tier === 'premium' ? 'rgba(167,139,250,0.3)' : C.border}`,
+                flexShrink: 0,
+              }}>
+                {u.tier === 'premium' ? 'Premium' : 'Gratuit'}
+              </span>
+            </div>
+          ))}
+        </div>
+
       </div>
     </div>
   );
