@@ -11,6 +11,7 @@ interface Props {
   type: MbtiType;
 }
 
+const ONE_TIME_PRICE = '1,99 €';
 const MONTHLY_PRICE = '9,99 €';
 const ANNUAL_PRICE = '29,99 €';
 
@@ -28,6 +29,30 @@ export default function TypeClient({ type }: Props) {
   const [authSent, setAuthSent] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const pendingRef = useRef(false);
+
+  // ── Checkout: paiement unique 1,99 € ──
+  const doOneTime = useCallback(async (email?: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: window.location.origin,
+          quizSlug: 'personnalite',
+          typeCode: type.code,
+          userEmail: email ?? session?.user?.email ?? undefined,
+          oneTime: true,
+        }),
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) { window.location.href = data.url; }
+      else { alert(data.error ?? 'Erreur de paiement'); setLoading(false); }
+    } catch {
+      alert('Erreur réseau. Réessaie.');
+      setLoading(false);
+    }
+  }, [session?.user?.email, type.code]);
 
   // ── Checkout: abonnement (mensuel par défaut, ou annuel) ──
   const doCheckout = useCallback(async (annual: boolean, email?: string) => {
@@ -61,21 +86,38 @@ export default function TypeClient({ type }: Props) {
     if (!session?.user || pendingRef.current) return;
     let flag = false;
     let annual = false;
+    let onetime = false;
     try {
       flag = sessionStorage.getItem('pending_checkout') === '1';
       annual = sessionStorage.getItem('pending_checkout_annual') === '1';
+      onetime = sessionStorage.getItem('pending_checkout_onetime') === '1';
     } catch {}
     if (!flag) return;
     try {
       sessionStorage.removeItem('pending_checkout');
       sessionStorage.removeItem('pending_checkout_annual');
+      sessionStorage.removeItem('pending_checkout_onetime');
     } catch {}
     pendingRef.current = true;
     if ((session.user as { tier?: string }).tier !== 'premium') {
-      void doCheckout(annual, session.user.email ?? undefined);
+      if (onetime) void doOneTime(session.user.email ?? undefined);
+      else void doCheckout(annual, session.user.email ?? undefined);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.email]);
+
+  const handleOneTime = useCallback(() => {
+    if (isPremium) return;
+    if (!session?.user) {
+      try {
+        sessionStorage.setItem('pending_checkout', '1');
+        sessionStorage.setItem('pending_checkout_onetime', '1');
+      } catch {}
+      setShowAuthModal(true);
+      return;
+    }
+    void doOneTime();
+  }, [isPremium, session?.user, doOneTime]);
 
   const handleUnlock = useCallback((annual: boolean) => {
     if (isPremium) return;
@@ -259,18 +301,41 @@ export default function TypeClient({ type }: Props) {
         </div>
       )}
 
-      <div className="mt-6 rounded-2xl border border-violet-500/30 p-6 text-center" style={{ background: 'rgba(139,92,246,0.06)' }}>
-        <div className="text-3xl mb-3">🔓</div>
-        <h3 className="text-lg font-black text-white mb-1">{t.paywallTitle(type.code)}</h3>
-        <p className="text-sm text-zinc-400 mb-1 max-w-xs mx-auto">
-          {t.paywallSubtitle} <span className="text-white font-semibold">{t.paywallPlus}</span>
-        </p>
-        <p className="text-xs text-zinc-500 mb-5">{t.paywallTagline}</p>
+      {/* ── Paiement impulsif 1,99 € ── */}
+      <div className="mt-6 rounded-2xl border-2 p-6 text-center"
+        style={{ borderColor: type.accentColor, background: `${type.accentColor}10` }}>
+        <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 text-white"
+          style={{ background: type.accentColor }}>
+          RÉSULTAT {type.code}
+        </div>
+        <div className="text-4xl font-black text-white mb-1">{ONE_TIME_PRICE}</div>
+        <p className="text-zinc-400 text-xs mb-5">{t.oneTimeDesc}</p>
+        <button
+          onClick={handleOneTime}
+          disabled={loading}
+          className="w-full max-w-xs px-7 py-4 rounded-xl font-black text-white text-base transition-all hover:scale-105 active:scale-95 disabled:opacity-60"
+          style={{ background: type.accentColor, boxShadow: `0 6px 24px ${type.accentColor}66` }}
+        >
+          {loading ? t.loading : t.unlockOneTime(ONE_TIME_PRICE)}
+        </button>
+      </div>
+
+      {/* ── Séparateur ── */}
+      <div className="flex items-center gap-3 my-5">
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="text-zinc-600 text-xs font-medium">{t.orPremium}</span>
+        <div className="flex-1 h-px bg-white/10" />
+      </div>
+
+      {/* ── Abonnement ── */}
+      <div className="rounded-2xl border border-white/10 p-5 text-center" style={{ background: 'rgba(139,92,246,0.05)' }}>
+        <p className="text-xs text-zinc-500 mb-1">{t.paywallTagline}</p>
+        <p className="text-xs text-zinc-600 mb-4">{t.paywallPlus}</p>
         <button
           onClick={() => handleUnlock(false)}
           disabled={loading}
           className="w-full max-w-xs px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-105 disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
+          style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.35)' }}
         >
           {loading ? t.loading : t.unlockMonthly(MONTHLY_PRICE)}
         </button>
