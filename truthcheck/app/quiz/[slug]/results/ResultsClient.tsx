@@ -616,15 +616,23 @@ export default function ResultsClient({ quiz }: Props) {
                 </span>
               </div>
 
-              {/* Résultat 100% verrouillé */}
-              <div className="flex flex-col items-center gap-1.5 mb-6">
-                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-base font-bold border border-white/10 bg-white/5 text-zinc-500">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              {/* Teaser — 15% visible */}
+              <div className="mb-5 rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+                <p className="text-zinc-100 font-black text-[15px] leading-snug mb-3">{tier.message}</p>
+                <p className="text-zinc-300 text-sm leading-relaxed">{analysis[0]}</p>
+                <div className="relative mt-3 overflow-hidden" style={{ maxHeight: 58 }}>
+                  <div style={{ filter: 'blur(5px)', userSelect: 'none', pointerEvents: 'none' }}>
+                    <p className="text-zinc-400 text-sm leading-relaxed">{analysis[1]}</p>
+                    <p className="text-zinc-400 text-sm leading-relaxed mt-2">{analysis[2]}</p>
+                  </div>
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.97) 70%)' }} />
+                </div>
+                <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-white/5">
+                  <svg className="w-3.5 h-3.5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  Résultat verrouillé
-                </span>
-                <p className="text-zinc-600 text-xs">Débloque pour voir ton score et ton analyse</p>
+                  <span className="text-[11px] text-zinc-600">9 points d&apos;analyse supplémentaires verrouillés</span>
+                </div>
               </div>
 
               {/* Main paywall card */}
@@ -637,23 +645,6 @@ export default function ResultsClient({ quiz }: Props) {
                   <p className="text-zinc-400 text-sm leading-relaxed">
                     {pw.subline}
                   </p>
-                </div>
-
-                {/* What you get */}
-                <div className="space-y-2 mb-4">
-                  {[
-                    'Ton score précis sur 100',
-                    'Ton niveau parmi 5 catégories',
-                    'Analyse de 10 points personnalisée',
-                    'Accès illimité à tous les quizzes',
-                  ].map((item) => (
-                    <div key={item} className="flex items-center gap-2 text-sm text-zinc-300">
-                      <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {item}
-                    </div>
-                  ))}
                 </div>
 
                 {/* Scary stat */}
@@ -706,35 +697,6 @@ export default function ResultsClient({ quiz }: Props) {
                 </p>
               </div>
 
-              {/* Blurred preview */}
-              <div className="relative rounded-2xl overflow-hidden border border-white/5" style={{ pointerEvents: 'none' }}>
-                <div style={{ filter: 'blur(7px)', userSelect: 'none' }}>
-                  <div className="flex justify-center pt-4 pb-2 bg-black/40">
-                    <span
-                      className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold border"
-                      style={{ color: tier.glowColor, borderColor: `${tier.glowColor}40`, backgroundColor: `${tier.glowColor}15` }}
-                    >
-                      <span>{tier.emoji}</span>
-                      {tier.title}
-                    </span>
-                  </div>
-                  <div className="px-4 pb-3 bg-black/40">
-                    <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${score}%`, background: `linear-gradient(90deg, ${tier.glowColor}66, ${tier.glowColor})` }} />
-                    </div>
-                  </div>
-                  <div className="p-4 bg-black/40 space-y-2">
-                    <p className="text-zinc-200 font-semibold text-sm">{tier.message}</p>
-                    {analysis.slice(0, 3).map((line, i) => (
-                      <p key={i} className="text-zinc-400 text-xs leading-relaxed">{line}</p>
-                    ))}
-                  </div>
-                </div>
-                <div
-                  className="absolute inset-0"
-                  style={{ background: 'linear-gradient(to bottom, rgba(9,9,11,0.3) 0%, rgba(9,9,11,0.85) 100%)' }}
-                />
-              </div>
             </div>
           )}
 

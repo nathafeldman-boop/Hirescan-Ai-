@@ -311,6 +311,38 @@ export default function TypeClient({ type }: Props) {
         </div>
       )}
 
+      {/* ── Teaser 15% ── */}
+      <div className="mt-8 rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+        <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: type.accentColor }}>
+          Aperçu de ton profil
+        </p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {localType.traits.slice(0, 3).map(trait => (
+            <span key={trait} className="px-3 py-1.5 rounded-full text-xs font-medium border"
+              style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
+              {trait}
+            </span>
+          ))}
+        </div>
+        <p className="text-zinc-200 text-sm leading-relaxed">
+          {localType.fullDesc.split(/(?<=[.!?])\s/)[0]}
+        </p>
+        <div className="relative mt-3 overflow-hidden" style={{ maxHeight: 54 }}>
+          <div style={{ filter: 'blur(5px)', userSelect: 'none', pointerEvents: 'none' }}>
+            <p className="text-zinc-400 text-sm leading-relaxed">
+              {localType.fullDesc.split(/(?<=[.!?])\s/).slice(1, 4).join(' ')}
+            </p>
+          </div>
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.97) 65%)' }} />
+        </div>
+        <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-white/5">
+          <svg className="w-3.5 h-3.5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span className="text-[11px] text-zinc-600">Rapport complet verrouillé — traits, amour, travail, forces…</span>
+        </div>
+      </div>
+
       {/* ── Paiement impulsif 1,99 € ── */}
       <div className="mt-6 rounded-2xl border-2 p-6 text-center"
         style={{ borderColor: type.accentColor, background: `${type.accentColor}10` }}>
