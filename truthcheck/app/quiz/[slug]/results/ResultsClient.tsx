@@ -101,8 +101,9 @@ export default function ResultsClient({ quiz }: Props) {
   const rawScore = parseInt(searchParams.get('score') ?? '0', 10);
   const score = Math.max(0, Math.min(100, rawScore));
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
+  const sessionLoading = status === 'loading';
 
   const tier = getResultTier(quiz, score);
 
@@ -201,16 +202,16 @@ export default function ResultsClient({ quiz }: Props) {
 
   // Auto-scroll to paywall after results load
   useEffect(() => {
-    if (isPremium) return;
+    if (isPremium || sessionLoading) return;
     const t = setTimeout(() => {
       paywallRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 1400);
     return () => clearTimeout(t);
-  }, [isPremium]);
+  }, [isPremium, sessionLoading]);
 
   // Exit intent — desktop (mouse leaves top) + mobile (tab switch)
   useEffect(() => {
-    if (isPremium) return;
+    if (isPremium || sessionLoading) return;
     const trigger = () => {
       if (!exitTriggered.current) {
         exitTriggered.current = true;
@@ -225,7 +226,7 @@ export default function ResultsClient({ quiz }: Props) {
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [isPremium]);
+  }, [isPremium, sessionLoading]);
 
   // Exit modal countdown
   useEffect(() => {
@@ -518,7 +519,11 @@ export default function ResultsClient({ quiz }: Props) {
         <div className="w-full max-w-md">
           <p className="text-center text-zinc-500 text-sm mb-6">{quiz.title}</p>
 
-          {isPremium ? (
+          {sessionLoading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
+            </div>
+          ) : isPremium ? (
             /* ── PREMIUM: full results ── */
             <>
               {/* Score circle — revealed */}

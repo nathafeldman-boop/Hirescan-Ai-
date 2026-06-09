@@ -125,10 +125,10 @@ export default function LandingPage() {
             L&apos;IA analyse tes vraies réponses — sans filtre.
           </p>
 
-          <div className="flex items-center justify-center gap-3 flex-wrap">
+          <div className="flex flex-col items-center gap-3 w-full max-w-xs mx-auto sm:max-w-sm">
             <Link
               href="/onboarding"
-              className="px-7 py-3 rounded-xl font-bold text-[15px] text-white transition-all hover:opacity-90 active:scale-95"
+              className="w-full py-4 rounded-xl font-bold text-[15px] text-white text-center transition-all hover:opacity-90 active:scale-95"
               style={{
                 background: 'linear-gradient(135deg, #7c3aed, #db2777)',
                 boxShadow: '0 4px 24px rgba(124,58,237,0.5), 0 1px 0 rgba(255,255,255,0.12) inset',
@@ -136,20 +136,28 @@ export default function LandingPage() {
             >
               Commencer gratuitement →
             </Link>
-            <Link
-              href="/quiz"
-              className="px-7 py-3 rounded-xl font-semibold text-[15px] text-zinc-300 hover:text-white transition-all"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-            >
-              Voir tous les quiz
-            </Link>
-            <Link href="/quiz/personnalite"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-sky-300 hover:text-white bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 hover:border-sky-400/50 transition-all hover:scale-105 active:scale-95">
-              Test de personnalité →
-            </Link>
+            <div className="flex gap-3 w-full">
+              <Link
+                href="/quiz"
+                className="flex-1 py-3 rounded-xl font-semibold text-[14px] text-zinc-300 hover:text-white transition-all text-center"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                }}
+              >
+                Tous les quiz
+              </Link>
+              <Link
+                href="/quiz/personnalite"
+                className="flex-1 py-3 rounded-xl font-semibold text-[14px] text-violet-300 hover:text-white transition-all text-center"
+                style={{
+                  background: 'rgba(139,92,246,0.10)',
+                  border: '1px solid rgba(139,92,246,0.30)',
+                }}
+              >
+                Personnalité →
+              </Link>
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-10 mt-14">

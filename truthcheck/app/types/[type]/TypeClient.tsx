@@ -16,8 +16,9 @@ const MONTHLY_PRICE = '9,99 €';
 const ANNUAL_PRICE = '29,99 €';
 
 export default function TypeClient({ type }: Props) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
+  const sessionLoading = status === 'loading';
   const { lang } = useLang();
   const t = ui[lang].type;
   const enData = mbtiTypesEn[type.code] ?? {};
@@ -134,6 +135,14 @@ export default function TypeClient({ type }: Props) {
   }, [isPremium, session?.user, doCheckout]);
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
+
+  if (sessionLoading) {
+    return (
+      <div className="mt-10 flex justify-center py-16">
+        <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
+      </div>
+    );
+  }
 
   // ─────────────────────────────────────────────────────────────
   // PREMIUM : rapport complet révélé + accès aux 15 tests UrCecret
