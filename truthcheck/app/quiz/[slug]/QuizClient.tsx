@@ -51,6 +51,7 @@ export default function QuizClient({ quiz }: Props) {
   const [selected, setSelected] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
+  const [showIntro, setShowIntro] = useState(true);
   const [showMidHook, setShowMidHook] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -105,11 +106,11 @@ export default function QuizClient({ quiz }: Props) {
         setShowAnalysis(true);
         let prog = 0;
         const iv = setInterval(() => {
-          prog += 2;
-          setAnalysisProgress(prog);
+          prog += 1.2;
+          setAnalysisProgress(Math.min(100, prog));
           if (prog >= 100) {
             clearInterval(iv);
-            router.push(`/quiz/${quiz.slug}/results?score=${percentage}`);
+            setTimeout(() => router.push(`/quiz/${quiz.slug}/results?score=${percentage}`), 400);
           }
         }, 70);
       } else if (currentIndex === MID_HOOK_INDEX) {
@@ -137,22 +138,74 @@ export default function QuizClient({ quiz }: Props) {
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#09090b' }}>
 
+      {/* ── INTRO SCREEN — commitment + anticipation (Typeform/Noom style) ── */}
+      {showIntro && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ background: '#09090b' }}>
+          <div className="w-full max-w-sm text-center">
+            <div className="text-7xl mb-6 select-none">{quiz.emoji}</div>
+            {session.firstName && (
+              <p className="text-zinc-500 text-sm mb-2">Hey {session.firstName} 👋</p>
+            )}
+            <h1 className="text-white font-black text-2xl leading-snug mb-3">
+              {quiz.title}
+            </h1>
+            <p className="text-zinc-400 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
+              {quiz.subtitle}
+            </p>
+            <div className="flex items-center justify-center gap-4 mb-8">
+              {[
+                { icon: '⚡', label: `${questions.length} questions` },
+                { icon: '🔒', label: '100% anonyme' },
+                { icon: '🧠', label: 'Analyse IA' },
+              ].map(({ icon, label }) => (
+                <div key={label} className="flex flex-col items-center gap-1">
+                  <span className="text-lg">{icon}</span>
+                  <span className="text-[11px] text-zinc-500 font-medium">{label}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowIntro(false)}
+              className="w-full py-4 rounded-xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: `linear-gradient(135deg, ${quiz.accentColor}cc, ${quiz.accentColor})`, boxShadow: `0 6px 28px ${quiz.accentColor}55` }}
+            >
+              Commencer le quiz →
+            </button>
+            <p className="text-zinc-700 text-xs mt-4">Durée estimée : 2–3 min</p>
+          </div>
+        </div>
+      )}
+
       {/* End-of-quiz analysis screen (Noom-style sunk cost + anticipation) */}
       {showAnalysis && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: '#09090b' }}>
           <div className="text-center px-6 w-full max-w-sm">
             <div className="text-6xl mb-6" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>🧠</div>
-            <h2 className="text-white font-black text-2xl mb-2">Analyse en cours…</h2>
-            <p className="text-zinc-500 text-sm mb-8">
-              {analysisProgress < 35
-                ? 'Calibration de ton profil…'
-                : analysisProgress < 65
-                ? 'Analyse des patterns…'
-                : analysisProgress < 90
-                ? 'Génération de ton rapport…'
-                : 'Finalisation…'}
-            </p>
-            <div className="w-full bg-white/5 rounded-full h-2.5 mb-3 overflow-hidden">
+            <h2 className="text-white font-black text-2xl mb-1">Analyse en cours…</h2>
+            {session.firstName && (
+              <p className="text-zinc-600 text-sm mb-6">Profil de {session.firstName}</p>
+            )}
+            <div className="text-left space-y-2 mb-7 max-w-xs mx-auto">
+              {[
+                { threshold: 0,  label: 'Lecture de tes réponses…' },
+                { threshold: 28, label: 'Comparaison avec 50 000 profils…' },
+                { threshold: 55, label: 'Identification des patterns…' },
+                { threshold: 78, label: 'Génération de ton rapport…' },
+                { threshold: 93, label: 'Finalisation…' },
+              ].map(({ threshold, label }) => {
+                const done = analysisProgress > threshold + 22;
+                const active = analysisProgress >= threshold && !done;
+                return (
+                  <div key={label} className={`flex items-center gap-2.5 text-sm transition-all duration-300 ${done ? 'text-zinc-400' : active ? 'text-white' : 'text-zinc-700'}`}>
+                    <span className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
+                      {done ? '✓' : active ? <span className="w-2 h-2 rounded-full inline-block animate-pulse" style={{ background: quiz.accentColor }} /> : '·'}
+                    </span>
+                    {label}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="w-full bg-white/5 rounded-full h-2 mb-2 overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -162,7 +215,7 @@ export default function QuizClient({ quiz }: Props) {
                 }}
               />
             </div>
-            <p className="text-xs text-zinc-600 tabular-nums font-mono">{analysisProgress}%</p>
+            <p className="text-xs text-zinc-700 tabular-nums font-mono">{analysisProgress}%</p>
           </div>
         </div>
       )}
