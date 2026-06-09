@@ -83,6 +83,10 @@ export default function LandingPage() {
               className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all">
               Essayer un quiz
             </Link>
+            <Link href="/quiz/qi"
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-sky-300 hover:text-white bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 hover:border-sky-400/50 transition-all hover:scale-105 active:scale-95">
+              Test de QI →
+            </Link>
           </div>
           <div className="flex items-center justify-center gap-8 mt-14">
             {STATS.map((s) => (
