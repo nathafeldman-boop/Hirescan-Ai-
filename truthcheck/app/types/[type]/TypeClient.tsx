@@ -64,6 +64,7 @@ export default function TypeClient({ type }: Props) {
         body: JSON.stringify({
           origin: window.location.origin,
           quizSlug: 'personnalite',
+          typeCode: type.code,
           userEmail: email ?? session?.user?.email ?? undefined,
           ...(annual ? { annual: true } : {}),
         }),

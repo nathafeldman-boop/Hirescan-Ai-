@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { quizzes } from '@/lib/quizzes';
 import QuizIcon from '@/components/QuizIcon';
+import UserMenu from '@/components/UserMenu';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -56,12 +57,7 @@ export default function QuizIndexPage() {
           <Link href="/duo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: 14, padding: '6px 12px' }}>
             Mode duo
           </Link>
-          <Link href="/api/auth/signin" style={{
-            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-            color: '#fff', borderRadius: 8, padding: '6px 16px', fontSize: 14, textDecoration: 'none',
-          }}>
-            Connexion
-          </Link>
+          <UserMenu />
         </div>
       </nav>
 
