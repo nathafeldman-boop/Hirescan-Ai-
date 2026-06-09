@@ -584,7 +584,7 @@ export default function ResultsClient({ quiz }: Props) {
                       strokeLinecap="round" transform="rotate(-90 90 90)"
                       style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
                     />
-                    <text x="90" y="98" textAnchor="middle" fill={tier.glowColor} fontSize="42" fontWeight="900">{partialScore}</text>
+                    <text x="90" y="98" textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="42" fontWeight="900">??</text>
                   </svg>
                 </div>
                 {/* Lock icon overlay */}
@@ -611,21 +611,15 @@ export default function ResultsClient({ quiz }: Props) {
                 </span>
               </div>
 
-              {/* Tier revealed for free */}
+              {/* Résultat 100% verrouillé */}
               <div className="flex flex-col items-center gap-1.5 mb-6">
-                <span
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-base font-bold border"
-                  style={{
-                    color: tier.glowColor,
-                    borderColor: `${tier.glowColor}50`,
-                    backgroundColor: `${tier.glowColor}18`,
-                    boxShadow: `0 0 20px ${tier.glowColor}20`,
-                  }}
-                >
-                  <span>{tier.emoji}</span>
-                  {tier.title}
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-base font-bold border border-white/10 bg-white/5 text-zinc-500">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Résultat verrouillé
                 </span>
-                <p className="text-zinc-600 text-xs">Ton score exact est verrouillé ↓</p>
+                <p className="text-zinc-600 text-xs">Débloque pour voir ton score et ton analyse</p>
               </div>
 
               {/* Main paywall card */}
