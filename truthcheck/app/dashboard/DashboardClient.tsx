@@ -19,159 +19,132 @@ interface Props {
 export default function DashboardClient({ user }: Props) {
   const isPremium = user.tier === 'premium' || user.tier === 'pro';
   const type = user.mbtiType ? mbtiTypes[user.mbtiType] : null;
-  const memberYear = new Date(user.memberSince).getFullYear();
+  const firstName = user.name?.split(' ')[0] ?? 'toi';
 
   return (
-    <main className="min-h-screen bg-white">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-100/40 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-100/30 rounded-full blur-3xl" />
-      </div>
+    <main className="min-h-screen bg-gray-50">
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
-
-        {/* Header */}
-        <header className="flex items-center justify-between mb-8">
-          <Link href="/" className="text-xl font-black">
+      {/* Top nav */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+          <Link href="/" className="text-lg font-black">
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-gray-900">Cecret</span>
           </Link>
-          <div className="flex items-center gap-3">
-            {user.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-gray-200" />
-            )}
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="text-gray-400 hover:text-gray-900 text-sm transition-colors"
-            >
+          <div className="flex items-center gap-2">
+            {user.image
+              ? <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-gray-200" /> // eslint-disable-line @next/next/no-img-element
+              : <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 text-sm font-bold">{firstName[0]?.toUpperCase()}</div>
+            }
+            <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs text-gray-400 hover:text-gray-700 transition-colors ml-1">
               Déconnexion
             </button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* User info + stats */}
-        <div className="bg-white rounded-2xl p-6 mb-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-gray-400 text-xs mb-0.5">Membre depuis {memberYear}</p>
-              <h2 className="text-gray-900 font-black text-xl">
-                Bonjour {user.name?.split(' ')[0] ?? 'toi'} 👋
-              </h2>
-              <p className="text-gray-500 text-sm">{user.email}</p>
-            </div>
-            <div className="text-right">
-              {isPremium ? (
-                <span className="text-xs font-black px-3 py-1.5 rounded-full border"
-                  style={{ color: '#7c3aed', borderColor: '#7c3aed40', backgroundColor: '#7c3aed10' }}>
-                  👑 Pro
-                </span>
-              ) : (
-                <Link href="/pricing"
-                  className="text-xs font-bold px-3 py-1.5 rounded-full"
-                  style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff' }}>
-                  Passer Pro →
-                </Link>
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
+
+        {/* Greeting + tier */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-black text-gray-900">Bonjour {firstName} 👋</h1>
+            <p className="text-sm text-gray-400">{user.email}</p>
+          </div>
+          {isPremium
+            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: '#7c3aed', backgroundColor: '#7c3aed12', border: '1px solid #7c3aed30' }}>👑 Pro</span>
+            : <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-gray-500 bg-gray-100">Gratuit</span>
+          }
+        </div>
+
+        {/* MBTI type — main card */}
+        {type ? (
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Color band */}
+            <div className="h-1.5 w-full" style={{ background: `linear-gradient(to right,${type.accentColor},#ec4899)` }} />
+            <div className="p-5">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-3">Ton type de personnalité</p>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-5xl leading-none">{type.emoji}</div>
+                <div>
+                  <p className="text-2xl font-black text-gray-900 leading-tight">{user.mbtiType}</p>
+                  <p className="text-sm font-bold text-gray-500">{type.name}</p>
+                  <p className="text-xs mt-0.5" style={{ color: type.accentColor }}>{type.rarity} de la population</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 italic mb-5 leading-relaxed">&ldquo;{type.tagline}&rdquo;</p>
+              <Link
+                href={`/types/${user.mbtiType!.toLowerCase()}`}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-white text-sm"
+                style={{ background: `linear-gradient(135deg,${type.accentColor},#ec4899)` }}>
+                Voir mon profil complet →
+              </Link>
+              {user.mbtiTestCount > 0 && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-xs text-gray-400">Test passé {user.mbtiTestCount} fois</p>
+                  <Link href="/quiz/personnalite" className="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+                    Repasser le test →
+                  </Link>
+                </div>
               )}
             </div>
           </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-100">
-            <div className="text-center">
-              <p className="text-2xl font-black text-gray-900">{user.mbtiTestCount}</p>
-              <p className="text-xs text-gray-400 mt-0.5">test{user.mbtiTestCount > 1 ? 's' : ''} passé{user.mbtiTestCount > 1 ? 's' : ''}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-black" style={{ color: isPremium ? '#7c3aed' : '#9ca3af' }}>
-                {isPremium ? '∞' : '0'}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">analyses débloquées</p>
-            </div>
-          </div>
-        </div>
-
-        {/* MBTI type card */}
-        {type ? (
-          <div className="rounded-2xl border-2 p-5 mb-5"
-            style={{ borderColor: type.accentColor + '40', background: type.accentColor + '06' }}>
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Ton type MBTI</p>
-            <div className="flex items-center gap-4">
-              <div className="text-4xl">{type.emoji}</div>
-              <div className="flex-1">
-                <p className="text-xl font-black text-gray-900">{user.mbtiType} — {type.name}</p>
-                <p className="text-xs text-gray-500 italic mt-0.5">{type.tagline}</p>
-                <p className="text-xs font-semibold mt-1" style={{ color: type.accentColor }}>
-                  {type.rarity} de la population
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4">
-              <Link href={`/types/${user.mbtiType!.toLowerCase()}`}
-                className="flex-1 text-center py-2.5 rounded-xl font-bold text-white text-sm"
-                style={{ background: `linear-gradient(135deg,${type.accentColor},#ec4899)` }}>
-                Voir mon profil →
-              </Link>
-              <Link href="/quiz/personnalite"
-                className="px-4 py-2.5 rounded-xl font-semibold text-gray-600 text-sm border border-gray-200 hover:bg-gray-50 transition-all">
-                Repasser
-              </Link>
-            </div>
-          </div>
         ) : (
-          <div className="rounded-2xl border-2 border-dashed border-gray-200 p-6 mb-5 text-center">
-            <div className="text-3xl mb-3">🧠</div>
-            <p className="text-gray-900 font-black text-base mb-1">Découvre ton type MBTI</p>
-            <p className="text-gray-500 text-sm mb-4">100 questions · ~12 minutes · gratuit</p>
+          <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-6 text-center">
+            <div className="text-4xl mb-3">🧠</div>
+            <p className="text-base font-black text-gray-900 mb-1">Découvre ton type MBTI</p>
+            <p className="text-sm text-gray-400 mb-5">100 questions · environ 12 minutes</p>
             <Link href="/quiz/personnalite"
-              className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 15px rgba(124,58,237,0.3)' }}>
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.25)' }}>
               Passer le test →
             </Link>
           </div>
         )}
 
-        {/* Compatibilité duo */}
-        {isPremium ? (
-          <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5 mb-5 flex items-center gap-4">
-            <div className="text-3xl">💑</div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-black text-gray-900">Compatibilité MBTI</p>
-              <p className="text-xs text-gray-500 mt-0.5">Compare ta personnalité avec quelqu&apos;un</p>
+        {/* Feature row */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Duo */}
+          <Link
+            href={isPremium ? '/duo' : '/pricing'}
+            className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-sm hover:border-gray-300 transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-2xl">💑</span>
+              {!isPremium && (
+                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-600">Pro</span>
+              )}
             </div>
-            <Link href="/duo"
-              className="px-4 py-2.5 rounded-xl font-bold text-white text-sm flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
-              Tester →
-            </Link>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 mb-5 flex items-center gap-4">
-            <div className="text-3xl">💑</div>
+            <p className="text-sm font-bold text-gray-900">Compatibilité</p>
+            <p className="text-xs text-gray-400 mt-0.5 leading-snug">Compare avec quelqu&apos;un</p>
+          </Link>
+
+          {/* 16 types */}
+          <Link href="/types"
+            className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-sm hover:border-gray-300 transition-all">
+            <div className="mb-3">
+              <span className="text-2xl">🔍</span>
+            </div>
+            <p className="text-sm font-bold text-gray-900">Les 16 types</p>
+            <p className="text-xs text-gray-400 mt-0.5 leading-snug">Explorer tous les profils</p>
+          </Link>
+        </div>
+
+        {/* Upgrade banner — free only */}
+        {!isPremium && (
+          <div className="rounded-2xl p-5 flex items-center gap-4"
+            style={{ background: 'linear-gradient(135deg,#7c3aed12,#ec489912)', border: '1px solid #7c3aed20' }}>
+            <div className="text-2xl flex-shrink-0">💎</div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-sm font-black text-gray-900">Compatibilité MBTI</p>
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">Pro</span>
-              </div>
-              <p className="text-xs text-gray-400">Compare ta personnalité avec quelqu&apos;un</p>
+              <p className="text-sm font-black text-gray-900">Passer Pro</p>
+              <p className="text-xs text-gray-500 mt-0.5">Type révélé · Compatibilité duo · Profils complets</p>
             </div>
             <Link href="/pricing"
-              className="px-4 py-2.5 rounded-xl font-semibold text-violet-700 text-sm flex-shrink-0 border border-violet-200 hover:bg-violet-50 transition-all">
-              Débloquer
+              className="px-4 py-2 rounded-xl font-bold text-white text-xs flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+              Voir →
             </Link>
           </div>
         )}
-
-        {/* 16 types explorer */}
-        <Link href="/types"
-          className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 hover:border-gray-300 hover:shadow-sm transition-all">
-          <div className="text-3xl">🔍</div>
-          <div>
-            <p className="text-sm font-black text-gray-900">Explorer les 16 types</p>
-            <p className="text-xs text-gray-500 mt-0.5">Profils complets, amour, carrière, compatibilités</p>
-          </div>
-          <span className="ml-auto text-gray-300 text-lg">→</span>
-        </Link>
 
       </div>
     </main>
