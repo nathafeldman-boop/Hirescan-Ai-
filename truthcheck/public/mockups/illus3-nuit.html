@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Illustration — Nuit obsession</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 390px; height: 844px;
+    background: #050507;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: white;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; overflow: hidden; position: relative;
+  }
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 15%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 30%, rgba(255,255,255,.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 60%, rgba(255,255,255,.2) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 10% 70%, rgba(255,255,255,.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 45%, rgba(255,255,255,.2) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 70% 10%, rgba(255,255,255,.3) 0%, transparent 100%);
+  }
+  .time-badge {
+    position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 999px; padding: 8px 20px;
+    font-size: 28px; font-weight: 900; color: rgba(255,255,255,.9);
+    font-variant-numeric: tabular-nums;
+  }
+  .moon { font-size: 20px; }
+  .phone-glow {
+    position: relative; z-index: 2; margin-bottom: 28px;
+  }
+  .phone-screen {
+    width: 140px; height: 200px; border-radius: 24px;
+    background: #09090b; border: 2px solid rgba(139,92,246,.4);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px;
+    box-shadow: 0 0 60px rgba(139,92,246,.4), 0 0 120px rgba(139,92,246,.15);
+  }
+  .phone-logo { font-size: 22px; font-weight: 900; }
+  .phone-logo .ur { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .phone-count {
+    font-size: 28px; font-weight: 900;
+    background: linear-gradient(135deg, #f87171, #fbbf24);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .phone-label { font-size: 10px; color: #52525b; text-align: center; padding: 0 12px; line-height: 1.4; }
+  h2 {
+    font-size: 28px; font-weight: 900; line-height: 1.2;
+    margin-bottom: 12px; position: relative; z-index: 1;
+  }
+  h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #f87171, #fbbf24);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sub {
+    font-size: 15px; color: #52525b; line-height: 1.65;
+    max-width: 300px; position: relative; z-index: 1; margin-bottom: 32px;
+  }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 1; }
+  .tag {
+    padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); color: #71717a;
+  }
+  .corner-logo {
+    position: absolute; bottom: 32px; right: 24px;
+    font-size: 16px; font-weight: 900; z-index: 2;
+  }
+  .corner-logo .ur { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="time-badge">
+    <span class="moon">🌙</span>
+    <span>02:34</span>
+  </div>
+
+  <div class="phone-glow">
+    <div class="phone-screen">
+      <div class="phone-logo"><span class="ur">Ur</span><span style="color:white">Cecret</span></div>
+      <div class="phone-count">247×</div>
+      <div class="phone-label">le même test<br>repassé</div>
+    </div>
+  </div>
+
+  <h2>Chercher le type<br><em>parfaitement</em><br>compatible</h2>
+  <p class="sub">Il ne dormait plus. Il relançait le test en espérant un résultat différent.</p>
+  <div class="tags">
+    <span class="tag">ENFJ — 89%</span>
+    <span class="tag">INTJ — 82%</span>
+    <span class="tag">ENTJ — 78%</span>
+    <span class="tag">INFJ — 91% ✓</span>
+  </div>
+  <div class="corner-logo"><span class="ur">Ur</span><span style="color:#3f3f46">Cecret</span></div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Illustration — 67%</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 390px; height: 844px;
+    background: #09090b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: white;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; overflow: hidden; position: relative;
+  }
+  .glow-orange {
+    position: absolute; width: 360px; height: 360px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,.18) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+  }
+  .types-row {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 32px;
+    position: relative; z-index: 1;
+  }
+  .type-pill {
+    padding: 12px 20px; border-radius: 16px;
+    font-size: 22px; font-weight: 900;
+  }
+  .infp { background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.35); color: #34d399; }
+  .entp { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.35); color: #fbbf24; }
+  .cross { font-size: 20px; color: #3f3f46; font-weight: 900; }
+  .big-number {
+    font-size: 120px; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    position: relative; z-index: 1; margin-bottom: 8px;
+    filter: drop-shadow(0 0 40px rgba(245,158,11,.4));
+  }
+  .compat-label {
+    font-size: 18px; font-weight: 700; color: #71717a;
+    position: relative; z-index: 1; margin-bottom: 32px;
+  }
+  .warning {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 22px; border-radius: 14px;
+    background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25);
+    font-size: 14px; font-weight: 700; color: #fbbf24;
+    position: relative; z-index: 1; margin-bottom: 16px;
+  }
+  .comment {
+    font-size: 14px; color: #52525b; line-height: 1.6;
+    max-width: 290px; position: relative; z-index: 1;
+  }
+  .corner-logo {
+    position: absolute; bottom: 32px; right: 24px;
+    font-size: 16px; font-weight: 900;
+  }
+  .corner-logo .ur { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+</head>
+<body>
+  <div class="glow-orange"></div>
+  <div class="types-row">
+    <div class="type-pill infp">INFP</div>
+    <span class="cross">✕</span>
+    <div class="type-pill entp">ENTP</div>
+  </div>
+  <div class="big-number">67%</div>
+  <div class="compat-label">de compatibilité amoureuse</div>
+  <div class="warning">⚠️ Compatibilité modérée</div>
+  <p class="comment">Ce score était suffisant pour que mon mec cherche quelqu'un de mieux.</p>
+  <div class="corner-logo"><span class="ur">Ur</span><span style="color:#71717a">Cecret</span></div>
+</body>
+</html>
