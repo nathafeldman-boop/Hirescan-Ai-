@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
       : typeCode
         ? `${baseUrl}/types/${typeCode.toLowerCase()}`
-        : `${baseUrl}/quizzes`;
+        : `${baseUrl}/quiz/personnalite`;
 
     const successUrl = typeCode
       ? `${baseUrl}/types/${typeCode.toLowerCase()}?unlocked=true&session_id={CHECKOUT_SESSION_ID}`
