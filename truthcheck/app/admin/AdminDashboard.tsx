@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates';
 
@@ -94,6 +95,16 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   const [tab, setTab] = useState<Tab>('overview');
   const [search, setSearch] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'premium' | 'free'>('all');
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const router = useRouter();
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      router.refresh();
+      setLastRefresh(new Date());
+    }, 60_000);
+    return () => clearInterval(id);
+  }, [router]);
 
   const conversionRate = stats.totalUsers > 0
     ? ((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1)
@@ -149,6 +160,9 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             <span className="text-white">Cecret</span>
           </Link>
           <div className="flex items-center gap-4">
+            <span className="text-xs text-zinc-600 tabular-nums">
+              Mis à jour {lastRefresh.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
             <span className="text-xs text-zinc-500 font-semibold uppercase tracking-widest">Admin · Dashboard</span>
             <Link href="/admin/affiliates" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
               Gérer affiliés →
