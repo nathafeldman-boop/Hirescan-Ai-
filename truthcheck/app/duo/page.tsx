@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { duoQuizzes } from '@/lib/duoQuizzes';
-import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 import TeamCodeEntry from './TeamCodeEntry';
 
 const BASE = 'https://urcecret.site';
@@ -30,13 +29,12 @@ export const metadata: Metadata = {
 
 export default function DuoPage() {
   return (
-    <main className="min-h-screen bg-[#09090b] flex flex-col">
-      <UrCecretAnimatedBg />
+    <main className="min-h-screen bg-white flex flex-col">
 
       {/* Header */}
-      <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">
+      <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/quizzes" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
+          <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1.5 text-sm">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -46,31 +44,31 @@ export default function DuoPage() {
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Ur
             </span>
-            <span className="text-white">Cecret</span>
+            <span className="text-gray-900">Cecret</span>
           </Link>
-          <span className="text-xs text-zinc-500 font-semibold uppercase tracking-widest">Équipe</span>
+          <span className="text-xs text-gray-400 font-semibold uppercase tracking-widest">Compatibilité</span>
         </div>
       </header>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center px-4 py-10">
+      <div className="flex-1 flex flex-col items-center px-4 py-10">
         <div className="w-full max-w-md">
 
           {/* Hero */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-              <span className="text-violet-400 text-xs font-semibold uppercase tracking-widest">Mode Équipe — Nouveau</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-200 bg-violet-50 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+              <span className="text-violet-600 text-xs font-semibold uppercase tracking-widest">Test de compatibilité MBTI</span>
             </div>
-            <h1 className="text-3xl font-black text-white leading-tight mb-3">
-              Qui te connaît
+            <h1 className="text-3xl font-black text-gray-900 leading-tight mb-3">
+              Comparez vos
               <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                {' '}vraiment ?
+                {' '}personnalités
               </span>
             </h1>
-            <p className="text-zinc-400 text-sm leading-relaxed mb-5">
-              Chaque joueur répond seul — sans voir les réponses des autres.
-              Comparez vos secrets et découvrez qui se ressemble vraiment.
-              <strong className="text-zinc-200"> Vous serez surpris.</strong>
+            <p className="text-gray-500 text-sm leading-relaxed mb-5">
+              Chacun répond séparément au test MBTI.
+              L&apos;IA compare vos deux profils et révèle votre niveau de compatibilité réelle.
+              <strong className="text-gray-700"> Sans filtre.</strong>
             </p>
           </div>
 
@@ -78,22 +76,22 @@ export default function DuoPage() {
           <TeamCodeEntry />
 
           {/* How it works */}
-          <div className="glass rounded-2xl p-5 mb-8">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">Comment ça marche</p>
+          <div className="bg-gray-50 rounded-2xl p-5 mb-8 border border-gray-100">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Comment ça marche</p>
             <div className="space-y-3">
               {[
-                { n: '1', icon: '🧩', text: 'Tu fais le quiz seul(e) — tes réponses restent cachées' },
-                { n: '2', icon: '🔑', text: 'Tu partages le lien ou le code à tes coéquipier(s)' },
-                { n: '3', icon: '💥', text: 'Ils répondent — les comparaisons s\'affichent. Prépare-toi.' },
+                { n: '1', icon: '🧠', text: 'Chacun fait le test MBTI séparément — les résultats restent cachés' },
+                { n: '2', icon: '🔗', text: 'Partagez le lien ou le code à votre partenaire' },
+                { n: '3', icon: '💡', text: 'L\'IA révèle votre compatibilité MBTI. Préparez-vous.' },
               ].map(({ n, icon, text }) => (
                 <div key={n} className="flex items-center gap-4">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black"
-                    style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: 'white' }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black text-white"
+                    style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)' }}
                   >
                     {n}
                   </div>
-                  <span className="text-sm text-zinc-300">{icon} {text}</span>
+                  <span className="text-sm text-gray-600">{icon} {text}</span>
                 </div>
               ))}
             </div>
@@ -105,42 +103,36 @@ export default function DuoPage() {
               <Link
                 key={quiz.slug}
                 href={`/duo/${quiz.slug}`}
-                className="group relative rounded-2xl border border-white/8 overflow-hidden transition-all duration-300 hover:border-white/20 hover:scale-[1.02] active:scale-[0.99]"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
+                className="group relative rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] bg-white"
               >
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at 20% 50%, ${quiz.accentColor}18 0%, transparent 70%)` }}
+                  style={{ background: `radial-gradient(ellipse at 20% 50%, ${quiz.accentColor}08 0%, transparent 70%)` }}
                 />
                 <div className="relative p-5 flex items-center gap-4">
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
-                    style={{ background: `${quiz.accentColor}20`, border: `1px solid ${quiz.accentColor}30` }}
+                    style={{ background: `${quiz.accentColor}12`, border: `1px solid ${quiz.accentColor}25` }}
                   >
                     {quiz.emoji}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-bold text-base leading-snug mb-1">{quiz.title}</p>
-                    <p className="text-zinc-500 text-xs leading-relaxed">{quiz.subtitle}</p>
+                    <p className="text-gray-900 font-bold text-base leading-snug mb-1">{quiz.title}</p>
+                    <p className="text-gray-500 text-xs leading-relaxed">{quiz.subtitle}</p>
                   </div>
                   <svg
-                    className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                    style={{ color: quiz.accentColor }}
+                    className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1 text-gray-400"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-                <div
-                  className="h-px w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `linear-gradient(90deg, transparent, ${quiz.accentColor}60, transparent)` }}
-                />
               </Link>
             ))}
           </div>
 
-          <p className="text-center text-zinc-600 text-xs mt-10 tracking-wide">
-            🔒 100% anonyme · Vos réponses individuelles restent privées · Min. 2 joueurs
+          <p className="text-center text-gray-400 text-xs mt-10 tracking-wide">
+            🔒 100% anonyme · Vos réponses individuelles restent privées
           </p>
         </div>
       </div>

@@ -8,20 +8,11 @@ import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 
-const TOTAL = mbtiQuestions.length; // 24
-const PAGE_SIZE = 4;
-const TOTAL_PAGES = Math.ceil(TOTAL / PAGE_SIZE); // 6
+const TOTAL = mbtiQuestions.length;
 
 type QuizAnswer = 'A' | 'B' | 'C' | 'D';
 type Answers = Record<number, QuizAnswer>;
 type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
-
-const CIRCLE_CONFIG = [
-  { key: 'A' as QuizAnswer, bg: '#fecaca', fill: '#f87171', ring: '#ef4444' },
-  { key: 'B' as QuizAnswer, bg: '#fed7aa', fill: '#fb923c', ring: '#f97316' },
-  { key: 'C' as QuizAnswer, bg: '#bbf7d0', fill: '#86efac', ring: '#4ade80' },
-  { key: 'D' as QuizAnswer, bg: '#dcfce7', fill: '#22c55e', ring: '#16a34a' },
-];
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -53,109 +44,91 @@ function GoogleIcon() {
   );
 }
 
-// ─── Quiz page (Truity-style) ─────────────────────────────────────────────────
+// ─── Progress bar ─────────────────────────────────────────────────────────────
 
-function QuizPage({
-  page,
-  pageQuestions,
-  answers,
-  onAnswer,
-  onNext,
-  lang,
-}: {
-  page: number;
-  pageQuestions: MbtiQuestion[];
-  answers: Answers;
-  onAnswer: (qId: number, ans: QuizAnswer) => void;
-  onNext: () => void;
-  lang: string;
+function ProgressBar({ current, total, label }: { current: number; total: number; label: string }) {
+  const pct = Math.round((current / total) * 100);
+  return (
+    <div className="w-full mb-8">
+      <div className="flex justify-between text-xs text-gray-400 mb-2">
+        <span>{label}</span>
+        <span>{pct}%</span>
+      </div>
+      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${pct}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─── Quiz screen — one question at a time ─────────────────────────────────────
+
+function QuizScreen({ onComplete, questions, t }: {
+  onComplete: (answers: Answers) => void;
+  questions: MbtiQuestion[];
+  t: QuizT;
 }) {
-  const [showWarning, setShowWarning] = useState(false);
-  const answeredOnPage = pageQuestions.filter(q => answers[q.id] !== undefined).length;
-  const allAnswered = answeredOnPage === pageQuestions.length;
-  const totalAnswered = Object.keys(answers).length;
-  const pct = Math.round((totalAnswered / TOTAL) * 100);
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState<Answers>({});
+  const [selected, setSelected] = useState<QuizAnswer | null>(null);
+  const [animating, setAnimating] = useState(false);
 
-  const handleNext = () => {
-    if (!allAnswered) { setShowWarning(true); return; }
-    setShowWarning(false);
-    onNext();
+  const q: MbtiQuestion = questions[current];
+
+  const handleChoice = (choice: QuizAnswer) => {
+    if (animating) return;
+    setSelected(choice);
+    setAnimating(true);
+    const next = { ...answers, [q.id]: choice };
+    setTimeout(() => {
+      if (current + 1 >= TOTAL) {
+        onComplete(next);
+      } else {
+        setAnswers(next);
+        setCurrent(c => c + 1);
+        setSelected(null);
+        setAnimating(false);
+      }
+    }, 400);
   };
 
-  useEffect(() => {
-    if (allAnswered) setShowWarning(false);
-  }, [allAnswered]);
-
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f0ea' }}>
-      {/* Sticky progress */}
-      <div className="sticky top-0 z-20 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-            <span className="font-semibold text-gray-700">{pct}%</span>
-            <span>{lang === 'en' ? `Step ${page + 1} of ${TOTAL_PAGES}` : `Étape ${page + 1} sur ${TOTAL_PAGES}`}</span>
-          </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: '#22c55e' }} />
-          </div>
-        </div>
-      </div>
+    <div className="max-w-xl mx-auto px-4 py-10">
+      <ProgressBar current={current + 1} total={TOTAL} label={t.questionOf(current + 1, TOTAL)} />
 
-      <div className="max-w-2xl mx-auto px-4 pt-6 pb-36">
-        <p className="text-center text-sm text-gray-500 mb-6">
-          {lang === 'en' ? 'Choose how much each statement applies to you' : 'Choisissez dans quelle mesure chaque énoncé vous correspond'}
+      <div className="mb-10 text-center">
+        <p className="text-xs text-gray-400 uppercase tracking-widest mb-4">
+          {t.dimLabel[q.dimension]}
         </p>
-
-        <div className="space-y-4">
-          {pageQuestions.map((q) => {
-            const selected = answers[q.id];
-            const options = [q.optionA, q.optionB, ...(q.optionC ? [q.optionC] : []), ...(q.optionD ? [q.optionD] : [])];
-            return (
-              <div key={q.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <p className="text-gray-800 font-semibold text-[15px] leading-snug mb-4">{q.text}</p>
-                <div className="flex justify-between text-xs text-gray-400 mb-3 px-1">
-                  <span>{lang === 'en' ? 'Not at all' : 'Pas du tout'}</span>
-                  <span>{lang === 'en' ? 'Completely' : 'Tout à fait'}</span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  {CIRCLE_CONFIG.slice(0, options.length).map(({ key, bg, fill, ring }, idx) => {
-                    const isSelected = selected === key;
-                    return (
-                      <button key={key} onClick={() => onAnswer(q.id, key)} title={options[idx].text}
-                        className="flex-1 flex flex-col items-center" aria-label={options[idx].text}>
-                        <div className="rounded-full transition-all duration-200" style={{
-                          width: 44, height: 44,
-                          backgroundColor: isSelected ? fill : bg,
-                          border: `2px solid ${isSelected ? ring : 'transparent'}`,
-                          boxShadow: isSelected ? `0 0 0 3px ${fill}55` : undefined,
-                          transform: isSelected ? 'scale(1.12)' : 'scale(1)',
-                        }} />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">{q.text}</h2>
       </div>
 
-      {/* Sticky footer */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-200 shadow-lg">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          {showWarning && (
-            <p className="text-center text-sm text-red-500 mb-3">
-              {lang === 'en' ? 'You must answer all questions to continue' : 'Vous devez répondre à toutes les questions pour continuer'}
-            </p>
-          )}
-          <button onClick={handleNext}
-            className="w-full py-3.5 rounded-xl font-semibold text-white transition-all duration-200 active:scale-[0.98]"
-            style={{ backgroundColor: allAnswered ? '#22c55e' : '#86efac', cursor: allAnswered ? 'pointer' : 'default' }}>
-            {page < TOTAL_PAGES - 1
-              ? (lang === 'en' ? 'Next' : 'Suivant')
-              : (lang === 'en' ? 'See my result' : 'Voir mon résultat')}
-          </button>
-        </div>
+      <div className="flex flex-col gap-3">
+        {([
+          { key: 'A' as const, option: q.optionA },
+          { key: 'B' as const, option: q.optionB },
+          ...(q.optionC ? [{ key: 'C' as const, option: q.optionC }] : []),
+          ...(q.optionD ? [{ key: 'D' as const, option: q.optionD }] : []),
+        ]).map(({ key, option }) => {
+          const isSelected = selected === key;
+          return (
+            <button
+              key={key}
+              onClick={() => handleChoice(key)}
+              disabled={animating}
+              className={`w-full text-center px-6 py-4 rounded-2xl border-2 transition-all duration-200 text-base font-semibold ${
+                isSelected
+                  ? 'border-violet-500 bg-violet-50 text-violet-700 scale-[0.98]'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-violet-300 hover:bg-violet-50/50'
+              }`}
+            >
+              {option.text}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -181,36 +154,37 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   }, [onDone]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f5f0ea' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-white">
       <div className="text-center max-w-sm">
-        <div className="mb-6 text-green-500"><BrainIcon /></div>
-        <h2 className="text-xl font-bold text-gray-800 mb-2">{t.analysisStages[stage]}</h2>
-        <p className="text-gray-500 text-sm mb-8">{t.doNotClose}</p>
-        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-full rounded-full transition-all duration-100" style={{ width: `${progress}%`, backgroundColor: '#22c55e' }} />
+        <div className="mb-6 text-violet-500"><BrainIcon /></div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">{t.analysisStages[stage]}</h2>
+        <p className="text-gray-400 text-sm mb-8">{t.doNotClose}</p>
+        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-100"
+            style={{ width: `${progress}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
+          />
         </div>
-        <p className="text-xs text-gray-400 mt-3">{progress}%</p>
+        <p className="text-xs text-gray-300 mt-3">{progress}%</p>
       </div>
     </div>
   );
 }
 
-// ─── Auth gate — shown after analysis if user is not logged in ────────────────
+// ─── Auth gate ────────────────────────────────────────────────────────────────
 
 function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const callbackUrl = `/types/${typeCode.toLowerCase()}`;
-
   const isFr = lang !== 'en';
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ backgroundColor: '#f5f0ea' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
       <div className="w-full max-w-sm">
-        {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-8 h-8">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
             </svg>
@@ -226,7 +200,7 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
         </div>
 
         {/* Blurred result teaser */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-6 relative overflow-hidden">
+        <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
             <div className="flex-1 space-y-1.5">
@@ -239,11 +213,10 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
             <div className="h-2.5 bg-gray-100 rounded-full w-5/6 animate-pulse" />
             <div className="h-2.5 bg-gray-100 rounded-full w-4/6 animate-pulse" />
           </div>
-          {/* Lock overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[2px] rounded-2xl">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
             <div className="text-center">
               <div className="text-gray-400 mb-1 flex justify-center"><LockIcon /></div>
-              <p className="text-xs text-gray-500 font-medium">
+              <p className="text-xs text-gray-400 font-medium">
                 {isFr ? 'Résultat verrouillé' : 'Result locked'}
               </p>
             </div>
@@ -251,10 +224,10 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
         </div>
 
         {/* Auth card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
           {sent ? (
             <div className="text-center py-2">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                 </svg>
@@ -263,7 +236,7 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
                 {isFr ? 'Vérifie tes emails' : 'Check your inbox'}
               </h3>
               <p className="text-gray-500 text-sm">
-                {isFr ? 'Un lien de connexion a été envoyé à' : 'A sign-in link was sent to'}{' '}
+                {isFr ? 'Lien envoyé à' : 'Link sent to'}{' '}
                 <span className="text-violet-600 font-medium">{email}</span>
               </p>
               <p className="text-gray-400 text-xs mt-3">
@@ -275,23 +248,18 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
               <h2 className="text-gray-900 font-bold text-[15px] text-center mb-5">
                 {isFr ? 'Connexion / Inscription — 30 secondes' : 'Sign in / Sign up — 30 seconds'}
               </h2>
-
-              {/* Google */}
               <button
                 onClick={() => signIn('google', { callbackUrl })}
-                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 font-semibold text-sm hover:bg-gray-50 transition-colors mb-4 shadow-sm"
+                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4"
               >
                 <GoogleIcon />
                 {isFr ? 'Continuer avec Google' : 'Continue with Google'}
               </button>
-
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-gray-100" />
+                <div className="flex-1 h-px bg-gray-200" />
                 <span className="text-gray-400 text-xs">{isFr ? 'ou par email' : 'or by email'}</span>
-                <div className="flex-1 h-px bg-gray-100" />
+                <div className="flex-1 h-px bg-gray-200" />
               </div>
-
-              {/* Magic link */}
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
@@ -306,7 +274,7 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
                 <input
                   type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                   placeholder={isFr ? 'ton@email.com' : 'your@email.com'} required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 transition-all"
                 />
                 <button
                   type="submit" disabled={loading}
@@ -318,7 +286,6 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
                     : (isFr ? 'Recevoir mon lien de connexion' : 'Get my sign-in link')}
                 </button>
               </form>
-
               <p className="text-center text-xs text-gray-400 mt-4">
                 {isFr ? 'Gratuit · Aucune carte bancaire requise' : 'Free · No credit card required'}
               </p>
@@ -337,51 +304,31 @@ export default function PersonnaliteClient() {
   const { data: session } = useSession();
   const { lang } = useLang();
   const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate'>('quiz');
-  const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [mbtiType, setMbtiType] = useState('');
 
   const questions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
   const t = ui[lang].quiz;
 
-  const handleAnswer = (qId: number, ans: QuizAnswer) => {
-    setAnswers(prev => ({ ...prev, [qId]: ans }));
-  };
-
-  const handleNextPage = () => {
-    if (page < TOTAL_PAGES - 1) {
-      setPage(p => p + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      setPhase('analysis');
-    }
+  const handleComplete = (ans: Answers) => {
+    setAnswers(ans);
+    setPhase('analysis');
   };
 
   const handleAnalysisDone = () => {
     const type = computeMbtiType(answers);
     setMbtiType(type);
     if (session?.user) {
-      // Already signed in — go straight to the type page (payment wall there)
       router.push(`/types/${type.toLowerCase()}`);
     } else {
-      // Not signed in — show auth gate
       setPhase('gate');
     }
   };
 
-  const pageQuestions = questions.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
-
   return (
-    <>
+    <main className="min-h-screen bg-white text-gray-900">
       {phase === 'quiz' && (
-        <QuizPage
-          page={page}
-          pageQuestions={pageQuestions}
-          answers={answers}
-          onAnswer={handleAnswer}
-          onNext={handleNextPage}
-          lang={lang}
-        />
+        <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
       {phase === 'analysis' && (
         <AnalysisScreen onDone={handleAnalysisDone} t={t} />
@@ -389,6 +336,6 @@ export default function PersonnaliteClient() {
       {phase === 'gate' && (
         <AuthGate typeCode={mbtiType} lang={lang} />
       )}
-    </>
+    </main>
   );
 }

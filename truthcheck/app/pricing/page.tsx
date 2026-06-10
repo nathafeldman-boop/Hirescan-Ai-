@@ -71,7 +71,7 @@ function CheckoutButton({ label, annual, userEmail, highlighted }: {
     <button
       onClick={handleClick}
       disabled={loading}
-      className="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:bg-white/10 active:scale-95 disabled:opacity-60 border border-white/15 text-zinc-300"
+      className="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:bg-gray-100 active:scale-95 disabled:opacity-60 border border-gray-200 text-gray-700"
     >
       {loading ? 'Chargement…' : label}
     </button>
@@ -84,12 +84,12 @@ export default function PricingPage() {
   const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
 
   return (
-    <main className="min-h-screen bg-[#09090b] text-white">
-      <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
+    <main className="min-h-screen bg-white text-gray-900">
+      <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-black">
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-white">Cecret</span>
+            <span className="text-gray-900">Cecret</span>
           </Link>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -102,31 +102,31 @@ export default function PricingPage() {
 
         {/* Titre */}
         <div className="text-center mb-8">
-          <p className="text-zinc-500 text-sm mb-2">Débloquer tout UrCecret</p>
-          <h1 className="text-2xl font-black text-white">Choisir ton plan</h1>
+          <p className="text-gray-500 text-sm mb-2">Débloquer tout UrCecret</p>
+          <h1 className="text-2xl font-black text-gray-900">Choisir ton plan</h1>
         </div>
 
         {/* Plan gratuit — plan actuel */}
-        <div className="rounded-2xl border border-white/10 bg-white/3 p-5 mb-4">
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 mb-4">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-white font-bold">Gratuit</p>
-              <p className="text-zinc-500 text-sm">Accès limité</p>
+              <p className="text-gray-900 font-bold">Gratuit</p>
+              <p className="text-gray-500 text-sm">Accès limité</p>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-black text-white">0 €</span>
-              <p className="text-zinc-600 text-xs">pour toujours</p>
+              <span className="text-2xl font-black text-gray-900">0 €</span>
+              <p className="text-gray-400 text-xs">pour toujours</p>
             </div>
           </div>
           <ul className="space-y-2 mb-4">
             {FREE_PERKS.map((p) => (
-              <li key={p} className="flex items-center gap-2 text-sm text-zinc-500">
-                <span className="text-zinc-600">✓</span>
+              <li key={p} className="flex items-center gap-2 text-sm text-gray-500">
+                <span className="text-gray-400">✓</span>
                 {p}
               </li>
             ))}
           </ul>
-          <div className="w-full py-3 rounded-xl text-center text-sm font-semibold text-zinc-600 bg-white/5 border border-white/5">
+          <div className="w-full py-3 rounded-xl text-center text-sm font-semibold text-gray-500 bg-gray-100 border border-gray-200">
             {isPremium ? 'Ancien plan' : 'Plan actuel'}
           </div>
         </div>
@@ -145,19 +145,19 @@ export default function PricingPage() {
 
           <div className="flex items-center justify-between mb-4 mt-1">
             <div>
-              <p className="text-white font-black text-lg">Premium</p>
-              <p className="text-violet-400 text-sm font-medium">Accès illimité</p>
+              <p className="text-gray-900 font-black text-lg">Premium</p>
+              <p className="text-violet-600 text-sm font-medium">Accès illimité</p>
             </div>
             <div className="text-right">
-              <span className="text-4xl font-black text-white">9,99 €</span>
-              <p className="text-zinc-400 text-sm">/mois</p>
+              <span className="text-4xl font-black text-gray-900">9,99 €</span>
+              <p className="text-gray-500 text-sm">/mois</p>
             </div>
           </div>
 
           <ul className="space-y-2.5 mb-6">
             {PREMIUM_PERKS.map((p) => (
-              <li key={p} className="flex items-center gap-2.5 text-sm text-zinc-200">
-                <span className="text-violet-400 font-bold flex-shrink-0">✓</span>
+              <li key={p} className="flex items-center gap-2.5 text-sm text-gray-700">
+                <span className="text-violet-500 font-bold flex-shrink-0">✓</span>
                 {p}
               </li>
             ))}
@@ -172,20 +172,20 @@ export default function PricingPage() {
         </div>
 
         {/* Option annuelle */}
-        <div className="rounded-2xl border border-white/10 bg-white/3 p-4 mb-6">
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-6">
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-white font-bold">Annuel</p>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/20">
+                <p className="text-gray-900 font-bold">Annuel</p>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200">
                   −75%
                 </span>
               </div>
-              <p className="text-zinc-500 text-sm">Soit 2,50 € / mois</p>
+              <p className="text-gray-500 text-sm">Soit 2,50 € / mois</p>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-black text-white">29,99 €</span>
-              <p className="text-zinc-500 text-xs">/an</p>
+              <span className="text-2xl font-black text-gray-900">29,99 €</span>
+              <p className="text-gray-400 text-xs">/an</p>
             </div>
           </div>
           <CheckoutButton
@@ -195,12 +195,12 @@ export default function PricingPage() {
           />
         </div>
 
-        <p className="text-center text-zinc-600 text-xs mb-6">
+        <p className="text-center text-gray-400 text-xs mb-6">
           Paiement sécurisé par Stripe · Annulable à tout moment · Aucune surprise
         </p>
 
         <div className="text-center">
-          <Link href="/dashboard" className="text-zinc-500 hover:text-white text-sm transition-colors">
+          <Link href="/dashboard" className="text-gray-400 hover:text-gray-900 text-sm transition-colors">
             ← Retour au dashboard
           </Link>
         </div>

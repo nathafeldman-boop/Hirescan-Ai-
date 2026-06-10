@@ -107,19 +107,15 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Monthly subscription ──
-    const priceId = process.env.STRIPE_PRICE_ID;
-
-    const lineItem = priceId
-      ? { price: priceId, quantity: 1 }
-      : {
-          price_data: {
-            currency: 'eur',
-            product: MONTHLY_PRODUCT_ID,
-            unit_amount: 999,
-            recurring: { interval: 'month' as const },
-          },
-          quantity: 1,
-        };
+    const lineItem = {
+      price_data: {
+        currency: 'eur',
+        product: MONTHLY_PRODUCT_ID,
+        unit_amount: 999,
+        recurring: { interval: 'month' as const },
+      },
+      quantity: 1,
+    };
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',

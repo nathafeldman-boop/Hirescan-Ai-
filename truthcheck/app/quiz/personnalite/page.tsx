@@ -8,7 +8,7 @@ const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Test MBTI Gratuit — 16 Types de Personnalité en Français',
-  description: 'Test de personnalité MBTI gratuit : 24 questions pour découvrir ton profil parmi les 16 types — INFJ, ENFP, INTJ, INTP, ESFP, ISFJ, ENTJ et plus. Résultat instantané, sans inscription. Le test MBTI le plus complet en français.',
+  description: 'Test de personnalité MBTI gratuit : 100 questions pour découvrir ton profil parmi les 16 types — INFJ, ENFP, INTJ, INTP, ESFP, ISFJ, ENTJ et plus. Résultat instantané, sans inscription. Le test MBTI le plus complet en français.',
   keywords: [
     'test MBTI', 'MBTI gratuit', 'test de personnalité MBTI', '16 types MBTI',
     'INFJ', 'ENFP', 'INTJ', 'INTP', 'ENFJ', 'ENTP', 'INFP', 'ISFJ',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE}/quiz/personnalite` },
   openGraph: {
     title: 'Test MBTI Gratuit — 16 Types de Personnalité | UrCecret',
-    description: 'Découvre ton type MBTI en 24 questions. INFJ, ENFP, INTJ, INTP et 12 autres profils. Gratuit, instantané, en français.',
+    description: 'Découvre ton type MBTI en 100 questions. INFJ, ENFP, INTJ, INTP et 12 autres profils. Gratuit, instantané, en français.',
     type: 'website',
     url: `${BASE}/quiz/personnalite`,
     siteName: 'UrCecret',
@@ -138,15 +138,15 @@ export default function PersonnalitePage() {
       </div>
 
       {/* Hero landing page */}
-      <main className="min-h-screen bg-[#09090b] text-white">
-        <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
+      <main className="min-h-screen bg-white text-gray-900">
+        <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
               <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-              <span className="text-white">Cecret</span>
+              <span className="text-gray-900">Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
-              <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">16 types MBTI →</Link>
+              <Link href="/types" className="text-xs text-gray-500 hover:text-gray-900 transition-colors">16 types MBTI →</Link>
               <LanguageSwitcher />
               <UserMenu />
             </div>
@@ -155,12 +155,12 @@ export default function PersonnalitePage() {
 
         <div className="max-w-3xl mx-auto px-4 py-16 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-4 py-1.5 text-xs text-violet-400 font-medium mb-8">
+          <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-full px-4 py-1.5 text-xs text-violet-600 font-medium mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-            Gratuit · 5 minutes · Résultat instantané
+            Gratuit · 12 minutes · Résultat instantané
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-black mb-5 leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-black mb-5 leading-tight text-gray-900">
             Test{' '}
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               MBTI
@@ -168,8 +168,8 @@ export default function PersonnalitePage() {
             {' '}Gratuit — Quel est ton type ?
           </h1>
 
-          <p className="text-lg text-zinc-400 mb-10 max-w-xl mx-auto leading-relaxed">
-            24 questions · 16 types de personnalité · INFJ, ENFP, INTJ et plus.
+          <p className="text-lg text-gray-500 mb-10 max-w-xl mx-auto leading-relaxed">
+            100 questions · 16 types de personnalité · INFJ, ENFP, INTJ et plus.
             Le test MBTI le plus complet en français — résultat instantané.
           </p>
 
@@ -178,11 +178,11 @@ export default function PersonnalitePage() {
             {[
               { n: '2,3M', label: 'tests passés' },
               { n: '16', label: 'types distincts' },
-              { n: '5 min', label: 'en moyenne' },
+              { n: '12 min', label: 'en moyenne' },
             ].map(({ n, label }) => (
               <div key={label}>
-                <div className="text-2xl font-black text-white">{n}</div>
-                <div className="text-xs text-zinc-500">{label}</div>
+                <div className="text-2xl font-black text-gray-900">{n}</div>
+                <div className="text-xs text-gray-400">{label}</div>
               </div>
             ))}
           </div>
@@ -192,12 +192,12 @@ export default function PersonnalitePage() {
             {TYPE_PREVIEW.map(t => (
               <div
                 key={t.code}
-                className="rounded-lg p-3 text-center border border-white/5 bg-white/5"
-                style={{ borderColor: `${t.color}30` }}
+                className="rounded-lg p-3 text-center border bg-gray-50"
+                style={{ borderColor: `${t.color}40` }}
               >
                 <div className="text-xl mb-1">{t.emoji}</div>
-                <div className="text-xs font-bold text-white">{t.code}</div>
-                <div className="text-xs text-zinc-500 leading-tight">{t.name}</div>
+                <div className="text-xs font-bold text-gray-900">{t.code}</div>
+                <div className="text-xs text-gray-500 leading-tight">{t.name}</div>
               </div>
             ))}
           </div>
@@ -207,21 +207,21 @@ export default function PersonnalitePage() {
           {/* How it works */}
           <div className="mt-16 grid sm:grid-cols-3 gap-6 text-left">
             {[
-              { icon: '🎯', title: '24 questions ciblées', desc: '6 questions par dimension psychologique. Pas de bonnes ou mauvaises réponses.' },
-              { icon: '⚡', title: 'Résultat immédiat', desc: 'Ton type parmi les 16 profils en moins de 5 minutes. Gratuit, sans inscription.' },
-              { icon: '🔓', title: 'Rapport complet en option', desc: 'Relations, carrière, forces, croissance personnelle. Débloquer pour €19.99.' },
+              { icon: '🎯', title: '100 questions ciblées', desc: '25 questions par dimension psychologique. Pas de bonnes ou mauvaises réponses.' },
+              { icon: '⚡', title: 'Résultat immédiat', desc: 'Ton type parmi les 16 profils en moins de 12 minutes. Gratuit, sans inscription.' },
+              { icon: '🔓', title: 'Rapport complet en option', desc: 'Relations, carrière, forces, croissance personnelle. Accessible avec Premium.' },
             ].map(({ icon, title, desc }) => (
-              <div key={title} className="bg-white/5 rounded-xl p-5 border border-white/5">
+              <div key={title} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
                 <div className="text-2xl mb-3">{icon}</div>
-                <h3 className="font-bold text-white text-sm mb-1">{title}</h3>
-                <p className="text-zinc-500 text-xs leading-relaxed">{desc}</p>
+                <h3 className="font-bold text-gray-900 text-sm mb-1">{title}</h3>
+                <p className="text-gray-500 text-xs leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
 
           {/* SEO text */}
-          <div className="mt-16 text-left space-y-4 text-sm text-zinc-500 leading-relaxed max-w-2xl mx-auto">
-            <h2 className="text-base font-bold text-white">Pourquoi passer ce test de personnalité ?</h2>
+          <div className="mt-16 text-left space-y-4 text-sm text-gray-500 leading-relaxed max-w-2xl mx-auto">
+            <h2 className="text-base font-bold text-gray-900">Pourquoi passer ce test de personnalité ?</h2>
             <p>
               La théorie des 16 types de personnalité est l&apos;un des modèles psychologiques les plus utilisés au
               monde. Basé sur les travaux de Carl Jung, puis développé par Isabel Briggs Myers et Katharine Cook
@@ -232,11 +232,11 @@ export default function PersonnalitePage() {
               décisions, traites l&apos;information et organises ta vie. Ce n&apos;est pas une case dans laquelle t&apos;enfermer —
               c&apos;est un miroir qui révèle tes forces naturelles.
             </p>
-            <h2 className="text-base font-bold text-white">Comment fonctionne ce test ?</h2>
+            <h2 className="text-base font-bold text-gray-900">Comment fonctionne ce test ?</h2>
             <p>
-              Notre test analyse tes préférences sur 4 axes : <strong className="text-zinc-300">Extraversion vs Introversion</strong> (où tu
-              puises ton énergie), <strong className="text-zinc-300">Sensation vs Intuition</strong> (comment tu perçois l&apos;information),
-              <strong className="text-zinc-300"> Pensée vs Sentiment</strong> (comment tu prends des décisions), et <strong className="text-zinc-300">Jugement vs Perception</strong> (comment
+              Notre test analyse tes préférences sur 4 axes : <strong className="text-gray-700">Extraversion vs Introversion</strong> (où tu
+              puises ton énergie), <strong className="text-gray-700">Sensation vs Intuition</strong> (comment tu perçois l&apos;information),
+              <strong className="text-gray-700"> Pensée vs Sentiment</strong> (comment tu prends des décisions), et <strong className="text-gray-700">Jugement vs Perception</strong> (comment
               tu organises ta vie). Le résultat : l&apos;un des 16 types comme INFJ, ENFP, INTJ, ou ESFP.
             </p>
           </div>

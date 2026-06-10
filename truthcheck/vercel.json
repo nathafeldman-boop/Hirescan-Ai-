@@ -2,5 +2,11 @@
   "framework": "nextjs",
   "buildCommand": "npx prisma generate && npx prisma db push; next build",
   "installCommand": "npm install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/email-sequence",
+      "schedule": "0 9 * * *"
+    }
+  ]
 }

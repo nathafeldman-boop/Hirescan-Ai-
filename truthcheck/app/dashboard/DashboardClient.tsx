@@ -72,40 +72,40 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
   ];
 
   return (
-    <main className="min-h-screen bg-[#09090b]">
+    <main className="min-h-screen bg-white">
       <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-900/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-900/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-100/50 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-100/40 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-black">
-            <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
-            <span className="text-white">Cecret</span>
+            <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent">Ur</span>
+            <span className="text-gray-900">Cecret</span>
           </h1>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             {user.image && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-white/20" />
+              <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-gray-200" />
             )}
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="text-zinc-500 hover:text-white text-sm transition-colors"
+              className="text-gray-400 hover:text-gray-900 text-sm transition-colors"
             >
               Déconnexion
             </button>
           </div>
         </header>
 
-        {/* Rizz Score Card */}
-        <div className="glass rounded-2xl p-6 mb-6 border border-white/8">
+        {/* Score Card */}
+        <div className="bg-white rounded-2xl p-6 mb-6 border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-zinc-500 text-sm">Bonjour {user.name?.split(' ')[0] ?? 'toi'} 👋</p>
-              <h2 className="text-white font-black text-xl mt-0.5">Ton Rizz Score</h2>
+              <p className="text-gray-500 text-sm">Bonjour {user.name?.split(' ')[0] ?? 'toi'} 👋</p>
+              <h2 className="text-gray-900 font-black text-xl mt-0.5">Ton Score</h2>
             </div>
             <div className="text-right">
               <div
@@ -123,11 +123,11 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
           {/* Progress bar */}
           {nextLevel && (
             <div>
-              <div className="flex justify-between text-xs text-zinc-500 mb-1.5">
+              <div className="flex justify-between text-xs text-gray-400 mb-1.5">
                 <span>{level.label}</span>
                 <span>{nextLevel.label} — {nextLevel.min - user.rizzScore} pts</span>
               </div>
-              <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${progress}%`, backgroundColor: level.color }}
@@ -168,7 +168,7 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
             <Link
               key={action.href}
               href={action.badge === 'Bientôt' ? '#' : action.href}
-              className={`glass rounded-2xl p-4 border border-white/8 transition-all hover:border-white/20 ${action.badge === 'Bientôt' ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`bg-white rounded-2xl p-4 border border-gray-200 transition-all hover:border-gray-300 hover:shadow-sm ${action.badge === 'Bientôt' ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="flex items-start justify-between mb-3">
                 <span className="text-2xl">{action.emoji}</span>
@@ -177,32 +177,32 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
                     className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                     style={
                       action.badge === 'Bientôt'
-                        ? { color: '#6b7280', backgroundColor: '#6b728020' }
-                        : { color: action.color, backgroundColor: action.color + '20' }
+                        ? { color: '#9ca3af', backgroundColor: '#f3f4f6' }
+                        : { color: action.color, backgroundColor: action.color + '15' }
                     }
                   >
                     {action.badge}
                   </span>
                 )}
               </div>
-              <p className="text-white font-bold text-sm leading-tight">{action.label}</p>
-              <p className="text-zinc-500 text-xs mt-0.5">{action.desc}</p>
+              <p className="text-gray-900 font-bold text-sm leading-tight">{action.label}</p>
+              <p className="text-gray-500 text-xs mt-0.5">{action.desc}</p>
             </Link>
           ))}
         </div>
 
         {/* Recent activity */}
         {(recentQuizzes.length > 0 || recentAnalyses.length > 0) && (
-          <div className="glass rounded-2xl p-5 border border-white/8">
-            <h3 className="text-white font-bold text-sm mb-4">Activité récente</h3>
+          <div className="bg-white rounded-2xl p-5 border border-gray-200">
+            <h3 className="text-gray-900 font-bold text-sm mb-4">Activité récente</h3>
             <div className="space-y-2">
               {recentAnalyses.map((a) => (
-                <div key={a.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                <div key={a.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                   <div className="flex items-center gap-3">
                     <span className="text-lg">📸</span>
                     <div>
-                      <p className="text-zinc-300 text-sm truncate max-w-[180px]">{a.context}</p>
-                      <p className="text-zinc-600 text-xs">{new Date(a.createdAt).toLocaleDateString('fr-FR')}</p>
+                      <p className="text-gray-700 text-sm truncate max-w-[180px]">{a.context}</p>
+                      <p className="text-gray-400 text-xs">{new Date(a.createdAt).toLocaleDateString('fr-FR')}</p>
                     </div>
                   </div>
                   <span className="text-sm font-bold" style={{ color: '#8b5cf6' }}>
@@ -211,15 +211,15 @@ export default function DashboardClient({ user, recentQuizzes, recentAnalyses }:
                 </div>
               ))}
               {recentQuizzes.map((q) => (
-                <div key={q.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                <div key={q.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                   <div className="flex items-center gap-3">
                     <span className="text-lg">❓</span>
                     <div>
-                      <p className="text-zinc-300 text-sm capitalize">{q.quizSlug.replace('-', ' ')}</p>
-                      <p className="text-zinc-600 text-xs">{new Date(q.createdAt).toLocaleDateString('fr-FR')}</p>
+                      <p className="text-gray-700 text-sm capitalize">{q.quizSlug.replace('-', ' ')}</p>
+                      <p className="text-gray-400 text-xs">{new Date(q.createdAt).toLocaleDateString('fr-FR')}</p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-pink-400">{q.score}%</span>
+                  <span className="text-sm font-bold text-pink-500">{q.score}%</span>
                 </div>
               ))}
             </div>

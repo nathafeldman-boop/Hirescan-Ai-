@@ -66,7 +66,7 @@ const STEPS = [
   {
     n: '1',
     title: 'Réponds aux questions',
-    desc: '24 questions pour cerner ta façon de penser, de décider et d'interagir avec le monde.',
+    desc: "24 questions pour cerner ta façon de penser, de décider et d'interagir avec le monde.",
   },
   {
     n: '2',
@@ -183,7 +183,7 @@ export default function HomeClient() {
                   }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: group.color }}>{type}</div>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
-                      {(group.labels as Record<string, string>)[type]}
+                      {(group.labels as unknown as Record<string, string>)[type]}
                     </div>
                   </Link>
                 ))}
@@ -229,9 +229,9 @@ export default function HomeClient() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
           {[
             { href: '/quiz/personnalite', emoji: '🧠', title: 'Test MBTI', desc: 'Ton type de personnalité complet' },
-            { href: '/quiz/love-language', emoji: '❤️', title: 'Langage d\'amour', desc: 'Comment tu exprimes l\'affection' },
-            { href: '/quiz/attachment-style', emoji: '🔗', title: 'Style d\'attachement', desc: 'Anxieux, évitant ou sécure ?' },
-            { href: '/quiz/dark-triad', emoji: '🌑', title: 'Côté sombre', desc: 'Narcissisme, machiavélisme...' },
+            { href: '/quiz/langages-amour', emoji: '❤️', title: 'Langage d\'amour', desc: 'Comment tu exprimes l\'affection' },
+            { href: '/quiz/style-attachement', emoji: '🔗', title: 'Style d\'attachement', desc: 'Anxieux, évitant ou sécure ?' },
+            { href: '/quiz/narcissique', emoji: '🌑', title: 'Côté sombre', desc: 'Narcissisme, machiavélisme...' },
           ].map((q) => (
             <Link key={q.href} href={q.href} style={{
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',

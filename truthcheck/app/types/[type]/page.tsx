@@ -39,14 +39,14 @@ function FAQ({ type }: { type: MbtiType }) {
   ];
   return (
     <div className="mt-12 space-y-4">
-      <h2 className="text-lg font-black text-white">Questions fréquentes — {type.code}</h2>
+      <h2 className="text-lg font-black text-gray-900">Questions fréquentes — {type.code}</h2>
       {faqs.map(({ q, a }) => (
-        <details key={q} className="group border border-white/10 rounded-xl">
-          <summary className="px-5 py-4 cursor-pointer text-sm font-medium text-zinc-300 list-none flex justify-between items-center hover:text-white transition-colors">
+        <details key={q} className="group border border-gray-200 rounded-xl">
+          <summary className="px-5 py-4 cursor-pointer text-sm font-medium text-gray-700 list-none flex justify-between items-center hover:text-gray-900 transition-colors">
             {q}
-            <span className="text-zinc-500 group-open:rotate-180 transition-transform">▾</span>
+            <span className="text-gray-400 group-open:rotate-180 transition-transform">▾</span>
           </summary>
-          <p className="px-5 pb-4 text-sm text-zinc-500 leading-relaxed">{a}</p>
+          <p className="px-5 pb-4 text-sm text-gray-500 leading-relaxed">{a}</p>
         </details>
       ))}
     </div>
@@ -82,15 +82,15 @@ export default function TypePage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
-      <main className="min-h-screen bg-[#09090b] text-white">
-        <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
+      <main className="min-h-screen bg-white text-gray-900">
+        <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
               <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-              <span className="text-white">Cecret</span>
+              <span className="text-gray-900">Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
-              <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">← Tous les types</Link>
+              <Link href="/types" className="text-xs text-gray-500 hover:text-gray-900 transition-colors">← Tous les types</Link>
               <LanguageSwitcher />
               <UserMenu />
             </div>
@@ -105,19 +105,19 @@ export default function TypePage({ params }: Props) {
               style={{ background: `${type.accentColor}20`, color: type.accentColor, border: `1px solid ${type.accentColor}40` }}>
               {type.rarity} de la population
             </div>
-            <h1 className="text-3xl font-black text-white mb-2">
+            <h1 className="text-3xl font-black text-gray-900 mb-2">
               {code} — {type.name}
             </h1>
-            <p className="text-zinc-400 text-base italic">{type.tagline}</p>
+            <p className="text-gray-500 text-base italic">{type.tagline}</p>
           </div>
 
           {/* Breadcrumb */}
-          <nav className="text-xs text-zinc-600 mb-8 flex gap-2 items-center">
-            <Link href="/" className="hover:text-zinc-400">Accueil</Link>
+          <nav className="text-xs text-gray-400 mb-8 flex gap-2 items-center">
+            <Link href="/" className="hover:text-gray-700">Accueil</Link>
             <span>/</span>
-            <Link href="/types" className="hover:text-zinc-400">Types</Link>
+            <Link href="/types" className="hover:text-gray-700">Types</Link>
             <span>/</span>
-            <span className="text-zinc-400">{code}</span>
+            <span className="text-gray-600">{code}</span>
           </nav>
 
           {/* Main client content (paywall etc.) */}
@@ -127,15 +127,15 @@ export default function TypePage({ params }: Props) {
           <FAQ type={type} />
 
           {/* All types nav */}
-          <div className="mt-12 pt-8 border-t border-white/5">
-            <h2 className="text-sm font-bold text-zinc-400 mb-4">Explore les 16 types</h2>
+          <div className="mt-12 pt-8 border-t border-gray-100">
+            <h2 className="text-sm font-bold text-gray-500 mb-4">Explore les 16 types</h2>
             <div className="flex flex-wrap gap-2">
               {ALL_MBTI_TYPES.map(c => (
                 <Link key={c} href={`/types/${c.toLowerCase()}`}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                     c === code
-                      ? 'text-white border-violet-500 bg-violet-500/20'
-                      : 'text-zinc-500 border-white/10 hover:text-white hover:border-white/20'
+                      ? 'text-white border-violet-500 bg-violet-500'
+                      : 'text-gray-500 border-gray-200 hover:text-gray-900 hover:border-gray-400'
                   }`}>
                   {c}
                 </Link>
