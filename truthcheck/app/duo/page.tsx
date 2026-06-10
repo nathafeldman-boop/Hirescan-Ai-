@@ -1,139 +1,75 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { duoQuizzes } from '@/lib/duoQuizzes';
-import TeamCodeEntry from './TeamCodeEntry';
+import DuoMbtiClient from './DuoMbtiClient';
+import UserMenu from '@/components/UserMenu';
 
 const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
-  title: 'Mode Équipe — Comparez vos secrets | UrCecret',
-  description: 'Rejoignez une partie avec un code ou un lien. Chacun répond seul, l\'IA compare vos secrets. Découvrez qui vous connaît vraiment.',
-  keywords: ['quiz équipe', 'quiz groupe', 'test compatibilité', 'quiz couple', 'mode équipe UrCecret', 'quiz partenaire'],
-  openGraph: {
-    title: 'Mode Équipe — Comparez vos secrets | UrCecret',
-    description: 'Rejoignez avec un code. Chacun répond seul. L\'IA révèle vos vraies divergences.',
-    url: `${BASE}/duo`,
-    siteName: 'UrCecret',
-    locale: 'fr_FR',
-    type: 'website',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'UrCecret Mode Équipe' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Mode Équipe — Comparez vos secrets | UrCecret',
-    description: 'Code d\'entrée · Chacun répond seul · Comparez vos secrets',
-    images: ['/api/og'],
-  },
+  title: 'Test de compatibilité MBTI — Comparez vos personnalités | UrCecret',
+  description: 'Découvrez votre compatibilité MBTI avec votre partenaire, ami ou collègue. Analyse complète des 4 dimensions de personnalité. Gratuit et instantané.',
+  keywords: ['compatibilité MBTI', 'test couple MBTI', 'compatibilité personnalité', 'MBTI couple', 'test compatibilité'],
   alternates: { canonical: `${BASE}/duo` },
+  openGraph: {
+    title: 'Test de compatibilité MBTI | UrCecret',
+    description: 'Sélectionnez vos types MBTI et découvrez votre compatibilité réelle.',
+    url: `${BASE}/duo`,
+    type: 'website',
+  },
 };
 
 export default function DuoPage() {
   return (
-    <main className="min-h-screen bg-white flex flex-col">
-
-      {/* Header */}
-      <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+    <main className="min-h-screen bg-white">
+      <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1.5 text-sm">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Retour
-          </Link>
           <Link href="/" className="text-xl font-black">
-            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Ur
-            </span>
+            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-gray-900">Cecret</span>
           </Link>
-          <span className="text-xs text-gray-400 font-semibold uppercase tracking-widest">Compatibilité</span>
+          <div className="flex items-center gap-3">
+            <Link href="/quiz/personnalite" className="text-xs text-violet-600 font-medium hover:text-violet-700 transition-colors">
+              Faire le test →
+            </Link>
+            <UserMenu />
+          </div>
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center px-4 py-10">
-        <div className="w-full max-w-md">
-
-          {/* Hero */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-200 bg-violet-50 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-              <span className="text-violet-600 text-xs font-semibold uppercase tracking-widest">Test de compatibilité MBTI</span>
-            </div>
-            <h1 className="text-3xl font-black text-gray-900 leading-tight mb-3">
-              Comparez vos
-              <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                {' '}personnalités
-              </span>
-            </h1>
-            <p className="text-gray-500 text-sm leading-relaxed mb-5">
-              Chacun répond séparément au test MBTI.
-              L&apos;IA compare vos deux profils et révèle votre niveau de compatibilité réelle.
-              <strong className="text-gray-700"> Sans filtre.</strong>
-            </p>
+      <div className="max-w-2xl mx-auto px-4 py-10">
+        {/* Hero */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-200 bg-violet-50 mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+            <span className="text-violet-600 text-xs font-semibold uppercase tracking-widest">Compatibilité MBTI</span>
           </div>
-
-          {/* Code entry */}
-          <TeamCodeEntry />
-
-          {/* How it works */}
-          <div className="bg-gray-50 rounded-2xl p-5 mb-8 border border-gray-100">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Comment ça marche</p>
-            <div className="space-y-3">
-              {[
-                { n: '1', icon: '🧠', text: 'Chacun fait le test MBTI séparément — les résultats restent cachés' },
-                { n: '2', icon: '🔗', text: 'Partagez le lien ou le code à votre partenaire' },
-                { n: '3', icon: '💡', text: 'L\'IA révèle votre compatibilité MBTI. Préparez-vous.' },
-              ].map(({ n, icon, text }) => (
-                <div key={n} className="flex items-center gap-4">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black text-white"
-                    style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)' }}
-                  >
-                    {n}
-                  </div>
-                  <span className="text-sm text-gray-600">{icon} {text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quiz cards */}
-          <div className="flex flex-col gap-4">
-            {duoQuizzes.map((quiz) => (
-              <Link
-                key={quiz.slug}
-                href={`/duo/${quiz.slug}`}
-                className="group relative rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 hover:border-gray-300 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] bg-white"
-              >
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at 20% 50%, ${quiz.accentColor}08 0%, transparent 70%)` }}
-                />
-                <div className="relative p-5 flex items-center gap-4">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
-                    style={{ background: `${quiz.accentColor}12`, border: `1px solid ${quiz.accentColor}25` }}
-                  >
-                    {quiz.emoji}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 font-bold text-base leading-snug mb-1">{quiz.title}</p>
-                    <p className="text-gray-500 text-xs leading-relaxed">{quiz.subtitle}</p>
-                  </div>
-                  <svg
-                    className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1 text-gray-400"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <p className="text-center text-gray-400 text-xs mt-10 tracking-wide">
-            🔒 100% anonyme · Vos réponses individuelles restent privées
+          <h1 className="text-3xl font-black text-gray-900 leading-tight mb-3">
+            Comparez vos{' '}
+            <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              personnalités
+            </span>
+          </h1>
+          <p className="text-gray-500 text-sm leading-relaxed max-w-md mx-auto">
+            Sélectionnez vos deux types MBTI. L&apos;IA analyse votre compatibilité sur 4 dimensions et révèle vos forces et tensions naturelles.
           </p>
+        </div>
+
+        <DuoMbtiClient />
+
+        {/* How it works */}
+        <div className="mt-12 grid grid-cols-3 gap-4 text-center">
+          {[
+            { n: '1', icon: '🧠', text: 'Chacun fait le test MBTI' },
+            { n: '2', icon: '🔗', text: 'Partagez vos types' },
+            { n: '3', icon: '💡', text: 'Découvrez votre alchimie' },
+          ].map(({ n, icon, text }) => (
+            <div key={n} className="text-center">
+              <div className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-black text-white"
+                style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)' }}>{n}</div>
+              <div className="text-xl mb-1">{icon}</div>
+              <p className="text-xs text-gray-500">{text}</p>
+            </div>
+          ))}
         </div>
       </div>
     </main>

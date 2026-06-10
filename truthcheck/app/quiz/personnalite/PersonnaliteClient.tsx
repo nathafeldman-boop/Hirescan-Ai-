@@ -10,7 +10,7 @@ import { ui } from '@/lib/i18n/ui';
 
 const TOTAL = mbtiQuestions.length;
 
-type QuizAnswer = 'A' | 'B' | 'C' | 'D';
+type QuizAnswer = 'A' | 'B' | 'C' | 'D' | 'E';
 type Answers = Record<number, QuizAnswer>;
 type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
 
@@ -106,26 +106,32 @@ function QuizScreen({ onComplete, questions, t }: {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">{q.text}</h2>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5">
         {([
-          { key: 'A' as const, option: q.optionA },
-          { key: 'B' as const, option: q.optionB },
-          ...(q.optionC ? [{ key: 'C' as const, option: q.optionC }] : []),
-          ...(q.optionD ? [{ key: 'D' as const, option: q.optionD }] : []),
-        ]).map(({ key, option }) => {
+          { key: 'A' as const, label: "Totalement d'accord", color: '#7c3aed' },
+          { key: 'B' as const, label: "Plutôt d'accord",     color: '#a78bfa' },
+          { key: 'C' as const, label: 'Neutre',              color: '#9ca3af' },
+          { key: 'D' as const, label: "Plutôt pas d'accord", color: '#f97316' },
+          { key: 'E' as const, label: "Pas du tout d'accord",color: '#ef4444' },
+        ] as { key: QuizAnswer; label: string; color: string }[]).map(({ key, label, color }) => {
           const isSelected = selected === key;
           return (
             <button
               key={key}
               onClick={() => handleChoice(key)}
               disabled={animating}
-              className={`w-full text-center px-6 py-4 rounded-2xl border-2 transition-all duration-200 text-base font-semibold ${
+              className={`w-full text-left px-5 py-3.5 rounded-2xl border-2 transition-all duration-150 text-sm font-semibold flex items-center gap-3 ${
                 isSelected
-                  ? 'border-violet-500 bg-violet-50 text-violet-700 scale-[0.98]'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-violet-300 hover:bg-violet-50/50'
+                  ? 'scale-[0.98]'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
               }`}
+              style={isSelected ? { borderColor: color, backgroundColor: color + '12', color } : {}}
             >
-              {option.text}
+              <span className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all"
+                style={isSelected ? { borderColor: color, backgroundColor: color } : { borderColor: '#d1d5db' }}>
+                {isSelected && <span className="w-2 h-2 rounded-full bg-white" />}
+              </span>
+              {label}
             </button>
           );
         })}
