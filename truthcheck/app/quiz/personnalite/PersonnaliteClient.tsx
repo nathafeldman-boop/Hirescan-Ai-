@@ -8,7 +8,7 @@ import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 
-const TOTAL = mbtiQuestions.length; // 24
+const TOTAL = mbtiQuestions.length;
 
 type QuizAnswer = 'A' | 'B' | 'C' | 'D';
 type Answers = Record<number, QuizAnswer>;
@@ -50,14 +50,14 @@ function ProgressBar({ current, total, label }: { current: number; total: number
   const pct = Math.round((current / total) * 100);
   return (
     <div className="w-full mb-8">
-      <div className="flex justify-between text-xs text-zinc-500 mb-2">
+      <div className="flex justify-between text-xs text-gray-400 mb-2">
         <span>{label}</span>
         <span>{pct}%</span>
       </div>
-      <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: 'linear-gradient(to right,#a78bfa,#f472b6)' }}
+          style={{ width: `${pct}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
         />
       </div>
     </div>
@@ -100,13 +100,13 @@ function QuizScreen({ onComplete, questions, t }: {
       <ProgressBar current={current + 1} total={TOTAL} label={t.questionOf(current + 1, TOTAL)} />
 
       <div className="mb-10 text-center">
-        <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">
+        <p className="text-xs text-gray-400 uppercase tracking-widest mb-4">
           {t.dimLabel[q.dimension]}
         </p>
-        <h2 className="text-xl font-bold text-white leading-snug">{q.text}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">{q.text}</h2>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {([
           { key: 'A' as const, option: q.optionA },
           { key: 'B' as const, option: q.optionB },
@@ -119,13 +119,12 @@ function QuizScreen({ onComplete, questions, t }: {
               key={key}
               onClick={() => handleChoice(key)}
               disabled={animating}
-              className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 text-sm font-medium ${
+              className={`w-full text-center px-6 py-4 rounded-2xl border-2 transition-all duration-200 text-base font-semibold ${
                 isSelected
-                  ? 'border-violet-500 bg-violet-500/20 text-white scale-[0.98]'
-                  : 'border-white/10 bg-white/5 text-zinc-300 hover:border-violet-500/50 hover:bg-white/10'
+                  ? 'border-violet-500 bg-violet-50 text-violet-700 scale-[0.98]'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-violet-300 hover:bg-violet-50/50'
               }`}
             >
-              <span className="text-zinc-500 mr-3 font-mono text-xs">{key}</span>
               {option.text}
             </button>
           );
@@ -155,18 +154,18 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   }, [onDone]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#09090b]">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-white">
       <div className="text-center max-w-sm">
-        <div className="mb-6 text-violet-400"><BrainIcon /></div>
-        <h2 className="text-xl font-bold text-white mb-2">{t.analysisStages[stage]}</h2>
-        <p className="text-zinc-500 text-sm mb-8">{t.doNotClose}</p>
-        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="mb-6 text-violet-500"><BrainIcon /></div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">{t.analysisStages[stage]}</h2>
+        <p className="text-gray-400 text-sm mb-8">{t.doNotClose}</p>
+        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-100"
-            style={{ width: `${progress}%`, background: 'linear-gradient(to right,#a78bfa,#f472b6)' }}
+            style={{ width: `${progress}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
           />
         </div>
-        <p className="text-xs text-zinc-600 mt-3">{progress}%</p>
+        <p className="text-xs text-gray-300 mt-3">{progress}%</p>
       </div>
     </div>
   );
@@ -182,18 +181,18 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
   const isFr = lang !== 'en';
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-[#09090b]">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-8 h-8">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-black text-white mb-2">
+          <h1 className="text-2xl font-black text-gray-900 mb-2">
             {isFr ? 'Ton analyse est prête !' : 'Your analysis is ready!'}
           </h1>
-          <p className="text-zinc-400 text-sm leading-relaxed">
+          <p className="text-gray-500 text-sm leading-relaxed">
             {isFr
               ? 'Crée ton compte gratuitement pour révéler ton type de personnalité.'
               : 'Create your free account to reveal your personality type.'}
@@ -201,23 +200,23 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
         </div>
 
         {/* Blurred result teaser */}
-        <div className="bg-white/5 rounded-2xl p-5 border border-white/10 mb-6 relative overflow-hidden">
+        <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
+            <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
             <div className="flex-1 space-y-1.5">
-              <div className="h-3 bg-white/10 rounded-full w-3/4 animate-pulse" />
-              <div className="h-2.5 bg-white/5 rounded-full w-1/2 animate-pulse" />
+              <div className="h-3 bg-gray-200 rounded-full w-3/4 animate-pulse" />
+              <div className="h-2.5 bg-gray-100 rounded-full w-1/2 animate-pulse" />
             </div>
           </div>
           <div className="space-y-2">
-            <div className="h-2.5 bg-white/5 rounded-full animate-pulse" />
-            <div className="h-2.5 bg-white/5 rounded-full w-5/6 animate-pulse" />
-            <div className="h-2.5 bg-white/5 rounded-full w-4/6 animate-pulse" />
+            <div className="h-2.5 bg-gray-100 rounded-full animate-pulse" />
+            <div className="h-2.5 bg-gray-100 rounded-full w-5/6 animate-pulse" />
+            <div className="h-2.5 bg-gray-100 rounded-full w-4/6 animate-pulse" />
           </div>
-          <div className="absolute inset-0 flex items-center justify-center bg-[#09090b]/70 backdrop-blur-[2px] rounded-2xl">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
             <div className="text-center">
-              <div className="text-zinc-500 mb-1 flex justify-center"><LockIcon /></div>
-              <p className="text-xs text-zinc-500 font-medium">
+              <div className="text-gray-400 mb-1 flex justify-center"><LockIcon /></div>
+              <p className="text-xs text-gray-400 font-medium">
                 {isFr ? 'Résultat verrouillé' : 'Result locked'}
               </p>
             </div>
@@ -225,28 +224,28 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
         </div>
 
         {/* Auth card */}
-        <div className="bg-white/5 rounded-2xl border border-white/10 p-6">
+        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
           {sent ? (
             <div className="text-center py-2">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                 </svg>
               </div>
-              <h3 className="text-white font-bold text-lg mb-1">
+              <h3 className="text-gray-900 font-bold text-lg mb-1">
                 {isFr ? 'Vérifie tes emails' : 'Check your inbox'}
               </h3>
-              <p className="text-zinc-400 text-sm">
+              <p className="text-gray-500 text-sm">
                 {isFr ? 'Lien envoyé à' : 'Link sent to'}{' '}
-                <span className="text-violet-400 font-medium">{email}</span>
+                <span className="text-violet-600 font-medium">{email}</span>
               </p>
-              <p className="text-zinc-600 text-xs mt-3">
+              <p className="text-gray-400 text-xs mt-3">
                 {isFr ? 'Clique sur le lien pour révéler ton type.' : 'Click the link to reveal your type.'}
               </p>
             </div>
           ) : (
             <>
-              <h2 className="text-white font-bold text-[15px] text-center mb-5">
+              <h2 className="text-gray-900 font-bold text-[15px] text-center mb-5">
                 {isFr ? 'Connexion / Inscription — 30 secondes' : 'Sign in / Sign up — 30 seconds'}
               </h2>
               <button
@@ -275,7 +274,7 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
                 <input
                   type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                   placeholder={isFr ? 'ton@email.com' : 'your@email.com'} required
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-zinc-600 outline-none focus:border-violet-500/60 transition-all"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 transition-all"
                 />
                 <button
                   type="submit" disabled={loading}
@@ -287,7 +286,7 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
                     : (isFr ? 'Recevoir mon lien de connexion' : 'Get my sign-in link')}
                 </button>
               </form>
-              <p className="text-center text-xs text-zinc-600 mt-4">
+              <p className="text-center text-xs text-gray-400 mt-4">
                 {isFr ? 'Gratuit · Aucune carte bancaire requise' : 'Free · No credit card required'}
               </p>
             </>
@@ -327,7 +326,7 @@ export default function PersonnaliteClient() {
   };
 
   return (
-    <main className="min-h-screen bg-[#09090b] text-white">
+    <main className="min-h-screen bg-white text-gray-900">
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
