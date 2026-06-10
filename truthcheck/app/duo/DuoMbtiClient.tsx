@@ -44,8 +44,44 @@ function TypePicker({ value, onChange, label }: { value: string; onChange: (t: s
   );
 }
 
+function PremiumGate({ onUpgrade, loading }: { onUpgrade: (annual: boolean) => void; loading: boolean }) {
+  return (
+    <div className="rounded-2xl border-2 border-violet-200 bg-violet-50 p-6 text-center">
+      <div className="text-4xl mb-4">👑</div>
+      <h2 className="text-lg font-black text-gray-900 mb-2">Fonctionnalité Pro</h2>
+      <p className="text-sm text-gray-600 mb-2 leading-relaxed">
+        Le mode compatibilité MBTI est réservé aux membres Pro.
+      </p>
+      <p className="text-sm text-gray-500 mb-6">
+        Compare ton type avec n&apos;importe qui — partenaire, ami, collègue — et découvre votre alchimie sur 4 dimensions.
+      </p>
+
+      <div className="space-y-2 max-w-xs mx-auto">
+        <button
+          onClick={() => onUpgrade(true)}
+          disabled={loading}
+          className="w-full py-3.5 rounded-2xl font-black text-white text-sm relative overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
+          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 6px 20px rgba(124,58,237,0.3)' }}>
+          <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg">
+            −75%
+          </span>
+          {loading ? 'Chargement…' : 'Annuel — 29,99 €/an'}
+        </button>
+        <button
+          onClick={() => onUpgrade(false)}
+          disabled={loading}
+          className="w-full py-2.5 rounded-2xl font-semibold text-gray-700 text-sm border border-gray-200 hover:bg-white transition-all disabled:opacity-60">
+          Mensuel — 9,99 €/mois
+        </button>
+      </div>
+
+      <p className="text-[11px] text-gray-400 mt-4">Inclus : 16 profils MBTI + compatibilité + quiz illimité</p>
+    </div>
+  );
+}
+
 export default function DuoMbtiClient() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
 
   const [typeA, setTypeA] = useState('');
@@ -90,6 +126,14 @@ export default function DuoMbtiClient() {
     }
   }, [session?.user?.email]);
 
+  if (status === 'loading') {
+    return <div className="py-20 text-center text-gray-300 text-sm animate-pulse">Chargement…</div>;
+  }
+
+  if (!isPremium) {
+    return <PremiumGate onUpgrade={doCheckout} loading={checkoutLoading} />;
+  }
+
   if (mode === 'result' && compat && typeA && typeB) {
     const tA = mbtiTypes[typeA];
     const tB = mbtiTypes[typeB];
@@ -101,7 +145,7 @@ export default function DuoMbtiClient() {
           ← Modifier les types
         </button>
 
-        {/* Score hero — always visible */}
+        {/* Score hero */}
         <div className="rounded-2xl border-2 p-6 text-center mb-6"
           style={{ borderColor: compat.color, background: compat.color + '08' }}>
           <div className="text-5xl mb-3">{compat.emoji}</div>
@@ -126,107 +170,31 @@ export default function DuoMbtiClient() {
         </div>
 
         {/* Dimension breakdown */}
-        {isPremium ? (
-          <div className="space-y-3 mb-8">
-            <h2 className="text-sm font-black text-gray-900 uppercase tracking-widest">Analyse dimension par dimension</h2>
-            {compat.dimensions.map(d => (
-              <div key={d.dim} className={`rounded-xl p-4 border ${d.aligned ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${d.aligned ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
-                    {d.aligned ? '✓ Alignés' : '≠ Différents'}
-                  </span>
-                  <span className="text-xs text-gray-500">{d.labelA} · {d.labelB}</span>
-                </div>
-                <p className="text-xs text-gray-600 leading-relaxed">{d.analysis}</p>
+        <div className="space-y-3 mb-8">
+          <h2 className="text-sm font-black text-gray-900 uppercase tracking-widest">Analyse dimension par dimension</h2>
+          {compat.dimensions.map(d => (
+            <div key={d.dim} className={`rounded-xl p-4 border ${d.aligned ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${d.aligned ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
+                  {d.aligned ? '✓ Alignés' : '≠ Différents'}
+                </span>
+                <span className="text-xs text-gray-500">{d.labelA} · {d.labelB}</span>
               </div>
-            ))}
-          </div>
-        ) : (
-          /* Paywall: first dimension visible, rest blurred */
-          <div className="mb-8">
-            <h2 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-3">Analyse dimension par dimension</h2>
-
-            {/* First dimension — free teaser */}
-            {compat.dimensions[0] && (() => {
-              const d = compat.dimensions[0];
-              return (
-                <div className={`rounded-xl p-4 border mb-3 ${d.aligned ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${d.aligned ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
-                      {d.aligned ? '✓ Alignés' : '≠ Différents'}
-                    </span>
-                    <span className="text-xs text-gray-500">{d.labelA} · {d.labelB}</span>
-                  </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">{d.analysis}</p>
-                </div>
-              );
-            })()}
-
-            {/* Remaining dimensions blurred */}
-            <div className="relative">
-              <div className="space-y-3 blur-sm pointer-events-none select-none" aria-hidden>
-                {compat.dimensions.slice(1).map(d => (
-                  <div key={d.dim} className={`rounded-xl p-4 border ${d.aligned ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${d.aligned ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
-                        {d.aligned ? '✓ Alignés' : '≠ Différents'}
-                      </span>
-                      <span className="text-xs text-gray-500">{d.labelA} · {d.labelB}</span>
-                    </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{d.analysis}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Gradient overlay + paywall card */}
-              <div className="absolute inset-0 flex flex-col items-center justify-end pb-2"
-                style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 30%, rgba(255,255,255,1) 60%)' }}>
-                <div className="w-full rounded-2xl border border-gray-200 bg-white p-5 shadow-lg text-center">
-                  <div className="text-2xl mb-2">🔒</div>
-                  <p className="text-sm font-black text-gray-900 mb-1">Débloque l&apos;analyse complète</p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    3 dimensions restantes · Forces & tensions · Conseils pour votre duo
-                  </p>
-
-                  {/* Pricing options */}
-                  <div className="flex flex-col gap-2 max-w-xs mx-auto mb-3">
-                    <button
-                      onClick={() => doCheckout(true)}
-                      disabled={checkoutLoading}
-                      className="w-full py-3 rounded-xl font-black text-white text-sm relative overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-                      style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 6px 20px rgba(124,58,237,0.3)' }}>
-                      <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg">
-                        −75%
-                      </span>
-                      {checkoutLoading ? 'Chargement…' : 'Annuel — 29,99 €/an'}
-                    </button>
-                    <button
-                      onClick={() => doCheckout(false)}
-                      disabled={checkoutLoading}
-                      className="w-full py-2.5 rounded-xl font-semibold text-gray-700 text-sm border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60">
-                      Mensuel — 9,99 €/mois
-                    </button>
-                  </div>
-
-                  <p className="text-[10px] text-gray-400">Accès illimité à tous les types + quiz personnalité</p>
-                </div>
-              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">{d.analysis}</p>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
 
-        {/* CTA — profile link */}
-        {isPremium && (
-          <div className="rounded-2xl bg-gray-50 border border-gray-200 p-5 text-center">
-            <p className="text-sm font-bold text-gray-900 mb-1">Découvrir ton profil complet</p>
-            <p className="text-xs text-gray-500 mb-4">Forces, faiblesses, amour, carrière — le rapport complet de ton type.</p>
-            <Link href={`/types/${typeA.toLowerCase()}`}
-              className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
-              Voir mon profil {typeA} →
-            </Link>
-          </div>
-        )}
+        {/* CTA */}
+        <div className="rounded-2xl bg-gray-50 border border-gray-200 p-5 text-center">
+          <p className="text-sm font-bold text-gray-900 mb-1">Découvrir ton profil complet</p>
+          <p className="text-xs text-gray-500 mb-4">Forces, faiblesses, amour, carrière — le rapport complet de ton type.</p>
+          <Link href={`/types/${typeA.toLowerCase()}`}
+            className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+            Voir mon profil {typeA} →
+          </Link>
+        </div>
       </div>
     );
   }

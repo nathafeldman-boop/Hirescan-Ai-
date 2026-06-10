@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signIn } from 'next-auth/react';
-import { mbtiQuestions, computeMbtiType, MbtiQuestion } from '@/lib/mbti';
+import { mbtiQuestions, computeMbtiType, mbtiTypes, MbtiQuestion } from '@/lib/mbti';
 import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
@@ -14,7 +14,7 @@ type QuizAnswer = 'A' | 'B' | 'C' | 'D' | 'E';
 type Answers = Record<number, QuizAnswer>;
 type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// ─── Icons ─────────────────────────────────────────────────────────────────────
 
 function BrainIcon() {
   return (
@@ -44,7 +44,7 @@ function GoogleIcon() {
   );
 }
 
-// ─── Progress bar ─────────────────────────────────────────────────────────────
+// ─── Progress bar ───────────────────────────────────────────────────────────────
 
 function ProgressBar({ current, total, label }: { current: number; total: number; label: string }) {
   const pct = Math.round((current / total) * 100);
@@ -64,7 +64,7 @@ function ProgressBar({ current, total, label }: { current: number; total: number
   );
 }
 
-// ─── Quiz screen — one question at a time ─────────────────────────────────────
+// ─── Quiz screen ────────────────────────────────────────────────────────────────
 
 function QuizScreen({ onComplete, questions, t }: {
   onComplete: (answers: Answers) => void;
@@ -140,7 +140,7 @@ function QuizScreen({ onComplete, questions, t }: {
   );
 }
 
-// ─── Analysis screen ──────────────────────────────────────────────────────────
+// ─── Analysis screen ────────────────────────────────────────────────────────────
 
 function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   const [progress, setProgress] = useState(0);
@@ -177,7 +177,118 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   );
 }
 
-// ─── Auth gate ────────────────────────────────────────────────────────────────
+// ─── Result teaser (logged-in free users) ───────────────────────────────────────
+
+function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: string; userEmail?: string | null }) {
+  const type = mbtiTypes[typeCode];
+  const isFr = lang !== 'en';
+  const [loading, setLoading] = useState(false);
+
+  const doCheckout = useCallback(async (annual: boolean) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: window.location.origin,
+          quizSlug: 'personnalite',
+          typeCode,
+          userEmail: userEmail ?? undefined,
+          ...(annual ? { annual: true } : {}),
+        }),
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) window.location.href = data.url;
+      else { alert(data.error ?? 'Erreur de paiement'); setLoading(false); }
+    } catch {
+      alert('Erreur réseau. Réessaie.');
+      setLoading(false);
+    }
+  }, [typeCode, userEmail]);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          {/* Blurred mystery emoji */}
+          <div className="text-6xl mb-4 blur-sm select-none" aria-hidden>{type?.emoji ?? '✨'}</div>
+
+          {/* Rarity badge */}
+          <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4 bg-violet-50 border border-violet-200 text-violet-700">
+            {isFr ? `Seulement ${type?.rarity} de la population` : `Only ${type?.rarity} of the population`}
+          </div>
+
+          <h1 className="text-2xl font-black text-gray-900 mb-3">
+            {isFr ? 'Tu es ' : 'You are '}
+            <span style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              {isFr ? 'rarissime' : 'extremely rare'}
+            </span>
+          </h1>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            {isFr
+              ? `Moins de ${type?.rarity} des gens partagent ce profil. Débloque ton type et ton analyse complète.`
+              : `Fewer than ${type?.rarity} of people share this profile. Unlock your type and full analysis.`}
+          </p>
+        </div>
+
+        {/* Locked type card */}
+        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 mb-6 relative overflow-hidden">
+          <div className="space-y-3 blur-sm select-none" aria-hidden>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gray-300" />
+              <div>
+                <div className="h-4 w-28 bg-gray-300 rounded-full mb-1.5" />
+                <div className="h-3 w-20 bg-gray-200 rounded-full" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 rounded-full" />
+              <div className="h-3 bg-gray-200 rounded-full w-5/6" />
+              <div className="h-3 bg-gray-200 rounded-full w-4/6" />
+            </div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
+            <div className="text-center">
+              <div className="text-gray-400 mb-1 flex justify-center"><LockIcon /></div>
+              <p className="text-xs text-gray-500 font-medium">
+                {isFr ? 'Type verrouillé' : 'Type locked'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Paywall */}
+        <div className="space-y-2">
+          <button
+            onClick={() => doCheckout(true)}
+            disabled={loading}
+            className="w-full py-4 rounded-2xl font-black text-white text-sm relative overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 30px rgba(124,58,237,0.25)' }}>
+            <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-2 py-0.5 rounded-bl-xl">
+              −75%
+            </span>
+            {loading
+              ? (isFr ? 'Chargement…' : 'Loading…')
+              : (isFr ? 'Révéler mon type — 29,99 €/an' : 'Reveal my type — €29.99/year')}
+          </button>
+          <button
+            onClick={() => doCheckout(false)}
+            disabled={loading}
+            className="w-full py-3 rounded-2xl font-semibold text-gray-700 text-sm border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60">
+            {isFr ? 'Mensuel — 9,99 €/mois' : 'Monthly — €9.99/month'}
+          </button>
+        </div>
+
+        <p className="text-center text-[11px] text-gray-400 mt-4">
+          {isFr ? 'Accès illimité · 16 types MBTI · Quiz · Mode Duo' : 'Unlimited access · 16 MBTI types · Quiz · Duo mode'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Auth gate (not logged in) ──────────────────────────────────────────────────
 
 function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
   const [email, setEmail] = useState('');
@@ -256,7 +367,7 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
               </h2>
               <button
                 onClick={() => signIn('google', { callbackUrl })}
-                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4"
+                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4 border border-gray-200"
               >
                 <GoogleIcon />
                 {isFr ? 'Continuer avec Google' : 'Continue with Google'}
@@ -303,13 +414,14 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
   );
 }
 
-// ─── Root component ───────────────────────────────────────────────────────────
+// ─── Root component ─────────────────────────────────────────────────────────────
 
 export default function PersonnaliteClient() {
   const router = useRouter();
   const { data: session } = useSession();
+  const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
   const { lang } = useLang();
-  const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate'>('quiz');
+  const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>('quiz');
   const [answers, setAnswers] = useState<Answers>({});
   const [mbtiType, setMbtiType] = useState('');
 
@@ -321,15 +433,19 @@ export default function PersonnaliteClient() {
     setPhase('analysis');
   };
 
-  const handleAnalysisDone = () => {
+  const handleAnalysisDone = useCallback(() => {
     const type = computeMbtiType(answers);
     setMbtiType(type);
     if (session?.user) {
-      router.push(`/types/${type.toLowerCase()}`);
+      if (isPremium) {
+        router.push(`/types/${type.toLowerCase()}`);
+      } else {
+        setPhase('result');
+      }
     } else {
       setPhase('gate');
     }
-  };
+  }, [answers, session, isPremium, router]);
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
@@ -341,6 +457,9 @@ export default function PersonnaliteClient() {
       )}
       {phase === 'gate' && (
         <AuthGate typeCode={mbtiType} lang={lang} />
+      )}
+      {phase === 'result' && (
+        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} />
       )}
     </main>
   );
