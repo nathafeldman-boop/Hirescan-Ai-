@@ -31,5 +31,9 @@ export default async function AffiliePage({ params }: Props) {
     });
   }
 
-  return <AffilieClient affiliate={JSON.parse(JSON.stringify(affiliate))} />;
+  const clicks = await prisma.pageView.count({
+    where: { path: `/__aff/${params.slug}` },
+  });
+
+  return <AffilieClient affiliate={JSON.parse(JSON.stringify(affiliate))} clicks={clicks} />;
 }

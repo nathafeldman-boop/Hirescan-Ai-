@@ -24,6 +24,7 @@ interface Stats {
   monthRevenueCents: number;
   yearRevenueCents: number;
   revenueByMonth: Record<string, { revenue: number; commission: number; count: number }>;
+  mbtiDistribution: Record<string, number>;
   affiliates: Array<{
     id: string;
     slug: string;
@@ -33,6 +34,7 @@ interface Stats {
     createdAt: string;
     conversions: Array<{ amountCents: number; commissionCents: number; createdAt: string }>;
   }>;
+  affiliateClicks: Record<string, number>;
 }
 
 const QUIZ_NAMES: Record<string, string> = {
@@ -186,7 +188,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <KpiCard label="Total utilisateurs" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} />
               <KpiCard label="Premium" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#f472b6" />
-              <KpiCard label="Quiz complétés" value={stats.totalResults.toLocaleString('fr-FR')} sub={`${stats.paidResults} payants`} color="#34d399" />
+              <KpiCard label="Tests MBTI faits" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.byQuiz['personnalite']?.paidCount ?? 0} payants`} color="#34d399" />
               <KpiCard label="Revenus affiliés" value={fmt(stats.totalRevenueCents)} sub="total cumulé" color="#fbbf24" />
             </div>
 
@@ -197,6 +199,37 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <KpiCard label="Unlocks payants" value={stats.paidResults} sub={`+${stats.paidToday} aujourd'hui`} color="#34d399" />
               <KpiCard label="Revenus ce mois" value={fmt(stats.monthRevenueCents)} color="#fbbf24" />
             </div>
+
+            {/* MBTI type distribution */}
+            {Object.keys(stats.mbtiDistribution).length > 0 && (
+              <div className="glass rounded-2xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-white/5">
+                  <p className="text-sm font-semibold text-white">Répartition des types MBTI</p>
+                </div>
+                <div className="p-5">
+                  {(() => {
+                    const total = Object.values(stats.mbtiDistribution).reduce((s, n) => s + n, 0);
+                    const sorted = Object.entries(stats.mbtiDistribution).sort(([, a], [, b]) => b - a);
+                    return (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {sorted.map(([type, count]) => {
+                          const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
+                          return (
+                            <div key={type} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.04] border border-white/5">
+                              <span className="font-black text-sm text-white">{type}</span>
+                              <div className="text-right">
+                                <span className="text-violet-400 font-semibold text-sm">{pct}%</span>
+                                <span className="text-zinc-600 text-xs ml-1">({count})</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
 
             {/* Recent users */}
             <div className="glass rounded-2xl overflow-hidden">
@@ -437,13 +470,19 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Slug / lien</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Email</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Commission</th>
+                      <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Clics</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Ventes</th>
+                      <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Taux</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">CA généré</th>
                     </tr>
                   </thead>
                   <tbody>
                     {stats.affiliates.map(a => {
                       const ca = a.conversions.reduce((s, c) => s + c.amountCents, 0);
+                      const clicks = stats.affiliateClicks[a.slug] ?? 0;
+                      const ctr = clicks > 0
+                        ? `${((a.conversions.length / clicks) * 100).toFixed(1)}%`
+                        : '—';
                       return (
                         <tr key={a.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                           <td className="px-5 py-3 text-white font-medium">{a.name}</td>
@@ -452,13 +491,15 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                           </td>
                           <td className="px-5 py-3 text-zinc-400 text-xs">{a.email ?? '—'}</td>
                           <td className="px-5 py-3 text-zinc-300">{a.commissionPct}%</td>
+                          <td className="px-5 py-3 text-blue-400 font-semibold">{clicks.toLocaleString('fr-FR')}</td>
                           <td className="px-5 py-3 text-zinc-300">{a.conversions.length}</td>
+                          <td className="px-5 py-3 text-pink-400 font-semibold">{ctr}</td>
                           <td className="px-5 py-3 text-yellow-400 font-semibold">{fmt(ca)}</td>
                         </tr>
                       );
                     })}
                     {stats.affiliates.length === 0 && (
-                      <tr><td colSpan={6} className="px-5 py-8 text-center text-zinc-600">Aucun affilié enregistré</td></tr>
+                      <tr><td colSpan={8} className="px-5 py-8 text-center text-zinc-600">Aucun affilié enregistré</td></tr>
                     )}
                   </tbody>
                 </table>

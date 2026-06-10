@@ -705,22 +705,26 @@ export default function ResultsClient({ quiz }: Props) {
                 </span>
               </div>
 
-              {/* Teaser — 15% visible */}
+              {/* Teaser — 10% visible */}
               <div className="mb-5 rounded-2xl border border-white/8 bg-white/[0.03] p-5">
                 <p className="text-zinc-100 font-black text-[15px] leading-snug mb-3">{tier.message}</p>
-                <p className="text-zinc-300 text-sm leading-relaxed">{analysis[0]}</p>
-                <div className="relative mt-3 overflow-hidden" style={{ maxHeight: 58 }}>
-                  <div style={{ filter: 'blur(5px)', userSelect: 'none', pointerEvents: 'none' }}>
+                <div className="relative overflow-hidden" style={{ maxHeight: 52 }}>
+                  <p className="text-zinc-300 text-sm leading-relaxed">
+                    {analysis[0].slice(0, 90)}&hellip;
+                  </p>
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 20%, rgba(9,9,11,0.98) 80%)' }} />
+                </div>
+                <div className="relative mt-2 overflow-hidden" style={{ maxHeight: 40 }}>
+                  <div style={{ filter: 'blur(6px)', userSelect: 'none', pointerEvents: 'none' }}>
                     <p className="text-zinc-400 text-sm leading-relaxed">{analysis[1]}</p>
-                    <p className="text-zinc-400 text-sm leading-relaxed mt-2">{analysis[2]}</p>
                   </div>
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.97) 70%)' }} />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.97) 60%)' }} />
                 </div>
                 <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-white/5">
                   <svg className="w-3.5 h-3.5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  <span className="text-[11px] text-zinc-600">9 points d&apos;analyse supplémentaires verrouillés</span>
+                  <span className="text-[11px] text-zinc-600">10 révélations verrouillées — tu dois savoir ce qu&apos;il y a là-dedans</span>
                 </div>
               </div>
 

@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './Providers';
 import Tracker from './Tracker';
+import { Suspense } from 'react';
+import AffiliateTracker from '@/components/AffiliateTracker';
 
 const BASE = 'https://urcecret.site';
 
@@ -113,6 +115,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-[#09090b] text-white antialiased">
         <Providers>
           <Tracker />
+          <Suspense fallback={null}>
+            <AffiliateTracker />
+          </Suspense>
           {children}
         </Providers>
       </body>

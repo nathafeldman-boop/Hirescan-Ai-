@@ -53,8 +53,18 @@ export default async function AdminPage() {
     }),
   ]);
 
-  // Affiliate conversions (revenue tracking)
-  const [allConversions, affiliates] = await Promise.all([
+  // MBTI type distribution
+  const mbtiUsers = await prisma.user.findMany({
+    where: { mbtiType: { not: null } },
+    select: { mbtiType: true },
+  });
+  const mbtiDistribution: Record<string, number> = {};
+  mbtiUsers.forEach(u => {
+    if (u.mbtiType) mbtiDistribution[u.mbtiType] = (mbtiDistribution[u.mbtiType] ?? 0) + 1;
+  });
+
+  // Affiliate conversions (revenue tracking) + click counts
+  const [allConversions, affiliates, affiliateClickViews] = await Promise.all([
     prisma.affiliateConversion.findMany({
       select: { amountCents: true, commissionCents: true, createdAt: true, affiliateId: true },
     }),
@@ -62,7 +72,18 @@ export default async function AdminPage() {
       include: { conversions: { orderBy: { createdAt: 'desc' } } },
       orderBy: { createdAt: 'desc' },
     }),
+    prisma.pageView.findMany({
+      where: { path: { startsWith: '/__aff/' } },
+      select: { path: true },
+    }),
   ]);
+
+  // Build affiliate click counts: { slug → count }
+  const affiliateClicks: Record<string, number> = {};
+  affiliateClickViews.forEach(v => {
+    const slug = v.path.replace('/__aff/', '');
+    affiliateClicks[slug] = (affiliateClicks[slug] ?? 0) + 1;
+  });
 
   // Group users by month
   const usersByMonth: Record<string, number> = {};
@@ -121,6 +142,7 @@ export default async function AdminPage() {
       paidToday,
       paidThisMonth,
       byQuiz,
+      mbtiDistribution,
       // Revenue
       totalRevenueCents,
       todayRevenueCents,
@@ -130,6 +152,7 @@ export default async function AdminPage() {
       revenueByMonth,
       // Affiliates
       affiliates,
+      affiliateClicks,
     })
   );
 

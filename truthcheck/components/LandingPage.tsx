@@ -127,6 +127,32 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Compatibility CTA — hero placement */}
+      <section className="py-12 px-6 text-center border-b border-gray-100">
+        <div className="max-w-lg mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-5"
+            style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+            ✨ Nouveau
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 mb-3">
+            Test de compatibilité MBTI
+          </h2>
+          <p className="text-gray-500 text-base leading-relaxed mb-7 max-w-sm mx-auto">
+            Chacun répond séparément. L&apos;IA compare vos deux profils et révèle votre niveau de compatibilité réelle — sans filtre.
+          </p>
+          <Link
+            href="/duo"
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-white text-base transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
+              boxShadow: '0 8px 30px rgba(124,58,237,0.35)',
+            }}
+          >
+            💑 Tester notre compatibilité →
+          </Link>
+        </div>
+      </section>
+
       {/* 4 family sections */}
       {GROUPS.map((group) => (
         <section key={group.key} style={{ background: group.bg }} className="relative overflow-hidden">
@@ -210,29 +236,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Compatibility CTA */}
-      <section className="py-20 px-6 text-center" style={{ background: '#f5f3ff' }}>
-        <div className="max-w-lg mx-auto">
-          <div className="text-6xl mb-6">💑</div>
-          <h2 className="text-3xl font-black text-gray-900 mb-4">
-            Test de compatibilité MBTI
-          </h2>
-          <p className="text-gray-500 text-base leading-relaxed mb-8 max-w-sm mx-auto">
-            Chacun répond séparément. L&apos;IA compare vos deux profils et révèle votre niveau de compatibilité réelle — sans filtre.
-          </p>
-          <Link
-            href="/duo"
-            className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-white text-base transition-all hover:scale-105 active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
-              boxShadow: '0 8px 30px rgba(124,58,237,0.35)',
-            }}
-          >
-            Tester notre compatibilité →
-          </Link>
         </div>
       </section>
 
