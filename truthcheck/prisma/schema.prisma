@@ -55,6 +55,8 @@ model User {
   rizzScore     Int       @default(0)
   rizzLevel     Int       @default(1)
   tier          String    @default("free") // free | pro | premium
+  mbtiType      String?   // e.g. "ENTJ"
+  mbtiTestCount Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

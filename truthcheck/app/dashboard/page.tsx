@@ -15,6 +15,8 @@ export default async function DashboardPage() {
       email: true,
       image: true,
       tier: true,
+      mbtiType: true,
+      mbtiTestCount: true,
       createdAt: true,
     },
   });
@@ -28,6 +30,8 @@ export default async function DashboardPage() {
         email: user.email,
         image: user.image,
         tier: user.tier,
+        mbtiType: user.mbtiType,
+        mbtiTestCount: user.mbtiTestCount,
         memberSince: user.createdAt.toISOString(),
       }}
     />

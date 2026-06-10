@@ -433,10 +433,16 @@ export default function PersonnaliteClient() {
     setPhase('analysis');
   };
 
-  const handleAnalysisDone = useCallback(() => {
+  const handleAnalysisDone = useCallback(async () => {
     const type = computeMbtiType(answers);
     setMbtiType(type);
     if (session?.user) {
+      // Save MBTI type to user profile (fire-and-forget)
+      fetch('/api/user/save-mbti', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mbtiType: type }),
+      }).catch(() => {});
       if (isPremium) {
         router.push(`/types/${type.toLowerCase()}`);
       } else {
