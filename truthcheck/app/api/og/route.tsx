@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import { mbtiTypes } from '@/lib/mbti';
 
 export const runtime = 'edge';
 
@@ -35,7 +36,77 @@ export async function GET(req: NextRequest) {
   const score = req.nextUrl.searchParams.get('score');   // "78"
   const tier  = req.nextUrl.searchParams.get('tier');    // "Forte probabilité"
   const mode  = req.nextUrl.searchParams.get('mode');    // "duo" | null
+  const typeParam = req.nextUrl.searchParams.get('type'); // MBTI type code e.g. "INFJ"
   const meta  = quiz ? quizMeta[quiz] : null;
+
+  // ── MBTI TYPE CARD ────────────────────────────────────────────────────────
+  if (typeParam) {
+    const t = mbtiTypes[typeParam.toUpperCase()];
+    if (t) {
+      return new ImageResponse(
+        (
+          <div
+            style={{
+              width: '1200px',
+              height: '630px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+              position: 'relative',
+              overflow: 'hidden',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+            }}
+          >
+            {/* Background accent glow */}
+            <div style={{ position: 'absolute', top: '-80px', left: '-60px', width: '480px', height: '480px', borderRadius: '50%', background: `radial-gradient(circle, ${t.accentColor}22 0%, transparent 70%)` }} />
+            <div style={{ position: 'absolute', bottom: '-60px', right: '-40px', width: '400px', height: '400px', borderRadius: '50%', background: `radial-gradient(circle, ${t.accentColor}15 0%, transparent 70%)` }} />
+
+            {/* Brand */}
+            <div style={{ position: 'absolute', top: '32px', left: '48px', display: 'flex', alignItems: 'baseline' }}>
+              <span style={{ fontSize: '22px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
+              <span style={{ fontSize: '22px', fontWeight: '900', color: '#09090b' }}>Cecret</span>
+            </div>
+            <div style={{ position: 'absolute', top: '36px', right: '48px', background: `${t.accentColor}15`, border: `1px solid ${t.accentColor}40`, borderRadius: '100px', padding: '6px 16px', display: 'flex' }}>
+              <span style={{ fontSize: '13px', fontWeight: '700', color: t.accentColor }}>{t.rarity} de la population</span>
+            </div>
+
+            {/* Type badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '80px', height: '80px', borderRadius: '24px', background: `${t.accentColor}18`, border: `2px solid ${t.accentColor}40`, fontSize: '44px' }}>
+                {t.emoji}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '72px', fontWeight: '900', color: t.accentColor, lineHeight: 1 }}>{t.code}</span>
+                <span style={{ fontSize: '20px', fontWeight: '700', color: '#374151' }}>{t.name}</span>
+              </div>
+            </div>
+
+            {/* Tagline */}
+            <div style={{ fontSize: '26px', fontWeight: '600', color: '#6b7280', textAlign: 'center', maxWidth: '780px', lineHeight: 1.4, marginBottom: '32px', padding: '0 40px' }}>
+              {t.tagline}
+            </div>
+
+            {/* Short desc snippet */}
+            <div style={{ background: 'white', border: `1px solid ${t.accentColor}25`, borderRadius: '16px', padding: '20px 32px', maxWidth: '780px', textAlign: 'center' }}>
+              <span style={{ fontSize: '16px', color: '#374151', lineHeight: 1.6 }}>
+                {t.shortDesc.slice(0, 180)}…
+              </span>
+            </div>
+
+            {/* Footer */}
+            <div style={{ position: 'absolute', bottom: '28px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '15px', color: '#9ca3af' }}>urcecret.site/types/{t.code.toLowerCase()}</span>
+              <span style={{ fontSize: '14px', color: '#d1d5db' }}>·</span>
+              <span style={{ fontSize: '14px', color: '#d1d5db' }}>16 types MBTI en français</span>
+            </div>
+          </div>
+        ),
+        { width: 1200, height: 630 }
+      );
+    }
+  }
 
   // ── RESULT CARD (with score) ──────────────────────────────────────────────
   if (meta && score) {
