@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { generateAffiliateToken } from '@/lib/affiliateToken';
 import AffiliatesClient from './AffiliatesClient';
 import Link from 'next/link';
 
@@ -11,10 +12,16 @@ export default async function AdminAffiliatesPage() {
   const session = await getServerSession(authOptions);
   if (session?.user?.email !== OWNER_EMAIL) redirect('/login');
 
-  const affiliates = await prisma.affiliate.findMany({
+  const affiliatesRaw = await prisma.affiliate.findMany({
     include: { conversions: { orderBy: { createdAt: 'desc' } } },
     orderBy: { createdAt: 'desc' },
   });
+
+  // Attach secure dashboard link for each affiliate
+  const affiliates = affiliatesRaw.map(a => ({
+    ...a,
+    dashboardUrl: `https://urcecret.site/affilie/${a.slug}?token=${generateAffiliateToken(a.slug)}`,
+  }));
 
   return (
     <main className="min-h-screen bg-[#09090b] text-white">

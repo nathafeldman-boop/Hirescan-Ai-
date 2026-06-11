@@ -3,6 +3,9 @@ Allow: /
 Disallow: /api/
 Disallow: /dashboard
 Disallow: /analyze
+Disallow: /admin
+Disallow: /natha-admin
+Disallow: /affilie/
 
 # Sitemaps
 Sitemap: https://urcecret.site/sitemap.xml
