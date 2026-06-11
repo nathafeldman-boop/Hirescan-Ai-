@@ -779,7 +779,7 @@ export default function ResultsClient({ quiz }: Props) {
                 <button
                   onClick={handlePayClick}
                   disabled={isCheckingOut}
-                  className="w-full py-4 rounded-xl font-black text-white text-base mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                  className="w-full py-4 rounded-xl font-black text-white text-base mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
                   style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
                 >
                   {isCheckingOut ? (
@@ -794,6 +794,21 @@ export default function ResultsClient({ quiz }: Props) {
                     'Voir mon score complet — 9,99€/mois ✦'
                   )}
                 </button>
+
+                {/* Benefit bullets */}
+                <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-4 px-1">
+                  {[
+                    'Score exact révélé',
+                    '10 révélations IA',
+                    'Accès à tous les quiz',
+                    'Annulable à tout moment',
+                  ].map(b => (
+                    <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                      <span className="text-emerald-400 text-[10px]">✓</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
 
                 {/* Annual option */}
                 <button

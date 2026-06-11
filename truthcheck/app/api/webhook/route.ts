@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
+import { emailPurchaseConfirm, sendEmail } from '@/lib/emails';
 
 export async function POST(req: NextRequest) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -47,6 +48,24 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         console.error('[webhook] ERREUR upgrade tier email:', email, e);
         return NextResponse.json({ error: 'db_error' }, { status: 500 });
+      }
+    }
+
+    // Send purchase confirmation email (non-blocking)
+    if (email) {
+      const isAnnual = session.metadata?.annual === 'true';
+      const isOneTime = session.metadata?.oneTime === 'true';
+      const isRapport = session.metadata?.rapport === 'true';
+      const typeCode = session.metadata?.typeCode;
+      const emailType = isRapport ? 'rapport' : isOneTime ? 'onetime' : isAnnual ? 'annual' : 'monthly';
+      try {
+        const user = await prisma.user.findFirst({ where: { email }, select: { name: true } });
+        const { subject, html } = emailPurchaseConfirm(user?.name ?? null, emailType, typeCode);
+        await sendEmail(email, subject, html);
+        console.log('[webhook] confirmation email envoyé:', email, emailType);
+      } catch (e) {
+        console.error('[webhook] WARN confirmation email failed:', email, e);
+        // Non-blocking — user already has access
       }
     }
 
