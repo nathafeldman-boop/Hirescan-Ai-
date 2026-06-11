@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { Quiz } from '@/lib/quizzes';
 import { getResultTier } from '@/lib/quizzes';
+import { track } from '@/lib/analytics';
 
 interface Props {
   quiz: Quiz;
@@ -125,12 +126,8 @@ export default function ResultsClient({ quiz }: Props) {
 
   const partialScore = score >= 100 ? '9?%' : score >= 10 ? `${Math.floor(score / 10)}?%` : '?%';
 
-  function trackEvent(event: string) {
-    fetch('/api/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: `/__${event}/${quiz.slug}` }),
-    }).catch(() => {});
+  function trackEvent(event: 'paywall_view' | 'checkout_click' | 'payment_success') {
+    track(event, { quiz: quiz.slug, content_name: quiz.title });
   }
 
   const PAYWALL_CONFIG: Record<string, { headline: string; subline: string; social: string }> = {
@@ -356,7 +353,7 @@ export default function ResultsClient({ quiz }: Props) {
   }
 
   function handleOneTimeClick() {
-    trackEvent('checkout_click_onetime');
+    trackEvent('checkout_click');
     if (!session?.user) {
       try {
         sessionStorage.setItem('pending_checkout', '1');

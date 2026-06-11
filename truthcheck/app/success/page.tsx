@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
+import SuccessTracker from './SuccessTracker';
 
 async function verifyAndUnlock(sessionId: string | undefined, resultId: string | undefined) {
   if (!sessionId || !process.env.STRIPE_SECRET_KEY) return false;
@@ -53,6 +54,7 @@ export default async function SuccessPage({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-20 bg-violet-600" />
       </div>
 
+      <SuccessTracker />
       <div className="relative z-10 text-center max-w-md">
         <div
           className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center"

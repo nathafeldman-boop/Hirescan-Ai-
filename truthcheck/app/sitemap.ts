@@ -27,10 +27,11 @@ const DUO_SLUGS = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   return [
-    { url: BASE_URL,                             lastModified: now, changeFrequency: 'daily',  priority: 1    },
-    { url: `${BASE_URL}/quizzes`,                lastModified: now, changeFrequency: 'daily',  priority: 0.95 },
-    { url: `${BASE_URL}/quiz/personnalite`,       lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${BASE_URL}/types`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.93 },
+    { url: BASE_URL,                                         lastModified: now, changeFrequency: 'daily',  priority: 1    },
+    { url: `${BASE_URL}/test-personnalite-mbti`,             lastModified: now, changeFrequency: 'weekly', priority: 0.98 },
+    { url: `${BASE_URL}/quizzes`,                            lastModified: now, changeFrequency: 'daily',  priority: 0.95 },
+    { url: `${BASE_URL}/quiz/personnalite`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${BASE_URL}/types`,                              lastModified: now, changeFrequency: 'weekly', priority: 0.93 },
     { url: `${BASE_URL}/duo`,                    lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
     { url: `${BASE_URL}/tests`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.88 },
     ...QUIZ_SLUGS.map((slug) => ({

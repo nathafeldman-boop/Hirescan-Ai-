@@ -7,6 +7,7 @@ import type { Quiz, QuizSession } from '@/lib/quizzes';
 import { selectQuestions } from '@/lib/quizzes';
 import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 import QuizAtmosphereBg from '@/components/QuizAtmosphereBg';
+import { track } from '@/lib/analytics';
 
 interface Props {
   quiz: Quiz;
@@ -110,6 +111,7 @@ export default function QuizClient({ quiz }: Props) {
           setAnalysisProgress(Math.min(100, prog));
           if (prog >= 100) {
             clearInterval(iv);
+            track('quiz_complete', { quiz: quiz.slug, content_name: quiz.title });
             setTimeout(() => router.push(`/quiz/${quiz.slug}/results?score=${percentage}`), 400);
           }
         }, 70);
@@ -165,7 +167,7 @@ export default function QuizClient({ quiz }: Props) {
               ))}
             </div>
             <button
-              onClick={() => setShowIntro(false)}
+              onClick={() => { track('quiz_start', { quiz: quiz.slug, content_name: quiz.title }); setShowIntro(false); }}
               className="w-full py-4 rounded-xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
               style={{ background: `linear-gradient(135deg, ${quiz.accentColor}cc, ${quiz.accentColor})`, boxShadow: `0 6px 28px ${quiz.accentColor}55` }}
             >

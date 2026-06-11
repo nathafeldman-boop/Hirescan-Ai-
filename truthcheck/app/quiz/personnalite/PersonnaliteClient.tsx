@@ -7,6 +7,7 @@ import { mbtiQuestions, computeMbtiType, mbtiTypes, MbtiQuestion } from '@/lib/m
 import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
+import { track } from '@/lib/analytics';
 
 const TOTAL = mbtiQuestions.length;
 
@@ -75,6 +76,10 @@ function QuizScreen({ onComplete, questions, t }: {
   const [answers, setAnswers] = useState<Answers>({});
   const [selected, setSelected] = useState<QuizAnswer | null>(null);
   const [animating, setAnimating] = useState(false);
+
+  useEffect(() => {
+    track('quiz_start', { quiz: 'personnalite', content_name: 'Test MBTI' });
+  }, []);
 
   const q: MbtiQuestion = questions[current];
 
@@ -429,6 +434,7 @@ export default function PersonnaliteClient() {
   const t = ui[lang].quiz;
 
   const handleComplete = (ans: Answers) => {
+    track('quiz_complete', { quiz: 'personnalite', content_name: 'Test MBTI' });
     setAnswers(ans);
     setPhase('analysis');
   };

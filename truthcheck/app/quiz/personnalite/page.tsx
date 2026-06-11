@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Test MBTI Gratuit — 16 Types de Personnalité',
-    description: 'Découvre ton profil MBTI en 24 questions. Gratuit, instantané.',
+    description: 'Découvre ton profil MBTI en 100 questions. Gratuit, instantané.',
     images: ['/api/og'],
   },
 };
