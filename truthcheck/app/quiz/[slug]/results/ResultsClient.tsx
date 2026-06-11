@@ -125,6 +125,14 @@ export default function ResultsClient({ quiz }: Props) {
 
   const partialScore = score >= 100 ? '9?%' : score >= 10 ? `${Math.floor(score / 10)}?%` : '?%';
 
+  function trackEvent(event: string) {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: `/__${event}/${quiz.slug}` }),
+    }).catch(() => {});
+  }
+
   const PAYWALL_CONFIG: Record<string, { headline: string; subline: string; social: string }> = {
     infidelite: {
       headline: score >= 60
@@ -207,6 +215,19 @@ export default function ResultsClient({ quiz }: Props) {
       paywallRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 1400);
     return () => clearTimeout(t);
+  }, [isPremium, sessionLoading]);
+
+  // Track paywall impression once per session
+  useEffect(() => {
+    if (isPremium || sessionLoading) return;
+    try {
+      const key = `pw_seen_${quiz.slug}`;
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, '1');
+        trackEvent('paywall_view');
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPremium, sessionLoading]);
 
   // Exit intent — desktop (mouse leaves top) + mobile (tab switch)
@@ -322,6 +343,7 @@ export default function ResultsClient({ quiz }: Props) {
   }
 
   function handlePayClick() {
+    trackEvent('checkout_click');
     if (!session?.user) {
       try {
         sessionStorage.setItem('pending_checkout', '1');
@@ -334,6 +356,7 @@ export default function ResultsClient({ quiz }: Props) {
   }
 
   function handleOneTimeClick() {
+    trackEvent('checkout_click_onetime');
     if (!session?.user) {
       try {
         sessionStorage.setItem('pending_checkout', '1');
@@ -792,13 +815,15 @@ export default function ResultsClient({ quiz }: Props) {
                   Accès annuel — 29,99€/an <span className="text-xs opacity-60">(2,50€/mois)</span>
                 </button>
 
-                {/* One-time option */}
+                {/* One-time option — prominent low-friction entry */}
                 <button
                   onClick={handleOneTimeClick}
                   disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-semibold text-zinc-400 text-sm border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] hover:text-zinc-200 transition-all active:scale-[0.98] mb-3 disabled:opacity-60"
+                  className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] mb-3 disabled:opacity-60 relative overflow-hidden"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.18)', color: '#e4e4e7' }}
                 >
-                  Juste ce résultat — 1,99€ (paiement unique)
+                  <span className="block text-sm font-black text-white">Juste ce résultat — 1,99€</span>
+                  <span className="block text-[11px] text-zinc-500 mt-0.5">Paiement unique · Pas d&apos;abonnement</span>
                 </button>
 
                 <p className="text-center text-[11px] text-zinc-600">
@@ -906,6 +931,29 @@ export default function ResultsClient({ quiz }: Props) {
                 className="block text-center text-xs text-zinc-600 hover:text-zinc-400 transition-colors py-1"
               >
                 Voir les 5 quiz duo →
+              </Link>
+            </div>
+          </div>
+
+          {/* MBTI cross-sell */}
+          <div
+            className="mt-4 rounded-2xl overflow-hidden border"
+            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10), rgba(168,85,247,0.08))', borderColor: 'rgba(99,102,241,0.25)' }}
+          >
+            <div className="p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Nouveau</span>
+              </div>
+              <p className="text-white font-black text-sm leading-snug mb-1">Découvre ton type MBTI</p>
+              <p className="text-zinc-500 text-xs mb-3 leading-relaxed">
+                100 questions — trouve ton vrai profil parmi les 16 types de personnalité.
+              </p>
+              <Link
+                href="/quiz/personnalite"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', boxShadow: '0 4px 16px rgba(99,102,241,0.35)' }}
+              >
+                🧠 Faire le test MBTI →
               </Link>
             </div>
           </div>
