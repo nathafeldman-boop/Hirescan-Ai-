@@ -381,10 +381,18 @@ export default function TypeClient({ type }: Props) {
         >
           {loading ? t.loading : t.unlockMonthly(MONTHLY_PRICE)}
         </button>
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3 mb-3 text-left max-w-xs mx-auto">
+          {['Rapport MBTI complet', 'Amour & compatibilité', 'Forces & faiblesses', 'Tous les 16 types', 'Accès aux quiz UrCecret', 'Annulable à tout moment'].map(b => (
+            <li key={b} className="flex items-center gap-1.5 text-[11px] text-gray-500">
+              <span className="text-emerald-500 text-[10px]">✓</span>
+              {b}
+            </li>
+          ))}
+        </ul>
         <button
           onClick={() => handleUnlock(true)}
           disabled={loading}
-          className="w-full max-w-xs mt-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 disabled:opacity-60 border border-violet-300 text-violet-600 hover:border-violet-400 hover:bg-violet-50"
+          className="w-full max-w-xs mt-1 px-7 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 disabled:opacity-60 border border-violet-300 text-violet-600 hover:border-violet-400 hover:bg-violet-50"
         >
           {t.unlockAnnual(ANNUAL_PRICE)}
         </button>

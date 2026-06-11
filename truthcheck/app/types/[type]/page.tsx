@@ -25,6 +25,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${code} — ${t.name} | UrCecret`,
       description: t.shortDesc.slice(0, 200),
       type: 'article',
+      images: [{
+        url: `https://urcecret.site/api/og?type=${code}`,
+        width: 1200,
+        height: 630,
+        alt: `Type MBTI ${code} — ${t.name}`,
+      }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [`https://urcecret.site/api/og?type=${code}`],
     },
   };
 }

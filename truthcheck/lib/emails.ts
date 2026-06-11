@@ -58,21 +58,24 @@ export function emailWelcome(name: string | null) {
 export function emailDay1(name: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   return {
-    subject: '🔍 Tu as découvert ton type MBTI ?',
+    subject: `${firstName}, ton résultat t'attend encore 👀`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+1</p>
-      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${firstName}, une question rapide</h2>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Ton score est encore là…</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        Tu as eu le temps de faire ton test MBTI hier ? Si non, c'est parti — ça prend 3 minutes.
+        Hier tu as commencé. Ton résultat est sauvegardé — mais la plupart des gens qui n'y reviennent pas dans 24h ne reviennent jamais.
       </p>
-      <p style="margin:0 0 8px;color:#fff;font-size:15px;font-weight:700">Pourquoi ça vaut le coup :</p>
-      <ul style="margin:0 0 24px;padding-left:20px;color:#71717a;font-size:14px;line-height:2.2">
-        <li>Comprendre pourquoi tu réagis comme tu réagis</li>
-        <li>Savoir avec qui tu es vraiment compatible</li>
-        <li>Décoder les comportements des gens autour de toi</li>
-      </ul>
-      ${cta('Faire mon test MBTI gratuit →', `${BASE}/quiz/personnalite`)}
-      <p style="margin:12px 0 0;color:#52525b;font-size:13px;text-align:center">Aussi disponible : quiz sur l'infidélité, les relations toxiques, le burnout…</p>
+      <div style="background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;color:#f472b6;font-size:14px;font-style:italic;line-height:1.7">
+          "Je pensais que ce serait un quiz bateau. En fait j'ai pleuré en lisant mon analyse. C'était exactement ça."
+        </p>
+        <p style="margin:8px 0 0;color:#52525b;font-size:12px">— Marie, 24 ans</p>
+      </div>
+      <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
+        Ton score exact + 10 points d'analyse détaillée = <strong style="color:#fff">1,99€</strong>. Une seule fois.
+      </p>
+      ${cta('Voir mon résultat complet →', `${BASE}/quiz/personnalite`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Paiement sécurisé · Accès immédiat · Anonyme</p>
     `),
   };
 }
@@ -80,26 +83,27 @@ export function emailDay1(name: string | null) {
 export function emailDay3(name: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   return {
-    subject: '🤫 Ce que 3 000 personnes ont découvert cette semaine',
+    subject: `${firstName}, 73% des gens avec ton profil ont été surpris 😳`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+3</p>
-      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Les résultats qui choquent le plus</h2>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Ce que ton résultat dit sur toi</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        Cette semaine, des milliers de personnes ont utilisé UrCecret pour obtenir des réponses honnêtes.
+        73% des personnes qui lisent leur analyse complète disent que ça a changé leur façon de voir une situation dans leur vie.
       </p>
       <div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
-        <p style="margin:0 0 12px;color:#a78bfa;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Les quiz les plus populaires</p>
-        <ul style="margin:0;padding-left:20px;color:#e4e4e7;font-size:14px;line-height:2.2">
-          <li>🧠 Test MBTI — "Je savais pas que j'étais INFJ"</li>
-          <li>💔 Infidélité — résultat qui fait réfléchir</li>
-          <li>🔥 Relation toxique — "Je me suis reconnu(e)"</li>
-          <li>💡 Burnout — "J'aurais dû le faire plus tôt"</li>
+        <p style="margin:0 0 12px;color:#a78bfa;font-size:13px;font-weight:700">Ce que les gens découvrent :</p>
+        <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.2">
+          <li>🧠 "Je comprends enfin pourquoi je réagis comme ça"</li>
+          <li>💔 "J'avais raison de me poser des questions"</li>
+          <li>🔥 "Ça m'a aidé à prendre la décision que j'évitais"</li>
+          <li>✨ "Je me suis reconnu(e) dans chaque ligne"</li>
         </ul>
       </div>
       <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
-        Débloquer ton résultat complet = 1,99€. Une seule fois, accès à vie.
+        Ton analyse complète est encore disponible — <strong style="color:#fff">1,99€ une seule fois</strong>, accès à vie.
       </p>
-      ${cta('Voir tous les quiz →', `${BASE}/quizzes`)}
+      ${cta('Lire mon analyse complète →', `${BASE}/quizzes`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">+ accès à 15 quiz : infidélité, burnout, relations toxiques, amour…</p>
     `),
   };
 }
@@ -107,24 +111,75 @@ export function emailDay3(name: string | null) {
 export function emailDay7(name: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   return {
-    subject: '💜 Une dernière chose, ' + firstName,
+    subject: `Dernier message, ${firstName} — ton résultat va expirer`,
     html: wrap(`
-      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+7</p>
-      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Tu sais ce qui te bloque ?</h2>
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+7 · Dernier email</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Ta chance de savoir la vérité</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        La plupart des gens évitent les réponses honnêtes sur eux-mêmes — parce que la vérité peut faire peur.
-      </p>
-      <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
-        Nos quiz ne te diront pas ce que tu veux entendre. Ils te diront ce que tu <strong style="color:#fff">as besoin</strong> d'entendre.
+        C'est le dernier email que je t'envoie. Dans 24h, ton analyse est archivée et tu devras tout refaire.
       </p>
       <div style="background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
-        <p style="margin:0;color:#f472b6;font-size:15px;font-style:italic;line-height:1.7">
-          "J'ai fait le quiz relation toxique et j'ai finalement compris pourquoi je n'arrivais pas à partir."
-        </p>
-        <p style="margin:8px 0 0;color:#71717a;font-size:12px">— Utilisatrice anonyme</p>
+        <p style="margin:0 0 4px;color:#f472b6;font-size:15px;font-weight:700">Ce que ${firstName} n'a pas encore vu :</p>
+        <ul style="margin:8px 0 0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.1">
+          <li>Son score exact (pas juste une fourchette)</li>
+          <li>10 points d'analyse personnalisée</li>
+          <li>Ce que ses réponses révèlent sur sa situation</li>
+          <li>Les conseils concrets adaptés à son profil</li>
+        </ul>
       </div>
-      ${cta('Obtenir mes réponses →', `${BASE}/quizzes`)}
-      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Résultat complet à 1,99€ · Anonyme · Accès immédiat</p>
+      <p style="margin:0 0 8px;color:#71717a;font-size:15px;line-height:1.7">
+        Prix : <strong style="color:#fff">1,99€</strong> une seule fois. Moins qu'un café.
+      </p>
+      <p style="margin:0 0 24px;color:#52525b;font-size:13px;line-height:1.6">
+        Si tu préfères l'abonnement mensuel (9,99€/mois), tu as accès à tous les quiz + résultats à vie.
+      </p>
+      ${cta('Débloquer avant expiration →', `${BASE}/quizzes`)}
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
+        <p style="margin:0;color:#3f3f46;font-size:11px;text-align:center">Tu ne veux plus recevoir ces emails ? <a href="${BASE}/dashboard" style="color:#52525b">Se désabonner</a></p>
+      </div>
+    `),
+  };
+}
+
+export function emailPurchaseConfirm(name: string | null, type: 'onetime' | 'monthly' | 'annual' | 'rapport', typeCode?: string) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const isSubscription = type === 'monthly' || type === 'annual';
+  const isRapport = type === 'rapport';
+
+  const headline = isRapport
+    ? `Ton rapport ${typeCode ?? 'MBTI'} est débloqué 🔓`
+    : isSubscription
+      ? 'Accès UrCecret Premium activé 🔓'
+      : 'Ton résultat est débloqué 🔓';
+
+  const body = isRapport
+    ? `Ton rapport complet <strong style="color:#fff">${typeCode ?? 'MBTI'}</strong> est maintenant disponible — personnalité, amour, carrière, forces et compatibilité.`
+    : isSubscription
+      ? `Ton accès <strong style="color:#fff">UrCecret Premium</strong> est actif. Tu as maintenant accès à tous les quiz et à chacun de tes résultats en détail, sans limite.`
+      : `Ton résultat complet est maintenant disponible — score exact, analyse IA en 10 points et ce que tes réponses révèlent vraiment.`;
+
+  const link = typeCode ? `${BASE}/types/${typeCode.toLowerCase()}` : `${BASE}/quizzes`;
+  const ctaText = typeCode ? `Voir mon rapport ${typeCode} →` : 'Accéder à mes résultats →';
+
+  return {
+    subject: `✅ ${isRapport ? 'Rapport' : isSubscription ? 'Accès Premium' : 'Résultat'} débloqué — UrCecret`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Confirmation d'achat</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${firstName}, ${headline}</h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">${body}</p>
+      ${isSubscription ? `
+      <div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0 0 8px;color:#a78bfa;font-size:13px;font-weight:700">Ce que tu peux faire maintenant :</p>
+        <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.1">
+          <li>Voir ton score exact sur tous tes quiz</li>
+          <li>Accéder à l'analyse complète de chaque résultat</li>
+          <li>Faire le test de compatibilité duo avec quelqu'un</li>
+        </ul>
+      </div>` : ''}
+      ${cta(ctaText, link)}
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:8px">
+        <p style="margin:0;color:#52525b;font-size:12px">Une question ? Réponds directement à cet email · Paiement sécurisé par Stripe</p>
+      </div>
     `),
   };
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
+import { emailPurchaseConfirm, sendEmail } from '@/lib/emails';
 
 export async function POST(req: NextRequest) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -31,32 +32,63 @@ export async function POST(req: NextRequest) {
     console.log('[webhook] checkout completed — email:', email, 'resultId:', resultId);
 
     if (resultId) {
-      await prisma.quizResult.update({
-        where: { id: resultId },
-        data: { paid: true },
-      }).catch(() => {});
+      try {
+        await prisma.quizResult.update({ where: { id: resultId }, data: { paid: true } });
+        console.log('[webhook] résultat marqué payé:', resultId);
+      } catch (e) {
+        console.error('[webhook] ERREUR mark paid resultId:', resultId, e);
+        return NextResponse.json({ error: 'db_error' }, { status: 500 });
+      }
     }
 
     if (email) {
-      await prisma.user.updateMany({
-        where: { email },
-        data: { tier: 'premium' },
-      }).catch(() => {});
+      try {
+        await prisma.user.updateMany({ where: { email }, data: { tier: 'premium' } });
+        console.log('[webhook] user upgradé premium:', email);
+      } catch (e) {
+        console.error('[webhook] ERREUR upgrade tier email:', email, e);
+        return NextResponse.json({ error: 'db_error' }, { status: 500 });
+      }
+    }
+
+    // Send purchase confirmation email (non-blocking)
+    if (email) {
+      const isAnnual = session.metadata?.annual === 'true';
+      const isOneTime = session.metadata?.oneTime === 'true';
+      const isRapport = session.metadata?.rapport === 'true';
+      const typeCode = session.metadata?.typeCode;
+      const emailType = isRapport ? 'rapport' : isOneTime ? 'onetime' : isAnnual ? 'annual' : 'monthly';
+      try {
+        const user = await prisma.user.findFirst({ where: { email }, select: { name: true } });
+        const { subject, html } = emailPurchaseConfirm(user?.name ?? null, emailType, typeCode);
+        await sendEmail(email, subject, html);
+        console.log('[webhook] confirmation email envoyé:', email, emailType);
+      } catch (e) {
+        console.error('[webhook] WARN confirmation email failed:', email, e);
+        // Non-blocking — user already has access
+      }
     }
 
     const affiliateSlug = session.metadata?.affiliateSlug;
     if (affiliateSlug) {
-      const affiliate = await prisma.affiliate.findUnique({ where: { slug: affiliateSlug } }).catch(() => null);
-      if (affiliate) {
-        const amountCents = session.amount_total ?? 0;
-        await prisma.affiliateConversion.create({
-          data: {
-            affiliateId: affiliate.id,
-            amountCents,
-            commissionCents: Math.round(amountCents * affiliate.commissionPct / 100),
-            stripeSessionId: session.id,
-          },
-        }).catch(() => {});
+      try {
+        const affiliate = await prisma.affiliate.findUnique({ where: { slug: affiliateSlug } });
+        if (affiliate) {
+          const amountCents = session.amount_total ?? 0;
+          const commissionPct = affiliate.commissionPct ?? 50;
+          await prisma.affiliateConversion.create({
+            data: {
+              affiliateId: affiliate.id,
+              amountCents,
+              commissionCents: Math.round(amountCents * commissionPct / 100),
+              stripeSessionId: session.id,
+            },
+          });
+          console.log('[webhook] conversion affilié enregistrée:', affiliateSlug, amountCents);
+        }
+      } catch (e) {
+        // Ne pas bloquer le webhook pour une erreur affilié (unique constraint = déjà enregistré)
+        console.error('[webhook] erreur conversion affilié (ignorée):', affiliateSlug, e);
       }
     }
   }
@@ -64,17 +96,18 @@ export async function POST(req: NextRequest) {
   // ── Renouvellement mensuel/annuel réussi → confirme le premium ──
   if (event.type === 'invoice.paid') {
     const invoice = event.data.object as Stripe.Invoice;
-    // Seulement pour les renouvellements (pas le premier paiement géré par checkout.session.completed)
     if (invoice.billing_reason === 'subscription_cycle') {
       const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
       if (customerId) {
-        const customer = await stripe.customers.retrieve(customerId).catch(() => null);
-        if (customer && !customer.deleted && customer.email) {
-          await prisma.user.updateMany({
-            where: { email: customer.email },
-            data: { tier: 'premium' },
-          }).catch(() => {});
-          console.log('[webhook] renouvellement confirmé pour:', customer.email);
+        try {
+          const customer = await stripe.customers.retrieve(customerId);
+          if (!customer.deleted && customer.email) {
+            await prisma.user.updateMany({ where: { email: customer.email }, data: { tier: 'premium' } });
+            console.log('[webhook] renouvellement confirmé pour:', customer.email);
+          }
+        } catch (e) {
+          console.error('[webhook] ERREUR renouvellement invoice.paid:', customerId, e);
+          return NextResponse.json({ error: 'db_error' }, { status: 500 });
         }
       }
     }
@@ -83,17 +116,17 @@ export async function POST(req: NextRequest) {
   // ── Paiement de renouvellement échoué → downgrade après échec définitif ──
   if (event.type === 'invoice.payment_failed') {
     const invoice = event.data.object as Stripe.Invoice;
-    // next_payment_attempt = null signifie que Stripe a abandonné (toutes les relances épuisées)
     if (invoice.next_payment_attempt === null) {
       const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
       if (customerId) {
-        const customer = await stripe.customers.retrieve(customerId).catch(() => null);
-        if (customer && !customer.deleted && customer.email) {
-          await prisma.user.updateMany({
-            where: { email: customer.email },
-            data: { tier: 'free' },
-          }).catch(() => {});
-          console.log('[webhook] paiement abandonné — downgrade:', customer.email);
+        try {
+          const customer = await stripe.customers.retrieve(customerId);
+          if (!customer.deleted && customer.email) {
+            await prisma.user.updateMany({ where: { email: customer.email }, data: { tier: 'free' } });
+            console.log('[webhook] paiement abandonné — downgrade:', customer.email);
+          }
+        } catch (e) {
+          console.error('[webhook] ERREUR payment_failed downgrade:', customerId, e);
         }
       }
     }
@@ -103,41 +136,42 @@ export async function POST(req: NextRequest) {
   if (event.type === 'customer.subscription.deleted') {
     const sub = event.data.object as Stripe.Subscription;
     const customerId = sub.customer as string;
-    const customer = await stripe.customers.retrieve(customerId).catch(() => null);
-    if (customer && !customer.deleted && customer.email) {
-      await prisma.user.updateMany({
-        where: { email: customer.email },
-        data: { tier: 'free' },
-      }).catch(() => {});
-      console.log('[webhook] abonnement résilié — downgrade:', customer.email);
+    try {
+      const customer = await stripe.customers.retrieve(customerId);
+      if (!customer.deleted && customer.email) {
+        await prisma.user.updateMany({ where: { email: customer.email }, data: { tier: 'free' } });
+        console.log('[webhook] abonnement résilié — downgrade:', customer.email);
+      }
+    } catch (e) {
+      console.error('[webhook] ERREUR subscription.deleted:', customerId, e);
     }
   }
 
-  // ── Abonnement suspendu (Stripe Pause) → downgrade ──
   if (event.type === 'customer.subscription.paused') {
     const sub = event.data.object as Stripe.Subscription;
     const customerId = sub.customer as string;
-    const customer = await stripe.customers.retrieve(customerId).catch(() => null);
-    if (customer && !customer.deleted && customer.email) {
-      await prisma.user.updateMany({
-        where: { email: customer.email },
-        data: { tier: 'free' },
-      }).catch(() => {});
-      console.log('[webhook] abonnement suspendu — downgrade:', customer.email);
+    try {
+      const customer = await stripe.customers.retrieve(customerId);
+      if (!customer.deleted && customer.email) {
+        await prisma.user.updateMany({ where: { email: customer.email }, data: { tier: 'free' } });
+        console.log('[webhook] abonnement suspendu — downgrade:', customer.email);
+      }
+    } catch (e) {
+      console.error('[webhook] ERREUR subscription.paused:', customerId, e);
     }
   }
 
-  // ── Reprise après suspension → upgrade ──
   if (event.type === 'customer.subscription.resumed') {
     const sub = event.data.object as Stripe.Subscription;
     const customerId = sub.customer as string;
-    const customer = await stripe.customers.retrieve(customerId).catch(() => null);
-    if (customer && !customer.deleted && customer.email) {
-      await prisma.user.updateMany({
-        where: { email: customer.email },
-        data: { tier: 'premium' },
-      }).catch(() => {});
-      console.log('[webhook] abonnement repris — upgrade:', customer.email);
+    try {
+      const customer = await stripe.customers.retrieve(customerId);
+      if (!customer.deleted && customer.email) {
+        await prisma.user.updateMany({ where: { email: customer.email }, data: { tier: 'premium' } });
+        console.log('[webhook] abonnement repris — upgrade:', customer.email);
+      }
+    } catch (e) {
+      console.error('[webhook] ERREUR subscription.resumed:', customerId, e);
     }
   }
 

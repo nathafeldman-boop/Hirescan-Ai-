@@ -14,6 +14,7 @@ type Affiliate = {
   name: string;
   email: string | null;
   commissionPct: number;
+  dashboardUrl?: string;
   conversions: Conversion[];
 };
 
@@ -135,7 +136,7 @@ export default function AffiliatesClient({ initial }: { initial: Affiliate[] }) 
         const commission = a.conversions.reduce((s, c) => s + c.commissionCents, 0);
         const months = groupByMonth(a.conversions);
         const link = `https://urcecret.site/?ref=${a.slug}`;
-        const dashboardLink = `https://urcecret.site/affilie/${a.slug}`;
+        const dashboardLink = a.dashboardUrl ?? `https://urcecret.site/affilie/${a.slug}`;
 
         return (
           <div key={a.id} className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -154,14 +155,14 @@ export default function AffiliatesClient({ initial }: { initial: Affiliate[] }) 
                     copier
                   </button>
                 </div>
-                {/* Dashboard link — send this to the influencer */}
+                {/* Secure dashboard link — send this to the influencer */}
                 <div className="flex items-center gap-2 mt-1.5">
                   <code className="bg-black/40 text-emerald-400 text-xs px-2 py-1 rounded font-mono truncate max-w-[220px]">{dashboardLink}</code>
                   <button
                     onClick={() => { navigator.clipboard.writeText(dashboardLink); }}
-                    className="text-xs text-zinc-500 hover:text-white transition-colors flex-shrink-0"
+                    className="text-xs text-emerald-500 hover:text-emerald-300 transition-colors flex-shrink-0 font-semibold"
                   >
-                    📊 dashboard
+                    📊 lien sécurisé
                   </button>
                 </div>
               </div>

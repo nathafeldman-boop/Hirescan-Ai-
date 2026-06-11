@@ -12,7 +12,11 @@ const SEQUENCES: { type: string; days: number; template: (name: string | null) =
 
 export async function GET(req: NextRequest) {
   const isVercelCron = req.headers.get('x-vercel-cron') === '1';
-  if (!isVercelCron) {
+  const cronSecret = process.env.CRON_SECRET;
+  const authHeader = req.headers.get('authorization');
+  const hasValidSecret = cronSecret && authHeader === `Bearer ${cronSecret}`;
+
+  if (!isVercelCron && !hasValidSecret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

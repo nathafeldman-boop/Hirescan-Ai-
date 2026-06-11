@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -15,6 +16,11 @@ const ANNUAL_PRICE_CENTS   = 2999;  // €29.99/year
 const RAPPORT_PRICE_CENTS  = 1999;  // €19.99 — rapport MBTI
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  if (!rateLimit(`checkout:${ip}`, 10, 60_000)) {
+    return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
+  }
+
   const stripe = getStripe();
   if (!stripe) {
     return NextResponse.json({ error: 'Stripe non configuré' }, { status: 503 });

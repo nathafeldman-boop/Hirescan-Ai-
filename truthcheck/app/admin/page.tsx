@@ -42,14 +42,16 @@ export default async function AdminPage() {
     }),
   ]);
 
-  // Quiz Results
-  const [totalResults, paidResults, paidToday, paidThisMonth, allResults] = await Promise.all([
+  // Quiz Results — use groupBy to avoid fetching all rows
+  const [totalResults, paidResults, paidToday, paidThisMonth, quizGrouped] = await Promise.all([
     prisma.quizResult.count(),
     prisma.quizResult.count({ where: { paid: true } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfMonth } } }),
-    prisma.quizResult.findMany({
-      select: { quizSlug: true, score: true, paid: true, createdAt: true, userId: true },
+    prisma.quizResult.groupBy({
+      by: ['quizSlug', 'paid'],
+      _count: { id: true },
+      _sum: { score: true },
     }),
   ]);
 
@@ -78,13 +80,6 @@ export default async function AdminPage() {
     }),
   ]);
 
-  // Build affiliate click counts: { slug → count }
-  const affiliateClicks: Record<string, number> = {};
-  affiliateClickViews.forEach(v => {
-    const slug = v.path.replace('/__aff/', '');
-    affiliateClicks[slug] = (affiliateClicks[slug] ?? 0) + 1;
-  });
-
   // Group users by month
   const usersByMonth: Record<string, number> = {};
   allUsersForMonth.forEach(u => {
@@ -102,16 +97,24 @@ export default async function AdminPage() {
     revenueByMonth[key].count++;
   });
 
-  // Group quiz results by slug
+  // Build byQuiz from groupBy results
   const byQuiz: Record<string, { count: number; paidCount: number; totalScore: number }> = {};
-  allResults.forEach(r => {
-    if (!byQuiz[r.quizSlug]) byQuiz[r.quizSlug] = { count: 0, paidCount: 0, totalScore: 0 };
-    byQuiz[r.quizSlug].count++;
-    if (r.paid) byQuiz[r.quizSlug].paidCount++;
-    byQuiz[r.quizSlug].totalScore += r.score;
+  quizGrouped.forEach(row => {
+    if (!byQuiz[row.quizSlug]) byQuiz[row.quizSlug] = { count: 0, paidCount: 0, totalScore: 0 };
+    byQuiz[row.quizSlug].count += row._count.id;
+    byQuiz[row.quizSlug].totalScore += row._sum.score ?? 0;
+    if (row.paid) byQuiz[row.quizSlug].paidCount += row._count.id;
+  });
+
+  // Build affiliate click counts map
+  const affiliateClicks: Record<string, number> = {};
+  affiliateClickViews.forEach(v => {
+    const slug = v.path.replace('/__aff/', '');
+    affiliateClicks[slug] = (affiliateClicks[slug] ?? 0) + 1;
   });
 
   // Revenue totals
+
   const totalRevenueCents = allConversions.reduce((s, c) => s + c.amountCents, 0);
   const todayRevenueCents = allConversions
     .filter(c => new Date(c.createdAt) >= startOfToday)

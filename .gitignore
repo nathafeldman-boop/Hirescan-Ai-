@@ -1,0 +1,6 @@
+smartapp-website/node_modules/
+smartapp-website/out/
+smartapp-website/.next/
+smartapp-website/.vercel/
+smartapp-website/tsconfig.tsbuildinfo
+smartapp-website/next-env.d.ts
