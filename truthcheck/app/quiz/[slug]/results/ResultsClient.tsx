@@ -776,9 +776,14 @@ export default function ResultsClient({ quiz }: Props) {
                   <span className="text-xs text-zinc-500">{pw.social}</span>
                 </div>
 
-                {/* CTA */}
+                {/* CTA — 1,99€ one-time: primary hero */}
+                <div className="flex justify-center mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 tracking-wide">
+                    ⭐ Le plus populaire pour découvrir son résultat
+                  </span>
+                </div>
                 <button
-                  onClick={handlePayClick}
+                  onClick={handleOneTimeClick}
                   disabled={isCheckingOut}
                   className="w-full py-4 rounded-xl font-black text-white text-base mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
                   style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
@@ -792,17 +797,17 @@ export default function ResultsClient({ quiz }: Props) {
                       Redirection…
                     </span>
                   ) : (
-                    'Voir mon score complet — 9,99€/mois ✦'
+                    'Juste ce résultat — 1,99€ ✦'
                   )}
                 </button>
 
-                {/* Benefit bullets */}
+                {/* Benefit bullets — one-time focused */}
                 <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-4 px-1">
                   {[
                     'Score exact révélé',
                     '10 révélations IA',
-                    'Accès à tous les quiz',
-                    'Annulable à tout moment',
+                    'Paiement unique',
+                    'Accès immédiat',
                   ].map(b => (
                     <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
                       <span className="text-emerald-400 text-[10px]">✓</span>
@@ -810,6 +815,15 @@ export default function ResultsClient({ quiz }: Props) {
                     </li>
                   ))}
                 </ul>
+
+                {/* Monthly sub — secondary */}
+                <button
+                  onClick={handlePayClick}
+                  disabled={isCheckingOut}
+                  className="w-full py-3 rounded-xl font-semibold text-violet-300 text-sm border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 hover:text-white transition-all active:scale-[0.98] mb-2 disabled:opacity-60"
+                >
+                  Tout débloquer — 9,99€/mois <span className="text-xs opacity-60">(tous les quiz)</span>
+                </button>
 
                 {/* Annual option */}
                 <button
@@ -826,24 +840,13 @@ export default function ResultsClient({ quiz }: Props) {
                     })();
                   }}
                   disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-semibold text-violet-300 text-sm border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 hover:text-white transition-all active:scale-[0.98] mb-2 disabled:opacity-60"
+                  className="w-full py-3 rounded-xl font-semibold text-violet-300 text-sm border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 hover:text-white transition-all active:scale-[0.98] mb-3 disabled:opacity-60"
                 >
                   Accès annuel — 29,99€/an <span className="text-xs opacity-60">(2,50€/mois)</span>
                 </button>
 
-                {/* One-time option — prominent low-friction entry */}
-                <button
-                  onClick={handleOneTimeClick}
-                  disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] mb-3 disabled:opacity-60 relative overflow-hidden"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.18)', color: '#e4e4e7' }}
-                >
-                  <span className="block text-sm font-black text-white">Juste ce résultat — 1,99€</span>
-                  <span className="block text-[11px] text-zinc-500 mt-0.5">Paiement unique · Pas d&apos;abonnement</span>
-                </button>
-
                 <p className="text-center text-[11px] text-zinc-600">
-                  Abonnement annulable à tout moment · Paiement 100% sécurisé
+                  Paiement 100% sécurisé · Sans engagement pour le paiement unique
                 </p>
               </div>
 
