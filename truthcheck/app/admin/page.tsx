@@ -42,25 +42,31 @@ export default async function AdminPage() {
     }),
   ]);
 
-  // Quiz Results
-  const [totalResults, paidResults, paidToday, paidThisMonth, allResults] = await Promise.all([
+  // Quiz Results — use groupBy to avoid fetching all rows
+  const [totalResults, paidResults, paidToday, paidThisMonth, quizGrouped] = await Promise.all([
     prisma.quizResult.count(),
     prisma.quizResult.count({ where: { paid: true } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfMonth } } }),
-    prisma.quizResult.findMany({
-      select: { quizSlug: true, score: true, paid: true, createdAt: true, userId: true },
+    prisma.quizResult.groupBy({
+      by: ['quizSlug', 'paid'],
+      _count: { id: true },
+      _sum: { score: true },
     }),
   ]);
 
-  // Affiliate conversions (revenue tracking)
-  const [allConversions, affiliates] = await Promise.all([
+  // Affiliate conversions (revenue tracking) + click counts
+  const [allConversions, affiliates, affiliateClickViews] = await Promise.all([
     prisma.affiliateConversion.findMany({
       select: { amountCents: true, commissionCents: true, createdAt: true, affiliateId: true },
     }),
     prisma.affiliate.findMany({
       include: { conversions: { orderBy: { createdAt: 'desc' } } },
       orderBy: { createdAt: 'desc' },
+    }),
+    prisma.pageView.findMany({
+      where: { path: { startsWith: '/__aff/' } },
+      select: { path: true },
     }),
   ]);
 
@@ -81,13 +87,20 @@ export default async function AdminPage() {
     revenueByMonth[key].count++;
   });
 
-  // Group quiz results by slug
+  // Build byQuiz from groupBy results
   const byQuiz: Record<string, { count: number; paidCount: number; totalScore: number }> = {};
-  allResults.forEach(r => {
-    if (!byQuiz[r.quizSlug]) byQuiz[r.quizSlug] = { count: 0, paidCount: 0, totalScore: 0 };
-    byQuiz[r.quizSlug].count++;
-    if (r.paid) byQuiz[r.quizSlug].paidCount++;
-    byQuiz[r.quizSlug].totalScore += r.score;
+  quizGrouped.forEach(row => {
+    if (!byQuiz[row.quizSlug]) byQuiz[row.quizSlug] = { count: 0, paidCount: 0, totalScore: 0 };
+    byQuiz[row.quizSlug].count += row._count.id;
+    byQuiz[row.quizSlug].totalScore += row._sum.score ?? 0;
+    if (row.paid) byQuiz[row.quizSlug].paidCount += row._count.id;
+  });
+
+  // Build affiliate click counts map
+  const affiliateClicks: Record<string, number> = {};
+  affiliateClickViews.forEach(v => {
+    const slug = v.path.replace('/__aff/', '');
+    affiliateClicks[slug] = (affiliateClicks[slug] ?? 0) + 1;
   });
 
   // Revenue totals
@@ -130,6 +143,7 @@ export default async function AdminPage() {
       revenueByMonth,
       // Affiliates
       affiliates,
+      affiliateClicks,
     })
   );
 

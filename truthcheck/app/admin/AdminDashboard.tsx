@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates';
@@ -33,6 +34,7 @@ interface Stats {
     createdAt: string;
     conversions: Array<{ amountCents: number; commissionCents: number; createdAt: string }>;
   }>;
+  affiliateClicks: Record<string, number>;
 }
 
 const QUIZ_NAMES: Record<string, string> = {
@@ -89,9 +91,20 @@ function TierBadge({ tier }: { tier: string }) {
 }
 
 export default function AdminDashboard({ stats }: { stats: Stats }) {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>('overview');
   const [search, setSearch] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'premium' | 'free'>('all');
+  const [lastRefresh, setLastRefresh] = useState(() => new Date().toLocaleTimeString('fr-FR'));
+
+  // Auto-refresh every 60 s
+  useEffect(() => {
+    const id = setInterval(() => {
+      router.refresh();
+      setLastRefresh(new Date().toLocaleTimeString('fr-FR'));
+    }, 60_000);
+    return () => clearInterval(id);
+  }, [router]);
 
   const conversionRate = stats.totalUsers > 0
     ? ((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1)
@@ -147,6 +160,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             <span className="text-white">Cecret</span>
           </Link>
           <div className="flex items-center gap-4">
+            <span className="text-xs text-zinc-600">↻ {lastRefresh}</span>
             <span className="text-xs text-zinc-500 font-semibold uppercase tracking-widest">Admin · Dashboard</span>
             <Link href="/admin/affiliates" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
               Gérer affiliés →
@@ -186,7 +200,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <KpiCard label="Total utilisateurs" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} />
               <KpiCard label="Premium" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#f472b6" />
-              <KpiCard label="Quiz complétés" value={stats.totalResults.toLocaleString('fr-FR')} sub={`${stats.paidResults} payants`} color="#34d399" />
+              <KpiCard label="Tests MBTI faits" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} color="#34d399" />
               <KpiCard label="Revenus affiliés" value={fmt(stats.totalRevenueCents)} sub="total cumulé" color="#fbbf24" />
             </div>
 
@@ -437,13 +451,17 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Slug / lien</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Email</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Commission</th>
+                      <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Clics</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">Ventes</th>
+                      <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">CTR</th>
                       <th className="text-left px-5 py-3 text-zinc-500 text-xs font-medium">CA généré</th>
                     </tr>
                   </thead>
                   <tbody>
                     {stats.affiliates.map(a => {
                       const ca = a.conversions.reduce((s, c) => s + c.amountCents, 0);
+                      const clicks = stats.affiliateClicks[a.slug] ?? 0;
+                      const ctr = clicks > 0 ? ((a.conversions.length / clicks) * 100).toFixed(1) + '%' : '—';
                       return (
                         <tr key={a.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                           <td className="px-5 py-3 text-white font-medium">{a.name}</td>
@@ -452,13 +470,15 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                           </td>
                           <td className="px-5 py-3 text-zinc-400 text-xs">{a.email ?? '—'}</td>
                           <td className="px-5 py-3 text-zinc-300">{a.commissionPct}%</td>
+                          <td className="px-5 py-3 text-zinc-300">{clicks.toLocaleString('fr-FR')}</td>
                           <td className="px-5 py-3 text-zinc-300">{a.conversions.length}</td>
+                          <td className="px-5 py-3 text-emerald-400 text-xs font-semibold">{ctr}</td>
                           <td className="px-5 py-3 text-yellow-400 font-semibold">{fmt(ca)}</td>
                         </tr>
                       );
                     })}
                     {stats.affiliates.length === 0 && (
-                      <tr><td colSpan={6} className="px-5 py-8 text-center text-zinc-600">Aucun affilié enregistré</td></tr>
+                      <tr><td colSpan={8} className="px-5 py-8 text-center text-zinc-600">Aucun affilié enregistré</td></tr>
                     )}
                   </tbody>
                 </table>
