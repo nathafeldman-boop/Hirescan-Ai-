@@ -89,7 +89,8 @@ function QuizScreen({ onComplete, questions, t }: {
     setAnimating(true);
     const next = { ...answers, [q.id]: choice };
     setTimeout(() => {
-      if (current + 1 >= TOTAL) {
+      if (current + 1 >= questions.length) {
+        setAnimating(false);
         onComplete(next);
       } else {
         setAnswers(next);
@@ -102,7 +103,7 @@ function QuizScreen({ onComplete, questions, t }: {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-10">
-      <ProgressBar current={current + 1} total={TOTAL} label={t.questionOf(current + 1, TOTAL)} />
+      <ProgressBar current={current + 1} total={questions.length} label={t.questionOf(current + 1, questions.length)} />
 
       <div className="mb-10 text-center">
         <p className="text-xs text-gray-400 uppercase tracking-widest mb-4">
