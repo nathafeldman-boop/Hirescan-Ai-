@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signIn } from 'next-auth/react';
 import { mbtiQuestions, computeMbtiType, mbtiTypes, MbtiQuestion } from '@/lib/mbti';
@@ -76,9 +76,45 @@ function QuizScreen({ onComplete, questions, t }: {
   const [answers, setAnswers] = useState<Answers>({});
   const [selected, setSelected] = useState<QuizAnswer | null>(null);
   const [animating, setAnimating] = useState(false);
+  const trackedMilestones = useRef<Set<number>>(new Set());
+  const currentRef = useRef(0);
 
   useEffect(() => {
     track('quiz_start', { quiz: 'personnalite', content_name: 'Test MBTI' });
+  }, []);
+
+  // Keep ref in sync so visibilitychange always reads latest question
+  useEffect(() => { currentRef.current = current; }, [current]);
+
+  // Track milestone questions for drop-off analysis
+  useEffect(() => {
+    const q = current + 1;
+    if ([10, 25, 50, 75].includes(q) && !trackedMilestones.current.has(q)) {
+      trackedMilestones.current.add(q);
+      fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: `/__quiz/q${q}` }),
+      }).catch(() => {});
+    }
+  }, [current]);
+
+  // Track exact question when user leaves mid-quiz
+  useEffect(() => {
+    const onHide = () => {
+      if (!document.hidden) return;
+      const q = currentRef.current + 1;
+      if (q < questions.length) {
+        fetch('/api/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: `/__quiz/drop/q${q}` }),
+        }).catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', onHide);
+    return () => document.removeEventListener('visibilitychange', onHide);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const q: MbtiQuestion = questions[current];

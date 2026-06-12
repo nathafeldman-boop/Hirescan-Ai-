@@ -71,6 +71,18 @@ export default async function NathaAdminPage() {
     prisma.affiliateConversion.findMany({ select: { amountCents: true, createdAt: true } }),
   ]);
 
+  // Quiz drop-off funnel (MBTI personnalite)
+  const [fStart, fQ10, fQ25, fQ50, fQ75, fComplete, fPaywall, fCheckout] = await Promise.all([
+    prisma.pageView.count({ where: { path: '/__evt/quiz_start/personnalite' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q10' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q25' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q50' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q75' } }),
+    prisma.pageView.count({ where: { path: '/__evt/quiz_complete/personnalite' } }),
+    prisma.pageView.count({ where: { path: '/__evt/paywall_view/personnalite' } }),
+    prisma.pageView.count({ where: { path: '/__evt/checkout_click/personnalite' } }),
+  ]);
+
   const revenueToday = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
   const revenueWeek  = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
   const revenueMonth = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
@@ -302,7 +314,45 @@ export default async function NathaAdminPage() {
           ))}
         </div>
 
-        {/* ── SECTION 7 : Pages les plus vues ── */}
+        {/* ── SECTION 7 : Funnel drop-off MBTI ── */}
+        <p style={{ color: C.pink, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Funnel MBTI — où les gens lâchent</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
+          {fStart === 0 && <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>Pas encore de données (tracking actif depuis ce soir).</p>}
+          {fStart > 0 && (() => {
+            const steps = [
+              { label: 'Démarré le quiz', n: fStart, color: C.blue },
+              { label: 'Q10 atteinte', n: fQ10, color: C.purple },
+              { label: 'Q25 atteinte', n: fQ25, color: C.purple },
+              { label: 'Q50 atteinte', n: fQ50, color: C.yellow },
+              { label: 'Q75 atteinte', n: fQ75, color: C.orange },
+              { label: 'Quiz terminé (100)', n: fComplete, color: C.green },
+              { label: 'Paywall vu', n: fPaywall, color: C.pink },
+              { label: 'Paiement cliqué', n: fCheckout, color: C.green },
+            ];
+            const maxN = steps[0].n || 1;
+            return steps.map((s, i) => {
+              const pctVal = s.n === 0 ? 0 : Math.round((s.n / maxN) * 100);
+              const dropVsNext = i < steps.length - 1 && steps[i + 1].n > 0
+                ? Math.round(((s.n - steps[i + 1].n) / s.n) * 100) : null;
+              return (
+                <div key={s.label} style={{ padding: '10px 0', borderBottom: i < steps.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
+                    <span style={{ color: C.muted, fontSize: 12, width: 22, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ flex: 1, color: C.text, fontSize: 13, fontWeight: 600 }}>{s.label}</span>
+                    <span style={{ color: s.color, fontSize: 15, fontWeight: 900, minWidth: 30, textAlign: 'right' }}>{s.n}</span>
+                    <span style={{ color: C.muted, fontSize: 12, width: 44, textAlign: 'right' }}>{pctVal}%</span>
+                    {dropVsNext !== null && <span style={{ color: C.red, fontSize: 11, fontWeight: 700, width: 52, textAlign: 'right' }}>−{dropVsNext}%</span>}
+                  </div>
+                  <div style={{ marginLeft: 32, height: 5, borderRadius: 3, background: C.border, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pctVal}%`, background: s.color, borderRadius: 3, transition: 'width 0.4s' }} />
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+
+        {/* ── SECTION 8 : Pages les plus vues ── */}
         <p style={{ color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Pages les plus vues</p>
         <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
           {topPages.map((p, i) => (
