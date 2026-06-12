@@ -183,6 +183,99 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   );
 }
 
+// ─── In-app browser overlay ─────────────────────────────────────────────────────
+
+function InAppBrowserOverlay({ onDismiss }: { onDismiss: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const openInChrome = () => {
+    const url = window.location.href;
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+    if (isIOS) {
+      window.location.href = `googlechrome://${url.replace(/^https?:\/\//, '')}`;
+    } else {
+      window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
+    }
+    setTimeout(async () => {
+      try { await navigator.clipboard.writeText(url); setCopied(true); } catch {}
+    }, 1200);
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+    } catch {
+      setCopied(true);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6 text-center">
+      <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-amber-100 flex items-center justify-center text-3xl">⚠️</div>
+      <h2 className="text-xl font-black text-gray-900 mb-3">
+        Ouvre dans Chrome ou Safari
+      </h2>
+      <p className="text-gray-500 text-sm mb-8 leading-relaxed max-w-xs">
+        Le navigateur de TikTok bloque la connexion et le paiement. Ouvre ce lien dans Chrome ou Safari pour ne pas perdre ton résultat.
+      </p>
+      <div className="w-full max-w-xs space-y-3">
+        <button
+          onClick={openInChrome}
+          className="w-full py-4 rounded-2xl font-black text-white text-base"
+          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>
+          Ouvrir dans Chrome
+        </button>
+        <button
+          onClick={copyLink}
+          className="w-full py-3 rounded-2xl font-semibold text-sm border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all">
+          {copied ? '✓ Lien copié — colle-le dans Chrome !' : '📋 Copier le lien'}
+        </button>
+      </div>
+      <button
+        onClick={onDismiss}
+        className="mt-8 text-xs text-gray-300 hover:text-gray-500 transition-colors">
+        Continuer quand même (risqué)
+      </button>
+    </div>
+  );
+}
+
+// ─── Countdown timer ─────────────────────────────────────────────────────────────
+
+function CountdownTimer({ isFr }: { isFr: boolean }) {
+  const [seconds, setSeconds] = useState(() => {
+    try {
+      const end = sessionStorage.getItem('_pwt');
+      if (end) {
+        const rem = Math.round((parseInt(end) - Date.now()) / 1000);
+        if (rem > 0 && rem <= 15 * 60) return rem;
+      }
+    } catch {}
+    const endTs = Date.now() + 15 * 60 * 1000;
+    try { sessionStorage.setItem('_pwt', endTs.toString()); } catch {}
+    return 15 * 60;
+  });
+
+  useEffect(() => {
+    if (seconds <= 0) return;
+    const id = setInterval(() => setSeconds(s => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (seconds <= 0) return null;
+  const m = Math.floor(seconds / 60);
+  const s = (seconds % 60).toString().padStart(2, '0');
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mb-3">
+      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-black bg-red-50 border border-red-200 text-red-600">
+        ⏱ {isFr ? `Prix réduit — encore ${m}:${s}` : `Reduced price — ${m}:${s} left`}
+      </span>
+    </div>
+  );
+}
+
 // ─── Result teaser (free users — logged in or not) ─────────────────────────────
 
 function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: string; userEmail?: string | null }) {
@@ -258,11 +351,17 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
                   {isFr ? 'Lien envoyé à' : 'Link sent to'}{' '}
                   <span className="text-violet-600 font-medium">{authEmail}</span>
                 </p>
-                <p className="text-gray-400 text-xs mt-3">
+                <p className="text-gray-400 text-xs mt-2 leading-relaxed">
                   {isFr
-                    ? 'Clique sur le lien → tu arrives directement sur la page de paiement.'
-                    : 'Click the link → you land directly on the payment page.'}
+                    ? 'Clique sur le lien dans ton email → tu arrives directement sur la page de paiement. Ton type est sauvegardé, pas besoin de refaire le test.'
+                    : 'Click the link in your email → you land directly on the payment page. Your type is saved.'}
                 </p>
+                <button
+                  onClick={() => { window.location.href = `mailto:${authEmail}`; }}
+                  className="mt-3 w-full py-2.5 rounded-xl text-xs font-bold text-violet-600 border border-violet-200 hover:bg-violet-50 transition-all"
+                >
+                  {isFr ? '📧 Ouvrir mon application email' : '📧 Open email app'}
+                </button>
               </div>
             ) : (
               <>
@@ -346,26 +445,30 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
         </div>
 
         {/* Locked type card */}
-        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 mb-6 relative overflow-hidden">
-          <div className="space-y-3 blur-sm select-none" aria-hidden>
+        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 mb-4 relative overflow-hidden">
+          <div className="space-y-3 select-none" aria-hidden>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gray-300" />
+              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-black text-gray-400">
+                {typeCode.slice(0, 2)}
+              </div>
               <div>
-                <div className="h-4 w-28 bg-gray-300 rounded-full mb-1.5" />
-                <div className="h-3 w-20 bg-gray-200 rounded-full" />
+                <div className="text-sm font-black text-gray-800 tracking-widest">
+                  {typeCode.slice(0, 2)}<span className="blur-sm">??</span>
+                </div>
+                <div className="h-2.5 w-20 bg-gray-200 rounded-full mt-1 blur-sm" />
               </div>
             </div>
             <div className="space-y-2">
-              <div className="h-3 bg-gray-200 rounded-full" />
-              <div className="h-3 bg-gray-200 rounded-full w-5/6" />
-              <div className="h-3 bg-gray-200 rounded-full w-4/6" />
+              <div className="h-3 bg-gray-200 rounded-full blur-sm" />
+              <div className="h-3 bg-gray-200 rounded-full w-5/6 blur-sm" />
+              <div className="h-3 bg-gray-200 rounded-full w-4/6 blur-sm" />
             </div>
           </div>
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
+          <div className="absolute inset-0 flex items-end justify-center pb-4 bg-gradient-to-t from-white/95 via-white/50 to-transparent rounded-2xl">
             <div className="text-center">
               <div className="text-gray-400 mb-1 flex justify-center"><LockIcon /></div>
-              <p className="text-xs text-gray-500 font-medium">
-                {isFr ? 'Type verrouillé' : 'Type locked'}
+              <p className="text-xs text-gray-500 font-semibold">
+                {isFr ? `Ton type complet est verrouillé` : 'Your full type is locked'}
               </p>
             </div>
           </div>
@@ -373,6 +476,9 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
 
         {/* Paywall */}
         <div className="space-y-2">
+          {/* Countdown timer */}
+          <CountdownTimer isFr={isFr} />
+
           {/* Hero — 1,99€ one-time */}
           <div className="flex justify-center mb-1">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 border border-emerald-200 text-emerald-600 tracking-wide">
@@ -688,14 +794,7 @@ export default function PersonnaliteClient() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
       {inAppWarning && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-400 px-4 py-3 shadow-md">
-          <div className="flex items-center justify-between max-w-xl mx-auto gap-3">
-            <p className="text-xs text-amber-950 font-bold leading-snug">
-              ⚠️ Pour éviter les bugs de connexion, ouvre ce lien dans <strong>Chrome</strong> ou <strong>Safari</strong> avant de commencer.
-            </p>
-            <button onClick={() => setInAppWarning(false)} className="text-amber-800 flex-shrink-0 text-lg font-bold leading-none">✕</button>
-          </div>
-        </div>
+        <InAppBrowserOverlay onDismiss={() => setInAppWarning(false)} />
       )}
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
