@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { generateAffiliateToken } from '@/lib/affiliateToken';
 
 const OWNER_EMAIL = 'nathabuisseness@gmail.com';
+const BASE = 'https://urcecret.site';
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -21,7 +23,12 @@ export async function GET() {
     orderBy: { createdAt: 'desc' },
   });
 
-  return NextResponse.json(affiliates);
+  return NextResponse.json(
+    affiliates.map(a => ({
+      ...a,
+      dashboardUrl: `${BASE}/affilie/${a.slug}?token=${generateAffiliateToken(a.slug)}`,
+    }))
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -43,7 +50,10 @@ export async function POST(req: NextRequest) {
     data: { name, slug: cleanSlug, email: email || null, commissionPct: 50 },
   });
 
-  return NextResponse.json(affiliate);
+  return NextResponse.json({
+    ...affiliate,
+    dashboardUrl: `${BASE}/affilie/${affiliate.slug}?token=${generateAffiliateToken(affiliate.slug)}`,
+  });
 }
 
 export async function DELETE(req: NextRequest) {
