@@ -50,7 +50,10 @@ export default async function NathaAdminPage() {
     prisma.pageView.count({ where: { path: '/' } }),
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 8 }),
     prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { email: true, name: true, tier: true, createdAt: true } }),
-    prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }),
+    prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }).then(async (aff) => {
+      const clicks = await Promise.all(aff.map(a => prisma.pageView.count({ where: { path: `/__aff/${a.slug}` } })));
+      return aff.map((a, i) => ({ ...a, clicks: clicks[i] }));
+    }),
     prisma.quizResult.findMany({ select: { quizSlug: true, paid: true } }),
     prisma.affiliateConversion.findMany({ select: { amountCents: true, createdAt: true } }),
   ]);
@@ -242,7 +245,17 @@ export default async function NathaAdminPage() {
                     <p style={{ color: C.text, fontWeight: 700, fontSize: 15, margin: 0 }}>{a.name}</p>
                     <p style={{ color: C.muted, fontSize: 12, margin: '3px 0 0', fontFamily: 'monospace' }}>?ref={a.slug}</p>
                   </div>
-                  <div style={{ display: 'flex', gap: 24 }}>
+                  <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ ...label, marginBottom: 2 }}>Clics</p>
+                      <p style={{ color: C.blue, fontWeight: 900, fontSize: 20, margin: 0 }}>{a.clicks}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ ...label, marginBottom: 2 }}>Tx conv.</p>
+                      <p style={{ color: C.purple, fontWeight: 900, fontSize: 20, margin: 0 }}>
+                        {a.clicks > 0 ? `${((a.conversions.length / a.clicks) * 100).toFixed(1)}%` : '—'}
+                      </p>
+                    </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ ...label, marginBottom: 2 }}>Ventes</p>
                       <p style={{ color: C.text, fontWeight: 900, fontSize: 20, margin: 0 }}>{a.conversions.length}</p>
