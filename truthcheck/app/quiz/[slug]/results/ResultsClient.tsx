@@ -701,7 +701,7 @@ export default function ResultsClient({ quiz }: Props) {
                       strokeLinecap="round" transform="rotate(-90 90 90)"
                       style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
                     />
-                    <text x="90" y="98" textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="42" fontWeight="900">??</text>
+                    <text x="90" y="98" textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="32" fontWeight="900">{partialScore}</text>
                   </svg>
                 </div>
                 {/* Lock icon overlay */}
@@ -775,11 +775,11 @@ export default function ResultsClient({ quiz }: Props) {
                   <span className="text-xs text-zinc-500">{pw.social}</span>
                 </div>
 
-                {/* CTA */}
+                {/* Hero CTA — 1,99€ one-time (lowest friction, most likely to convert) */}
                 <button
-                  onClick={handlePayClick}
+                  onClick={handleOneTimeClick}
                   disabled={isCheckingOut}
-                  className="w-full py-4 rounded-xl font-black text-white text-base mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
+                  className="w-full py-4 rounded-xl font-black text-white text-base mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
                   style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
                 >
                   {isCheckingOut ? (
@@ -791,24 +791,28 @@ export default function ResultsClient({ quiz }: Props) {
                       Redirection…
                     </span>
                   ) : (
-                    'Voir mon score complet — 9,99€/mois ✦'
+                    'Voir mon analyse complète — 1,99€ ✦'
                   )}
                 </button>
+                <p className="text-center text-[11px] text-zinc-500 mb-5">
+                  Paiement unique · Accès immédiat · Pas d&apos;abonnement
+                </p>
 
-                {/* Benefit bullets */}
-                <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-4 px-1">
-                  {[
-                    'Score exact révélé',
-                    '10 révélations IA',
-                    'Accès à tous les quiz',
-                    'Annulable à tout moment',
-                  ].map(b => (
-                    <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                      <span className="text-emerald-400 text-[10px]">✓</span>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
+                {/* Divider — subscriptions are secondary */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-px bg-white/8" />
+                  <span className="text-[10px] text-zinc-600 uppercase tracking-widest whitespace-nowrap">Pour les passionnés</span>
+                  <div className="flex-1 h-px bg-white/8" />
+                </div>
+
+                {/* Monthly sub — secondary choice */}
+                <button
+                  onClick={handlePayClick}
+                  disabled={isCheckingOut}
+                  className="w-full py-3 rounded-xl font-semibold text-zinc-300 text-sm border border-white/12 bg-white/[0.05] hover:bg-white/10 transition-all active:scale-[0.98] mb-2 disabled:opacity-60"
+                >
+                  Accès illimité — 9,99€/mois <span className="text-[11px] text-zinc-500">(15 quiz, annulable)</span>
+                </button>
 
                 {/* Annual option */}
                 <button
@@ -825,24 +829,13 @@ export default function ResultsClient({ quiz }: Props) {
                     })();
                   }}
                   disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-semibold text-violet-300 text-sm border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 hover:text-white transition-all active:scale-[0.98] mb-2 disabled:opacity-60"
+                  className="w-full py-2.5 rounded-xl font-semibold text-zinc-500 text-sm border border-white/8 bg-transparent hover:bg-white/5 transition-all active:scale-[0.98] mb-4 disabled:opacity-60"
                 >
-                  Accès annuel — 29,99€/an <span className="text-xs opacity-60">(2,50€/mois)</span>
+                  Annuel — 29,99€/an <span className="text-[11px] opacity-70">(2,50€/mois — −75%)</span>
                 </button>
 
-                {/* One-time option — prominent low-friction entry */}
-                <button
-                  onClick={handleOneTimeClick}
-                  disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] mb-3 disabled:opacity-60 relative overflow-hidden"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.18)', color: '#e4e4e7' }}
-                >
-                  <span className="block text-sm font-black text-white">Juste ce résultat — 1,99€</span>
-                  <span className="block text-[11px] text-zinc-500 mt-0.5">Paiement unique · Pas d&apos;abonnement</span>
-                </button>
-
-                <p className="text-center text-[11px] text-zinc-600">
-                  Abonnement annulable à tout moment · Paiement 100% sécurisé
+                <p className="text-center text-[11px] text-zinc-700">
+                  Paiement 100% sécurisé · Annulable à tout moment
                 </p>
               </div>
 

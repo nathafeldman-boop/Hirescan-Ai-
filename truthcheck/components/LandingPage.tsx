@@ -236,6 +236,75 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Truth quizzes — high-intent entry points */}
+      <section className="py-20 px-6 bg-white border-t border-gray-100">
+        <div className="max-w-lg mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: '#7c3aed' }}>
+            Quiz vérité
+          </p>
+          <h2 className="text-3xl font-black text-gray-900 text-center mb-2 tracking-tight">
+            Les vérités que tu n&apos;osais pas chercher
+          </h2>
+          <p className="text-gray-500 text-center text-sm mb-8 max-w-xs mx-auto leading-relaxed">
+            Des questions difficiles. Des réponses précises. Anonyme, instantané.
+          </p>
+          <div className="space-y-3">
+            {[
+              {
+                href: '/quiz/infidelite',
+                emoji: '💔',
+                q: 'Mon/ma partenaire me trompe ?',
+                sub: '8 comportements analysés · Résultat en 2 min',
+              },
+              {
+                href: '/quiz/amoureux',
+                emoji: '❤️',
+                q: 'Suis-je vraiment amoureux(se) ?',
+                sub: 'Amour ou attachement ? L\'IA dit la vérité',
+              },
+              {
+                href: '/quiz/vrais-amis',
+                emoji: '🫂',
+                q: 'Sont-ils mes vrais amis ?',
+                sub: 'Identifie les dynamiques toxiques dans tes amitiés',
+              },
+              {
+                href: '/quiz/manipule',
+                emoji: '🎭',
+                q: 'Suis-je manipulé(e) ?',
+                sub: 'Reconnaître le gaslighting et les comportements de contrôle',
+              },
+            ].map((q) => (
+              <Link
+                key={q.href}
+                href={q.href}
+                className="flex items-center gap-4 p-4 rounded-2xl border border-gray-200 hover:border-violet-300 hover:bg-violet-50/30 transition-all group"
+              >
+                <span className="text-3xl flex-shrink-0">{q.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-900 group-hover:text-violet-700 transition-colors text-sm leading-snug">
+                    {q.q}
+                  </p>
+                  <p className="text-gray-400 text-xs mt-0.5">{q.sub}</p>
+                </div>
+                <svg
+                  className="w-4 h-4 text-gray-300 group-hover:text-violet-500 flex-shrink-0 transition-colors"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ))}
+          </div>
+          <Link
+            href="/quizzes"
+            className="block text-center mt-6 text-sm text-gray-400 hover:text-violet-600 transition-colors"
+          >
+            Voir les 15 quiz vérité →
+          </Link>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-gray-100 bg-white">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
