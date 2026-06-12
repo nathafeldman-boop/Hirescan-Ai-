@@ -183,14 +183,24 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   );
 }
 
-// ─── Result teaser (logged-in free users) ───────────────────────────────────────
+// ─── Result teaser (free users — logged in or not) ─────────────────────────────
 
 function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: string; userEmail?: string | null }) {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
+  const [showAuthInline, setShowAuthInline] = useState(false);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authSent, setAuthSent] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
 
-  const doCheckout = useCallback(async (type: 'onetime' | 'annual' | 'monthly') => {
+  const callbackUrl = `/quiz/personnalite?pending=${typeCode}`;
+
+  const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
+    if (!userEmail) {
+      setShowAuthInline(true);
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch('/api/checkout', {
@@ -200,9 +210,9 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
           origin: window.location.origin,
           quizSlug: 'personnalite',
           typeCode,
-          userEmail: userEmail ?? undefined,
-          ...(type === 'annual' ? { annual: true } : {}),
-          ...(type === 'onetime' ? { oneTime: true } : {}),
+          userEmail,
+          ...(checkoutType === 'annual' ? { annual: true } : {}),
+          ...(checkoutType === 'onetime' ? { oneTime: true } : {}),
         }),
       });
       const data = await res.json() as { url?: string; error?: string };
@@ -213,6 +223,102 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
       setLoading(false);
     }
   }, [typeCode, userEmail]);
+
+  if (showAuthInline) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-7 h-7">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-black text-gray-900 mb-2">
+              {isFr ? 'Dernière étape' : 'Last step'}
+            </h1>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              {isFr
+                ? 'Entre ton email pour recevoir ton lien d\'accès. Ton type est gardé — pas besoin de refaire le test.'
+                : 'Enter your email to get your access link. Your type is saved — no need to redo the quiz.'}
+            </p>
+          </div>
+          <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
+            {authSent ? (
+              <div className="text-center py-2">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                  </svg>
+                </div>
+                <h3 className="text-gray-900 font-bold text-lg mb-1">
+                  {isFr ? 'Vérifie tes emails !' : 'Check your inbox!'}
+                </h3>
+                <p className="text-gray-500 text-sm mb-1">
+                  {isFr ? 'Lien envoyé à' : 'Link sent to'}{' '}
+                  <span className="text-violet-600 font-medium">{authEmail}</span>
+                </p>
+                <p className="text-gray-400 text-xs mt-3">
+                  {isFr
+                    ? 'Clique sur le lien → tu arrives directement sur la page de paiement.'
+                    : 'Click the link → you land directly on the payment page.'}
+                </p>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => signIn('google', { callbackUrl })}
+                  className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4 border border-gray-200"
+                >
+                  <GoogleIcon />
+                  {isFr ? 'Continuer avec Google' : 'Continue with Google'}
+                </button>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-px bg-gray-200" />
+                  <span className="text-gray-400 text-xs">{isFr ? 'ou par email' : 'or by email'}</span>
+                  <div className="flex-1 h-px bg-gray-200" />
+                </div>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!authEmail.trim()) return;
+                    setAuthLoading(true);
+                    await signIn('email', { email: authEmail, callbackUrl, redirect: false });
+                    setAuthSent(true);
+                    setAuthLoading(false);
+                  }}
+                  className="space-y-3"
+                >
+                  <input
+                    type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)}
+                    placeholder={isFr ? 'ton@email.com' : 'your@email.com'} required
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 transition-all"
+                  />
+                  <button
+                    type="submit" disabled={authLoading}
+                    className="w-full py-4 rounded-xl font-black text-white text-sm transition-all disabled:opacity-60 active:scale-[0.98]"
+                    style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)', boxShadow: '0 6px 24px rgba(124,58,237,0.3)' }}
+                  >
+                    {authLoading
+                      ? (isFr ? 'Envoi…' : 'Sending…')
+                      : (isFr ? 'Révéler mon type exact — 1,99 €' : 'Reveal my exact type — €1.99')}
+                  </button>
+                </form>
+                <p className="text-center text-[11px] text-gray-400 mt-3">
+                  {isFr ? 'Paiement 100% sécurisé · Stripe · Sans abonnement' : '100% secure · Stripe · No subscription'}
+                </p>
+              </>
+            )}
+          </div>
+          {!authSent && (
+            <button onClick={() => setShowAuthInline(false)} className="mt-4 w-full text-center text-xs text-gray-400 hover:text-gray-600 transition-colors">
+              ← {isFr ? 'Retour' : 'Back'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
@@ -473,10 +579,16 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
 
 export default function PersonnaliteClient() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
   const { lang } = useLang();
-  const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>('quiz');
+  const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('pending')?.toUpperCase();
+      if (p && mbtiTypes[p]) return 'gate'; // loading state until session resolves
+    }
+    return 'quiz';
+  });
   const [answers, setAnswers] = useState<Answers>({});
   const [mbtiType, setMbtiType] = useState('');
   const [inAppWarning, setInAppWarning] = useState(false);
@@ -494,37 +606,59 @@ export default function PersonnaliteClient() {
 
   // After magic-link auth: restore type from URL (?pending=INFJ) or localStorage
   useEffect(() => {
-    if (!session?.user?.email) return;
+    if (sessionStatus === 'loading') return;
     const params = new URLSearchParams(window.location.search);
     const pending = params.get('pending')?.toUpperCase();
-    if (pending && mbtiTypes[pending]) {
-      window.history.replaceState(null, '', '/quiz/personnalite');
-      fetch('/api/user/save-mbti', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mbtiType: pending }),
-      }).catch(() => {});
-      setMbtiType(pending);
-      if (isPremium) { router.push(`/types/${pending.toLowerCase()}`); }
-      else { setPhase('result'); }
-      return;
-    }
-    try {
-      const saved = localStorage.getItem('_mbti_pending');
-      if (saved && mbtiTypes[saved]) {
-        localStorage.removeItem('_mbti_pending');
+
+    if (session?.user?.email) {
+      if (pending && mbtiTypes[pending]) {
+        window.history.replaceState(null, '', '/quiz/personnalite');
         fetch('/api/user/save-mbti', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mbtiType: saved }),
+          body: JSON.stringify({ mbtiType: pending }),
         }).catch(() => {});
-        setMbtiType(saved);
-        if (isPremium) { router.push(`/types/${saved.toLowerCase()}`); }
+        setMbtiType(pending);
+        if (isPremium) { router.push(`/types/${pending.toLowerCase()}`); }
         else { setPhase('result'); }
+        return;
       }
-    } catch {}
+      try {
+        const saved = localStorage.getItem('_mbti_pending');
+        if (saved && mbtiTypes[saved]) {
+          localStorage.removeItem('_mbti_pending');
+          fetch('/api/user/save-mbti', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mbtiType: saved }),
+          }).catch(() => {});
+          setMbtiType(saved);
+          if (isPremium) { router.push(`/types/${saved.toLowerCase()}`); }
+          else { setPhase('result'); }
+        }
+      } catch {}
+    } else {
+      // Not authenticated — if we were waiting for magic link, show paywall with type from URL/storage
+      if (pending && mbtiTypes[pending]) {
+        window.history.replaceState(null, '', '/quiz/personnalite');
+        setMbtiType(pending);
+        setPhase('result');
+      } else {
+        try {
+          const saved = localStorage.getItem('_mbti_pending');
+          if (saved && mbtiTypes[saved]) {
+            setMbtiType(saved);
+            setPhase('result');
+          } else if (phase === 'gate') {
+            setPhase('quiz');
+          }
+        } catch {
+          if (phase === 'gate') setPhase('quiz');
+        }
+      }
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user?.email]);
+  }, [session?.user?.email, sessionStatus]);
 
   const handleComplete = (ans: Answers) => {
     track('quiz_complete', { quiz: 'personnalite', content_name: 'Test MBTI' });
@@ -535,8 +669,8 @@ export default function PersonnaliteClient() {
   const handleAnalysisDone = useCallback(async () => {
     const type = computeMbtiType(answers);
     setMbtiType(type);
+    try { localStorage.setItem('_mbti_pending', type); } catch {}
     if (session?.user) {
-      // Save MBTI type to user profile (fire-and-forget)
       fetch('/api/user/save-mbti', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -544,13 +678,11 @@ export default function PersonnaliteClient() {
       }).catch(() => {});
       if (isPremium) {
         router.push(`/types/${type.toLowerCase()}`);
-      } else {
-        setPhase('result');
+        return;
       }
-    } else {
-      try { localStorage.setItem('_mbti_pending', type); } catch {}
-      setPhase('gate');
     }
+    // Everyone (logged in free OR anonymous) sees the paywall directly
+    setPhase('result');
   }, [answers, session, isPremium, router]);
 
   return (
@@ -572,7 +704,12 @@ export default function PersonnaliteClient() {
         <AnalysisScreen onDone={handleAnalysisDone} t={t} />
       )}
       {phase === 'gate' && (
-        <AuthGate typeCode={mbtiType} lang={lang} />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-10 h-10 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
+            <p className="text-gray-400 text-sm">Chargement de tes résultats…</p>
+          </div>
+        </div>
       )}
       {phase === 'result' && (
         <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} />
