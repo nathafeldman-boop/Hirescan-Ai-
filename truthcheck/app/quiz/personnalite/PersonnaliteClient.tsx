@@ -415,6 +415,27 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
             </>
           )}
         </div>
+
+        {/* Truth quiz upsell — shown only before email sent */}
+        {!sent && isFr && (
+          <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-3 text-center">
+              Inclus avec ton compte gratuit
+            </p>
+            <div className="space-y-2">
+              {[
+                { emoji: '💔', q: 'Mon/ma partenaire me trompe ?', href: '/quiz/infidelite' },
+                { emoji: '❤️', q: 'Suis-je vraiment amoureux(se) ?', href: '/quiz/amoureux' },
+                { emoji: '🫂', q: 'Sont-ils mes vrais amis ?', href: '/quiz/vrais-amis' },
+              ].map(({ emoji, q }) => (
+                <div key={q} className="flex items-center gap-2.5">
+                  <span className="text-base flex-shrink-0">{emoji}</span>
+                  <p className="text-gray-600 text-xs font-medium">{q}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

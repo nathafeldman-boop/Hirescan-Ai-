@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import AffilieClient from './AffilieClient';
-import { verifyAffiliateToken } from '@/lib/affiliateToken';
 
 export const metadata: Metadata = {
   title: 'Mon espace affilié — UrCecret',
@@ -11,16 +10,9 @@ export const metadata: Metadata = {
 
 interface Props {
   params: { slug: string };
-  searchParams: { token?: string };
 }
 
-export default async function AffiliePage({ params, searchParams }: Props) {
-  const token = searchParams.token ?? '';
-
-  if (!verifyAffiliateToken(params.slug, token)) {
-    return notFound();
-  }
-
+export default async function AffiliePage({ params }: Props) {
   const affiliate = await prisma.affiliate.findUnique({
     where: { slug: params.slug },
     include: { conversions: { orderBy: { createdAt: 'desc' } } },

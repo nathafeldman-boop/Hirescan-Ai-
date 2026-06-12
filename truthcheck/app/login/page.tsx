@@ -35,7 +35,7 @@ function LoginContent() {
             <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
             <span className="text-white">Cecret</span>
           </h1>
-          <p className="text-zinc-500 text-sm">Améliore ton rizz. Explore tes désirs.</p>
+          <p className="text-zinc-500 text-sm">Tes résultats t&apos;attendent.</p>
         </div>
 
         <div className="glass rounded-2xl p-6 border border-white/8">

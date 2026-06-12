@@ -14,6 +14,7 @@ type Affiliate = {
   name: string;
   email: string | null;
   commissionPct: number;
+  clicks: number;
   dashboardUrl?: string;
   conversions: Conversion[];
 };
@@ -57,7 +58,7 @@ export default function AffiliatesClient({ initial }: { initial: Affiliate[] }) 
     });
     const data = await res.json();
     if (res.ok) {
-      setAffiliates(prev => [{ ...data, conversions: [] }, ...prev]);
+      setAffiliates(prev => [{ ...data, clicks: 0, conversions: [] }, ...prev]);
       setName(''); setSlug(''); setEmail('');
       setMsg('✅ Affilié créé !');
     } else {
@@ -175,6 +176,22 @@ export default function AffiliatesClient({ initial }: { initial: Affiliate[] }) 
             </div>
 
             {/* Totals */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              {[
+                { label: 'Clics sur le lien', value: a.clicks.toLocaleString('fr-FR') },
+                {
+                  label: 'Taux de conversion',
+                  value: a.clicks > 0
+                    ? `${((a.conversions.length / a.clicks) * 100).toFixed(1)}%`
+                    : '—',
+                },
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-black/30 rounded-xl p-3 text-center">
+                  <div className="text-white font-black text-xl">{value}</div>
+                  <div className="text-zinc-500 text-xs mt-1">{label}</div>
+                </div>
+              ))}
+            </div>
             <div className="grid grid-cols-3 gap-3 mb-4">
               {[
                 { label: 'Ventes', value: a.conversions.length.toString() },

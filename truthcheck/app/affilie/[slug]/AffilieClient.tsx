@@ -103,7 +103,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
           </p>
         </div>
 
-        {/* Stats */}
+        {/* Stats — clics */}
         <div className="grid grid-cols-2 gap-3 mb-3">
           {[
             { label: 'Clics sur ton lien', value: clicks.toLocaleString('fr-FR'), color: '#60a5fa' },
@@ -121,6 +121,8 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
             </div>
           ))}
         </div>
+
+        {/* Stats — revenus */}
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Ventes', value: affiliate.conversions.length.toString(), color: '#a78bfa' },
