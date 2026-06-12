@@ -300,20 +300,6 @@ export default async function NathaAdminPage() {
           </div>
         )}
 
-        {/* ── SECTION 6 : Quiz les plus populaires ── */}
-        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Quiz les plus populaires</p>
-        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
-          {quizSorted.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun quiz complété pour l'instant.</p>}
-          {quizSorted.map(([slug, data], i) => (
-            <div key={slug} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < quizSorted.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-              <span style={{ color: C.muted, fontSize: 13, width: 20, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
-              <span style={{ flex: 1, color: C.text, fontSize: 14, fontWeight: 600, textTransform: 'capitalize' }}>{slug.replace(/-/g, ' ')}</span>
-              <span style={{ color: C.muted, fontSize: 13 }}>{data.total} fois</span>
-              <span style={{ color: C.green, fontSize: 13, fontWeight: 700, width: 60, textAlign: 'right' }}>{data.paid} payant{data.paid > 1 ? 's' : ''}</span>
-            </div>
-          ))}
-        </div>
-
         {/* ── SECTION 7 : Funnel drop-off MBTI ── */}
         <p style={{ color: C.pink, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Funnel MBTI — où les gens lâchent</p>
         <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
@@ -332,7 +318,7 @@ export default async function NathaAdminPage() {
             const maxN = steps[0].n || 1;
             return steps.map((s, i) => {
               const pctVal = s.n === 0 ? 0 : Math.round((s.n / maxN) * 100);
-              const dropVsNext = i < steps.length - 1 && steps[i + 1].n > 0
+              const dropVsNext = i < steps.length - 1 && s.n > 0 && steps[i + 1].n > 0
                 ? Math.round(((s.n - steps[i + 1].n) / s.n) * 100) : null;
               return (
                 <div key={s.label} style={{ padding: '10px 0', borderBottom: i < steps.length - 1 ? `1px solid ${C.border}` : 'none' }}>
