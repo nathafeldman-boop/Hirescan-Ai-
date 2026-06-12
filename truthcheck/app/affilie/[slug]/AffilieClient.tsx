@@ -60,7 +60,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   );
 }
 
-export default function AffilieClient({ affiliate }: { affiliate: Affiliate }) {
+export default function AffilieClient({ affiliate, clicks }: { affiliate: Affiliate; clicks: number }) {
   const affiliateLink = `https://urcecret.site/?ref=${affiliate.slug}`;
   const totalRevenue = affiliate.conversions.reduce((s, c) => s + c.amountCents, 0);
   const totalCommission = affiliate.conversions.reduce((s, c) => s + c.commissionCents, 0);
@@ -102,12 +102,31 @@ export default function AffilieClient({ affiliate }: { affiliate: Affiliate }) {
           </p>
         </div>
 
-        {/* Stats */}
+        {/* Stats — clics */}
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: 'Clics sur ton lien', value: clicks.toLocaleString('fr-FR'), color: '#60a5fa' },
+            {
+              label: 'Taux de conversion',
+              value: clicks > 0
+                ? `${((affiliate.conversions.length / clicks) * 100).toFixed(1)}%`
+                : '—',
+              color: '#f472b6',
+            },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="bg-white/5 border border-white/8 rounded-2xl p-4 text-center">
+              <div className="text-xl font-black mb-1" style={{ color }}>{value}</div>
+              <div className="text-zinc-500 text-xs">{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Stats — revenus */}
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Ventes', value: affiliate.conversions.length.toString(), color: '#a78bfa' },
             { label: 'CA généré', value: fmt(totalRevenue), color: '#f472b6' },
-            { label: `Ta commission`, value: fmt(totalCommission), color: '#34d399' },
+            { label: 'Ta commission', value: fmt(totalCommission), color: '#34d399' },
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-white/5 border border-white/8 rounded-2xl p-4 text-center">
               <div className="text-xl font-black mb-1" style={{ color }}>{value}</div>
