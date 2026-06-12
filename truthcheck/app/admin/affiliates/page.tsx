@@ -17,9 +17,15 @@ export default async function AdminAffiliatesPage() {
     orderBy: { createdAt: 'desc' },
   });
 
-  // Attach secure dashboard link for each affiliate
-  const affiliates = affiliatesRaw.map(a => ({
+  // Fetch click counts for all affiliates in parallel
+  const clickCounts = await Promise.all(
+    affiliatesRaw.map(a => prisma.pageView.count({ where: { path: `/__aff/${a.slug}` } }))
+  );
+
+  // Attach secure dashboard link and click counts for each affiliate
+  const affiliates = affiliatesRaw.map((a, i) => ({
     ...a,
+    clicks: clickCounts[i],
     dashboardUrl: `https://urcecret.site/affilie/${a.slug}?token=${generateAffiliateToken(a.slug)}`,
   }));
 
