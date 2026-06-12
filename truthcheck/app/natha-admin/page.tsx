@@ -17,13 +17,26 @@ function pct(a: number, b: number) {
   return ((a / b) * 100).toFixed(1) + '%';
 }
 
+const TZ = 'Europe/Paris';
+
+// Returns the UTC Date corresponding to midnight Paris time for a given date string "YYYY-MM-DD"
+function parisMidnight(dateStr: string): Date {
+  const utcMid = new Date(dateStr + 'T00:00:00Z');
+  // How many hours into the Paris day does UTC midnight fall? That's the Paris offset.
+  const parisHour = +new Intl.DateTimeFormat('en', { timeZone: TZ, hour: 'numeric', hour12: false }).format(utcMid);
+  return new Date(utcMid.getTime() - parisHour * 3_600_000);
+}
+
 export default async function NathaAdminPage() {
   const now = new Date();
-  const startOfToday   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const sevenDaysAgo   = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
-  const fourteenAgo    = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-  const startOfMonth   = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfYear    = new Date(now.getFullYear(), 0, 1);
+  const todayParis  = now.toLocaleDateString('en-CA', { timeZone: TZ }); // "2026-06-12"
+  const monthParis  = todayParis.slice(0, 7) + '-01';                    // "2026-06-01"
+
+  const startOfToday = parisMidnight(todayParis);
+  const startOfMonth = parisMidnight(monthParis);
+  const sevenDaysAgo = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
+  const fourteenAgo  = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const startOfYear  = new Date(now.getFullYear(), 0, 1);
 
   const [
     totalUsers, premiumUsers, newToday, newThisWeek, newLastWeek,
@@ -116,7 +129,7 @@ export default async function NathaAdminPage() {
             <span style={{ color: C.muted, fontWeight: 400, fontSize: 16, marginLeft: 12 }}>— tableau de bord</span>
           </h1>
           <p style={{ color: C.muted, fontSize: 13, margin: '6px 0 0' }}>
-            {now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à {now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            {now.toLocaleDateString('fr-FR', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long' })} à {now.toLocaleTimeString('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
 
