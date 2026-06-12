@@ -328,7 +328,7 @@ function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const callbackUrl = `/types/${typeCode.toLowerCase()}`;
+  const callbackUrl = `/quiz/personnalite?pending=${typeCode}`;
   const isFr = lang !== 'en';
 
   return (
@@ -479,9 +479,52 @@ export default function PersonnaliteClient() {
   const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>('quiz');
   const [answers, setAnswers] = useState<Answers>({});
   const [mbtiType, setMbtiType] = useState('');
+  const [inAppWarning, setInAppWarning] = useState(false);
 
   const questions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
   const t = ui[lang].quiz;
+
+  // Detect in-app browser (TikTok, Instagram, Snapchat…)
+  useEffect(() => {
+    const ua = navigator.userAgent || '';
+    if (/FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat/.test(ua)) {
+      setInAppWarning(true);
+    }
+  }, []);
+
+  // After magic-link auth: restore type from URL (?pending=INFJ) or localStorage
+  useEffect(() => {
+    if (!session?.user?.email) return;
+    const params = new URLSearchParams(window.location.search);
+    const pending = params.get('pending')?.toUpperCase();
+    if (pending && mbtiTypes[pending]) {
+      window.history.replaceState(null, '', '/quiz/personnalite');
+      fetch('/api/user/save-mbti', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mbtiType: pending }),
+      }).catch(() => {});
+      setMbtiType(pending);
+      if (isPremium) { router.push(`/types/${pending.toLowerCase()}`); }
+      else { setPhase('result'); }
+      return;
+    }
+    try {
+      const saved = localStorage.getItem('_mbti_pending');
+      if (saved && mbtiTypes[saved]) {
+        localStorage.removeItem('_mbti_pending');
+        fetch('/api/user/save-mbti', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mbtiType: saved }),
+        }).catch(() => {});
+        setMbtiType(saved);
+        if (isPremium) { router.push(`/types/${saved.toLowerCase()}`); }
+        else { setPhase('result'); }
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.email]);
 
   const handleComplete = (ans: Answers) => {
     track('quiz_complete', { quiz: 'personnalite', content_name: 'Test MBTI' });
@@ -505,12 +548,23 @@ export default function PersonnaliteClient() {
         setPhase('result');
       }
     } else {
+      try { localStorage.setItem('_mbti_pending', type); } catch {}
       setPhase('gate');
     }
   }, [answers, session, isPremium, router]);
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
+      {inAppWarning && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-400 px-4 py-3 shadow-md">
+          <div className="flex items-center justify-between max-w-xl mx-auto gap-3">
+            <p className="text-xs text-amber-950 font-bold leading-snug">
+              ⚠️ Pour éviter les bugs de connexion, ouvre ce lien dans <strong>Chrome</strong> ou <strong>Safari</strong> avant de commencer.
+            </p>
+            <button onClick={() => setInAppWarning(false)} className="text-amber-800 flex-shrink-0 text-lg font-bold leading-none">✕</button>
+          </div>
+        </div>
+      )}
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
