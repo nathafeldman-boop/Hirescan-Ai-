@@ -76,8 +76,15 @@ function QuizScreen({ onComplete, questions, t }: {
   const [answers, setAnswers] = useState<Answers>({});
   const [selected, setSelected] = useState<QuizAnswer | null>(null);
   const [animating, setAnimating] = useState(false);
+  const [milestoneMsg, setMilestoneMsg] = useState<{ emoji: string; title: string; sub: string } | null>(null);
   const trackedMilestones = useRef<Set<number>>(new Set());
   const currentRef = useRef(0);
+
+  const MILESTONE_MSGS: Record<number, { emoji: string; title: string; sub: string }> = {
+    25: { emoji: '🔥', title: 'Tu es dans le top 25 % !', sub: 'La plupart des gens s\'arrêtent avant toi. Continue — ton type se dessine.' },
+    50: { emoji: '⚡', title: 'Mi-chemin atteint !', sub: 'Ton profil commence à prendre forme. Plus que 50 questions pour le révéler.' },
+    75: { emoji: '🎯', title: 'Plus que 25 questions !', sub: 'Ton type se précise. Tu es à quelques secondes de découvrir qui tu es vraiment.' },
+  };
 
   useEffect(() => {
     track('quiz_start', { quiz: 'personnalite', content_name: 'Test MBTI' });
@@ -86,7 +93,7 @@ function QuizScreen({ onComplete, questions, t }: {
   // Keep ref in sync so visibilitychange always reads latest question
   useEffect(() => { currentRef.current = current; }, [current]);
 
-  // Track milestone questions for drop-off analysis
+  // Track milestones + show motivation banner
   useEffect(() => {
     const q = current + 1;
     if ([10, 25, 50, 75].includes(q) && !trackedMilestones.current.has(q)) {
@@ -96,7 +103,12 @@ function QuizScreen({ onComplete, questions, t }: {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: `/__quiz/q${q}` }),
       }).catch(() => {});
+      if (MILESTONE_MSGS[q]) {
+        setMilestoneMsg(MILESTONE_MSGS[q]);
+        setTimeout(() => setMilestoneMsg(null), 2800);
+      }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current]);
 
   // Track exact question when user leaves mid-quiz
@@ -139,6 +151,18 @@ function QuizScreen({ onComplete, questions, t }: {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-10">
+      {/* Milestone motivation banner */}
+      {milestoneMsg && (
+        <div
+          className="fixed inset-x-4 top-4 z-50 rounded-2xl p-4 text-center shadow-2xl"
+          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', animation: 'fadeInDown 0.3s ease' }}
+          onClick={() => setMilestoneMsg(null)}
+        >
+          <p className="text-2xl mb-1">{milestoneMsg.emoji}</p>
+          <p className="text-white font-black text-base leading-tight">{milestoneMsg.title}</p>
+          <p className="text-white/80 text-xs mt-1 leading-snug">{milestoneMsg.sub}</p>
+        </div>
+      )}
       <ProgressBar current={current + 1} total={questions.length} label={t.questionOf(current + 1, questions.length)} />
 
       <div className="mb-10 text-center">
