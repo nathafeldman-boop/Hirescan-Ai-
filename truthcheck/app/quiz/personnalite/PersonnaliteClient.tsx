@@ -190,7 +190,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
 
-  const doCheckout = useCallback(async (annual: boolean) => {
+  const doCheckout = useCallback(async (type: 'onetime' | 'annual' | 'monthly') => {
     setLoading(true);
     try {
       const res = await fetch('/api/checkout', {
@@ -201,7 +201,8 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
           quizSlug: 'personnalite',
           typeCode,
           userEmail: userEmail ?? undefined,
-          ...(annual ? { annual: true } : {}),
+          ...(type === 'annual' ? { annual: true } : {}),
+          ...(type === 'onetime' ? { oneTime: true } : {}),
         }),
       });
       const data = await res.json() as { url?: string; error?: string };
@@ -266,28 +267,55 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
 
         {/* Paywall */}
         <div className="space-y-2">
-          <button
-            onClick={() => doCheckout(true)}
-            disabled={loading}
-            className="w-full py-4 rounded-2xl font-black text-white text-sm relative overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 30px rgba(124,58,237,0.25)' }}>
-            <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-2 py-0.5 rounded-bl-xl">
-              −75%
+          {/* Hero — 1,99€ one-time */}
+          <div className="flex justify-center mb-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 border border-emerald-200 text-emerald-600 tracking-wide">
+              ⚡ {isFr ? 'Choix #1 — sans engagement' : 'Top choice — no commitment'}
             </span>
-            {loading
-              ? (isFr ? 'Chargement…' : 'Loading…')
-              : (isFr ? 'Révéler mon type — 29,99 €/an' : 'Reveal my type — €29.99/year')}
+          </div>
+          <button
+            onClick={() => doCheckout('onetime')}
+            disabled={loading}
+            className="w-full py-5 rounded-2xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 30px rgba(124,58,237,0.35)' }}>
+            {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? 'Révéler mon type exact — 1,99 €' : 'Reveal my exact type — €1.99')}
+          </button>
+          <p className="text-center text-[11px] text-emerald-600 font-semibold">
+            {isFr ? 'Paiement unique · Accès immédiat · Pas d\'abonnement' : 'One-time · Instant access · No subscription'}
+          </p>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 pt-1 pb-1">
+            <div className="flex-1 h-px bg-gray-100" />
+            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider whitespace-nowrap">
+              {isFr ? 'Pour les passionnés MBTI' : 'For MBTI enthusiasts'}
+            </span>
+            <div className="flex-1 h-px bg-gray-100" />
+          </div>
+
+          <button
+            onClick={() => doCheckout('annual')}
+            disabled={loading}
+            className="w-full py-3 rounded-2xl font-semibold text-gray-500 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4 relative overflow-hidden">
+            <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-2 py-0.5 rounded-bl-xl">−75%</span>
+            <span className="flex items-center justify-between pr-8">
+              <span>{isFr ? 'Accès illimité · 16 types · Quiz · Mode Duo' : 'Unlimited · 16 types · Quiz · Duo'}</span>
+              <span className="font-bold">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+            </span>
           </button>
           <button
-            onClick={() => doCheckout(false)}
+            onClick={() => doCheckout('monthly')}
             disabled={loading}
-            className="w-full py-3 rounded-2xl font-semibold text-gray-700 text-sm border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60">
-            {isFr ? 'Mensuel — 9,99 €/mois' : 'Monthly — €9.99/month'}
+            className="w-full py-3 rounded-2xl font-semibold text-gray-500 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4">
+            <span className="flex items-center justify-between">
+              <span>{isFr ? 'Mensuel · sans engagement' : 'Monthly · no commitment'}</span>
+              <span className="font-bold">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+            </span>
           </button>
         </div>
 
-        <p className="text-center text-[11px] text-gray-400 mt-4">
-          {isFr ? 'Accès illimité · 16 types MBTI · Quiz · Mode Duo' : 'Unlimited access · 16 MBTI types · Quiz · Duo mode'}
+        <p className="text-center text-[11px] text-gray-400 mt-3">
+          {isFr ? 'Paiement 100% sécurisé · Stripe' : '100% secure payment · Stripe'}
         </p>
       </div>
     </div>
