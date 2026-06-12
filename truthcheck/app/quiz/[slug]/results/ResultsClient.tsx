@@ -396,19 +396,19 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
             <div className="space-y-3">
               <button
-                onClick={() => { setShowExitModal(false); void doCheckout(); }}
-                disabled={isCheckingOut}
-                className="w-full py-4 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
-              >
-                Voir mon score — 9,99€/mois ✦
-              </button>
-              <button
                 onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
                 disabled={isCheckingOut}
-                className="w-full py-3 rounded-xl font-semibold text-zinc-200 text-sm bg-white/[0.06] hover:bg-white/10 border border-white/12 transition-all disabled:opacity-60"
+                className="w-full py-4 rounded-xl font-black text-white text-base transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
               >
-                Juste ce résultat — 1,99€ (paiement unique)
+                Voir mon résultat — 1,99€ ✦ (paiement unique)
+              </button>
+              <button
+                onClick={() => { setShowExitModal(false); void doCheckout(); }}
+                disabled={isCheckingOut}
+                className="w-full py-2.5 rounded-xl font-medium text-zinc-500 text-xs border border-white/6 bg-white/[0.03] hover:bg-white/5 hover:text-zinc-400 transition-all disabled:opacity-60"
+              >
+                Accès illimité — 9,99€/mois (pour les passionnés MBTI)
               </button>
               <button
                 onClick={() => setShowExitModal(false)}
@@ -523,15 +523,27 @@ export default function ResultsClient({ quiz }: Props) {
             Retour
           </Link>
           <span className="text-sm font-medium text-zinc-300">{quiz.emoji} Résultats</span>
-          <Link
-            href="/quizzes"
-            className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            Accueil
-          </Link>
+          {session?.user ? (
+            <Link
+              href="/dashboard"
+              className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Mon profil
+            </Link>
+          ) : (
+            <Link
+              href="/quizzes"
+              className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Accueil
+            </Link>
+          )}
         </div>
       </header>
 
@@ -668,7 +680,7 @@ export default function ResultsClient({ quiz }: Props) {
               </div>
 
               {/* Full analysis */}
-              <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 mb-6">
+              <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 mb-4">
                 <p className="text-zinc-200 font-semibold text-sm mb-4">{tier.message}</p>
                 <div className="space-y-3">
                   {analysis.map((line, i) => (
@@ -676,6 +688,24 @@ export default function ResultsClient({ quiz }: Props) {
                   ))}
                 </div>
               </div>
+
+              {/* Dashboard CTA — premium users */}
+              <Link
+                href="/dashboard"
+                className="flex items-center justify-between w-full px-5 py-4 rounded-2xl mb-6 transition-all hover:opacity-90 active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(236,72,153,0.14))', border: '1px solid rgba(139,92,246,0.3)' }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">👤</span>
+                  <div>
+                    <p className="text-white font-black text-sm leading-tight">Mon profil UrCecret</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Historique · type MBTI · compatibilités</p>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </>
           ) : (
             /* ── FREE: paywall ── */
@@ -779,14 +809,14 @@ export default function ResultsClient({ quiz }: Props) {
                 {/* CTA — 1,99€ one-time: primary hero */}
                 <div className="flex justify-center mb-2">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 tracking-wide">
-                    ⭐ Le plus populaire pour découvrir son résultat
+                    ⚡ Choix #1 — rapide, sans engagement
                   </span>
                 </div>
                 <button
                   onClick={handleOneTimeClick}
                   disabled={isCheckingOut}
-                  className="w-full py-4 rounded-xl font-black text-white text-base mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
-                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
+                  className="w-full py-5 rounded-2xl font-black text-white text-lg mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 6px 32px rgba(139,92,246,0.55)' }}
                 >
                   {isCheckingOut ? (
                     <span className="flex items-center justify-center gap-2">
@@ -797,12 +827,12 @@ export default function ResultsClient({ quiz }: Props) {
                       Redirection…
                     </span>
                   ) : (
-                    'Juste ce résultat — 1,99€ ✦'
+                    <>Voir mon résultat maintenant — <strong>1,99€</strong> ✦</>
                   )}
                 </button>
 
                 {/* Benefit bullets — one-time focused */}
-                <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-4 px-1">
+                <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-5 px-1">
                   {[
                     'Score exact révélé',
                     '10 révélations IA',
@@ -816,13 +846,23 @@ export default function ResultsClient({ quiz }: Props) {
                   ))}
                 </ul>
 
-                {/* Monthly sub — secondary */}
+                {/* Divider — for power users */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-1 h-px bg-white/5" />
+                  <span className="text-[10px] text-zinc-600 font-semibold tracking-wider uppercase whitespace-nowrap">Pour ceux qui s'y connaissent en MBTI</span>
+                  <div className="flex-1 h-px bg-white/5" />
+                </div>
+
+                {/* Monthly sub — for power users */}
                 <button
                   onClick={handlePayClick}
                   disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-semibold text-violet-300 text-sm border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 hover:text-white transition-all active:scale-[0.98] mb-2 disabled:opacity-60"
+                  className="w-full py-2.5 rounded-xl font-medium text-zinc-600 text-xs border border-white/6 bg-white/[0.02] hover:bg-white/5 hover:text-zinc-400 transition-all active:scale-[0.98] mb-2 disabled:opacity-60 text-left px-4"
                 >
-                  Tout débloquer — 9,99€/mois <span className="text-xs opacity-60">(tous les quiz)</span>
+                  <span className="flex items-center justify-between">
+                    <span>Accès illimité · 15 quiz · analyses croisées</span>
+                    <span className="font-bold text-zinc-500">9,99€/mois</span>
+                  </span>
                 </button>
 
                 {/* Annual option */}
@@ -840,9 +880,12 @@ export default function ResultsClient({ quiz }: Props) {
                     })();
                   }}
                   disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-semibold text-violet-300 text-sm border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 hover:text-white transition-all active:scale-[0.98] mb-3 disabled:opacity-60"
+                  className="w-full py-2.5 rounded-xl font-medium text-zinc-600 text-xs border border-white/6 bg-white/[0.02] hover:bg-white/5 hover:text-zinc-400 transition-all active:scale-[0.98] mb-4 disabled:opacity-60 text-left px-4"
                 >
-                  Accès annuel — 29,99€/an <span className="text-xs opacity-60">(2,50€/mois)</span>
+                  <span className="flex items-center justify-between">
+                    <span>Accès annuel · meilleur rapport qualité/prix</span>
+                    <span className="font-bold text-zinc-500">29,99€/an</span>
+                  </span>
                 </button>
 
                 <p className="text-center text-[11px] text-zinc-600">
