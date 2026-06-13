@@ -451,35 +451,45 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           </p>
         </div>
 
-        {/* Locked type card */}
+        {/* Locked type card — shows real type data to create FOMO */}
         <div
           className="rounded-2xl p-5 mb-4 relative overflow-hidden"
           style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
         >
-          <div className="space-y-3 select-none" aria-hidden>
+          <div className="space-y-3">
+            {/* Type identity — emoji + code + name */}
             <div className="flex items-center gap-3">
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-black"
-                style={{ background: 'rgba(109,40,217,0.1)', color: '#7c3aed' }}
+                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                style={{ background: 'rgba(109,40,217,0.08)' }}
               >
-                {typeCode.slice(0, 2)}
+                {type?.emoji ?? typeCode.slice(0, 2)}
               </div>
               <div>
                 <div className="text-sm font-black text-stone-900 tracking-widest">
                   {typeCode.slice(0, 2)}<span className="blur-sm opacity-30">??</span>
                 </div>
-                <div className="h-2.5 w-20 bg-stone-200 rounded-full mt-1 blur-sm" />
+                {type?.name && (
+                  <div className="text-xs font-semibold text-stone-500 mt-0.5">{type.name}</div>
+                )}
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="h-3 bg-stone-100 rounded-full blur-sm" />
-              <div className="h-3 bg-stone-100 rounded-full w-5/6 blur-sm" />
-              <div className="h-3 bg-stone-100 rounded-full w-4/6 blur-sm" />
-            </div>
+            {/* Tagline visible + shortDesc: first sentence clear, rest blurred */}
+            {type && (
+              <div className="select-none">
+                <p className="text-[10px] italic text-stone-400 mb-1 leading-relaxed">{type.tagline}</p>
+                <p className="text-[11px] text-stone-700 leading-relaxed">
+                  {type.shortDesc.split('.')[0]}.
+                  <span className="blur-[3px] opacity-40 pointer-events-none">
+                    {' '}{type.shortDesc.split('.').slice(1, 3).join('. ').trim()}.
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
           <div
             className="absolute inset-0 flex items-end justify-center pb-4 rounded-2xl"
-            style={{ background: 'linear-gradient(to top, rgba(250,249,247,0.97) 0%, rgba(250,249,247,0.55) 50%, transparent 100%)' }}
+            style={{ background: 'linear-gradient(to top, rgba(250,249,247,0.98) 0%, rgba(250,249,247,0.65) 40%, transparent 100%)' }}
           >
             <div className="text-center">
               <div className="mb-1 flex justify-center" style={{ color: '#7c3aed' }}><LockIcon /></div>
@@ -490,7 +500,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           </div>
         </div>
 
-        {/* What's inside */}
+        {/* What's inside — personalized per type */}
         <div
           className="rounded-xl px-4 py-3 mb-4"
           style={{ background: 'rgba(109,40,217,0.05)', border: '1px solid rgba(109,40,217,0.15)' }}
@@ -498,23 +508,45 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5" style={{ color: '#7c3aed' }}>
             {isFr ? '🎁 Ce que tu débloques' : '🎁 What you unlock'}
           </p>
-          <ul className="space-y-1.5">
-            {(isFr ? [
-              { icon: '🧠', text: 'Tes 4 fonctions cognitives détaillées' },
-              { icon: '❤️', text: 'Profil amoureux et compatibilité' },
-              { icon: '⚡', text: 'Forces, faiblesses, axes de croissance' },
-              { icon: '🌟', text: 'Célébrités qui partagent ton type' },
-            ] : [
-              { icon: '🧠', text: 'Your 4 cognitive functions in detail' },
-              { icon: '❤️', text: 'Love profile and compatibility' },
-              { icon: '⚡', text: 'Strengths, weaknesses, growth areas' },
-              { icon: '🌟', text: 'Famous people of your type' },
-            ]).map(item => (
-              <li key={item.text} className="flex items-center gap-2 text-xs text-stone-700">
-                <span className="flex-shrink-0 text-base leading-none">{item.icon}</span>
-                {item.text}
-              </li>
-            ))}
+          <ul className="space-y-2">
+            {/* First strength visible, rest blurred */}
+            <li className="flex items-start gap-2 text-xs text-stone-700">
+              <span className="flex-shrink-0 text-base leading-none mt-0.5">⚡</span>
+              <span>
+                {isFr ? 'Tes forces : ' : 'Your strengths: '}
+                <span className="font-semibold text-stone-800">{type?.strengths?.[0]}</span>
+                <span className="blur-[3px] opacity-40 select-none pointer-events-none">
+                  {`, ${type?.strengths?.[1]}, ${type?.strengths?.[2]}...`}
+                </span>
+              </span>
+            </li>
+            {/* First compatible type visible, others blurred */}
+            <li className="flex items-start gap-2 text-xs text-stone-700">
+              <span className="flex-shrink-0 text-base leading-none mt-0.5">❤️</span>
+              <span>
+                {isFr ? 'Compatible avec : ' : 'Compatible with: '}
+                <span className="font-semibold text-stone-800">{type?.compatibleWith?.[0]}</span>
+                <span className="blur-[3px] opacity-40 select-none pointer-events-none">
+                  {`, ${type?.compatibleWith?.[1]}, ${type?.compatibleWith?.[2]}, ${type?.compatibleWith?.[3]}`}
+                </span>
+              </span>
+            </li>
+            {/* First celebrity visible, others blurred */}
+            <li className="flex items-start gap-2 text-xs text-stone-700">
+              <span className="flex-shrink-0 text-base leading-none mt-0.5">🌟</span>
+              <span>
+                {isFr ? 'Comme eux : ' : 'Famous examples: '}
+                <span className="font-semibold text-stone-800">{type?.famousExamples?.[0]}</span>
+                <span className="blur-[3px] opacity-40 select-none pointer-events-none">
+                  {`, ${type?.famousExamples?.[1]}, ${type?.famousExamples?.[2]}...`}
+                </span>
+              </span>
+            </li>
+            {/* Generic last item */}
+            <li className="flex items-start gap-2 text-xs text-stone-700">
+              <span className="flex-shrink-0 text-base leading-none mt-0.5">🧠</span>
+              <span>{isFr ? 'Analyse amour, travail, axes de croissance' : 'Love, career & growth full analysis'}</span>
+            </li>
           </ul>
         </div>
 
