@@ -182,7 +182,7 @@ export async function GET(req: NextRequest) {
 
           {/* Footer */}
           <div style={{ position: 'absolute', bottom: '28px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span style={{ fontSize: '16px', color: 'rgba(161,161,170,0.5)' }}>ursecret.vercel.app</span>
+            <span style={{ fontSize: '16px', color: 'rgba(161,161,170,0.5)' }}>urcecret.site</span>
             <span style={{ fontSize: '14px', color: 'rgba(161,161,170,0.35)' }}>·</span>
             <span style={{ fontSize: '14px', color: 'rgba(161,161,170,0.4)' }}>Tu ferais mieux ? →</span>
           </div>

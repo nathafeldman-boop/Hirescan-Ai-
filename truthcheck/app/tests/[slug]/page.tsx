@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://urcecret.site';
 
 interface GuideData {
   slug: string;

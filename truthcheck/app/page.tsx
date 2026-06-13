@@ -59,10 +59,43 @@ const landingSchema = {
   },
 };
 
+const homeFaqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'C\'est quoi le test MBTI ?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Le MBTI (Myers-Briggs Type Indicator) est un test de personnalité qui classe les individus en 16 types selon 4 dimensions : Extraversion/Introversion, Sensation/Intuition, Pensée/Sentiment, Jugement/Perception. Il a été développé par Isabel Briggs Myers et Katharine Cook Briggs.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Combien de types de personnalité MBTI y a-t-il ?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Il y a 16 types de personnalité MBTI : INTJ, INTP, ENTJ, ENTP, INFJ, INFP, ENFJ, ENFP, ISTJ, ISFJ, ESTJ, ESFJ, ISTP, ISFP, ESTP, ESFP. Chacun correspond à une combinaison unique de traits psychologiques.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Quel est le type MBTI le plus rare ?',
+      acceptedAnswer: { '@type': 'Answer', text: 'L\'INFJ est le type MBTI le plus rare, représentant environ 1 à 2% de la population mondiale. C\'est le type "L\'Avocat" — visionnaire, empathique et déterminé.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Le test MBTI est-il gratuit sur UrCecret ?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Oui, le test MBTI sur UrCecret est 100% gratuit, sans inscription et sans carte bancaire. Tu obtiens ton type de personnalité parmi les 16 profils instantanément après avoir répondu aux questions.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Combien de temps dure le test MBTI ?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Le test MBTI d\'UrCecret dure environ 10 à 15 minutes. Il comprend une série de questions sur tes préférences et comportements naturels pour déterminer ton type de personnalité parmi les 16 profils.' },
+    },
+  ],
+};
+
 export default function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(landingSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homeFaqSchema) }} />
       <LandingPage />
     </>
   );

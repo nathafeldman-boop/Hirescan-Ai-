@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Conditions Générales d\'Utilisation',
   description: 'Conditions Générales d\'Utilisation d\'UrCecret. Règles d\'utilisation des quiz psychologiques et des abonnements premium.',
   robots: { index: true, follow: false },
-  alternates: { canonical: 'https://ursecret.vercel.app/cgu' },
+  alternates: { canonical: 'https://urcecret.site/cgu' },
 };
 
 export default function CGU() {

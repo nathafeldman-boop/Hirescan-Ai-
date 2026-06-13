@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Mentions Légales',
   description: 'Mentions légales d\'UrCecret conformément à la loi française LCEN du 21 juin 2004.',
   robots: { index: true, follow: false },
-  alternates: { canonical: 'https://ursecret.vercel.app/mentions-legales' },
+  alternates: { canonical: 'https://urcecret.site/mentions-legales' },
 };
 
 export default function MentionsLegales() {

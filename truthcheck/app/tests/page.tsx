@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-const BASE = 'https://ursecret.vercel.app';
+const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Tests Psychologiques Gratuits 2025 — UrCecret',

@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Politique de Confidentialité',
   description: 'Politique de confidentialité d\'UrCecret. Comment nous traitons tes données personnelles. Conformité RGPD.',
   robots: { index: true, follow: false },
-  alternates: { canonical: 'https://ursecret.vercel.app/politique-confidentialite' },
+  alternates: { canonical: 'https://urcecret.site/politique-confidentialite' },
 };
 
 export default function PolitiqueConfidentialite() {
