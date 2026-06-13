@@ -261,8 +261,10 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
 }
 
 // ─── In-app browser overlay ─────────────────────────────────────────────────────
+// Shown immediately when TikTok/Instagram in-app browser is detected.
+// Blocks the quiz entirely — Stripe does not work in these browsers.
 
-function InAppBrowserOverlay({ onDismiss }: { onDismiss: () => void }) {
+function InAppBrowserOverlay() {
   const [copied, setCopied] = useState(false);
 
   const openInChrome = () => {
@@ -289,33 +291,52 @@ function InAppBrowserOverlay({ onDismiss }: { onDismiss: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center" style={{ background: '#faf9f7' }}>
-      <div className="text-5xl mb-5">🌐</div>
-      <h2 className="text-2xl font-black text-stone-900 mb-3">
-        Ouvre dans Safari ou Chrome
+      {/* Icon */}
+      <div className="text-6xl mb-4">🌐</div>
+
+      <h2 className="text-2xl font-black text-stone-900 mb-2">
+        Ouvre dans ton navigateur
       </h2>
-      <p className="text-stone-500 text-sm mb-8 leading-relaxed max-w-xs">
-        Le navigateur TikTok peut bloquer le paiement sécurisé.<br />
-        <strong className="text-stone-700">Ton résultat est sauvegardé</strong> — il t&apos;attendra dans Safari.
+      <p className="text-stone-500 text-sm mb-7 leading-relaxed max-w-xs">
+        Le paiement sécurisé ne fonctionne pas dans le navigateur TikTok / Instagram.
+        Suis ces 2 étapes — ça prend 5 secondes :
       </p>
+
+      {/* Step-by-step visual guide */}
+      <div className="w-full max-w-xs mb-7 space-y-3 text-left">
+        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
+          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>1</span>
+          <p className="text-stone-700 text-sm leading-snug pt-0.5">
+            Appuie sur les <strong>⋯</strong> en haut à droite de l&apos;écran
+          </p>
+        </div>
+        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
+          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>2</span>
+          <p className="text-stone-700 text-sm leading-snug pt-0.5">
+            Appuie sur <strong>&quot;Ouvrir dans le navigateur&quot;</strong>
+          </p>
+        </div>
+      </div>
+
+      {/* Buttons */}
       <div className="w-full max-w-xs space-y-3">
         <button
           onClick={openInChrome}
-          className="w-full py-4 rounded-2xl font-black text-white text-base"
+          className="w-full py-4 rounded-2xl font-black text-white text-base transition-all hover:opacity-90 active:scale-[0.98]"
           style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>
-          🚀 Ouvrir dans Safari / Chrome
+          🚀 Ouvrir dans Chrome / Safari
         </button>
         <button
           onClick={copyLink}
-          className="w-full py-3 rounded-2xl font-semibold text-sm text-stone-700 transition-all"
+          className="w-full py-3 rounded-2xl font-semibold text-sm text-stone-700 transition-all hover:bg-stone-50"
           style={{ background: 'white', border: '2px solid #e7e5e0' }}>
-          {copied ? '✓ Lien copié — colle dans Safari !' : '📋 Copier le lien'}
+          {copied ? '✅ Lien copié — colle-le dans Safari !' : '📋 Copier le lien manuellement'}
         </button>
       </div>
-      <button
-        onClick={onDismiss}
-        className="mt-8 text-xs text-stone-300 hover:text-stone-500 transition-colors">
-        Continuer quand même
-      </button>
+
+      <p className="text-stone-400 text-xs mt-6 max-w-xs">
+        Tes réponses sont sauvegardées — ton profil t&apos;attendra dans le navigateur 🔒
+      </p>
     </div>
   );
 }
@@ -581,13 +602,31 @@ export default function PersonnaliteClient() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Detect in-app browser (TikTok, Instagram, Snapchat…)
+  // Detect in-app browser (TikTok, Instagram, Snapchat…) — block immediately
   useEffect(() => {
     const ua = navigator.userAgent || '';
     if (/FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat/.test(ua)) {
       setInAppWarning(true);
       diagLog('inapp_detected', { ua: ua.slice(0, 120) });
     }
+  }, []);
+
+  // Affiliate tracking — read ?ref= or ?utm_campaign= → set urs_ref cookie → Stripe picks it up
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref') ?? params.get('utm_campaign') ?? '';
+      const source = params.get('utm_source') ?? '';
+      if (ref) {
+        document.cookie = `urs_ref=${encodeURIComponent(ref)}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+        track('affiliate_click', { ref, source: source || 'unknown' });
+        diagLog('affiliate_click', { ref, source });
+      } else if (source) {
+        document.cookie = `urs_ref=${encodeURIComponent(source)}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+        track('affiliate_click', { ref: source, source });
+        diagLog('affiliate_click', { ref: source, source });
+      }
+    } catch {}
   }, []);
 
   // Restore type from URL (?pending=INFJ) after returning from auth, or from localStorage
@@ -686,10 +725,8 @@ export default function PersonnaliteClient() {
 
   return (
     <main className="min-h-screen text-stone-900" style={{ background: '#faf9f7' }}>
-      {/* InAppBrowserOverlay: shown when TikTok/Instagram browser detected + paywall reached */}
-      {inAppWarning && phase === 'result' && (
-        <InAppBrowserOverlay onDismiss={() => setInAppWarning(false)} />
-      )}
+      {/* InAppBrowserOverlay: shown immediately when in-app browser detected — blocks quiz + Stripe */}
+      {inAppWarning && <InAppBrowserOverlay />}
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
