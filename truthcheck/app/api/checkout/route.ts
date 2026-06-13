@@ -35,7 +35,9 @@ export async function POST(req: NextRequest) {
       ? `${baseUrl}/duo`
       : quizSlug && score !== undefined
         ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
-        : `${baseUrl}/quiz/personnalite`;
+        : typeCode
+          ? `${baseUrl}/quiz/personnalite?pending=${typeCode}`
+          : `${baseUrl}/quiz/personnalite`;
 
     // All non-duo checkouts funnel through /success so the page can
     // verify payment server-side and create the account from Stripe's email

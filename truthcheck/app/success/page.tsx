@@ -132,22 +132,8 @@ export default async function SuccessPage({
         )}
 
         <div className="space-y-3 max-w-sm mx-auto">
-          {/* Email CTA — open email app */}
-          {magicLinkSent && email && (
-            <a
-              href={`mailto:${email}`}
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              📬 Ouvrir mes emails →
-            </a>
-          )}
-
-          {/* Direct link if already logged in */}
-          {!magicLinkSent && typeCode && (
+          {/* Direct link to result — always shown when typeCode is available */}
+          {typeCode && (
             <Link
               href={`/types/${typeCode.toLowerCase()}`}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -157,7 +143,22 @@ export default async function SuccessPage({
             </Link>
           )}
 
-          {!magicLinkSent && resultId && (
+          {/* Email CTA — secondary when magic link was sent */}
+          {magicLinkSent && email && (
+            <a
+              href={`mailto:${email}`}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-stone-600 text-sm text-center transition-all hover:bg-stone-100"
+              style={{ background: 'white', border: '1px solid #e7e5e0' }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              📬 Recevoir par email aussi →
+            </a>
+          )}
+
+          {/* Direct link if no typeCode but resultId exists */}
+          {!typeCode && resultId && (
             <Link
               href={`/share/${resultId}`}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
