@@ -201,6 +201,20 @@ export default function LandingPage() {
             Gratuit · 12 minutes · Sans inscription
           </p>
 
+          {/* Teaser autres features */}
+          <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
+            <span className="text-stone-400 text-xs font-medium">Et aussi :</span>
+            <a href="/duo" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#7c3aed' }}>
+              💑 Test duo
+            </a>
+            <a href="/fusion" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#ec4899' }}>
+              ⚗️ Quiz de groupe
+            </a>
+            <a href="/quizzes" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#6b7280' }}>
+              🎯 15 quiz secrets
+            </a>
+          </div>
+
           {/* Stats */}
           <div className="flex items-center justify-center gap-12 mt-14 pt-10 border-t border-stone-200">
             {[
