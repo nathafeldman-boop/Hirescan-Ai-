@@ -131,68 +131,52 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative z-10 pt-28 pb-14 px-6 text-center">
+      <section className="relative z-10 pt-32 pb-16 px-6 text-center">
         <div className="max-w-xl mx-auto">
-
-          {/* Social proof nudge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6"
-            style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.15)', color: '#6d28d9' }}>
-            <span className="flex -space-x-1">
-              {['🟣','🔵','🟢'].map(c => <span key={c} className="text-[10px]">{c}</span>)}
-            </span>
-            <span>+14 000 tests passés cette semaine</span>
+          {/* Floating crystal balls */}
+          <div className="flex justify-center gap-3 mb-6 text-4xl">
+            <span className="animate-bounce" style={{ animationDelay: '0ms', animationDuration: '2s' }}>🔮</span>
+            <span className="animate-bounce" style={{ animationDelay: '200ms', animationDuration: '2s' }}>✨</span>
+            <span className="animate-bounce" style={{ animationDelay: '400ms', animationDuration: '2s' }}>🧠</span>
           </div>
 
-          <h1 className="text-5xl sm:text-[54px] font-black leading-[1.05] mb-4 tracking-tight text-stone-900">
-            Ce que tu crois savoir<br />
+          <div
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 tracking-wide"
+            style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)', color: '#7c3aed' }}
+          >
+            ✦ Test de personnalité — 100 questions
+          </div>
+
+          <h1 className="text-5xl sm:text-[56px] font-black leading-[1.05] mb-5 tracking-tight text-stone-900">
+            Test MBTI — quel est<br />
             <span style={{ background: 'linear-gradient(135deg,#7c3aed 0%,#ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              sur toi est faux.
+              ton type ?
             </span>
           </h1>
 
-          <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-3">
-            Le test MBTI révèle ton type de personnalité parmi 16 profils — et ce que tu n&apos;as jamais osé admettre sur toi-même.
-          </p>
-
-          <p className="text-stone-400 text-sm font-medium mb-8">
-            Gratuit · 12 minutes · Résultat immédiat
+          <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-9">
+            Parmi 16 profils psychologiques. Basé sur la théorie des types cognitifs de Myers-Briggs. Résultat complet en 12 minutes.
           </p>
 
           <Link
             href="/quiz/personnalite"
-            className="inline-flex items-center gap-2 px-9 py-4.5 rounded-2xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 10px 40px rgba(124,58,237,0.4)', padding: '16px 36px', borderRadius: '16px' }}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.35)' }}
           >
-            Révèle mon type →
+            Découvrir mon type →
           </Link>
-
-          {/* Trust micro-text */}
-          <p className="text-stone-400 text-xs mt-3">
-            Sans inscription · Résultat complet · Anonyme
+          <p className="text-stone-400 text-xs mt-4">
+            Gratuit · 12 minutes · Sans inscription
           </p>
-
-          {/* Curiosity hooks */}
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-            {[
-              { emoji: '🔮', title: 'Pourquoi certaines personnes t\'épuisent ?', sub: 'Ton type explique exactement pourquoi.' },
-              { emoji: '💔', title: 'Ce que tu répètes en amour sans le réaliser', sub: 'Un pattern précis, caché dans ton profil.' },
-              { emoji: '🚀', title: 'Ce dans quoi tu excelles vraiment', sub: 'Pas ce qu\'on t\'a appris — ce qui est câblé en toi.' },
-            ].map(h => (
-              <div key={h.title} className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #ede9fe', boxShadow: '0 2px 12px rgba(124,58,237,0.06)' }}>
-                <div className="text-2xl mb-2">{h.emoji}</div>
-                <p className="text-stone-900 text-xs font-bold leading-snug mb-1">{h.title}</p>
-                <p className="text-stone-400 text-[11px]">{h.sub}</p>
-              </div>
-            ))}
-          </div>
 
           {/* Features strip */}
           <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
+            <span className="text-stone-400 text-xs font-medium">Et aussi :</span>
             <a href="/duo" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#7c3aed' }}>
-              💑 Compatibilité
+              💑 Test duo
             </a>
             <a href="/fusion" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#ec4899' }}>
-              ⚗️ Mode Fusion
+              ⚗️ Quiz de groupe
             </a>
             <a href="/quizzes" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#6b7280' }}>
               🎯 15 quiz secrets
@@ -200,10 +184,10 @@ export default function LandingPage() {
           </div>
 
           {/* Stats */}
-          <div className="flex items-center justify-center gap-12 mt-12 pt-8 border-t border-stone-200">
+          <div className="flex items-center justify-center gap-12 mt-14 pt-10 border-t border-stone-200">
             {[
-              { value: '16', label: 'Profils psychologiques', emoji: '🌈' },
-              { value: '12 min', label: 'Pour tout révéler', emoji: '⚡' },
+              { value: '16', label: 'Profils distincts', emoji: '🌈' },
+              { value: '100', label: 'Questions calibrées', emoji: '🎯' },
               { value: '0 €', label: 'Pour commencer', emoji: '🎁' },
             ].map((s) => (
               <div key={s.label} className="text-center">
