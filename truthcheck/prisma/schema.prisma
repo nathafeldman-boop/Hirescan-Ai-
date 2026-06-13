@@ -141,6 +141,15 @@ model EmailLog {
   @@unique([userId, type])
 }
 
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
+}
+
 model FusionGroup {
   id          String   @id @default(cuid())
   code        String   @unique // 6-char alphanumeric e.g. "K7P2XQ"
