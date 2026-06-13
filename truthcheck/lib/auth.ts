@@ -116,6 +116,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
     error: '/login',
+    newUser: '/quiz/personnalite',
   },
   events: {
     async createUser({ user }) {
@@ -132,10 +133,18 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
-      if (url.startsWith(baseUrl)) return url;
-      // Si OAuth renvoie vers un domaine inattendu → quiz
-      return `${baseUrl}/quiz/personnalite`;
+      // Normalise to pathname
+      let path: string;
+      if (url.startsWith('/')) {
+        path = url;
+      } else if (url.startsWith(baseUrl)) {
+        path = url.slice(baseUrl.length) || '/';
+      } else {
+        return `${baseUrl}/quiz/personnalite`;
+      }
+      // Root path (landing page) or empty → always send to quiz, never strand the user there
+      if (path === '/' || path === '') return `${baseUrl}/quiz/personnalite`;
+      return `${baseUrl}${path}`;
     },
   },
 };
