@@ -11,6 +11,19 @@ import { track } from '@/lib/analytics';
 
 const TOTAL = mbtiQuestions.length;
 
+// ─── Diagnostic logger ──────────────────────────────────────────────────────────
+// Writes to browser console AND to the PageView DB so steps are visible in admin.
+// Path format: /__diag/<step> — queryable in the admin diagnostic section.
+function diagLog(step: string, meta: Record<string, unknown> = {}) {
+  // eslint-disable-next-line no-console
+  console.log(`%c[FUNNEL] ${step}`, 'color:#a78bfa;font-weight:bold', meta);
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: `/__diag/${step}` }),
+  }).catch(() => {});
+}
+
 type QuizAnswer = 'A' | 'B' | 'C' | 'D' | 'E';
 type Answers = Record<number, QuizAnswer>;
 type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
@@ -357,6 +370,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
   // Track paywall view once on mount
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
+    diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail, isInAppBrowser: !!isInAppBrowser });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
@@ -364,9 +379,11 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
       // Persist intent: sessionStorage (same browser) + state (encodes into callbackUrl for cross-browser)
       try { sessionStorage.setItem('_uc_intent', checkoutType); } catch {}
       setCheckoutIntent(checkoutType);
+      diagLog('checkout_no_email', { intent: checkoutType, callbackUrl: `/quiz/personnalite?pending=${typeCode}&intent=${checkoutType}` });
       setShowAuthInline(true);
       return;
     }
+    diagLog('checkout_with_email', { intent: checkoutType });
     track('checkout_click', {
       quiz: 'personnalite',
       value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
@@ -400,6 +417,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
     if (!userEmail) return;
     try {
       const intent = sessionStorage.getItem('_uc_intent') as 'onetime' | 'annual' | 'monthly' | null;
+      diagLog('auto_checkout_check', { hasIntent: !!intent, intent: intent ?? null });
       if (intent && ['onetime', 'annual', 'monthly'].includes(intent)) {
         sessionStorage.removeItem('_uc_intent');
         doCheckout(intent);
@@ -787,11 +805,21 @@ export default function PersonnaliteClient() {
   const questions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
   const t = ui[lang].quiz;
 
+  // Log initial phase and URL params on first render
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pending = params.get('pending')?.toUpperCase() ?? null;
+    const intent = params.get('intent') ?? null;
+    diagLog('page_load', { phase, hasPending: !!pending, pendingType: pending, urlIntent: intent });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Detect in-app browser (TikTok, Instagram, Snapchat…)
   useEffect(() => {
     const ua = navigator.userAgent || '';
     if (/FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat/.test(ua)) {
       setInAppWarning(true);
+      diagLog('inapp_detected', { ua: ua.slice(0, 120) });
     }
   }, []);
 
@@ -800,11 +828,19 @@ export default function PersonnaliteClient() {
     if (sessionStatus === 'loading') return;
     const params = new URLSearchParams(window.location.search);
     const pending = params.get('pending')?.toUpperCase();
+    const urlIntent = params.get('intent') as 'onetime' | 'annual' | 'monthly' | null;
+
+    diagLog('session_restore_fired', {
+      status: sessionStatus,
+      hasEmail: !!session?.user?.email,
+      pending: pending ?? null,
+      urlIntent: urlIntent ?? null,
+    });
 
     if (session?.user?.email) {
       if (pending && mbtiTypes[pending]) {
+        diagLog('pending_found_authed', { pending, urlIntent: urlIntent ?? null });
         // If intent was encoded in URL (cross-browser TikTok→Safari), restore it to sessionStorage
-        const urlIntent = params.get('intent') as 'onetime' | 'annual' | 'monthly' | null;
         if (urlIntent && ['onetime', 'annual', 'monthly'].includes(urlIntent)) {
           try { sessionStorage.setItem('_uc_intent', urlIntent); } catch {}
         }
@@ -822,6 +858,7 @@ export default function PersonnaliteClient() {
       try {
         const saved = localStorage.getItem('_mbti_pending');
         if (saved && mbtiTypes[saved]) {
+          diagLog('type_from_localstorage', { saved });
           localStorage.removeItem('_mbti_pending');
           fetch('/api/user/save-mbti', {
             method: 'POST',
@@ -836,6 +873,7 @@ export default function PersonnaliteClient() {
     } else {
       // Not authenticated — if we were waiting for magic link, show paywall with type from URL/storage
       if (pending && mbtiTypes[pending]) {
+        diagLog('pending_found_not_authed', { pending });
         window.history.replaceState(null, '', '/quiz/personnalite');
         setMbtiType(pending);
         setPhase('result');
@@ -843,6 +881,7 @@ export default function PersonnaliteClient() {
         try {
           const saved = localStorage.getItem('_mbti_pending');
           if (saved && mbtiTypes[saved]) {
+            diagLog('type_from_localstorage_not_authed', { saved });
             setMbtiType(saved);
             setPhase('result');
           } else if (phase === 'gate') {
@@ -864,6 +903,7 @@ export default function PersonnaliteClient() {
 
   const handleAnalysisDone = useCallback(async () => {
     const type = computeMbtiType(answers);
+    diagLog('analysis_done', { type, hasSession: !!session?.user, isPremium });
     setMbtiType(type);
     try { localStorage.setItem('_mbti_pending', type); } catch {}
     if (session?.user) {

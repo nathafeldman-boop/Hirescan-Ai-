@@ -83,6 +83,22 @@ export default async function NathaAdminPage() {
     prisma.pageView.count({ where: { path: '/__evt/checkout_click/personnalite' } }),
   ]);
 
+  // Diagnostic funnel steps (last 24h)
+  const diagSteps = [
+    'page_load', 'inapp_detected',
+    'session_restore_fired',
+    'pending_found_authed', 'pending_found_not_authed',
+    'type_from_localstorage', 'type_from_localstorage_not_authed',
+    'analysis_done',
+    'paywall_mounted',
+    'checkout_no_email', 'checkout_with_email',
+    'auto_checkout_check',
+  ];
+  const diagCounts = await Promise.all(
+    diagSteps.map(step => prisma.pageView.count({ where: { path: `/__diag/${step}`, createdAt: { gte: sevenDaysAgo } } }))
+  );
+  const diagData = diagSteps.map((step, i) => ({ step, count: diagCounts[i] }));
+
   const revenueToday = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
   const revenueWeek  = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
   const revenueMonth = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
@@ -353,7 +369,7 @@ export default async function NathaAdminPage() {
 
         {/* ── SECTION 8 : Derniers inscrits ── */}
         <p style={{ color: C.purple, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Derniers inscrits</p>
-        <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
           {recentUsers.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun inscrit pour l'instant.</p>}
           {recentUsers.map((u, i) => (
             <div key={u.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentUsers.length - 1 ? `1px solid ${C.border}` : 'none', flexWrap: 'wrap' }}>
@@ -376,6 +392,27 @@ export default async function NathaAdminPage() {
               </span>
             </div>
           ))}
+        </div>
+
+        {/* ── SECTION 9 : Diagnostic TikTok funnel (7 derniers jours) ── */}
+        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Diagnostic funnel TikTok — 7 derniers jours</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
+          {diagData.map((d, i) => (
+            <div key={d.step} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < diagData.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <span style={{ flex: 1, color: d.count > 0 ? C.text : C.muted, fontSize: 13, fontFamily: 'monospace' }}>
+                {'/__diag/' + d.step}
+              </span>
+              <span style={{
+                color: d.count > 0 ? C.orange : C.muted,
+                fontSize: 14, fontWeight: 700, minWidth: 32, textAlign: 'right',
+              }}>
+                {d.count}
+              </span>
+            </div>
+          ))}
+          <p style={{ color: C.muted, fontSize: 11, marginTop: 12, marginBottom: 0 }}>
+            Ces compteurs apparaissent dès qu'un utilisateur atteint l'étape correspondante. Zéro = l'étape n'a pas été atteinte.
+          </p>
         </div>
 
       </div>
