@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 import QuizListSection from './QuizListSection';
 
 const BASE = 'https://urcecret.site';
@@ -74,19 +73,24 @@ export default function QuizzesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="min-h-screen bg-[#09090b] flex flex-col">
-        <UrCecretAnimatedBg />
+      <main className="min-h-screen flex flex-col" style={{ background: '#faf9f7' }}>
+
+        {/* Subtle animated orbs */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.12] bg-violet-300" style={{ animation: 'pulse 7s ease-in-out infinite' }} />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-300/10 rounded-full blur-3xl" />
+        </div>
 
         {/* Header */}
-        <header className="relative z-10 border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0">
+        <header className="relative z-10 border-b border-stone-200 sticky top-0 backdrop-blur-md" style={{ background: 'rgba(250,249,247,0.9)' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(to right,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Ur
               </span>
-              <span className="text-white">Cecret</span>
+              <span className="text-stone-900">Cecret</span>
             </Link>
-            <span className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Choisis ton quiz</span>
+            <span className="text-xs text-stone-400 uppercase tracking-widest font-semibold">Choisis ton quiz</span>
           </div>
         </header>
 
@@ -95,13 +99,16 @@ export default function QuizzesPage() {
           <div className="w-full max-w-md">
 
             <div className="text-center mb-10">
-              <p className="text-xs text-zinc-500 uppercase tracking-[0.2em] font-semibold mb-3">
+              <div className="flex justify-center gap-2 text-3xl mb-4">
+                <span>🔍</span><span>✨</span><span>💫</span>
+              </div>
+              <p className="text-xs text-stone-400 uppercase tracking-[0.2em] font-semibold mb-3">
                 30 questions · Résultats instantanés
               </p>
-              <h1 className="text-3xl font-black text-white leading-tight">
-                Quelle vérité veux-tu
-                <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  {' '}découvrir ?
+              <h1 className="text-3xl font-black text-stone-900 leading-tight">
+                Quelle vérité veux-tu{' '}
+                <span style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  découvrir ?
                 </span>
               </h1>
             </div>
@@ -109,72 +116,66 @@ export default function QuizzesPage() {
             {/* Mode Équipe banner */}
             <Link
               href="/duo"
-              className="group relative rounded-2xl overflow-hidden mb-6 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
-              style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(236,72,153,0.15))', border: '1px solid rgba(139,92,246,0.35)' }}
+              className="group relative rounded-2xl overflow-hidden mb-4 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
+              style={{ background: 'white', border: '1px solid rgba(124,58,237,0.2)', boxShadow: '0 2px 12px rgba(124,58,237,0.08)' }}
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(139,92,246,0.2) 0%, transparent 70%)' }} />
               <div className="relative p-5 flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
-                  style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.4)' }}>
+                  style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)' }}>
                   🧩
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-white font-black text-base">Mode Équipe</span>
+                    <span className="text-stone-900 font-black text-base">Mode Équipe</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(236,72,153,0.25)', color: '#f472b6', border: '1px solid rgba(236,72,153,0.4)' }}>
+                      style={{ background: 'rgba(236,72,153,0.1)', color: '#ec4899', border: '1px solid rgba(236,72,153,0.2)' }}>
                       Nouveau
                     </span>
                   </div>
-                  <p className="text-zinc-400 text-xs leading-relaxed">
+                  <p className="text-stone-400 text-xs leading-relaxed">
                     Rejoint avec un code · Chacun répond seul · Comparez vos secrets
                   </p>
                 </div>
                 <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                  style={{ color: '#a78bfa' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  style={{ color: '#7c3aed' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-              <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.6), transparent)' }} />
             </Link>
 
             {/* Personnalité 16 types banner */}
             <Link
               href="/quiz/personnalite"
               className="group relative rounded-2xl overflow-hidden mb-6 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
-              style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(167,139,250,0.15))', border: '1px solid rgba(99,102,241,0.35)' }}
+              style={{ background: 'white', border: '1px solid rgba(124,58,237,0.2)', boxShadow: '0 2px 12px rgba(124,58,237,0.08)' }}
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.2) 0%, transparent 70%)' }} />
               <div className="relative p-5 flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
-                  style={{ background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)' }}>
+                  style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)' }}>
                   🧠
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-white font-black text-base">Test de Personnalité 16 Types</span>
+                    <span className="text-stone-900 font-black text-base">Test de Personnalité 16 Types</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(99,102,241,0.25)', color: '#a78bfa', border: '1px solid rgba(99,102,241,0.4)' }}>
+                      style={{ background: 'rgba(124,58,237,0.1)', color: '#7c3aed', border: '1px solid rgba(124,58,237,0.2)' }}>
                       Gratuit
                     </span>
                   </div>
-                  <p className="text-zinc-400 text-xs leading-relaxed">
-                    24 questions · INFJ, ENFP, INTJ et 13 autres · Résultat instantané
+                  <p className="text-stone-400 text-xs leading-relaxed">
+                    100 questions · INFJ, ENFP, INTJ et 13 autres · Résultat instantané
                   </p>
                 </div>
                 <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                  style={{ color: '#a78bfa' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  style={{ color: '#7c3aed' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-              <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.6), transparent)' }} />
             </Link>
 
             <QuizListSection />
 
-            <p className="text-center text-zinc-600 text-xs mt-10 tracking-wide">
+            <p className="text-center text-stone-400 text-xs mt-10 tracking-wide">
               🔒 100% anonyme · Zéro compte requis
             </p>
           </div>

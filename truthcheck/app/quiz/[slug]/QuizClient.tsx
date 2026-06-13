@@ -331,7 +331,7 @@ export default function QuizClient({ quiz }: Props) {
             >
               Question {currentIndex + 1}{greeting}
             </div>
-            <p className="text-xl sm:text-2xl font-semibold text-white leading-relaxed">
+            <p className="text-xl sm:text-2xl font-semibold leading-relaxed" style={{ color: '#1c1917' }}>
               {question.text}
             </p>
           </div>

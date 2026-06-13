@@ -11,8 +11,8 @@ export default function QuizListSection() {
         <Link
           key={quiz.slug}
           href={`/quiz/${quiz.slug}`}
-          className="group relative rounded-2xl border border-white/8 overflow-hidden transition-all duration-300 hover:border-white/20 hover:scale-[1.02] active:scale-[0.99]"
-          style={{ background: 'rgba(255,255,255,0.03)' }}
+          className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
+          style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
         >
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
@@ -28,8 +28,8 @@ export default function QuizListSection() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-base leading-snug mb-1">{quiz.title}</p>
-              <p className="text-zinc-500 text-xs leading-relaxed">{quiz.subtitle}</p>
+              <p className="text-stone-900 font-bold text-base leading-snug mb-1">{quiz.title}</p>
+              <p className="text-stone-400 text-xs leading-relaxed">{quiz.subtitle}</p>
             </div>
 
             <svg
