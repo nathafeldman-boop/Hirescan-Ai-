@@ -455,12 +455,12 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
                   />
                   <button
                     type="submit" disabled={authLoading}
-                    className="w-full py-4 rounded-xl font-black text-white text-sm transition-all disabled:opacity-60 active:scale-[0.98]"
-                    style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)', boxShadow: '0 6px 24px rgba(124,58,237,0.3)' }}
+                    className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all disabled:opacity-60 active:scale-[0.98]"
+                    style={{ background: '#111827' }}
                   >
                     {authLoading
                       ? (isFr ? 'Envoi…' : 'Sending…')
-                      : (isFr ? 'Révéler mon type exact — 1,99 €' : 'Reveal my exact type — €1.99')}
+                      : (isFr ? 'Accéder à mon type — 1,99 €' : 'Access my type — €1.99')}
                   </button>
                 </form>
                 <p className="text-center text-[11px] text-gray-400 mt-3">
@@ -483,24 +483,18 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          {/* Blurred mystery emoji */}
-          <div className="text-6xl mb-4 blur-sm select-none" aria-hidden>{type?.emoji ?? '✨'}</div>
-
-          {/* Rarity badge */}
-          <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4 bg-violet-50 border border-violet-200 text-violet-700">
-            {isFr ? `Seulement ${type?.rarity} de la population` : `Only ${type?.rarity} of the population`}
+          {/* Type code preview */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500 text-xs font-semibold mb-5 tracking-widest">
+            {typeCode.slice(0, 2)}<span className="blur-[3px] select-none">??</span>
           </div>
 
           <h1 className="text-2xl font-black text-gray-900 mb-3">
-            {isFr ? 'Tu es ' : 'You are '}
-            <span style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              {isFr ? 'rarissime' : 'extremely rare'}
-            </span>
+            {isFr ? 'Votre profil est identifié' : 'Your profile is identified'}
           </h1>
           <p className="text-gray-500 text-sm leading-relaxed">
             {isFr
-              ? `Moins de ${type?.rarity} des gens partagent ce profil. Débloque ton type et ton analyse complète.`
-              : `Fewer than ${type?.rarity} of people share this profile. Unlock your type and full analysis.`}
+              ? `Partagé par ${type?.rarity} de la population. Accédez à votre type complet et à l'analyse de vos 4 dimensions cognitives.`
+              : `Shared by ${type?.rarity} of the population. Access your full type and cognitive analysis.`}
           </p>
         </div>
 
@@ -536,31 +530,23 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
 
         {/* Paywall */}
         <div className="space-y-2">
-          {/* Countdown timer */}
-          <CountdownTimer isFr={isFr} />
-
           {/* Hero — 1,99€ one-time */}
-          <div className="flex justify-center mb-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 border border-emerald-200 text-emerald-600 tracking-wide">
-              ⚡ {isFr ? 'Choix #1 — sans engagement' : 'Top choice — no commitment'}
-            </span>
-          </div>
           <button
             onClick={() => doCheckout('onetime')}
             disabled={loading}
-            className="w-full py-5 rounded-2xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 30px rgba(124,58,237,0.35)' }}>
-            {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? 'Révéler mon type exact — 1,99 €' : 'Reveal my exact type — €1.99')}
+            className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-60"
+            style={{ background: '#111827' }}>
+            {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? 'Accéder à mon type complet — 1,99 €' : 'Access my full type — €1.99')}
           </button>
-          <p className="text-center text-[11px] text-emerald-600 font-semibold">
-            {isFr ? 'Paiement unique · Accès immédiat · Pas d\'abonnement' : 'One-time · Instant access · No subscription'}
+          <p className="text-center text-[11px] text-gray-400">
+            {isFr ? 'Paiement unique · Stripe · Sans abonnement' : 'One-time payment · Stripe · No subscription'}
           </p>
 
           {/* Divider */}
-          <div className="flex items-center gap-3 pt-1 pb-1">
+          <div className="flex items-center gap-3 pt-2 pb-1">
             <div className="flex-1 h-px bg-gray-100" />
-            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider whitespace-nowrap">
-              {isFr ? 'Pour les passionnés MBTI' : 'For MBTI enthusiasts'}
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider whitespace-nowrap">
+              {isFr ? 'Accès complet' : 'Full access'}
             </span>
             <div className="flex-1 h-px bg-gray-100" />
           </div>
@@ -568,20 +554,20 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
           <button
             onClick={() => doCheckout('annual')}
             disabled={loading}
-            className="w-full py-3 rounded-2xl font-semibold text-gray-500 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4 relative overflow-hidden">
-            <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-2 py-0.5 rounded-bl-xl">−75%</span>
+            className="w-full py-3 rounded-xl font-medium text-gray-600 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4 relative overflow-hidden">
+            <span className="absolute top-0 right-0 bg-gray-900 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">−75%</span>
             <span className="flex items-center justify-between pr-8">
-              <span>{isFr ? 'Accès illimité · 16 types · Quiz · Mode Duo' : 'Unlimited · 16 types · Quiz · Duo'}</span>
-              <span className="font-bold">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+              <span>{isFr ? '16 types · Quiz illimités · Mode Duo' : '16 types · Unlimited quizzes · Duo'}</span>
+              <span className="font-semibold text-gray-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
             </span>
           </button>
           <button
             onClick={() => doCheckout('monthly')}
             disabled={loading}
-            className="w-full py-3 rounded-2xl font-semibold text-gray-500 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4">
+            className="w-full py-3 rounded-xl font-medium text-gray-500 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4">
             <span className="flex items-center justify-between">
-              <span>{isFr ? 'Mensuel · sans engagement' : 'Monthly · no commitment'}</span>
-              <span className="font-bold">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+              <span>{isFr ? 'Accès mensuel · sans engagement' : 'Monthly · no commitment'}</span>
+              <span className="font-semibold text-gray-700">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
             </span>
           </button>
         </div>
