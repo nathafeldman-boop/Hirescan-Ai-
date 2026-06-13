@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   alternates: {
     canonical: '/',
-    languages: { 'fr-FR': '/', 'en-US': '/' },
+    languages: { 'fr-FR': '/' },
   },
   manifest: '/manifest.json',
   verification: {

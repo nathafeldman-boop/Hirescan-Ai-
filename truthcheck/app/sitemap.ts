@@ -34,6 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/quiz/personnalite`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE_URL}/types`,                              lastModified: now, changeFrequency: 'weekly', priority: 0.93 },
     { url: `${BASE_URL}/duo`,                    lastModified: now, changeFrequency: 'weekly', priority: 0.9  },
+    { url: `${BASE_URL}/fusion`,                 lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE_URL}/tests`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.88 },
     ...QUIZ_SLUGS.map((slug) => ({
       url: `${BASE_URL}/quiz/${slug}`,
