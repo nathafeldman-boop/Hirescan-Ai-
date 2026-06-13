@@ -27,15 +27,38 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode, affiliateRef } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode, affiliateRef, fusionGroupId, fusionCode } = await req.json();
     const affiliateSlug = req.cookies.get('urs_ref')?.value || (typeof affiliateRef === 'string' ? affiliateRef : '') || '';
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
+
+    // ── Fusion group unlock ──
+    if (fusionGroupId && fusionCode) {
+      const fusionSession = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          price_data: {
+            currency: 'eur',
+            product: ONE_TIME_PRODUCT_ID,
+            unit_amount: ONE_TIME_PRICE_CENTS,
+          },
+          quantity: 1,
+        }],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        metadata: { fusionGroupId, fusionCode, affiliateSlug },
+        success_url: `${baseUrl}/fusion/${fusionCode}?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/fusion/${fusionCode}`,
+      });
+      return NextResponse.json({ url: fusionSession.url });
+    }
 
     const cancelUrl = quizSlug === 'duo'
       ? `${baseUrl}/duo`
       : quizSlug && score !== undefined
         ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
-        : `${baseUrl}/quiz/personnalite`;
+        : typeCode
+          ? `${baseUrl}/quiz/personnalite?pending=${typeCode}`
+          : `${baseUrl}/quiz/personnalite`;
 
     // All non-duo checkouts funnel through /success so the page can
     // verify payment server-side and create the account from Stripe's email
