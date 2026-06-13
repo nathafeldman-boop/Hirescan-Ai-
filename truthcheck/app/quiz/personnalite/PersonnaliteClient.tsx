@@ -64,11 +64,11 @@ function ProgressBar({ current, total, label }: { current: number; total: number
   const pct = Math.round((current / total) * 100);
   return (
     <div className="w-full mb-8">
-      <div className="flex justify-between text-xs text-gray-400 mb-2">
+      <div className="flex justify-between text-xs text-stone-400 mb-2">
         <span>{label}</span>
         <span>{pct}%</span>
       </div>
-      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${pct}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
@@ -179,10 +179,13 @@ function QuizScreen({ onComplete, questions, t }: {
       <ProgressBar current={current + 1} total={questions.length} label={t.questionOf(current + 1, questions.length)} />
 
       <div className="mb-10 text-center">
-        <p className="text-xs text-gray-400 uppercase tracking-widest mb-4">
+        <div className="text-4xl mb-3">
+          {q.dimension === 'EI' ? '🧭' : q.dimension === 'SN' ? '🌟' : q.dimension === 'TF' ? '🧠' : '📅'}
+        </div>
+        <p className="text-xs text-stone-400 uppercase tracking-widest mb-4">
           {t.dimLabel[q.dimension]}
         </p>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">{q.text}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-stone-900 leading-snug">{q.text}</h2>
       </div>
 
       <div className="flex flex-col gap-2.5">
@@ -202,12 +205,12 @@ function QuizScreen({ onComplete, questions, t }: {
               className={`w-full text-left px-5 py-3.5 rounded-2xl border-2 transition-all duration-150 text-sm font-semibold flex items-center gap-3 ${
                 isSelected
                   ? 'scale-[0.98]'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                  : 'border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50'
               }`}
               style={isSelected ? { borderColor: color, backgroundColor: color + '12', color } : {}}
             >
               <span className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all"
-                style={isSelected ? { borderColor: color, backgroundColor: color } : { borderColor: '#d1d5db' }}>
+                style={isSelected ? { borderColor: color, backgroundColor: color } : { borderColor: '#d6d3d1' }}>
                 {isSelected && <span className="w-2 h-2 rounded-full bg-white" />}
               </span>
               {label}
@@ -239,18 +242,19 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   }, [onDone]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-white">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
       <div className="text-center max-w-sm">
+        <div className="text-5xl mb-4 animate-pulse">🔮</div>
         <div className="mb-6 text-violet-500"><BrainIcon /></div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">{t.analysisStages[stage]}</h2>
-        <p className="text-gray-400 text-sm mb-8">{t.doNotClose}</p>
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <h2 className="text-xl font-bold text-stone-900 mb-2">{t.analysisStages[stage]}</h2>
+        <p className="text-stone-500 text-sm mb-8">{t.doNotClose}</p>
+        <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-100"
             style={{ width: `${progress}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
           />
         </div>
-        <p className="text-xs text-gray-300 mt-3">{progress}%</p>
+        <p className="text-xs text-stone-400 mt-3">{progress}%</p>
       </div>
     </div>
   );
@@ -681,7 +685,7 @@ export default function PersonnaliteClient() {
   }, [answers, session, isPremium, router]);
 
   return (
-    <main className="min-h-screen bg-white text-gray-900">
+    <main className="min-h-screen text-stone-900" style={{ background: '#faf9f7' }}>
       {/* InAppBrowserOverlay: shown when TikTok/Instagram browser detected + paywall reached */}
       {inAppWarning && phase === 'result' && (
         <InAppBrowserOverlay onDismiss={() => setInAppWarning(false)} />
