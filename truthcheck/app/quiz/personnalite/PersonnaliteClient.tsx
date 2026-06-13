@@ -553,6 +553,99 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
         {/* Countdown timer */}
         <CountdownTimer isFr={isFr} />
 
+        {/* Premium features teaser */}
+        <div className="mb-5 rounded-2xl overflow-hidden" style={{ border: '1.5px solid rgba(124,58,237,0.25)', background: 'linear-gradient(135deg,rgba(124,58,237,0.05),rgba(236,72,153,0.03))' }}>
+          <div className="px-4 pt-4 pb-2">
+            <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#7c3aed' }}>
+              {isFr ? '✦ Réservé aux membres Premium' : '✦ Premium members only'}
+            </p>
+            <h3 className="text-sm font-black text-stone-900 leading-snug">
+              {isFr
+                ? `Ce que tu rates sans l'abonnement :`
+                : 'What you miss without a subscription:'}
+            </h3>
+          </div>
+
+          {/* Suivi 15 jours */}
+          <div className="mx-4 mb-3 rounded-xl p-3.5" style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
+            <div className="flex items-start gap-3">
+              <span className="text-xl flex-shrink-0">🧠</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-stone-900 mb-0.5">
+                  {isFr ? 'Suivi psychologique 15 jours' : '15-day psychological journey'}
+                </p>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  {isFr
+                    ? `Un programme personnalisé pour ton type ${typeCode ?? ''}. 15 jours de conseils, exercices et révélations sur toi-même — en 3 phases : te connaître, tes relations, tes projets.`
+                    : `A personalized program for your ${typeCode ?? ''} type. 15 days of insights, exercises and self-discovery.`}
+                </p>
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  {(isFr ? ['🧠 Me connaître', '💝 Mes relations', '🎯 Mes projets'] : ['🧠 Know yourself', '💝 Relationships', '🎯 Projects']).map(tag => (
+                    <span key={tag} className="text-[9px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'rgba(124,58,237,0.1)', color: '#7c3aed' }}>{tag}</span>
+                  ))}
+                </div>
+                {/* Locked day preview */}
+                <div className="mt-2 rounded-lg px-3 py-2 flex items-center gap-2" style={{ background: 'rgba(0,0,0,0.06)' }}>
+                  <span className="text-sm">🔒</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold text-stone-500">{isFr ? 'Aperçu Jour 1' : 'Day 1 preview'}</p>
+                    <p className="text-[10px] text-stone-400 truncate">{isFr ? 'Ton moteur secret — découvre ce qui te motive vraiment...' : 'Your secret engine — discover what truly drives you...'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Compatibilité 240 paires */}
+          <div className="mx-4 mb-3 rounded-xl p-3.5" style={{ background: 'rgba(236,72,153,0.07)', border: '1px solid rgba(236,72,153,0.2)' }}>
+            <div className="flex items-start gap-3">
+              <span className="text-xl flex-shrink-0">💑</span>
+              <div>
+                <p className="text-xs font-black text-stone-900 mb-0.5">
+                  {isFr ? 'Compatibilité MBTI — 240 paires analysées' : 'MBTI Compatibility — 240 pairs analyzed'}
+                </p>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  {isFr
+                    ? `Tes dynamiques avec chacun des 15 autres types. Amour, amitié, travail — ce qui se passe réellement entre ${typeCode ?? 'toi'} et les autres.`
+                    : `Your dynamics with each of the 15 other types. Love, friendship, work.`}
+                </p>
+                <div className="mt-2 flex gap-1.5 overflow-hidden">
+                  {['INFJ','ENFP','INTJ','ENTP','ISFJ'].map(t => (
+                    <span key={t} className="text-[9px] font-black px-2 py-1 rounded-lg flex-shrink-0" style={{ background: 'rgba(236,72,153,0.1)', color: '#ec4899' }}>
+                      🔒 {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Fusion mode */}
+          <div className="mx-4 mb-4 rounded-xl p-3.5" style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)' }}>
+            <div className="flex items-start gap-3">
+              <span className="text-xl flex-shrink-0">⚗️</span>
+              <div>
+                <p className="text-xs font-black text-stone-900 mb-0.5">
+                  {isFr ? 'Mode Fusion — profil de groupe' : 'Fusion Mode — group profile'}
+                </p>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  {isFr
+                    ? '2 à 10 personnes répondent ensemble. Découvrez votre personnalité collective, vos forces en groupe et vos dynamiques d\'équipe.'
+                    : '2-10 people answer together. Discover your group personality and team dynamics.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="px-4 pb-4">
+            <p className="text-[10px] text-center font-semibold" style={{ color: '#7c3aed', opacity: 0.8 }}>
+              {isFr
+                ? '+ Accès illimité à tous les quiz · Nouveaux contenus chaque mois'
+                : '+ Unlimited quiz access · New content every month'}
+            </p>
+          </div>
+        </div>
+
         {/* Persuasive value section */}
         <div className="mb-5">
 

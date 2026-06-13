@@ -78,6 +78,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
+    ...ALL_MBTI_TYPES.map((type) => ({
+      url: `${BASE_URL}/suivi/${type}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
     { url: `${BASE_URL}/mentions-legales`,           lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
     { url: `${BASE_URL}/politique-confidentialite`,  lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
     { url: `${BASE_URL}/cgu`,                        lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
