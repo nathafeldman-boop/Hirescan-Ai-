@@ -403,6 +403,8 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
     });
     setLoading(true);
     try {
+      let affiliateRef = '';
+      try { affiliateRef = localStorage.getItem('_urs_ref') ?? ''; } catch {}
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -413,6 +415,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           ...(userEmail ? { userEmail } : {}),
           ...(checkoutType === 'annual' ? { annual: true } : {}),
           ...(checkoutType === 'onetime' ? { oneTime: true } : {}),
+          ...(affiliateRef ? { affiliateRef } : {}),
         }),
       });
       const data = await res.json() as { url?: string; error?: string };
@@ -518,6 +521,42 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
         {/* Countdown timer */}
         <CountdownTimer isFr={isFr} />
 
+        {/* Tier comparison — what you get with each plan */}
+        <div className="rounded-xl overflow-hidden mb-4" style={{ border: '1px solid #e7e5e0' }}>
+          {/* PASS RÉSULTAT */}
+          <div className="px-4 py-3" style={{ background: 'rgba(124,58,237,0.06)', borderBottom: '1px solid #e7e5e0' }}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
+                {isFr ? 'PASS RÉSULTAT' : 'RESULT PASS'}
+              </span>
+              <span className="text-xs font-black text-stone-900">1,99 €</span>
+            </div>
+            <p className="text-[11px] text-stone-600">✔ {isFr ? 'Débloque immédiatement ton résultat complet' : 'Unlock your full result immediately'}</p>
+          </div>
+          {/* PREMIUM */}
+          <div className="px-4 py-3" style={{ background: 'white', borderBottom: '1px solid #e7e5e0' }}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">PREMIUM</span>
+              <span className="text-xs font-black text-stone-900">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+            </div>
+            <div className="text-[11px] text-stone-500 space-y-0.5">
+              <p>✔ {isFr ? 'Résultat complet + compatibilités amoureuses' : 'Full result + romantic compatibility'}</p>
+              <p>✔ {isFr ? 'Tous les tests · Analyses · Historique' : 'All quizzes · Analysis · History'}</p>
+            </div>
+          </div>
+          {/* VIP */}
+          <div className="px-4 py-3" style={{ background: 'white' }}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">VIP</span>
+              <span className="text-xs font-black text-stone-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+            </div>
+            <div className="text-[11px] text-stone-500 space-y-0.5">
+              <p>✔ {isFr ? 'Tout le Premium' : 'Everything in Premium'}</p>
+              <p>✔ {isFr ? 'Accès anticipé · Rapports avancés · Support prioritaire' : 'Early access · Advanced reports · Priority support'}</p>
+            </div>
+          </div>
+        </div>
+
         {/* Paywall buttons — DO NOT MODIFY onClick handlers */}
         <div className="space-y-2">
           {/* Hero CTA — 1,99€ */}
@@ -611,20 +650,17 @@ export default function PersonnaliteClient() {
     }
   }, []);
 
-  // Affiliate tracking — read ?ref= or ?utm_campaign= → set urs_ref cookie → Stripe picks it up
+  // Affiliate tracking — persist ref in localStorage as fallback (cookie set by middleware, httpOnly)
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('ref') ?? params.get('utm_campaign') ?? '';
       const source = params.get('utm_source') ?? '';
-      if (ref) {
-        document.cookie = `urs_ref=${encodeURIComponent(ref)}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
-        track('affiliate_click', { ref, source: source || 'unknown' });
-        diagLog('affiliate_click', { ref, source });
-      } else if (source) {
-        document.cookie = `urs_ref=${encodeURIComponent(source)}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
-        track('affiliate_click', { ref: source, source });
-        diagLog('affiliate_click', { ref: source, source });
+      const refValue = (ref || source).toLowerCase().slice(0, 32);
+      if (refValue && /^[a-z0-9_-]{2,32}$/.test(refValue)) {
+        localStorage.setItem('_urs_ref', refValue);
+        track('affiliate_click', { ref: refValue, source: source || 'direct' });
+        diagLog('affiliate_click', { ref: refValue, source });
       }
     } catch {}
   }, []);

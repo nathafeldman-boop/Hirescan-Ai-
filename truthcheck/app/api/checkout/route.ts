@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode } = await req.json();
-    const affiliateSlug = req.cookies.get('urs_ref')?.value ?? '';
+    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode, affiliateRef } = await req.json();
+    const affiliateSlug = req.cookies.get('urs_ref')?.value || (typeof affiliateRef === 'string' ? affiliateRef : '') || '';
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
     const cancelUrl = quizSlug === 'duo'

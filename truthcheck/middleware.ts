@@ -29,8 +29,10 @@ export function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-  // Affiliate tracking — ?ref=slug → cookie 30 jours
-  const ref = request.nextUrl.searchParams.get('ref');
+  // Affiliate tracking — ?ref= OR ?utm_campaign= → cookie 30 jours
+  const ref = request.nextUrl.searchParams.get('ref')
+    ?? request.nextUrl.searchParams.get('utm_campaign')
+    ?? '';
   if (ref && /^[a-z0-9_-]{2,32}$/i.test(ref)) {
     response.cookies.set('urs_ref', ref.toLowerCase(), {
       maxAge: 60 * 60 * 24 * 30,

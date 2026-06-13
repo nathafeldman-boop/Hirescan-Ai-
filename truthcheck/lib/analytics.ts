@@ -17,7 +17,8 @@ export type AnalyticsEvent =
   | 'quiz_complete'
   | 'paywall_view'
   | 'checkout_click'
-  | 'payment_success';
+  | 'payment_success'
+  | 'affiliate_click';
 
 interface TrackProps {
   quiz?: string;           // quiz slug
@@ -35,6 +36,7 @@ const TT_EVENT: Record<AnalyticsEvent, string> = {
   paywall_view:    'AddToCart',
   checkout_click:  'InitiateCheckout',
   payment_success: 'CompletePayment',
+  affiliate_click: 'ViewContent',
 };
 
 // GA4 event name mapping
@@ -45,6 +47,7 @@ const GA_EVENT: Record<AnalyticsEvent, string> = {
   paywall_view:    'paywall_view',
   checkout_click:  'begin_checkout',
   payment_success: 'purchase',
+  affiliate_click: 'affiliate_click',
 };
 
 export function track(event: AnalyticsEvent, props: TrackProps = {}) {
