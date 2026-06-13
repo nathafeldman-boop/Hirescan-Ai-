@@ -349,11 +349,23 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
 
   const callbackUrl = `/quiz/personnalite?pending=${typeCode}`;
 
+  // Track paywall view once on mount
+  useEffect(() => {
+    track('paywall_view', { quiz: 'personnalite' });
+  }, []);
+
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
     if (!userEmail) {
+      // Save intent so we auto-trigger checkout after auth round-trip
+      try { sessionStorage.setItem('_uc_intent', checkoutType); } catch {}
       setShowAuthInline(true);
       return;
     }
+    track('checkout_click', {
+      quiz: 'personnalite',
+      value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
+      currency: 'EUR',
+    });
     setLoading(true);
     try {
       const res = await fetch('/api/checkout', {
@@ -376,6 +388,18 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
       setLoading(false);
     }
   }, [typeCode, userEmail]);
+
+  // Auto-trigger checkout if user just authenticated with a pending intent
+  useEffect(() => {
+    if (!userEmail) return;
+    try {
+      const intent = sessionStorage.getItem('_uc_intent') as 'onetime' | 'annual' | 'monthly' | null;
+      if (intent && ['onetime', 'annual', 'monthly'].includes(intent)) {
+        sessionStorage.removeItem('_uc_intent');
+        doCheckout(intent);
+      }
+    } catch {}
+  }, [userEmail, doCheckout]);
 
   if (showAuthInline) {
     return (
