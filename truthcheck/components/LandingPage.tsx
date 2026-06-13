@@ -242,6 +242,29 @@ export default function LandingPage() {
               Tester la compatibilité →
             </Link>
           </div>
+
+          {/* Fusion card */}
+          <div
+            className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-3"
+            style={{ background: 'linear-gradient(135deg,rgba(236,72,153,0.06),rgba(124,58,237,0.04))', border: '1px solid rgba(236,72,153,0.15)' }}
+          >
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#ec4899' }}>⚗️ Mode groupe</p>
+              <h2 className="text-base font-black text-stone-900 mb-1">
+                Fusion — Quiz de groupe
+              </h2>
+              <p className="text-stone-500 text-xs leading-relaxed max-w-xs">
+                2 à 10 personnes répondent ensemble et découvrent le profil collectif de leur groupe.
+              </p>
+            </div>
+            <Link
+              href="/fusion"
+              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 whitespace-nowrap"
+              style={{ background: 'linear-gradient(135deg,#ec4899,#7c3aed)', boxShadow: '0 4px 16px rgba(236,72,153,0.25)' }}
+            >
+              Lancer un Fusion →
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -370,6 +393,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-6 text-stone-400 text-xs">
             <Link href="/types" className="hover:text-stone-700 transition-colors">16 types</Link>
             <Link href="/duo" className="hover:text-stone-700 transition-colors">Compatibilité</Link>
+            <Link href="/fusion" className="hover:text-stone-700 transition-colors">Fusion</Link>
             <Link href="/mentions-legales" className="hover:text-stone-700 transition-colors">Mentions légales</Link>
             <Link href="/politique-confidentialite" className="hover:text-stone-700 transition-colors">Confidentialité</Link>
           </div>
