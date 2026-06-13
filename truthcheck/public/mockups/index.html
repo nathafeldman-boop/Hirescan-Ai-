@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups Vidéo — UrCecret</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #050507; color: white; min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 40px 24px;
+  }
+  h1 { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
+  h1 span { background: linear-gradient(135deg,#a78bfa,#f472b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .subtitle { color: #52525b; font-size: 14px; margin-bottom: 40px; }
+
+  .section-title {
+    font-size: 11px; font-weight: 700; color: #52525b;
+    text-transform: uppercase; letter-spacing: .12em;
+    margin-bottom: 20px; margin-top: 36px;
+    padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, 200px);
+    gap: 20px; margin-bottom: 12px;
+  }
+  .card {
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,.08);
+    transition: transform .2s, border-color .2s;
+    text-decoration: none; display: block;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(167,139,250,.4); }
+  .card iframe {
+    width: 390px; height: 250px;
+    transform-origin: top left;
+    transform: scale(0.513);
+    display: block; border: none; pointer-events: none;
+  }
+  .card-frame { width: 200px; height: 128px; overflow: hidden; }
+  .card-label {
+    padding: 10px 12px;
+    background: rgba(255,255,255,.04);
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .card-label .num {
+    font-size: 10px; color: #52525b; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em; margin-bottom: 3px;
+  }
+  .card-label .name { font-size: 13px; font-weight: 700; color: #d4d4d8; }
+
+  .tip {
+    background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.2);
+    border-radius: 12px; padding: 14px 16px;
+    font-size: 13px; color: #a78bfa; line-height: 1.6; margin-top: 40px;
+  }
+  .tip strong { color: #c4b5fd; }
+</style>
+</head>
+<body>
+  <h1><span>Ur</span>Cecret</h1>
+  <p class="subtitle">Mockups vidéo — Clique sur une vignette pour ouvrir en plein écran</p>
+
+  <div class="section-title">📱 Screenshots app (moment du script)</div>
+  <div class="grid">
+    <a class="card" href="screen1-decouverte.html" target="_blank">
+      <div class="card-frame"><iframe src="screen1-decouverte.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Screen 1</div><div class="name">Découverte du test</div></div>
+    </a>
+    <a class="card" href="screen2-compatibilite-67.html" target="_blank">
+      <div class="card-frame"><iframe src="screen2-compatibilite-67.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Screen 2</div><div class="name">INFP × ENTP = 67%</div></div>
+    </a>
+    <a class="card" href="screen3-obsession.html" target="_blank">
+      <div class="card-frame"><iframe src="screen3-obsession.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Screen 3</div><div class="name">247 fois le test</div></div>
+    </a>
+    <a class="card" href="screen4-warning.html" target="_blank">
+      <div class="card-frame"><iframe src="screen4-warning.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Screen 4</div><div class="name">⚠️ N'accepte jamais</div></div>
+    </a>
+  </div>
+
+  <div class="section-title">💳 Previews abonnement Premium</div>
+  <div class="grid">
+    <a class="card" href="screen5-premium-paywall.html" target="_blank">
+      <div class="card-frame"><iframe src="screen5-premium-paywall.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Screen 5</div><div class="name">Paywall — 3 plans</div></div>
+    </a>
+    <a class="card" href="screen6-resultats-premium.html" target="_blank">
+      <div class="card-frame"><iframe src="screen6-resultats-premium.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Screen 6</div><div class="name">Résultats débloqués</div></div>
+    </a>
+  </div>
+
+  <div class="section-title">🎨 Illustrations (moments forts)</div>
+  <div class="grid">
+    <a class="card" href="illus1-choc.html" target="_blank">
+      <div class="card-frame"><iframe src="illus1-choc.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Illus 1</div><div class="name">Choc de la découverte</div></div>
+    </a>
+    <a class="card" href="illus2-67pct.html" target="_blank">
+      <div class="card-frame"><iframe src="illus2-67pct.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Illus 2</div><div class="name">Le score 67%</div></div>
+    </a>
+    <a class="card" href="illus3-nuit.html" target="_blank">
+      <div class="card-frame"><iframe src="illus3-nuit.html" scrolling="no"></iframe></div>
+      <div class="card-label"><div class="num">Illus 3</div><div class="name">L'obsession nocturne</div></div>
+    </a>
+  </div>
+
+  <div class="tip">
+    <strong>Pour capturer :</strong> clique sur une vignette → Chrome s'ouvre → F12 → icône téléphone → résolution <strong>390×844</strong> → capture d'écran (ou enregistrement OBS pour video).
+  </div>
+</body>
+</html>

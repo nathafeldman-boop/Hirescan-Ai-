@@ -14,7 +14,7 @@ export interface MbtiQuestion {
   optionD?: { text: string; pole: MbtiPole };
 }
 
-export type QuizAnswer = 'A' | 'B' | 'C' | 'D';
+export type QuizAnswer = 'A' | 'B' | 'C' | 'D' | 'E';
 
 export interface MbtiType {
   code: string;
@@ -166,25 +166,18 @@ export const mbtiQuestions: MbtiQuestion[] = [
 ];
 
 export function computeMbtiType(answers: Record<number, QuizAnswer>): string {
-  let E = 0, I = 0, S = 0, N = 0, T = 0, F = 0, J = 0, P = 0;
+  const sc: Record<string, number> = { E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0 };
   for (const q of mbtiQuestions) {
     const ans = answers[q.id];
     if (!ans) continue;
-    const pole = ans === 'A' ? q.optionA.pole
-               : ans === 'B' ? q.optionB.pole
-               : ans === 'C' ? q.optionC?.pole
-               : q.optionD?.pole;
-    if (!pole) continue;
-    if (pole === 'E') E++;
-    else if (pole === 'I') I++;
-    else if (pole === 'S') S++;
-    else if (pole === 'N') N++;
-    else if (pole === 'T') T++;
-    else if (pole === 'F') F++;
-    else if (pole === 'J') J++;
-    else if (pole === 'P') P++;
+    // 5-point weighted: A=+2 poleA, B=+1 poleA, C=neutral, D=+1 poleB, E=+2 poleB
+    if (ans === 'A') sc[q.optionA.pole] += 2;
+    else if (ans === 'B') sc[q.optionA.pole] += 1;
+    else if (ans === 'D') sc[q.optionB.pole] += 1;
+    else if (ans === 'E') sc[q.optionB.pole] += 2;
+    // C = neutral, no points
   }
-  return `${E >= I ? 'E' : 'I'}${S >= N ? 'S' : 'N'}${T >= F ? 'T' : 'F'}${J >= P ? 'J' : 'P'}`;
+  return `${sc.E >= sc.I ? 'E' : 'I'}${sc.S >= sc.N ? 'S' : 'N'}${sc.T >= sc.F ? 'T' : 'F'}${sc.J >= sc.P ? 'J' : 'P'}`;
 }
 
 export const mbtiTypes: Record<string, MbtiType> = {

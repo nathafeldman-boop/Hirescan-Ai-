@@ -10,9 +10,14 @@ export default async function DashboardPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: {
-      quizResults: { orderBy: { createdAt: 'desc' }, take: 5 },
-      analyses: { orderBy: { createdAt: 'desc' }, take: 5 },
+    select: {
+      name: true,
+      email: true,
+      image: true,
+      tier: true,
+      mbtiType: true,
+      mbtiTestCount: true,
+      createdAt: true,
     },
   });
 
@@ -24,17 +29,11 @@ export default async function DashboardPage() {
         name: user.name,
         email: user.email,
         image: user.image,
-        rizzScore: user.rizzScore,
-        rizzLevel: user.rizzLevel,
         tier: user.tier,
+        mbtiType: user.mbtiType,
+        mbtiTestCount: user.mbtiTestCount,
+        memberSince: user.createdAt.toISOString(),
       }}
-      recentQuizzes={user.quizResults}
-      recentAnalyses={user.analyses.map((a) => ({
-        id: a.id,
-        context: a.context,
-        rizzScoreAfter: a.rizzScoreAfter,
-        createdAt: a.createdAt.toISOString(),
-      }))}
     />
   );
 }

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Screen 2 — Compatibilité 67%</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 390px; min-height: 844px;
+    background: #09090b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: white;
+  }
+  .status-bar {
+    height: 44px; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 24px;
+  }
+  .status-time { font-size: 15px; font-weight: 600; }
+  .back { font-size: 15px; color: #a78bfa; display: flex; align-items: center; gap: 4px; }
+  .content { padding: 12px 20px 40px; }
+  .badge {
+    display: inline-flex; align-items: center; gap-6px; gap: 6px;
+    background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 999px; padding: 6px 14px;
+    font-size: 12px; color: #a78bfa; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 20px;
+  }
+  h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+  .sub { color: #52525b; font-size: 14px; margin-bottom: 28px; }
+  .types-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+  }
+  .type-card {
+    flex: 1; border-radius: 20px; padding: 20px 16px; text-align: center;
+    border: 1px solid;
+  }
+  .type-card.infp {
+    background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.25);
+  }
+  .type-card.entp {
+    background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25);
+  }
+  .type-emoji { font-size: 36px; margin-bottom: 8px; }
+  .type-code { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+  .type-card.infp .type-code { color: #34d399; }
+  .type-card.entp .type-code { color: #fbbf24; }
+  .type-name { font-size: 12px; color: #71717a; font-weight: 500; }
+  .vs {
+    font-size: 18px; font-weight: 900; color: #3f3f46;
+    flex-shrink: 0;
+  }
+  /* Score ring */
+  .score-section { text-align: center; margin-bottom: 28px; position: relative; }
+  .ring-wrap { position: relative; display: inline-block; }
+  svg.ring { display: block; }
+  .score-inside {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .score-pct { font-size: 46px; font-weight: 900; color: #f59e0b; line-height: 1; }
+  .score-label { font-size: 12px; color: #52525b; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+  .verdict-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 12px; padding: 10px 18px; margin-bottom: 24px;
+  }
+  .verdict-text { font-size: 14px; font-weight: 700; color: #fbbf24; }
+  .bars { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { font-size: 12px; color: #71717a; width: 90px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; }
+  .bar-pct { font-size: 12px; color: #a1a1aa; width: 30px; text-align: right; flex-shrink: 0; }
+  .warning-box {
+    background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 16px; padding: 16px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .warning-icon { font-size: 20px; flex-shrink: 0; }
+  .warning-text { font-size: 13px; color: #fca5a5; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span class="status-time">21:53</span>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+      <span>●●●●</span><span>🔋</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="badge">💑 Test de compatibilité MBTI</div>
+    <h2>Votre compatibilité</h2>
+    <p class="sub">Résultat basé sur vos deux profils psychologiques</p>
+
+    <div class="types-row">
+      <div class="type-card infp">
+        <div class="type-emoji">🌿</div>
+        <div class="type-code">INFP</div>
+        <div class="type-name">Le Médiateur</div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="type-card entp">
+        <div class="type-emoji">⚡</div>
+        <div class="type-code">ENTP</div>
+        <div class="type-name">Le Débatteur</div>
+      </div>
+    </div>
+
+    <div class="score-section">
+      <div class="ring-wrap">
+        <svg class="ring" width="180" height="180" viewBox="0 0 180 180">
+          <defs>
+            <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#ef4444"/>
+            </linearGradient>
+          </defs>
+          <circle cx="90" cy="90" r="72" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12"/>
+          <circle cx="90" cy="90" r="72" fill="none"
+            stroke="url(#g)" stroke-width="12"
+            stroke-dasharray="452.4" stroke-dashoffset="149"
+            stroke-linecap="round" transform="rotate(-90 90 90)"/>
+        </svg>
+        <div class="score-inside">
+          <div class="score-pct">67%</div>
+          <div class="score-label">compatibles</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:20px;">
+      <div class="verdict-badge">
+        <span>⚠️</span>
+        <span class="verdict-text">Compatibilité modérée — risque de friction</span>
+      </div>
+    </div>
+
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-label">Communication</span>
+        <div class="bar-track"><div class="bar-fill" style="width:58%;background:linear-gradient(90deg,#f59e0b,#ef4444)"></div></div>
+        <span class="bar-pct">58%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Valeurs</span>
+        <div class="bar-track"><div class="bar-fill" style="width:72%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
+        <span class="bar-pct">72%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Long terme</span>
+        <div class="bar-track"><div class="bar-fill" style="width:61%;background:linear-gradient(90deg,#f59e0b,#ef4444)"></div></div>
+        <span class="bar-pct">61%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Attirance</span>
+        <div class="bar-track"><div class="bar-fill" style="width:84%;background:linear-gradient(90deg,#8b5cf6,#ec4899)"></div></div>
+        <span class="bar-pct">84%</span>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <span class="warning-icon">⚠️</span>
+      <span class="warning-text">Les INFP et ENTP peuvent se sentir incompris l'un de l'autre sur le long terme. Cette combinaison nécessite un effort conscient des deux côtés.</span>
+    </div>
+  </div>
+</body>
+</html>

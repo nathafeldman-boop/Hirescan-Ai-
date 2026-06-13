@@ -279,6 +279,11 @@ body {
   letter-spacing: 0.08em;
 }
 
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* Circle progress animation */
 @keyframes stroke-animate {
   to {

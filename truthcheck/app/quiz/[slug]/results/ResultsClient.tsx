@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { Quiz } from '@/lib/quizzes';
 import { getResultTier } from '@/lib/quizzes';
+import { track } from '@/lib/analytics';
 
 interface Props {
   quiz: Quiz;
@@ -124,71 +125,215 @@ export default function ResultsClient({ quiz }: Props) {
   const analysis = buildAnalysis(quiz, score, tier.title);
 
   const partialScore = score >= 100 ? '9?%' : score >= 10 ? `${Math.floor(score / 10)}?%` : '?%';
+  const partialType = quiz.slug === 'personnalite' && tier.title?.length >= 4
+    ? tier.title.slice(0, 2) + '??'
+    : null;
 
-  function trackEvent(event: string) {
-    fetch('/api/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: `/__${event}/${quiz.slug}` }),
-    }).catch(() => {});
+  function trackEvent(event: 'paywall_view' | 'checkout_click' | 'payment_success') {
+    track(event, { quiz: quiz.slug, content_name: quiz.title });
   }
 
   const PAYWALL_CONFIG: Record<string, { headline: string; subline: string; social: string }> = {
     infidelite: {
-      headline: score >= 60
-        ? "L'IA a trouvé plusieurs signaux dans tes réponses."
-        : "Tes réponses révèlent quelque chose d'important.",
+      headline: score >= 70
+        ? `L'analyse repère ${score >= 80 ? '4' : '3'} comportements dans tes réponses qui figurent parmi les signaux les plus fiables.`
+        : score >= 40
+        ? "Deux des réponses que tu as données ont déclenché un signal — l'analyse explique pourquoi."
+        : "L'analyse identifie précisément ce qui alimente tes doutes — et si c'est fondé.",
       subline: score >= 60
-        ? "Ce que tu décris correspond à des schémas reconnus. Tu mérites de savoir exactement où tu en es."
-        : "Ton score indique un niveau de risque précis. La vérité est là — à un clic.",
-      social: "4 127 personnes ont découvert leur vérité cette semaine",
+        ? "Ces comportements ne s'expliquent pas tous par le stress ou la fatigue. L'analyse nomme lequel est le plus révélateur dans ton cas."
+        : "Connaître la source exacte d'un doute, c'est déjà reprendre le contrôle.",
+      social: "4 127 personnes ont lu leur analyse cette semaine",
     },
     adopte: {
-      headline: "Certains des indices que tu décris ne trompent pas.",
-      subline: "L'analyse détaille exactement ce que tes réponses suggèrent sur ton histoire. Tu mérites une réponse claire.",
+      headline: score >= 60
+        ? "Parmi les indices que tu décris, au moins deux sortent de la variabilité familiale normale."
+        : "L'analyse distingue ce qui est banal de ce qui mérite vraiment une réponse.",
+      subline: score >= 60
+        ? "L'analyse nomme chaque indice et explique ce qu'il suggère — sans interprétation approximative."
+        : "Mettre un mot précis sur une intuition floue, c'est la première étape vers la paix de l'esprit.",
       social: "1 389 personnes ont éclairci leur histoire cette semaine",
     },
     amoureux: {
-      headline: "Tes sentiments sont beaucoup plus définis qu'il n'y paraît.",
-      subline: "L'IA a identifié la nature exacte de ce que tu ressens. Est-ce vraiment de l'amour, ou autre chose ?",
-      social: "2 841 personnes ont clarifié leurs sentiments cette semaine",
+      headline: score >= 70
+        ? "Ce que tu ressens pour cette personne n'est pas de l'amitié — l'analyse identifie précisément ce que c'est."
+        : score >= 40
+        ? "Tes sentiments sont à mi-chemin entre l'attachement et l'amour — l'analyse fait la distinction."
+        : "L'analyse te dit exactement pourquoi ce que tu ressens te semble flou.",
+      subline: score >= 60
+        ? "Il y a une question que tu n'oses pas te poser — tes réponses y ont déjà répondu."
+        : "Nommer ce qu'on ressent, c'est 50 % du chemin vers savoir quoi faire.",
+      social: "2 841 personnes ont mis un mot sur leurs sentiments cette semaine",
     },
     'vrais-amis': {
-      headline: "Certaines de tes réponses sont particulièrement révélatrices.",
-      subline: "L'analyse montre clairement si cette amitié est saine — ou si tu mérites mieux.",
-      social: "2 063 personnes ont vu la réalité en face cette semaine",
+      headline: score >= 60
+        ? "Au moins trois des comportements que tu décris ne font pas partie d'une amitié saine."
+        : score >= 30
+        ? "L'analyse identifie le point de friction principal dans cette amitié."
+        : "L'analyse confirme ce que tu ressens — et nomme ce qui rend cette amitié solide.",
+      subline: score >= 60
+        ? "L'analyse te dit quel comportement est le plus problématique — et lequel tu minimises probablement."
+        : "Savoir exactement sur qui compter, ça change la façon dont on investit dans ses relations.",
+      social: "2 063 personnes ont réévalué une amitié cette semaine",
     },
     orientation: {
-      headline: "Tes réponses dessinent un profil cohérent et précis.",
-      subline: "Ce que l'IA a identifié sur ton identité mérite d'être découvert. Sans jugement.",
+      headline: score >= 60
+        ? "Tes réponses indiquent une attirance non-hétérosexuelle significative — l'analyse la décrit avec précision."
+        : score >= 35
+        ? "L'analyse identifie la nuance exacte de ton orientation — ni tout blanc ni tout noir."
+        : "L'analyse te dit pourquoi tu te poses ces questions — et ce que tes réponses révèlent vraiment.",
+      subline: score >= 50
+        ? "Mettre un mot précis sur qui on est, c'est souvent ce qui libère."
+        : "Ton orientation t'appartient — l'analyse est là pour t'aider à la comprendre, pas à l'étiqueter.",
       social: "1 156 personnes se sont mieux comprises cette semaine",
+    },
+    personnalite: {
+      headline: `Ton profil contient une information que la majorité des tests MBTI ne révèlent jamais : la version de toi qui émerge sous stress, en amour ou dans le conflit.`,
+      subline: `Chaque type a une "face cachée" — un mode secondaire qui détermine tes vraies réactions. L'analyse nomme la tienne avec précision.`,
+      social: `7 241 personnes ont découvert leur profil exact cette semaine`,
     },
   };
   const pw = PAYWALL_CONFIG[quiz.slug] ?? {
-    headline: "L'IA a analysé toutes tes réponses.",
-    subline: "Ton profil précis t'attend. Découvre ce que tes réponses révèlent vraiment.",
-    social: "Des milliers de personnes ont découvert leur vérité cette semaine",
+    headline: score >= 60
+      ? "L'analyse a identifié le pattern principal dans tes réponses — il est plus précis que tu ne le crois."
+      : "Tes réponses dessinent un profil précis — l'analyse le nomme.",
+    subline: "Ce que tu as répondu pointe vers quelque chose de spécifique. L'analyse le formule clairement.",
+    social: "Des milliers de personnes ont découvert leur profil cette semaine",
   };
 
   const SCARY_STATS: Record<string, (s: number) => string> = {
     infidelite: (s) => s >= 60
-      ? '63 % des personnes avec ce niveau de score ont confirmé leurs doutes par la suite.'
-      : '41 % des personnes avec ce profil disent avoir été soulagées de connaître la réalité.',
+      ? `63 % des personnes avec exactement ce niveau de signaux ont eu raison de ne pas ignorer leurs doutes.`
+      : `41 % des personnes avec ce profil disent que connaître leur score les a aidées à sortir du doute.`,
     adopte: (s) => s >= 50
-      ? '71 % des personnes avec ce score ont découvert quelque chose d\'inattendu sur leur famille.'
-      : '58 % des personnes avec ce profil ont trouvé des réponses qui les ont apaisées.',
+      ? `71 % des personnes avec ce score ont appris quelque chose d'inattendu sur leur histoire familiale.`
+      : `58 % des personnes avec ce profil ont trouvé dans l'analyse la clarté qu'une conversation n'avait pas donnée.`,
     amoureux: (s) => s >= 60
-      ? '78 % des personnes avec ce résultat qui ont osé parler ne le regrettent pas.'
-      : '65 % des personnes avec ce profil ont trouvé de la clarté en connaissant leur score.',
+      ? `78 % des personnes avec ce résultat qui ont agi sur leurs sentiments disent ne pas le regretter.`
+      : `65 % des personnes avec ce profil disent que mettre un mot précis sur leurs émotions a tout changé.`,
     'vrais-amis': (s) => s >= 60
-      ? '69 % des personnes avec ce profil ont reconsidéré certaines amitiés après l\'analyse.'
-      : '54 % des personnes avec ce score ont renforcé leurs liens après avoir lu l\'analyse.',
+      ? `69 % des personnes avec ce score ont pris une décision sur cette relation après avoir lu l'analyse.`
+      : `54 % des personnes avec ce profil ont dit que l'analyse avait renforcé la confiance dans leurs vraies amitiés.`,
     orientation: (s) => s >= 50
-      ? '74 % des personnes avec ce profil se sont senties soulagées après avoir vu leurs résultats.'
+      ? `74 % des personnes avec ce profil décrivent la lecture de l'analyse comme un moment de soulagement.`
       : '67 % des personnes avec ce score disent que l\'analyse les a aidées à mieux se comprendre.',
+    personnalite: () => `91 % des personnes qui lisent leur analyse complète disent avoir découvert quelque chose d'inattendu — même celles qui connaissaient déjà leur type depuis des années.`,
   };
   const scaryStat = SCARY_STATS[quiz.slug]?.(score)
     ?? `${Math.min(97, Math.round(55 + score * 0.35))} % des personnes avec ce profil considèrent cette analyse comme un tournant.`;
+
+  // ── Teaser hooks: one real insight cut before the key conclusion ──
+  const TEASER_HOOKS: Record<string, (s: number) => { intro: string; cut: string; locked: string[] }> = {
+    infidelite: (s) => ({
+      intro: s >= 70
+        ? `Parmi les comportements que tu décris, l'un d'eux est présent dans 8 cas sur 10 d'infidélité confirmée. Ce n'est pas le plus évident — c'est celui que la plupart des gens remarquent en dernier.`
+        : s >= 40
+        ? `Deux des réponses que tu as données s'écartent de ce qu'on observe dans les couples sans problème. L'une concerne la communication, l'autre…`
+        : `Tes réponses ne montrent pas les signaux classiques — mais l'analyse identifie précisément la source de ton instinct.`,
+      cut: s >= 40
+        ? `Le comportement le plus révélateur dans ton cas est lié à…`
+        : `Ce qui génère tes doutes sans raison apparente, c'est…`,
+      locked: [
+        `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
+        `🔒 Le signal #1 dans tes réponses`,
+        `🔒 Pourquoi ce comportement spécifique est significatif`,
+        `🔒 Ce que tu peux faire concrètement maintenant`,
+      ],
+    }),
+    adopte: (s) => ({
+      intro: s >= 60
+        ? `Deux des indices que tu décris sortent de la variabilité génétique normale entre membres d'une même famille. L'un concerne des traits physiques, l'autre un schéma comportemental que tu as mentionné.`
+        : s >= 30
+        ? `L'analyse distingue les différences familiales normales de celles qui méritent une vraie réponse. Dans ton cas, un élément se démarque clairement des autres.`
+        : `Tes réponses penchent vers une histoire familiale cohérente — mais l'analyse explique précisément pourquoi tu te poses ces questions.`,
+      cut: `Ce qui donne le plus de poids à tes interrogations, c'est…`,
+      locked: [
+        `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
+        `🔒 L'indice le plus significatif dans ton cas`,
+        `🔒 Ce qui distingue une vraie interrogation d'une curiosité normale`,
+        `🔒 Les prochaines étapes si tu veux une réponse définitive`,
+      ],
+    }),
+    amoureux: (s) => ({
+      intro: s >= 70
+        ? `Tes réponses contiennent un schéma que les psychologues associent à l'attachement romantique réel — pas à l'admiration, pas à l'habitude. La différence tient à trois types de réponses que tu as données.`
+        : s >= 40
+        ? `Ce que tu ressens oscille entre l'attachement profond et quelque chose de plus. L'analyse identifie exactement à quel stade tu en es — et ce que ça signifie pour la suite.`
+        : `L'analyse explique pourquoi ce que tu ressens te semble difficile à nommer — et te donne le mot juste.`,
+      cut: s >= 40
+        ? `La réponse qui a le plus pesé dans ton score est celle où tu as dit que…`
+        : `Ce que tes réponses révèlent sur la nature de tes sentiments, c'est…`,
+      locked: [
+        `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
+        `🔒 Si c'est vraiment de l'amour ou autre chose`,
+        `🔒 Le signal émotionnel le plus fort dans tes réponses`,
+        `🔒 Quoi faire — et quand`,
+      ],
+    }),
+    'vrais-amis': (s) => ({
+      intro: s >= 60
+        ? `L'analyse repère trois comportements dans ce que tu décris qui ne font pas partie d'une amitié saine. Le plus problématique n'est pas forcément celui que tu penses.`
+        : s >= 30
+        ? `Toute amitié a ses zones d'ombre — mais l'analyse identifie si ce que tu décris est de la normale ou un pattern qui mérite attention.`
+        : `Les réponses que tu as données dessinent une amitié globalement solide. L'analyse identifie son vrai point fort — et son unique point faible.`,
+      cut: s >= 40
+        ? `Le comportement qui a le plus impacté ton score, c'est le fait que cette personne…`
+        : `Ce qui rend cette amitié résiliente selon tes réponses, c'est…`,
+      locked: [
+        `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
+        `🔒 Le comportement le plus révélateur de cette personne`,
+        `🔒 Si tu minimises ou surestimes le problème`,
+        `🔒 Ce qu'une amitié saine devrait ressembler dans ton cas`,
+      ],
+    }),
+    orientation: (s) => ({
+      intro: s >= 60
+        ? `Tes réponses indiquent une attirance non-hétérosexuelle cohérente — pas une curiosité passagère. L'analyse la décrit avec précision, sans étiquette forcée.`
+        : s >= 30
+        ? `L'analyse situe ton orientation sur le spectre de façon précise. Ce n'est pas binaire — et tes réponses le confirment.`
+        : `L'analyse explique pourquoi tu te poses ces questions — et ce que tes réponses révèlent réellement sur ton orientation.`,
+      cut: `Ce que tes réponses suggèrent de plus précis sur ton orientation, c'est…`,
+      locked: [
+        `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
+        `🔒 La description précise de ce que tes réponses révèlent`,
+        `🔒 Ce qui confirme ou nuance cette première impression`,
+        `🔒 Des ressources adaptées à ta situation`,
+      ],
+    }),
+    personnalite: () => ({
+      intro: `Ton profil révèle une tension entre deux fonctions cognitives que la plupart des gens ne distinguent jamais. Ce n'est pas juste 4 lettres — c'est un système entier qui explique pourquoi tu réagis comme tu le fais dans les situations qui comptent vraiment.`,
+      cut: `La fonction que tu utilises réellement en premier (pas celle que tu crois) est…`,
+      locked: [
+        `🔒 Tes 4 lettres confirmées + ton niveau de certitude`,
+        `🔒 Ta fonction cognitive dominante réelle`,
+        `🔒 Ton profil "sous pression" — le toi qui émerge dans le stress ou en amour`,
+        `🔒 Tes 3 compatibilités les plus inattendues`,
+      ],
+    }),
+  };
+  const teaser = TEASER_HOOKS[quiz.slug]?.(score) ?? {
+    intro: score >= 60
+      ? `L'analyse a identifié un pattern cohérent dans tes réponses. Ce pattern pointe vers quelque chose de précis — pas une généralité.`
+      : `Tes réponses dessinent un profil spécifique. L'analyse le formule avec des mots que tu n'aurais peut-être pas utilisés toi-même.`,
+    cut: `Ce que tes réponses révèlent de plus précis, c'est…`,
+    locked: [
+      `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
+      `🔒 Le point principal de ton profil`,
+      `🔒 Ce que la plupart des gens ne voient pas dans leurs propres réponses`,
+      `🔒 Les recommandations personnalisées`,
+    ],
+  };
+
+  // ── CTA button label — specific to quiz context ──
+  const ctaLabel: Record<string, string> = {
+    infidelite: score >= 60 ? `Voir les signaux identifiés — 1,99€` : `Voir mon analyse complète — 1,99€`,
+    adopte: `Voir ce que mes réponses révèlent — 1,99€`,
+    amoureux: score >= 60 ? `Savoir si c'est vraiment de l'amour — 1,99€` : `Nommer ce que je ressens — 1,99€`,
+    'vrais-amis': score >= 60 ? `Voir le comportement #1 identifié — 1,99€` : `Voir l'analyse complète — 1,99€`,
+    orientation: `Voir la description précise de mon profil — 1,99€`,
+    personnalite: `Révéler mon type exact et mon profil caché — 1,99€`,
+  };
+  const ctaText = ctaLabel[quiz.slug] ?? `Voir mon résultat complet — 1,99€`;
 
   useEffect(() => {
     if (hasSaved.current) return;
@@ -356,7 +501,7 @@ export default function ResultsClient({ quiz }: Props) {
   }
 
   function handleOneTimeClick() {
-    trackEvent('checkout_click_onetime');
+    trackEvent('checkout_click');
     if (!session?.user) {
       try {
         sessionStorage.setItem('pending_checkout', '1');
@@ -399,19 +544,19 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
             <div className="space-y-3">
               <button
-                onClick={() => { setShowExitModal(false); void doCheckout(); }}
-                disabled={isCheckingOut}
-                className="w-full py-4 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
-              >
-                Voir mon score — 9,99€/mois ✦
-              </button>
-              <button
                 onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
                 disabled={isCheckingOut}
-                className="w-full py-3 rounded-xl font-semibold text-zinc-200 text-sm bg-white/[0.06] hover:bg-white/10 border border-white/12 transition-all disabled:opacity-60"
+                className="w-full py-4 rounded-xl font-black text-white text-base transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
               >
-                Juste ce résultat — 1,99€ (paiement unique)
+                {ctaText} ✦
+              </button>
+              <button
+                onClick={() => { setShowExitModal(false); void doCheckout(); }}
+                disabled={isCheckingOut}
+                className="w-full py-2.5 rounded-xl font-medium text-zinc-500 text-xs border border-white/6 bg-white/[0.03] hover:bg-white/5 hover:text-zinc-400 transition-all disabled:opacity-60"
+              >
+                Accès illimité — 9,99€/mois (pour les passionnés MBTI)
               </button>
               <button
                 onClick={() => setShowExitModal(false)}
@@ -526,15 +671,27 @@ export default function ResultsClient({ quiz }: Props) {
             Retour
           </Link>
           <span className="text-sm font-medium text-zinc-300">{quiz.emoji} Résultats</span>
-          <Link
-            href="/quizzes"
-            className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            Accueil
-          </Link>
+          {session?.user ? (
+            <Link
+              href="/dashboard"
+              className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Mon profil
+            </Link>
+          ) : (
+            <Link
+              href="/quizzes"
+              className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Accueil
+            </Link>
+          )}
         </div>
       </header>
 
@@ -545,95 +702,6 @@ export default function ResultsClient({ quiz }: Props) {
           {sessionLoading ? (
             <div className="flex justify-center py-20">
               <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
-            </div>
-          ) : !session?.user ? (
-            /* ── AUTH GATE: email-first "où envoyer tes résultats" ── */
-            <div className="flex flex-col items-center text-center py-4">
-              {/* Blurred score hint */}
-              <div className="relative mb-5">
-                <svg width="120" height="120" viewBox="0 0 180 180" style={{ filter: 'blur(6px)', opacity: 0.4 }}>
-                  <circle cx="90" cy="90" r="72" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
-                  <circle cx="90" cy="90" r="72" fill="none" stroke={tier.glowColor} strokeWidth="10"
-                    strokeDasharray={CIRCUMFERENCE} strokeDashoffset={CIRCUMFERENCE * 0.35}
-                    strokeLinecap="round" transform="rotate(-90 90 90)" />
-                  <text x="90" y="98" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="42" fontWeight="900">??</text>
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6cc, #ec4899cc)' }}>
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Analyse terminée — résultats prêts
-              </div>
-
-              <h2 className="text-white font-black text-2xl mb-2 leading-snug">
-                Tes résultats sont prêts ✓
-              </h2>
-              <p className="text-zinc-400 text-sm leading-relaxed mb-7 max-w-xs">
-                Saisis ton email pour les recevoir et y accéder à tout moment.
-              </p>
-
-              {!authSent ? (
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (!authEmail.trim()) return;
-                    setAuthLoading(true);
-                    try { sessionStorage.setItem('pending_checkout', '1'); } catch {}
-                    await signIn('email', { email: authEmail, callbackUrl: currentUrl, redirect: false });
-                    setAuthSent(true);
-                    setAuthLoading(false);
-                  }}
-                  className="w-full max-w-xs space-y-3 mb-4"
-                >
-                  <input
-                    type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)}
-                    placeholder="ton@email.com" required autoFocus
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-zinc-600 outline-none focus:border-violet-500/60 transition-all"
-                  />
-                  <button type="submit" disabled={authLoading}
-                    className="w-full py-4 rounded-xl font-black text-white text-base disabled:opacity-60 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}>
-                    {authLoading ? 'Envoi…' : 'Voir mes résultats →'}
-                  </button>
-                </form>
-              ) : (
-                <div className="text-center py-3 mb-4">
-                  <div className="text-3xl mb-2">📬</div>
-                  <p className="text-zinc-300 text-sm font-semibold">Lien envoyé !</p>
-                  <p className="text-zinc-500 text-xs mt-1">Clique sur le lien dans <span className="text-violet-400">{authEmail}</span></p>
-                </div>
-              )}
-
-              <div className="flex items-center gap-3 w-full max-w-xs mb-3">
-                <div className="flex-1 h-px bg-white/8" />
-                <span className="text-zinc-700 text-xs">ou</span>
-                <div className="flex-1 h-px bg-white/8" />
-              </div>
-
-              <button
-                onClick={() => { try { sessionStorage.setItem('pending_checkout', '1'); } catch {} void signIn('google', { callbackUrl: currentUrl }); }}
-                className="w-full max-w-xs flex items-center justify-center gap-3 py-3 rounded-xl bg-white/8 border border-white/10 text-zinc-300 hover:text-white font-medium text-sm hover:bg-white/12 transition-all"
-              >
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Continuer avec Google
-              </button>
-
-              <p className="text-zinc-700 text-[11px] mt-5 max-w-xs">
-                Tes résultats sont sauvegardés 7 jours · Aucun spam · Désinscription en 1 clic
-              </p>
             </div>
           ) : isPremium ? (
             /* ── PREMIUM: full results ── */
@@ -671,7 +739,7 @@ export default function ResultsClient({ quiz }: Props) {
               </div>
 
               {/* Full analysis */}
-              <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 mb-6">
+              <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 mb-4">
                 <p className="text-zinc-200 font-semibold text-sm mb-4">{tier.message}</p>
                 <div className="space-y-3">
                   {analysis.map((line, i) => (
@@ -679,6 +747,24 @@ export default function ResultsClient({ quiz }: Props) {
                   ))}
                 </div>
               </div>
+
+              {/* Dashboard CTA — premium users */}
+              <Link
+                href="/dashboard"
+                className="flex items-center justify-between w-full px-5 py-4 rounded-2xl mb-6 transition-all hover:opacity-90 active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(236,72,153,0.14))', border: '1px solid rgba(139,92,246,0.3)' }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">👤</span>
+                  <div>
+                    <p className="text-white font-black text-sm leading-tight">Mon profil UrCecret</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Historique · type MBTI · compatibilités</p>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </>
           ) : (
             /* ── FREE: paywall ── */
@@ -701,7 +787,7 @@ export default function ResultsClient({ quiz }: Props) {
                       strokeLinecap="round" transform="rotate(-90 90 90)"
                       style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
                     />
-                    <text x="90" y="98" textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="32" fontWeight="900">{partialScore}</text>
+                    <text x="90" y="98" textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize={partialType ? '26' : '36'} fontWeight="900">{partialType ?? partialScore}</text>
                   </svg>
                 </div>
                 {/* Lock icon overlay */}
@@ -720,30 +806,36 @@ export default function ResultsClient({ quiz }: Props) {
                 </div>
               </div>
 
-              {/* "Results ready" badge */}
+              {/* Badge — tier + partial score */}
               <div className="flex justify-center mb-4">
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-white/5 border border-white/10 text-zinc-300">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Analyse terminée — résultats prêts
+                <span
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold border"
+                  style={{ color: tier.glowColor, borderColor: `${tier.glowColor}40`, backgroundColor: `${tier.glowColor}12` }}
+                >
+                  <span>{tier.emoji}</span>
+                  {tier.title} · {partialType ?? partialScore}
                 </span>
               </div>
 
-              {/* Teaser — 15% visible */}
+              {/* Teaser — specific hook + locked list */}
               <div className="mb-5 rounded-2xl border border-white/8 bg-white/[0.03] p-5">
-                <p className="text-zinc-100 font-black text-[15px] leading-snug mb-3">{tier.message}</p>
-                <p className="text-zinc-300 text-sm leading-relaxed">{analysis[0]}</p>
-                <div className="relative mt-3 overflow-hidden" style={{ maxHeight: 58 }}>
-                  <div style={{ filter: 'blur(5px)', userSelect: 'none', pointerEvents: 'none' }}>
-                    <p className="text-zinc-400 text-sm leading-relaxed">{analysis[1]}</p>
-                    <p className="text-zinc-400 text-sm leading-relaxed mt-2">{analysis[2]}</p>
-                  </div>
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.97) 70%)' }} />
+                {/* First real insight, visible */}
+                <p className="text-zinc-100 text-sm leading-relaxed mb-3">
+                  {teaser.intro}
+                </p>
+                {/* Cut-off — the crucial moment */}
+                <div className="relative overflow-hidden" style={{ maxHeight: 36 }}>
+                  <p className="text-zinc-400 text-sm leading-relaxed italic">
+                    {teaser.cut}
+                  </p>
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 60%, rgba(9,9,11,0.98) 100%)' }} />
                 </div>
-                <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-white/5">
-                  <svg className="w-3.5 h-3.5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span className="text-[11px] text-zinc-600">9 points d&apos;analyse supplémentaires verrouillés</span>
+
+                {/* What's locked — specific list */}
+                <div className="mt-4 pt-4 border-t border-white/5 space-y-1.5">
+                  {teaser.locked.map((item) => (
+                    <p key={item} className="text-[11px] text-zinc-600 leading-snug">{item}</p>
+                  ))}
                 </div>
               </div>
 
@@ -775,12 +867,17 @@ export default function ResultsClient({ quiz }: Props) {
                   <span className="text-xs text-zinc-500">{pw.social}</span>
                 </div>
 
-                {/* Hero CTA — 1,99€ one-time (lowest friction, most likely to convert) */}
+                {/* CTA — 1,99€ one-time: primary hero */}
+                <div className="flex justify-center mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 tracking-wide">
+                    ⚡ Choix #1 — rapide, sans engagement
+                  </span>
+                </div>
                 <button
                   onClick={handleOneTimeClick}
                   disabled={isCheckingOut}
-                  className="w-full py-4 rounded-xl font-black text-white text-base mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
-                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 28px rgba(139,92,246,0.45)' }}
+                  className="w-full py-5 rounded-2xl font-black text-white text-lg mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 6px 32px rgba(139,92,246,0.55)' }}
                 >
                   {isCheckingOut ? (
                     <span className="flex items-center justify-center gap-2">
@@ -791,27 +888,42 @@ export default function ResultsClient({ quiz }: Props) {
                       Redirection…
                     </span>
                   ) : (
-                    'Voir mon analyse complète — 1,99€ ✦'
+                    <>{ctaText} ✦</>
                   )}
                 </button>
-                <p className="text-center text-[11px] text-zinc-500 mb-5">
-                  Paiement unique · Accès immédiat · Pas d&apos;abonnement
-                </p>
 
-                {/* Divider — subscriptions are secondary */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 h-px bg-white/8" />
-                  <span className="text-[10px] text-zinc-600 uppercase tracking-widest whitespace-nowrap">Pour les passionnés</span>
-                  <div className="flex-1 h-px bg-white/8" />
+                {/* Benefit bullets — one-time focused */}
+                <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-5 px-1">
+                  {[
+                    'Score exact révélé',
+                    '10 révélations IA',
+                    'Paiement unique',
+                    'Accès immédiat',
+                  ].map(b => (
+                    <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                      <span className="text-emerald-400 text-[10px]">✓</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Divider — for power users */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-1 h-px bg-white/5" />
+                  <span className="text-[10px] text-zinc-600 font-semibold tracking-wider uppercase whitespace-nowrap">Pour ceux qui s'y connaissent en MBTI</span>
+                  <div className="flex-1 h-px bg-white/5" />
                 </div>
 
-                {/* Monthly sub — secondary choice */}
+                {/* Monthly sub — for power users */}
                 <button
                   onClick={handlePayClick}
                   disabled={isCheckingOut}
-                  className="w-full py-3 rounded-xl font-semibold text-zinc-300 text-sm border border-white/12 bg-white/[0.05] hover:bg-white/10 transition-all active:scale-[0.98] mb-2 disabled:opacity-60"
+                  className="w-full py-2.5 rounded-xl font-medium text-zinc-600 text-xs border border-white/6 bg-white/[0.02] hover:bg-white/5 hover:text-zinc-400 transition-all active:scale-[0.98] mb-2 disabled:opacity-60 text-left px-4"
                 >
-                  Accès illimité — 9,99€/mois <span className="text-[11px] text-zinc-500">(15 quiz, annulable)</span>
+                  <span className="flex items-center justify-between">
+                    <span>Accès illimité · 15 quiz · analyses croisées</span>
+                    <span className="font-bold text-zinc-500">9,99€/mois</span>
+                  </span>
                 </button>
 
                 {/* Annual option */}
@@ -829,13 +941,16 @@ export default function ResultsClient({ quiz }: Props) {
                     })();
                   }}
                   disabled={isCheckingOut}
-                  className="w-full py-2.5 rounded-xl font-semibold text-zinc-500 text-sm border border-white/8 bg-transparent hover:bg-white/5 transition-all active:scale-[0.98] mb-4 disabled:opacity-60"
+                  className="w-full py-2.5 rounded-xl font-medium text-zinc-600 text-xs border border-white/6 bg-white/[0.02] hover:bg-white/5 hover:text-zinc-400 transition-all active:scale-[0.98] mb-4 disabled:opacity-60 text-left px-4"
                 >
-                  Annuel — 29,99€/an <span className="text-[11px] opacity-70">(2,50€/mois — −75%)</span>
+                  <span className="flex items-center justify-between">
+                    <span>Accès annuel · meilleur rapport qualité/prix</span>
+                    <span className="font-bold text-zinc-500">29,99€/an</span>
+                  </span>
                 </button>
 
-                <p className="text-center text-[11px] text-zinc-700">
-                  Paiement 100% sécurisé · Annulable à tout moment
+                <p className="text-center text-[11px] text-zinc-600">
+                  Paiement 100% sécurisé · Sans engagement pour le paiement unique
                 </p>
               </div>
 

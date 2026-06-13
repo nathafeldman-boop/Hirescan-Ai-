@@ -2,229 +2,172 @@
 
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
-
-const RIZZ_LEVELS = [
-  { min: 0,   max: 200,  label: 'Rookie',      emoji: '🌱', color: '#6b7280' },
-  { min: 200, max: 500,  label: 'Apprenti',    emoji: '✨', color: '#3b82f6' },
-  { min: 500, max: 1000, label: 'Charmeur',    emoji: '🔥', color: '#8b5cf6' },
-  { min: 1000,max: 2000, label: 'Séducteur',   emoji: '💜', color: '#ec4899' },
-  { min: 2000,max: 9999, label: 'Rizz Master', emoji: '👑', color: '#f59e0b' },
-];
-
-function getRizzLevel(score: number) {
-  return RIZZ_LEVELS.find((l) => score >= l.min && score < l.max) ?? RIZZ_LEVELS[0];
-}
+import { mbtiTypes } from '@/lib/mbti';
 
 interface Props {
   user: {
     name: string | null;
     email: string | null;
     image: string | null;
-    rizzScore: number;
-    rizzLevel: number;
     tier: string;
+    mbtiType: string | null;
+    mbtiTestCount: number;
+    memberSince: string;
   };
-  recentQuizzes: { id: string; quizSlug: string; score: number; createdAt: Date }[];
-  recentAnalyses: { id: string; context: string; rizzScoreAfter: number; createdAt: string }[];
 }
 
-export default function DashboardClient({ user, recentQuizzes, recentAnalyses }: Props) {
-  const level = getRizzLevel(user.rizzScore);
-  const nextLevel = RIZZ_LEVELS[RIZZ_LEVELS.indexOf(level) + 1];
-  const progress = nextLevel
-    ? ((user.rizzScore - level.min) / (nextLevel.min - level.min)) * 100
-    : 100;
-
-  const ACTIONS = [
-    {
-      href: '/quiz/personnalite',
-      emoji: '🧠',
-      label: 'Test de personnalité',
-      desc: 'Découvre ton type MBTI en 5 min',
-      color: '#8b5cf6',
-      badge: 'Gratuit',
-    },
-    {
-      href: '/types',
-      emoji: '🔍',
-      label: 'Les 16 types',
-      desc: 'Explore tous les profils',
-      color: '#ec4899',
-      badge: null,
-    },
-    {
-      href: '/onboarding',
-      emoji: '❓',
-      label: 'Questionnaires',
-      desc: 'Explore tes vérités cachées',
-      color: '#06b6d4',
-      badge: null,
-    },
-    {
-      href: '#',
-      emoji: '📸',
-      label: 'Analyse photo',
-      desc: 'Bientôt disponible',
-      color: '#10b981',
-      badge: 'Bientôt',
-    },
-  ];
+export default function DashboardClient({ user }: Props) {
+  const isPremium = user.tier === 'premium' || user.tier === 'pro';
+  const type = user.mbtiType ? mbtiTypes[user.mbtiType] : null;
+  const firstName = user.name?.split(' ')[0] ?? 'toi';
 
   return (
-    <main className="min-h-screen bg-white">
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-violet-100/50 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-100/40 rounded-full blur-3xl" />
+    <main className="min-h-screen bg-[#09090b]">
+
+      {/* Background atmosphere */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-[0.08] bg-violet-600" />
+        <div className="absolute bottom-1/3 left-0 w-72 h-72 rounded-full blur-3xl opacity-[0.06] bg-pink-600" />
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-black">
-            <span className="bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent">Ur</span>
-            <span className="text-gray-900">Cecret</span>
-          </h1>
+      {/* Top nav */}
+      <header className="relative z-10 sticky top-0" style={{ background: 'rgba(9,9,11,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+          <Link href="/" className="text-lg font-black">
+            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span className="text-white">Cecret</span>
+          </Link>
           <div className="flex items-center gap-3">
-            <LanguageSwitcher />
-            {user.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-gray-200" />
-            )}
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="text-gray-400 hover:text-gray-900 text-sm transition-colors"
-            >
+            {user.image
+              ? <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-white/10" /> // eslint-disable-line @next/next/no-img-element
+              : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff' }}>{firstName[0]?.toUpperCase()}</div>
+            }
+            <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
               Déconnexion
             </button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Score Card */}
-        <div className="bg-white rounded-2xl p-6 mb-6 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-gray-500 text-sm">Bonjour {user.name?.split(' ')[0] ?? 'toi'} 👋</p>
-              <h2 className="text-gray-900 font-black text-xl mt-0.5">Ton Score</h2>
-            </div>
-            <div className="text-right">
-              <div
-                className="text-4xl font-black tabular-nums"
-                style={{ color: level.color }}
-              >
-                {user.rizzScore.toLocaleString('fr-FR')}
-              </div>
-              <div className="text-sm font-semibold" style={{ color: level.color }}>
-                {level.emoji} {level.label}
-              </div>
-            </div>
+      <div className="relative z-10 max-w-lg mx-auto px-4 py-6 space-y-4">
+
+        {/* Greeting + tier */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-black text-white">Bonjour {firstName} 👋</h1>
+            <p className="text-sm text-zinc-500">{user.email}</p>
           </div>
+          {isPremium
+            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: '#a78bfa', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)' }}>👑 Pro</span>
+            : <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-zinc-400" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>Gratuit</span>
+          }
+        </div>
 
-          {/* Progress bar */}
-          {nextLevel && (
-            <div>
-              <div className="flex justify-between text-xs text-gray-400 mb-1.5">
-                <span>{level.label}</span>
-                <span>{nextLevel.label} — {nextLevel.min - user.rizzScore} pts</span>
+        {/* MBTI type — main card */}
+        {type ? (
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            {/* Color band */}
+            <div className="h-1 w-full" style={{ background: `linear-gradient(to right,${type.accentColor},#ec4899)` }} />
+            <div className="p-5">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Ton type de personnalité</p>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-5xl leading-none">{type.emoji}</div>
+                <div>
+                  <p className="text-2xl font-black text-white leading-tight">{user.mbtiType}</p>
+                  <p className="text-sm font-bold text-zinc-400">{type.name}</p>
+                  <p className="text-xs mt-0.5" style={{ color: type.accentColor }}>{type.rarity} de la population</p>
+                </div>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{ width: `${progress}%`, backgroundColor: level.color }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Tier badge */}
-          <div className="mt-4 flex items-center gap-2">
-            <span
-              className="text-xs font-semibold px-2.5 py-1 rounded-full border"
-              style={
-                user.tier === 'premium'
-                  ? { color: '#f59e0b', borderColor: '#f59e0b40', backgroundColor: '#f59e0b10' }
-                  : user.tier === 'pro'
-                  ? { color: '#8b5cf6', borderColor: '#8b5cf640', backgroundColor: '#8b5cf610' }
-                  : { color: '#6b7280', borderColor: '#6b728040', backgroundColor: '#6b728010' }
-              }
-            >
-              {user.tier === 'premium' ? '👑 Premium' : user.tier === 'pro' ? '💜 Pro' : '🆓 Free'}
-            </span>
-            {user.tier === 'free' && (
+              <p className="text-sm text-zinc-400 italic mb-5 leading-relaxed">&ldquo;{type.tagline}&rdquo;</p>
               <Link
-                href="/pricing"
-                className="text-xs font-semibold px-3 py-1 rounded-full transition-all"
-                style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff' }}
+                href={`/types/${user.mbtiType!.toLowerCase()}`}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01]"
+                style={{ background: `linear-gradient(135deg,${type.accentColor},#ec4899)`, boxShadow: `0 4px 20px ${type.accentColor}30` }}
               >
-                Passer Premium →
+                Voir mon profil complet →
               </Link>
-            )}
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {ACTIONS.map((action) => (
-            <Link
-              key={action.href}
-              href={action.badge === 'Bientôt' ? '#' : action.href}
-              className={`bg-white rounded-2xl p-4 border border-gray-200 transition-all hover:border-gray-300 hover:shadow-sm ${action.badge === 'Bientôt' ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <span className="text-2xl">{action.emoji}</span>
-                {action.badge && (
-                  <span
-                    className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                    style={
-                      action.badge === 'Bientôt'
-                        ? { color: '#9ca3af', backgroundColor: '#f3f4f6' }
-                        : { color: action.color, backgroundColor: action.color + '15' }
-                    }
-                  >
-                    {action.badge}
-                  </span>
-                )}
-              </div>
-              <p className="text-gray-900 font-bold text-sm leading-tight">{action.label}</p>
-              <p className="text-gray-500 text-xs mt-0.5">{action.desc}</p>
-            </Link>
-          ))}
-        </div>
-
-        {/* Recent activity */}
-        {(recentQuizzes.length > 0 || recentAnalyses.length > 0) && (
-          <div className="bg-white rounded-2xl p-5 border border-gray-200">
-            <h3 className="text-gray-900 font-bold text-sm mb-4">Activité récente</h3>
-            <div className="space-y-2">
-              {recentAnalyses.map((a) => (
-                <div key={a.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">📸</span>
-                    <div>
-                      <p className="text-gray-700 text-sm truncate max-w-[180px]">{a.context}</p>
-                      <p className="text-gray-400 text-xs">{new Date(a.createdAt).toLocaleDateString('fr-FR')}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold" style={{ color: '#8b5cf6' }}>
-                    +{a.rizzScoreAfter} pts
-                  </span>
+              {user.mbtiTestCount > 0 && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-xs text-zinc-600">Test passé {user.mbtiTestCount} fois</p>
+                  <Link href="/quiz/personnalite" className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
+                    Repasser le test →
+                  </Link>
                 </div>
-              ))}
-              {recentQuizzes.map((q) => (
-                <div key={q.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">❓</span>
-                    <div>
-                      <p className="text-gray-700 text-sm capitalize">{q.quizSlug.replace('-', ' ')}</p>
-                      <p className="text-gray-400 text-xs">{new Date(q.createdAt).toLocaleDateString('fr-FR')}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-pink-500">{q.score}%</span>
-                </div>
-              ))}
+              )}
             </div>
+          </div>
+        ) : (
+          <div
+            className="rounded-2xl p-6 text-center"
+            style={{ background: 'rgba(139,92,246,0.06)', border: '2px dashed rgba(139,92,246,0.25)' }}
+          >
+            <div className="text-4xl mb-3">🧠</div>
+            <p className="text-base font-black text-white mb-1">Découvre ton type MBTI</p>
+            <p className="text-sm text-zinc-500 mb-5">100 questions · environ 12 minutes</p>
+            <Link
+              href="/quiz/personnalite"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.3)' }}
+            >
+              Passer le test →
+            </Link>
           </div>
         )}
+
+        {/* Feature row */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            href={isPremium ? '/duo' : '/pricing'}
+            className="rounded-2xl p-4 transition-all hover:scale-[1.02] group"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-2xl">💑</span>
+              {!isPremium && (
+                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>Pro</span>
+              )}
+            </div>
+            <p className="text-sm font-bold text-white">Compatibilité</p>
+            <p className="text-xs text-zinc-500 mt-0.5 leading-snug">Compare avec quelqu&apos;un</p>
+          </Link>
+
+          <Link
+            href="/types"
+            className="rounded-2xl p-4 transition-all hover:scale-[1.02]"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <div className="mb-3">
+              <span className="text-2xl">🔍</span>
+            </div>
+            <p className="text-sm font-bold text-white">Les 16 types</p>
+            <p className="text-xs text-zinc-500 mt-0.5 leading-snug">Explorer tous les profils</p>
+          </Link>
+        </div>
+
+        {/* Upgrade banner — free only */}
+        {!isPremium && (
+          <div
+            className="rounded-2xl p-5 flex items-center gap-4"
+            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.12),rgba(236,72,153,0.08))', border: '1px solid rgba(139,92,246,0.2)' }}
+          >
+            <div className="text-2xl flex-shrink-0">💎</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-white">Passer Pro</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Type révélé · Compatibilité duo · Profils complets</p>
+            </div>
+            <Link
+              href="/pricing"
+              className="px-4 py-2 rounded-xl font-bold text-white text-xs flex-shrink-0 transition-all hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+            >
+              Voir →
+            </Link>
+          </div>
+        )}
+
       </div>
     </main>
   );

@@ -1,20 +1,34 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession, signIn } from 'next-auth/react';
-import { mbtiQuestions, computeMbtiType, MbtiQuestion } from '@/lib/mbti';
+import { useSession } from 'next-auth/react';
+import { mbtiQuestions, computeMbtiType, mbtiTypes, MbtiQuestion } from '@/lib/mbti';
 import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
+import { track } from '@/lib/analytics';
 
 const TOTAL = mbtiQuestions.length;
 
-type QuizAnswer = 'A' | 'B' | 'C' | 'D';
+// ─── Diagnostic logger ──────────────────────────────────────────────────────────
+// Writes to browser console AND to the PageView DB so steps are visible in admin.
+// Path format: /__diag/<step> — queryable in the admin diagnostic section.
+function diagLog(step: string, meta: Record<string, unknown> = {}) {
+  // eslint-disable-next-line no-console
+  console.log(`%c[FUNNEL] ${step}`, 'color:#a78bfa;font-weight:bold', meta);
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: `/__diag/${step}` }),
+  }).catch(() => {});
+}
+
+type QuizAnswer = 'A' | 'B' | 'C' | 'D' | 'E';
 type Answers = Record<number, QuizAnswer>;
 type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// ─── Icons ─────────────────────────────────────────────────────────────────────
 
 function BrainIcon() {
   return (
@@ -44,7 +58,7 @@ function GoogleIcon() {
   );
 }
 
-// ─── Progress bar ─────────────────────────────────────────────────────────────
+// ─── Progress bar ───────────────────────────────────────────────────────────────
 
 function ProgressBar({ current, total, label }: { current: number; total: number; label: string }) {
   const pct = Math.round((current / total) * 100);
@@ -64,7 +78,7 @@ function ProgressBar({ current, total, label }: { current: number; total: number
   );
 }
 
-// ─── Quiz screen — one question at a time ─────────────────────────────────────
+// ─── Quiz screen ────────────────────────────────────────────────────────────────
 
 function QuizScreen({ onComplete, questions, t }: {
   onComplete: (answers: Answers) => void;
@@ -75,6 +89,58 @@ function QuizScreen({ onComplete, questions, t }: {
   const [answers, setAnswers] = useState<Answers>({});
   const [selected, setSelected] = useState<QuizAnswer | null>(null);
   const [animating, setAnimating] = useState(false);
+  const [milestoneMsg, setMilestoneMsg] = useState<{ emoji: string; title: string; sub: string } | null>(null);
+  const trackedMilestones = useRef<Set<number>>(new Set());
+  const currentRef = useRef(0);
+
+  const MILESTONE_MSGS: Record<number, { emoji: string; title: string; sub: string }> = {
+    25: { emoji: '🔥', title: 'Tu es dans le top 25 % !', sub: 'La plupart des gens s\'arrêtent avant toi. Continue — ton type se dessine.' },
+    50: { emoji: '⚡', title: 'Mi-chemin atteint !', sub: 'Ton profil commence à prendre forme. Plus que 50 questions pour le révéler.' },
+    75: { emoji: '🎯', title: 'Plus que 25 questions !', sub: 'Ton type se précise. Tu es à quelques secondes de découvrir qui tu es vraiment.' },
+  };
+
+  useEffect(() => {
+    track('quiz_start', { quiz: 'personnalite', content_name: 'Test MBTI' });
+  }, []);
+
+  // Keep ref in sync so visibilitychange always reads latest question
+  useEffect(() => { currentRef.current = current; }, [current]);
+
+  // Track milestones + show motivation banner
+  useEffect(() => {
+    const q = current + 1;
+    if ([10, 25, 50, 75].includes(q) && !trackedMilestones.current.has(q)) {
+      trackedMilestones.current.add(q);
+      fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: `/__quiz/q${q}` }),
+      }).catch(() => {});
+      if (MILESTONE_MSGS[q]) {
+        setMilestoneMsg(MILESTONE_MSGS[q]);
+        setTimeout(() => setMilestoneMsg(null), 2800);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current]);
+
+  // Track exact question when user leaves mid-quiz
+  useEffect(() => {
+    const onHide = () => {
+      if (!document.hidden) return;
+      const q = currentRef.current + 1;
+      if (q < questions.length) {
+        fetch('/api/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: `/__quiz/drop/q${q}` }),
+        }).catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', onHide);
+    return () => document.removeEventListener('visibilitychange', onHide);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const q: MbtiQuestion = questions[current];
 
@@ -84,7 +150,8 @@ function QuizScreen({ onComplete, questions, t }: {
     setAnimating(true);
     const next = { ...answers, [q.id]: choice };
     setTimeout(() => {
-      if (current + 1 >= TOTAL) {
+      if (current + 1 >= questions.length) {
+        setAnimating(false);
         onComplete(next);
       } else {
         setAnswers(next);
@@ -97,7 +164,19 @@ function QuizScreen({ onComplete, questions, t }: {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-10">
-      <ProgressBar current={current + 1} total={TOTAL} label={t.questionOf(current + 1, TOTAL)} />
+      {/* Milestone motivation banner */}
+      {milestoneMsg && (
+        <div
+          className="fixed inset-x-4 top-4 z-50 rounded-2xl p-4 text-center shadow-2xl"
+          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', animation: 'fadeInDown 0.3s ease' }}
+          onClick={() => setMilestoneMsg(null)}
+        >
+          <p className="text-2xl mb-1">{milestoneMsg.emoji}</p>
+          <p className="text-white font-black text-base leading-tight">{milestoneMsg.title}</p>
+          <p className="text-white/80 text-xs mt-1 leading-snug">{milestoneMsg.sub}</p>
+        </div>
+      )}
+      <ProgressBar current={current + 1} total={questions.length} label={t.questionOf(current + 1, questions.length)} />
 
       <div className="mb-10 text-center">
         <p className="text-xs text-gray-400 uppercase tracking-widest mb-4">
@@ -106,26 +185,32 @@ function QuizScreen({ onComplete, questions, t }: {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">{q.text}</h2>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5">
         {([
-          { key: 'A' as const, option: q.optionA },
-          { key: 'B' as const, option: q.optionB },
-          ...(q.optionC ? [{ key: 'C' as const, option: q.optionC }] : []),
-          ...(q.optionD ? [{ key: 'D' as const, option: q.optionD }] : []),
-        ]).map(({ key, option }) => {
+          { key: 'A' as const, label: "Totalement d'accord", color: '#7c3aed' },
+          { key: 'B' as const, label: "Plutôt d'accord",     color: '#a78bfa' },
+          { key: 'C' as const, label: 'Neutre',              color: '#9ca3af' },
+          { key: 'D' as const, label: "Plutôt pas d'accord", color: '#f97316' },
+          { key: 'E' as const, label: "Pas du tout d'accord",color: '#ef4444' },
+        ] as { key: QuizAnswer; label: string; color: string }[]).map(({ key, label, color }) => {
           const isSelected = selected === key;
           return (
             <button
               key={key}
               onClick={() => handleChoice(key)}
               disabled={animating}
-              className={`w-full text-center px-6 py-4 rounded-2xl border-2 transition-all duration-200 text-base font-semibold ${
+              className={`w-full text-left px-5 py-3.5 rounded-2xl border-2 transition-all duration-150 text-sm font-semibold flex items-center gap-3 ${
                 isSelected
-                  ? 'border-violet-500 bg-violet-50 text-violet-700 scale-[0.98]'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-violet-300 hover:bg-violet-50/50'
+                  ? 'scale-[0.98]'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
               }`}
+              style={isSelected ? { borderColor: color, backgroundColor: color + '12', color } : {}}
             >
-              {option.text}
+              <span className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all"
+                style={isSelected ? { borderColor: color, backgroundColor: color } : { borderColor: '#d1d5db' }}>
+                {isSelected && <span className="w-2 h-2 rounded-full bg-white" />}
+              </span>
+              {label}
             </button>
           );
         })}
@@ -134,7 +219,7 @@ function QuizScreen({ onComplete, questions, t }: {
   );
 }
 
-// ─── Analysis screen ──────────────────────────────────────────────────────────
+// ─── Analysis screen ────────────────────────────────────────────────────────────
 
 function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   const [progress, setProgress] = useState(0);
@@ -171,180 +256,425 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   );
 }
 
-// ─── Auth gate ────────────────────────────────────────────────────────────────
+// ─── In-app browser overlay ─────────────────────────────────────────────────────
 
-function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const callbackUrl = `/types/${typeCode.toLowerCase()}`;
-  const isFr = lang !== 'en';
+function InAppBrowserOverlay({ onDismiss }: { onDismiss: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const openInChrome = () => {
+    const url = window.location.href;
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+    if (isIOS) {
+      window.location.href = `googlechrome://${url.replace(/^https?:\/\//, '')}`;
+    } else {
+      window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
+    }
+    setTimeout(async () => {
+      try { await navigator.clipboard.writeText(url); setCopied(true); } catch {}
+    }, 1200);
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+    } catch {
+      setCopied(true);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-8 h-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
-            </svg>
+    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6 text-center">
+      <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-amber-100 flex items-center justify-center text-3xl">⚠️</div>
+      <h2 className="text-xl font-black text-gray-900 mb-3">
+        Ouvre dans Chrome ou Safari
+      </h2>
+      <p className="text-gray-500 text-sm mb-8 leading-relaxed max-w-xs">
+        Le navigateur de TikTok bloque la connexion et le paiement. Ouvre ce lien dans Chrome ou Safari pour ne pas perdre ton résultat.
+      </p>
+      <div className="w-full max-w-xs space-y-3">
+        <button
+          onClick={openInChrome}
+          className="w-full py-4 rounded-2xl font-black text-white text-base"
+          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>
+          Ouvrir dans Chrome
+        </button>
+        <button
+          onClick={copyLink}
+          className="w-full py-3 rounded-2xl font-semibold text-sm border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all">
+          {copied ? '✓ Lien copié — colle-le dans Chrome !' : '📋 Copier le lien'}
+        </button>
+      </div>
+      <button
+        onClick={onDismiss}
+        className="mt-8 text-xs text-gray-300 hover:text-gray-500 transition-colors">
+        Continuer quand même (risqué)
+      </button>
+    </div>
+  );
+}
+
+// ─── Countdown timer ─────────────────────────────────────────────────────────────
+
+function CountdownTimer({ isFr }: { isFr: boolean }) {
+  const [seconds, setSeconds] = useState(() => {
+    try {
+      const end = sessionStorage.getItem('_pwt');
+      if (end) {
+        const rem = Math.round((parseInt(end) - Date.now()) / 1000);
+        if (rem > 0 && rem <= 15 * 60) return rem;
+      }
+    } catch {}
+    const endTs = Date.now() + 15 * 60 * 1000;
+    try { sessionStorage.setItem('_pwt', endTs.toString()); } catch {}
+    return 15 * 60;
+  });
+
+  useEffect(() => {
+    if (seconds <= 0) return;
+    const id = setInterval(() => setSeconds(s => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (seconds <= 0) return null;
+  const m = Math.floor(seconds / 60);
+  const s = (seconds % 60).toString().padStart(2, '0');
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mb-3">
+      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-black bg-red-50 border border-red-200 text-red-600">
+        ⏱ {isFr ? `Prix réduit — encore ${m}:${s}` : `Reduced price — ${m}:${s} left`}
+      </span>
+    </div>
+  );
+}
+
+// ─── Result teaser (free users — logged in or not) ─────────────────────────────
+// Auth gate removed: user goes straight to Stripe which collects their email.
+// The success page creates the account automatically from the Stripe email.
+
+function ResultTeaser({ typeCode, lang, userEmail }: {
+  typeCode: string; lang: string; userEmail?: string | null;
+}) {
+  const type = mbtiTypes[typeCode];
+  const isFr = lang !== 'en';
+  const [loading, setLoading] = useState(false);
+
+  // Track paywall view once on mount
+  useEffect(() => {
+    track('paywall_view', { quiz: 'personnalite' });
+    diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
+    diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail });
+    track('checkout_click', {
+      quiz: 'personnalite',
+      value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
+      currency: 'EUR',
+    });
+    setLoading(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: window.location.origin,
+          quizSlug: 'personnalite',
+          typeCode,
+          ...(userEmail ? { userEmail } : {}),
+          ...(checkoutType === 'annual' ? { annual: true } : {}),
+          ...(checkoutType === 'onetime' ? { oneTime: true } : {}),
+        }),
+      });
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) window.location.href = data.url;
+      else { alert(data.error ?? 'Erreur de paiement'); setLoading(false); }
+    } catch {
+      alert('Erreur réseau. Réessaie.');
+      setLoading(false);
+    }
+  }, [typeCode, userEmail]);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-[#09090b]">
+      {/* Background atmosphere */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.1] bg-violet-600" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-[0.07] bg-pink-600" />
+      </div>
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="text-center mb-6">
+          {/* Type code preview */}
+          <div
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black mb-5 tracking-widest"
+            style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa' }}
+          >
+            {typeCode.slice(0, 2)}<span className="blur-[4px] select-none opacity-60">??</span>
           </div>
-          <h1 className="text-2xl font-black text-gray-900 mb-2">
-            {isFr ? 'Ton analyse est prête !' : 'Your analysis is ready!'}
+
+          <h1 className="text-2xl font-black text-white mb-2">
+            {isFr ? 'Ton type est prêt' : 'Your type is ready'}
           </h1>
-          <p className="text-gray-500 text-sm leading-relaxed">
+          <p className="text-zinc-400 text-sm leading-relaxed">
             {isFr
-              ? 'Crée ton compte gratuitement pour révéler ton type de personnalité.'
-              : 'Create your free account to reveal your personality type.'}
+              ? `${type?.rarity} de la population partagent ce profil.`
+              : `${type?.rarity} of the population share this profile.`}
           </p>
         </div>
 
-        {/* Blurred result teaser */}
-        <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6 relative overflow-hidden">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
-            <div className="flex-1 space-y-1.5">
-              <div className="h-3 bg-gray-200 rounded-full w-3/4 animate-pulse" />
-              <div className="h-2.5 bg-gray-100 rounded-full w-1/2 animate-pulse" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="h-2.5 bg-gray-100 rounded-full animate-pulse" />
-            <div className="h-2.5 bg-gray-100 rounded-full w-5/6 animate-pulse" />
-            <div className="h-2.5 bg-gray-100 rounded-full w-4/6 animate-pulse" />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
-            <div className="text-center">
-              <div className="text-gray-400 mb-1 flex justify-center"><LockIcon /></div>
-              <p className="text-xs text-gray-400 font-medium">
-                {isFr ? 'Résultat verrouillé' : 'Result locked'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Auth card */}
-        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
-          {sent ? (
-            <div className="text-center py-2">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                </svg>
-              </div>
-              <h3 className="text-gray-900 font-bold text-lg mb-1">
-                {isFr ? 'Vérifie tes emails' : 'Check your inbox'}
-              </h3>
-              <p className="text-gray-500 text-sm">
-                {isFr ? 'Lien envoyé à' : 'Link sent to'}{' '}
-                <span className="text-violet-600 font-medium">{email}</span>
-              </p>
-              <p className="text-gray-400 text-xs mt-3">
-                {isFr ? 'Clique sur le lien pour révéler ton type.' : 'Click the link to reveal your type.'}
-              </p>
-            </div>
-          ) : (
-            <>
-              <h2 className="text-gray-900 font-bold text-[15px] text-center mb-5">
-                {isFr ? 'Connexion / Inscription — 30 secondes' : 'Sign in / Sign up — 30 seconds'}
-              </h2>
-              <button
-                onClick={() => signIn('google', { callbackUrl })}
-                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4"
+        {/* Locked type card */}
+        <div
+          className="rounded-2xl p-5 mb-4 relative overflow-hidden"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+        >
+          <div className="space-y-3 select-none" aria-hidden>
+            <div className="flex items-center gap-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-black"
+                style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa' }}
               >
-                <GoogleIcon />
-                {isFr ? 'Continuer avec Google' : 'Continue with Google'}
-              </button>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-gray-400 text-xs">{isFr ? 'ou par email' : 'or by email'}</span>
-                <div className="flex-1 h-px bg-gray-200" />
+                {typeCode.slice(0, 2)}
               </div>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!email.trim()) return;
-                  setLoading(true);
-                  await signIn('email', { email, callbackUrl, redirect: false });
-                  setSent(true);
-                  setLoading(false);
-                }}
-                className="space-y-3"
-              >
-                <input
-                  type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder={isFr ? 'ton@email.com' : 'your@email.com'} required
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 transition-all"
-                />
-                <button
-                  type="submit" disabled={loading}
-                  className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all disabled:opacity-60 active:scale-[0.98]"
-                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
-                >
-                  {loading
-                    ? (isFr ? 'Envoi…' : 'Sending…')
-                    : (isFr ? 'Recevoir mon lien de connexion' : 'Get my sign-in link')}
-                </button>
-              </form>
-              <p className="text-center text-xs text-gray-400 mt-4">
-                {isFr ? 'Gratuit · Aucune carte bancaire requise' : 'Free · No credit card required'}
-              </p>
-            </>
-          )}
-        </div>
-
-        {/* Truth quiz upsell — shown only before email sent */}
-        {!sent && isFr && (
-          <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-3 text-center">
-              Inclus avec ton compte gratuit
-            </p>
-            <div className="space-y-2">
-              {[
-                { emoji: '💔', q: 'Mon/ma partenaire me trompe ?', href: '/quiz/infidelite' },
-                { emoji: '❤️', q: 'Suis-je vraiment amoureux(se) ?', href: '/quiz/amoureux' },
-                { emoji: '🫂', q: 'Sont-ils mes vrais amis ?', href: '/quiz/vrais-amis' },
-              ].map(({ emoji, q }) => (
-                <div key={q} className="flex items-center gap-2.5">
-                  <span className="text-base flex-shrink-0">{emoji}</span>
-                  <p className="text-gray-600 text-xs font-medium">{q}</p>
+              <div>
+                <div className="text-sm font-black text-white tracking-widest">
+                  {typeCode.slice(0, 2)}<span className="blur-sm opacity-40">??</span>
                 </div>
-              ))}
+                <div className="h-2.5 w-20 bg-white/10 rounded-full mt-1 blur-sm" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 bg-white/8 rounded-full blur-sm" />
+              <div className="h-3 bg-white/8 rounded-full w-5/6 blur-sm" />
+              <div className="h-3 bg-white/8 rounded-full w-4/6 blur-sm" />
             </div>
           </div>
-        )}
+          <div
+            className="absolute inset-0 flex items-end justify-center pb-4 rounded-2xl"
+            style={{ background: 'linear-gradient(to top, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.6) 50%, transparent 100%)' }}
+          >
+            <div className="text-center">
+              <div className="mb-1 flex justify-center" style={{ color: '#a78bfa' }}><LockIcon /></div>
+              <p className="text-xs text-zinc-400 font-semibold">
+                {isFr ? 'Ton type complet est verrouillé' : 'Your full type is locked'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* What's inside */}
+        <div
+          className="rounded-xl px-4 py-3 mb-4"
+          style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
+        >
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5" style={{ color: '#a78bfa' }}>
+            {isFr ? 'Ce que tu débloques' : 'What you unlock'}
+          </p>
+          <ul className="space-y-1.5">
+            {(isFr ? [
+              { icon: '🧠', text: 'Tes 4 fonctions cognitives détaillées' },
+              { icon: '❤️', text: 'Profil amoureux et compatibilité' },
+              { icon: '⚡', text: 'Forces, faiblesses, axes de croissance' },
+              { icon: '🌟', text: 'Célébrités de ton type' },
+            ] : [
+              { icon: '🧠', text: 'Your 4 cognitive functions in detail' },
+              { icon: '❤️', text: 'Love profile and compatibility' },
+              { icon: '⚡', text: 'Strengths, weaknesses, growth areas' },
+              { icon: '🌟', text: 'Famous people of your type' },
+            ]).map(item => (
+              <li key={item.text} className="flex items-center gap-2 text-xs text-zinc-300">
+                <span className="flex-shrink-0 text-base leading-none">{item.icon}</span>
+                {item.text}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Paywall */}
+        <div className="space-y-2">
+          {/* Hero — 1,99€ one-time */}
+          <button
+            onClick={() => doCheckout('onetime')}
+            disabled={loading}
+            className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.4)' }}>
+            {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? 'Accéder à mon type complet — 1,99 €' : 'Access my full type — €1.99')}
+          </button>
+          <p className="text-center text-[11px] text-zinc-500">
+            {isFr ? 'Sans compte requis · Accès immédiat · Paiement unique' : 'No account needed · Instant access · One-time payment'}
+          </p>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 pt-2 pb-1">
+            <div className="flex-1 h-px bg-white/8" />
+            <span className="text-[10px] text-zinc-600 uppercase tracking-wider whitespace-nowrap">
+              {isFr ? 'Accès complet' : 'Full access'}
+            </span>
+            <div className="flex-1 h-px bg-white/8" />
+          </div>
+
+          <button
+            onClick={() => doCheckout('annual')}
+            disabled={loading}
+            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 relative overflow-hidden transition-all hover:opacity-90 disabled:opacity-60"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#d4d4d8' }}>
+            <span className="absolute top-0 right-0 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>−75%</span>
+            <span className="flex items-center justify-between pr-8">
+              <span>{isFr ? '16 types · Quiz illimités · Mode Duo' : '16 types · Unlimited quizzes · Duo'}</span>
+              <span className="font-bold text-white">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+            </span>
+          </button>
+          <button
+            onClick={() => doCheckout('monthly')}
+            disabled={loading}
+            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 transition-all hover:opacity-90 disabled:opacity-60"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: '#71717a' }}>
+            <span className="flex items-center justify-between">
+              <span>{isFr ? 'Accès mensuel · sans engagement' : 'Monthly · no commitment'}</span>
+              <span className="font-semibold text-zinc-400">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+            </span>
+          </button>
+        </div>
+
+        <p className="text-center text-[11px] text-zinc-600 mt-3">
+          {isFr ? '🔒 Paiement sécurisé Stripe' : '🔒 Secure Stripe payment'}
+        </p>
       </div>
     </div>
   );
 }
 
-// ─── Root component ───────────────────────────────────────────────────────────
+// ─── Root component ─────────────────────────────────────────────────────────────
 
 export default function PersonnaliteClient() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
+  const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
   const { lang } = useLang();
-  const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate'>('quiz');
+  const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('pending')?.toUpperCase();
+      if (p && mbtiTypes[p]) return 'gate'; // loading state until session resolves
+    }
+    return 'quiz';
+  });
   const [answers, setAnswers] = useState<Answers>({});
   const [mbtiType, setMbtiType] = useState('');
+  const [inAppWarning, setInAppWarning] = useState(false);
 
   const questions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
   const t = ui[lang].quiz;
 
+  // Log initial phase and URL params on first render
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pending = params.get('pending')?.toUpperCase() ?? null;
+    const intent = params.get('intent') ?? null;
+    diagLog('page_load', { phase, hasPending: !!pending, pendingType: pending, urlIntent: intent });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Detect in-app browser (TikTok, Instagram, Snapchat…)
+  useEffect(() => {
+    const ua = navigator.userAgent || '';
+    if (/FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat/.test(ua)) {
+      setInAppWarning(true);
+      diagLog('inapp_detected', { ua: ua.slice(0, 120) });
+    }
+  }, []);
+
+  // Restore type from URL (?pending=INFJ) after returning from auth, or from localStorage
+  useEffect(() => {
+    if (sessionStatus === 'loading') return;
+    const params = new URLSearchParams(window.location.search);
+    const pending = params.get('pending')?.toUpperCase();
+
+    diagLog('session_restore_fired', {
+      status: sessionStatus,
+      hasEmail: !!session?.user?.email,
+      pending: pending ?? null,
+    });
+
+    if (session?.user?.email) {
+      if (pending && mbtiTypes[pending]) {
+        diagLog('pending_found_authed', { pending });
+        window.history.replaceState(null, '', '/quiz/personnalite');
+        fetch('/api/user/save-mbti', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mbtiType: pending }),
+        }).catch(() => {});
+        setMbtiType(pending);
+        if (isPremium) { router.push(`/types/${pending.toLowerCase()}`); }
+        else { setPhase('result'); }
+        return;
+      }
+      try {
+        const saved = localStorage.getItem('_mbti_pending');
+        if (saved && mbtiTypes[saved]) {
+          diagLog('type_from_localstorage', { saved });
+          localStorage.removeItem('_mbti_pending');
+          fetch('/api/user/save-mbti', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mbtiType: saved }),
+          }).catch(() => {});
+          setMbtiType(saved);
+          if (isPremium) { router.push(`/types/${saved.toLowerCase()}`); }
+          else { setPhase('result'); }
+        }
+      } catch {}
+    } else {
+      // Not authenticated — if we were waiting for magic link, show paywall with type from URL/storage
+      if (pending && mbtiTypes[pending]) {
+        diagLog('pending_found_not_authed', { pending });
+        window.history.replaceState(null, '', '/quiz/personnalite');
+        setMbtiType(pending);
+        setPhase('result');
+      } else {
+        try {
+          const saved = localStorage.getItem('_mbti_pending');
+          if (saved && mbtiTypes[saved]) {
+            diagLog('type_from_localstorage_not_authed', { saved });
+            setMbtiType(saved);
+            setPhase('result');
+          } else if (phase === 'gate') {
+            setPhase('quiz');
+          }
+        } catch {
+          if (phase === 'gate') setPhase('quiz');
+        }
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.email, sessionStatus]);
+
   const handleComplete = (ans: Answers) => {
+    track('quiz_complete', { quiz: 'personnalite', content_name: 'Test MBTI' });
     setAnswers(ans);
     setPhase('analysis');
   };
 
-  const handleAnalysisDone = () => {
+  const handleAnalysisDone = useCallback(async () => {
     const type = computeMbtiType(answers);
+    diagLog('analysis_done', { type, hasSession: !!session?.user, isPremium });
     setMbtiType(type);
+    try { localStorage.setItem('_mbti_pending', type); } catch {}
     if (session?.user) {
-      router.push(`/types/${type.toLowerCase()}`);
-    } else {
-      setPhase('gate');
+      fetch('/api/user/save-mbti', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mbtiType: type }),
+      }).catch(() => {});
+      if (isPremium) {
+        router.push(`/types/${type.toLowerCase()}`);
+        return;
+      }
     }
-  };
+    // Everyone (logged in free OR anonymous) sees the paywall directly
+    setPhase('result');
+  }, [answers, session, isPremium, router]);
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
@@ -355,7 +685,15 @@ export default function PersonnaliteClient() {
         <AnalysisScreen onDone={handleAnalysisDone} t={t} />
       )}
       {phase === 'gate' && (
-        <AuthGate typeCode={mbtiType} lang={lang} />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-10 h-10 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
+            <p className="text-gray-400 text-sm">Chargement de tes résultats…</p>
+          </div>
+        </div>
+      )}
+      {phase === 'result' && (
+        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} />
       )}
     </main>
   );

@@ -17,13 +17,26 @@ function pct(a: number, b: number) {
   return ((a / b) * 100).toFixed(1) + '%';
 }
 
+const TZ = 'Europe/Paris';
+
+// Returns the UTC Date corresponding to midnight Paris time for a given date string "YYYY-MM-DD"
+function parisMidnight(dateStr: string): Date {
+  const utcMid = new Date(dateStr + 'T00:00:00Z');
+  // How many hours into the Paris day does UTC midnight fall? That's the Paris offset.
+  const parisHour = +new Intl.DateTimeFormat('en', { timeZone: TZ, hour: 'numeric', hour12: false }).format(utcMid);
+  return new Date(utcMid.getTime() - parisHour * 3_600_000);
+}
+
 export default async function NathaAdminPage() {
   const now = new Date();
-  const startOfToday   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const sevenDaysAgo   = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
-  const fourteenAgo    = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-  const startOfMonth   = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfYear    = new Date(now.getFullYear(), 0, 1);
+  const todayParis  = now.toLocaleDateString('en-CA', { timeZone: TZ }); // "2026-06-12"
+  const monthParis  = todayParis.slice(0, 7) + '-01';                    // "2026-06-01"
+
+  const startOfToday = parisMidnight(todayParis);
+  const startOfMonth = parisMidnight(monthParis);
+  const sevenDaysAgo = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
+  const fourteenAgo  = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const startOfYear  = new Date(now.getFullYear(), 0, 1);
 
   const [
     totalUsers, premiumUsers, newToday, newThisWeek, newLastWeek,
@@ -50,10 +63,41 @@ export default async function NathaAdminPage() {
     prisma.pageView.count({ where: { path: '/' } }),
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 8 }),
     prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { email: true, name: true, tier: true, createdAt: true } }),
-    prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }),
+    prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }).then(async (aff) => {
+      const clicks = await Promise.all(aff.map(a => prisma.pageView.count({ where: { path: `/__aff/${a.slug}` } })));
+      return aff.map((a, i) => ({ ...a, clicks: clicks[i] }));
+    }),
     prisma.quizResult.findMany({ select: { quizSlug: true, paid: true } }),
     prisma.affiliateConversion.findMany({ select: { amountCents: true, createdAt: true } }),
   ]);
+
+  // Quiz drop-off funnel (MBTI personnalite)
+  const [fStart, fQ10, fQ25, fQ50, fQ75, fComplete, fPaywall, fCheckout] = await Promise.all([
+    prisma.pageView.count({ where: { path: '/__evt/quiz_start/personnalite' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q10' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q25' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q50' } }),
+    prisma.pageView.count({ where: { path: '/__quiz/q75' } }),
+    prisma.pageView.count({ where: { path: '/__evt/quiz_complete/personnalite' } }),
+    prisma.pageView.count({ where: { path: '/__evt/paywall_view/personnalite' } }),
+    prisma.pageView.count({ where: { path: '/__evt/checkout_click/personnalite' } }),
+  ]);
+
+  // Diagnostic funnel steps (last 24h)
+  const diagSteps = [
+    'page_load', 'inapp_detected',
+    'session_restore_fired',
+    'pending_found_authed', 'pending_found_not_authed',
+    'type_from_localstorage', 'type_from_localstorage_not_authed',
+    'analysis_done',
+    'paywall_mounted',
+    'checkout_no_email', 'checkout_with_email',
+    'auto_checkout_check',
+  ];
+  const diagCounts = await Promise.all(
+    diagSteps.map(step => prisma.pageView.count({ where: { path: `/__diag/${step}`, createdAt: { gte: sevenDaysAgo } } }))
+  );
+  const diagData = diagSteps.map((step, i) => ({ step, count: diagCounts[i] }));
 
   const revenueToday = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
   const revenueWeek  = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
@@ -113,7 +157,7 @@ export default async function NathaAdminPage() {
             <span style={{ color: C.muted, fontWeight: 400, fontSize: 16, marginLeft: 12 }}>— tableau de bord</span>
           </h1>
           <p style={{ color: C.muted, fontSize: 13, margin: '6px 0 0' }}>
-            {now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à {now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            {now.toLocaleDateString('fr-FR', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long' })} à {now.toLocaleTimeString('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
 
@@ -242,7 +286,17 @@ export default async function NathaAdminPage() {
                     <p style={{ color: C.text, fontWeight: 700, fontSize: 15, margin: 0 }}>{a.name}</p>
                     <p style={{ color: C.muted, fontSize: 12, margin: '3px 0 0', fontFamily: 'monospace' }}>?ref={a.slug}</p>
                   </div>
-                  <div style={{ display: 'flex', gap: 24 }}>
+                  <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ ...label, marginBottom: 2 }}>Clics</p>
+                      <p style={{ color: C.blue, fontWeight: 900, fontSize: 20, margin: 0 }}>{a.clicks}</p>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ ...label, marginBottom: 2 }}>Tx conv.</p>
+                      <p style={{ color: C.purple, fontWeight: 900, fontSize: 20, margin: 0 }}>
+                        {a.clicks > 0 ? `${((a.conversions.length / a.clicks) * 100).toFixed(1)}%` : '—'}
+                      </p>
+                    </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ ...label, marginBottom: 2 }}>Ventes</p>
                       <p style={{ color: C.text, fontWeight: 900, fontSize: 20, margin: 0 }}>{a.conversions.length}</p>
@@ -262,21 +316,45 @@ export default async function NathaAdminPage() {
           </div>
         )}
 
-        {/* ── SECTION 6 : Quiz les plus populaires ── */}
-        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Quiz les plus populaires</p>
+        {/* ── SECTION 7 : Funnel drop-off MBTI ── */}
+        <p style={{ color: C.pink, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Funnel MBTI — où les gens lâchent</p>
         <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
-          {quizSorted.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun quiz complété pour l'instant.</p>}
-          {quizSorted.map(([slug, data], i) => (
-            <div key={slug} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < quizSorted.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-              <span style={{ color: C.muted, fontSize: 13, width: 20, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
-              <span style={{ flex: 1, color: C.text, fontSize: 14, fontWeight: 600, textTransform: 'capitalize' }}>{slug.replace(/-/g, ' ')}</span>
-              <span style={{ color: C.muted, fontSize: 13 }}>{data.total} fois</span>
-              <span style={{ color: C.green, fontSize: 13, fontWeight: 700, width: 60, textAlign: 'right' }}>{data.paid} payant{data.paid > 1 ? 's' : ''}</span>
-            </div>
-          ))}
+          {fStart === 0 && <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>Pas encore de données (tracking actif depuis ce soir).</p>}
+          {fStart > 0 && (() => {
+            const steps = [
+              { label: 'Démarré le quiz', n: fStart, color: C.blue },
+              { label: 'Q10 atteinte', n: fQ10, color: C.purple },
+              { label: 'Q25 atteinte', n: fQ25, color: C.purple },
+              { label: 'Q50 atteinte', n: fQ50, color: C.yellow },
+              { label: 'Q75 atteinte', n: fQ75, color: C.orange },
+              { label: 'Quiz terminé (100)', n: fComplete, color: C.green },
+              { label: 'Paywall vu', n: fPaywall, color: C.pink },
+              { label: 'Paiement cliqué', n: fCheckout, color: C.green },
+            ];
+            const maxN = steps[0].n || 1;
+            return steps.map((s, i) => {
+              const pctVal = s.n === 0 ? 0 : Math.round((s.n / maxN) * 100);
+              const dropVsNext = i < steps.length - 1 && s.n > 0 && steps[i + 1].n > 0
+                ? Math.round(((s.n - steps[i + 1].n) / s.n) * 100) : null;
+              return (
+                <div key={s.label} style={{ padding: '10px 0', borderBottom: i < steps.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
+                    <span style={{ color: C.muted, fontSize: 12, width: 22, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ flex: 1, color: C.text, fontSize: 13, fontWeight: 600 }}>{s.label}</span>
+                    <span style={{ color: s.color, fontSize: 15, fontWeight: 900, minWidth: 30, textAlign: 'right' }}>{s.n}</span>
+                    <span style={{ color: C.muted, fontSize: 12, width: 44, textAlign: 'right' }}>{pctVal}%</span>
+                    {dropVsNext !== null && <span style={{ color: C.red, fontSize: 11, fontWeight: 700, width: 52, textAlign: 'right' }}>−{dropVsNext}%</span>}
+                  </div>
+                  <div style={{ marginLeft: 32, height: 5, borderRadius: 3, background: C.border, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pctVal}%`, background: s.color, borderRadius: 3, transition: 'width 0.4s' }} />
+                  </div>
+                </div>
+              );
+            });
+          })()}
         </div>
 
-        {/* ── SECTION 7 : Pages les plus vues ── */}
+        {/* ── SECTION 8 : Pages les plus vues ── */}
         <p style={{ color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Pages les plus vues</p>
         <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
           {topPages.map((p, i) => (
@@ -291,7 +369,7 @@ export default async function NathaAdminPage() {
 
         {/* ── SECTION 8 : Derniers inscrits ── */}
         <p style={{ color: C.purple, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Derniers inscrits</p>
-        <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
           {recentUsers.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun inscrit pour l'instant.</p>}
           {recentUsers.map((u, i) => (
             <div key={u.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentUsers.length - 1 ? `1px solid ${C.border}` : 'none', flexWrap: 'wrap' }}>
@@ -314,6 +392,27 @@ export default async function NathaAdminPage() {
               </span>
             </div>
           ))}
+        </div>
+
+        {/* ── SECTION 9 : Diagnostic TikTok funnel (7 derniers jours) ── */}
+        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Diagnostic funnel TikTok — 7 derniers jours</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
+          {diagData.map((d, i) => (
+            <div key={d.step} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < diagData.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <span style={{ flex: 1, color: d.count > 0 ? C.text : C.muted, fontSize: 13, fontFamily: 'monospace' }}>
+                {'/__diag/' + d.step}
+              </span>
+              <span style={{
+                color: d.count > 0 ? C.orange : C.muted,
+                fontSize: 14, fontWeight: 700, minWidth: 32, textAlign: 'right',
+              }}>
+                {d.count}
+              </span>
+            </div>
+          ))}
+          <p style={{ color: C.muted, fontSize: 11, marginTop: 12, marginBottom: 0 }}>
+            Ces compteurs apparaissent dès qu'un utilisateur atteint l'étape correspondante. Zéro = l'étape n'a pas été atteinte.
+          </p>
         </div>
 
       </div>

@@ -26,8 +26,8 @@ export default function TeamCodeEntry() {
       className="rounded-2xl border p-5 mb-8"
       style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(236,72,153,0.04))', borderColor: 'rgba(139,92,246,0.3)' }}
     >
-      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-1">Tu as reçu un code ?</p>
-      <p className="text-zinc-400 text-xs mb-4">Entre le code de 6 lettres partagé par ton coéquipier(e)</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-1">Tu as reçu un code ?</p>
+      <p className="text-gray-400 text-xs mb-4">Entre le code de 6 lettres partagé par ton coéquipier(e)</p>
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="text"
@@ -35,7 +35,7 @@ export default function TeamCodeEntry() {
           onChange={(e) => { setCode(e.target.value.toUpperCase().slice(0, 6)); setError(''); }}
           placeholder="EX: COABCD"
           maxLength={6}
-          className="flex-1 px-4 py-3 rounded-xl font-mono text-base font-black text-white bg-white/5 border border-white/10 focus:outline-none focus:border-violet-500/60 tracking-widest placeholder:text-zinc-600 placeholder:font-normal placeholder:tracking-normal"
+          className="flex-1 px-4 py-3 rounded-xl font-mono text-base font-black text-gray-900 bg-white border border-gray-200 focus:outline-none focus:border-violet-400 tracking-widest placeholder:text-gray-400 placeholder:font-normal placeholder:tracking-normal"
           style={{ letterSpacing: '0.2em' }}
           autoCapitalize="characters"
           autoCorrect="off"

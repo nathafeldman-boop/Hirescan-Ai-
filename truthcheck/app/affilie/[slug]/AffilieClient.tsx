@@ -19,6 +19,7 @@ type Affiliate = {
   conversions: Conversion[];
 };
 
+
 function fmt(cents: number) {
   return (cents / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
 }
@@ -103,7 +104,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
         </div>
 
         {/* Stats — clics */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 mb-3">
           {[
             { label: 'Clics sur ton lien', value: clicks.toLocaleString('fr-FR'), color: '#60a5fa' },
             {

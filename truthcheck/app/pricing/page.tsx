@@ -7,18 +7,17 @@ import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const FREE_PERKS = [
-  'Test de personnalité MBTI (type uniquement)',
-  'Accès aux quiz de base',
-  'Résultats partiels',
+  'Test MBTI — type de base uniquement',
+  'Quiz relationnels (résultats partiels)',
+  'Résultats sans détail cognitif',
 ];
 
 const PREMIUM_PERKS = [
-  'Rapport complet de personnalité',
-  'Tous les 15 tests UrCecret illimités',
-  'Analyses détaillées par IA',
-  'Mode Duo illimité',
-  'Résultats instantanés et complets',
-  'Accès anticipé aux nouvelles fonctions',
+  'Analyse complète des 4 fonctions cognitives',
+  'Les 16 types détaillés — forces, faiblesses, amour, carrière',
+  'Tous les quiz relationnels — résultats complets',
+  'Mode Duo — comparaison de deux profils',
+  'Mises à jour incluses',
 ];
 
 function CheckoutButton({ label, annual, userEmail, highlighted }: {
@@ -59,10 +58,10 @@ function CheckoutButton({ label, annual, userEmail, highlighted }: {
       <button
         onClick={handleClick}
         disabled={loading}
-        className="w-full py-4 rounded-2xl font-black text-base transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
-        style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff', boxShadow: '0 8px 32px rgba(139,92,246,0.45)' }}
+        className="w-full py-4 rounded-xl font-bold text-base transition-all hover:opacity-95 active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+        style={{ background: '#111827', color: '#fff' }}
       >
-        {loading ? 'Chargement…' : <><span>✦</span> {label}</>}
+        {loading ? 'Chargement…' : label}
       </button>
     );
   }
@@ -71,7 +70,7 @@ function CheckoutButton({ label, annual, userEmail, highlighted }: {
     <button
       onClick={handleClick}
       disabled={loading}
-      className="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:bg-gray-100 active:scale-95 disabled:opacity-60 border border-gray-200 text-gray-700"
+      className="w-full py-3 rounded-xl font-medium text-sm transition-all hover:bg-gray-100 active:scale-95 disabled:opacity-60 border border-gray-200 text-gray-600"
     >
       {loading ? 'Chargement…' : label}
     </button>
@@ -102,12 +101,12 @@ export default function PricingPage() {
 
         {/* Titre */}
         <div className="text-center mb-8">
-          <p className="text-gray-500 text-sm mb-2">Débloquer tout UrCecret</p>
-          <h1 className="text-2xl font-black text-gray-900">Choisir ton plan</h1>
+          <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2">Tarifs</p>
+          <h1 className="text-2xl font-black text-gray-900">Choisissez votre formule</h1>
         </div>
 
         {/* Plan gratuit — plan actuel */}
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 mb-4">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5 mb-4">
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-gray-900 font-bold">Gratuit</p>
@@ -132,21 +131,19 @@ export default function PricingPage() {
         </div>
 
         {/* Plan Premium — recommandé */}
-        <div className="relative rounded-2xl border-2 border-violet-500/60 p-5 mb-2"
-          style={{ background: 'linear-gradient(145deg, rgba(139,92,246,0.12), rgba(236,72,153,0.06))' }}>
+        <div className="relative rounded-xl border-2 border-gray-900 p-5 mb-2 bg-white">
 
           {/* Badge recommandé */}
-          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-            <span className="text-xs font-black px-3 py-1 rounded-full"
-              style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', color: '#fff' }}>
-              ✦ Recommandé
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-900 text-white">
+              Recommandé
             </span>
           </div>
 
           <div className="flex items-center justify-between mb-4 mt-1">
             <div>
-              <p className="text-gray-900 font-black text-lg">Premium</p>
-              <p className="text-violet-600 text-sm font-medium">Accès illimité</p>
+              <p className="text-gray-900 font-black text-lg">Accès complet</p>
+              <p className="text-gray-500 text-sm">Analyses + tous les quiz</p>
             </div>
             <div className="text-right">
               <span className="text-4xl font-black text-gray-900">9,99 €</span>
@@ -156,15 +153,15 @@ export default function PricingPage() {
 
           <ul className="space-y-2.5 mb-6">
             {PREMIUM_PERKS.map((p) => (
-              <li key={p} className="flex items-center gap-2.5 text-sm text-gray-700">
-                <span className="text-violet-500 font-bold flex-shrink-0">✓</span>
+              <li key={p} className="flex items-start gap-2.5 text-sm text-gray-700">
+                <span className="text-gray-900 font-bold flex-shrink-0 mt-px">✓</span>
                 {p}
               </li>
             ))}
           </ul>
 
           <CheckoutButton
-            label="Passer à Premium"
+            label="Obtenir l'accès complet"
             annual={false}
             userEmail={userEmail}
             highlighted
@@ -172,7 +169,7 @@ export default function PricingPage() {
         </div>
 
         {/* Option annuelle */}
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 mb-6">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 mb-6">
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="flex items-center gap-2">

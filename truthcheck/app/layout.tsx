@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './Providers';
 import Tracker from './Tracker';
+import { Suspense } from 'react';
+import AffiliateTracker from '@/components/AffiliateTracker';
+import Analytics from '@/components/Analytics';
 
 const BASE = 'https://urcecret.site';
 
@@ -10,7 +13,7 @@ export const metadata: Metadata = {
     default: 'UrCecret — Test MBTI Gratuit · 16 Types de Personnalité',
     template: '%s | UrCecret',
   },
-  description: 'Découvre ton type de personnalité MBTI parmi les 16 profils psychologiques : INFJ, ENFP, INTJ, INTP, ESFP et plus. Test gratuit, 24 questions, résultat instantané. Le test de personnalité le plus complet en français.',
+  description: 'Découvre ton type de personnalité MBTI parmi les 16 profils psychologiques : INFJ, ENFP, INTJ, INTP, ESFP et plus. Test gratuit, 100 questions, résultat instantané. Le test de personnalité le plus complet en français.',
   keywords: [
     'test MBTI', 'MBTI gratuit', 'test de personnalité', '16 types de personnalité',
     'type MBTI', 'MBTI français', 'test personnalité gratuit', '16 personnalités',
@@ -36,7 +39,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'UrCecret — Test MBTI Gratuit · 16 Types de Personnalité',
-    description: 'Découvre ton type MBTI parmi les 16 profils psychologiques. Test gratuit, 24 questions, résultat instantané.',
+    description: 'Découvre ton type MBTI parmi les 16 profils psychologiques. Test gratuit, 100 questions, résultat instantané.',
     type: 'website',
     siteName: 'UrCecret',
     locale: 'fr_FR',
@@ -47,7 +50,7 @@ export const metadata: Metadata = {
     site: '@urcecret',
     creator: '@urcecret',
     title: 'UrCecret — Test MBTI Gratuit',
-    description: 'Découvre ton type de personnalité MBTI. 16 profils · 24 questions · Gratuit.',
+    description: 'Découvre ton type de personnalité MBTI. 16 profils · 100 questions · Gratuit.',
   },
   robots: {
     index: true,
@@ -113,6 +116,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-[#09090b] text-white antialiased">
         <Providers>
           <Tracker />
+          <Suspense fallback={null}>
+            <AffiliateTracker />
+          </Suspense>
+          <Suspense fallback={null}>
+            <Analytics />
+          </Suspense>
           {children}
         </Providers>
       </body>

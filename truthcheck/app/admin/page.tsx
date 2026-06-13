@@ -55,6 +55,16 @@ export default async function AdminPage() {
     }),
   ]);
 
+  // MBTI type distribution
+  const mbtiUsers = await prisma.user.findMany({
+    where: { mbtiType: { not: null } },
+    select: { mbtiType: true },
+  });
+  const mbtiDistribution: Record<string, number> = {};
+  mbtiUsers.forEach(u => {
+    if (u.mbtiType) mbtiDistribution[u.mbtiType] = (mbtiDistribution[u.mbtiType] ?? 0) + 1;
+  });
+
   // Affiliate conversions (revenue tracking) + click counts
   const [allConversions, affiliates, affiliateClickViews] = await Promise.all([
     prisma.affiliateConversion.findMany({
@@ -104,6 +114,7 @@ export default async function AdminPage() {
   });
 
   // Revenue totals
+
   const totalRevenueCents = allConversions.reduce((s, c) => s + c.amountCents, 0);
   const todayRevenueCents = allConversions
     .filter(c => new Date(c.createdAt) >= startOfToday)
@@ -134,6 +145,7 @@ export default async function AdminPage() {
       paidToday,
       paidThisMonth,
       byQuiz,
+      mbtiDistribution,
       // Revenue
       totalRevenueCents,
       todayRevenueCents,

@@ -31,15 +31,18 @@ export async function POST(req: NextRequest) {
     const affiliateSlug = req.cookies.get('urs_ref')?.value ?? '';
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
-    const cancelUrl = quizSlug && score !== undefined
-      ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
-      : typeCode
-        ? `${baseUrl}/types/${typeCode.toLowerCase()}`
-        : `${baseUrl}/quizzes`;
+    const cancelUrl = quizSlug === 'duo'
+      ? `${baseUrl}/duo`
+      : quizSlug && score !== undefined
+        ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
+        : `${baseUrl}/quiz/personnalite`;
 
-    const successUrl = typeCode
-      ? `${baseUrl}/types/${typeCode.toLowerCase()}?unlocked=true&session_id={CHECKOUT_SESSION_ID}`
-      : `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+    // All non-duo checkouts funnel through /success so the page can
+    // verify payment server-side and create the account from Stripe's email
+    // regardless of whether the user was logged in before checkout.
+    const successUrl = quizSlug === 'duo'
+      ? `${baseUrl}/duo?unlocked=true&session_id={CHECKOUT_SESSION_ID}`
+      : `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}${resultId ? `&result=${resultId}` : ''}${typeCode ? `&typeCode=${typeCode}` : ''}`;
 
     // ── MBTI Rapport one-time ──
     if (rapport && typeCode) {

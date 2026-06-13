@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Screen 5 — Abonnement Premium</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 390px; min-height: 844px;
+    background: #09090b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: white;
+  }
+  .status-bar {
+    height: 44px; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 24px;
+  }
+  .content { padding: 0 20px 40px; }
+
+  /* Blurred score circle */
+  .score-zone {
+    display: flex; justify-content: center;
+    margin-bottom: 20px; position: relative;
+  }
+  .score-blur { filter: blur(10px); opacity: 0.45; }
+  .lock-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+  }
+  .lock-btn {
+    width: 56px; height: 56px; border-radius: 18px;
+    background: linear-gradient(135deg, rgba(139,92,246,.9), rgba(236,72,153,.9));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 8px 32px rgba(139,92,246,0.5);
+  }
+  .lock-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .12em; }
+
+  .ready-badge {
+    display: flex; justify-content: center; margin-bottom: 16px;
+  }
+  .ready-badge span {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 16px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); color: #d4d4d8;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* Teaser */
+  .teaser {
+    border-radius: 18px; border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03); padding: 18px; margin-bottom: 16px;
+  }
+  .teaser-title { font-size: 15px; font-weight: 900; color: #f4f4f5; margin-bottom: 10px; }
+  .teaser-line { font-size: 14px; color: #a1a1aa; line-height: 1.6; }
+  .teaser-blur { filter: blur(5px); margin-top: 8px; user-select: none; }
+  .locked-count {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.05);
+    font-size: 11px; color: #52525b;
+  }
+
+  /* Main paywall card */
+  .paywall {
+    border-radius: 20px; padding: 22px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: linear-gradient(135deg, rgba(139,92,246,.12), rgba(236,72,153,.08));
+    margin-bottom: 16px;
+  }
+  .pw-headline { font-size: 20px; font-weight: 900; text-align: center; margin-bottom: 8px; }
+  .pw-sub { font-size: 13px; color: #71717a; text-align: center; line-height: 1.6; margin-bottom: 16px; }
+
+  .scary-stat {
+    border-radius: 12px; padding: 11px 14px; margin-bottom: 14px; text-align: center;
+    background: rgba(139,92,246,.07); border: 1px solid rgba(139,92,246,.2);
+  }
+  .scary-stat p { font-size: 12px; font-weight: 600; color: #a78bfa; line-height: 1.5; }
+
+  .social {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 14px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.05); background: rgba(255,255,255,.03);
+    margin-bottom: 16px;
+  }
+  .social span { font-size: 12px; color: #52525b; }
+
+  /* Plans */
+  .plan-main {
+    width: 100%; padding: 18px; border-radius: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    box-shadow: 0 4px 28px rgba(139,92,246,.45);
+    font-size: 16px; font-weight: 900; color: white; text-align: center;
+    margin-bottom: 10px; border: none; cursor: pointer;
+  }
+  .plan-annual {
+    width: 100%; padding: 13px; border-radius: 14px;
+    border: 1px solid rgba(139,92,246,.35); background: rgba(139,92,246,.06);
+    font-size: 14px; font-weight: 700; color: #c4b5fd; text-align: center;
+    margin-bottom: 10px; cursor: pointer; position: relative;
+  }
+  .best-tag {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    font-size: 10px; font-weight: 800; color: white;
+    padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .plan-annual .sub-price { font-size: 11px; opacity: .55; margin-left: 6px; }
+  .plan-once {
+    width: 100%; padding: 13px; border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03);
+    font-size: 14px; font-weight: 600; color: #71717a; text-align: center;
+    margin-bottom: 14px; cursor: pointer;
+  }
+  .pw-footer { font-size: 11px; color: #3f3f46; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span style="font-size:15px;font-weight:600">22:04</span>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <span>●●●●</span><span>🔋</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Blurred score -->
+    <div class="score-zone">
+      <div class="score-blur">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="64" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="10"/>
+          <circle cx="80" cy="80" r="64" fill="none"
+            stroke="#f59e0b" stroke-width="10"
+            stroke-dasharray="402" stroke-dashoffset="130"
+            stroke-linecap="round" transform="rotate(-90 80 80)"/>
+          <text x="80" y="88" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="38" font-weight="900">??</text>
+        </svg>
+      </div>
+      <div class="lock-overlay">
+        <div class="lock-btn">🔒</div>
+        <span class="lock-label">Score caché</span>
+      </div>
+    </div>
+
+    <!-- Ready badge -->
+    <div class="ready-badge">
+      <span><span class="dot"></span> Analyse terminée — résultats prêts</span>
+    </div>
+
+    <!-- Teaser -->
+    <div class="teaser">
+      <p class="teaser-title">🎯 Ton analyse personnalisée</p>
+      <p class="teaser-line">Ton profil révèle quelque chose que la plupart des gens autour de toi ne voi…</p>
+      <p class="teaser-line teaser-blur">Tu fonctionnes différemment des autres. Ta façon de percevoir les émotions et de prendre des décisions est directement liée à tes relations amoureuses. Voici ce que personne ne t'a dit.</p>
+      <div class="locked-count">🔒 10 révélations verrouillées — tu dois savoir ce qu'il y a là-dedans</div>
+    </div>
+
+    <!-- Paywall card -->
+    <div class="paywall">
+      <p class="pw-headline">Débloquer ton analyse complète</p>
+      <p class="pw-sub">Comprends vraiment qui tu es et pourquoi tes relations se passent comme ça.</p>
+
+      <div class="scary-stat">
+        <p>📊 Les personnes qui connaissent leur type MBTI ont 3× moins de conflits dans leur couple</p>
+      </div>
+
+      <div class="social">
+        <span class="dot"></span>
+        <span>2 847 personnes ont débloqué leurs résultats cette semaine</span>
+      </div>
+
+      <button class="plan-main">Voir mon analyse complète — 9,99€/mois ✦</button>
+
+      <button class="plan-annual">
+        <span class="best-tag">⚡ Meilleur choix</span>
+        Accès annuel — 29,99€/an <span class="sub-price">(2,50€/mois)</span>
+      </button>
+
+      <button class="plan-once">Juste ce résultat — 1,99€ (paiement unique)</button>
+
+      <p class="pw-footer">Abonnement annulable à tout moment · Paiement 100% sécurisé 🔒</p>
+    </div>
+  </div>
+</body>
+</html>

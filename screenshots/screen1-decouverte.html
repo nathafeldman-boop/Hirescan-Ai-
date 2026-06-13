@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Screen 1</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 390px; min-height: 844px;
+    background: #09090b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: white;
+    overflow-x: hidden;
+  }
+  .status-bar {
+    height: 44px; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 24px;
+    background: #09090b;
+  }
+  .status-time { font-size: 15px; font-weight: 600; }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+  .browser-bar {
+    margin: 0 16px 0;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex; align-items: center; gap-8px; gap: 8px;
+  }
+  .browser-bar .lock { font-size: 12px; color: #34d399; }
+  .browser-bar .url { font-size: 13px; color: #a78bfa; font-weight: 500; flex: 1; text-align: center; }
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+  }
+  .logo { font-size: 28px; font-weight: 900; margin-bottom: 48px; }
+  .logo .ur { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  h1 {
+    font-size: 44px; font-weight: 900; line-height: 1.05;
+    margin-bottom: 20px; letter-spacing: -0.03em;
+  }
+  p.sub { color: #71717a; font-size: 16px; line-height: 1.6; margin-bottom: 36px; max-width: 280px; margin-left: auto; margin-right: auto; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 18px 40px; border-radius: 999px;
+    font-weight: 800; font-size: 17px; color: white;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    box-shadow: 0 8px 32px rgba(124,58,237,0.5);
+    text-decoration: none; margin-bottom: 18px;
+  }
+  .meta { color: #52525b; font-size: 13px; margin-bottom: 48px; }
+  .stats {
+    display: flex; justify-content: center; gap: 36px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 32px;
+  }
+  .stat { text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 900; color: white; }
+  .stat-label { font-size: 11px; color: #52525b; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+  .notification {
+    position: fixed; bottom: 32px; left: 16px; right: 16px;
+    background: rgba(20,20,24,0.95);
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 16px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+  .notif-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .notif-text { flex: 1; }
+  .notif-title { font-size: 13px; font-weight: 700; color: white; }
+  .notif-sub { font-size: 12px; color: #71717a; margin-top: 2px; }
+  .notif-time { font-size: 11px; color: #52525b; }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span class="status-time">21:47</span>
+    <div class="status-icons">
+      <span>●●●●</span>
+      <span>WiFi</span>
+      <span>🔋</span>
+    </div>
+  </div>
+
+  <div class="browser-bar">
+    <span class="lock">🔒</span>
+    <span class="url">urcecret.site</span>
+  </div>
+
+  <div class="hero">
+    <div class="logo"><span class="ur">Ur</span><span>Cecret</span></div>
+    <h1>Test des 16<br>personnalités</h1>
+    <p class="sub">Découvrez votre type MBTI et votre niveau de compatibilité amoureuse réelle.</p>
+    <div style="display:block">
+      <a class="cta">Commencer le test →</a>
+    </div>
+    <p class="meta">Gratuit · 12 minutes · Résultat immédiat</p>
+    <div class="stats">
+      <div class="stat"><div class="stat-val">50K+</div><div class="stat-label">Profils</div></div>
+      <div class="stat"><div class="stat-val">4.9★</div><div class="stat-label">Note</div></div>
+      <div class="stat"><div class="stat-val">100%</div><div class="stat-label">Gratuit</div></div>
+    </div>
+  </div>
+
+  <div class="notification">
+    <div class="notif-icon">🧠</div>
+    <div class="notif-text">
+      <div class="notif-title">UrCecret</div>
+      <div class="notif-sub">Ton résultat MBTI est prêt 👀</div>
+    </div>
+    <div class="notif-time">maintenant</div>
+  </div>
+</body>
+</html>
