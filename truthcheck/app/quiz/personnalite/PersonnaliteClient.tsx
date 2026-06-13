@@ -398,18 +398,26 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
   }, [typeCode, userEmail]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-[#09090b]">
+      {/* Background atmosphere */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.1] bg-violet-600" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-[0.07] bg-pink-600" />
+      </div>
+      <div className="relative z-10 w-full max-w-sm">
         <div className="text-center mb-6">
           {/* Type code preview */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500 text-xs font-semibold mb-5 tracking-widest">
-            {typeCode.slice(0, 2)}<span className="blur-[3px] select-none">??</span>
+          <div
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black mb-5 tracking-widest"
+            style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa' }}
+          >
+            {typeCode.slice(0, 2)}<span className="blur-[4px] select-none opacity-60">??</span>
           </div>
 
-          <h1 className="text-2xl font-black text-gray-900 mb-2">
-            {isFr ? 'Votre type est prêt' : 'Your type is ready'}
+          <h1 className="text-2xl font-black text-white mb-2">
+            {isFr ? 'Ton type est prêt' : 'Your type is ready'}
           </h1>
-          <p className="text-gray-500 text-sm leading-relaxed">
+          <p className="text-zinc-400 text-sm leading-relaxed">
             {isFr
               ? `${type?.rarity} de la population partagent ce profil.`
               : `${type?.rarity} of the population share this profile.`}
@@ -417,55 +425,67 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
         </div>
 
         {/* Locked type card */}
-        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 mb-4 relative overflow-hidden">
+        <div
+          className="rounded-2xl p-5 mb-4 relative overflow-hidden"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+        >
           <div className="space-y-3 select-none" aria-hidden>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-lg font-black text-gray-400">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-black"
+                style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa' }}
+              >
                 {typeCode.slice(0, 2)}
               </div>
               <div>
-                <div className="text-sm font-black text-gray-800 tracking-widest">
-                  {typeCode.slice(0, 2)}<span className="blur-sm">??</span>
+                <div className="text-sm font-black text-white tracking-widest">
+                  {typeCode.slice(0, 2)}<span className="blur-sm opacity-40">??</span>
                 </div>
-                <div className="h-2.5 w-20 bg-gray-200 rounded-full mt-1 blur-sm" />
+                <div className="h-2.5 w-20 bg-white/10 rounded-full mt-1 blur-sm" />
               </div>
             </div>
             <div className="space-y-2">
-              <div className="h-3 bg-gray-200 rounded-full blur-sm" />
-              <div className="h-3 bg-gray-200 rounded-full w-5/6 blur-sm" />
-              <div className="h-3 bg-gray-200 rounded-full w-4/6 blur-sm" />
+              <div className="h-3 bg-white/8 rounded-full blur-sm" />
+              <div className="h-3 bg-white/8 rounded-full w-5/6 blur-sm" />
+              <div className="h-3 bg-white/8 rounded-full w-4/6 blur-sm" />
             </div>
           </div>
-          <div className="absolute inset-0 flex items-end justify-center pb-4 bg-gradient-to-t from-white/95 via-white/50 to-transparent rounded-2xl">
+          <div
+            className="absolute inset-0 flex items-end justify-center pb-4 rounded-2xl"
+            style={{ background: 'linear-gradient(to top, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.6) 50%, transparent 100%)' }}
+          >
             <div className="text-center">
-              <div className="text-gray-400 mb-1 flex justify-center"><LockIcon /></div>
-              <p className="text-xs text-gray-500 font-semibold">
-                {isFr ? `Ton type complet est verrouillé` : 'Your full type is locked'}
+              <div className="mb-1 flex justify-center" style={{ color: '#a78bfa' }}><LockIcon /></div>
+              <p className="text-xs text-zinc-400 font-semibold">
+                {isFr ? 'Ton type complet est verrouillé' : 'Your full type is locked'}
               </p>
             </div>
           </div>
         </div>
 
         {/* What's inside */}
-        <div className="bg-gray-50 rounded-xl border border-gray-100 px-4 py-3 mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2.5">
-            {isFr ? 'Ce que vous débloquez' : 'What you unlock'}
+        <div
+          className="rounded-xl px-4 py-3 mb-4"
+          style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
+        >
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5" style={{ color: '#a78bfa' }}>
+            {isFr ? 'Ce que tu débloques' : 'What you unlock'}
           </p>
           <ul className="space-y-1.5">
             {(isFr ? [
-              'Vos 4 fonctions cognitives détaillées',
-              'Profil amoureux et compatibilité',
-              'Forces, faiblesses, axes de croissance',
-              'Célébrités de votre type',
+              { icon: '🧠', text: 'Tes 4 fonctions cognitives détaillées' },
+              { icon: '❤️', text: 'Profil amoureux et compatibilité' },
+              { icon: '⚡', text: 'Forces, faiblesses, axes de croissance' },
+              { icon: '🌟', text: 'Célébrités de ton type' },
             ] : [
-              'Your 4 cognitive functions in detail',
-              'Love profile and compatibility',
-              'Strengths, weaknesses, growth areas',
-              'Famous people of your type',
+              { icon: '🧠', text: 'Your 4 cognitive functions in detail' },
+              { icon: '❤️', text: 'Love profile and compatibility' },
+              { icon: '⚡', text: 'Strengths, weaknesses, growth areas' },
+              { icon: '🌟', text: 'Famous people of your type' },
             ]).map(item => (
-              <li key={item} className="flex items-center gap-2 text-xs text-gray-600">
-                <span className="text-gray-400 flex-shrink-0">✓</span>
-                {item}
+              <li key={item.text} className="flex items-center gap-2 text-xs text-zinc-300">
+                <span className="flex-shrink-0 text-base leading-none">{item.icon}</span>
+                {item.text}
               </li>
             ))}
           </ul>
@@ -477,45 +497,47 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           <button
             onClick={() => doCheckout('onetime')}
             disabled={loading}
-            className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-60"
-            style={{ background: '#111827' }}>
+            className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.4)' }}>
             {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? 'Accéder à mon type complet — 1,99 €' : 'Access my full type — €1.99')}
           </button>
-          <p className="text-center text-[11px] text-gray-400">
+          <p className="text-center text-[11px] text-zinc-500">
             {isFr ? 'Sans compte requis · Accès immédiat · Paiement unique' : 'No account needed · Instant access · One-time payment'}
           </p>
 
           {/* Divider */}
           <div className="flex items-center gap-3 pt-2 pb-1">
-            <div className="flex-1 h-px bg-gray-100" />
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider whitespace-nowrap">
+            <div className="flex-1 h-px bg-white/8" />
+            <span className="text-[10px] text-zinc-600 uppercase tracking-wider whitespace-nowrap">
               {isFr ? 'Accès complet' : 'Full access'}
             </span>
-            <div className="flex-1 h-px bg-gray-100" />
+            <div className="flex-1 h-px bg-white/8" />
           </div>
 
           <button
             onClick={() => doCheckout('annual')}
             disabled={loading}
-            className="w-full py-3 rounded-xl font-medium text-gray-600 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4 relative overflow-hidden">
-            <span className="absolute top-0 right-0 bg-gray-900 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">−75%</span>
+            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 relative overflow-hidden transition-all hover:opacity-90 disabled:opacity-60"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#d4d4d8' }}>
+            <span className="absolute top-0 right-0 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>−75%</span>
             <span className="flex items-center justify-between pr-8">
               <span>{isFr ? '16 types · Quiz illimités · Mode Duo' : '16 types · Unlimited quizzes · Duo'}</span>
-              <span className="font-semibold text-gray-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+              <span className="font-bold text-white">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
             </span>
           </button>
           <button
             onClick={() => doCheckout('monthly')}
             disabled={loading}
-            className="w-full py-3 rounded-xl font-medium text-gray-500 text-xs border border-gray-200 hover:bg-gray-50 transition-all disabled:opacity-60 text-left px-4">
+            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 transition-all hover:opacity-90 disabled:opacity-60"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: '#71717a' }}>
             <span className="flex items-center justify-between">
               <span>{isFr ? 'Accès mensuel · sans engagement' : 'Monthly · no commitment'}</span>
-              <span className="font-semibold text-gray-700">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+              <span className="font-semibold text-zinc-400">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
             </span>
           </button>
         </div>
 
-        <p className="text-center text-[11px] text-gray-400 mt-3">
+        <p className="text-center text-[11px] text-zinc-600 mt-3">
           {isFr ? '🔒 Paiement sécurisé Stripe' : '🔒 Secure Stripe payment'}
         </p>
       </div>

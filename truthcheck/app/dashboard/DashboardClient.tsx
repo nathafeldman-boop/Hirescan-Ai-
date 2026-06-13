@@ -22,67 +22,77 @@ export default function DashboardClient({ user }: Props) {
   const firstName = user.name?.split(' ')[0] ?? 'toi';
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-[#09090b]">
+
+      {/* Background atmosphere */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-[0.08] bg-violet-600" />
+        <div className="absolute bottom-1/3 left-0 w-72 h-72 rounded-full blur-3xl opacity-[0.06] bg-pink-600" />
+      </div>
 
       {/* Top nav */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
+      <header className="relative z-10 sticky top-0" style={{ background: 'rgba(9,9,11,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="text-lg font-black">
             <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-gray-900">Cecret</span>
+            <span className="text-white">Cecret</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {user.image
-              ? <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-gray-200" /> // eslint-disable-line @next/next/no-img-element
-              : <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 text-sm font-bold">{firstName[0]?.toUpperCase()}</div>
+              ? <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-white/10" /> // eslint-disable-line @next/next/no-img-element
+              : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff' }}>{firstName[0]?.toUpperCase()}</div>
             }
-            <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs text-gray-400 hover:text-gray-700 transition-colors ml-1">
+            <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
               Déconnexion
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
+      <div className="relative z-10 max-w-lg mx-auto px-4 py-6 space-y-4">
 
         {/* Greeting + tier */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-black text-gray-900">Bonjour {firstName} 👋</h1>
-            <p className="text-sm text-gray-400">{user.email}</p>
+            <h1 className="text-xl font-black text-white">Bonjour {firstName} 👋</h1>
+            <p className="text-sm text-zinc-500">{user.email}</p>
           </div>
           {isPremium
-            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: '#7c3aed', backgroundColor: '#7c3aed12', border: '1px solid #7c3aed30' }}>👑 Pro</span>
-            : <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-gray-500 bg-gray-100">Gratuit</span>
+            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: '#a78bfa', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)' }}>👑 Pro</span>
+            : <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-zinc-400" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>Gratuit</span>
           }
         </div>
 
         {/* MBTI type — main card */}
         {type ? (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
             {/* Color band */}
-            <div className="h-1.5 w-full" style={{ background: `linear-gradient(to right,${type.accentColor},#ec4899)` }} />
+            <div className="h-1 w-full" style={{ background: `linear-gradient(to right,${type.accentColor},#ec4899)` }} />
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-3">Ton type de personnalité</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Ton type de personnalité</p>
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-5xl leading-none">{type.emoji}</div>
                 <div>
-                  <p className="text-2xl font-black text-gray-900 leading-tight">{user.mbtiType}</p>
-                  <p className="text-sm font-bold text-gray-500">{type.name}</p>
+                  <p className="text-2xl font-black text-white leading-tight">{user.mbtiType}</p>
+                  <p className="text-sm font-bold text-zinc-400">{type.name}</p>
                   <p className="text-xs mt-0.5" style={{ color: type.accentColor }}>{type.rarity} de la population</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-500 italic mb-5 leading-relaxed">&ldquo;{type.tagline}&rdquo;</p>
+              <p className="text-sm text-zinc-400 italic mb-5 leading-relaxed">&ldquo;{type.tagline}&rdquo;</p>
               <Link
                 href={`/types/${user.mbtiType!.toLowerCase()}`}
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-white text-sm"
-                style={{ background: `linear-gradient(135deg,${type.accentColor},#ec4899)` }}>
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01]"
+                style={{ background: `linear-gradient(135deg,${type.accentColor},#ec4899)`, boxShadow: `0 4px 20px ${type.accentColor}30` }}
+              >
                 Voir mon profil complet →
               </Link>
               {user.mbtiTestCount > 0 && (
                 <div className="flex items-center justify-between mt-3">
-                  <p className="text-xs text-gray-400">Test passé {user.mbtiTestCount} fois</p>
-                  <Link href="/quiz/personnalite" className="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+                  <p className="text-xs text-zinc-600">Test passé {user.mbtiTestCount} fois</p>
+                  <Link href="/quiz/personnalite" className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
                     Repasser le test →
                   </Link>
                 </div>
@@ -90,13 +100,18 @@ export default function DashboardClient({ user }: Props) {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-6 text-center">
+          <div
+            className="rounded-2xl p-6 text-center"
+            style={{ background: 'rgba(139,92,246,0.06)', border: '2px dashed rgba(139,92,246,0.25)' }}
+          >
             <div className="text-4xl mb-3">🧠</div>
-            <p className="text-base font-black text-gray-900 mb-1">Découvre ton type MBTI</p>
-            <p className="text-sm text-gray-400 mb-5">100 questions · environ 12 minutes</p>
-            <Link href="/quiz/personnalite"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.25)' }}>
+            <p className="text-base font-black text-white mb-1">Découvre ton type MBTI</p>
+            <p className="text-sm text-zinc-500 mb-5">100 questions · environ 12 minutes</p>
+            <Link
+              href="/quiz/personnalite"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.3)' }}
+            >
               Passer le test →
             </Link>
           </div>
@@ -104,43 +119,50 @@ export default function DashboardClient({ user }: Props) {
 
         {/* Feature row */}
         <div className="grid grid-cols-2 gap-3">
-          {/* Duo */}
           <Link
             href={isPremium ? '/duo' : '/pricing'}
-            className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-sm hover:border-gray-300 transition-all">
+            className="rounded-2xl p-4 transition-all hover:scale-[1.02] group"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
             <div className="flex items-start justify-between mb-3">
               <span className="text-2xl">💑</span>
               {!isPremium && (
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-600">Pro</span>
+                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>Pro</span>
               )}
             </div>
-            <p className="text-sm font-bold text-gray-900">Compatibilité</p>
-            <p className="text-xs text-gray-400 mt-0.5 leading-snug">Compare avec quelqu&apos;un</p>
+            <p className="text-sm font-bold text-white">Compatibilité</p>
+            <p className="text-xs text-zinc-500 mt-0.5 leading-snug">Compare avec quelqu&apos;un</p>
           </Link>
 
-          {/* 16 types */}
-          <Link href="/types"
-            className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-sm hover:border-gray-300 transition-all">
+          <Link
+            href="/types"
+            className="rounded-2xl p-4 transition-all hover:scale-[1.02]"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
             <div className="mb-3">
               <span className="text-2xl">🔍</span>
             </div>
-            <p className="text-sm font-bold text-gray-900">Les 16 types</p>
-            <p className="text-xs text-gray-400 mt-0.5 leading-snug">Explorer tous les profils</p>
+            <p className="text-sm font-bold text-white">Les 16 types</p>
+            <p className="text-xs text-zinc-500 mt-0.5 leading-snug">Explorer tous les profils</p>
           </Link>
         </div>
 
         {/* Upgrade banner — free only */}
         {!isPremium && (
-          <div className="rounded-2xl p-5 flex items-center gap-4"
-            style={{ background: 'linear-gradient(135deg,#7c3aed12,#ec489912)', border: '1px solid #7c3aed20' }}>
+          <div
+            className="rounded-2xl p-5 flex items-center gap-4"
+            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.12),rgba(236,72,153,0.08))', border: '1px solid rgba(139,92,246,0.2)' }}
+          >
             <div className="text-2xl flex-shrink-0">💎</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-black text-gray-900">Passer Pro</p>
-              <p className="text-xs text-gray-500 mt-0.5">Type révélé · Compatibilité duo · Profils complets</p>
+              <p className="text-sm font-black text-white">Passer Pro</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Type révélé · Compatibilité duo · Profils complets</p>
             </div>
-            <Link href="/pricing"
-              className="px-4 py-2 rounded-xl font-bold text-white text-xs flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+            <Link
+              href="/pricing"
+              className="px-4 py-2 rounded-xl font-bold text-white text-xs flex-shrink-0 transition-all hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+            >
               Voir →
             </Link>
           </div>
