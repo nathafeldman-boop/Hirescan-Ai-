@@ -644,7 +644,7 @@ export default function PersonnaliteClient() {
   // Detect in-app browser (TikTok, Instagram, Snapchat…) — block immediately
   useEffect(() => {
     const ua = navigator.userAgent || '';
-    if (/FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat/.test(ua)) {
+    if (/FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/.test(ua)) {
       setInAppWarning(true);
       diagLog('inapp_detected', { ua: ua.slice(0, 120) });
     }

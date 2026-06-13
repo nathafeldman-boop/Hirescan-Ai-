@@ -51,8 +51,63 @@ const MBTI_LETTERS = [
   { letter: 'J/P', emoji: '📅', label: 'Jugement · Perception', color: '#0ea5e9', desc: 'Comment vous organisez votre vie : avec structure et planification ou avec flexibilité et spontanéité.' },
 ];
 
+function InAppBrowserBlock() {
+  const [copied, setCopied] = useState(false);
+  const url = typeof window !== 'undefined' ? window.location.href : '';
+
+  const openExternal = () => {
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+    if (isIOS) {
+      window.location.href = `googlechrome://${url.replace(/^https?:\/\//, '')}`;
+    } else {
+      window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
+    }
+    setTimeout(async () => {
+      try { await navigator.clipboard.writeText(url); setCopied(true); } catch {}
+    }, 1200);
+  };
+
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(url); } catch {}
+    setCopied(true);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center" style={{ background: '#faf9f7' }}>
+      <div className="text-6xl mb-4">🌐</div>
+      <h2 className="text-2xl font-black text-stone-900 mb-2">Ouvre dans ton navigateur</h2>
+      <p className="text-stone-500 text-sm mb-7 leading-relaxed max-w-xs">
+        Le paiement sécurisé ne fonctionne pas dans le navigateur TikTok / Instagram.
+        Suis ces 2 étapes :
+      </p>
+      <div className="w-full max-w-xs mb-7 space-y-3 text-left">
+        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
+          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>1</span>
+          <p className="text-stone-700 text-sm leading-snug pt-0.5">Appuie sur les <strong>⋯</strong> en haut à droite</p>
+        </div>
+        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
+          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>2</span>
+          <p className="text-stone-700 text-sm leading-snug pt-0.5">Appuie sur <strong>&quot;Ouvrir dans le navigateur&quot;</strong></p>
+        </div>
+      </div>
+      <div className="w-full max-w-xs space-y-3">
+        <button onClick={openExternal} className="w-full py-4 rounded-2xl font-black text-white text-base" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>
+          🚀 Ouvrir dans Chrome / Safari
+        </button>
+        <button onClick={copyLink} className="w-full py-3 rounded-2xl font-semibold text-sm text-stone-700" style={{ background: 'white', border: '2px solid #e7e5e0' }}>
+          {copied ? '✅ Lien copié !' : '📋 Copier le lien'}
+        </button>
+      </div>
+      <p className="text-stone-400 text-xs mt-6 max-w-xs">Tes réponses seront sauvegardées 🔒</p>
+    </div>
+  );
+}
+
+const IN_APP_REGEX = /FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/;
+
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
+  const [inApp, setInApp] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -60,8 +115,13 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (IN_APP_REGEX.test(navigator.userAgent || '')) setInApp(true);
+  }, []);
+
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ background: '#faf9f7' }}>
+      {inApp && <InAppBrowserBlock />}
 
       {/* Subtle cream orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
