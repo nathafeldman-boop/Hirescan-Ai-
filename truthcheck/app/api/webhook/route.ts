@@ -106,6 +106,39 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+
+    // ── Subscription updated (plan change) → keep premium ──
+    if (event.type === 'customer.subscription.updated') {
+      const sub = event.data.object as Stripe.Subscription;
+      if (sub.status === 'active' || sub.status === 'trialing') {
+        const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
+        const customer = await stripe.customers.retrieve(customerId).catch(() => null);
+        if (customer && !customer.deleted) {
+          const customerEmail = (customer as Stripe.Customer).email;
+          if (customerEmail) {
+            await prisma.user.updateMany({
+              where: { email: customerEmail },
+              data: { tier: 'premium' },
+            }).catch(() => {});
+          }
+        }
+      }
+    }
+
+    // ── Invoice payment failed → downgrade to free ──
+    if (event.type === 'invoice.payment_failed') {
+      const invoice = event.data.object as Stripe.Invoice;
+      // Only downgrade after final failed attempt (next_payment_attempt = null)
+      if (invoice.next_payment_attempt === null) {
+        const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email : null;
+        if (customerEmail) {
+          await prisma.user.updateMany({
+            where: { email: customerEmail },
+            data: { tier: 'free' },
+          }).catch(() => {});
+        }
+      }
+    }
   } catch {
     // Return 200 even on internal error so Stripe doesn't retry forever
   }
