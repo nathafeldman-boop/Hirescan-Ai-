@@ -521,39 +521,134 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
         {/* Countdown timer */}
         <CountdownTimer isFr={isFr} />
 
-        {/* Tier comparison — what you get with each plan */}
-        <div className="rounded-xl overflow-hidden mb-4" style={{ border: '1px solid #e7e5e0' }}>
-          {/* PASS RÉSULTAT */}
-          <div className="px-4 py-3" style={{ background: 'rgba(124,58,237,0.06)', borderBottom: '1px solid #e7e5e0' }}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
-                {isFr ? 'PASS RÉSULTAT' : 'RESULT PASS'}
+        {/* Persuasive value section */}
+        <div className="mb-5">
+
+          {/* Headline + intro */}
+          <div className="text-center mb-4 px-1">
+            <h2 className="text-base font-black text-stone-900 mb-2 leading-snug">
+              {isFr ? 'Ton résultat n\'est que le début.' : 'Your result is just the beginning.'}
+            </h2>
+            <p className="text-[11px] text-stone-500 leading-relaxed">
+              {isFr
+                ? 'Ton profil révèle bien plus qu\'un simple type. Débloque des analyses exclusives sur tes relations, tes compatibilités, tes points forts cachés — et les comportements que tu reproduis sans t\'en rendre compte.'
+                : 'Your profile reveals far more than a simple type. Unlock exclusive insights into your relationships, compatibilities, hidden strengths — and the patterns you repeat without realising.'}
+            </p>
+          </div>
+
+          {/* Tier cards */}
+          <div className="space-y-2.5">
+
+            {/* PASS RÉSULTAT */}
+            <div className="rounded-xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
+                  {isFr ? 'PASS RÉSULTAT' : 'RESULT PASS'}
+                </span>
+                <span className="text-sm font-black text-stone-900">1,99 €</span>
+              </div>
+              <ul className="space-y-1.5 mb-2.5">
+                {(isFr ? [
+                  'Voir ton résultat complet immédiatement',
+                  'Découvrir ton type principal',
+                  'Accéder à ton analyse de base',
+                ] : [
+                  'See your full result immediately',
+                  'Discover your main type',
+                  'Access your basic analysis',
+                ]).map(item => (
+                  <li key={item} className="flex items-start gap-2 text-[11px] text-stone-600">
+                    <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#10b981' }}>✔</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] text-stone-400 italic">
+                {isFr ? 'Pour ceux qui veulent simplement connaître leur résultat.' : 'For those who just want to know their result.'}
+              </p>
+            </div>
+
+            {/* PREMIUM */}
+            <div className="rounded-xl p-4" style={{ background: 'white', border: '1.5px solid rgba(124,58,237,0.25)' }}>
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
+                  PREMIUM
+                </span>
+                <span className="text-sm font-black text-stone-900">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+              </div>
+              <ul className="space-y-1.5 mb-2.5">
+                {(isFr ? [
+                  'Résultat complet',
+                  'Compatibilité amoureuse avec tous les profils',
+                  'Accès aux quiz relationnels et psychologiques',
+                  'Historique de tes résultats',
+                  'Nouveaux tests ajoutés chaque mois',
+                  'Analyses plus détaillées',
+                  'Déblocage automatique des futurs contenus Premium',
+                ] : [
+                  'Full result',
+                  'Romantic compatibility with all profiles',
+                  'Access to relational and psychological quizzes',
+                  'Your results history',
+                  'New tests added every month',
+                  'More detailed analyses',
+                  'Automatic unlock of future Premium content',
+                ]).map(item => (
+                  <li key={item} className="flex items-start gap-2 text-[11px] text-stone-600">
+                    <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#7c3aed' }}>✔</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] text-stone-400 italic">
+                {isFr
+                  ? 'Pour ceux qui veulent réellement comprendre leur personnalité et leurs relations.'
+                  : 'For those who truly want to understand their personality and relationships.'}
+              </p>
+            </div>
+
+            {/* PASS ANNUEL — highlighted */}
+            <div
+              className="rounded-xl p-4 relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.07),rgba(236,72,153,0.05))', border: '2px solid rgba(124,58,237,0.35)' }}
+            >
+              <span
+                className="absolute top-0 right-0 text-white text-[9px] font-black tracking-wider px-2.5 py-1 rounded-bl-lg"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+              >
+                {isFr ? 'LE PLUS POPULAIRE' : 'MOST POPULAR'}
               </span>
-              <span className="text-xs font-black text-stone-900">1,99 €</span>
+              <div className="flex items-center justify-between mb-2.5 pr-16">
+                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
+                  {isFr ? 'PASS ANNUEL' : 'ANNUAL PASS'}
+                </span>
+                <span className="text-sm font-black text-stone-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+              </div>
+              <ul className="space-y-1.5 mb-2.5">
+                {(isFr ? [
+                  'Tout le Premium',
+                  '12 mois pour le prix de 3',
+                  'Accès anticipé aux nouveaux tests',
+                  'Fonctionnalités Premium futures incluses',
+                  'Meilleure offre disponible',
+                ] : [
+                  'Everything in Premium',
+                  '12 months for the price of 3',
+                  'Early access to new tests',
+                  'Future Premium features included',
+                  'Best available offer',
+                ]).map(item => (
+                  <li key={item} className="flex items-start gap-2 text-[11px] text-stone-700">
+                    <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#7c3aed' }}>✔</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] italic" style={{ color: '#7c3aed', opacity: 0.8 }}>
+                {isFr ? 'Économise 70 % par rapport au mensuel.' : 'Save 70% compared to monthly.'}
+              </p>
             </div>
-            <p className="text-[11px] text-stone-600">✔ {isFr ? 'Débloque immédiatement ton résultat complet' : 'Unlock your full result immediately'}</p>
-          </div>
-          {/* PREMIUM */}
-          <div className="px-4 py-3" style={{ background: 'white', borderBottom: '1px solid #e7e5e0' }}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">PREMIUM</span>
-              <span className="text-xs font-black text-stone-900">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
-            </div>
-            <div className="text-[11px] text-stone-500 space-y-0.5">
-              <p>✔ {isFr ? 'Résultat complet + compatibilités amoureuses' : 'Full result + romantic compatibility'}</p>
-              <p>✔ {isFr ? 'Tous les tests · Analyses · Historique' : 'All quizzes · Analysis · History'}</p>
-            </div>
-          </div>
-          {/* VIP */}
-          <div className="px-4 py-3" style={{ background: 'white' }}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">VIP</span>
-              <span className="text-xs font-black text-stone-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
-            </div>
-            <div className="text-[11px] text-stone-500 space-y-0.5">
-              <p>✔ {isFr ? 'Tout le Premium' : 'Everything in Premium'}</p>
-              <p>✔ {isFr ? 'Accès anticipé · Rapports avancés · Support prioritaire' : 'Early access · Advanced reports · Priority support'}</p>
-            </div>
+
           </div>
         </div>
 
