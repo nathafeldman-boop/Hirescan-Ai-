@@ -284,31 +284,33 @@ function InAppBrowserOverlay({ onDismiss }: { onDismiss: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6 text-center">
-      <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-amber-100 flex items-center justify-center text-3xl">⚠️</div>
-      <h2 className="text-xl font-black text-gray-900 mb-3">
-        Ouvre dans Chrome ou Safari
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center" style={{ background: '#faf9f7' }}>
+      <div className="text-5xl mb-5">🌐</div>
+      <h2 className="text-2xl font-black text-stone-900 mb-3">
+        Ouvre dans Safari ou Chrome
       </h2>
-      <p className="text-gray-500 text-sm mb-8 leading-relaxed max-w-xs">
-        Le navigateur de TikTok bloque la connexion et le paiement. Ouvre ce lien dans Chrome ou Safari pour ne pas perdre ton résultat.
+      <p className="text-stone-500 text-sm mb-8 leading-relaxed max-w-xs">
+        Le navigateur TikTok peut bloquer le paiement sécurisé.<br />
+        <strong className="text-stone-700">Ton résultat est sauvegardé</strong> — il t&apos;attendra dans Safari.
       </p>
       <div className="w-full max-w-xs space-y-3">
         <button
           onClick={openInChrome}
           className="w-full py-4 rounded-2xl font-black text-white text-base"
           style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>
-          Ouvrir dans Chrome
+          🚀 Ouvrir dans Safari / Chrome
         </button>
         <button
           onClick={copyLink}
-          className="w-full py-3 rounded-2xl font-semibold text-sm border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all">
-          {copied ? '✓ Lien copié — colle-le dans Chrome !' : '📋 Copier le lien'}
+          className="w-full py-3 rounded-2xl font-semibold text-sm text-stone-700 transition-all"
+          style={{ background: 'white', border: '2px solid #e7e5e0' }}>
+          {copied ? '✓ Lien copié — colle dans Safari !' : '📋 Copier le lien'}
         </button>
       </div>
       <button
         onClick={onDismiss}
-        className="mt-8 text-xs text-gray-300 hover:text-gray-500 transition-colors">
-        Continuer quand même (risqué)
+        className="mt-8 text-xs text-stone-300 hover:text-stone-500 transition-colors">
+        Continuer quand même
       </button>
     </div>
   );
@@ -398,66 +400,63 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
   }, [typeCode, userEmail]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-[#09090b]">
-      {/* Background atmosphere */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.1] bg-violet-600" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-[0.07] bg-pink-600" />
-      </div>
-      <div className="relative z-10 w-full max-w-sm">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ background: '#faf9f7' }}>
+      <div className="w-full max-w-sm">
+
+        {/* Header with character illustration */}
         <div className="text-center mb-6">
-          {/* Type code preview */}
+          <div className="text-5xl mb-3 animate-bounce" style={{ animationDuration: '2s' }}>🔮</div>
           <div
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black mb-5 tracking-widest"
-            style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa' }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black mb-4 tracking-widest"
+            style={{ background: 'rgba(109,40,217,0.08)', border: '1px solid rgba(109,40,217,0.2)', color: '#7c3aed' }}
           >
-            {typeCode.slice(0, 2)}<span className="blur-[4px] select-none opacity-60">??</span>
+            {typeCode.slice(0, 2)}<span className="blur-[4px] select-none opacity-40">??</span>
           </div>
 
-          <h1 className="text-2xl font-black text-white mb-2">
-            {isFr ? 'Ton type est prêt' : 'Your type is ready'}
+          <h1 className="text-2xl font-black text-stone-900 mb-2">
+            {isFr ? 'Ton type est prêt ✨' : 'Your type is ready ✨'}
           </h1>
-          <p className="text-zinc-400 text-sm leading-relaxed">
+          <p className="text-stone-500 text-sm leading-relaxed">
             {isFr
-              ? `${type?.rarity} de la population partagent ce profil.`
-              : `${type?.rarity} of the population share this profile.`}
+              ? `Seulement ${type?.rarity} de la population partagent ce profil.`
+              : `Only ${type?.rarity} of the population share this profile.`}
           </p>
         </div>
 
         {/* Locked type card */}
         <div
           className="rounded-2xl p-5 mb-4 relative overflow-hidden"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
         >
           <div className="space-y-3 select-none" aria-hidden>
             <div className="flex items-center gap-3">
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-black"
-                style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa' }}
+                style={{ background: 'rgba(109,40,217,0.1)', color: '#7c3aed' }}
               >
                 {typeCode.slice(0, 2)}
               </div>
               <div>
-                <div className="text-sm font-black text-white tracking-widest">
-                  {typeCode.slice(0, 2)}<span className="blur-sm opacity-40">??</span>
+                <div className="text-sm font-black text-stone-900 tracking-widest">
+                  {typeCode.slice(0, 2)}<span className="blur-sm opacity-30">??</span>
                 </div>
-                <div className="h-2.5 w-20 bg-white/10 rounded-full mt-1 blur-sm" />
+                <div className="h-2.5 w-20 bg-stone-200 rounded-full mt-1 blur-sm" />
               </div>
             </div>
             <div className="space-y-2">
-              <div className="h-3 bg-white/8 rounded-full blur-sm" />
-              <div className="h-3 bg-white/8 rounded-full w-5/6 blur-sm" />
-              <div className="h-3 bg-white/8 rounded-full w-4/6 blur-sm" />
+              <div className="h-3 bg-stone-100 rounded-full blur-sm" />
+              <div className="h-3 bg-stone-100 rounded-full w-5/6 blur-sm" />
+              <div className="h-3 bg-stone-100 rounded-full w-4/6 blur-sm" />
             </div>
           </div>
           <div
             className="absolute inset-0 flex items-end justify-center pb-4 rounded-2xl"
-            style={{ background: 'linear-gradient(to top, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.6) 50%, transparent 100%)' }}
+            style={{ background: 'linear-gradient(to top, rgba(250,249,247,0.97) 0%, rgba(250,249,247,0.55) 50%, transparent 100%)' }}
           >
             <div className="text-center">
-              <div className="mb-1 flex justify-center" style={{ color: '#a78bfa' }}><LockIcon /></div>
-              <p className="text-xs text-zinc-400 font-semibold">
-                {isFr ? 'Ton type complet est verrouillé' : 'Your full type is locked'}
+              <div className="mb-1 flex justify-center" style={{ color: '#7c3aed' }}><LockIcon /></div>
+              <p className="text-xs text-stone-500 font-semibold">
+                {isFr ? 'Ton profil complet est verrouillé 🔒' : 'Your full profile is locked 🔒'}
               </p>
             </div>
           </div>
@@ -466,24 +465,24 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
         {/* What's inside */}
         <div
           className="rounded-xl px-4 py-3 mb-4"
-          style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
+          style={{ background: 'rgba(109,40,217,0.05)', border: '1px solid rgba(109,40,217,0.15)' }}
         >
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5" style={{ color: '#a78bfa' }}>
-            {isFr ? 'Ce que tu débloques' : 'What you unlock'}
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5" style={{ color: '#7c3aed' }}>
+            {isFr ? '🎁 Ce que tu débloques' : '🎁 What you unlock'}
           </p>
           <ul className="space-y-1.5">
             {(isFr ? [
               { icon: '🧠', text: 'Tes 4 fonctions cognitives détaillées' },
               { icon: '❤️', text: 'Profil amoureux et compatibilité' },
               { icon: '⚡', text: 'Forces, faiblesses, axes de croissance' },
-              { icon: '🌟', text: 'Célébrités de ton type' },
+              { icon: '🌟', text: 'Célébrités qui partagent ton type' },
             ] : [
               { icon: '🧠', text: 'Your 4 cognitive functions in detail' },
               { icon: '❤️', text: 'Love profile and compatibility' },
               { icon: '⚡', text: 'Strengths, weaknesses, growth areas' },
               { icon: '🌟', text: 'Famous people of your type' },
             ]).map(item => (
-              <li key={item.text} className="flex items-center gap-2 text-xs text-zinc-300">
+              <li key={item.text} className="flex items-center gap-2 text-xs text-stone-700">
                 <span className="flex-shrink-0 text-base leading-none">{item.icon}</span>
                 {item.text}
               </li>
@@ -491,54 +490,57 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           </ul>
         </div>
 
-        {/* Paywall */}
+        {/* Countdown timer */}
+        <CountdownTimer isFr={isFr} />
+
+        {/* Paywall buttons — DO NOT MODIFY onClick handlers */}
         <div className="space-y-2">
-          {/* Hero — 1,99€ one-time */}
+          {/* Hero CTA — 1,99€ */}
           <button
             onClick={() => doCheckout('onetime')}
             disabled={loading}
             className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.4)' }}>
-            {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? 'Accéder à mon type complet — 1,99 €' : 'Access my full type — €1.99')}
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.35)' }}>
+            {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? '🔓 Accéder à mon type complet — 1,99 €' : '🔓 Access my full type — €1.99')}
           </button>
-          <p className="text-center text-[11px] text-zinc-500">
+          <p className="text-center text-[11px] text-stone-400">
             {isFr ? 'Sans compte requis · Accès immédiat · Paiement unique' : 'No account needed · Instant access · One-time payment'}
           </p>
 
           {/* Divider */}
           <div className="flex items-center gap-3 pt-2 pb-1">
-            <div className="flex-1 h-px bg-white/8" />
-            <span className="text-[10px] text-zinc-600 uppercase tracking-wider whitespace-nowrap">
+            <div className="flex-1 h-px bg-stone-200" />
+            <span className="text-[10px] text-stone-400 uppercase tracking-wider whitespace-nowrap">
               {isFr ? 'Accès complet' : 'Full access'}
             </span>
-            <div className="flex-1 h-px bg-white/8" />
+            <div className="flex-1 h-px bg-stone-200" />
           </div>
 
           <button
             onClick={() => doCheckout('annual')}
             disabled={loading}
-            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 relative overflow-hidden transition-all hover:opacity-90 disabled:opacity-60"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#d4d4d8' }}>
+            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 relative overflow-hidden transition-all hover:shadow-md disabled:opacity-60"
+            style={{ background: 'white', border: '2px solid #e7e5e0', color: '#57534e', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <span className="absolute top-0 right-0 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>−75%</span>
             <span className="flex items-center justify-between pr-8">
-              <span>{isFr ? '16 types · Quiz illimités · Mode Duo' : '16 types · Unlimited quizzes · Duo'}</span>
-              <span className="font-bold text-white">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+              <span>{isFr ? '✨ 16 types · Quiz illimités · Mode Duo' : '✨ 16 types · Unlimited quizzes · Duo'}</span>
+              <span className="font-bold text-stone-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
             </span>
           </button>
           <button
             onClick={() => doCheckout('monthly')}
             disabled={loading}
-            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 transition-all hover:opacity-90 disabled:opacity-60"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: '#71717a' }}>
+            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 transition-all hover:bg-stone-100 disabled:opacity-60"
+            style={{ background: 'white', border: '1px solid #e7e5e0', color: '#78716c' }}>
             <span className="flex items-center justify-between">
               <span>{isFr ? 'Accès mensuel · sans engagement' : 'Monthly · no commitment'}</span>
-              <span className="font-semibold text-zinc-400">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+              <span className="font-semibold text-stone-600">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
             </span>
           </button>
         </div>
 
-        <p className="text-center text-[11px] text-zinc-600 mt-3">
-          {isFr ? '🔒 Paiement sécurisé Stripe' : '🔒 Secure Stripe payment'}
+        <p className="text-center text-[11px] text-stone-400 mt-3">
+          {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe payment · Card, Apple Pay, Google Pay'}
         </p>
       </div>
     </div>
@@ -661,6 +663,8 @@ export default function PersonnaliteClient() {
     diagLog('analysis_done', { type, hasSession: !!session?.user, isPremium });
     setMbtiType(type);
     try { localStorage.setItem('_mbti_pending', type); } catch {}
+    // Also encode type in URL — survives TikTok browser localStorage wipe on navigation
+    try { window.history.replaceState(null, '', `/quiz/personnalite?pending=${type}`); } catch {}
     if (session?.user) {
       fetch('/api/user/save-mbti', {
         method: 'POST',
@@ -678,6 +682,10 @@ export default function PersonnaliteClient() {
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
+      {/* InAppBrowserOverlay: shown when TikTok/Instagram browser detected + paywall reached */}
+      {inAppWarning && phase === 'result' && (
+        <InAppBrowserOverlay onDismiss={() => setInAppWarning(false)} />
+      )}
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
@@ -685,10 +693,10 @@ export default function PersonnaliteClient() {
         <AnalysisScreen onDone={handleAnalysisDone} t={t} />
       )}
       {phase === 'gate' && (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center" style={{ background: '#faf9f7' }}>
           <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
-            <p className="text-gray-400 text-sm">Chargement de tes résultats…</p>
+            <div className="text-4xl animate-spin" style={{ animationDuration: '1.5s' }}>🔮</div>
+            <p className="text-stone-400 text-sm font-medium">Chargement de tes résultats…</p>
           </div>
         </div>
       )}

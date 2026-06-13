@@ -100,65 +100,60 @@ export default async function SuccessPage({
   }
 
   return (
-    <main className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
-      <div className="pointer-events-none fixed inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-20 bg-violet-600" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-900/10 rounded-full blur-3xl" />
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.1] bg-violet-500" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-400/10 rounded-full blur-3xl" />
       </div>
 
       <SuccessTracker />
-      <div className="relative z-10 text-center max-w-md">
-        {/* Icon */}
-        <div
-          className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
-        >
-          <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
+      <div className="relative z-10 text-center max-w-md w-full">
+        {/* Success illustration */}
+        <div className="text-6xl mb-4 animate-bounce" style={{ animationDuration: '2s' }}>🎉</div>
 
-        <h1 className="text-3xl font-black text-white mb-3">
-          {typeCode ? `Profil ${typeCode} débloqué !` : 'Bienvenue dans UrCecret Premium'}
+        <h1 className="text-3xl font-black text-stone-900 mb-3">
+          {typeCode ? `Profil ${typeCode} débloqué !` : 'Bienvenue dans UrCecret ✨'}
         </h1>
 
         {magicLinkSent && email ? (
-          <p className="text-zinc-400 mb-8 leading-relaxed">
-            Un lien d'accès a été envoyé à{' '}
-            <span className="text-white font-semibold">{email}</span>.{' '}
-            Clique dessus pour voir ton profil complet — ça prend 10 secondes.
-          </p>
+          <div className="mb-8">
+            <p className="text-stone-500 leading-relaxed mb-2">
+              Un lien d&apos;accès a été envoyé à{' '}
+              <span style={{ color: '#7c3aed' }} className="font-semibold">{email}</span>.
+            </p>
+            <p className="text-stone-400 text-sm">Ouvre ton appli mail et clique le lien — ça prend 10 secondes.</p>
+          </div>
         ) : (
-          <p className="text-zinc-400 mb-8 leading-relaxed">
+          <p className="text-stone-500 mb-8 leading-relaxed">
             {typeCode
               ? `Ton profil ${typeCode} et les 15 tests UrCecret sont maintenant débloqués.`
               : `Ton rapport complet et les 15 tests UrCecret sont maintenant débloqués.`}
           </p>
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-3 max-w-sm mx-auto">
           {/* Email CTA — open email app */}
           {magicLinkSent && email && (
             <a
               href={`mailto:${email}`}
               className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              Ouvrir mes emails →
+              📬 Ouvrir mes emails →
             </a>
           )}
 
-          {/* Direct link if no magic link was sent (user was already logged in) */}
+          {/* Direct link if already logged in */}
           {!magicLinkSent && typeCode && (
             <Link
               href={`/types/${typeCode.toLowerCase()}`}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
             >
-              Voir mon profil {typeCode} →
+              🔓 Voir mon profil {typeCode} →
             </Link>
           )}
 
@@ -166,7 +161,7 @@ export default async function SuccessPage({
             <Link
               href={`/share/${resultId}`}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 32px rgba(139,92,246,0.35)' }}
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
             >
               Voir mon analyse complète →
             </Link>
@@ -174,14 +169,15 @@ export default async function SuccessPage({
 
           <Link
             href="/quizzes"
-            className="block w-full py-3 rounded-2xl font-semibold text-zinc-300 text-center border border-white/10 hover:border-white/20 transition-all text-sm"
+            className="block w-full py-3 rounded-2xl font-semibold text-stone-600 text-center transition-all text-sm hover:bg-stone-100"
+            style={{ background: 'white', border: '1px solid #e7e5e0' }}
           >
             Découvrir les 15 tests UrCecret →
           </Link>
         </div>
 
         {!paid && (
-          <p className="mt-6 text-xs text-zinc-600">
+          <p className="mt-6 text-xs text-stone-400">
             Si ton analyse ne s&apos;affiche pas, attends quelques secondes et réessaie.
           </p>
         )}
