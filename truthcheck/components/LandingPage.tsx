@@ -103,7 +103,12 @@ function InAppBrowserBlock() {
   );
 }
 
-const IN_APP_REGEX = /FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/;
+function isInAppBrowser(ua: string): boolean {
+  const isAndroidWebView = /Android/.test(ua) && /\bwv\b/.test(ua);
+  const isIOSWebView = /iP(hone|ad|od)/.test(ua) && /AppleWebKit/.test(ua) && !/Safari/.test(ua);
+  const isSocialApp = /FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/.test(ua);
+  return isAndroidWebView || isIOSWebView || isSocialApp;
+}
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -116,7 +121,7 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    if (IN_APP_REGEX.test(navigator.userAgent || '')) setInApp(true);
+    if (isInAppBrowser(navigator.userAgent || '')) setInApp(true);
   }, []);
 
   return (

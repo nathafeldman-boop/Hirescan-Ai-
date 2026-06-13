@@ -644,7 +644,12 @@ export default function PersonnaliteClient() {
   // Detect in-app browser (TikTok, Instagram, Snapchat…) — block immediately
   useEffect(() => {
     const ua = navigator.userAgent || '';
-    if (/FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/.test(ua)) {
+    // Android WebView adds "wv" token — covers TikTok "Navigateur Web" and all other in-app browsers
+    const isAndroidWebView = /Android/.test(ua) && /\bwv\b/.test(ua);
+    // iOS WebView has AppleWebKit but no "Safari" in UA
+    const isIOSWebView = /iP(hone|ad|od)/.test(ua) && /AppleWebKit/.test(ua) && !/Safari/.test(ua);
+    const isSocialApp = /FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/.test(ua);
+    if (isAndroidWebView || isIOSWebView || isSocialApp) {
       setInAppWarning(true);
       diagLog('inapp_detected', { ua: ua.slice(0, 120) });
     }
