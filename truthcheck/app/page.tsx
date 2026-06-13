@@ -4,8 +4,8 @@ import LandingPage from '@/components/LandingPage';
 const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
-  title: 'UrCecret — Test MBTI Gratuit & Quiz Vérité Anonymes',
-  description: 'Découvre ton type MBTI en 24 questions (INFJ, ENFP, INTJ…) + 15 quiz anonymes sur l\'infidélité, l\'amour et tes amis. Résultats instantanés, sans inscription.',
+  title: 'Test MBTI Gratuit — 16 Types de Personnalité | UrCecret',
+  description: 'Découvre ton type MBTI en 100 questions · 15 quiz anonymes sur l\'infidélité, l\'amour et tes amis. Gratuit, instantané, sans inscription.',
   keywords: [
     'UrCecret', 'urcecret', 'urcecret.site',
     'test MBTI', 'MBTI gratuit', 'test de personnalité gratuit', '16 types personnalité',

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { getAllPairs } from '@/lib/compatibility';
 
 const BASE_URL = 'https://urcecret.site';
 
@@ -56,6 +57,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: 'monthly' as const,
       priority: 0.9,
+    })),
+    ...ALL_MBTI_TYPES.map((type) => ({
+      url: `${BASE_URL}/types/${type}/celebrites`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    })),
+    ...ALL_MBTI_TYPES.map((type) => ({
+      url: `${BASE_URL}/suis-je/${type}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    ...getAllPairs().map(({ pair }) => ({
+      url: `${BASE_URL}/compatibilite/${pair}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
     })),
     { url: `${BASE_URL}/mentions-legales`,           lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
     { url: `${BASE_URL}/politique-confidentialite`,  lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
