@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession, signIn } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { mbtiQuestions, computeMbtiType, mbtiTypes, MbtiQuestion } from '@/lib/mbti';
 import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
@@ -350,40 +350,25 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
 }
 
 // ─── Result teaser (free users — logged in or not) ─────────────────────────────
+// Auth gate removed: user goes straight to Stripe which collects their email.
+// The success page creates the account automatically from the Stripe email.
 
-function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
-  typeCode: string; lang: string; userEmail?: string | null; isInAppBrowser?: boolean;
+function ResultTeaser({ typeCode, lang, userEmail }: {
+  typeCode: string; lang: string; userEmail?: string | null;
 }) {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
-  const [showAuthInline, setShowAuthInline] = useState(false);
-  const [authEmail, setAuthEmail] = useState('');
-  const [authSent, setAuthSent] = useState(false);
-  const [authLoading, setAuthLoading] = useState(false);
-  // Tracks which checkout product the user wants — encoded into callbackUrl for cross-browser survival
-  const [checkoutIntent, setCheckoutIntent] = useState<'onetime' | 'annual' | 'monthly' | null>(null);
-
-  // callbackUrl includes intent so it survives magic-link cross-browser round-trips (TikTok → Safari)
-  const callbackUrl = `/quiz/personnalite?pending=${typeCode}${checkoutIntent ? `&intent=${checkoutIntent}` : ''}`;
 
   // Track paywall view once on mount
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
-    diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail, isInAppBrowser: !!isInAppBrowser });
+    diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
-    if (!userEmail) {
-      // Persist intent: sessionStorage (same browser) + state (encodes into callbackUrl for cross-browser)
-      try { sessionStorage.setItem('_uc_intent', checkoutType); } catch {}
-      setCheckoutIntent(checkoutType);
-      diagLog('checkout_no_email', { intent: checkoutType, callbackUrl: `/quiz/personnalite?pending=${typeCode}&intent=${checkoutType}` });
-      setShowAuthInline(true);
-      return;
-    }
-    diagLog('checkout_with_email', { intent: checkoutType });
+    diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail });
     track('checkout_click', {
       quiz: 'personnalite',
       value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
@@ -398,7 +383,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
           origin: window.location.origin,
           quizSlug: 'personnalite',
           typeCode,
-          userEmail,
+          ...(userEmail ? { userEmail } : {}),
           ...(checkoutType === 'annual' ? { annual: true } : {}),
           ...(checkoutType === 'onetime' ? { oneTime: true } : {}),
         }),
@@ -412,146 +397,22 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
     }
   }, [typeCode, userEmail]);
 
-  // Auto-trigger checkout if user just authenticated with a pending intent
-  useEffect(() => {
-    if (!userEmail) return;
-    try {
-      const intent = sessionStorage.getItem('_uc_intent') as 'onetime' | 'annual' | 'monthly' | null;
-      diagLog('auto_checkout_check', { hasIntent: !!intent, intent: intent ?? null });
-      if (intent && ['onetime', 'annual', 'monthly'].includes(intent)) {
-        sessionStorage.removeItem('_uc_intent');
-        doCheckout(intent);
-      }
-    } catch {}
-  }, [userEmail, doCheckout]);
-
-  if (showAuthInline) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-7 h-7">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25z" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-black text-gray-900 mb-2">
-              {isFr ? 'Dernière étape' : 'Last step'}
-            </h1>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              {isFr
-                ? 'Entre ton email pour recevoir ton lien d\'accès. Ton type est gardé — pas besoin de refaire le test.'
-                : 'Enter your email to get your access link. Your type is saved — no need to redo the quiz.'}
-            </p>
-          </div>
-          <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
-            {authSent ? (
-              <div className="text-center py-2">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                  </svg>
-                </div>
-                <h3 className="text-gray-900 font-bold text-lg mb-1">
-                  {isFr ? 'Vérifie tes emails !' : 'Check your inbox!'}
-                </h3>
-                <p className="text-gray-500 text-sm mb-1">
-                  {isFr ? 'Lien envoyé à' : 'Link sent to'}{' '}
-                  <span className="text-violet-600 font-medium">{authEmail}</span>
-                </p>
-                <p className="text-gray-400 text-xs mt-2 leading-relaxed">
-                  {isFr
-                    ? 'Clique sur le lien dans ton email → tu arrives directement sur la page de paiement. Ton type est sauvegardé, pas besoin de refaire le test.'
-                    : 'Click the link in your email → you land directly on the payment page. Your type is saved.'}
-                </p>
-                <button
-                  onClick={() => { window.location.href = `mailto:${authEmail}`; }}
-                  className="mt-3 w-full py-2.5 rounded-xl text-xs font-bold text-violet-600 border border-violet-200 hover:bg-violet-50 transition-all"
-                >
-                  {isFr ? '📧 Ouvrir mon application email' : '📧 Open email app'}
-                </button>
-              </div>
-            ) : (
-              <>
-                {!isInAppBrowser && (
-                  <>
-                    <button
-                      onClick={() => signIn('google', { callbackUrl })}
-                      className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4 border border-gray-200"
-                    >
-                      <GoogleIcon />
-                      {isFr ? 'Continuer avec Google' : 'Continue with Google'}
-                    </button>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="flex-1 h-px bg-gray-200" />
-                      <span className="text-gray-400 text-xs">{isFr ? 'ou par email' : 'or by email'}</span>
-                      <div className="flex-1 h-px bg-gray-200" />
-                    </div>
-                  </>
-                )}
-                {isInAppBrowser && (
-                  <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-4 text-center">
-                    {isFr ? 'Utilise ton email — Google ne fonctionne pas dans ce navigateur.' : 'Use email — Google sign-in is blocked in this browser.'}
-                  </p>
-                )}
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (!authEmail.trim()) return;
-                    setAuthLoading(true);
-                    await signIn('email', { email: authEmail, callbackUrl, redirect: false });
-                    setAuthSent(true);
-                    setAuthLoading(false);
-                  }}
-                  className="space-y-3"
-                >
-                  <input
-                    type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)}
-                    placeholder={isFr ? 'ton@email.com' : 'your@email.com'} required
-                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 transition-all"
-                  />
-                  <button
-                    type="submit" disabled={authLoading}
-                    className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all disabled:opacity-60 active:scale-[0.98]"
-                    style={{ background: '#111827' }}
-                  >
-                    {authLoading
-                      ? (isFr ? 'Envoi…' : 'Sending…')
-                      : (isFr ? 'Accéder à mon type — 1,99 €' : 'Access my type — €1.99')}
-                  </button>
-                </form>
-                <p className="text-center text-[11px] text-gray-400 mt-3">
-                  {isFr ? 'Paiement 100% sécurisé · Stripe · Sans abonnement' : '100% secure · Stripe · No subscription'}
-                </p>
-              </>
-            )}
-          </div>
-          {!authSent && (
-            <button onClick={() => setShowAuthInline(false)} className="mt-4 w-full text-center text-xs text-gray-400 hover:text-gray-600 transition-colors">
-              ← {isFr ? 'Retour' : 'Back'}
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           {/* Type code preview */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500 text-xs font-semibold mb-5 tracking-widest">
             {typeCode.slice(0, 2)}<span className="blur-[3px] select-none">??</span>
           </div>
 
-          <h1 className="text-2xl font-black text-gray-900 mb-3">
-            {isFr ? 'Votre profil est identifié' : 'Your profile is identified'}
+          <h1 className="text-2xl font-black text-gray-900 mb-2">
+            {isFr ? 'Votre type est prêt' : 'Your type is ready'}
           </h1>
           <p className="text-gray-500 text-sm leading-relaxed">
             {isFr
-              ? `Partagé par ${type?.rarity} de la population. Accédez à votre type complet et à l'analyse de vos 4 dimensions cognitives.`
-              : `Shared by ${type?.rarity} of the population. Access your full type and cognitive analysis.`}
+              ? `${type?.rarity} de la population partagent ce profil.`
+              : `${type?.rarity} of the population share this profile.`}
           </p>
         </div>
 
@@ -585,6 +446,31 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
           </div>
         </div>
 
+        {/* What's inside */}
+        <div className="bg-gray-50 rounded-xl border border-gray-100 px-4 py-3 mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2.5">
+            {isFr ? 'Ce que vous débloquez' : 'What you unlock'}
+          </p>
+          <ul className="space-y-1.5">
+            {(isFr ? [
+              'Vos 4 fonctions cognitives détaillées',
+              'Profil amoureux et compatibilité',
+              'Forces, faiblesses, axes de croissance',
+              'Célébrités de votre type',
+            ] : [
+              'Your 4 cognitive functions in detail',
+              'Love profile and compatibility',
+              'Strengths, weaknesses, growth areas',
+              'Famous people of your type',
+            ]).map(item => (
+              <li key={item} className="flex items-center gap-2 text-xs text-gray-600">
+                <span className="text-gray-400 flex-shrink-0">✓</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* Paywall */}
         <div className="space-y-2">
           {/* Hero — 1,99€ one-time */}
@@ -596,7 +482,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
             {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? 'Accéder à mon type complet — 1,99 €' : 'Access my full type — €1.99')}
           </button>
           <p className="text-center text-[11px] text-gray-400">
-            {isFr ? 'Paiement unique · Stripe · Sans abonnement' : 'One-time payment · Stripe · No subscription'}
+            {isFr ? 'Sans compte requis · Accès immédiat · Paiement unique' : 'No account needed · Instant access · One-time payment'}
           </p>
 
           {/* Divider */}
@@ -630,155 +516,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
         </div>
 
         <p className="text-center text-[11px] text-gray-400 mt-3">
-          {isFr ? 'Paiement 100% sécurisé · Stripe' : '100% secure payment · Stripe'}
+          {isFr ? '🔒 Paiement sécurisé Stripe' : '🔒 Secure Stripe payment'}
         </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Auth gate (not logged in) ──────────────────────────────────────────────────
-
-function AuthGate({ typeCode, lang }: { typeCode: string; lang: string }) {
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const callbackUrl = `/quiz/personnalite?pending=${typeCode}`;
-  const isFr = lang !== 'en';
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-white">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-8 h-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-black text-gray-900 mb-2">
-            {isFr ? 'Ton analyse est prête !' : 'Your analysis is ready!'}
-          </h1>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            {isFr
-              ? 'Crée ton compte gratuitement pour révéler ton type de personnalité.'
-              : 'Create your free account to reveal your personality type.'}
-          </p>
-        </div>
-
-        {/* Blurred result teaser */}
-        <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-6 relative overflow-hidden">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
-            <div className="flex-1 space-y-1.5">
-              <div className="h-3 bg-gray-200 rounded-full w-3/4 animate-pulse" />
-              <div className="h-2.5 bg-gray-100 rounded-full w-1/2 animate-pulse" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="h-2.5 bg-gray-100 rounded-full animate-pulse" />
-            <div className="h-2.5 bg-gray-100 rounded-full w-5/6 animate-pulse" />
-            <div className="h-2.5 bg-gray-100 rounded-full w-4/6 animate-pulse" />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-[2px] rounded-2xl">
-            <div className="text-center">
-              <div className="text-gray-400 mb-1 flex justify-center"><LockIcon /></div>
-              <p className="text-xs text-gray-400 font-medium">
-                {isFr ? 'Résultat verrouillé' : 'Result locked'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Auth card */}
-        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
-          {sent ? (
-            <div className="text-center py-2">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                </svg>
-              </div>
-              <h3 className="text-gray-900 font-bold text-lg mb-1">
-                {isFr ? 'Vérifie tes emails' : 'Check your inbox'}
-              </h3>
-              <p className="text-gray-500 text-sm">
-                {isFr ? 'Lien envoyé à' : 'Link sent to'}{' '}
-                <span className="text-violet-600 font-medium">{email}</span>
-              </p>
-              <p className="text-gray-400 text-xs mt-3">
-                {isFr ? 'Clique sur le lien pour révéler ton type.' : 'Click the link to reveal your type.'}
-              </p>
-            </div>
-          ) : (
-            <>
-              <h2 className="text-gray-900 font-bold text-[15px] text-center mb-5">
-                {isFr ? 'Connexion / Inscription — 30 secondes' : 'Sign in / Sign up — 30 seconds'}
-              </h2>
-              <button
-                onClick={() => signIn('google', { callbackUrl })}
-                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4 border border-gray-200"
-              >
-                <GoogleIcon />
-                {isFr ? 'Continuer avec Google' : 'Continue with Google'}
-              </button>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-gray-400 text-xs">{isFr ? 'ou par email' : 'or by email'}</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!email.trim()) return;
-                  setLoading(true);
-                  await signIn('email', { email, callbackUrl, redirect: false });
-                  setSent(true);
-                  setLoading(false);
-                }}
-                className="space-y-3"
-              >
-                <input
-                  type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder={isFr ? 'ton@email.com' : 'your@email.com'} required
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 transition-all"
-                />
-                <button
-                  type="submit" disabled={loading}
-                  className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all disabled:opacity-60 active:scale-[0.98]"
-                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
-                >
-                  {loading
-                    ? (isFr ? 'Envoi…' : 'Sending…')
-                    : (isFr ? 'Recevoir mon lien de connexion' : 'Get my sign-in link')}
-                </button>
-              </form>
-              <p className="text-center text-xs text-gray-400 mt-4">
-                {isFr ? 'Gratuit · Aucune carte bancaire requise' : 'Free · No credit card required'}
-              </p>
-            </>
-          )}
-        </div>
-
-        {/* Truth quiz upsell — shown only before email sent */}
-        {!sent && isFr && (
-          <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-3 text-center">
-              Inclus avec ton compte gratuit
-            </p>
-            <div className="space-y-2">
-              {[
-                { emoji: '💔', q: 'Mon/ma partenaire me trompe ?', href: '/quiz/infidelite' },
-                { emoji: '❤️', q: 'Suis-je vraiment amoureux(se) ?', href: '/quiz/amoureux' },
-                { emoji: '🫂', q: 'Sont-ils mes vrais amis ?', href: '/quiz/vrais-amis' },
-              ].map(({ emoji, q }) => (
-                <div key={q} className="flex items-center gap-2.5">
-                  <span className="text-base flex-shrink-0">{emoji}</span>
-                  <p className="text-gray-600 text-xs font-medium">{q}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -823,27 +562,21 @@ export default function PersonnaliteClient() {
     }
   }, []);
 
-  // After magic-link auth: restore type from URL (?pending=INFJ) or localStorage
+  // Restore type from URL (?pending=INFJ) after returning from auth, or from localStorage
   useEffect(() => {
     if (sessionStatus === 'loading') return;
     const params = new URLSearchParams(window.location.search);
     const pending = params.get('pending')?.toUpperCase();
-    const urlIntent = params.get('intent') as 'onetime' | 'annual' | 'monthly' | null;
 
     diagLog('session_restore_fired', {
       status: sessionStatus,
       hasEmail: !!session?.user?.email,
       pending: pending ?? null,
-      urlIntent: urlIntent ?? null,
     });
 
     if (session?.user?.email) {
       if (pending && mbtiTypes[pending]) {
-        diagLog('pending_found_authed', { pending, urlIntent: urlIntent ?? null });
-        // If intent was encoded in URL (cross-browser TikTok→Safari), restore it to sessionStorage
-        if (urlIntent && ['onetime', 'annual', 'monthly'].includes(urlIntent)) {
-          try { sessionStorage.setItem('_uc_intent', urlIntent); } catch {}
-        }
+        diagLog('pending_found_authed', { pending });
         window.history.replaceState(null, '', '/quiz/personnalite');
         fetch('/api/user/save-mbti', {
           method: 'POST',
@@ -923,9 +656,6 @@ export default function PersonnaliteClient() {
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      {inAppWarning && (
-        <InAppBrowserOverlay onDismiss={() => setInAppWarning(false)} />
-      )}
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
@@ -941,7 +671,7 @@ export default function PersonnaliteClient() {
         </div>
       )}
       {phase === 'result' && (
-        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} isInAppBrowser={inAppWarning} />
+        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} />
       )}
     </main>
   );

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { useState, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import { MbtiType } from '@/lib/mbti';
 import { mbtiTypesEn } from '@/lib/i18n/mbtiTypesEn';
 import { useLang } from '@/contexts/LanguageContext';
@@ -25,11 +25,6 @@ export default function TypeClient({ type }: Props) {
   const localType: MbtiType = lang === 'en' ? { ...type, ...enData } as MbtiType : type;
 
   const [loading, setLoading] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authEmail, setAuthEmail] = useState('');
-  const [authSent, setAuthSent] = useState(false);
-  const [authLoading, setAuthLoading] = useState(false);
-  const pendingRef = useRef(false);
 
   // ── Checkout: paiement unique 1,99 € ──
   const doOneTime = useCallback(async (email?: string) => {
@@ -83,58 +78,15 @@ export default function TypeClient({ type }: Props) {
     }
   }, [session?.user?.email]);
 
-  // Au retour d'OAuth/lien magique, déclenche le checkout en attente
-  useEffect(() => {
-    if (!session?.user || pendingRef.current) return;
-    let flag = false;
-    let annual = false;
-    let onetime = false;
-    try {
-      flag = sessionStorage.getItem('pending_checkout') === '1';
-      annual = sessionStorage.getItem('pending_checkout_annual') === '1';
-      onetime = sessionStorage.getItem('pending_checkout_onetime') === '1';
-    } catch {}
-    if (!flag) return;
-    try {
-      sessionStorage.removeItem('pending_checkout');
-      sessionStorage.removeItem('pending_checkout_annual');
-      sessionStorage.removeItem('pending_checkout_onetime');
-    } catch {}
-    pendingRef.current = true;
-    if ((session.user as { tier?: string }).tier !== 'premium') {
-      if (onetime) void doOneTime(session.user.email ?? undefined);
-      else void doCheckout(annual, session.user.email ?? undefined);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user?.email]);
-
   const handleOneTime = useCallback(() => {
     if (isPremium) return;
-    if (!session?.user) {
-      try {
-        sessionStorage.setItem('pending_checkout', '1');
-        sessionStorage.setItem('pending_checkout_onetime', '1');
-      } catch {}
-      setShowAuthModal(true);
-      return;
-    }
     void doOneTime();
-  }, [isPremium, session?.user, doOneTime]);
+  }, [isPremium, doOneTime]);
 
   const handleUnlock = useCallback((annual: boolean) => {
     if (isPremium) return;
-    if (!session?.user) {
-      try {
-        sessionStorage.setItem('pending_checkout', '1');
-        sessionStorage.setItem('pending_checkout_annual', annual ? '1' : '0');
-      } catch {}
-      setShowAuthModal(true);
-      return;
-    }
     void doCheckout(annual);
-  }, [isPremium, session?.user, doCheckout]);
-
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
+  }, [isPremium, doCheckout]);
 
   if (sessionLoading) {
     return (
@@ -238,79 +190,6 @@ export default function TypeClient({ type }: Props) {
   // ─────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Auth modal — crée ton compte d'abord */}
-      {showAuthModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)' }}
-          onClick={(e) => { if (e.target === e.currentTarget) setShowAuthModal(false); }}
-        >
-          <div className="relative w-full max-w-sm rounded-2xl p-6 border border-gray-200 bg-white shadow-xl">
-            <button onClick={() => setShowAuthModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors text-lg leading-none">✕</button>
-            <div className="text-center mb-6">
-              <div className="text-4xl mb-3">🔐</div>
-              <h2 className="text-gray-900 font-black text-xl mb-2">{t.authModalTitle}</h2>
-              <p className="text-gray-500 text-sm leading-relaxed">{t.authModalDesc}</p>
-            </div>
-            {authSent ? (
-              <div className="text-center py-4">
-                <div className="text-4xl mb-3">📬</div>
-                <h3 className="text-gray-900 font-bold text-lg mb-2">{t.emailCheckTitle}</h3>
-                <p className="text-gray-500 text-sm">{t.emailCheckDesc} <span className="text-violet-600">{authEmail}</span></p>
-                <p className="text-gray-400 text-xs mt-3">{t.emailCheckHint}</p>
-              </div>
-            ) : (
-              <>
-                <button
-                  onClick={() => {
-                    try { sessionStorage.setItem('pending_checkout', '1'); } catch {}
-                    void signIn('google', { callbackUrl: currentUrl });
-                  }}
-                  className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-50 transition-colors mb-4 border border-gray-200 shadow-sm"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
-                  {t.continueGoogle}
-                </button>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-gray-400 text-xs">{t.orByEmail}</span>
-                  <div className="flex-1 h-px bg-gray-200" />
-                </div>
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (!authEmail.trim()) return;
-                    setAuthLoading(true);
-                    try { sessionStorage.setItem('pending_checkout', '1'); } catch {}
-                    await signIn('email', { email: authEmail, callbackUrl: currentUrl, redirect: false });
-                    setAuthSent(true);
-                    setAuthLoading(false);
-                  }}
-                  className="space-y-3"
-                >
-                  <input
-                    type="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)}
-                    placeholder={t.emailPlaceholder} required
-                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
-                  />
-                  <button type="submit" disabled={authLoading}
-                    className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}>
-                    {authLoading ? t.sending : t.sendLink}
-                  </button>
-                </form>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* ── Teaser ── */}
       <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-5">
         <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: type.accentColor }}>

@@ -35,15 +35,14 @@ export async function POST(req: NextRequest) {
       ? `${baseUrl}/duo`
       : quizSlug && score !== undefined
         ? `${baseUrl}/quiz/${quizSlug}/results?score=${score}`
-        : typeCode
-          ? `${baseUrl}/types/${typeCode.toLowerCase()}`
-          : `${baseUrl}/quiz/personnalite`;
+        : `${baseUrl}/quiz/personnalite`;
 
+    // All non-duo checkouts funnel through /success so the page can
+    // verify payment server-side and create the account from Stripe's email
+    // regardless of whether the user was logged in before checkout.
     const successUrl = quizSlug === 'duo'
       ? `${baseUrl}/duo?unlocked=true&session_id={CHECKOUT_SESSION_ID}`
-      : typeCode
-        ? `${baseUrl}/types/${typeCode.toLowerCase()}?unlocked=true&session_id={CHECKOUT_SESSION_ID}`
-        : `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&result=${resultId ?? ''}`;
+      : `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}${resultId ? `&result=${resultId}` : ''}${typeCode ? `&typeCode=${typeCode}` : ''}`;
 
     // ── MBTI Rapport one-time ──
     if (rapport && typeCode) {
