@@ -990,8 +990,8 @@ export default function PersonnaliteClient() {
 
   return (
     <main className="min-h-screen text-stone-900" style={{ background: '#faf9f7' }}>
-      {/* InAppBrowserOverlay: shown immediately when in-app browser detected — blocks quiz + Stripe */}
-      {inAppWarning && <InAppBrowserOverlay />}
+      {/* InAppBrowserOverlay: shown only at paywall — quiz itself works in TikTok/Instagram browser */}
+      {inAppWarning && phase === 'result' && <InAppBrowserOverlay />}
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
