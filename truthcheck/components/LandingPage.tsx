@@ -51,54 +51,21 @@ const MBTI_LETTERS = [
   { letter: 'J/P', emoji: '📅', label: 'Jugement · Perception', color: '#0ea5e9', desc: 'Comment vous organisez votre vie : avec structure et planification ou avec flexibilité et spontanéité.' },
 ];
 
-function InAppBrowserBlock() {
-  const [copied, setCopied] = useState(false);
-  const url = typeof window !== 'undefined' ? window.location.href : '';
-
-  const openExternal = () => {
-    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
-    if (isIOS) {
-      window.location.href = `googlechrome://${url.replace(/^https?:\/\//, '')}`;
-    } else {
-      window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
-    }
-    setTimeout(async () => {
-      try { await navigator.clipboard.writeText(url); setCopied(true); } catch {}
-    }, 1200);
-  };
-
+function InAppBanner({ onClose }: { onClose: () => void }) {
   const copyLink = async () => {
-    try { await navigator.clipboard.writeText(url); } catch {}
-    setCopied(true);
+    try { await navigator.clipboard.writeText(window.location.href); } catch {}
   };
-
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center" style={{ background: '#faf9f7' }}>
-      <div className="text-6xl mb-4">🌐</div>
-      <h2 className="text-2xl font-black text-stone-900 mb-2">Ouvre dans ton navigateur</h2>
-      <p className="text-stone-500 text-sm mb-7 leading-relaxed max-w-xs">
-        Le paiement sécurisé ne fonctionne pas dans le navigateur TikTok / Instagram.
-        Suis ces 2 étapes :
+    <div className="fixed bottom-4 left-4 right-4 z-50 rounded-2xl px-4 py-3 flex items-center gap-3"
+      style={{ background: '#1c1917', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}>
+      <span className="text-xl flex-shrink-0">📱</span>
+      <p className="flex-1 text-white text-xs leading-snug">
+        Pour payer, <strong>ouvre dans ton navigateur</strong> (⋯ → Ouvrir dans le navigateur)
       </p>
-      <div className="w-full max-w-xs mb-7 space-y-3 text-left">
-        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
-          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>1</span>
-          <p className="text-stone-700 text-sm leading-snug pt-0.5">Appuie sur les <strong>⋯</strong> en haut à droite</p>
-        </div>
-        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
-          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>2</span>
-          <p className="text-stone-700 text-sm leading-snug pt-0.5">Appuie sur <strong>&quot;Ouvrir dans le navigateur&quot;</strong></p>
-        </div>
-      </div>
-      <div className="w-full max-w-xs space-y-3">
-        <button onClick={openExternal} className="w-full py-4 rounded-2xl font-black text-white text-base" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>
-          🚀 Ouvrir dans Chrome / Safari
-        </button>
-        <button onClick={copyLink} className="w-full py-3 rounded-2xl font-semibold text-sm text-stone-700" style={{ background: 'white', border: '2px solid #e7e5e0' }}>
-          {copied ? '✅ Lien copié !' : '📋 Copier le lien'}
-        </button>
-      </div>
-      <p className="text-stone-400 text-xs mt-6 max-w-xs">Tes réponses seront sauvegardées 🔒</p>
+      <button onClick={copyLink} className="flex-shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(124,58,237,0.25)', color: '#a78bfa' }}>
+        Copier
+      </button>
+      <button onClick={onClose} className="flex-shrink-0 text-zinc-500 text-sm leading-none">✕</button>
     </div>
   );
 }
@@ -113,6 +80,7 @@ function isInAppBrowser(ua: string): boolean {
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [inApp, setInApp] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -126,7 +94,7 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ background: '#faf9f7' }}>
-      {inApp && <InAppBrowserBlock />}
+      {inApp && !bannerDismissed && <InAppBanner onClose={() => setBannerDismissed(true)} />}
 
       {/* Subtle cream orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
