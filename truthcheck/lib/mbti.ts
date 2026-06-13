@@ -191,7 +191,7 @@ export const mbtiTypes: Record<string, MbtiType> = {
     strengths: ['Pensée stratégique à long terme', 'Capacité à résoudre des problèmes complexes', 'Autonomie et autodiscipline', 'Confiance en ses propres analyses', 'Efficacité et orientation résultats'],
     weaknesses: ['Tendance à l\'arrogance intellectuelle', 'Difficulté à exprimer ses émotions', 'Impatience envers les "moins rapides"', 'Rigidité face aux plans qui changent', 'Isolement social par choix'],
     growth: "Ton plus grand défi : accepter que l'intelligence émotionnelle est aussi une forme d'intelligence. Apprends à valoriser les contributions des autres même quand leur raisonnement est différent du tien. Exprime tes sentiments — pas parce que c'est nécessaire à ta survie, mais parce que ça enrichit ta vie et tes relations.",
-    famousExamples: ['Elon Musk', 'Mark Zuckerberg', 'Friedrich Nietzsche', 'Isaac Newton', 'Michelle Obama'],
+    famousExamples: ['Elon Musk', 'Nikola Tesla', 'Friedrich Nietzsche', 'Isaac Newton', 'Mark Zuckerberg'],
     compatibleWith: ['ENFP', 'ENTP', 'INFJ', 'INFP'],
   },
   INTP: {
@@ -230,7 +230,7 @@ export const mbtiTypes: Record<string, MbtiType> = {
     strengths: ['Pensée créative et originale', 'Capacité à voir les systèmes sous tous les angles', 'Charisme et capacité à convaincre', 'Adaptabilité intellectuelle', 'Humour et vivacité d\'esprit'],
     weaknesses: ['Difficulté à finir ce qu\'on commence', 'Tendance à l\'arrogance intellectuelle', 'Insensibilité aux émotions des autres', 'Procrastination sur les tâches routinières', 'Débat parfois pour le plaisir de débattre'],
     growth: "Apprends à reconnaître quand les autres ont besoin d'être écoutés, pas challengés. Toutes les conversations ne sont pas des débats. Travaille aussi ta persévérance : tes meilleures idées méritent d'être menées jusqu'au bout.",
-    famousExamples: ['Thomas Edison', 'Leonardo da Vinci', 'Celine Dion', 'Steve Jobs', 'Barack Obama'],
+    famousExamples: ['Thomas Edison', 'Leonardo da Vinci', 'Benjamin Franklin', 'Steve Jobs', 'Voltaire'],
     compatibleWith: ['INFJ', 'INTJ', 'INFP', 'ENFP'],
   },
   INFJ: {
@@ -243,7 +243,7 @@ export const mbtiTypes: Record<string, MbtiType> = {
     strengths: ['Intuition sociale exceptionnelle', 'Profondeur d\'engagement et loyauté', 'Créativité et vision à long terme', 'Capacité à comprendre les motivations cachées', 'Détermination quand une cause le vaut'],
     weaknesses: ['Tendance au perfectionnisme paralysant', 'Difficulté à poser des limites', 'Épuisement empathique (absorbe les émotions des autres)', 'Tendance à l\'isolement quand débordé(e)', '"Door slam" : coupure soudaine des relations toxiques'],
     growth: "Ton plus grand travail intérieur : apprendre à te mettre en priorité sans culpabilité. Tu ne peux pas verser de l'eau d'une cruche vide. Tes besoins comptent autant que ceux des autres — accepter cela est ta plus grande victoire.",
-    famousExamples: ['Martin Luther King', 'Nelson Mandela', 'Lady Gaga', 'Noam Chomsky', 'Taylor Swift'],
+    famousExamples: ['Martin Luther King', 'Nelson Mandela', 'Lady Gaga', 'Noam Chomsky', 'Fyodor Dostoïevski'],
     compatibleWith: ['ENFP', 'ENTP', 'INFP', 'INTJ'],
   },
   INFP: {
@@ -269,7 +269,7 @@ export const mbtiTypes: Record<string, MbtiType> = {
     strengths: ['Intelligence émotionnelle élevée', 'Communication naturelle et persuasive', 'Capacité à fédérer les équipes', 'Altruisme sincère', 'Vision et sens de l\'organisation'],
     weaknesses: ['Tendance à prendre en charge les problèmes des autres', 'Difficulté à dire non', 'Trop grande sensibilité aux conflits', 'Oubli de ses propres besoins', 'Idéalisme parfois déconnecté de la réalité'],
     growth: "Apprends à reconnaître que tu ne peux pas sauver tout le monde, et que ce n'est pas ton rôle. Prends soin de toi avec la même générosité que tu offres aux autres.",
-    famousExamples: ['Barack Obama', 'Oprah Winfrey', 'Martin Luther King', 'Emma Watson', 'Malala Yousafzai'],
+    famousExamples: ['Barack Obama', 'Oprah Winfrey', 'Bono', 'Emma Watson', 'Malala Yousafzai'],
     compatibleWith: ['INFP', 'ISFP', 'INFJ', 'INTJ'],
   },
   ENFP: {

@@ -660,7 +660,11 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
             disabled={loading}
             className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-60"
             style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.35)' }}>
-            {loading ? (isFr ? 'Chargement…' : 'Loading…') : (isFr ? '🔓 Accéder à mon type complet — 1,99 €' : '🔓 Access my full type — €1.99')}
+            {loading
+              ? (isFr ? 'Chargement…' : 'Loading…')
+              : isFr
+                ? `🔓 Révéler le profil ${type?.name ?? typeCode} — 1,99 €`
+                : `🔓 Reveal the ${type?.name ?? typeCode} profile — €1.99`}
           </button>
           <p className="text-center text-[11px] text-stone-400">
             {isFr ? 'Sans compte requis · Accès immédiat · Paiement unique' : 'No account needed · Instant access · One-time payment'}
@@ -670,7 +674,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           <div className="flex items-center gap-3 pt-2 pb-1">
             <div className="flex-1 h-px bg-stone-200" />
             <span className="text-[10px] text-stone-400 uppercase tracking-wider whitespace-nowrap">
-              {isFr ? 'Accès complet' : 'Full access'}
+              {isFr ? 'Accès illimité' : 'Unlimited access'}
             </span>
             <div className="flex-1 h-px bg-stone-200" />
           </div>
@@ -682,7 +686,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
             style={{ background: 'white', border: '2px solid #e7e5e0', color: '#57534e', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <span className="absolute top-0 right-0 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>−75%</span>
             <span className="flex items-center justify-between pr-8">
-              <span>{isFr ? '✨ 16 types · Quiz illimités · Mode Duo' : '✨ 16 types · Unlimited quizzes · Duo'}</span>
+              <span>{isFr ? `${type?.emoji ?? '✨'} ${typeCode} + 15 profils · Quiz illimités · Duo` : `${type?.emoji ?? '✨'} ${typeCode} + 15 profiles · Unlimited quizzes · Duo`}</span>
               <span className="font-bold text-stone-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
             </span>
           </button>
@@ -692,7 +696,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
             className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 transition-all hover:bg-stone-100 disabled:opacity-60"
             style={{ background: 'white', border: '1px solid #e7e5e0', color: '#78716c' }}>
             <span className="flex items-center justify-between">
-              <span>{isFr ? 'Accès mensuel · sans engagement' : 'Monthly · no commitment'}</span>
+              <span>{isFr ? `Accès complet ${type?.name ?? typeCode} · Sans engagement` : `Full ${type?.name ?? typeCode} access · No commitment`}</span>
               <span className="font-semibold text-stone-600">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
             </span>
           </button>
