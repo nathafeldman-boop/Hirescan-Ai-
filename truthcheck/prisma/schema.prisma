@@ -145,4 +145,30 @@ model PageView {
   id        String   @id @default(cuid())
   path      String
   createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
 }
+
+model FusionGroup {
+  id          String   @id @default(cuid())
+  code        String   @unique // 6-char alphanumeric e.g. "K7P2XQ"
+  status      String   @default("waiting") // waiting | active | complete
+  questionIds Json?    // [15 randomly selected question IDs]
+  resultType  String?  // e.g. "visionnaires"
+  resultData  Json?    // full computed result object
+  paid        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  participants FusionParticipant[]
+}
+
+model FusionParticipant {
+  id        String   @id @default(cuid())
+  groupId   String
+  name      String
+  answers   Json?    // Record<number, 'A'|'B'|'C'>
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  group     FusionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
