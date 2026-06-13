@@ -338,7 +338,9 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
 
 // ─── Result teaser (free users — logged in or not) ─────────────────────────────
 
-function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: string; userEmail?: string | null }) {
+function ResultTeaser({ typeCode, lang, userEmail, isInAppBrowser }: {
+  typeCode: string; lang: string; userEmail?: string | null; isInAppBrowser?: boolean;
+}) {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
@@ -346,8 +348,11 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
   const [authEmail, setAuthEmail] = useState('');
   const [authSent, setAuthSent] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+  // Tracks which checkout product the user wants — encoded into callbackUrl for cross-browser survival
+  const [checkoutIntent, setCheckoutIntent] = useState<'onetime' | 'annual' | 'monthly' | null>(null);
 
-  const callbackUrl = `/quiz/personnalite?pending=${typeCode}`;
+  // callbackUrl includes intent so it survives magic-link cross-browser round-trips (TikTok → Safari)
+  const callbackUrl = `/quiz/personnalite?pending=${typeCode}${checkoutIntent ? `&intent=${checkoutIntent}` : ''}`;
 
   // Track paywall view once on mount
   useEffect(() => {
@@ -356,8 +361,9 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
     if (!userEmail) {
-      // Save intent so we auto-trigger checkout after auth round-trip
+      // Persist intent: sessionStorage (same browser) + state (encodes into callbackUrl for cross-browser)
       try { sessionStorage.setItem('_uc_intent', checkoutType); } catch {}
+      setCheckoutIntent(checkoutType);
       setShowAuthInline(true);
       return;
     }
@@ -449,18 +455,27 @@ function ResultTeaser({ typeCode, lang, userEmail }: { typeCode: string; lang: s
               </div>
             ) : (
               <>
-                <button
-                  onClick={() => signIn('google', { callbackUrl })}
-                  className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4 border border-gray-200"
-                >
-                  <GoogleIcon />
-                  {isFr ? 'Continuer avec Google' : 'Continue with Google'}
-                </button>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-gray-400 text-xs">{isFr ? 'ou par email' : 'or by email'}</span>
-                  <div className="flex-1 h-px bg-gray-200" />
-                </div>
+                {!isInAppBrowser && (
+                  <>
+                    <button
+                      onClick={() => signIn('google', { callbackUrl })}
+                      className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-zinc-900 font-semibold text-sm hover:bg-zinc-100 transition-colors mb-4 border border-gray-200"
+                    >
+                      <GoogleIcon />
+                      {isFr ? 'Continuer avec Google' : 'Continue with Google'}
+                    </button>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex-1 h-px bg-gray-200" />
+                      <span className="text-gray-400 text-xs">{isFr ? 'ou par email' : 'or by email'}</span>
+                      <div className="flex-1 h-px bg-gray-200" />
+                    </div>
+                  </>
+                )}
+                {isInAppBrowser && (
+                  <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-4 text-center">
+                    {isFr ? 'Utilise ton email — Google ne fonctionne pas dans ce navigateur.' : 'Use email — Google sign-in is blocked in this browser.'}
+                  </p>
+                )}
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
@@ -788,6 +803,11 @@ export default function PersonnaliteClient() {
 
     if (session?.user?.email) {
       if (pending && mbtiTypes[pending]) {
+        // If intent was encoded in URL (cross-browser TikTok→Safari), restore it to sessionStorage
+        const urlIntent = params.get('intent') as 'onetime' | 'annual' | 'monthly' | null;
+        if (urlIntent && ['onetime', 'annual', 'monthly'].includes(urlIntent)) {
+          try { sessionStorage.setItem('_uc_intent', urlIntent); } catch {}
+        }
         window.history.replaceState(null, '', '/quiz/personnalite');
         fetch('/api/user/save-mbti', {
           method: 'POST',
@@ -881,7 +901,7 @@ export default function PersonnaliteClient() {
         </div>
       )}
       {phase === 'result' && (
-        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} />
+        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} isInAppBrowser={inAppWarning} />
       )}
     </main>
   );
