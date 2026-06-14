@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
-import { verifyAffiliateToken } from '@/lib/affiliateToken';
 import AffilieClient from './AffilieClient';
 
 export const metadata: Metadata = {
@@ -11,17 +10,9 @@ export const metadata: Metadata = {
 
 interface Props {
   params: { slug: string };
-  searchParams: { token?: string };
 }
 
-export default async function AffiliePage({ params, searchParams }: Props) {
-  const token = searchParams.token ?? '';
-
-  // Token required — without a valid HMAC token the page is 404
-  if (!token || !verifyAffiliateToken(params.slug, token)) {
-    return notFound();
-  }
-
+export default async function AffiliePage({ params }: Props) {
   const affiliate = await prisma.affiliate.findUnique({
     where: { slug: params.slug },
     include: { conversions: { orderBy: { createdAt: 'desc' } } },
