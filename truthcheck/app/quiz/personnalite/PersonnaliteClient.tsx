@@ -269,15 +269,30 @@ function InAppBrowserOverlay() {
 
   const openInChrome = () => {
     const url = window.location.href;
-    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+    const ua = navigator.userAgent;
+    const isIOS = /iP(hone|ad|od)/.test(ua);
+
+    // Copy URL immediately so it's ready as last-resort fallback
+    try { navigator.clipboard.writeText(url).catch(() => {}); } catch {}
+
     if (isIOS) {
-      window.location.href = `googlechrome://${url.replace(/^https?:\/\//, '')}`;
+      // 1st try: x-safari-https:// → opens Safari directly from TikTok/Instagram in-app browser
+      window.location.href = url.replace(/^https:\/\//, 'x-safari-https://').replace(/^http:\/\//, 'x-safari-http://');
+      // 2nd try after 600ms: Chrome URL scheme (if Safari scheme didn't fire)
+      setTimeout(() => {
+        window.location.href = `googlechrome://${url.replace(/^https?:\/\//, '')}`;
+        // Last resort: show clipboard confirmation
+        setTimeout(() => setCopied(true), 800);
+      }, 600);
     } else {
-      window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end;`;
+      // Android: intent to ANY default browser (no package lock → opens system chooser)
+      window.location.href = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`;
+      // Fallback: window.open (works in some WebViews)
+      setTimeout(() => {
+        try { window.open(url, '_blank'); } catch {}
+        setTimeout(() => setCopied(true), 600);
+      }, 900);
     }
-    setTimeout(async () => {
-      try { await navigator.clipboard.writeText(url); setCopied(true); } catch {}
-    }, 1200);
   };
 
   const copyLink = async () => {
@@ -372,19 +387,26 @@ function InAppBrowserOverlay() {
           onClick={openInChrome}
           className="w-full py-[1.05rem] rounded-2xl font-black text-white text-base transition-all active:scale-[0.97]"
           style={{
-            background: 'linear-gradient(270deg,#7c3aed,#ec4899,#7c3aed)',
+            background: copied ? 'linear-gradient(135deg,#16a34a,#22c55e)' : 'linear-gradient(270deg,#7c3aed,#ec4899,#7c3aed)',
             backgroundSize: '300% 100%',
-            animation: 'iab-shimmer 3s linear infinite, iab-glow 2s ease-in-out infinite',
-            boxShadow: '0 10px 36px rgba(124,58,237,0.55)'
+            animation: copied ? 'none' : 'iab-shimmer 3s linear infinite, iab-glow 2s ease-in-out infinite',
+            boxShadow: copied ? '0 10px 36px rgba(34,197,94,0.4)' : '0 10px 36px rgba(124,58,237,0.55)'
           }}>
-          🔓 Voir mon type MBTI
+          {copied ? '✅ Lien copié — colle dans Safari / Chrome !' : '🔓 Voir mon type MBTI'}
         </button>
-        <button
-          onClick={copyLink}
-          className="w-full py-3 rounded-2xl font-semibold text-sm transition-all active:scale-[0.97]"
-          style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.65)' }}>
-          {copied ? '✅ Lien copié — colle-le dans Safari !' : '📋 Copier le lien'}
-        </button>
+        {copied && (
+          <p className="text-white/60 text-xs text-center leading-snug px-2">
+            Le lien est dans ton presse-papiers — colle-le dans ton navigateur
+          </p>
+        )}
+        {!copied && (
+          <button
+            onClick={copyLink}
+            className="w-full py-3 rounded-2xl font-semibold text-sm transition-all active:scale-[0.97]"
+            style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.65)' }}>
+            📋 Copier le lien
+          </button>
+        )}
       </div>
 
       <p className="text-white/25 text-[11px] mt-5 max-w-[15rem] leading-relaxed">
