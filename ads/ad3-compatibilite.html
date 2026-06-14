@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Ad 3 — Compatibilité</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 390px;
+    height: 844px;
+    overflow: hidden;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: #09090b;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .scene {
+    width: 390px; height: 844px;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+
+  .orb {
+    position: absolute; border-radius: 50%; filter: blur(90px);
+  }
+  .orb1 { width: 280px; height: 280px; background: #7c3aed; opacity: 0.20; top: -60px; left: -60px; }
+  .orb2 { width: 240px; height: 240px; background: #ec4899; opacity: 0.18; bottom: -40px; right: -60px; }
+  .orb3 { width: 160px; height: 160px; background: #f472b6; opacity: 0.12; top: 50%; left: 50%; transform:translate(-50%,-50%); }
+
+  .noise {
+    position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .timer-bar {
+    position: absolute; top: 0; left: 0; height: 3px; border-radius: 0 2px 2px 0;
+    background: linear-gradient(90deg, #7c3aed, #f472b6, #ec4899);
+    animation: timerFill 21s linear forwards; z-index: 20;
+  }
+  @keyframes timerFill { from{width:0} to{width:100%} }
+
+  /* ── Scene 1: Hook ──────────────────────────── */
+  .s1 {
+    position: absolute; z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 32px; text-align: center;
+    animation: sceneIn 0.5s ease forwards, sceneOut 0.4s ease 3.0s forwards;
+    opacity: 0;
+  }
+  .s1-emoji { font-size: 64px; margin-bottom: 14px; animation: heartbeat 1.5s ease-in-out infinite; }
+  @keyframes heartbeat {
+    0%,100%{transform:scale(1)} 14%{transform:scale(1.15)} 28%{transform:scale(1)} 42%{transform:scale(1.08)} 70%{transform:scale(1)}
+  }
+  .s1-text {
+    font-size: 30px; font-weight: 900; color: white; line-height: 1.2; letter-spacing: -0.02em;
+  }
+  .s1-text em {
+    background: linear-gradient(135deg,#f472b6,#a78bfa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-style: normal;
+  }
+
+  /* ── Scene 2: Pair reveal ───────────────────── */
+  .s2 {
+    position: absolute; z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 28px; width: 100%; text-align: center;
+    animation: sceneIn 0.5s ease 3.3s forwards, sceneOut 0.4s ease 10.5s forwards;
+    opacity: 0;
+  }
+  .s2-label {
+    color: #71717a; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 22px;
+  }
+  .pair-row {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 24px; width: 100%;
+    justify-content: center;
+  }
+  .type-badge {
+    flex: 1; max-width: 130px; padding: 20px 10px;
+    border-radius: 20px; text-align: center;
+    opacity: 0;
+  }
+  .tb-left {
+    background: rgba(124,58,237,0.15); border: 2px solid rgba(124,58,237,0.4);
+    animation: slideFromLeft 0.5s cubic-bezier(0.34,1.56,0.64,1) 3.9s forwards;
+    transform: translateX(-40px);
+    box-shadow: 0 0 40px rgba(124,58,237,0.2);
+  }
+  .tb-right {
+    background: rgba(236,72,153,0.13); border: 2px solid rgba(236,72,153,0.38);
+    animation: slideFromRight 0.5s cubic-bezier(0.34,1.56,0.64,1) 3.9s forwards;
+    transform: translateX(40px);
+    box-shadow: 0 0 40px rgba(236,72,153,0.2);
+  }
+  @keyframes slideFromLeft  { to { opacity:1; transform:translateX(0); } }
+  @keyframes slideFromRight { to { opacity:1; transform:translateX(0); } }
+
+  .tb-emoji { font-size: 28px; display: block; margin-bottom: 8px; }
+  .tb-code  { font-size: 22px; font-weight: 900; color: white; margin-bottom: 4px; }
+  .tb-name  { font-size: 11px; color: #71717a; }
+
+  .versus {
+    font-size: 18px; font-weight: 900; color: #3f3f46; flex-shrink: 0;
+    opacity: 0; animation: fadeUp 0.3s ease 4.5s forwards;
+  }
+
+  /* Compatibility ring */
+  .compat-ring {
+    position: relative; width: 140px; height: 140px; margin: 0 auto 20px;
+    opacity: 0; animation: fadeUp 0.5s ease 5.2s forwards;
+  }
+  .ring-svg { width: 140px; height: 140px; transform: rotate(-90deg); }
+  .ring-bg   { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 10; }
+  .ring-fill {
+    fill: none; stroke: url(#ringGrad); stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 352;
+    stroke-dashoffset: 352;
+    animation: fillRing 1.8s cubic-bezier(0.4,0,0.2,1) 5.5s forwards;
+  }
+  @keyframes fillRing {
+    to { stroke-dashoffset: 42; } /* 352 * (1 - 0.88) ≈ 42 */
+  }
+  .ring-text {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .ring-pct  { font-size: 36px; font-weight: 900; color: white; line-height: 1; }
+  .ring-lbl  { font-size: 11px; color: #71717a; margin-top: 3px; }
+
+  .compat-label {
+    font-size: 16px; font-weight: 800; color: #e4e4e7;
+    opacity: 0; animation: fadeUp 0.5s ease 7.5s forwards;
+  }
+  .compat-sub {
+    color: #71717a; font-size: 13px; margin-top: 6px;
+    opacity: 0; animation: fadeUp 0.5s ease 8.0s forwards; line-height: 1.5;
+  }
+
+  /* ── Scene 3: Dimensions ────────────────────── */
+  .s3 {
+    position: absolute; z-index: 10;
+    display: flex; flex-direction: column; align-items: flex-start;
+    padding: 0 28px; width: 100%;
+    animation: sceneIn 0.5s ease 10.8s forwards, sceneOut 0.4s ease 16.5s forwards;
+    opacity: 0;
+  }
+  .s3-title {
+    color: #71717a; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px; align-self: center;
+  }
+  .dim-row { width: 100%; margin-bottom: 14px; opacity: 0; }
+  .dim-label { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .dim-name  { color: #a1a1aa; font-size: 13px; font-weight: 600; }
+  .dim-pct   { font-size: 13px; font-weight: 800; }
+  .dim-bar   { height: 8px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+  .dim-fill  { height: 100%; border-radius: 999px; width: 0; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+  .d1 { animation: showDim 0.4s ease 11.4s forwards; }
+  .d2 { animation: showDim 0.4s ease 11.9s forwards; }
+  .d3 { animation: showDim 0.4s ease 12.4s forwards; }
+  .d4 { animation: showDim 0.4s ease 12.9s forwards; }
+
+  @keyframes showDim { to { opacity: 1; } }
+
+  .d1 .dim-fill { background: linear-gradient(90deg,#7c3aed,#a78bfa); animation: fillBar 1.2s ease 11.6s forwards; --w: 92%; }
+  .d2 .dim-fill { background: linear-gradient(90deg,#ec4899,#f472b6); animation: fillBar 1.2s ease 12.1s forwards; --w: 85%; }
+  .d3 .dim-fill { background: linear-gradient(90deg,#10b981,#34d399); animation: fillBar 1.2s ease 12.6s forwards; --w: 78%; }
+  .d4 .dim-fill { background: linear-gradient(90deg,#f59e0b,#fbbf24); animation: fillBar 1.2s ease 13.1s forwards; --w: 95%; }
+
+  @keyframes fillBar { to { width: var(--w); } }
+  .d1 .dim-pct { color: #a78bfa; }
+  .d2 .dim-pct { color: #f472b6; }
+  .d3 .dim-pct { color: #34d399; }
+  .d4 .dim-pct { color: #fbbf24; }
+
+  .s3-quote {
+    align-self: center; margin-top: 8px; text-align: center;
+    font-size: 15px; font-weight: 700; color: #e4e4e7; line-height: 1.4;
+    opacity: 0; animation: fadeUp 0.5s ease 14.0s forwards;
+  }
+  .s3-quote em {
+    background: linear-gradient(135deg,#a78bfa,#f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-style: normal;
+  }
+
+  /* ── Scene 4: CTA ──────────────────────────── */
+  .s4 {
+    position: absolute; z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 28px; width: 100%; text-align: center;
+    animation: sceneIn 0.5s ease 16.8s forwards;
+    opacity: 0;
+  }
+  .s4-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 18px;
+    background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.3);
+    color: #f472b6; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  }
+  .s4-head {
+    font-size: 30px; font-weight: 900; color: white;
+    line-height: 1.2; margin-bottom: 10px; letter-spacing: -0.02em;
+  }
+  .s4-head span {
+    background: linear-gradient(135deg,#f472b6,#a78bfa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .s4-sub {
+    color: #71717a; font-size: 13px; line-height: 1.6; margin-bottom: 24px;
+  }
+  .s4-stat {
+    font-size: 30px; font-weight: 900; color: white; margin-bottom: 4px;
+    background: linear-gradient(135deg,#a78bfa,#f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .s4-stat-label { color: #52525b; font-size: 12px; margin-bottom: 22px; }
+  .s4-btn {
+    width: 100%; padding: 18px; border-radius: 18px; border: none; cursor: pointer;
+    background: linear-gradient(135deg,#7c3aed,#ec4899);
+    color: white; font-size: 17px; font-weight: 900;
+    box-shadow: 0 12px 40px rgba(124,58,237,0.45);
+    animation: pulseCta 2s ease-in-out infinite;
+  }
+  @keyframes pulseCta {
+    0%,100% { box-shadow: 0 12px 40px rgba(124,58,237,0.45); }
+    50%      { box-shadow: 0 12px 55px rgba(236,72,153,0.55); }
+  }
+  .s4-domain { margin-top: 14px; color: #52525b; font-size: 12px; }
+  .s4-badges {
+    display: flex; justify-content: center; gap: 16px;
+    margin-top: 10px; color: #52525b; font-size: 11px;
+  }
+
+  /* Shared */
+  @keyframes sceneIn  { from{opacity:0;transform:scale(0.96)} to{opacity:1;transform:scale(1)} }
+  @keyframes sceneOut { to{opacity:0;transform:scale(1.03)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .watermark {
+    position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+    z-index: 20; display: flex; align-items: center; gap: 6px;
+    background: rgba(9,9,11,0.75); border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px); border-radius: 999px; padding: 6px 14px;
+  }
+  .watermark-dot { width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg,#f472b6,#7c3aed); }
+  .watermark-text { color: #a1a1aa; font-size: 11px; font-weight: 600; }
+  .watermark-text b { color: white; }
+  .swipe-hint {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    color: #52525b; font-size: 11px; z-index: 20; letter-spacing: 0.04em;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="timer-bar"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="noise"></div>
+
+  <!-- S1 -->
+  <div class="s1">
+    <div class="s1-emoji">💑</div>
+    <div class="s1-text">
+      Êtes-vous faits<br />l'un pour <em>l'autre ?</em>
+    </div>
+  </div>
+
+  <!-- S2: Pair + compat ring -->
+  <div class="s2">
+    <div class="s2-label">✦ Analyse de compatibilité MBTI</div>
+    <div class="pair-row">
+      <div class="type-badge tb-left">
+        <span class="tb-emoji">🦉</span>
+        <div class="tb-code">INFJ</div>
+        <div class="tb-name">L'Avocat</div>
+      </div>
+      <div class="versus">VS</div>
+      <div class="type-badge tb-right">
+        <span class="tb-emoji">🌻</span>
+        <div class="tb-code">ENFP</div>
+        <div class="tb-name">Le Champion</div>
+      </div>
+    </div>
+
+    <div class="compat-ring">
+      <svg class="ring-svg" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#7c3aed"/>
+            <stop offset="100%" style="stop-color:#f472b6"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="60" cy="60" r="56"/>
+        <circle class="ring-fill" cx="60" cy="60" r="56"/>
+      </svg>
+      <div class="ring-text">
+        <div class="ring-pct">88%</div>
+        <div class="ring-lbl">Compatible</div>
+      </div>
+    </div>
+
+    <div class="compat-label">🔥 Duo d'exception</div>
+    <div class="compat-sub">
+      Ils se comprennent sans se l'expliquer.<br />
+      Connexion intellectuelle + émotionnelle rare.
+    </div>
+  </div>
+
+  <!-- S3: Dimensions -->
+  <div class="s3">
+    <div class="s3-title">✦ Score par dimension</div>
+
+    <div class="dim-row d1">
+      <div class="dim-label">
+        <span class="dim-name">Communication</span>
+        <span class="dim-pct">92%</span>
+      </div>
+      <div class="dim-bar"><div class="dim-fill"></div></div>
+    </div>
+
+    <div class="dim-row d2">
+      <div class="dim-label">
+        <span class="dim-name">Émotions</span>
+        <span class="dim-pct">85%</span>
+      </div>
+      <div class="dim-bar"><div class="dim-fill"></div></div>
+    </div>
+
+    <div class="dim-row d3">
+      <div class="dim-label">
+        <span class="dim-name">Projets de vie</span>
+        <span class="dim-pct">78%</span>
+      </div>
+      <div class="dim-bar"><div class="dim-fill"></div></div>
+    </div>
+
+    <div class="dim-row d4">
+      <div class="dim-label">
+        <span class="dim-name">Valeurs communes</span>
+        <span class="dim-pct">95%</span>
+      </div>
+      <div class="dim-bar"><div class="dim-fill"></div></div>
+    </div>
+
+    <div class="s3-quote">
+      Ton type révèle exactement<br />
+      <em>avec qui tu es fait pour être.</em>
+    </div>
+  </div>
+
+  <!-- S4: CTA -->
+  <div class="s4">
+    <div class="s4-pill">💑 Test de compatibilité</div>
+    <div class="s4-head">Testez votre<br /><span>compatibilité</span></div>
+    <div class="s4-sub">
+      Chacun répond séparément.<br />
+      Vos profils sont comparés sur 4 dimensions cognitives.
+    </div>
+    <div class="s4-stat">240</div>
+    <div class="s4-stat-label">paires MBTI analysées</div>
+    <button class="s4-btn">Analyser notre duo →</button>
+    <div class="s4-domain">urcecret.site/duo</div>
+    <div class="s4-badges">
+      <span>🔒 Privé</span>
+      <span>⚡ Immédiat</span>
+      <span>🎁 Gratuit</span>
+    </div>
+  </div>
+
+  <div class="watermark">
+    <div class="watermark-dot"></div>
+    <div class="watermark-text"><b>urcecret.site</b></div>
+  </div>
+  <div class="swipe-hint">↑ Tester notre compatibilité</div>
+</div>
+</body>
+</html>

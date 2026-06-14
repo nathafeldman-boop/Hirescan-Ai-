@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Ad 1 — Révèle ton type</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 390px;
+    height: 844px;
+    overflow: hidden;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: #09090b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scene {
+    width: 390px;
+    height: 844px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Background gradient orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: pulse 4s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 280px; height: 280px; background: #7c3aed; opacity: 0.25; top: -60px; left: -60px; animation-delay: 0s; }
+  .orb2 { width: 220px; height: 220px; background: #ec4899; opacity: 0.20; bottom: 80px; right: -40px; animation-delay: 1s; }
+  .orb3 { width: 160px; height: 160px; background: #6366f1; opacity: 0.15; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 2s; }
+
+  @keyframes pulse {
+    from { opacity: 0.15; transform: scale(1); }
+    to   { opacity: 0.30; transform: scale(1.1); }
+  }
+
+  .content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0 32px;
+  }
+
+  /* ── Scene 1: Logo intro ─────────────────── */
+  .s1-logo {
+    animation: sceneIn 0.6s ease forwards, sceneOut 0.5s ease 2.2s forwards;
+    opacity: 0;
+  }
+  .crystal { font-size: 64px; display: block; text-align: center;
+    animation: float 2.5s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+  .logo-text { font-size: 26px; font-weight: 900; margin-top: 12px; text-align: center;
+    background: linear-gradient(135deg, #a78bfa, #f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .logo-sub { color: #71717a; font-size: 13px; margin-top: 4px; letter-spacing: 0.08em; }
+
+  /* ── Scene 2: "Tu as fait le test..." ─────── */
+  .s2-question {
+    position: absolute;
+    animation: sceneIn 0.6s ease 2.5s forwards, sceneOut 0.5s ease 5.0s forwards;
+    opacity: 0;
+  }
+  .question-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 999px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35);
+    color: #a78bfa; font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    margin-bottom: 24px;
+  }
+  .question-text {
+    color: #e4e4e7; font-size: 28px; font-weight: 900; text-align: center;
+    line-height: 1.25; letter-spacing: -0.02em;
+  }
+  .question-text em { color: #f4f4f5; font-style: normal; }
+
+  /* ── Scene 3: Type Reveal ──────────────────── */
+  .s3-reveal {
+    position: absolute;
+    animation: sceneIn 0.6s ease 5.3s forwards, sceneOut 0.5s ease 10.5s forwards;
+    opacity: 0;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0 32px;
+    display: flex;
+  }
+  .reveal-label {
+    color: #71717a; font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  .letters {
+    display: flex; gap: 10px; margin-bottom: 24px;
+  }
+  .letter-box {
+    width: 66px; height: 80px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px; font-weight: 900; color: white;
+    background: rgba(124,58,237,0.15);
+    border: 2px solid rgba(124,58,237,0.4);
+    opacity: 0;
+    transform: translateY(20px) scale(0.85);
+    box-shadow: 0 0 30px rgba(124,58,237,0.3);
+  }
+  .l1 { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 5.9s forwards; }
+  .l2 { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 6.3s forwards; }
+  .l3 { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 6.7s forwards; }
+  .l4 { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 7.1s forwards; }
+
+  @keyframes popIn {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .type-name {
+    font-size: 19px; font-weight: 800; color: #e4e4e7; text-align: center;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 7.8s forwards;
+  }
+  .type-rare {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 8px;
+    padding: 4px 12px; border-radius: 999px;
+    background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.3);
+    color: #f472b6; font-size: 11px; font-weight: 700;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 8.2s forwards;
+  }
+
+  /* ── Scene 4: Traits ──────────────────────── */
+  .s4-traits {
+    position: absolute;
+    animation: sceneIn 0.6s ease 10.8s forwards, sceneOut 0.5s ease 16.5s forwards;
+    opacity: 0;
+    width: 100%; padding: 0 28px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .traits-title {
+    color: #71717a; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 18px;
+  }
+  .trait {
+    width: 100%; padding: 14px 18px; border-radius: 16px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+    opacity: 0; transform: translateX(-20px);
+  }
+  .trait-icon { font-size: 22px; flex-shrink: 0; }
+  .trait-text { color: #e4e4e7; font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .trait-sub  { color: #71717a; font-size: 11px; margin-top: 2px; }
+
+  .t1 { background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.25);
+        animation: slideIn 0.45s ease 11.4s forwards; }
+  .t2 { background: rgba(236,72,153,0.1);  border: 1px solid rgba(236,72,153,0.22);
+        animation: slideIn 0.45s ease 11.85s forwards; }
+  .t3 { background: rgba(16,185,129,0.1);  border: 1px solid rgba(16,185,129,0.22);
+        animation: slideIn 0.45s ease 12.3s forwards; }
+
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── Scene 5: CTA ──────────────────────────── */
+  .s5-cta {
+    position: absolute;
+    animation: sceneIn 0.6s ease 16.8s forwards;
+    opacity: 0;
+    width: 100%; padding: 0 28px;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+  }
+  .cta-emoji { font-size: 54px; margin-bottom: 16px;
+    animation: float 2.5s ease-in-out infinite;
+  }
+  .cta-headline {
+    font-size: 32px; font-weight: 900; line-height: 1.15;
+    color: white; margin-bottom: 8px; letter-spacing: -0.02em;
+  }
+  .cta-headline span {
+    background: linear-gradient(135deg, #a78bfa, #f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .cta-sub {
+    color: #71717a; font-size: 14px; margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .cta-btn {
+    width: 100%; padding: 18px; border-radius: 18px;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    color: white; font-size: 17px; font-weight: 900;
+    box-shadow: 0 12px 40px rgba(124,58,237,0.45);
+    border: none; cursor: pointer; letter-spacing: -0.01em;
+    animation: btnPulse 2s ease-in-out infinite;
+  }
+  @keyframes btnPulse {
+    0%,100% { box-shadow: 0 12px 40px rgba(124,58,237,0.45); }
+    50%      { box-shadow: 0 12px 55px rgba(236,72,153,0.55); }
+  }
+  .cta-domain {
+    margin-top: 14px; color: #52525b; font-size: 12px;
+  }
+  .cta-trust {
+    margin-top: 10px;
+    display: flex; gap: 12px; align-items: center;
+    color: #52525b; font-size: 11px;
+  }
+  .cta-trust span { display: flex; align-items: center; gap: 4px; }
+
+  /* ── Shared animations ──────────────────────── */
+  @keyframes sceneIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes sceneOut {
+    to { opacity: 0; transform: scale(1.02); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Noise overlay */
+  .noise {
+    position: absolute; inset: 0; z-index: 5; pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* Timer bar */
+  .timer-bar {
+    position: absolute; top: 0; left: 0; height: 3px; border-radius: 0 2px 2px 0;
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    animation: timerFill 22s linear forwards;
+    z-index: 20;
+  }
+  @keyframes timerFill {
+    from { width: 0; }
+    to   { width: 100%; }
+  }
+
+  /* Watermark */
+  .watermark {
+    position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+    z-index: 20; display: flex; align-items: center; gap: 6px;
+    background: rgba(9,9,11,0.75); border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px); border-radius: 999px; padding: 6px 14px;
+  }
+  .watermark-dot { width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg,#7c3aed,#ec4899); }
+  .watermark-text { color: #a1a1aa; font-size: 11px; font-weight: 600; }
+  .watermark-text b { color: white; }
+
+  /* swipe hint */
+  .swipe-hint {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    color: #52525b; font-size: 11px; z-index: 20; letter-spacing: 0.04em;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="timer-bar"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="noise"></div>
+
+  <!-- Scene 1: Logo intro -->
+  <div class="s1-logo content" style="position:absolute;">
+    <span class="crystal">🔮</span>
+    <div class="logo-text">UrCecret</div>
+    <div class="logo-sub">Test de personnalité MBTI</div>
+  </div>
+
+  <!-- Scene 2: Hook question -->
+  <div class="s2-question content">
+    <div class="question-badge">✦ 16 types psychologiques</div>
+    <div class="question-text">
+      Tu sais que tu es<br /><em>différent.</em><br />Mais tu ne sais pas<br /><em>pourquoi.</em>
+    </div>
+  </div>
+
+  <!-- Scene 3: Reveal -->
+  <div class="s3-reveal">
+    <div class="reveal-label">✦ Ton type révélé ✦</div>
+    <div class="letters">
+      <div class="letter-box l1">I</div>
+      <div class="letter-box l2">N</div>
+      <div class="letter-box l3">F</div>
+      <div class="letter-box l4">J</div>
+    </div>
+    <div class="type-name">L'Avocat · Le plus rare au monde</div>
+    <div class="type-rare">✨ 1,5% de la population</div>
+  </div>
+
+  <!-- Scene 4: Traits -->
+  <div class="s4-traits">
+    <div class="traits-title">Ce que ça dit de toi</div>
+    <div class="trait t1">
+      <span class="trait-icon">💡</span>
+      <div>
+        <div class="trait-text">Empathie extrême</div>
+        <div class="trait-sub">Tu ressens les émotions des autres comme les tiennes</div>
+      </div>
+    </div>
+    <div class="trait t2">
+      <span class="trait-icon">🌙</span>
+      <div>
+        <div class="trait-text">Vision profonde</div>
+        <div class="trait-sub">Tu vois ce que les autres ne voient pas encore</div>
+      </div>
+    </div>
+    <div class="trait t3">
+      <span class="trait-icon">🛡️</span>
+      <div>
+        <div class="trait-text">Protecteur naturel</div>
+        <div class="trait-sub">Tu sacrifies souvent tes besoins pour les autres</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 5: CTA -->
+  <div class="s5-cta">
+    <div class="cta-emoji">🔮</div>
+    <div class="cta-headline">Quel est<br /><span>ton type ?</span></div>
+    <div class="cta-sub">100 questions · Résultat complet<br />Gratuit · 12 minutes</div>
+    <button class="cta-btn">Découvrir mon type →</button>
+    <div class="cta-domain">urcecret.site</div>
+    <div class="cta-trust">
+      <span>🔒 Anonyme</span>
+      <span>⚡ Immédiat</span>
+      <span>🎁 Gratuit</span>
+    </div>
+  </div>
+
+  <div class="watermark">
+    <div class="watermark-dot"></div>
+    <div class="watermark-text"><b>urcecret.site</b></div>
+  </div>
+  <div class="swipe-hint">↑ Faire le test</div>
+</div>
+</body>
+</html>
