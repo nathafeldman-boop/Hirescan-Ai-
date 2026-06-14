@@ -290,52 +290,105 @@ function InAppBrowserOverlay() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center" style={{ background: '#faf9f7' }}>
-      {/* Icon */}
-      <div className="text-6xl mb-4">🌐</div>
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
+         style={{ background: 'linear-gradient(160deg,#0a0014 0%,#0e0020 60%,#0a0010 100%)' }}>
 
-      <h2 className="text-2xl font-black text-stone-900 mb-2">
-        Ouvre dans ton navigateur
+      <style>{`
+        @keyframes iab-float { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-9px)} }
+        @keyframes iab-glow  { 0%,100%{box-shadow:0 0 28px rgba(124,58,237,.45)} 50%{box-shadow:0 0 48px rgba(236,72,153,.65)} }
+        @keyframes iab-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+        @keyframes iab-shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+      `}</style>
+
+      {/* Blurred MBTI profile card — Zeigarnik hook */}
+      <div className="relative mb-7" style={{ animation: 'iab-float 2.6s ease-in-out infinite' }}>
+        {/* Ambient glow */}
+        <div className="absolute inset-0 rounded-3xl blur-2xl opacity-60"
+             style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', transform: 'scale(1.15)' }}/>
+
+        <div className="relative rounded-3xl px-7 py-5"
+             style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', animation: 'iab-glow 2.2s ease-in-out infinite' }}>
+
+          <p className="text-white/40 text-xs uppercase tracking-widest mb-4 font-semibold">
+            Ton type MBTI
+          </p>
+
+          {/* 4 blurred type letters */}
+          <div className="flex gap-2 justify-center mb-4">
+            {[0,1,2,3].map(i => (
+              <div key={i}
+                   className="w-12 h-14 rounded-xl flex items-center justify-center text-2xl font-black text-white/20"
+                   style={{
+                     background: i%2===0 ? 'rgba(124,58,237,0.35)' : 'rgba(236,72,153,0.22)',
+                     border: '1px solid rgba(255,255,255,0.15)',
+                     filter: 'blur(5px)',
+                     animation: `iab-float ${2.2+i*0.18}s ease-in-out infinite`,
+                     animationDelay: `${i*0.12}s`
+                   }}>
+                ?
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-sm">🔒</span>
+            <p className="text-white/50 text-xs font-medium">Connexion requise pour révéler</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Headline */}
+      <h2 className="text-[1.6rem] font-black text-white mb-2 leading-tight">
+        Ton profil est prêt&nbsp;! 🔮
       </h2>
-      <p className="text-stone-500 text-sm mb-7 leading-relaxed max-w-xs">
-        Le paiement sécurisé ne fonctionne pas dans le navigateur TikTok / Instagram.
-        Suis ces 2 étapes — ça prend 5 secondes :
+      <p className="text-white/55 text-sm mb-6 leading-relaxed max-w-[17rem]">
+        Pour voir ton type et créer ton compte, ouvre dans ton navigateur —{' '}
+        <strong className="text-white/90">ça prend 5 secondes</strong>
       </p>
 
-      {/* Step-by-step visual guide */}
-      <div className="w-full max-w-xs mb-7 space-y-3 text-left">
-        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
-          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>1</span>
-          <p className="text-stone-700 text-sm leading-snug pt-0.5">
-            Appuie sur les <strong>⋯</strong> en haut à droite de l&apos;écran
+      {/* Steps */}
+      <div className="w-full max-w-[17rem] mb-6 space-y-2.5 text-left">
+        <div className="flex items-start gap-3 p-3.5 rounded-2xl"
+             style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
+          <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>1</span>
+          <p className="text-white/75 text-sm leading-snug pt-0.5">
+            Appuie sur les <strong className="text-white">⋯</strong> en haut à droite
           </p>
         </div>
-        <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'white', border: '1.5px solid #e7e5e0' }}>
-          <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>2</span>
-          <p className="text-stone-700 text-sm leading-snug pt-0.5">
-            Appuie sur <strong>&quot;Ouvrir dans le navigateur&quot;</strong>
+        <div className="flex items-start gap-3 p-3.5 rounded-2xl"
+             style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
+          <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>2</span>
+          <p className="text-white/75 text-sm leading-snug pt-0.5">
+            Appuie sur <strong className="text-white">&quot;Ouvrir dans le navigateur&quot;</strong>
           </p>
         </div>
       </div>
 
-      {/* Buttons */}
-      <div className="w-full max-w-xs space-y-3">
+      {/* CTA buttons */}
+      <div className="w-full max-w-[17rem] space-y-3">
         <button
           onClick={openInChrome}
-          className="w-full py-4 rounded-2xl font-black text-white text-base transition-all hover:opacity-90 active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 24px rgba(124,58,237,0.35)' }}>
-          🚀 Ouvrir dans Chrome / Safari
+          className="w-full py-[1.05rem] rounded-2xl font-black text-white text-base transition-all active:scale-[0.97]"
+          style={{
+            background: 'linear-gradient(270deg,#7c3aed,#ec4899,#7c3aed)',
+            backgroundSize: '300% 100%',
+            animation: 'iab-shimmer 3s linear infinite, iab-glow 2s ease-in-out infinite',
+            boxShadow: '0 10px 36px rgba(124,58,237,0.55)'
+          }}>
+          🔓 Voir mon type MBTI
         </button>
         <button
           onClick={copyLink}
-          className="w-full py-3 rounded-2xl font-semibold text-sm text-stone-700 transition-all hover:bg-stone-50"
-          style={{ background: 'white', border: '2px solid #e7e5e0' }}>
-          {copied ? '✅ Lien copié — colle-le dans Safari !' : '📋 Copier le lien manuellement'}
+          className="w-full py-3 rounded-2xl font-semibold text-sm transition-all active:scale-[0.97]"
+          style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.65)' }}>
+          {copied ? '✅ Lien copié — colle-le dans Safari !' : '📋 Copier le lien'}
         </button>
       </div>
 
-      <p className="text-stone-400 text-xs mt-6 max-w-xs">
-        Tes réponses sont sauvegardées — ton profil t&apos;attendra dans le navigateur 🔒
+      <p className="text-white/25 text-[11px] mt-5 max-w-[15rem] leading-relaxed">
+        Tes réponses sont sauvegardées — ton profil t&apos;attendra 🔒
       </p>
     </div>
   );

@@ -58,9 +58,9 @@ function InAppBanner({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 rounded-2xl px-4 py-3 flex items-center gap-3"
       style={{ background: '#1c1917', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}>
-      <span className="text-xl flex-shrink-0">📱</span>
+      <span className="text-xl flex-shrink-0">🔮</span>
       <p className="flex-1 text-white text-xs leading-snug">
-        Pour payer, <strong>ouvre dans ton navigateur</strong> (⋯ → Ouvrir dans le navigateur)
+        Pour voir tes résultats, <strong>ouvre dans ton navigateur</strong> (⋯ → Ouvrir dans le navigateur)
       </p>
       <button onClick={copyLink} className="flex-shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(124,58,237,0.25)', color: '#a78bfa' }}>
         Copier
