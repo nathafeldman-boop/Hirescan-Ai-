@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050508">
+<title>UrCecret — Notre IA peut-elle deviner ton type ?</title>
+<style>
+
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — Variables globales
+   ═══════════════════════════════════════════════ */
+:root {
+  --bg:         #050508;
+  --surface:    rgba(255,255,255,0.04);
+  --surface-2:  rgba(255,255,255,0.07);
+  --border:     rgba(255,255,255,0.08);
+  --border-hi:  rgba(255,255,255,0.15);
+  --violet:     #7c3aed;
+  --violet-lt:  #a78bfa;
+  --violet-gl:  rgba(124,58,237,0.35);
+  --cyan:       #06b6d4;
+  --cyan-gl:    rgba(6,182,212,0.3);
+  --pink:       #ec4899;
+  --pink-lt:    #f472b6;
+  --pink-gl:    rgba(236,72,153,0.3);
+  --gold:       #f59e0b;
+  --green:      #10b981;
+  --text-1:     #f4f4f5;
+  --text-2:     #a1a1aa;
+  --text-3:     #52525b;
+  --r-xl:       20px;
+  --r-lg:       14px;
+  --r-sm:       10px;
+  --r-xs:       7px;
+}
+
+/* ═══════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+html,body{width:100%;height:100%;overflow:hidden;
+  background:var(--bg);color:var(--text-1);
+  font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════════ */
+.app-wrap{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+}
+@media(min-width:430px){
+  .app-wrap::before{
+    content:'';position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 60% at 50% 30%,rgba(124,58,237,0.1) 0%,transparent 70%);
+  }
+}
+.ad{
+  position:relative;
+  width:min(390px,100vw);height:min(844px,100svh);
+  overflow:hidden;
+  border-radius:clamp(0px,env(safe-area-inset-top,0px),24px);
+}
+
+/* Background orbs */
+.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;
+  transition:opacity 1.5s ease;}
+.orb-1{width:340px;height:340px;background:var(--violet);
+  opacity:var(--o1,0.15);top:-80px;left:-80px;animation:orbFloat 9s ease-in-out infinite}
+.orb-2{width:260px;height:260px;background:var(--pink);
+  opacity:var(--o2,0.11);bottom:-50px;right:-70px;animation:orbFloat 11s ease-in-out infinite reverse}
+.orb-3{width:200px;height:200px;background:var(--cyan);
+  opacity:var(--o3,0.07);top:42%;left:42%;animation:orbFloat 7s ease-in-out infinite 1.5s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0)scale(1)}50%{transform:translate(18px,-18px)scale(1.06)}}
+
+/* Particle canvas */
+#cvs{position:absolute;inset:0;z-index:0;pointer-events:none}
+
+/* Noise overlay */
+.noise{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ═══════════════════════════════════════════════
+   SCREENS — Machine d'état
+   ═══════════════════════════════════════════════ */
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px 24px;z-index:10;
+  opacity:0;pointer-events:none;
+  transform:translateY(18px)scale(0.97);
+  transition:opacity 0.42s cubic-bezier(0.4,0,0.2,1),
+             transform 0.42s cubic-bezier(0.4,0,0.2,1);
+}
+.screen.active{opacity:1;pointer-events:all;transform:none}
+.screen.exit{opacity:0!important;transform:translateY(-14px)scale(1.01)!important;pointer-events:none}
+
+/* ═══════════════════════════════════════════════
+   COMPOSANTS PARTAGÉS
+   ═══════════════════════════════════════════════ */
+
+/* Brand chip */
+.brand{display:inline-flex;align-items:center;gap:7px;
+  padding:5px 14px;border-radius:999px;margin-bottom:22px;
+  background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);
+  color:var(--violet-lt);font-size:11px;font-weight:700;letter-spacing:0.08em}
+.brand-dot{width:6px;height:6px;border-radius:50%;background:var(--violet-lt);
+  animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.65)}}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;
+  padding:5px 13px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.05em}
+.badge-v{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);color:var(--violet-lt)}
+.badge-c{background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.28);color:var(--cyan)}
+.badge-p{background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.28);color:var(--pink-lt)}
+.badge-gold{
+  display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;
+  background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);
+  color:var(--gold);font-size:11px;font-weight:700;
+  animation:goldPulse 2.5s ease-in-out infinite;margin-bottom:18px;
+}
+@keyframes goldPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 24px rgba(245,158,11,0.2)}}
+
+/* Buttons */
+.btn{width:100%;padding:17px;border-radius:var(--r-lg);border:none;cursor:pointer;
+  font-size:15px;font-weight:800;letter-spacing:-0.01em;
+  transition:all 0.18s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(0.97)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--violet),var(--pink));color:white;
+  box-shadow:0 8px 32px rgba(124,58,237,0.4);
+  animation:btnGlow 3s ease-in-out infinite}
+@keyframes btnGlow{
+  0%,100%{box-shadow:0 8px 32px rgba(124,58,237,0.4)}
+  50%    {box-shadow:0 10px 44px rgba(236,72,153,0.5)}}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 44px rgba(124,58,237,0.55)}
+.btn-ghost{
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-2);font-size:13px;font-weight:600}
+.btn-ghost:hover{background:var(--surface-2);border-color:var(--border-hi);color:var(--text-1)}
+
+/* Progress dots */
+.pdots{display:flex;gap:7px;margin-bottom:26px}
+.pd{width:22px;height:4px;border-radius:2px;background:var(--surface-2);transition:all 0.3s ease}
+.pd.done{background:var(--violet);box-shadow:0 0 8px rgba(124,58,237,0.5)}
+.pd.now{width:30px;background:linear-gradient(90deg,var(--violet),var(--pink))}
+
+/* Option cards */
+.option-card{
+  width:100%;padding:16px 18px;border-radius:var(--r-lg);
+  background:var(--surface);border:1px solid var(--border);
+  cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:14px;
+  transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+.option-card:hover{background:var(--surface-2);border-color:var(--border-hi);transform:translateY(-1px)}
+.option-card:active{transform:scale(0.99)}
+.option-card.sel{
+  background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.5);
+  box-shadow:0 0 28px rgba(124,58,237,0.18)}
+.oicon{
+  width:44px;height:44px;border-radius:var(--r-sm);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  background:var(--surface-2);border:1px solid var(--border);transition:all 0.2s}
+.option-card.sel .oicon{background:rgba(124,58,237,0.18);border-color:rgba(124,58,237,0.4)}
+.olabel{font-size:15px;font-weight:700;color:var(--text-1)}
+.osub{font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4}
+
+/* AI detect bar */
+.ai-bar{
+  width:100%;margin-top:14px;padding:10px 14px;border-radius:var(--r-sm);
+  background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.15);
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;color:var(--cyan);font-weight:600;
+  animation:fadeUp 0.35s ease 0.5s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);
+  animation:pulse 1.4s ease-in-out infinite;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════
+   SCREEN 1 — INTRO / HOOK
+   ═══════════════════════════════════════════════ */
+
+/* Rotating ring hero */
+.hero-visual{
+  position:relative;width:190px;height:190px;margin-bottom:24px;flex-shrink:0}
+.h-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1px solid rgba(124,58,237,0.22);
+  animation:spin 7s linear infinite}
+.h-ring:nth-child(2){inset:14px;border-color:rgba(6,182,212,0.18);animation-direction:reverse;animation-duration:5s}
+.h-ring:nth-child(3){inset:28px;border-color:rgba(236,72,153,0.14);animation-duration:9s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.h-core{
+  position:absolute;inset:32px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.2),rgba(6,182,212,0.08),transparent);
+  display:flex;align-items:center;justify-content:center;
+  animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+.h-symbol{font-size:44px;filter:drop-shadow(0 0 20px rgba(124,58,237,0.6))}
+
+/* Floating type chips */
+.chip{
+  position:absolute;padding:5px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;white-space:nowrap;
+  background:rgba(9,9,11,0.82);backdrop-filter:blur(8px);
+  animation:chipFloat 5s ease-in-out infinite}
+.chip-1{top:5px;left:-18px;color:var(--violet-lt);border:1px solid rgba(124,58,237,0.35);animation-delay:0s}
+.chip-2{top:5px;right:-18px;color:var(--cyan);border:1px solid rgba(6,182,212,0.35);animation-delay:0.7s}
+.chip-3{bottom:15px;left:-28px;color:var(--pink-lt);border:1px solid rgba(236,72,153,0.35);animation-delay:1.4s}
+.chip-4{bottom:15px;right:-28px;color:#a1a1aa;border:1px solid rgba(255,255,255,0.12);animation-delay:2.1s}
+@keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+.intro-h{font-size:26px;font-weight:900;line-height:1.22;letter-spacing:-0.02em;text-align:center;margin-bottom:10px}
+.intro-h em{
+  background:linear-gradient(135deg,var(--violet-lt),var(--pink-lt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal}
+.intro-sub{color:var(--text-2);font-size:13px;text-align:center;line-height:1.6;
+  margin-bottom:20px;max-width:280px}
+.intro-trust{display:flex;gap:18px;font-size:11px;color:var(--text-3);margin-bottom:18px}
+.intro-trust span{display:flex;align-items:center;gap:4px}
+
+/* ═══════════════════════════════════════════════
+   AUDIO PLAYER
+   ═══════════════════════════════════════════════ */
+.audio-player{
+  width:100%;padding:14px 16px;border-radius:var(--r-lg);
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  margin-bottom:16px;display:flex;flex-direction:column;gap:10px}
+.a-top{display:flex;align-items:center;gap:12px}
+.a-play{
+  width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;
+  background:linear-gradient(135deg,var(--violet),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(124,58,237,0.4);transition:transform 0.18s;
+  -webkit-tap-highlight-color:transparent}
+.a-play:hover{transform:scale(1.08)}
+.a-play:active{transform:scale(0.93)}
+.a-play svg{width:16px;height:16px;fill:white}
+.a-info{flex:1;min-width:0}
+.a-title{font-size:12px;font-weight:700;color:var(--text-1);margin-bottom:3px}
+.waveform{display:flex;align-items:center;gap:2px;height:18px}
+.wb{width:3px;border-radius:2px;opacity:0.4;transition:height 0.1s;
+  background:linear-gradient(to top,var(--violet),var(--violet-lt))}
+.waveform.playing .wb{opacity:1;animation:wave 0.85s ease-in-out infinite alternate}
+.wb:nth-child(1){height:5px;animation-delay:0s}   .wb:nth-child(2){height:11px;animation-delay:0.07s}
+.wb:nth-child(3){height:17px;animation-delay:0.14s}.wb:nth-child(4){height:13px;animation-delay:0.21s}
+.wb:nth-child(5){height:7px;animation-delay:0.28s} .wb:nth-child(6){height:15px;animation-delay:0.35s}
+.wb:nth-child(7){height:19px;animation-delay:0.42s}.wb:nth-child(8){height:10px;animation-delay:0.49s}
+.wb:nth-child(9){height:14px;animation-delay:0.56s}.wb:nth-child(10){height:6px;animation-delay:0.63s}
+.wb:nth-child(11){height:12px;animation-delay:0.70s}.wb:nth-child(12){height:8px;animation-delay:0.77s}
+@keyframes wave{from{transform:scaleY(0.25);opacity:0.5}to{transform:scaleY(1);opacity:1}}
+.a-time{font-size:11px;font-weight:600;color:var(--text-2);font-variant-numeric:tabular-nums;flex-shrink:0}
+.a-bar-wrap{
+  position:relative;height:3px;border-radius:2px;
+  background:rgba(255,255,255,0.08);cursor:pointer}
+.a-bar-fill{
+  height:100%;border-radius:2px;width:0%;
+  background:linear-gradient(90deg,var(--violet),var(--pink));
+  transition:width 0.1s linear;position:relative}
+.a-bar-fill::after{
+  content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;background:white;
+  box-shadow:0 0 8px var(--violet-gl);opacity:0;transition:opacity 0.2s}
+.a-bar-wrap:hover .a-bar-fill::after{opacity:1}
+
+/* ═══════════════════════════════════════════════
+   SCREEN 2-4 — QUIZ
+   ═══════════════════════════════════════════════ */
+.q-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.1em;
+  color:var(--text-3);text-transform:uppercase;margin-bottom:14px}
+.q-text{font-size:23px;font-weight:900;line-height:1.25;letter-spacing:-0.015em;
+  color:var(--text-1);margin-bottom:6px}
+.q-sub{font-size:13px;color:var(--text-2);line-height:1.5}
+.options-col{width:100%;display:flex;flex-direction:column;gap:10px;margin-top:22px}
+
+/* ═══════════════════════════════════════════════
+   SCREEN 5 — ANALYZING
+   ═══════════════════════════════════════════════ */
+.ana-wrap{text-align:center;width:100%}
+.ana-status{font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:22px;min-height:22px}
+.ana-status span{color:var(--cyan)}
+
+/* Neural dot grid */
+.neural-grid{
+  display:grid;grid-template-columns:repeat(8,1fr);
+  gap:9px;width:240px;margin:0 auto 24px;
+}
+.nd{
+  width:8px;height:8px;border-radius:50%;justify-self:center;
+  background:rgba(255,255,255,0.06);
+  transition:background 0.12s,box-shadow 0.12s,transform 0.12s}
+.nd.on{background:var(--violet);box-shadow:0 0 10px rgba(124,58,237,0.7);transform:scale(1.35)}
+.nd.on.nc{background:var(--cyan);box-shadow:0 0 10px var(--cyan-gl)}
+.nd.on.np{background:var(--pink);box-shadow:0 0 10px var(--pink-gl)}
+
+/* Live stats */
+.live-stats{width:100%;max-width:300px;margin:0 auto}
+.lstat{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 13px;border-radius:var(--r-sm);margin-bottom:8px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  opacity:0;transform:translateX(-10px);
+  transition:opacity 0.35s ease,transform 0.35s ease}
+.lstat.show{opacity:1;transform:none}
+.lstat-k{font-size:11px;color:var(--text-3)}
+.lstat-v{font-size:12px;font-weight:800}
+.lstat-v.v{color:var(--violet-lt)}.lstat-v.c{color:var(--cyan)}.lstat-v.p{color:var(--pink-lt)}
+
+/* Analysis progress */
+.ana-bar-wrap{width:100%;max-width:280px;margin:20px auto 0}
+.ana-bar-bg{height:3px;border-radius:2px;background:rgba(255,255,255,0.08)}
+.ana-bar-fill{
+  height:3px;border-radius:2px;width:0%;
+  background:linear-gradient(90deg,var(--violet),var(--cyan),var(--pink));
+  box-shadow:0 0 8px var(--violet-gl);transition:width 0.15s ease}
+.ana-pct{font-size:11px;color:var(--text-3);margin-top:7px;text-align:right}
+
+/* ═══════════════════════════════════════════════
+   SCREEN 6 — PREDICTION
+   ═══════════════════════════════════════════════ */
+.pred-letters{
+  font-size:60px;font-weight:900;letter-spacing:5px;line-height:1;
+  min-height:68px;display:flex;align-items:center;justify-content:center;text-align:center;
+  background:linear-gradient(135deg,var(--violet-lt),var(--pink-lt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pred-name{font-size:14px;color:var(--text-2);font-weight:600;text-align:center;margin-top:6px}
+
+.match-row{display:flex;align-items:center;gap:10px;width:100%;max-width:300px;margin:18px 0}
+.match-bar{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.08);overflow:hidden}
+.match-fill{height:100%;border-radius:3px;width:0%;
+  background:linear-gradient(90deg,var(--violet),var(--pink));
+  transition:width 1.6s cubic-bezier(0.4,0,0.2,1)}
+.match-pct{font-size:15px;font-weight:900;color:var(--violet-lt);flex-shrink:0;
+  font-variant-numeric:tabular-nums}
+
+/* Blurred locked card */
+.locked-card{width:100%;border-radius:var(--r-xl);position:relative;margin-bottom:16px}
+.locked-inner{
+  padding:18px 20px;border-radius:var(--r-xl);
+  background:var(--surface);border:1px solid var(--border);
+  filter:blur(7px);user-select:none;pointer-events:none;aria-hidden:true}
+.lb{height:11px;border-radius:6px;background:rgba(255,255,255,0.08);margin-bottom:10px}
+.lb:nth-child(1){width:55%}.lb:nth-child(2){width:82%}
+.lb:nth-child(3){width:67%}.lb:nth-child(4){width:45%}
+.lock-over{
+  position:absolute;inset:0;border-radius:var(--r-xl);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  background:radial-gradient(ellipse at center,rgba(5,5,8,0.55),rgba(5,5,8,0.88));
+  border:1px solid rgba(124,58,237,0.18)}
+.lock-ico{font-size:26px;filter:drop-shadow(0 0 14px rgba(124,58,237,0.5))}
+.lock-lbl{font-size:12px;color:var(--text-2);font-weight:600}
+
+/* ═══════════════════════════════════════════════
+   SCREEN 7 — CTA FINAL
+   ═══════════════════════════════════════════════ */
+.ring-wrap{width:72px;height:72px;position:relative;margin-bottom:18px;flex-shrink:0}
+.ring-svg{width:72px;height:72px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:5}
+.ring-fill{
+  fill:none;stroke:url(#rg);stroke-width:5;stroke-linecap:round;
+  stroke-dasharray:201;stroke-dashoffset:201;
+  animation:fillRing 2s cubic-bezier(0.4,0,0.2,1) 0.4s forwards}
+@keyframes fillRing{to{stroke-dashoffset:24}}
+.ring-pct{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;
+  background:linear-gradient(135deg,var(--violet-lt),var(--pink-lt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+.cta-h{font-size:24px;font-weight:900;text-align:center;margin-bottom:6px;letter-spacing:-0.02em}
+.cta-sub-text{color:var(--text-2);font-size:13px;text-align:center;margin-bottom:20px;line-height:1.55}
+
+/* Blurred profile preview */
+.preview-card{width:100%;border-radius:var(--r-xl);overflow:hidden;position:relative;margin-bottom:20px}
+.prev-inner{
+  display:flex;gap:12px;padding:16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl)}
+.prev-avatar{
+  width:46px;height:46px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--violet),var(--pink));
+  opacity:0.35;filter:blur(3px)}
+.prev-lines{flex:1}
+.prev-line{height:9px;border-radius:5px;background:rgba(255,255,255,0.07);
+  margin-bottom:7px;filter:blur(2.5px)}
+.prev-line:nth-child(1){width:65%}.prev-line:nth-child(2){width:88%}.prev-line:nth-child(3){width:52%}
+.prev-blur{
+  position:absolute;inset:0;border-radius:var(--r-xl);
+  background:rgba(5,5,8,0.65);
+  display:flex;align-items:center;justify-content:center;font-size:20px}
+
+/* Share section */
+.share-sec{width:100%;margin-top:16px}
+.share-title{font-size:11px;font-weight:700;color:var(--text-3);
+  letter-spacing:0.08em;text-transform:uppercase;text-align:center;margin-bottom:12px}
+.share-row{display:flex;gap:8px;justify-content:center}
+.s-btn{
+  flex:1;max-width:80px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:10px 6px;border-radius:var(--r-sm);border:1px solid var(--border);
+  background:var(--surface);color:var(--text-2);font-size:10px;font-weight:600;cursor:pointer;
+  transition:all 0.18s;-webkit-tap-highlight-color:transparent}
+.s-btn:hover{background:var(--surface-2);border-color:var(--border-hi);transform:translateY(-2px)}
+.s-btn:active{transform:scale(0.95)}
+.s-btn svg{width:17px;height:17px}
+
+/* CTA Link buttons */
+.cta-link{
+  width:100%;display:block;text-align:center;text-decoration:none;
+  padding:17px;border-radius:var(--r-lg);
+  font-size:15px;font-weight:800;letter-spacing:-0.01em;
+  transition:all 0.18s;-webkit-tap-highlight-color:transparent}
+.cta-link:active{transform:scale(0.97)}
+.cta-link.primary{
+  background:linear-gradient(135deg,var(--violet),var(--pink));color:white;
+  box-shadow:0 8px 32px rgba(124,58,237,0.42);margin-bottom:10px;
+  animation:btnGlow 3s ease-in-out infinite}
+.cta-link.ghost{
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-2);font-size:13px}
+.cta-link.ghost:hover{background:var(--surface-2);border-color:var(--border-hi);color:var(--text-1)}
+
+</style>
+</head>
+<body>
+<div class="app-wrap">
+<div class="ad" id="ad">
+
+  <!-- Canvas particules -->
+  <canvas id="cvs"></canvas>
+  <!-- Orbs ambiant -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <!-- Texture bruit -->
+  <div class="noise"></div>
+
+  <!-- ════════════════════════════════════════
+       AUDIO CACHÉ
+       ════════════════════════════════════════ -->
+  <audio id="audio" preload="auto">
+    <!--
+    ////////////////////////////////////////////////////
+    INSÉRER URL AUDIO ELEVENLABS ICI
+    Pour production : remplacer par l'URL hébergée
+    Exemple: <source src="https://ton-cdn.com/manon-voix.mp3" type="audio/mpeg">
+    ////////////////////////////////////////////////////
+    -->
+    <source src="manon-voix.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 1 — INTRO / HOOK
+       Objectif psychologique : Curiosité + Effet Zeigarnik
+       L'IA prétend "déjà analyser" l'utilisateur
+       ════════════════════════════════════════ -->
+  <section class="screen active" id="s-intro" aria-label="Introduction">
+    <div class="brand"><div class="brand-dot"></div>UrCecret · IA MBTI</div>
+
+    <!-- Hero visuel — anneaux rotatifs + orbe centrale -->
+    <div class="hero-visual">
+      <div class="h-ring"></div>
+      <div class="h-ring"></div>
+      <div class="h-ring"></div>
+      <div class="h-core"><span class="h-symbol">🔮</span></div>
+      <!-- Chips de types flottantes — validation sociale implicite -->
+      <div class="chip chip-1">INFJ</div>
+      <div class="chip chip-2">ENTP</div>
+      <div class="chip chip-3">ISFP</div>
+      <div class="chip chip-4">ENTJ</div>
+    </div>
+
+    <h1 class="intro-h">Notre IA peut-elle deviner<br />ton type en <em>3 questions ?</em></h1>
+    <p class="intro-sub">Nous avons analysé 847 000 profils.<br />Essayons avec le tien.</p>
+
+    <!-- =====================================
+         AUDIO PLAYER — Voix off ElevenLabs
+         ===================================== -->
+    <div class="audio-player">
+      <div class="a-top">
+        <button class="a-play" id="play-btn" aria-label="Lancer la voix off">
+          <svg id="ico-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="ico-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <div class="a-info">
+          <div class="a-title">Voix off · Manon (ElevenLabs)</div>
+          <div class="waveform" id="waveform">
+            <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+            <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+            <div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div>
+          </div>
+        </div>
+        <div class="a-time"><span id="t-cur">0:00</span>&nbsp;/&nbsp;<span id="t-tot">0:30</span></div>
+      </div>
+      <div class="a-bar-wrap" id="a-bar-wrap" role="slider" aria-label="Progression">
+        <div class="a-bar-fill" id="a-bar-fill"></div>
+      </div>
+    </div>
+
+    <div class="intro-trust">
+      <span>🔒 Anonyme</span>
+      <span>⚡ 3 questions</span>
+      <span>🎁 Gratuit</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="go('s-q1')" aria-label="Commencer le test">
+      Notre IA t'attend — Commencer →
+    </button>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 2 — Q1 : ÉNERGIE (I vs E)
+       Objectif : segmentation cognitive
+       ════════════════════════════════════════ -->
+  <section class="screen" id="s-q1" aria-label="Question 1 — Énergie">
+    <div class="pdots">
+      <div class="pd now" id="pd1-1"></div>
+      <div class="pd" id="pd1-2"></div>
+      <div class="pd" id="pd1-3"></div>
+    </div>
+    <div style="width:100%;text-align:center">
+      <div class="q-eyebrow">Question 1 sur 3 · Énergie</div>
+      <h2 class="q-text">Tu récupères ton énergie...</h2>
+      <p class="q-sub">Réfléchis à ton état naturel, pas à ce que tu voudrais être.</p>
+    </div>
+    <div class="options-col">
+      <button class="option-card" onclick="ans(1,'I')" aria-label="Seul, dans le calme">
+        <div class="oicon">🌙</div>
+        <div><div class="olabel">Seul, dans le calme</div>
+          <div class="osub">Tu as besoin de temps pour toi après les interactions</div></div>
+      </button>
+      <button class="option-card" onclick="ans(1,'E')" aria-label="Avec les autres">
+        <div class="oicon">⚡</div>
+        <div><div class="olabel">Avec les autres</div>
+          <div class="osub">Les interactions te donnent de l'énergie et de la vitalité</div></div>
+      </button>
+    </div>
+    <!-- Signal psychologique : l'IA "analyse" en temps réel -->
+    <div class="ai-bar"><div class="ai-dot"></div>L'IA analyse tes comportements...</div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 3 — Q2 : DÉCISIONS (T vs F)
+       Objectif : axe émotionnel/logique
+       ════════════════════════════════════════ -->
+  <section class="screen" id="s-q2" aria-label="Question 2 — Décisions">
+    <div class="pdots">
+      <div class="pd done"></div>
+      <div class="pd now"></div>
+      <div class="pd"></div>
+    </div>
+    <div style="width:100%;text-align:center">
+      <div class="q-eyebrow">Question 2 sur 3 · Décisions</div>
+      <h2 class="q-text">Tu prends tes décisions...</h2>
+      <p class="q-sub">Quand quelque chose d'important se présente dans ta vie.</p>
+    </div>
+    <div class="options-col">
+      <button class="option-card" onclick="ans(2,'T')" aria-label="Par logique et analyse">
+        <div class="oicon">🧠</div>
+        <div><div class="olabel">Par logique et analyse</div>
+          <div class="osub">Tu pèses les faits et les conséquences objectivement</div></div>
+      </button>
+      <button class="option-card" onclick="ans(2,'F')" aria-label="Par instinct et valeurs">
+        <div class="oicon">💎</div>
+        <div><div class="olabel">Par instinct et valeurs</div>
+          <div class="osub">Tu ressens ce qui est juste et aligné avec qui tu es</div></div>
+      </button>
+    </div>
+    <!-- Augmentation de la curiosité : signal inattendu -->
+    <div class="ai-bar"><div class="ai-dot"></div>Signal cognitif inhabituel détecté</div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 4 — Q3 : ORGANISATION (J vs P)
+       Objectif : axe structurel
+       ════════════════════════════════════════ -->
+  <section class="screen" id="s-q3" aria-label="Question 3 — Organisation">
+    <div class="pdots">
+      <div class="pd done"></div>
+      <div class="pd done"></div>
+      <div class="pd now"></div>
+    </div>
+    <div style="width:100%;text-align:center">
+      <div class="q-eyebrow">Question 3 sur 3 · Organisation</div>
+      <h2 class="q-text">Au quotidien, tu préfères...</h2>
+      <p class="q-sub">Ton mode de fonctionnement le plus naturel.</p>
+    </div>
+    <div class="options-col">
+      <button class="option-card" onclick="ans(3,'J')" aria-label="Planifier et organiser">
+        <div class="oicon">📅</div>
+        <div><div class="olabel">Planifier et organiser</div>
+          <div class="osub">Tu aimes avoir un plan clair et savoir à quoi t'attendre</div></div>
+      </button>
+      <button class="option-card" onclick="ans(3,'P')" aria-label="T'adapter au fil du temps">
+        <div class="oicon">🌊</div>
+        <div><div class="olabel">T'adapter au fil du temps</div>
+          <div class="osub">Tu laisses les choses se développer et tu réagis à l'instant</div></div>
+      </button>
+    </div>
+    <div class="ai-bar"><div class="ai-dot"></div>Construction du profil en cours...</div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 5 — ANALYZING
+       Objectif psychologique : Anticipation + Attente
+       La progression crée une récompense différée
+       ════════════════════════════════════════ -->
+  <section class="screen" id="s-analyzing" aria-label="Analyse en cours">
+    <div class="brand"><div class="brand-dot"></div>Analyse · IA en cours</div>
+    <div class="ana-wrap">
+      <div class="ana-status" id="ana-status">
+        Traitement des données<span id="ellipsis">...</span>
+      </div>
+      <!-- Réseau neuronal visuel — donne l'impression d'une vraie IA -->
+      <div class="neural-grid" id="neural-grid" aria-hidden="true"></div>
+      <!-- Stats en direct — personnalisation perçue -->
+      <div class="live-stats">
+        <div class="lstat" id="ls1"><span class="lstat-k">Introversion / Extraversion</span><span class="lstat-v v" id="lv1">—</span></div>
+        <div class="lstat" id="ls2"><span class="lstat-k">Traitement émotionnel</span><span class="lstat-v c" id="lv2">—</span></div>
+        <div class="lstat" id="ls3"><span class="lstat-k">Structure cognitive</span><span class="lstat-v p" id="lv3">—</span></div>
+      </div>
+      <div class="ana-bar-wrap">
+        <div class="ana-bar-bg"><div class="ana-bar-fill" id="ana-fill"></div></div>
+        <div class="ana-pct" id="ana-pct">0%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 6 — PREDICTION PARTIELLE
+       Objectif psychologique : Zeigarnik + Frustration contrôlée
+       Donner assez pour intriguer, jamais assez pour satisfaire
+       ════════════════════════════════════════ -->
+  <section class="screen" id="s-prediction" aria-label="Résultat partiel">
+    <!-- Rareté — validation sociale + exclusivité -->
+    <div class="badge-gold">⚡ Profil rare détecté</div>
+
+    <!-- Révélation lettre par lettre — suspense dramatique -->
+    <div class="pred-letters" id="pred-letters" aria-live="polite"></div>
+    <div class="pred-name" id="pred-name" style="margin-bottom:16px"></div>
+
+    <!-- Barre de correspondance — précision perçue -->
+    <div class="match-row">
+      <div class="match-bar"><div class="match-fill" id="match-fill"></div></div>
+      <div class="match-pct" id="match-pct">—</div>
+    </div>
+
+    <!-- Statistique de rareté — FOMO + exclusivité -->
+    <div class="badge-gold" style="margin-bottom:20px">
+      👁&nbsp;<span id="pred-rarity">—</span>
+    </div>
+
+    <!-- Profil verrouillé / flouté — Zeigarnik : besoin de complétion -->
+    <div class="locked-card">
+      <div class="locked-inner" aria-hidden="true">
+        <div class="lb"></div><div class="lb"></div><div class="lb"></div><div class="lb"></div>
+      </div>
+      <div class="lock-over">
+        <div class="lock-ico">🔐</div>
+        <div class="lock-lbl">Analyse complète verrouillée</div>
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:18px">
+      12 dimensions supplémentaires t'attendent dans le profil complet.
+    </p>
+
+    <button class="btn btn-primary" onclick="go('s-cta')" aria-label="Voir mon profil complet">
+      Révèle mon profil complet →
+    </button>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SCREEN 7 — CTA FINAL
+       Objectif : conversion maximale + viralité
+       ════════════════════════════════════════ -->
+  <section class="screen" id="s-cta" aria-label="Offre finale">
+
+    <!-- Anneau de progression 92% — quasi-complétion (Zeigarnik) -->
+    <div class="ring-wrap">
+      <svg class="ring-svg" viewBox="0 0 72 72" aria-hidden="true">
+        <defs>
+          <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#7c3aed"/>
+            <stop offset="100%" style="stop-color:#ec4899"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="36" cy="36" r="32"/>
+        <circle class="ring-fill" cx="36" cy="36" r="32"/>
+      </svg>
+      <div class="ring-pct">92%</div>
+    </div>
+
+    <h2 class="cta-h">Ton profil est<br />presque prêt.</h2>
+    <p class="cta-sub-text">Nous avons déjà analysé une partie de ta personnalité.<br />Le reste t'attend sur UrCecret.</p>
+
+    <!-- Preview flouté — renforce le désir de voir le "vrai" résultat -->
+    <div class="preview-card" aria-hidden="true">
+      <div class="prev-inner">
+        <div class="prev-avatar"></div>
+        <div class="prev-lines">
+          <div class="prev-line"></div><div class="prev-line"></div><div class="prev-line"></div>
+        </div>
+      </div>
+      <div class="prev-blur">🔐</div>
+    </div>
+
+    <!-- ================================================
+         CTA PRINCIPAL
+         INSÉRER URL DU TEST MBTI ICI
+         ================================================ -->
+    <a href="https://urcecret.site/quiz/personnalite"
+       class="cta-link primary"
+       aria-label="Découvrir mon profil complet sur UrCecret">
+      Découvrir mon profil complet →
+    </a>
+
+    <!-- ================================================
+         CTA SECONDAIRE — Compatibilité
+         INSÉRER URL DUO ICI
+         ================================================ -->
+    <a href="https://urcecret.site/duo"
+       class="cta-link ghost"
+       aria-label="Voir mes compatibilités">
+      💑 Voir mes compatibilités
+    </a>
+
+    <!-- ════════════════════════════════
+         BOUCLE VIRALE — Partage social
+         Objectif : acquisition organique
+         ════════════════════════════════ -->
+    <div class="share-sec">
+      <div class="share-title">Défie tes amis</div>
+      <div class="share-row">
+
+        <!-- WhatsApp -->
+        <button class="s-btn" onclick="sWhatsApp()" aria-label="Partager sur WhatsApp">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.1-.47-.149-.669.149-.198.297-.767.967-.94 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.52-.074-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.871.117.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" fill="#25D366"/>
+            <path d="M12 2C6.452 2 2 6.452 2 12c0 1.74.455 3.37 1.254 4.793L2 22l5.45-1.43A9.85 9.85 0 0012 21.8C17.548 21.8 22 17.348 22 12S17.548 2 12 2m0 17.956a8.02 8.02 0 01-4.086-1.12l-.293-.174-3.235.849.865-3.153-.19-.324A8.04 8.04 0 013.844 12c0-4.447 3.609-8.056 8.056-8.056S19.957 7.553 19.957 12c0 4.448-3.61 8.056-8.057 8.056" fill="#25D366"/>
+          </svg>
+          WhatsApp
+        </button>
+
+        <!-- X / Twitter -->
+        <button class="s-btn" onclick="sTwitter()" aria-label="Partager sur X">
+          <svg viewBox="0 0 24 24" fill="var(--text-1)">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 5.894zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          X
+        </button>
+
+        <!-- TikTok -->
+        <button class="s-btn" onclick="sTikTok()" aria-label="Copier le lien pour TikTok">
+          <svg viewBox="0 0 24 24" fill="var(--text-1)">
+            <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.41a8.16 8.16 0 004.77 1.52V7.48a4.85 4.85 0 01-1-.79z"/>
+          </svg>
+          TikTok
+        </button>
+
+        <!-- Copier lien -->
+        <button class="s-btn" id="copy-btn" onclick="sCopy()" aria-label="Copier le lien">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+          </svg>
+          <span id="copy-lbl">Copier</span>
+        </button>
+
+      </div>
+    </div>
+
+  </section><!-- /s-cta -->
+
+</div><!-- /.ad -->
+</div><!-- /.app-wrap -->
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════
+   ████  CONFIGURATION — MODIFIER CES VALEURS  ████
+   ══════════════════════════════════════════════════ */
+
+// ////////////////////////////////////////////////////
+// INSÉRER URL DU TEST MBTI ICI
+const URL_TEST = 'https://urcecret.site/quiz/personnalite';
+// ////////////////////////////////////////////////////
+
+// ////////////////////////////////////////////////////
+// INSÉRER URL COMPATIBILITE ICI
+const URL_DUO = 'https://urcecret.site/duo';
+// ////////////////////////////////////////////////////
+
+// ////////////////////////////////////////////////////
+// TEXTE DE PARTAGE (WhatsApp / Twitter)
+const SHARE_TEXT = '🔮 Notre IA a détecté mon type MBTI en 3 questions — Essaie si elle devine le tien !';
+// ////////////////////////////////////////////////////
+
+/* ══════════════════════════════════════════════════
+   DONNÉES MBTI — 8 profils × statistiques
+   ══════════════════════════════════════════════════ */
+const MBTI_DB = {
+  IFJ:{ type:'INFJ', name:"L'Avocat",        pct:82, rarity:"1,5% de la population",  s1:"73% Introversion",  s2:"91% Empathie",    s3:"78% Structure"    },
+  IFP:{ type:'INFP', name:"Le Médiateur",    pct:79, rarity:"4,4% de la population",  s1:"81% Introversion",  s2:"88% Créativité",  s3:"64% Spontanéité"  },
+  ITJ:{ type:'INTJ', name:"L'Architecte",    pct:86, rarity:"2,1% de la population",  s1:"77% Introversion",  s2:"93% Analyse",     s3:"84% Stratégie"    },
+  ITP:{ type:'INTP', name:"Le Logicien",     pct:77, rarity:"3,3% de la population",  s1:"84% Introversion",  s2:"90% Logique",     s3:"69% Flexibilité"  },
+  EFJ:{ type:'ENFJ', name:"Le Protagoniste", pct:84, rarity:"2,5% de la population",  s1:"79% Extraversion",  s2:"89% Empathie",    s3:"81% Organisation" },
+  EFP:{ type:'ENFP', name:"Le Champion",     pct:81, rarity:"8,1% de la population",  s1:"86% Extraversion",  s2:"85% Enthousiasme",s3:"62% Spontanéité"  },
+  ETJ:{ type:'ENTJ', name:"Le Commandant",   pct:88, rarity:"1,8% de la population",  s1:"83% Extraversion",  s2:"94% Leadership",  s3:"87% Décision"     },
+  ETP:{ type:'ENTP', name:"Le Débatteur",    pct:76, rarity:"3,2% de la population",  s1:"80% Extraversion",  s2:"87% Innovation",  s3:"71% Flexibilité"  },
+};
+
+/* ══════════════════════════════════════════════════
+   STATE — Machine d'état centrale
+   ══════════════════════════════════════════════════ */
+const S = { answers:{q1:null,q2:null,q3:null}, prediction:null };
+
+/* ══════════════════════════════════════════════════
+   NAVIGATION ENTRE ÉCRANS
+   Mécanique : fade + translate sortant vers le haut,
+               entrant depuis le bas — fluidité native
+   ══════════════════════════════════════════════════ */
+function go(id) {
+  const prev = document.querySelector('.screen.active');
+  const next = document.getElementById(id);
+  if (!next || prev === next) return;
+
+  if (prev) {
+    prev.classList.add('exit');
+    setTimeout(() => prev.classList.remove('active','exit'), 480);
+  }
+
+  // Légère temporisation pour éviter le flash de transition
+  setTimeout(() => next.classList.add('active'), 30);
+
+  // Initialisation spécifique à l'écran
+  if (id === 's-analyzing')  setTimeout(startAnalysis, 120);
+  if (id === 's-prediction') setTimeout(animatePrediction, 550);
+}
+
+/* ══════════════════════════════════════════════════
+   QUIZ — Gestion des réponses
+   ══════════════════════════════════════════════════ */
+function ans(q, choice) {
+  S.answers['q'+q] = choice;
+
+  // Feedback visuel immédiat (sélection)
+  const screen = document.getElementById('s-q'+q);
+  screen.querySelectorAll('.option-card').forEach(c => {
+    if (c.getAttribute('onclick').includes(`'${choice}'`)) c.classList.add('sel');
+  });
+
+  // Auto-avancement après délai court (laisser voir la sélection)
+  setTimeout(() => {
+    if (q < 3) {
+      go('s-q'+(q+1));
+    } else {
+      computePrediction();
+      go('s-analyzing');
+    }
+  }, 420);
+}
+
+/* ══════════════════════════════════════════════════
+   CALCUL DU TYPE
+   Clé = E/I + T/F + J/P (N toujours supposé = Intuition)
+   ══════════════════════════════════════════════════ */
+function computePrediction() {
+  const k = (S.answers.q1||'I') + (S.answers.q2||'F') + (S.answers.q3||'J');
+  S.prediction = MBTI_DB[k] || MBTI_DB['IFJ'];
+}
+
+/* ══════════════════════════════════════════════════
+   ANALYSE — Animation réseau neuronal + progress
+   Durée totale : ~3 secondes
+   ══════════════════════════════════════════════════ */
+function startAnalysis() {
+  // Construction de la grille de points
+  const grid = document.getElementById('neural-grid');
+  grid.innerHTML = '';
+  // Répartition des couleurs : violet / cyan / pink aléatoires
+  const cols = [null,null,'nc',null,null,'np',null,null,
+                null,'nc',null,null,'np',null,null,null,
+                null,null,null,'nc',null,null,'np',null,
+                null,null,'nc',null,null,null,null,'np',
+                null,'nc',null,null,null,'np',null,null,
+                null,null,null,'nc',null,null,'np',null];
+  for (let i=0; i<48; i++) {
+    const d = document.createElement('div');
+    d.className = 'nd';
+    if (cols[i]) d.dataset.c = cols[i];
+    grid.appendChild(d);
+  }
+  const dots = [...grid.querySelectorAll('.nd')];
+
+  const fill  = document.getElementById('ana-fill');
+  const pct   = document.getElementById('ana-pct');
+  const stat  = document.getElementById('ana-status');
+  const pred  = S.prediction;
+
+  const msgs = [
+    'Traitement des données<span>...</span>',
+    'Profil cognitif en cours<span>...</span>',
+    '<span>Signal inhabituel détecté</span>',
+    'Calibrage final<span>...</span>',
+  ];
+  let mi=0, progress=0, di=0;
+
+  // Animation des points neuronaux
+  const dotTimer = setInterval(() => {
+    if (di < dots.length) {
+      dots[di].classList.add('on');
+      if (dots[di].dataset.c) dots[di].classList.add(dots[di].dataset.c);
+      di++;
+    }
+  }, 50);
+
+  // Barre de progression
+  const barTimer = setInterval(() => {
+    progress = Math.min(progress + 1.3, 100);
+    fill.style.width = progress + '%';
+    pct.textContent = Math.floor(progress) + '%';
+    if (progress >= 100) {
+      clearInterval(barTimer);
+      clearInterval(dotTimer);
+      clearInterval(msgTimer);
+      setTimeout(() => go('s-prediction'), 400);
+    }
+  }, 28);
+
+  // Rotation des messages d'état
+  const msgTimer = setInterval(() => {
+    mi = (mi+1) % msgs.length;
+    stat.innerHTML = msgs[mi];
+  }, 850);
+
+  // Apparition progressive des statistiques
+  const delays = [550, 1100, 1700];
+  const lsIds  = ['ls1','ls2','ls3'];
+  const lvIds  = ['lv1','lv2','lv3'];
+  const vals   = [pred.s1, pred.s2, pred.s3];
+
+  delays.forEach((d, i) => {
+    setTimeout(() => {
+      document.getElementById(lvIds[i]).textContent = vals[i];
+      document.getElementById(lsIds[i]).classList.add('show');
+    }, d);
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   ANIMATION DE PRÉDICTION
+   Révélation lettre par lettre = suspense maximal
+   ══════════════════════════════════════════════════ */
+function animatePrediction() {
+  const p = S.prediction;
+  if (!p) return;
+
+  const letEl  = document.getElementById('pred-letters');
+  const nameEl = document.getElementById('pred-name');
+  const rarEl  = document.getElementById('pred-rarity');
+  const mFill  = document.getElementById('match-fill');
+  const mPct   = document.getElementById('match-pct');
+
+  letEl.textContent = '';
+  nameEl.textContent = '';
+  mFill.style.width = '0%';
+  mPct.textContent = '—';
+  rarEl.textContent = '—';
+
+  // Révélation lettre par lettre
+  let i = 0;
+  const reveal = setInterval(() => {
+    letEl.textContent = p.type.slice(0, i+1);
+    i++;
+    if (i >= p.type.length) {
+      clearInterval(reveal);
+      setTimeout(() => {
+        nameEl.textContent = p.name;
+        rarEl.textContent = p.rarity;
+        // Barre de correspondance avec transition CSS
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            mFill.style.width = p.pct + '%';
+            mPct.textContent  = p.pct + '%';
+          }, 50);
+        });
+      }, 200);
+    }
+  }, 270);
+}
+
+/* ══════════════════════════════════════════════════
+   AUDIO PLAYER — Player sur mesure
+   ══════════════════════════════════════════════════ */
+function initAudio() {
+  const aud   = document.getElementById('audio');
+  const play  = document.getElementById('play-btn');
+  const iPlay = document.getElementById('ico-play');
+  const iPause= document.getElementById('ico-pause');
+  const wave  = document.getElementById('waveform');
+  const bFill = document.getElementById('a-bar-fill');
+  const tCur  = document.getElementById('t-cur');
+  const tTot  = document.getElementById('t-tot');
+  const bWrap = document.getElementById('a-bar-wrap');
+
+  function fmt(s) {
+    if (!s || isNaN(s)) return '0:00';
+    const m = Math.floor(s/60);
+    return `${m}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+  }
+
+  aud.addEventListener('loadedmetadata', () => tTot.textContent = fmt(aud.duration));
+
+  aud.addEventListener('timeupdate', () => {
+    const p = aud.duration ? (aud.currentTime/aud.duration)*100 : 0;
+    bFill.style.width = p + '%';
+    tCur.textContent  = fmt(aud.currentTime);
+    syncOrbsToAudio(aud.currentTime);
+  });
+
+  aud.addEventListener('ended', () => {
+    iPlay.style.display=''; iPause.style.display='none';
+    wave.classList.remove('playing');
+  });
+
+  // Toggle lecture / pause
+  play.addEventListener('click', () => {
+    if (aud.paused) {
+      aud.play().then(() => {
+        iPlay.style.display='none'; iPause.style.display='';
+        wave.classList.add('playing');
+      }).catch(()=>{});
+    } else {
+      aud.pause();
+      iPlay.style.display=''; iPause.style.display='none';
+      wave.classList.remove('playing');
+    }
+  });
+
+  // Scrubbing (clic sur barre de progression)
+  bWrap.addEventListener('click', e => {
+    const r = bWrap.getBoundingClientRect();
+    aud.currentTime = ((e.clientX - r.left) / r.width) * aud.duration;
+  });
+  bWrap.tabIndex = 0;
+  bWrap.addEventListener('keydown', e => {
+    if (e.key==='ArrowRight') aud.currentTime = Math.min(aud.currentTime+5, aud.duration);
+    if (e.key==='ArrowLeft')  aud.currentTime = Math.max(aud.currentTime-5, 0);
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   SYNCHRONISATION AUDIO → VISUELS (timeline)
+   Les orbs changent d'intensité selon le currentTime
+   ══════════════════════════════════════════════════ */
+function syncOrbsToAudio(t) {
+  const ad = document.getElementById('ad');
+  if      (t < 5)  { ad.style.setProperty('--o1','0.18'); ad.style.setProperty('--o2','0.11'); ad.style.setProperty('--o3','0.07'); }
+  else if (t < 12) { ad.style.setProperty('--o1','0.12'); ad.style.setProperty('--o2','0.09'); ad.style.setProperty('--o3','0.14'); }
+  else if (t < 20) { ad.style.setProperty('--o1','0.14'); ad.style.setProperty('--o2','0.17'); ad.style.setProperty('--o3','0.10'); }
+  else             { ad.style.setProperty('--o1','0.20'); ad.style.setProperty('--o2','0.20'); ad.style.setProperty('--o3','0.12'); }
+}
+
+/* ══════════════════════════════════════════════════
+   PARTICULES — Canvas léger (35 points)
+   ══════════════════════════════════════════════════ */
+function initParticles() {
+  const cvs = document.getElementById('cvs');
+  const ctx = cvs.getContext('2d');
+  const ad  = document.getElementById('ad');
+
+  function resize() { cvs.width=ad.offsetWidth; cvs.height=ad.offsetHeight; }
+  resize();
+  new ResizeObserver(resize).observe(ad);
+
+  const pts = Array.from({length:38}, () => ({
+    x: Math.random()*cvs.width, y: Math.random()*cvs.height,
+    r: Math.random()*1.4+0.4,
+    vx:(Math.random()-0.5)*0.28, vy:(Math.random()-0.5)*0.28,
+    o: Math.random()*0.35+0.1,
+    c:['#7c3aed','#06b6d4','#ec4899','#ffffff','#a78bfa'][Math.floor(Math.random()*5)],
+  }));
+
+  function draw() {
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    pts.forEach(p => {
+      p.x=(p.x+p.vx+cvs.width) %cvs.width;
+      p.y=(p.y+p.vy+cvs.height)%cvs.height;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.c;
+      ctx.globalAlpha=p.o;
+      ctx.fill();
+    });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ══════════════════════════════════════════════════
+   SHARE FUNCTIONS — Partage viral
+   ══════════════════════════════════════════════════ */
+
+function sWhatsApp() {
+  /* ////////////////////////////////////////////////
+     MODIFIER LE TEXTE WHATSAPP ICI
+     //////////////////////////////////////////////// */
+  window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT+'\n'+URL_TEST)}`, '_blank', 'noopener');
+}
+
+function sTwitter() {
+  /* ////////////////////////////////////////////////
+     MODIFIER LE TEXTE TWITTER/X ICI
+     //////////////////////////////////////////////// */
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(URL_TEST)}`, '_blank', 'noopener');
+}
+
+function sTikTok() {
+  /* ////////////////////////////////////////////////
+     TIKTOK : copie le lien (pas d'API de partage direct)
+     L'utilisateur le colle dans sa bio ou ses DMs
+     //////////////////////////////////////////////// */
+  sCopy('🎵 Lien copié ! Colle-le dans ta bio TikTok.');
+}
+
+function sCopy(msg) {
+  const lbl = document.getElementById('copy-lbl');
+  const btn = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(URL_TEST).then(() => {
+    lbl.textContent = '✓ Copié';
+    btn.style.borderColor = 'rgba(16,185,129,0.55)';
+    btn.style.color = '#10b981';
+    if (msg) setTimeout(() => alert(msg), 50);
+    setTimeout(() => {
+      lbl.textContent = 'Copier';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2200);
+  }).catch(() => prompt('Copie ce lien :', URL_TEST));
+}
+
+/* ══════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  initParticles();
+  initAudio();
+});
+
+</script>
+</body>
+</html>
