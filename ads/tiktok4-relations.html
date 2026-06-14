@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>TikTok — Relations</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d0008; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
+canvas { display:block; border-radius:14px; box-shadow:0 0 60px #ff4d6d33; }
+#ui { margin-top:16px; display:flex; gap:12px; align-items:center; }
+button { padding:10px 26px; border-radius:8px; border:none; font-size:15px; cursor:pointer; font-weight:bold; }
+#recBtn { background:#ff4d6d; color:#fff; }
+#recBtn.rec { background:#ff1744; animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.55} }
+#timer { color:#fff; font-size:14px; font-family:monospace; min-width:60px; }
+#hint { color:#555; font-size:12px; margin-top:8px; font-family:monospace; }
+</style>
+</head>
+<body>
+<canvas id="c" width="540" height="960"></canvas>
+<div id="ui">
+  <button id="recBtn">⏺ REC</button>
+  <span id="timer">00:00</span>
+  <button id="prevBtn" style="background:#222;color:#fff">▶ Preview</button>
+</div>
+<div id="hint">ffmpeg -i tiktok-relations.webm -c:v libx264 tiktok-relations.mp4</div>
+<audio id="aud" src="manon-relations.mp3" preload="auto" crossorigin="anonymous"></audio>
+
+<script>
+const CV = document.getElementById('c');
+const G = CV.getContext('2d');
+const W = 540, H = 960, DUR = 30;
+const PINK = '#ff4d6d';
+const PURP = '#7c3aed';
+
+// ── helpers ──────────────────────────────────────────────────
+function t(s,x,y,{sz=60,c='#fff',sk='#000',sw=10,al='center',a=1,f='Impact'}={}) {
+  G.save(); G.globalAlpha=a;
+  G.font=`${sz}px ${f}`; G.textAlign=al; G.textBaseline='middle';
+  if(sk&&sw){G.strokeStyle=sk;G.lineWidth=sw;G.lineJoin='round';G.strokeText(s,x,y);}
+  G.fillStyle=c; G.fillText(s,x,y);
+  G.restore();
+}
+
+function wrap(s,x,y,mw,lh,o={}) {
+  const words=s.split(' '); let line='',cy=y;
+  G.font=`${o.sz||52}px ${o.f||'Impact'}`;
+  for(const w of words){
+    const test=line+w+' ';
+    if(G.measureText(test).width>mw&&line){t(line.trim(),x,cy,o);line=w+' ';cy+=lh;}
+    else line=test;
+  }
+  if(line.trim()) t(line.trim(),x,cy,o);
+  return cy;
+}
+
+function em(e,x,y,sz=60,a=1){
+  G.save();G.globalAlpha=a;
+  G.font=`${sz}px serif`;G.textAlign='center';G.textBaseline='middle';
+  G.fillText(e,x,y);G.restore();
+}
+
+function rr(x,y,w,h,r){
+  G.beginPath();G.moveTo(x+r,y);G.lineTo(x+w-r,y);
+  G.quadraticCurveTo(x+w,y,x+w,y+r);G.lineTo(x+w,y+h-r);
+  G.quadraticCurveTo(x+w,y+h,x+w-r,y+h);G.lineTo(x+r,y+h);
+  G.quadraticCurveTo(x,y+h,x,y+h-r);G.lineTo(x,y+r);
+  G.quadraticCurveTo(x,y,x+r,y);G.closePath();
+}
+
+const eOut=t=>1-Math.pow(1-t,3);
+const eBack=t=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+const eEl=t=>{const c4=(2*Math.PI)/3;return t<=0?0:t>=1?1:Math.pow(2,-10*t)*Math.sin((t*10-.75)*c4)+1;};
+const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const p=(at,s,e,fn=eOut)=>fn(cl((at-s)/(e-s),0,1));
+
+// ── progress bar ──────────────────────────────────────────────
+function drawBar(at) {
+  G.fillStyle='#ffffff18'; G.fillRect(0,0,W,5);
+  G.fillStyle='#fff'; G.fillRect(0,0,W*cl(at/DUR,0,1),5);
+}
+
+// ── TikTok chrome ─────────────────────────────────────────────
+function drawChrome(at) {
+  // bottom gradient
+  const g=G.createLinearGradient(0,H-210,0,H);
+  g.addColorStop(0,'transparent'); g.addColorStop(1,'#000000e0');
+  G.fillStyle=g; G.fillRect(0,H-210,W,210);
+
+  // username
+  t('@urcecret', 22, H-158, {sz:28,c:'#fff',sk:'#000',sw:6,al:'left'});
+  // caption
+  wrap('Tu t\'entends instinctivement avec certaines personnes — ce test explique pourquoi 💗',
+    22, H-122, 370, 34, {sz:22,c:'#ffffffcc',sk:'',sw:0,al:'left',f:'sans-serif'});
+
+  // music pill
+  G.save(); G.globalAlpha=.22;
+  rr(14,H-58,270,38,19); G.fillStyle='#fff'; G.fill(); G.restore();
+  em('🎵',35,H-39,22);
+  t('urcecret · test de personnalité', 54, H-39, {sz:17,c:'#fff',sk:'',sw:0,al:'left',f:'sans-serif'});
+
+  // right sidebar
+  const sx=W-58;
+  G.save(); G.beginPath(); G.arc(sx,180,27,0,Math.PI*2);
+  G.strokeStyle=PINK; G.lineWidth=2.5; G.stroke(); G.restore();
+  em('👤',sx,180,32);
+  em('❤️',sx,268,36); t('24.8K',sx,298,{sz:18,c:'#fff',sk:'#000',sw:4,f:'Impact'});
+  em('💬',sx,352,36); t('3.1K',sx,382,{sz:18,c:'#fff',sk:'#000',sw:4,f:'Impact'});
+  em('↗️',sx,436,36); t('Partager',sx,466,{sz:15,c:'#fff',sk:'#000',sw:3,f:'Impact'});
+}
+
+// ────────────────────────────────────────────────────────────
+// SCENE 1 · HOOK · 0–4s
+// "Tu t'es déjà demandé pourquoi tu t'entends instantanément
+//  avec certaines personnes…"
+// ────────────────────────────────────────────────────────────
+function scHook(lt) {
+  const pulse = 0.5 + 0.5*Math.sin(lt*2.8);
+
+  // warm aura — left person
+  G.save(); G.globalAlpha = 0.14 + pulse*0.07;
+  G.beginPath(); G.arc(155,390,88+pulse*14,0,Math.PI*2);
+  G.fillStyle = PINK; G.fill(); G.restore();
+
+  // cold aura — right person
+  G.save(); G.globalAlpha = 0.05 + pulse*0.02;
+  G.beginPath(); G.arc(385,390,80+pulse*6,0,Math.PI*2);
+  G.fillStyle = '#888'; G.fill(); G.restore();
+
+  em('🙂', 155, 390, 68);
+  em('😑', 385, 390, 68);
+
+  // dashed connection line with animated dash offset
+  G.save(); G.globalAlpha = 0.35 + 0.2*Math.sin(lt*3.5);
+  G.setLineDash([10,10]); G.lineDashOffset = -lt*18;
+  G.strokeStyle = PINK; G.lineWidth = 3;
+  G.beginPath(); G.moveTo(204,390); G.lineTo(336,390); G.stroke();
+  G.setLineDash([]); G.restore();
+
+  // "TU T'ES DÉJÀ DEMANDÉ ?" — big hook
+  const a1 = p(lt, 0, 0.4);
+  t('TU T\'ES DÉJÀ', W/2, 195, {sz:62,c:'#fff',sk:'#000',sw:12,a:a1});
+  t('DEMANDÉ ?', W/2, 270, {sz:80,c:PINK,sk:'#000',sw:16,a:a1});
+
+  // sub question fades in
+  wrap('pourquoi tu t\'entends INSTANTANÉMENT avec certaines personnes…',
+    W/2, 502, 440, 54, {sz:42,c:'#ffffffcc',sk:'#000',sw:8, a:p(lt,0.6,1.4)});
+}
+
+// ────────────────────────────────────────────────────────────
+// SCENE 2 · PIVOT · 4–7s
+// "et pas du tout avec d'autres ? Ce n'est pas du hasard."
+// ────────────────────────────────────────────────────────────
+function scPivot(lt) {
+  if(lt < 1.6) {
+    // "et PAS DU TOUT avec d'autres ?"
+    em('🙂', 155, 388, 60);
+
+    // right person drifts away
+    const drift = eOut(p(lt,0.3,1.5)) * 30;
+    em('😑', 385+drift, 388, 60);
+
+    const a = p(lt, 0, 0.35);
+    t('et PAS DU TOUT', W/2, 242, {sz:70,c:'#fff',sk:'#000',sw:14,a});
+    t('avec d\'autres ?', W/2, 320, {sz:58,c:'#ffffffbb',sk:'#000',sw:10,a});
+
+    // X mark between them
+    const xa = p(lt, 0.2, 0.6);
+    G.save(); G.globalAlpha=xa; G.strokeStyle='#ff1744'; G.lineWidth=9; G.lineCap='round';
+    G.beginPath(); G.moveTo(244,352); G.lineTo(296,422); G.stroke();
+    G.beginPath(); G.moveTo(296,352); G.lineTo(244,422); G.stroke();
+    G.restore();
+
+  } else {
+    // white flash → "Ce n'est pas du hasard."
+    const flash = cl(1-(lt-1.6)/0.4, 0, 1);
+    G.fillStyle = `rgba(255,255,255,${flash*0.72})`; G.fillRect(0,0,W,H);
+
+    const a = p(lt, 1.6, 2.2);
+    t('CE N\'EST PAS', W/2, 292, {sz:72,c:'#fff',sk:'#000',sw:14,a});
+    t('DU HASARD.', W/2, 376, {sz:84,c:PINK,sk:'#000',sw:18,a});
+
+    // impact ripple
+    const rp = p(lt, 2.1, 3.0);
+    G.save(); G.globalAlpha = (1-rp)*0.25;
+    G.beginPath(); G.arc(W/2, 376, rp*120, 0, Math.PI*2);
+    G.strokeStyle=PINK; G.lineWidth=3; G.stroke(); G.restore();
+  }
+}
+
+// ────────────────────────────────────────────────────────────
+// SCENE 3 · REVEAL · 7–9s
+// "C'est ta personnalité."
+// ────────────────────────────────────────────────────────────
+function scReveal(lt) {
+  // 2 seconds
+  t('C\'EST TA', W/2, 168, {sz:60,c:'#ffffffaa',sk:'#000',sw:10, a:p(lt,0,0.4)});
+  t('PERSONNALITÉ.', W/2, 246, {sz:58,c:'#fff',sk:'#000',sw:10, a:p(lt,0,0.4)});
+
+  // MBTI blocks
+  const letters=['I','N','F','J'];
+  letters.forEach((l,i)=>{
+    const d = 0.3 + i*0.32;
+    const fa = eEl(p(lt, d, d+0.42));
+    const bx = 80+i*100, by=436, bw=84, bh=108;
+    G.save(); G.globalAlpha=fa;
+    rr(bx-bw/2, by-bh/2, bw, bh, 12);
+    G.fillStyle = i%2===0 ? PINK : '#12011e'; G.fill();
+    G.strokeStyle='#fff3'; G.lineWidth=1; G.stroke(); G.restore();
+    t(l, bx, by+5, {sz:66,c:i%2===0?'#fff':PINK,sk:'#000',sw:9,a:fa});
+  });
+
+  // tagline
+  wrap('Ton type explique tout — tes amours, tes silences, tes clashes.',
+    W/2, 578, 420, 48, {sz:36,c:'#ffffffcc',sk:'#000',sw:6, a:p(lt,1.4,2.0)});
+
+  // small heartbeat pulse
+  const hb = 0.5+0.5*Math.sin(lt*10);
+  em('💗', W/2, 636, 32+hb*6, p(lt,1.2,1.8));
+}
+
+// ────────────────────────────────────────────────────────────
+// SCENE 4 · DEMO · 9–17s (8s)
+// "En 2 minutes, ce test révèle ton type, comment tu aimes,
+//  comment tu communiques, et avec qui tu es vraiment compatible."
+// ────────────────────────────────────────────────────────────
+function scDemo(lt) {
+  // lt 0–8s, one feature card every ~2s
+  t('EN 2 MINUTES', W/2, 100, {sz:52,c:'#ffffffaa',sk:'#000',sw:10, a:p(lt,0,0.45)});
+  t('CE TEST RÉVÈLE :', W/2, 163, {sz:46,c:'#fff',sk:'#000',sw:8, a:p(lt,0,0.45)});
+
+  const feats = [
+    {e:'🔮', title:'Ton type exact',         sub:'parmi 16 profils MBTI',                 d:0,   ac:PINK},
+    {e:'❤️', title:'Comment tu AIMES',       sub:'et ce dont tu as vraiment besoin',       d:1.9, ac:'#ff6b6b'},
+    {e:'💬', title:'Comment tu communiques', sub:'et pourquoi on te comprend souvent mal', d:3.8, ac:'#a78bfa'},
+    {e:'🔗', title:'Avec qui tu es compatible', sub:'vraiment.',                           d:5.7, ac:'#34d399'},
+  ];
+
+  feats.forEach((f,i)=>{
+    const fa = eBack(p(lt, f.d, f.d+0.55));
+    const fy = 232 + i*149;
+    G.save(); G.globalAlpha=fa*0.92;
+    rr(28, fy-52, W-56, 118, 16);
+    G.fillStyle = i===0 ? PINK+'28' : '#ffffff0d'; G.fill();
+    G.strokeStyle = i===0 ? PINK+'88' : '#ffffff22'; G.lineWidth=1; G.stroke();
+    G.restore();
+    em(f.e, 76, fy+6, 48, fa);
+    t(f.title, 128, fy-12, {sz:34,c:f.ac,sk:'#000',sw:6,al:'left',a:fa});
+    t(f.sub,   128, fy+28, {sz:24,c:'#ffffffaa',sk:'',sw:0,al:'left',a:fa,f:'sans-serif'});
+  });
+}
+
+// ────────────────────────────────────────────────────────────
+// SCENE 5 · BENEFIT · 17–21s (4s)
+// "Tu vas enfin comprendre tes relations."
+// ────────────────────────────────────────────────────────────
+function scBenefit(lt) {
+  const a1 = p(lt, 0, 0.5);
+  t('TU VAS ENFIN', W/2, 138, {sz:64,c:'#fff',sk:'#000',sw:12,a:a1});
+  t('COMPRENDRE', W/2, 216, {sz:70,c:PINK,sk:'#000',sw:15,a:a1});
+  t('TES RELATIONS.', W/2, 292, {sz:60,c:'#fff',sk:'#000',sw:11,a:a1});
+
+  const cy = 476;
+  const pulse = 0.5+0.5*Math.sin(lt*4);
+
+  // glows
+  G.save(); G.globalAlpha=0.14+pulse*0.08;
+  G.beginPath(); G.arc(158,cy,72+pulse*12,0,Math.PI*2); G.fillStyle=PINK; G.fill(); G.restore();
+  G.save(); G.globalAlpha=0.11+pulse*0.06;
+  G.beginPath(); G.arc(382,cy,72+pulse*10,0,Math.PI*2); G.fillStyle=PURP; G.fill(); G.restore();
+
+  const fa = p(lt, 0.4, 0.9);
+  em('😊',158,cy,68,fa); em('🥰',382,cy,68,fa);
+
+  // heart chain
+  const ha = p(lt, 1.0, 1.55);
+  for(let i=0;i<3;i++){
+    const hx=224+i*46;
+    em('❤️', hx, cy, 20+pulse*(i===1?12:5), ha);
+  }
+
+  const la = p(lt, 1.2, 1.7);
+  t('INFJ', 158, cy+50, {sz:32,c:PINK,sk:'#000',sw:5,a:la});
+  t('ENFP', 382, cy+50, {sz:32,c:PURP,sk:'#000',sw:5,a:la});
+
+  // compat pill
+  const sa = p(lt, 2.0, 2.6);
+  G.save(); G.globalAlpha=sa;
+  rr(W/2-118,cy+76,236,64,32); G.fillStyle=PINK+'33'; G.fill();
+  G.strokeStyle=PINK; G.lineWidth=2; G.stroke(); G.restore();
+  t('❤️  94% compatibles', W/2, cy+108, {sz:26,c:'#fff',sk:'#000',sw:4,a:sa});
+
+  wrap('Découvre les tiens.', W/2, cy+188, 380, 48,
+    {sz:44,c:'#ffffffcc',sk:'#000',sw:8, a:p(lt,2.5,3.1)});
+}
+
+// ────────────────────────────────────────────────────────────
+// SCENE 6 · CTA · 21–30s (9s)
+// "Fais le test maintenant — et compare avec les gens que tu aimes."
+// ────────────────────────────────────────────────────────────
+function scCta(lt) {
+  // blurred locked profile (Zeigarnik)
+  const bga = p(lt, 0, 0.5);
+  G.save(); G.globalAlpha=bga*0.20;
+  rr(W/2-128,122,256,298,20); G.fillStyle='#fff'; G.fill(); G.restore();
+  G.save(); G.globalAlpha=bga*0.08;
+  [[PINK,162],[PURP,222],[PINK,282],['#aaa',342]].forEach(([c,y])=>{
+    rr(W/2-98,y,196,38,8); G.fillStyle=c; G.fill();
+  });
+  G.restore();
+  em('🔒', W/2, 272, 56, bga*0.75);
+  t('Ton profil t\'attend', W/2, 328, {sz:26,c:'#ffffff55',sk:'',sw:0,a:bga});
+
+  // "FAIS LE TEST MAINTENANT"
+  const bounce = lt>0.5 ? Math.sin(lt*5)*4 : 0;
+  const ma = p(lt, 0, 0.5);
+  t('FAIS LE TEST',  W/2, 476+bounce, {sz:76,c:'#fff',sk:'#000',sw:15,a:ma});
+  t('MAINTENANT',    W/2, 558+bounce, {sz:74,c:PINK,  sk:'#000',sw:16,a:ma});
+
+  // arrow
+  const arb = Math.sin(lt*5)*6;
+  em('👇', W/2, 638+arb, 56, p(lt,0.8,1.3));
+
+  // "compare avec les gens que tu aimes"
+  const va = p(lt, 1.5, 2.1);
+  G.save(); G.globalAlpha=va;
+  rr(28,696,W-56,100,16); G.fillStyle='#ffffff10'; G.fill();
+  G.strokeStyle='#ffffff20'; G.lineWidth=1; G.stroke(); G.restore();
+  t('et compare avec', W/2, 726, {sz:28,c:'#ffffffaa',sk:'',sw:0,a:va,f:'sans-serif'});
+  t('les gens que tu aimes ❤️', W/2, 770, {sz:36,c:'#fff',sk:'#000',sw:6,a:va});
+
+  // URL
+  t('urcecret.site', W/2, 850, {sz:30,c:PINK,sk:'#000',sw:5, a:p(lt,2.5,3.2)});
+
+  // pulsing border around CTA
+  const bp = 0.5+0.5*Math.sin(lt*3);
+  G.save(); G.globalAlpha=p(lt,1,2)*bp*0.38;
+  rr(W/2-128,450,256,132,16); G.strokeStyle=PINK; G.lineWidth=3; G.stroke(); G.restore();
+}
+
+// ── render loop ───────────────────────────────────────────────
+const aud = document.getElementById('aud');
+
+function render() {
+  const at = aud.currentTime;
+
+  // background
+  G.fillStyle='#000'; G.fillRect(0,0,W,H);
+  const vg = G.createRadialGradient(W/2,H*0.38,0,W/2,H*0.38,H*0.62);
+  vg.addColorStop(0,'#16000d'); vg.addColorStop(1,'#000');
+  G.fillStyle=vg; G.fillRect(0,0,W,H);
+
+  // scene routing (synced to script timing)
+  if      (at < 4)  scHook(at);
+  else if (at < 7)  scPivot(at-4);
+  else if (at < 9)  scReveal(at-7);
+  else if (at < 17) scDemo(at-9);
+  else if (at < 21) scBenefit(at-17);
+  else               scCta(at-21);
+
+  drawChrome(at);
+  drawBar(at);
+
+  requestAnimationFrame(render);
+}
+render();
+
+// ── Preview button ────────────────────────────────────────────
+document.getElementById('prevBtn').onclick = () => {
+  if(aud.paused){ aud.currentTime=0; aud.play().catch(()=>{}); }
+  else aud.pause();
+};
+
+// ── Record / export ───────────────────────────────────────────
+let rec=null, chunks=[], recInt=null;
+const btn = document.getElementById('recBtn');
+const tmr = document.getElementById('timer');
+
+btn.onclick = () => {
+  if(rec && rec.state==='recording'){ rec.stop(); return; }
+  chunks=[];
+
+  const vs = CV.captureStream(30);
+  let as;
+  try { as = aud.captureStream ? aud.captureStream() : null; }
+  catch(e){ as=null; }
+
+  const tracks = [...vs.getTracks(), ...(as?as.getTracks():[])];
+  rec = new MediaRecorder(new MediaStream(tracks),
+    { mimeType:'video/webm;codecs=vp9,opus', videoBitsPerSecond:8_000_000 });
+
+  rec.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
+  rec.onstop = () => {
+    clearInterval(recInt);
+    btn.textContent='⏺ REC'; btn.classList.remove('rec'); tmr.textContent='00:00';
+    const blob = new Blob(chunks,{type:'video/webm'});
+    const a = document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='tiktok-relations.webm'; a.click();
+  };
+
+  aud.currentTime=0; rec.start(); aud.play().catch(()=>{});
+  btn.textContent='⏹ STOP'; btn.classList.add('rec');
+
+  let s=0;
+  recInt = setInterval(()=>{
+    s++;
+    tmr.textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+    if(s >= DUR+2) rec.stop();
+  }, 1000);
+};
+</script>
+</body>
+</html>
