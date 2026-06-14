@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>TikTok Ad 3 — Ce test m'a décrit mieux que mes potes</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;font-family:system-ui}
+  canvas{display:block;height:min(844px,95vh);width:auto;border-radius:12px}
+  .controls{display:flex;gap:10px;align-items:center}
+  button{padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer}
+  #play-btn{background:#fff;color:#000}
+  #rec-btn{background:#e53e3e;color:#fff}
+  #rec-btn.recording{background:#48bb78;animation:recPulse 1s infinite}
+  @keyframes recPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+  #status{color:#aaa;font-size:12px;min-width:200px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="c" width="540" height="960"></canvas>
+<div class="controls">
+  <button id="play-btn">▶ Lancer la vidéo</button>
+  <button id="rec-btn">⏺ Enregistrer</button>
+  <div id="status">Prêt</div>
+</div>
+<audio id="aud" src="manon-voix.mp3" preload="auto"></audio>
+<script>
+'use strict';
+const c=document.getElementById('c');
+const ctx=c.getContext('2d');
+const W=540,H=960,DUR=30;
+const aud=document.getElementById('aud');
+
+/* ─── UTILS ─── */
+const clamp=(t,a=0,b=1)=>Math.max(a,Math.min(b,t));
+const easeO=t=>1-Math.pow(1-clamp(t),3);
+const easeBack=t=>{t=clamp(t);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};
+const easeEl=t=>{t=clamp(t);if(!t||t===1)return t;return Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(2*Math.PI/3))+1};
+
+function rr(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+function txt(t,x,y,{sz=60,col='#fff',stk='#000',sw=10,align='center',alpha=1}={}){
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.font=`900 ${sz}px Impact,'Arial Black',sans-serif`;
+  ctx.textAlign=align;ctx.textBaseline='middle';
+  if(stk&&sw>0){ctx.strokeStyle=stk;ctx.lineWidth=sw;ctx.lineJoin='round';ctx.strokeText(t,x,y);}
+  ctx.fillStyle=col;ctx.fillText(t,x,y);ctx.restore();
+}
+function txtW(text,x,y,maxW,lh,opts={}){
+  ctx.save();ctx.font=`900 ${opts.sz||60}px Impact,'Arial Black',sans-serif`;
+  const words=text.split(' ');let line='',lines=[];
+  for(const w of words){const t2=line?`${line} ${w}`:w;if(ctx.measureText(t2).width>maxW&&line){lines.push(line);line=w;}else line=t2;}
+  lines.push(line);ctx.restore();
+  const total=lines.length*lh;
+  lines.forEach((l,i)=>txt(l,x,y-total/2+lh*(i+0.5),opts));
+  return total;
+}
+function emo(e,x,y,sz=60,alpha=1){
+  ctx.save();ctx.globalAlpha=alpha;ctx.font=`${sz}px serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(e,x,y);ctx.restore();
+}
+
+/* ─── CHROME ─── */
+function drawChrome(time){
+  const rx=W-34;
+  ctx.save();
+  ctx.beginPath();ctx.arc(rx,H*0.52,24,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+  ctx.beginPath();ctx.arc(rx,H*0.52,22,0,Math.PI*2);ctx.fillStyle='#10b981';ctx.fill();
+  txt('U',rx,H*0.52,{sz:20,col:'#fff',stk:null});
+  [{e:'❤️',y:H*0.6,l:'31.4K'},{e:'💬',y:H*0.675,l:'5.1K'},{e:'↗️',y:H*0.75,l:'Partager'},{e:'🎵',y:H*0.825,l:'UrCecret'}]
+    .forEach(({e,y,l})=>{emo(e,rx,y,30);txt(l,rx,y+26,{sz:12,col:'#fff',stk:'#000',sw:3});});
+  ctx.restore();
+  const gr=ctx.createLinearGradient(0,H-220,0,H);
+  gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,0.88)');
+  ctx.fillStyle=gr;ctx.fillRect(0,H-220,W-70,220);
+  txt('@urcecret',20,H-140,{sz:18,col:'#fff',stk:'#000',sw:4,align:'left'});
+  txt('Ce test m\'a décrit mieux que mes potes 🤯',20,H-108,{sz:12,col:'#fff',stk:'#000',sw:3,align:'left'});
+  txt('🎵 Son original — urcecret',20,H-60,{sz:13,col:'#fff',stk:'#000',sw:3,align:'left'});
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fillRect(0,0,W,3);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W*Math.min(time/DUR,1),3);
+}
+
+/* ─── HOOK (0–2.5s) ─── */
+function drawHook(lt){
+  // Ligne 1
+  const s1=easeEl(clamp(lt/0.4));const a1=clamp(lt/0.12);
+  ctx.save();ctx.translate(W/2,H*0.29);ctx.scale(s1,s1);
+  txt('Ce test vient de me décrire',0,0,{sz:64,col:'#fff',stk:'#000',sw:11,alpha:a1});
+  ctx.restore();
+
+  if(lt>0.55){
+    const s2=easeEl(clamp((lt-0.55)/0.4));const a2=clamp((lt-0.55)/0.15);
+    ctx.save();ctx.translate(W/2,H*0.4);ctx.scale(s2,s2);
+    txt('mieux que',0,0,{sz:72,col:'#fff',stk:'#000',sw:11,alpha:a2});
+    ctx.restore();
+  }
+
+  if(lt>1.1){
+    const s3=easeEl(clamp((lt-1.1)/0.4));const a3=clamp((lt-1.1)/0.15);
+    ctx.save();ctx.translate(W/2,H*0.52);ctx.scale(s3,s3);
+    // "mes POTES" — POTES en vert
+    txt('mes ',W/2-90,0,{sz:80,col:'#fff',stk:'#000',sw:12,alpha:a3,align:'left'});
+    txt('POTES.',W/2+50,0,{sz:80,col:'#10b981',stk:'#000',sw:12,alpha:a3,align:'left'});
+    ctx.restore();
+  }
+
+  if(lt>1.8){
+    const ea=easeBack(clamp((lt-1.8)/0.4));
+    emo('🤯',W/2-44,H*0.68,50,ea);
+    emo('😳',W/2+44,H*0.68,44,ea*0.8);
+  }
+}
+
+/* ─── MYSTÈRE (2.5–8s) ─── */
+function drawMystery(lt){
+  if(lt<0.25){
+    ctx.fillStyle=`rgba(255,255,255,${(0.25-lt)/0.25*0.5})`;ctx.fillRect(0,0,W,H);
+  }
+
+  if(lt<2){
+    const a=clamp((lt-0.2)/0.3);
+    txtW("Et mes potes me connaissent depuis 10 ans.",W/2,H*0.35,W-80,68,{sz:56,col:'#fff',stk:'#000',sw:10,alpha:a});
+  }else{
+    txtW("Et mes potes me connaissent depuis 10 ans.",W/2,H*0.23,W-80,60,{sz:48,col:'#555',stk:'#000',sw:8});
+    const a2=clamp((lt-2)/0.4);
+    txtW("Le test m'a dit ce que je fais RÉELLEMENT en relation.",W/2,H*0.38,W-80,62,{sz:50,col:'#fff',stk:'#000',sw:9,alpha:a2});
+
+    if(lt>3.2){
+      const s=easeEl(clamp((lt-3.2)/0.45));const a3=clamp((lt-3.2)/0.2);
+      ctx.save();ctx.translate(W/2,H*0.56);ctx.scale(s,s);
+      txt('RÉELLEMENT.',0,0,{sz:88,col:'#10b981',stk:'#000',sw:13,alpha:a3});
+      ctx.restore();
+    }
+    if(lt>4.3){
+      const sh=lt<4.8?(lt-4.3)*5*Math.sin((lt-4.3)*28):0;
+      ctx.save();ctx.translate(sh,0);
+      txtW("Et ce qui me fait VRAIMENT peur.",W/2,H*0.7,W-80,58,{sz:50,col:'#fff',stk:'#000',sw:9,alpha:clamp((lt-4.3)/0.4)});
+      ctx.restore();
+    }
+  }
+}
+
+/* ─── DÉMO (8–15s) ─── */
+function drawDemo(lt){
+  if(lt<3.5){
+    // Quiz rapide
+    const alpha=clamp(lt/0.35);
+    ctx.save();ctx.globalAlpha=alpha;
+
+    ctx.fillStyle='rgba(255,255,255,0.04)';
+    rr(30,H*0.12,W-60,H*0.44,18);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.stroke();
+
+    const qs=[
+      {q:'Comment tu prends tes décisions ?',a:'Par instinct et valeurs ✓',t:0.3},
+      {q:'Tu préfères...',a:'T\'adapter au fil du temps ✓',t:1.2},
+      {q:'Tu récupères ton énergie...',a:'Seul, dans le calme ✓',t:2.1},
+    ];
+
+    const shown=qs.filter(q=>lt>q.t);
+    const current=shown[shown.length-1];
+    if(current){
+      const qa=clamp((lt-current.t)/0.25);
+      txt(current.q,W/2,H*0.2,{sz:26,col:'#fff',stk:'#000',sw:5,alpha:qa});
+      const bx=40;const bw=W-80;
+      ctx.fillStyle=`rgba(16,185,129,${0.3*qa})`;
+      rr(bx,H*0.27,bw,46,12);ctx.fill();
+      ctx.strokeStyle=`rgba(16,185,129,${0.7*qa})`;ctx.lineWidth=1.5;ctx.stroke();
+      txt(current.a,W/2,H*0.295,{sz:24,col:'#fff',stk:'#000',sw:5,alpha:qa});
+    }
+
+    if(lt>1.5){
+      const pa=clamp((lt-1.5)/0.4);
+      // Barre de progression
+      ctx.fillStyle=`rgba(255,255,255,${0.1*pa})`;
+      rr(40,H*0.375,W-80,18,6);ctx.fill();
+      const prog=clamp((lt-1.5)/2.0);
+      const grd=ctx.createLinearGradient(40,0,40+W-80,0);
+      grd.addColorStop(0,'#7c3aed');grd.addColorStop(1,'#10b981');
+      ctx.fillStyle=grd;
+      ctx.globalAlpha=pa;
+      rr(40,H*0.375,(W-80)*easeO(prog),18,6);ctx.fill();
+      ctx.globalAlpha=1;
+    }
+
+    ctx.restore();
+
+    if(lt>2.3){
+      const a2=clamp((lt-2.3)/0.4);
+      txtW("Et là il m'a rendu le résultat.",W/2,H*0.6,W-80,60,{sz:52,col:'#fff',stk:'#000',sw:9,alpha:a2});
+    }
+  }
+  else{
+    // Résultat INFP
+    const rlt=lt-3.5;
+    txt('Ton profil :',W/2,H*0.17,{sz:24,col:'#777',stk:null});
+
+    const types=['I','N','F','P'];const LX=[W/2-81,W/2-27,W/2+27,W/2+81];
+    types.forEach((l,i)=>{
+      const lp=clamp((rlt-i*0.35)/0.3);if(lp<=0) return;
+      const ls=easeEl(lp);
+      ctx.save();ctx.translate(LX[i],H*0.26);ctx.scale(ls,ls);
+      ctx.fillStyle=`rgba(16,185,129,${0.2*lp})`;ctx.strokeStyle=`rgba(16,185,129,${0.7*lp})`;
+      ctx.lineWidth=2;rr(-28,-40,56,80,12);ctx.fill();ctx.stroke();
+      txt(l,0,0,{sz:64,col:'#fff',stk:'#000',sw:10,alpha:lp});
+      ctx.restore();
+    });
+
+    if(rlt>1.5){
+      const ta=clamp((rlt-1.5)/0.4);
+      txt("Le Médiateur",W/2,H*0.39,{sz:28,col:'#10b981',stk:'#000',sw:6,alpha:ta});
+    }
+
+    if(rlt>2.2){
+      // Forces + faiblesses
+      const fa=clamp((rlt-2.2)/0.5);
+      ctx.save();ctx.globalAlpha=fa;
+
+      txt('Forces :',W/2-180,H*0.46,{sz:18,col:'#10b981',stk:null,align:'left'});
+      ['Empathie naturelle','Vision créative','Authenticité'].forEach((s,i)=>{
+        const sa=clamp((rlt-2.2-i*0.3)/0.3);
+        txt(`• ${s}`,W/2-180,H*0.495+i*36,{sz:20,col:'#fff',stk:'#000',sw:4,alpha:sa,align:'left'});
+      });
+
+      if(rlt>3.2){
+        txt('Faiblesses :',W/2-180,H*0.64,{sz:18,col:'#FF4444',stk:null,align:'left',alpha:clamp((rlt-3.2)/0.3)});
+        ['Trop dans sa tête','S\'oublie pour les autres','Conflits évités à tout prix'].forEach((s,i)=>{
+          const sa2=clamp((rlt-3.2-i*0.3)/0.3);
+          txt(`• ${s}`,W/2-180,H*0.665+i*34,{sz:18,col:'#FF8888',stk:'#000',sw:3,alpha:sa2,align:'left'});
+        });
+      }
+      ctx.restore();
+    }
+  }
+}
+
+/* ─── RÉVÉLATION (15–20s) ─── */
+function drawReveal(lt){
+  const a0=clamp(lt/0.4);
+  txtW("Et là j'ai vu le trait que j'avais jamais voulu admettre.",W/2,H*0.19,W-80,58,{sz:48,col:'#fff',stk:'#000',sw:9,alpha:a0});
+
+  if(lt>0.8){
+    const ba=clamp((lt-0.8)/0.5);
+    ctx.save();
+    const blurPx=Math.max(0,20-(lt-0.8)*4);
+    ctx.filter=`blur(${blurPx}px)`;ctx.globalAlpha=ba;
+    ctx.fillStyle='rgba(16,185,129,0.1)';
+    rr(35,H*0.3,W-70,220,16);ctx.fill();
+    ctx.strokeStyle='rgba(16,185,129,0.2)';ctx.lineWidth=1;ctx.stroke();
+    [0,1,2,3,4,5,6].forEach(i=>{
+      const ws=[0.8,0.95,0.6,0.88,0.72,0.9,0.55];
+      ctx.fillStyle='rgba(255,255,255,0.55)';
+      ctx.fillRect(55,H*0.32+i*28,(W-110)*ws[i],14);
+    });
+    ctx.restore();
+
+    // Curseur hover sur une ligne = curiosité
+    if(lt>2){
+      const ca=clamp((lt-2)/0.3);
+      ctx.fillStyle=`rgba(255,255,255,${0.12*ca})`;
+      ctx.fillRect(35,H*0.44,W-70,32);
+      ctx.fillStyle=`rgba(16,185,129,${0.5*ca})`;
+      ctx.fillRect(35,H*0.44,W-70,2);
+    }
+  }
+
+  if(lt>2.8){
+    const a2=clamp((lt-2.8)/0.45);
+    txt("J'ai screenshot et envoyé à ma meuf.",W/2,H*0.65,{sz:44,col:'#fff',stk:'#000',sw:8,alpha:a2});
+  }
+  if(lt>3.8){
+    const a3=clamp((lt-3.8)/0.4);
+    txt('"C\'est exactement toi." — elle',W/2,H*0.74,{sz:38,col:'#10b981',stk:'#000',sw:7,alpha:a3});
+    emo('😐',W/2,H*0.825,42,clamp((lt-4.4)/0.3));
+  }
+}
+
+/* ─── FRUSTRATION (20–25s) ─── */
+function drawFrustration(lt){
+  ctx.save();
+  ctx.filter='blur(16px)';ctx.fillStyle='rgba(16,185,129,0.1)';
+  rr(28,H*0.08,W-56,H*0.52,20);ctx.fill();
+  [0,1,2,3,4,5,6,7,8].forEach(i=>{
+    const ws=[0.78,0.93,0.62,0.88,0.7,0.96,0.55,0.82,0.68];
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillRect(48,H*0.1+i*50,(W-96)*ws[i],18);
+  });
+  ctx.restore();
+  const la=clamp(lt/0.5);
+  ctx.fillStyle=`rgba(5,5,8,${0.82*la})`;
+  rr(28,H*0.08,W-56,H*0.52,20);ctx.fill();
+  ctx.strokeStyle=`rgba(16,185,129,${0.3*la})`;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.globalAlpha=la;
+  emo('🔐',W/2,H*0.26,56);
+  txt('Analyse complète verrouillée',W/2,H*0.35,{sz:24,col:'#fff',stk:'#000',sw:5});
+  ctx.globalAlpha=1;
+  if(lt>1.5){
+    const a2=clamp((lt-1.5)/0.5);
+    txtW("T'as qu'à le faire toi-même.",W/2,H*0.63,W-80,58,{sz:52,col:'#fff',stk:'#000',sw:9,alpha:a2});
+  }
+  if(lt>3){
+    const a3=clamp((lt-3)/0.4);
+    txtW("Et envoie le résultat à tes potes.",W/2,H*0.75,W-80,54,{sz:46,col:'#FFD700',stk:'#000',sw:8,alpha:a3});
+    emo('👇',W/2,H*0.855,46,clamp((lt-4)/0.3));
+  }
+}
+
+/* ─── CTA (25–30s) ─── */
+function drawCta(lt){
+  const slam=easeBack(clamp(lt/0.65));const a0=clamp(lt/0.3);
+  const pulse=1+Math.sin(lt*3)*0.012;
+  ctx.save();ctx.translate(W/2,H*0.37);ctx.scale(slam*pulse,slam*pulse);
+  ctx.fillStyle='rgba(16,185,129,0.2)';
+  ctx.strokeStyle=`rgba(16,185,129,${0.5+Math.sin(lt*2)*0.2})`;
+  ctx.lineWidth=2;rr(-220,-44,440,88,16);ctx.fill();ctx.stroke();
+  txt('urcecret.site',0,0,{sz:72,col:'#fff',stk:'#000',sw:12,alpha:a0});
+  ctx.restore();
+  if(lt>0.9){
+    const a2=clamp((lt-0.9)/0.4);
+    txt('↑ Lien en bio ↑',W/2,H*0.52,{sz:28,col:'#fff',stk:'#000',sw:6,alpha:a2});
+    txt('Gratuit. 12 min. Résultat immédiat.',W/2,H*0.6,{sz:24,col:'#10b981',stk:'#000',sw:5,alpha:a2});
+  }
+  if(lt>2){
+    const a3=clamp((lt-2)/0.5);
+    txtW("Et compare avec tes potes.",W/2,H*0.7,W-80,54,{sz:48,col:'#fff',stk:'#000',sw:8,alpha:a3});
+  }
+  if(lt>3.5){ emo('🔮',W/2,H*0.82,46,clamp((lt-3.5)/0.3)); }
+  if(lt>4.5){
+    ctx.fillStyle=`rgba(0,0,0,${clamp((lt-4.5)/0.8)})`;ctx.fillRect(0,0,W,H);
+  }
+}
+
+/* ─── RENDER ─── */
+function render(){
+  const t=aud.paused?0:aud.currentTime;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  ctx.save();
+  if(t<2.5)        drawHook(t);
+  else if(t<8)     drawMystery(t-2.5);
+  else if(t<15)    drawDemo(t-8);
+  else if(t<20)    drawReveal(t-15);
+  else if(t<25)    drawFrustration(t-20);
+  else             drawCta(t-25);
+  ctx.restore();
+  drawChrome(t);
+  requestAnimationFrame(render);
+}
+render();
+
+document.getElementById('play-btn').addEventListener('click',()=>{aud.currentTime=0;aud.play();});
+document.getElementById('rec-btn').addEventListener('click',async()=>{
+  const btn=document.getElementById('rec-btn');
+  const status=document.getElementById('status');
+  btn.classList.add('recording');
+  const vs=c.captureStream(30);const tracks=[...vs.getVideoTracks()];
+  if(aud.captureStream) aud.captureStream().getAudioTracks().forEach(t=>tracks.push(t));
+  else if(aud.mozCaptureStream) aud.mozCaptureStream().getAudioTracks().forEach(t=>tracks.push(t));
+  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+  const rec=new MediaRecorder(new MediaStream(tracks),{mimeType:mime,videoBitsPerSecond:8000000});
+  const chunks=[];
+  rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  rec.onstop=()=>{
+    const blob=new Blob(chunks,{type:mime});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='tiktok3-urcecret.webm';a.click();
+    btn.textContent='✅ Téléchargé !';btn.classList.remove('recording');
+    status.textContent='ffmpeg -i tiktok3-urcecret.webm -c:v libx264 tiktok3.mp4';
+  };
+  aud.currentTime=0;await aud.play().catch(()=>{});
+  rec.start(100);
+  let e=0;const ti=setInterval(()=>{e++;btn.textContent=`⏺ ${e}s/${DUR}s`;},1000);
+  setTimeout(()=>{rec.stop();clearInterval(ti);},DUR*1000+600);
+});
+</script>
+</body>
+</html>

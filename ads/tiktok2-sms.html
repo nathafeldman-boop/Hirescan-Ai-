@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>TikTok Ad 2 — Pourquoi tu relis tes SMS 10 fois</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;font-family:system-ui}
+  canvas{display:block;height:min(844px,95vh);width:auto;border-radius:12px}
+  .controls{display:flex;gap:10px;align-items:center}
+  button{padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer}
+  #play-btn{background:#fff;color:#000}
+  #rec-btn{background:#e53e3e;color:#fff}
+  #rec-btn.recording{background:#48bb78;animation:recPulse 1s infinite}
+  @keyframes recPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+  #status{color:#aaa;font-size:12px;min-width:200px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="c" width="540" height="960"></canvas>
+<div class="controls">
+  <button id="play-btn">▶ Lancer la vidéo</button>
+  <button id="rec-btn">⏺ Enregistrer</button>
+  <div id="status">Prêt</div>
+</div>
+<audio id="aud" src="manon-voix.mp3" preload="auto"></audio>
+<script>
+'use strict';
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const W=540, H=960, DUR=30;
+const aud = document.getElementById('aud');
+
+/* ─── UTILS ─── */
+const clamp=(t,a=0,b=1)=>Math.max(a,Math.min(b,t));
+const easeO=t=>1-Math.pow(1-clamp(t),3);
+const easeBack=t=>{t=clamp(t);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};
+const easeEl=t=>{t=clamp(t);if(!t||t===1)return t;return Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(2*Math.PI/3))+1};
+
+function rr(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function txt(text,x,y,{sz=60,col='#fff',stk='#000',sw=10,align='center',alpha=1,bold=true}={}){
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.font=`${bold?'900':'700'} ${sz}px Impact,'Arial Black',sans-serif`;
+  ctx.textAlign=align;ctx.textBaseline='middle';
+  if(stk&&sw>0){ctx.strokeStyle=stk;ctx.lineWidth=sw;ctx.lineJoin='round';ctx.strokeText(text,x,y);}
+  ctx.fillStyle=col;ctx.fillText(text,x,y);ctx.restore();
+}
+
+function txtW(text,x,y,maxW,lh,opts={}){
+  ctx.save();ctx.font=`900 ${opts.sz||60}px Impact,'Arial Black',sans-serif`;
+  const words=text.split(' ');let line='',lines=[];
+  for(const w of words){const t2=line?`${line} ${w}`:w;if(ctx.measureText(t2).width>maxW&&line){lines.push(line);line=w;}else line=t2;}
+  lines.push(line);ctx.restore();
+  const total=lines.length*lh;
+  lines.forEach((l,i)=>txt(l,x,y-total/2+lh*(i+0.5),opts));
+  return total;
+}
+
+function emo(e,x,y,sz=60,alpha=1){
+  ctx.save();ctx.globalAlpha=alpha;ctx.font=`${sz}px serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(e,x,y);ctx.restore();
+}
+
+/* ─── CHROME TIKTOK ─── */
+function drawChrome(time) {
+  const rx=W-34;
+  ctx.save();
+  ctx.beginPath();ctx.arc(rx,H*0.52,24,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+  ctx.beginPath();ctx.arc(rx,H*0.52,22,0,Math.PI*2);ctx.fillStyle='#ec4899';ctx.fill();
+  txt('U',rx,H*0.52,{sz:20,col:'#fff',stk:null});
+
+  [{e:'❤️',y:H*0.6,l:'22.1K'},{e:'💬',y:H*0.675,l:'3.4K'},{e:'↗️',y:H*0.75,l:'Partager'},{e:'🎵',y:H*0.825,l:'UrCecret'}]
+    .forEach(({e,y,l})=>{emo(e,rx,y,30);txt(l,rx,y+26,{sz:12,col:'#fff',stk:'#000',sw:3});});
+  ctx.restore();
+
+  const gr=ctx.createLinearGradient(0,H-220,0,H);
+  gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,0.88)');
+  ctx.fillStyle=gr;ctx.fillRect(0,H-220,W-70,220);
+
+  txt('@urcecret',20,H-140,{sz:18,col:'#fff',stk:'#000',sw:4,align:'left'});
+  txt('Pourquoi tu relis tes SMS 10x avant d\'envoyer 👀',20,H-108,{sz:12,col:'#fff',stk:'#000',sw:3,align:'left'});
+  txt('🎵 Son original — urcecret',20,H-60,{sz:13,col:'#fff',stk:'#000',sw:3,align:'left'});
+
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fillRect(0,0,W,3);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W*Math.min(time/DUR,1),3);
+}
+
+/* ─── HOOK (0–2.5s) ─── */
+function drawHook(lt) {
+  // Ligne 1 : "Tu relis tes SMS"
+  const s1=easeEl(clamp(lt/0.45));
+  const a1=clamp(lt/0.15);
+  ctx.save();ctx.translate(W/2,H*0.3);ctx.scale(s1,s1);
+  txt('Tu relis tes SMS',0,0,{sz:72,col:'#fff',stk:'#000',sw:12,alpha:a1});
+  ctx.restore();
+
+  if(lt>0.6){
+    // "10 fois" — ÉNORME, jaune, slam
+    const s2=easeEl(clamp((lt-0.6)/0.45));
+    const a2=clamp((lt-0.6)/0.15);
+    ctx.save();ctx.translate(W/2,H*0.42);ctx.scale(s2,s2);
+    txt('10 FOIS',0,0,{sz:108,col:'#FFD700',stk:'#000',sw:16,alpha:a2});
+    ctx.restore();
+  }
+
+  if(lt>1.3){
+    const s3=easeEl(clamp((lt-1.3)/0.4));
+    const a3=clamp((lt-1.3)/0.15);
+    ctx.save();ctx.translate(W/2,H*0.57);ctx.scale(s3,s3);
+    txt('avant d\'envoyer ?',0,0,{sz:58,col:'#fff',stk:'#000',sw:10,alpha:a3});
+    ctx.restore();
+  }
+
+  if(lt>1.8){
+    const ea=easeBack(clamp((lt-1.8)/0.4));
+    emo('👀',W/2-44,H*0.7,48,ea);
+    emo('📱',W/2+44,H*0.7,48,ea);
+  }
+}
+
+/* ─── MYSTÈRE (2.5–8s) ─── */
+function drawMystery(lt) {
+  if(lt<0.25){
+    ctx.fillStyle=`rgba(255,255,255,${(0.25-lt)/0.25*0.5})`;
+    ctx.fillRect(0,0,W,H);
+  }
+
+  if(lt<2){
+    const a=clamp((lt-0.15)/0.35);
+    txtW("C'est pas de l'anxiété.",W/2,H*0.35,W-80,70,{sz:60,col:'#fff',stk:'#000',sw:10,alpha:a});
+    if(lt>1){
+      const a2=clamp((lt-1)/0.4);
+      txtW("C'est câblé dans ton cerveau.",W/2,H*0.5,W-80,65,{sz:54,col:'#fff',stk:'#000',sw:9,alpha:a2});
+    }
+  }else{
+    txtW("C'est pas de l'anxiété.",W/2,H*0.22,W-80,62,{sz:50,col:'#555',stk:'#000',sw:8});
+    txtW("C'est câblé dans ton cerveau.",W/2,H*0.33,W-80,60,{sz:48,col:'#888',stk:'#000',sw:8});
+
+    const a2=clamp((lt-2)/0.4);
+    txtW("Le test MBTI explique exactement ÇA.",W/2,H*0.46,W-80,62,{sz:52,col:'#fff',stk:'#000',sw:9,alpha:a2});
+
+    if(lt>3.2){
+      const s=easeEl(clamp((lt-3.2)/0.5));
+      const a3=clamp((lt-3.2)/0.2);
+      ctx.save();ctx.translate(W/2,H*0.59);ctx.scale(s,s);
+      // "ÇA" en gros rouge
+      txt('ÇA.',0,0,{sz:100,col:'#FF4444',stk:'#000',sw:14,alpha:a3});
+      ctx.restore();
+
+      if(lt>4.2){
+        const sh=lt<4.7?(lt-4.2)*6*Math.sin((lt-4.2)*30):0;
+        ctx.save();ctx.translate(sh,0);
+        txt('Pourquoi tu fais ça vraiment.',W/2,H*0.73,{sz:42,col:'#fff',stk:'#000',sw:8,alpha:clamp((lt-4.2)/0.4)});
+        ctx.restore();
+      }
+    }
+  }
+}
+
+/* ─── DÉMO (8–15s) ─── */
+function drawDemo(lt) {
+  if(lt<3){
+    // Simulation SMS thread
+    const alpha=clamp(lt/0.4);
+    ctx.save();ctx.globalAlpha=alpha;
+
+    // "Écran de téléphone"
+    ctx.fillStyle='rgba(255,255,255,0.04)';
+    rr(30,H*0.12,W-60,H*0.42,18);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.stroke();
+
+    txt('SMS — Meuf 💬',W/2,H*0.16,{sz:22,col:'#777',stk:null});
+
+    // Bulles de SMS
+    const msgs=[
+      {text:'Bon je t\'envoie ?',side:'right',y:H*0.22,sent:0.2},
+      {text:'...ou je supprime ?',side:'right',y:H*0.295,sent:0.6},
+      {text:'Non c\'est nul',side:'right',y:H*0.37,sent:1.0},
+      {text:'Ok j\'envoie',side:'right',y:H*0.44,sent:1.5},
+      {text:'Finalement non.',side:'right',y:H*0.515,sent:2.0},
+    ];
+
+    msgs.forEach(({text,side,y,sent})=>{
+      if(lt<sent) return;
+      const ma=clamp((lt-sent)/0.25);
+      const bx=side==='right' ? W-70-ctx.measureText(text).width*0.4 : 50;
+      ctx.fillStyle=`rgba(${side==='right'?'124,58,237':'50,50,50'},${0.5*ma})`;
+      rr(bx-12,y-16,ctx.measureText(text).width*0.42+24,36,12);
+      ctx.fill();
+      txt(text,bx+ctx.measureText(text).width*0.21,y,{sz:20,col:'#fff',stk:'#000',sw:4,alpha:ma});
+    });
+
+    // Curseur clignotant sur "Envoyer"
+    if(lt>2){
+      const blink=Math.sin(lt*8)>0;
+      ctx.fillStyle=`rgba(124,58,237,${blink?0.9:0.4})`;
+      rr(W-110,H*0.59,90,38,10);ctx.fill();
+      txt('Envoyer',W-65,H*0.61,{sz:18,col:'#fff',stk:null});
+    }
+
+    ctx.restore();
+
+    if(lt>1.5){
+      const a2=clamp((lt-1.5)/0.4);
+      txtW("On est combien à faire ça ?",W/2,H*0.72,W-80,58,{sz:50,col:'#fff',stk:'#000',sw:9,alpha:a2});
+    }
+  }
+  else{
+    // MBTI reveal + explication
+    const rlt=lt-3;
+
+    txt('Résultat du test :',W/2,H*0.17,{sz:24,col:'#777',stk:null});
+
+    const types=['I','N','T','J'];
+    const LX=[W/2-81,W/2-27,W/2+27,W/2+81];
+    types.forEach((l,i)=>{
+      const lp=clamp((rlt-i*0.35)/0.3);
+      if(lp<=0) return;
+      const ls=easeEl(lp);
+      ctx.save();ctx.translate(LX[i],H*0.26);ctx.scale(ls,ls);
+      ctx.fillStyle=`rgba(6,182,212,${0.2*lp})`;ctx.strokeStyle=`rgba(6,182,212,${0.7*lp})`;
+      ctx.lineWidth=2;rr(-28,-40,56,80,12);ctx.fill();ctx.stroke();
+      txt(l,0,0,{sz:64,col:'#fff',stk:'#000',sw:10,alpha:lp});
+      ctx.restore();
+    });
+
+    if(rlt>1.5){
+      const ta=clamp((rlt-1.5)/0.4);
+      txt("L'Architecte",W/2,H*0.39,{sz:28,col:'#06b6d4',stk:'#000',sw:6,alpha:ta});
+    }
+
+    if(rlt>2.2){
+      // Trait spécifique "relire les SMS"
+      const a2=clamp((rlt-2.2)/0.4);
+      ctx.save();ctx.globalAlpha=a2;
+      ctx.fillStyle='rgba(255,255,255,0.07)';
+      rr(35,H*0.45,W-70,130,14);ctx.fill();
+      ctx.strokeStyle='rgba(6,182,212,0.3)';ctx.lineWidth=1;ctx.stroke();
+
+      txt('Trait détecté :',W/2,H*0.47,{sz:18,col:'#06b6d4',stk:null});
+      txtW('"Analyse excessive des interactions sociales."',W/2,H*0.52,W-90,44,{sz:28,col:'#fff',stk:'#000',sw:6});
+      ctx.restore();
+    }
+
+    if(rlt>3.8){
+      const a3=clamp((rlt-3.8)/0.4);
+      txtW("Les INTJ et INFJ font TOUS ça.",W/2,H*0.64,W-80,56,{sz:46,col:'#FFD700',stk:'#000',sw:8,alpha:a3});
+      if(rlt>4.6){
+        const a4=clamp((rlt-4.6)/0.3);
+        txtW("C'est dans ta structure cognitive.",W/2,H*0.74,W-80,52,{sz:42,col:'#fff',stk:'#000',sw:8,alpha:a4});
+      }
+    }
+  }
+}
+
+/* ─── RÉVÉLATION (15–20s) ─── */
+function drawReveal(lt) {
+  const a0=clamp(lt/0.4);
+  txtW("Mais le test révèle aussi...",W/2,H*0.2,W-80,62,{sz:54,col:'#fff',stk:'#000',sw:9,alpha:a0});
+
+  if(lt>0.7){
+    const ba=clamp((lt-0.7)/0.5);
+    ctx.save();
+    ctx.filter=`blur(${Math.max(0,18-(lt-0.7)*4)}px)`;
+    ctx.globalAlpha=ba;
+    ctx.fillStyle='rgba(6,182,212,0.1)';
+    rr(35,H*0.29,W-70,230,16);ctx.fill();
+    ctx.strokeStyle='rgba(6,182,212,0.2)';ctx.lineWidth=1;ctx.stroke();
+
+    // Lignes de texte flouté
+    const ls=[
+      "Pourquoi tu te retires sans prévenir.",
+      "Ce que tu ressens mais n'oses pas dire.",
+      "Pourquoi tu t'attaches trop vite.",
+      "Ce qui te fait vraiment peur en relation.",
+      "Pourquoi tu analyses tout après coup.",
+    ];
+    ls.forEach((l,i)=>{
+      ctx.fillStyle=`rgba(255,255,255,${0.5+i*0.05})`;
+      ctx.fillRect(55,H*0.31+i*38,ctx.measureText(l).width*0.28,14);
+    });
+    ctx.restore();
+  }
+
+  if(lt>2.5){
+    const a2=clamp((lt-2.5)/0.45);
+    const sh=lt<3.5?(lt-2.5)*4*Math.sin((lt-2.5)*28):0;
+    ctx.save();ctx.translate(sh,0);
+    txt("J'aurais préféré ne pas voir ça.",W/2,H*0.64,{sz:46,col:'#FF4444',stk:'#000',sw:9,alpha:a2});
+    ctx.restore();
+    emo('💀',W/2,H*0.735,44,clamp((lt-3)/0.3));
+  }
+
+  if(lt>3.8){
+    const a3=clamp((lt-3.8)/0.4);
+    txtW("Mais maintenant je comprends pourquoi.",W/2,H*0.81,W-80,52,{sz:42,col:'#fff',stk:'#000',sw:8,alpha:a3});
+  }
+}
+
+/* ─── FRUSTRATION (20–25s) ─── */
+function drawFrustration(lt) {
+  ctx.save();
+  ctx.filter='blur(16px)';ctx.fillStyle='rgba(6,182,212,0.1)';
+  rr(28,H*0.08,W-56,H*0.52,20);ctx.fill();
+  [0,1,2,3,4,5,6,7,8].forEach(i=>{
+    const ws=[0.8,0.95,0.65,0.9,0.7,0.96,0.58,0.84,0.7];
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillRect(48,H*0.1+i*50,(W-96)*ws[i],18);
+  });
+  ctx.restore();
+
+  const la=clamp(lt/0.5);
+  ctx.fillStyle=`rgba(5,5,8,${0.82*la})`;
+  rr(28,H*0.08,W-56,H*0.52,20);ctx.fill();
+  ctx.strokeStyle=`rgba(6,182,212,${0.3*la})`;ctx.lineWidth=1.5;ctx.stroke();
+
+  ctx.globalAlpha=la;
+  emo('🔐',W/2,H*0.26,56);
+  txt('Profil complet verrouillé',W/2,H*0.35,{sz:24,col:'#fff',stk:'#000',sw:5});
+  ctx.globalAlpha=1;
+
+  if(lt>1.5){
+    const a2=clamp((lt-1.5)/0.5);
+    txtW("Je peux pas tout te montrer ici.",W/2,H*0.63,W-80,58,{sz:48,col:'#fff',stk:'#000',sw:8,alpha:a2});
+  }
+  if(lt>3){
+    const a3=clamp((lt-3)/0.4);
+    txtW("Mais tu peux faire le test toi-même.",W/2,H*0.75,W-80,55,{sz:46,col:'#FFD700',stk:'#000',sw:8,alpha:a3});
+    emo('👇',W/2,H*0.855,46,clamp((lt-4)/0.3));
+  }
+}
+
+/* ─── CTA (25–30s) ─── */
+function drawCta(lt) {
+  const slam=easeBack(clamp(lt/0.65));
+  const a0=clamp(lt/0.3);
+  const pulse=1+Math.sin(lt*3)*0.012;
+
+  ctx.save();ctx.translate(W/2,H*0.37);ctx.scale(slam*pulse,slam*pulse);
+  ctx.fillStyle='rgba(6,182,212,0.2)';
+  ctx.strokeStyle=`rgba(6,182,212,${0.5+Math.sin(lt*2)*0.2})`;
+  ctx.lineWidth=2;rr(-220,-44,440,88,16);ctx.fill();ctx.stroke();
+  txt('urcecret.site',0,0,{sz:72,col:'#fff',stk:'#000',sw:12,alpha:a0});
+  ctx.restore();
+
+  if(lt>0.9){
+    const a2=clamp((lt-0.9)/0.4);
+    txt('↑ Lien en bio ↑',W/2,H*0.52,{sz:28,col:'#fff',stk:'#000',sw:6,alpha:a2});
+    txt('Pour comprendre POURQUOI tu fais ça.',W/2,H*0.6,{sz:26,col:'#06b6d4',stk:'#000',sw:5,alpha:a2});
+  }
+  if(lt>2){
+    const a3=clamp((lt-2)/0.4);
+    txtW('Gratuit. Résultat en 12 min.',W/2,H*0.7,W-80,54,{sz:44,col:'#fff',stk:'#000',sw:8,alpha:a3});
+  }
+  if(lt>3.5){
+    emo('📱',W/2,H*0.82,46,clamp((lt-3.5)/0.3));
+  }
+  if(lt>4.5){
+    ctx.fillStyle=`rgba(0,0,0,${clamp((lt-4.5)/0.8)})`;
+    ctx.fillRect(0,0,W,H);
+  }
+}
+
+/* ─── RENDER ─── */
+function render(){
+  const t=aud.paused?0:aud.currentTime;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  ctx.save();
+  if(t<2.5)         drawHook(t);
+  else if(t<8)      drawMystery(t-2.5);
+  else if(t<15)     drawDemo(t-8);
+  else if(t<20)     drawReveal(t-15);
+  else if(t<25)     drawFrustration(t-20);
+  else              drawCta(t-25);
+  ctx.restore();
+  drawChrome(t);
+  requestAnimationFrame(render);
+}
+render();
+
+/* ─── CONTROLS ─── */
+document.getElementById('play-btn').addEventListener('click',()=>{aud.currentTime=0;aud.play();});
+
+document.getElementById('rec-btn').addEventListener('click',async()=>{
+  const btn=document.getElementById('rec-btn');
+  const status=document.getElementById('status');
+  btn.classList.add('recording');
+  const vs=c.captureStream(30);
+  const tracks=[...vs.getVideoTracks()];
+  if(aud.captureStream) aud.captureStream().getAudioTracks().forEach(t=>tracks.push(t));
+  else if(aud.mozCaptureStream) aud.mozCaptureStream().getAudioTracks().forEach(t=>tracks.push(t));
+  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+  const rec=new MediaRecorder(new MediaStream(tracks),{mimeType:mime,videoBitsPerSecond:8000000});
+  const chunks=[];
+  rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  rec.onstop=()=>{
+    const blob=new Blob(chunks,{type:mime});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='tiktok2-urcecret.webm';a.click();
+    btn.textContent='✅ Téléchargé !';btn.classList.remove('recording');
+    status.textContent='ffmpeg -i tiktok2-urcecret.webm -c:v libx264 tiktok2.mp4';
+  };
+  aud.currentTime=0;await aud.play().catch(()=>{});
+  rec.start(100);
+  let e=0;const ti=setInterval(()=>{e++;btn.textContent=`⏺ ${e}s/${DUR}s`;},1000);
+  setTimeout(()=>{rec.stop();clearInterval(ti);},DUR*1000+600);
+});
+</script>
+</body>
+</html>

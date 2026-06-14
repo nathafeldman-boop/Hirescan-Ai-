@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>TikTok Ad 1 — J'aurais préféré ne jamais faire ce test</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;font-family:system-ui}
+  canvas{display:block;height:min(844px,95vh);width:auto;border-radius:12px}
+  .controls{display:flex;gap:10px;align-items:center}
+  button{padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer}
+  #play-btn{background:#fff;color:#000}
+  #rec-btn{background:#e53e3e;color:#fff}
+  #rec-btn.recording{background:#48bb78;animation:recPulse 1s infinite}
+  @keyframes recPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+  #status{color:#aaa;font-size:12px;min-width:200px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="c" width="540" height="960"></canvas>
+<div class="controls">
+  <button id="play-btn">▶ Lancer la vidéo</button>
+  <button id="rec-btn">⏺ Enregistrer MP4</button>
+  <div id="status">Prêt — Ouvre les 2 fichiers dans le même dossier</div>
+</div>
+
+<!--
+  ////////////////////////////////////////////////////
+  INSÉRER URL AUDIO ICI (chemin relatif ou URL CDN)
+  ////////////////////////////////////////////////////
+-->
+<audio id="aud" src="manon-voix.mp3" preload="auto"></audio>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════
+   SETUP CANVAS
+   ═══════════════════════════════════════════ */
+const c   = document.getElementById('c');
+const ctx = c.getContext('2d');
+const W = 540, H = 960;
+const DUR = 30;
+
+/* ═══════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════ */
+const lerp  = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
+const easeO = t => 1 - Math.pow(1 - clamp(t), 3);
+const clamp = (t, a=0, b=1) => Math.max(a, Math.min(b, t));
+const easeBack = t => {
+  t = clamp(t);
+  const c1 = 1.70158, c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+};
+const easeElastic = t => {
+  t = clamp(t);
+  if (t === 0 || t === 1) return t;
+  return Math.pow(2, -10*t) * Math.sin((t*10 - 0.75) * (2*Math.PI/3)) + 1;
+};
+
+function rr(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+/* Text with TikTok-style stroke */
+function txt(text, x, y, {sz=60,col='#fff',stk='#000',sw=10,align='center',alpha=1,bold=true}={}) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = `${bold?'900':'700'} ${sz}px Impact, 'Arial Black', sans-serif`;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  if (stk && sw>0) { ctx.strokeStyle=stk; ctx.lineWidth=sw; ctx.lineJoin='round'; ctx.strokeText(text,x,y); }
+  ctx.fillStyle = col;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+/* Wrapped text, returns height used */
+function txtW(text, x, y, maxW, lh, opts={}) {
+  ctx.save();
+  ctx.font = `900 ${opts.sz||60}px Impact, 'Arial Black', sans-serif`;
+  const words = text.split(' ');
+  let line='', lines=[];
+  for (const w of words) {
+    const t2 = line ? `${line} ${w}` : w;
+    if (ctx.measureText(t2).width > maxW && line) { lines.push(line); line=w; }
+    else line=t2;
+  }
+  lines.push(line);
+  ctx.restore();
+  const total = lines.length * lh;
+  lines.forEach((l,i) => txt(l, x, y - total/2 + lh*(i+0.5), opts));
+  return total;
+}
+
+/* Emoji shortcut */
+function emo(e, x, y, sz=60, alpha=1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = `${sz}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(e, x, y);
+  ctx.restore();
+}
+
+/* ═══════════════════════════════════════════
+   TIKTOK CHROME OVERLAY
+   Doit ressembler exactement à une vraie vidéo TikTok
+   ═══════════════════════════════════════════ */
+function drawChrome(time) {
+  /* Right sidebar — likes, comments, share */
+  const rx = W - 34;
+
+  // Avatar
+  ctx.save();
+  ctx.beginPath(); ctx.arc(rx, H*0.52, 24, 0, Math.PI*2);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(rx, H*0.52, 22, 0, Math.PI*2);
+  ctx.fillStyle = '#7c3aed'; ctx.fill();
+  txt('U', rx, H*0.52, {sz:20,col:'#fff',stk:null});
+
+  const icons = [
+    {e:'❤️',  y:H*0.6,  label:'14.2K'},
+    {e:'💬',  y:H*0.675,label:'1.8K'},
+    {e:'↗️',  y:H*0.75, label:'Partager'},
+    {e:'🎵',  y:H*0.825,label:'UrCecret'},
+  ];
+  icons.forEach(({e,y,label}) => {
+    emo(e, rx, y, 30);
+    txt(label, rx, y+26, {sz:12,col:'#fff',stk:'#000',sw:3});
+  });
+  ctx.restore();
+
+  /* Bottom gradient + info */
+  const gr = ctx.createLinearGradient(0, H-220, 0, H);
+  gr.addColorStop(0, 'rgba(0,0,0,0)');
+  gr.addColorStop(1, 'rgba(0,0,0,0.88)');
+  ctx.fillStyle = gr;
+  ctx.fillRect(0, H-220, W-70, 220);
+
+  txt('@urcecret', 20, H-140, {sz:18,col:'#fff',stk:'#000',sw:4,align:'left'});
+  txt('J\'aurais préféré ne jamais faire ce test 💀', 20, H-108, {sz:13,col:'#fff',stk:'#000',sw:3,align:'left'});
+  txt('Voir plus', 20, H-88, {sz:13,col:'rgba(255,255,255,0.6)',stk:null,align:'left'});
+  txt('🎵 Son original — urcecret', 20, H-60, {sz:13,col:'#fff',stk:'#000',sw:3,align:'left'});
+
+  /* Progress bar */
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fillRect(0, 0, W, 3);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, W * Math.min(time/DUR, 1), 3);
+}
+
+/* ═══════════════════════════════════════════
+   SCENE FUNCTIONS
+   Structure obligatoire TikTok :
+   0-2s   HOOK
+   2-8s   MYSTÈRE
+   8-15s  DÉMO
+   15-20s RÉVÉLATION
+   20-25s FRUSTRATION
+   25-30s CTA
+   ═══════════════════════════════════════════ */
+
+/* —— HOOK (0–2.5s) ——
+   Phrase qui arrête le scroll immédiatement
+   Mécanisme : déclaration forte + contre-intuitive */
+function drawHook(lt) {
+  const slam = easeElastic(clamp(lt / 0.5));
+  const alpha = clamp(lt / 0.12);
+
+  ctx.save();
+  ctx.translate(W/2, H*0.38);
+  ctx.scale(slam, slam);
+  txtW("J'aurais préféré", 0, -55, W-80, 82, {sz:76,col:'#fff',stk:'#000',sw:13,alpha});
+  txtW("ne jamais faire ce test.", 0, 40, W-80, 82, {sz:76,col:'#fff',stk:'#000',sw:13,alpha});
+  ctx.restore();
+
+  if (lt > 1.2) {
+    // Emoji de réaction en bas
+    const ea = clamp((lt-1.2)/0.3);
+    const es = easeBack(ea);
+    ctx.save();
+    ctx.translate(W/2, H*0.72);
+    ctx.scale(es, es);
+    emo('💀', 0, -30, 52, ea);
+    emo('😳', -70, 10, 44, ea * 0.8);
+    emo('👁', 70, 10, 44, ea * 0.8);
+    ctx.restore();
+  }
+}
+
+/* —— MYSTÈRE (2.5–8s) ——
+   Créer le manque d'information + validation émotionnelle */
+function drawMystery(lt) {
+  // Flash de transition à lt=0
+  if (lt < 0.25) {
+    ctx.fillStyle = `rgba(255,255,255,${(0.25-lt)/0.25*0.6})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  if (lt < 2.5) {
+    // "Pas parce qu'il était faux."
+    const a = clamp((lt-0.15)/0.3);
+    txtW("Pas parce qu'il était faux.", W/2, H*0.35, W-80, 70, {sz:60,col:'#fff',stk:'#000',sw:10,alpha:a});
+  }
+  else if (lt < 3.8) {
+    txtW("Pas parce qu'il était faux.", W/2, H*0.28, W-80, 65, {sz:52,col:'#777',stk:'#000',sw:8});
+    const a = clamp((lt-2.5)/0.3);
+    txtW("Parce qu'il était", W/2, H*0.42, W-80, 65, {sz:58,col:'#fff',stk:'#000',sw:10,alpha:a});
+  }
+  else {
+    txtW("Pas parce qu'il était faux.", W/2, H*0.22, W-80, 62, {sz:48,col:'#555',stk:'#000',sw:7});
+    txtW("Parce qu'il était", W/2, H*0.36, W-80, 65, {sz:56,col:'#fff',stk:'#000',sw:9});
+
+    // TROP JUSTE — slam avec overshoot
+    const ys = easeElastic(clamp((lt-3.8)/0.45));
+    const a = clamp((lt-3.8)/0.2);
+    ctx.save();
+    ctx.translate(W/2, H*0.49 + (1-ys)*120);
+    txt("TROP JUSTE.", 0, 0, {sz:90,col:'#FFD700',stk:'#000',sw:14,alpha:a});
+    ctx.restore();
+
+    if (lt > 4.8) {
+      // Screen shake sur le mot "TROP JUSTE"
+      const sh = lt < 5.3 ? (5.3-lt)*8 : 0;
+      const a2 = clamp((lt-4.8)/0.3);
+      ctx.save();
+      ctx.translate((Math.random()-0.5)*sh, (Math.random()-0.5)*sh*0.5);
+      txtW("Il a su que je fais semblant d'aller bien.", W/2, H*0.62, W-80, 60, {sz:50,col:'#fff',stk:'#000',sw:9,alpha:a2});
+      ctx.restore();
+    }
+
+    if (lt > 5.6) {
+      const ea = clamp((lt-5.6)/0.3);
+      emo('😳', W/2, H*0.76, 52, ea);
+    }
+  }
+}
+
+/* —— DÉMO (8–15s) ——
+   Montrer le produit sans vendre — comme si on filmait son écran */
+function drawDemo(lt) {
+  if (lt < 3.5) {
+    // Quiz simulation — phone screen look
+    const alpha = clamp(lt/0.3);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    // "Fond" d'app sombre
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    rr(28, H*0.15, W-56, H*0.36, 18);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    txt("Test en cours...", W/2, H*0.19, {sz:22,col:'#777',stk:null});
+    txt("Tu récupères ton énergie...", W/2, H*0.24, {sz:30,col:'#fff',stk:'#000',sw:6});
+
+    const op1a = clamp((lt-0.5)/0.3);
+    // Option sélectionnée (violette)
+    ctx.fillStyle = `rgba(124,58,237,${0.35*op1a})`;
+    rr(48, H*0.28, W-96, 48, 12);
+    ctx.fill();
+    ctx.strokeStyle = `rgba(124,58,237,${0.7*op1a})`;
+    ctx.lineWidth = 1.5; ctx.stroke();
+    txt("🌙  Seul, dans le calme  ✓", W/2, H*0.305, {sz:24,col:'#fff',stk:'#000',sw:5,alpha:op1a});
+
+    const op2a = clamp((lt-0.8)/0.3)*0.4;
+    ctx.fillStyle = `rgba(255,255,255,${0.05*op2a})`;
+    rr(48, H*0.345, W-96, 48, 12);
+    ctx.fill();
+    txt("⚡  Avec les autres", W/2, H*0.37, {sz:24,col:'#666',stk:null,alpha:op2a});
+
+    ctx.restore();
+
+    if (lt > 1.5) {
+      const ca = clamp((lt-1.5)/0.4);
+      txtW("Il m'a posé 100 questions.", W/2, H*0.62, W-80, 60, {sz:52,col:'#fff',stk:'#000',sw:9,alpha:ca});
+      if (lt > 2.5) {
+        const ca2 = clamp((lt-2.5)/0.3);
+        txtW("Et là ça a tout changé.", W/2, H*0.73, W-80, 56, {sz:48,col:'#FFD700',stk:'#000',sw:8,alpha:ca2});
+      }
+    }
+  }
+  else {
+    // MBTI type reveal — lettre par lettre
+    const rlt = lt - 3.5;
+    const letters = ['I','N','F','J'];
+    const LX = [W/2-81, W/2-27, W/2+27, W/2+81];
+
+    txt("Résultat :", W/2, H*0.2, {sz:26,col:'#777',stk:null});
+
+    letters.forEach((l, i) => {
+      const lp = clamp((rlt - i*0.35) / 0.3);
+      if (lp <= 0) return;
+      const ls = easeElastic(lp);
+      const la = clamp(rlt - i*0.35);
+
+      ctx.save();
+      ctx.translate(LX[i], H*0.3);
+      ctx.scale(ls, ls);
+
+      // Box
+      ctx.fillStyle = `rgba(124,58,237,${0.2*la})`;
+      ctx.strokeStyle = `rgba(124,58,237,${0.7*la})`;
+      ctx.lineWidth = 2;
+      rr(-28, -40, 56, 80, 12);
+      ctx.fill(); ctx.stroke();
+
+      txt(l, 0, 0, {sz:64,col:'#fff',stk:'#000',sw:10,alpha:la});
+      ctx.restore();
+    });
+
+    if (rlt > 1.6) {
+      const na = clamp((rlt-1.6)/0.3);
+      txt("L'Avocat", W/2, H*0.43, {sz:30,col:'#a78bfa',stk:'#000',sw:6,alpha:na});
+      txt("1,5% de la population mondiale", W/2, H*0.49, {sz:20,col:'#777',stk:null,alpha:na});
+    }
+
+    if (rlt > 2.5) {
+      // Stats bars
+      const stats = [['Empathie',91],['Vision',88],['Intuition',94]];
+      stats.forEach(([label, val], i) => {
+        const sa = clamp((rlt - 2.5 - i*0.35)/0.35);
+        if (sa <= 0) return;
+        const bw = (W - 120) * (val/100) * easeO(sa);
+
+        ctx.globalAlpha = sa;
+        ctx.fillStyle = 'rgba(255,255,255,0.07)';
+        ctx.fillRect(60, H*0.56+i*44, W-120, 26);
+
+        const gr = ctx.createLinearGradient(60,0,60+W-120,0);
+        gr.addColorStop(0,'#7c3aed'); gr.addColorStop(1,'#ec4899');
+        ctx.fillStyle = gr;
+        ctx.fillRect(60, H*0.56+i*44, bw, 26);
+
+        ctx.globalAlpha = 1;
+        txt(`${label} — ${val}%`, W/2, H*0.56+i*44+13, {sz:20,col:'#fff',stk:'#000',sw:4,alpha:sa});
+      });
+    }
+  }
+}
+
+/* —— RÉVÉLATION PARTIELLE (15–20s) ——
+   Donner assez pour intriguer, jamais assez pour satisfaire */
+function drawReveal(lt) {
+  const a0 = clamp(lt/0.4);
+
+  txtW("Et puis j'ai lu quelque chose.", W/2, H*0.2, W-80, 65, {sz:54,col:'#fff',stk:'#000',sw:9,alpha:a0});
+
+  if (lt > 0.8) {
+    const ba = clamp((lt-0.8)/0.4);
+    // Bloc de texte flouté (analyse complète)
+    ctx.save();
+    const blurAmt = Math.max(0, 16 - (lt-0.8)*3);
+    ctx.filter = `blur(${blurAmt}px)`;
+    ctx.globalAlpha = ba;
+    ctx.fillStyle = 'rgba(124,58,237,0.12)';
+    rr(35, H*0.29, W-70, 220, 16);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(124,58,237,0.2)';
+    ctx.lineWidth = 1; ctx.stroke();
+
+    const lines = [0.82,0.96,0.68,0.90,0.74,0.85,0.6];
+    lines.forEach((w,i) => {
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.fillRect(55, H*0.31+i*28, (W-110)*w, 13);
+    });
+    ctx.restore();
+  }
+
+  if (lt > 2.8) {
+    const a2 = clamp((lt-2.8)/0.4);
+    // Shake effect
+    const sh = lt < 3.8 ? (lt-2.8)*5 * Math.sin((lt-2.8)*25) : 0;
+    ctx.save();
+    ctx.translate(sh, sh*0.3);
+    txt("Je l'ai relu 3 fois.", W/2, H*0.645, {sz:58,col:'#FF4444',stk:'#000',sw:10,alpha:a2});
+    ctx.restore();
+  }
+
+  if (lt > 4.0) {
+    const a3 = clamp((lt-4.0)/0.4);
+    txtW("C'était trop précis pour être un hasard.", W/2, H*0.74, W-80, 56, {sz:44,col:'#fff',stk:'#000',sw:8,alpha:a3});
+  }
+}
+
+/* —— FRUSTRATION (20–25s) ——
+   Effet Zeigarnik : besoin de complétion non résolu → clic obligatoire */
+function drawFrustration(lt) {
+  // Profil entier flouté en arrière-plan
+  ctx.save();
+  ctx.filter = 'blur(18px)';
+  ctx.fillStyle = 'rgba(124,58,237,0.14)';
+  rr(28, H*0.08, W-56, H*0.52, 20);
+  ctx.fill();
+  [0,1,2,3,4,5,6,7,8].forEach(i => {
+    const ws=[0.78,0.94,0.62,0.88,0.72,0.96,0.55,0.82,0.68];
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillRect(48, H*0.1+i*50, (W-96)*ws[i], 18);
+  });
+  ctx.restore();
+
+  // Overlay de verrou
+  const la = clamp(lt/0.6);
+  ctx.fillStyle = `rgba(5,5,8,${0.8*la})`;
+  rr(28, H*0.08, W-56, H*0.52, 20);
+  ctx.fill();
+  ctx.strokeStyle = `rgba(124,58,237,${0.3*la})`;
+  ctx.lineWidth = 1.5; ctx.stroke();
+
+  ctx.save();
+  ctx.globalAlpha = la;
+  emo('🔐', W/2, H*0.26, 56);
+  txt('Analyse complète verrouillée', W/2, H*0.35, {sz:24,col:'#fff',stk:'#000',sw:5});
+  ctx.restore();
+
+  if (lt > 1.5) {
+    const a2 = clamp((lt-1.5)/0.5);
+    txtW("Le profil complet je peux pas te le montrer.", W/2, H*0.65, W-80, 60, {sz:46,col:'#fff',stk:'#000',sw:8,alpha:a2});
+  }
+  if (lt > 3.0) {
+    const a3 = clamp((lt-3.0)/0.4);
+    txtW("Mais t'as qu'à voir toi-même.", W/2, H*0.77, W-80, 55, {sz:48,col:'#FFD700',stk:'#000',sw:9,alpha:a3});
+    if (lt > 4.0) {
+      const a4 = clamp((lt-4.0)/0.3);
+      emo('👇', W/2, H*0.86, 48, a4);
+    }
+  }
+}
+
+/* —— CTA (25–30s) ——
+   Conversion : URL claire, urgence douce, pas de hard sell */
+function drawCta(lt) {
+  const slam = easeBack(clamp(lt/0.7));
+  const a0   = clamp(lt/0.3);
+
+  // URL principale
+  ctx.save();
+  ctx.translate(W/2, H*0.38);
+  ctx.scale(slam, slam);
+
+  const pulse = 1 + Math.sin(lt*3)*0.012;
+  ctx.scale(pulse, pulse);
+
+  ctx.fillStyle = 'rgba(124,58,237,0.2)';
+  ctx.strokeStyle = `rgba(124,58,237,${0.5+Math.sin(lt*2)*0.2})`;
+  ctx.lineWidth = 2;
+  rr(-220, -44, 440, 88, 16);
+  ctx.fill(); ctx.stroke();
+
+  txt('urcecret.site', 0, 0, {sz:72,col:'#fff',stk:'#000',sw:12,alpha:a0});
+  ctx.restore();
+
+  if (lt > 0.9) {
+    const a2 = clamp((lt-0.9)/0.4);
+    txt('↑ Le lien est en bio ↑', W/2, H*0.53, {sz:28,col:'#fff',stk:'#000',sw:6,alpha:a2});
+    txt('100 questions · Gratuit · 12 min', W/2, H*0.6, {sz:24,col:'#999',stk:'#000',sw:4,alpha:a2});
+  }
+
+  if (lt > 2.2) {
+    const a3 = clamp((lt-2.2)/0.5);
+    txtW("Et là tu comprendras pourquoi tu fais ça.", W/2, H*0.72, W-80, 56, {sz:46,col:'#fff',stk:'#000',sw:8,alpha:a3});
+  }
+
+  if (lt > 3.5) {
+    const a4 = clamp((lt-3.5)/0.3);
+    emo('🔮', W/2, H*0.85, 44, a4);
+  }
+
+  // Fade out final
+  if (lt > 4.5) {
+    const fo = clamp((lt-4.5)/0.8);
+    ctx.fillStyle = `rgba(0,0,0,${fo})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MAIN RENDER LOOP
+   ═══════════════════════════════════════════ */
+const aud = document.getElementById('aud');
+let raf;
+
+function render() {
+  const t = aud.paused ? 0 : aud.currentTime;
+
+  // Black background
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+
+  // Route to correct scene
+  if      (t < 2.5)  drawHook(t);
+  else if (t < 8.0)  drawMystery(t - 2.5);
+  else if (t < 15.0) drawDemo(t - 8.0);
+  else if (t < 20.0) drawReveal(t - 15.0);
+  else if (t < 25.0) drawFrustration(t - 20.0);
+  else               drawCta(t - 25.0);
+
+  ctx.restore();
+
+  // TikTok chrome always on top
+  drawChrome(t);
+
+  raf = requestAnimationFrame(render);
+}
+
+render();
+
+/* ═══════════════════════════════════════════
+   CONTROLS
+   ═══════════════════════════════════════════ */
+const status = document.getElementById('status');
+
+document.getElementById('play-btn').addEventListener('click', () => {
+  aud.currentTime = 0;
+  aud.play();
+  status.textContent = '▶ Lecture en cours...';
+});
+
+/* ═══════════════════════════════════════════
+   MEDIARECORDER — Export WebM → MP4
+   Enregistre canvas + audio dans un fichier WebM
+   TikTok accepte directement le WebM.
+   Pour MP4 : ffmpeg -i video.webm -c:v libx264 output.mp4
+   ═══════════════════════════════════════════ */
+document.getElementById('rec-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('rec-btn');
+  btn.textContent = '⏺ Enregistrement... 0s';
+  btn.classList.add('recording');
+
+  const videoStream = c.captureStream(30);
+  const tracks = [...videoStream.getVideoTracks()];
+
+  // Capture audio si disponible
+  if (aud.captureStream) {
+    const audioStream = aud.captureStream();
+    audioStream.getAudioTracks().forEach(t => tracks.push(t));
+  } else if (aud.mozCaptureStream) {
+    const audioStream = aud.mozCaptureStream();
+    audioStream.getAudioTracks().forEach(t => tracks.push(t));
+  }
+
+  const combined = new MediaStream(tracks);
+  const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+    ? 'video/webm;codecs=vp9'
+    : 'video/webm';
+
+  const recorder = new MediaRecorder(combined, { mimeType, videoBitsPerSecond: 8000000 });
+  const chunks = [];
+
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: mimeType });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'tiktok1-urcecret.webm';
+    a.click();
+    URL.revokeObjectURL(url);
+    btn.textContent = '✅ Téléchargé ! Convertis en MP4 avec ffmpeg';
+    btn.classList.remove('recording');
+    status.textContent = 'ffmpeg -i tiktok1-urcecret.webm -c:v libx264 tiktok1.mp4';
+  };
+
+  // Start
+  aud.currentTime = 0;
+  await aud.play().catch(() => {});
+  recorder.start(100);
+
+  let elapsed = 0;
+  const timer = setInterval(() => {
+    elapsed++;
+    btn.textContent = `⏺ ${elapsed}s / ${DUR}s — Ne ferme pas !`;
+    status.textContent = `Enregistrement : ${Math.round(elapsed/DUR*100)}%`;
+  }, 1000);
+
+  setTimeout(() => {
+    recorder.stop();
+    clearInterval(timer);
+  }, DUR * 1000 + 600);
+});
+</script>
+</body>
+</html>
