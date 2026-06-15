@@ -1,14 +1,7 @@
-import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import AdminDashboard from './AdminDashboard';
 
-const OWNER_EMAIL = 'nathabuisseness@gmail.com';
-
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
-  if (session?.user?.email !== OWNER_EMAIL) redirect('/login');
 
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
