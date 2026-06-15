@@ -748,10 +748,83 @@ overlay.addEventListener('click', () => {
 
 vo.addEventListener('ended', () => {
   if (raf) { cancelAnimationFrame(raf); raf = null; }
+  recStatus.textContent = 'Lecture terminée — arrête l\'enregistrement dans OBS / Loom si besoin.';
 });
 
 // Show hook scene behind overlay on load
 showScene('hook');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RECORDER — capture onglet → WebM → téléchargement auto
+// ─────────────────────────────────────────────────────────────────────────────
+const recBtn    = document.getElementById('rec-btn');
+const recStatus = document.getElementById('rec-status');
+let   recorder  = null;
+
+recBtn.addEventListener('click', async () => {
+  if (recorder && recorder.state === 'recording') {
+    recorder.stop();
+    recBtn.textContent = '⏺ Enregistrer';
+    return;
+  }
+
+  recStatus.textContent = 'Sélectionne cet onglet (avec audio) dans la fenêtre…';
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: 60, displaySurface: 'browser' },
+      audio: true,
+      preferCurrentTab: true,
+    });
+  } catch(e) {
+    recStatus.textContent = 'Enregistrement annulé.';
+    return;
+  }
+
+  const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+    ? 'video/webm;codecs=vp9,opus' : 'video/webm';
+  recorder = new MediaRecorder(stream, { mimeType: mime });
+  const chunks = [];
+
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'meta-mbti-v1.webm';
+    a.click();
+    recStatus.textContent = '✅ Téléchargement WebM lancé — convertis en MP4 avec FFmpeg ou Handbrake.';
+    recBtn.textContent = '⏺ Enregistrer';
+    recorder = null;
+  };
+
+  recorder.start(100);
+  recBtn.textContent = '⏹ Arrêter';
+  recStatus.textContent = '🔴 Enregistrement en cours (30s)…';
+
+  // Lance l'animation au bout d'1s pour laisser le temps à l'écran de se stabiliser
+  setTimeout(() => overlay.click(), 800);
+
+  // Stop auto à 31s
+  setTimeout(() => { if (recorder && recorder.state === 'recording') recorder.stop(); }, 31500);
+});
 </script>
+
+<!-- RECORDING UI (hors stage, non visible dans la vidéo) -->
+<div style="
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  z-index:9999;
+">
+  <button id="rec-btn" style="
+    padding:16px 40px; border-radius:14px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,#7c3aed,#ec4899);
+    color:#fff; font-size:18px; font-weight:700; letter-spacing:0.3px;
+    box-shadow:0 8px 24px rgba(124,58,237,0.4);
+  ">⏺ Enregistrer</button>
+  <span id="rec-status" style="color:rgba(255,255,255,0.55);font-size:14px;font-family:system-ui;"></span>
+</div>
 </body>
 </html>
