@@ -26,34 +26,20 @@ interface Stats {
   yearRevenueCents: number;
   revenueByMonth: Record<string, { revenue: number; commission: number; count: number }>;
   affiliates: Array<{
-    id: string;
-    slug: string;
-    name: string;
-    email: string | null;
-    commissionPct: number;
-    createdAt: string;
+    id: string; slug: string; name: string; email: string | null;
+    commissionPct: number; createdAt: string;
     conversions: Array<{ amountCents: number; commissionCents: number; createdAt: string }>;
   }>;
   affiliateClicks: Record<string, number>;
+  mbtiDistribution?: Record<string, number>;
 }
 
 const QUIZ_NAMES: Record<string, string> = {
-  infidelite: 'Infidélité',
-  adopte: 'Suis-je adopté(e) ?',
-  amoureux: 'Suis-je amoureux ?',
-  'vrais-amis': 'Vrais amis',
-  orientation: 'Orientation',
-  narcissique: 'Narcissique',
-  'mon-ex': 'Mon ex',
-  manipule: 'Manipulé(e) ?',
-  rompre: 'Dois-je rompre ?',
-  jaloux: 'Jaloux/jalouse ?',
-  'relation-toxique': 'Relation toxique',
-  crush: 'Mon crush',
-  burnout: 'Burnout',
-  depression: 'Dépression',
-  'vrai-amour': 'Vrai amour',
-  personnalite: 'Test MBTI',
+  infidelite: 'Infidélité', adopte: 'Suis-je adopté(e) ?', amoureux: 'Suis-je amoureux ?',
+  'vrais-amis': 'Vrais amis', orientation: 'Orientation', narcissique: 'Narcissique',
+  'mon-ex': 'Mon ex', manipule: 'Manipulé(e) ?', rompre: 'Dois-je rompre ?',
+  jaloux: 'Jaloux/jalouse ?', 'relation-toxique': 'Relation toxique', crush: 'Mon crush',
+  burnout: 'Burnout', depression: 'Dépression', 'vrai-amour': 'Vrai amour', personnalite: 'Test MBTI',
 };
 
 function fmt(cents: number) {
@@ -83,10 +69,103 @@ function TierBadge({ tier }: { tier: string }) {
       </span>
     );
   }
+  return <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-400 border border-white/8">Gratuit</span>;
+}
+
+// ── Vertical SVG bar chart (1 or 2 series) ────────────────────────────────────
+type BarPoint = { label: string; a: number; b?: number };
+
+function VertBarChart({
+  data, labelA, labelB, fmtA, fmtB,
+  colorA = '#a78bfa', colorB = '#34d399',
+}: {
+  data: BarPoint[]; labelA: string; labelB?: string;
+  fmtA: (v: number) => string; fmtB?: (v: number) => string;
+  colorA?: string; colorB?: string;
+}) {
+  const [hov, setHov] = useState<number | null>(null);
+  const dual = labelB !== undefined;
+  const H = 140, BW = dual ? 13 : 20, GAP_INNER = 4, GROUP = dual ? BW * 2 + GAP_INNER : BW, GAP = 14;
+  const maxVal = Math.max(...data.flatMap(d => dual ? [d.a, d.b ?? 0] : [d.a]), 1);
+
+  if (data.length === 0) {
+    return <p className="text-center py-10 text-zinc-600 text-sm">Le graphique apparaîtra avec les premières données</p>;
+  }
+
+  const totalW = data.length * (GROUP + GAP) + 20;
+
   return (
-    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-400 border border-white/8">
-      Gratuit
-    </span>
+    <div className="overflow-x-auto pb-2">
+      <div className="flex gap-4 mb-3 text-xs text-zinc-400 px-1">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: colorA }} />
+          {labelA}
+        </span>
+        {dual && labelB && (
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: colorB }} />
+            {labelB}
+          </span>
+        )}
+      </div>
+      <svg width={Math.max(totalW, 260)} height={H + 36} style={{ display: 'block', minWidth: '100%' }}>
+        {data.map((d, i) => {
+          const x = 10 + i * (GROUP + GAP);
+          const hA = Math.max(Math.round((d.a / maxVal) * (H - 10)), d.a > 0 ? 3 : 0);
+          const hB = dual ? Math.max(Math.round(((d.b ?? 0) / maxVal) * (H - 10)), (d.b ?? 0) > 0 ? 3 : 0) : 0;
+          const isHov = hov === i;
+          const tooltipW = dual ? 108 : 88;
+          const tooltipH = dual ? 42 : 26;
+          const tipX = Math.min(x - 4, totalW - tooltipW - 8);
+
+          return (
+            <g key={i} style={{ cursor: 'default' }}
+              onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)}>
+              <rect x={x - 2} y={0} width={GROUP + 4} height={H + 2} fill="transparent" />
+              <rect x={x} y={H - hA} width={BW} height={hA} rx={3}
+                fill={colorA} opacity={isHov ? 1 : 0.72} style={{ transition: 'opacity .15s' }} />
+              {dual && (
+                <rect x={x + BW + GAP_INNER} y={H - hB} width={BW} height={hB} rx={3}
+                  fill={colorB} opacity={isHov ? 1 : 0.72} style={{ transition: 'opacity .15s' }} />
+              )}
+              <text x={x + GROUP / 2} y={H + 16} textAnchor="middle" fontSize={9} fill="#52525b">
+                {d.label}
+              </text>
+              {isHov && (
+                <g>
+                  <rect x={tipX} y={H - Math.max(hA, hB) - tooltipH - 8} width={tooltipW} height={tooltipH} rx={6}
+                    fill="#18181b" stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
+                  <text x={tipX + 8} y={H - Math.max(hA, hB) - tooltipH + 15} fontSize={10} fill={colorA}>
+                    {fmtA(d.a)}
+                  </text>
+                  {dual && fmtB && (
+                    <text x={tipX + 8} y={H - Math.max(hA, hB) - tooltipH + 30} fontSize={10} fill={colorB}>
+                      {fmtB(d.b ?? 0)}
+                    </text>
+                  )}
+                </g>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ── Horizontal progress bar ───────────────────────────────────────────────────
+function HorizBar({ label, value, max, color, valueLabel }: {
+  label: string; value: number; max: number; color: string; valueLabel: string;
+}) {
+  const pct = max > 0 ? Math.max((value / max) * 100, value > 0 ? 2 : 0) : 0;
+  return (
+    <div className="flex items-center gap-3 py-1.5">
+      <div className="w-28 text-right text-xs text-zinc-400 shrink-0 truncate" title={label}>{label}</div>
+      <div className="flex-1 h-4 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color, transition: 'width .6s cubic-bezier(.4,0,.2,1)' }} />
+      </div>
+      <div className="w-20 text-xs text-zinc-300 shrink-0 font-semibold text-right">{valueLabel}</div>
+    </div>
   );
 }
 
@@ -97,7 +176,6 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   const [tierFilter, setTierFilter] = useState<'all' | 'premium' | 'free'>('all');
   const [lastRefresh, setLastRefresh] = useState(() => new Date().toLocaleTimeString('fr-FR'));
 
-  // Auto-refresh every 60 s
   useEffect(() => {
     const id = setInterval(() => {
       router.refresh();
@@ -107,8 +185,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   }, [router]);
 
   const conversionRate = stats.totalUsers > 0
-    ? ((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1)
-    : '0';
+    ? ((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1) : '0';
 
   const filteredUsers = useMemo(() => {
     return stats.recentUsers.filter(u => {
@@ -122,10 +199,8 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
 
   const sortedQuizzes = Object.entries(stats.byQuiz)
     .map(([slug, data]) => ({
-      slug,
-      name: QUIZ_NAMES[slug] ?? slug,
-      count: data.count,
-      paidCount: data.paidCount,
+      slug, name: QUIZ_NAMES[slug] ?? slug,
+      count: data.count, paidCount: data.paidCount,
       avgScore: data.count > 0 ? Math.round(data.totalScore / data.count) : 0,
       paidRate: data.count > 0 ? ((data.paidCount / data.count) * 100).toFixed(1) : '0',
     }))
@@ -135,12 +210,46 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
     .sort(([a], [b]) => b.localeCompare(a))
     .slice(0, 12);
 
-  const totalAffilRevenue = stats.affiliates.reduce(
-    (s, a) => s + a.conversions.reduce((ss, c) => ss + c.amountCents, 0), 0
-  );
-  const totalAffilCommission = stats.affiliates.reduce(
-    (s, a) => s + a.conversions.reduce((ss, c) => ss + c.commissionCents, 0), 0
-  );
+  const totalAffilRevenue = stats.affiliates.reduce((s, a) => s + a.conversions.reduce((ss, c) => ss + c.amountCents, 0), 0);
+  const totalAffilCommission = stats.affiliates.reduce((s, a) => s + a.conversions.reduce((ss, c) => ss + c.commissionCents, 0), 0);
+
+  // Chart data
+  const revenueChartData: BarPoint[] = useMemo(() =>
+    Object.entries(stats.revenueByMonth)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-12)
+      .map(([key, v]) => ({
+        label: new Date(key + '-01').toLocaleDateString('fr-FR', { month: 'short' }).replace('.', ''),
+        a: v.revenue,
+        b: v.commission,
+      })),
+    [stats.revenueByMonth]);
+
+  const usersChartData: BarPoint[] = useMemo(() =>
+    Object.entries(stats.usersByMonth)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-12)
+      .map(([key, count]) => ({
+        label: new Date(key + '-01').toLocaleDateString('fr-FR', { month: 'short' }).replace('.', ''),
+        a: count,
+      })),
+    [stats.usersByMonth]);
+
+  const maxQuizCount = Math.max(...sortedQuizzes.map(q => q.count), 1);
+
+  const affiliateRanking = useMemo(() =>
+    stats.affiliates
+      .map(a => ({
+        name: a.name,
+        ca: a.conversions.reduce((s, c) => s + c.amountCents, 0),
+        sales: a.conversions.length,
+        clicks: stats.affiliateClicks[a.slug] ?? 0,
+        commission: a.conversions.reduce((s, c) => s + c.commissionCents, 0),
+      }))
+      .sort((a, b) => b.ca - a.ca),
+    [stats.affiliates, stats.affiliateClicks]);
+
+  const maxAffilCA = Math.max(...affiliateRanking.map(a => a.ca), 1);
 
   const TABS: { id: Tab; label: string }[] = [
     { id: 'overview', label: '📊 Vue d\'ensemble' },
@@ -152,7 +261,6 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
 
   return (
     <main className="min-h-screen text-white" style={{ background: '#09090b' }}>
-      {/* Header */}
       <header className="sticky top-0 z-20 border-b border-white/5 backdrop-blur-md" style={{ background: 'rgba(9,9,11,0.9)' }}>
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-black">
@@ -167,19 +275,11 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             </Link>
           </div>
         </div>
-
-        {/* Tab nav */}
         <div className="max-w-6xl mx-auto px-4 pb-0 flex gap-1 overflow-x-auto">
           {TABS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+            <button key={t.id} onClick={() => setTab(t.id)}
               className="px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all border-b-2"
-              style={{
-                color: tab === t.id ? '#a78bfa' : '#71717a',
-                borderBottomColor: tab === t.id ? '#a78bfa' : 'transparent',
-              }}
-            >
+              style={{ color: tab === t.id ? '#a78bfa' : '#71717a', borderBottomColor: tab === t.id ? '#a78bfa' : 'transparent' }}>
               {t.label}
             </button>
           ))}
@@ -193,26 +293,48 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-black text-white mb-1">Vue d&apos;ensemble</h1>
-              <p className="text-zinc-500 text-sm">Statistiques en temps réel de l&apos;application</p>
+              <p className="text-zinc-500 text-sm">Statistiques en temps réel</p>
             </div>
 
-            {/* KPI row 1 */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <KpiCard label="Total utilisateurs" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} />
               <KpiCard label="Premium" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#f472b6" />
               <KpiCard label="Tests MBTI faits" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} color="#34d399" />
-              <KpiCard label="Revenus affiliés" value={fmt(stats.totalRevenueCents)} sub="total cumulé" color="#fbbf24" />
+              <KpiCard label="CA affiliés total" value={fmt(stats.totalRevenueCents)} sub="total cumulé" color="#fbbf24" />
             </div>
 
-            {/* KPI row 2 */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <KpiCard label="Nouveaux aujourd'hui" value={stats.newToday} color="#a78bfa" />
-              <KpiCard label="Nouveaux cette semaine" value={stats.newThisWeek} color="#a78bfa" />
+              <KpiCard label="Cette semaine" value={stats.newThisWeek} color="#a78bfa" />
               <KpiCard label="Unlocks payants" value={stats.paidResults} sub={`+${stats.paidToday} aujourd'hui`} color="#34d399" />
               <KpiCard label="Revenus ce mois" value={fmt(stats.monthRevenueCents)} color="#fbbf24" />
             </div>
 
-            {/* Recent users */}
+            {/* Mini charts side by side */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="glass rounded-2xl p-5">
+                <p className="text-sm font-semibold text-white mb-4">Inscriptions · 12 derniers mois</p>
+                <VertBarChart
+                  data={usersChartData.slice(-6)}
+                  labelA="Inscrits"
+                  fmtA={v => v.toLocaleString('fr-FR') + ' users'}
+                  colorA="#a78bfa"
+                />
+              </div>
+              <div className="glass rounded-2xl p-5">
+                <p className="text-sm font-semibold text-white mb-4">CA affiliés · 12 derniers mois</p>
+                <VertBarChart
+                  data={revenueChartData.slice(-6)}
+                  labelA="CA"
+                  labelB="Commission"
+                  fmtA={v => fmt(v)}
+                  fmtB={v => fmt(v)}
+                  colorA="#fbbf24"
+                  colorB="#f472b6"
+                />
+              </div>
+            </div>
+
             <div className="glass rounded-2xl overflow-hidden">
               <div className="px-5 py-4 border-b border-white/5">
                 <p className="text-sm font-semibold text-white">Derniers inscrits</p>
@@ -253,19 +375,32 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               </div>
               <div className="flex gap-2">
                 {(['all', 'premium', 'free'] as const).map(f => (
-                  <button
-                    key={f}
-                    onClick={() => setTierFilter(f)}
+                  <button key={f} onClick={() => setTierFilter(f)}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                     style={tierFilter === f
                       ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }
-                      : { background: 'rgba(255,255,255,0.05)', color: '#71717a', border: '1px solid rgba(255,255,255,0.08)' }
-                    }
-                  >
+                      : { background: 'rgba(255,255,255,0.05)', color: '#71717a', border: '1px solid rgba(255,255,255,0.08)' }}>
                     {f === 'all' ? 'Tous' : f === 'premium' ? 'Premium' : 'Gratuit'}
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Growth chart */}
+            <div className="glass rounded-2xl p-5">
+              <p className="text-sm font-semibold text-white mb-4">Nouveaux inscrits par mois</p>
+              <VertBarChart
+                data={usersChartData}
+                labelA="Inscriptions"
+                fmtA={v => v.toLocaleString('fr-FR') + ' inscrits'}
+                colorA="#a78bfa"
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <KpiCard label="Aujourd'hui" value={stats.newToday} color="#a78bfa" />
+              <KpiCard label="Cette semaine" value={stats.newThisWeek} color="#a78bfa" />
+              <KpiCard label="Ce mois" value={stats.newThisMonth} color="#a78bfa" />
             </div>
 
             <input
@@ -316,7 +451,12 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-black text-white mb-1">Revenus</h1>
-              <p className="text-zinc-500 text-sm">Uniquement les revenus trackés via les liens affiliés. Pour les paiements directs, voir le <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:underline">dashboard Stripe →</a></p>
+              <p className="text-zinc-500 text-sm">
+                Revenus trackés via les liens affiliés.{' '}
+                <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:underline">
+                  Dashboard Stripe →
+                </a>
+              </p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
@@ -332,9 +472,23 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <KpiCard label="Unlocks ce mois" value={stats.paidThisMonth} sub={`+${stats.paidToday} aujourd'hui`} color="#34d399" />
             </div>
 
+            {/* Revenue chart */}
+            <div className="glass rounded-2xl p-5">
+              <p className="text-sm font-semibold text-white mb-4">CA & commissions par mois (12 derniers mois)</p>
+              <VertBarChart
+                data={revenueChartData}
+                labelA="CA généré"
+                labelB="Commission"
+                fmtA={v => fmt(v)}
+                fmtB={v => fmt(v)}
+                colorA="#fbbf24"
+                colorB="#f472b6"
+              />
+            </div>
+
             <div className="glass rounded-2xl overflow-hidden">
               <div className="px-5 py-4 border-b border-white/5">
-                <p className="text-sm font-semibold text-white">Revenus affiliés par mois</p>
+                <p className="text-sm font-semibold text-white">Détail mensuel</p>
               </div>
               {sortedMonths.length === 0 ? (
                 <p className="px-5 py-8 text-center text-zinc-600">Aucune conversion affiliate enregistrée</p>
@@ -355,7 +509,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                           {new Date(month + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                         </td>
                         <td className="px-5 py-3 text-yellow-400 font-semibold">{fmt(data.revenue)}</td>
-                        <td className="px-5 py-3 text-zinc-400">{fmt(data.commission)}</td>
+                        <td className="px-5 py-3 text-pink-400">{fmt(data.commission)}</td>
                         <td className="px-5 py-3 text-zinc-400">{data.count}</td>
                       </tr>
                     ))}
@@ -371,10 +525,47 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-black text-white mb-1">Stats Quiz</h1>
-              <p className="text-zinc-500 text-sm">{stats.totalResults.toLocaleString('fr-FR')} complétions · {stats.paidResults} résultats débloqués</p>
+              <p className="text-zinc-500 text-sm">{stats.totalResults.toLocaleString('fr-FR')} complétions · {stats.paidResults} débloqués</p>
+            </div>
+
+            {/* Horizontal bar leaderboard */}
+            <div className="glass rounded-2xl p-5">
+              <p className="text-sm font-semibold text-white mb-4">Classement par complétions</p>
+              <div className="space-y-1">
+                {sortedQuizzes.map(q => (
+                  <HorizBar
+                    key={q.slug}
+                    label={q.name}
+                    value={q.count}
+                    max={maxQuizCount}
+                    color="linear-gradient(90deg,#7c3aed,#ec4899)"
+                    valueLabel={q.count.toLocaleString('fr-FR')}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Paid rate comparison */}
+            <div className="glass rounded-2xl p-5">
+              <p className="text-sm font-semibold text-white mb-4">Taux de conversion payant</p>
+              <div className="space-y-1">
+                {sortedQuizzes.filter(q => q.count > 0).map(q => (
+                  <HorizBar
+                    key={q.slug}
+                    label={q.name}
+                    value={parseFloat(q.paidRate)}
+                    max={100}
+                    color="linear-gradient(90deg,#059669,#34d399)"
+                    valueLabel={`${q.paidRate}%`}
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-white/5">
+                <p className="text-sm font-semibold text-white">Tableau complet</p>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -390,10 +581,8 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                     {sortedQuizzes.map(q => (
                       <tr key={q.slug} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                         <td className="px-5 py-3">
-                          <div>
-                            <p className="text-white font-medium">{q.name}</p>
-                            <p className="text-zinc-600 text-xs">{q.slug}</p>
-                          </div>
+                          <p className="text-white font-medium">{q.name}</p>
+                          <p className="text-zinc-600 text-xs">{q.slug}</p>
                         </td>
                         <td className="px-5 py-3 text-zinc-300 font-semibold">{q.count.toLocaleString('fr-FR')}</td>
                         <td className="px-5 py-3 text-green-400">{q.paidCount}</td>
@@ -409,7 +598,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                       </tr>
                     ))}
                     {sortedQuizzes.length === 0 && (
-                      <tr><td colSpan={5} className="px-5 py-8 text-center text-zinc-600">Aucun résultat enregistré</td></tr>
+                      <tr><td colSpan={5} className="px-5 py-8 text-center text-zinc-600">Aucun résultat</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -426,12 +615,10 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <h1 className="text-2xl font-black text-white mb-1">Affiliés</h1>
                 <p className="text-zinc-500 text-sm">{stats.affiliates.length} affiliés actifs</p>
               </div>
-              <Link
-                href="/admin/affiliates"
+              <Link href="/admin/affiliates"
                 className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}
-              >
-                Gérer les affiliés →
+                style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
+                Gérer →
               </Link>
             </div>
 
@@ -442,7 +629,50 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <KpiCard label="Commissions dues" value={fmt(totalAffilCommission)} color="#f472b6" />
             </div>
 
+            {/* Leaderboard CA */}
+            {affiliateRanking.length > 0 && (
+              <div className="glass rounded-2xl p-5">
+                <p className="text-sm font-semibold text-white mb-4">🏆 Classement CA généré</p>
+                <div className="space-y-1">
+                  {affiliateRanking.map((a, i) => (
+                    <HorizBar
+                      key={a.name}
+                      label={`${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`} ${a.name}`}
+                      value={a.ca}
+                      max={maxAffilCA}
+                      color="linear-gradient(90deg,#7c3aed,#fbbf24)"
+                      valueLabel={fmt(a.ca)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Clics leaderboard */}
+            {affiliateRanking.length > 0 && (
+              <div className="glass rounded-2xl p-5">
+                <p className="text-sm font-semibold text-white mb-4">👆 Classement clics</p>
+                <div className="space-y-1">
+                  {[...affiliateRanking]
+                    .sort((a, b) => b.clicks - a.clicks)
+                    .map(a => (
+                      <HorizBar
+                        key={a.name}
+                        label={a.name}
+                        value={a.clicks}
+                        max={Math.max(...affiliateRanking.map(x => x.clicks), 1)}
+                        color="linear-gradient(90deg,#0ea5e9,#a78bfa)"
+                        valueLabel={a.clicks.toLocaleString('fr-FR') + ' clics'}
+                      />
+                    ))}
+                </div>
+              </div>
+            )}
+
             <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-white/5">
+                <p className="text-sm font-semibold text-white">Détail par affilié</p>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -465,9 +695,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                       return (
                         <tr key={a.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                           <td className="px-5 py-3 text-white font-medium">{a.name}</td>
-                          <td className="px-5 py-3">
-                            <code className="text-violet-400 text-xs">urcecret.site/?ref={a.slug}</code>
-                          </td>
+                          <td className="px-5 py-3"><code className="text-violet-400 text-xs">/?ref={a.slug}</code></td>
                           <td className="px-5 py-3 text-zinc-400 text-xs">{a.email ?? '—'}</td>
                           <td className="px-5 py-3 text-zinc-300">{a.commissionPct}%</td>
                           <td className="px-5 py-3 text-zinc-300">{clicks.toLocaleString('fr-FR')}</td>
@@ -483,15 +711,6 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                   </tbody>
                 </table>
               </div>
-            </div>
-
-            <div className="text-center pt-2">
-              <Link
-                href="/admin/affiliates"
-                className="inline-flex items-center gap-1 text-violet-400 hover:text-violet-300 transition-colors text-sm font-semibold"
-              >
-                Gérer les affiliés (créer, supprimer, voir détails) →
-              </Link>
             </div>
           </div>
         )}
