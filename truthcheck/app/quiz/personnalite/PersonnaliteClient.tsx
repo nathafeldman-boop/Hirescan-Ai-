@@ -8,6 +8,7 @@ import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
+import ContractScreen from '@/components/ContractScreen';
 
 const TOTAL = mbtiQuestions.length;
 
@@ -461,13 +462,15 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
+  const [contractAccepted, setContractAccepted] = useState(false);
 
-  // Track paywall view once on mount
+  // Track paywall view only after contract accepted
   useEffect(() => {
+    if (!contractAccepted) return;
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [contractAccepted]);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
     diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail });
@@ -501,6 +504,17 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
       setLoading(false);
     }
   }, [typeCode, userEmail]);
+
+  if (!contractAccepted) {
+    return (
+      <ContractScreen
+        quizTitle={isFr ? 'Test de personnalité MBTI' : 'MBTI Personality Test'}
+        quizSlug="personnalite"
+        accentColor="#7c3aed"
+        onAccept={() => setContractAccepted(true)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ background: '#faf9f7' }}>
@@ -581,7 +595,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           style={{ background: 'rgba(109,40,217,0.05)', border: '1px solid rgba(109,40,217,0.15)' }}
         >
           <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5" style={{ color: '#7c3aed' }}>
-            {isFr ? '🎁 Ce que tu débloques' : '🎁 What you unlock'}
+            {isFr ? '✦ Ce que tu vas ressentir' : '✦ What you\'ll feel'}
           </p>
           <ul className="space-y-2">
             {/* First strength visible, rest blurred */}
@@ -636,8 +650,8 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
             </p>
             <h3 className="text-sm font-black text-stone-900 leading-snug">
               {isFr
-                ? `Ce que tu rates sans l'abonnement :`
-                : 'What you miss without a subscription:'}
+                ? `Ce qui change concrètement avec l'abonnement :`
+                : 'What concretely changes with a subscription:'}
             </h3>
           </div>
 
@@ -749,13 +763,13 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
               </div>
               <ul className="space-y-1.5 mb-2.5">
                 {(isFr ? [
-                  'Voir ton résultat complet immédiatement',
-                  'Découvrir ton type principal',
-                  'Accéder à ton analyse de base',
+                  'Tu sais enfin qui tu es vraiment',
+                  'Tu comprends tes vraies réactions',
+                  'Tu mets des mots sur ce que tu ressens',
                 ] : [
-                  'See your full result immediately',
-                  'Discover your main type',
-                  'Access your basic analysis',
+                  'You finally know who you truly are',
+                  'You understand your real reactions',
+                  'You put words to what you feel',
                 ]).map(item => (
                   <li key={item} className="flex items-start gap-2 text-[11px] text-stone-600">
                     <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#10b981' }}>✔</span>
@@ -764,7 +778,7 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
                 ))}
               </ul>
               <p className="text-[10px] text-stone-400 italic">
-                {isFr ? 'Pour ceux qui veulent simplement connaître leur résultat.' : 'For those who just want to know their result.'}
+                {isFr ? 'Pour ceux qui veulent se comprendre, pas juste avoir 4 lettres.' : 'For those who want to understand themselves, not just get 4 letters.'}
               </p>
             </div>
 
@@ -778,21 +792,17 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
               </div>
               <ul className="space-y-1.5 mb-2.5">
                 {(isFr ? [
-                  'Résultat complet',
-                  'Compatibilité amoureuse avec tous les profils',
-                  'Accès aux quiz relationnels et psychologiques',
-                  'Historique de tes résultats',
-                  'Nouveaux tests ajoutés chaque mois',
-                  'Analyses plus détaillées',
-                  'Déblocage automatique des futurs contenus Premium',
+                  'Tu comprends pourquoi tu réagis comme ça — en amour, en conflit, sous pression',
+                  'Tu sors du doute sur tes relations les plus importantes',
+                  'Tu te connais mieux en 10 min qu\'en 10 ans d\'introspection',
+                  'Tu découvres tes vrais points forts (et ce qui te bloque)',
+                  'Tu deviens meilleur·e dans ta peau chaque mois',
                 ] : [
-                  'Full result',
-                  'Romantic compatibility with all profiles',
-                  'Access to relational and psychological quizzes',
-                  'Your results history',
-                  'New tests added every month',
-                  'More detailed analyses',
-                  'Automatic unlock of future Premium content',
+                  'You understand why you react the way you do — in love, conflict, under pressure',
+                  'You get clarity on your most important relationships',
+                  'You know yourself better in 10 min than in 10 years of introspection',
+                  'You discover your real strengths (and what blocks you)',
+                  'You feel better about yourself every month',
                 ]).map(item => (
                   <li key={item} className="flex items-start gap-2 text-[11px] text-stone-600">
                     <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#7c3aed' }}>✔</span>
@@ -802,8 +812,8 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
               </ul>
               <p className="text-[10px] text-stone-400 italic">
                 {isFr
-                  ? 'Pour ceux qui veulent réellement comprendre leur personnalité et leurs relations.'
-                  : 'For those who truly want to understand their personality and relationships.'}
+                  ? 'Pour ceux qui veulent vraiment se libérer mentalement et mieux vivre leurs relations.'
+                  : 'For those who want mental freedom and better relationships.'}
               </p>
             </div>
 
@@ -826,17 +836,15 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
               </div>
               <ul className="space-y-1.5 mb-2.5">
                 {(isFr ? [
-                  'Tout le Premium',
-                  '12 mois pour le prix de 3',
-                  'Accès anticipé aux nouveaux tests',
-                  'Fonctionnalités Premium futures incluses',
-                  'Meilleure offre disponible',
+                  'Tout ce que le Premium offre — pour un an de transformation',
+                  'Tu te libères mentalement sur la durée',
+                  'Tu construis une vraie connaissance de toi-même',
+                  'Meilleure offre — 2,50€/mois seulement',
                 ] : [
-                  'Everything in Premium',
-                  '12 months for the price of 3',
-                  'Early access to new tests',
-                  'Future Premium features included',
-                  'Best available offer',
+                  'Everything Premium — for a full year of transformation',
+                  'Long-term mental freedom',
+                  'You build real self-knowledge over time',
+                  'Best value — only €2.50/month',
                 ]).map(item => (
                   <li key={item} className="flex items-start gap-2 text-[11px] text-stone-700">
                     <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#7c3aed' }}>✔</span>
