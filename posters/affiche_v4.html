@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px;
+    height: 1080px;
+    overflow: hidden;
+    font-family: -apple-system, 'SF Pro Rounded', 'Helvetica Neue', Arial, sans-serif;
+    background: #e8f5f0;
+  }
+
+  .poster {
+    width: 1080px;
+    height: 1080px;
+    position: relative;
+    background: linear-gradient(145deg, #e2f4ec 0%, #dff0ff 50%, #ede8ff 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 44px 52px 40px;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  /* Decorative blobs */
+  .blob-tl {
+    position: absolute; top: -80px; left: -80px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: rgba(167,243,208,0.45);
+  }
+  .blob-br {
+    position: absolute; bottom: -100px; right: -60px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(196,181,253,0.35);
+  }
+  .blob-mid {
+    position: absolute; top: 40%; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(251,207,232,0.30);
+  }
+
+  /* === HEADER === */
+  .header {
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 28px;
+  }
+
+  .badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid rgba(139,92,246,0.25);
+    border-radius: 100px;
+    padding: 6px 18px;
+    margin-bottom: 16px;
+  }
+  .badge-top .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16,185,129,0.6);
+    flex-shrink: 0;
+  }
+  .badge-top span {
+    font-size: 15px;
+    color: #374151;
+    font-weight: 600;
+  }
+
+  .headline {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.08;
+    color: #111827;
+    letter-spacing: -0.03em;
+  }
+  .headline .pink { color: #ec4899; }
+  .headline .purple { color: #8b5cf6; }
+  .headline .teal { color: #0d9488; }
+
+  .sub-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.80);
+    border-radius: 100px;
+    padding: 5px 14px;
+    margin-top: 12px;
+  }
+  .sub-badge span { font-size: 15px; color: #6b7280; font-weight: 600; }
+
+  /* === MIDDLE ROW === */
+  .middle-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 36px;
+    width: 100%;
+    flex: 1;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* --- Phone mockups --- */
+  .phones {
+    display: flex;
+    align-items: flex-end;
+    gap: -16px;
+    flex-shrink: 0;
+    position: relative;
+    width: 320px;
+  }
+
+  .phone {
+    width: 155px;
+    height: 310px;
+    border-radius: 28px;
+    background: #1a1a2e;
+    box-shadow:
+      0 20px 60px rgba(0,0,0,0.25),
+      0 0 0 2px rgba(255,255,255,0.10) inset,
+      0 1px 0 rgba(255,255,255,0.20) inset;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .phone.back {
+    transform: rotate(-8deg) translateX(20px) translateY(20px);
+    z-index: 1;
+    opacity: 0.92;
+  }
+  .phone.front {
+    transform: rotate(3deg) translateX(-10px);
+    z-index: 2;
+  }
+
+  /* Phone screen content */
+  .phone-notch {
+    height: 20px;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .phone-notch-dot {
+    width: 50px; height: 6px;
+    border-radius: 3px;
+    background: #000;
+  }
+  .phone-screen {
+    flex: 1;
+    background: linear-gradient(160deg, #0f0a1e 0%, #1a0a2e 100%);
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+  }
+  .phone-label {
+    font-size: 8px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .phone-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .phone-title .g { background: linear-gradient(90deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .phone-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 2px 0;
+  }
+
+  .phone-block {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  .phone-block-label {
+    font-size: 7px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  .phone-block-text {
+    font-size: 9px;
+    color: rgba(255,255,255,0.70);
+    line-height: 1.5;
+  }
+  .phone-block-text strong { color: #f472b6; font-weight: 700; }
+
+  .phone-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 8px;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 6px;
+  }
+
+  .phone-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 4px;
+  }
+  .prog-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .prog-label { font-size: 7.5px; color: rgba(255,255,255,0.45); flex: 1; }
+  .prog-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    flex: 2;
+    overflow: hidden;
+  }
+  .prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #7c3aed, #ec4899); }
+
+  /* --- Quiz grid --- */
+  .quiz-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-content: center;
+  }
+
+  .quiz-card {
+    background: rgba(255,255,255,0.80);
+    border: 1.5px solid rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    transition: transform 0.2s;
+    text-align: center;
+  }
+
+  .quiz-icon {
+    width: 58px; height: 58px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .quiz-card-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1f2937;
+    line-height: 1.2;
+  }
+  .quiz-card-desc {
+    font-size: 11.5px;
+    color: #9ca3af;
+    line-height: 1.35;
+    font-weight: 500;
+  }
+
+  /* === BOTTOM CTA === */
+  .bottom {
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 24px;
+  }
+
+  .cta-text {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid rgba(139,92,246,0.20);
+    border-radius: 20px;
+    padding: 18px 28px;
+    flex: 1;
+  }
+  .cta-icon { font-size: 32px; flex-shrink: 0; }
+  .cta-inner {}
+  .cta-main-label {
+    font-size: 22px;
+    font-weight: 900;
+    color: #111827;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .cta-main-label .colored { color: #8b5cf6; }
+  .cta-sub-label {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .cta-button {
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    border-radius: 20px;
+    padding: 20px 32px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(139,92,246,0.40);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-button::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.18), transparent 50%);
+    border-radius: 20px;
+  }
+  .cta-button .btn-line1 {
+    display: block;
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    position: relative; z-index: 1;
+    white-space: nowrap;
+  }
+  .cta-button .btn-line2 {
+    display: block;
+    font-size: 13px;
+    color: rgba(255,255,255,0.70);
+    font-weight: 600;
+    position: relative; z-index: 1;
+    margin-top: 3px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="blob-tl"></div>
+  <div class="blob-br"></div>
+  <div class="blob-mid"></div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge-top">
+      <span class="dot"></span>
+      <span>+ Tests psychologiques basés sur la science</span>
+    </div>
+    <h1 class="headline">
+      Tu veux savoir <span class="pink">qui</span><br>
+      tu es <span class="purple">vraiment</span> —<br>
+      et <span class="teal">pourquoi</span> tu réagis comme ça ?
+    </h1>
+    <div class="sub-badge">
+      <span>⚡ 10 minutes · Résultat immédiat · 100% gratuit au départ</span>
+    </div>
+  </div>
+
+  <!-- MIDDLE -->
+  <div class="middle-row">
+
+    <!-- Phone mockups -->
+    <div class="phones">
+      <!-- Back phone -->
+      <div class="phone back">
+        <div class="phone-notch"><div class="phone-notch-dot"></div></div>
+        <div class="phone-screen">
+          <p class="phone-label">Résultat · Test infidélité</p>
+          <p class="phone-title">Votre partenaire <span class="g">cache quelque chose.</span></p>
+          <div class="phone-divider"></div>
+          <div class="phone-block">
+            <p class="phone-block-label">Analyse comportementale</p>
+            <p class="phone-block-text">Ses réponses révèlent un <strong>schéma de dissimulation</strong> dans 3 domaines clés...</p>
+          </div>
+          <div class="phone-progress">
+            <div class="prog-row">
+              <span class="prog-label">Transparence</span>
+              <div class="prog-bar"><div class="prog-fill" style="width:28%"></div></div>
+            </div>
+            <div class="prog-row">
+              <span class="prog-label">Confiance</span>
+              <div class="prog-bar"><div class="prog-fill" style="width:45%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Front phone -->
+      <div class="phone front">
+        <div class="phone-notch"><div class="phone-notch-dot"></div></div>
+        <div class="phone-screen">
+          <p class="phone-label">Ton profil · MBTI</p>
+          <p class="phone-title"><span class="g">INFP — L'Idéaliste</span></p>
+          <div class="phone-divider"></div>
+          <div class="phone-block">
+            <p class="phone-block-label">Tes vraies forces</p>
+            <p class="phone-block-text">Tu ressens les choses en profondeur. <strong>C'est ta superpuissance</strong>, pas ta faiblesse.</p>
+          </div>
+          <div class="phone-badge">✦ Voir mon analyse complète</div>
+          <div class="phone-progress" style="margin-top:8px">
+            <div class="prog-row">
+              <span class="prog-label">Empathie</span>
+              <div class="prog-bar"><div class="prog-fill" style="width:92%"></div></div>
+            </div>
+            <div class="prog-row">
+              <span class="prog-label">Créativité</span>
+              <div class="prog-bar"><div class="prog-fill" style="width:85%"></div></div>
+            </div>
+            <div class="prog-row">
+              <span class="prog-label">Loyauté</span>
+              <div class="prog-bar"><div class="prog-fill" style="width:78%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz category grid -->
+    <div class="quiz-grid">
+      <div class="quiz-card">
+        <div class="quiz-icon" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8);">🔍</div>
+        <div>
+          <p class="quiz-card-name">Infidélité</p>
+          <p class="quiz-card-desc">Sors du doute une bonne fois pour toutes</p>
+        </div>
+      </div>
+
+      <div class="quiz-card">
+        <div class="quiz-icon" style="background: linear-gradient(135deg, #ede9fe, #ddd6fe);">🧠</div>
+        <div>
+          <p class="quiz-card-name">Personnalité</p>
+          <p class="quiz-card-desc">Ton vrai type MBTI expliqué</p>
+        </div>
+      </div>
+
+      <div class="quiz-card">
+        <div class="quiz-icon" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">💞</div>
+        <div>
+          <p class="quiz-card-name">Amoureux</p>
+          <p class="quiz-card-desc">Nomme ce que tu ressens vraiment</p>
+        </div>
+      </div>
+
+      <div class="quiz-card">
+        <div class="quiz-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">👥</div>
+        <div>
+          <p class="quiz-card-name">Vrais Amis</p>
+          <p class="quiz-card-desc">Qui est là pour toi pour de vrai ?</p>
+        </div>
+      </div>
+
+      <div class="quiz-card">
+        <div class="quiz-icon" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe);">🧭</div>
+        <div>
+          <p class="quiz-card-name">Orientation</p>
+          <p class="quiz-card-desc">Comprends-toi tel·le que tu es</p>
+        </div>
+      </div>
+
+      <div class="quiz-card">
+        <div class="quiz-icon" style="background: linear-gradient(135deg, #fee2e2, #fecaca);">🔮</div>
+        <div>
+          <p class="quiz-card-name">Adopté·e ?</p>
+          <p class="quiz-card-desc">La vérité sur ton histoire</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM CTA -->
+  <div class="bottom">
+    <div class="cta-text">
+      <span class="cta-icon">🔎</span>
+      <div class="cta-inner">
+        <p class="cta-main-label">Tape <span class="colored">« UrCecret »</span><br>sur Google aujourd'hui</p>
+        <p class="cta-sub-label">ou lien en bio · urcecret.site</p>
+      </div>
+    </div>
+    <div class="cta-button">
+      <span class="btn-line1">Fais le test gratuit →</span>
+      <span class="btn-line2">Résultat en 10 minutes</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
