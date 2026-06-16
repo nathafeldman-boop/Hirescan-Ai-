@@ -172,3 +172,13 @@ model FusionParticipant {
   group     FusionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
+model AccessCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  note        String?   // e.g. affiliate name or purpose
+  used        Boolean   @default(false)
+  usedAt      DateTime?
+  usedByEmail String?
+  createdAt   DateTime  @default(now())
+}
+

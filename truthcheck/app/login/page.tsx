@@ -2,10 +2,11 @@
 
 import { signIn } from 'next-auth/react';
 import { useState, Suspense, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function LoginContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const rawCallbackUrl = searchParams.get('callbackUrl') ?? '/quiz/personnalite';
   const prefillEmail = searchParams.get('email') ?? '';
 
@@ -13,6 +14,12 @@ function LoginContent() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [callbackUrl, setCallbackUrl] = useState(rawCallbackUrl);
+
+  // "J'ai un code" state
+  const [mode, setMode] = useState<'email' | 'code'>('email');
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [codeLoading, setCodeLoading] = useState(false);
 
   // If returning to quiz, re-attach pending MBTI type from localStorage so quiz state survives login
   useEffect(() => {
@@ -32,6 +39,31 @@ function LoginContent() {
     await signIn('email', { email, callbackUrl, redirect: false });
     setSent(true);
     setLoading(false);
+  }
+
+  async function handleCode(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    setCodeError('');
+    setCodeLoading(true);
+    try {
+      const res = await fetch('/api/auth/redeem-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: trimmed, callbackUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCodeError(data.error ?? 'Erreur inconnue');
+        setCodeLoading(false);
+        return;
+      }
+      router.push(data.loginUrl);
+    } catch {
+      setCodeError('Erreur réseau, réessaie.');
+      setCodeLoading(false);
+    }
   }
 
   return (
@@ -83,32 +115,88 @@ function LoginContent() {
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex-1 h-px bg-stone-200" />
-                <span className="text-stone-400 text-xs">ou par email</span>
+                <span className="text-stone-400 text-xs">ou</span>
                 <div className="flex-1 h-px bg-stone-200" />
               </div>
 
-              {/* Email magic link */}
-              <form onSubmit={handleEmail} className="space-y-3">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ton@email.com"
-                  required
-                  className="w-full rounded-xl px-4 py-3.5 text-stone-900 text-sm placeholder-stone-400 outline-none transition-all"
-                  style={{ background: '#f5f4f2', border: '2px solid #e7e5e0' }}
-                  onFocus={e => { e.currentTarget.style.borderColor = '#7c3aed'; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = '#e7e5e0'; }}
-                />
+              {/* Mode toggle */}
+              <div className="flex rounded-xl overflow-hidden mb-4" style={{ border: '2px solid #e7e5e0' }}>
                 <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50 hover:opacity-90"
-                  style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+                  type="button"
+                  onClick={() => { setMode('email'); setCodeError(''); }}
+                  className="flex-1 py-2.5 text-sm font-semibold transition-all"
+                  style={{
+                    background: mode === 'email' ? 'linear-gradient(135deg,#7c3aed,#ec4899)' : 'transparent',
+                    color: mode === 'email' ? '#fff' : '#78716c',
+                  }}
                 >
-                  {loading ? '⏳ Envoi...' : '✉️ Recevoir mon lien de connexion →'}
+                  ✉️ Par email
                 </button>
-              </form>
+                <button
+                  type="button"
+                  onClick={() => { setMode('code'); setSent(false); }}
+                  className="flex-1 py-2.5 text-sm font-semibold transition-all"
+                  style={{
+                    background: mode === 'code' ? 'linear-gradient(135deg,#7c3aed,#ec4899)' : 'transparent',
+                    color: mode === 'code' ? '#fff' : '#78716c',
+                  }}
+                >
+                  🎟️ J&apos;ai un code
+                </button>
+              </div>
+
+              {mode === 'email' ? (
+                /* Email magic link */
+                <form onSubmit={handleEmail} className="space-y-3">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ton@email.com"
+                    required
+                    className="w-full rounded-xl px-4 py-3.5 text-stone-900 text-sm placeholder-stone-400 outline-none transition-all"
+                    style={{ background: '#f5f4f2', border: '2px solid #e7e5e0' }}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#7c3aed'; }}
+                    onBlur={e => { e.currentTarget.style.borderColor = '#e7e5e0'; }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50 hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+                  >
+                    {loading ? '⏳ Envoi...' : '✉️ Recevoir mon lien de connexion →'}
+                  </button>
+                </form>
+              ) : (
+                /* Code form */
+                <form onSubmit={handleCode} className="space-y-3">
+                  <input
+                    type="text"
+                    value={code}
+                    onChange={(e) => { setCode(e.target.value.toUpperCase()); setCodeError(''); }}
+                    placeholder="Ex: ABC12345"
+                    maxLength={12}
+                    required
+                    autoFocus
+                    className="w-full rounded-xl px-4 py-3.5 text-stone-900 text-sm placeholder-stone-400 outline-none transition-all tracking-widest font-mono text-center uppercase"
+                    style={{ background: '#f5f4f2', border: `2px solid ${codeError ? '#ef4444' : '#e7e5e0'}` }}
+                    onFocus={e => { e.currentTarget.style.borderColor = codeError ? '#ef4444' : '#7c3aed'; }}
+                    onBlur={e => { e.currentTarget.style.borderColor = codeError ? '#ef4444' : '#e7e5e0'; }}
+                  />
+                  {codeError && (
+                    <p className="text-red-500 text-xs text-center font-medium">{codeError}</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={codeLoading}
+                    className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50 hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+                  >
+                    {codeLoading ? '⏳ Vérification...' : '🎟️ Accéder avec mon code →'}
+                  </button>
+                </form>
+              )}
             </>
           )}
         </div>

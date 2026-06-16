@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates';
+type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates' | 'codes';
 
 interface Stats {
   totalUsers: number; premiumUsers: number;
@@ -216,6 +216,53 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   const [tierFilter, setTierFilter] = useState<'all' | 'premium' | 'free'>('all');
   const [lastRefresh, setLastRefresh] = useState(() => new Date().toLocaleTimeString('fr-FR'));
 
+  // Access codes tab state
+  type AccessCodeRow = { id: string; code: string; note: string | null; used: boolean; usedAt: string | null; usedByEmail: string | null; createdAt: string };
+  const [codes, setCodes] = useState<AccessCodeRow[]>([]);
+  const [codesLoaded, setCodesLoaded] = useState(false);
+  const [newCodeNote, setNewCodeNote] = useState('');
+  const [codesLoading, setCodesLoading] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState('');
+
+  async function loadCodes() {
+    setCodesLoading(true);
+    try {
+      const res = await fetch(`/api/admin/access-codes?secret=urcecret-admin-natha-2024`);
+      const data = await res.json();
+      setCodes(data.codes ?? []);
+      setCodesLoaded(true);
+    } finally { setCodesLoading(false); }
+  }
+
+  async function generateCode() {
+    setCodesLoading(true);
+    setGeneratedCode('');
+    try {
+      const res = await fetch(`/api/admin/access-codes?secret=urcecret-admin-natha-2024`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: newCodeNote.trim() || undefined }),
+      });
+      const data = await res.json();
+      if (data.code) {
+        setGeneratedCode(data.code.code);
+        setNewCodeNote('');
+        await loadCodes();
+      }
+    } finally { setCodesLoading(false); }
+  }
+
+  async function deleteCode(id: string) {
+    await fetch(`/api/admin/access-codes?secret=urcecret-admin-natha-2024&id=${id}`, { method: 'DELETE' });
+    setCodes(prev => prev.filter(c => c.id !== id));
+  }
+
+  useEffect(() => {
+    if (tab === 'codes' && !codesLoaded) loadCodes();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  // Auto-refresh every 60 s
   useEffect(() => {
     const id = setInterval(() => { router.refresh(); setLastRefresh(new Date().toLocaleTimeString('fr-FR')); }, 60_000);
     return () => clearInterval(id);
@@ -277,6 +324,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
     { id: 'revenue',    label: '💰 Revenus' },
     { id: 'quizzes',    label: '🧩 Quiz' },
     { id: 'affiliates', label: '🔗 Affiliés' },
+    { id: 'codes',      label: '🎟️ Codes accès' },
   ];
 
   const card = (content: React.ReactNode) => (
@@ -729,6 +777,80 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {/* ── ACCESS CODES ── */}
+        {tab === 'codes' && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-black text-white mb-1">Codes d&apos;accès affiliés</h1>
+              <p className="text-zinc-500 text-sm">Codes à usage unique pour tester l&apos;app gratuitement</p>
+            </div>
+
+            {/* Generate new code */}
+            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, padding: '20px 24px' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#a78bfa', marginBottom: 16 }}>Générer un nouveau code</p>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                <input
+                  value={newCodeNote}
+                  onChange={e => setNewCodeNote(e.target.value)}
+                  placeholder="Note (ex: NomAffiliéX)"
+                  style={{ flex: 1, minWidth: 180, padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, outline: 'none' }}
+                />
+                <button
+                  onClick={generateCode}
+                  disabled={codesLoading}
+                  style={{ padding: '10px 20px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer', opacity: codesLoading ? 0.6 : 1 }}
+                >
+                  {codesLoading ? '...' : '+ Générer'}
+                </button>
+              </div>
+              {generatedCode && (
+                <div style={{ marginTop: 16, padding: '14px 18px', borderRadius: 12, background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.3)' }}>
+                  <p style={{ fontSize: 11, color: '#a78bfa', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Code généré — à copier !</p>
+                  <p style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '0.2em', fontFamily: 'monospace' }}>{generatedCode}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Codes list */}
+            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, overflow: 'hidden' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                  <thead><tr>
+                    {['Code','Note','Statut','Utilisé par','Date',''].map(h => <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', borderBottom: '1px solid rgba(255,255,255,0.06)', whiteSpace: 'nowrap' }}>{h}</th>)}
+                  </tr></thead>
+                  <tbody>
+                    {codes.map(c => (
+                      <tr key={c.id}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                        <td style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#e4e4e7', letterSpacing: '0.1em' }}>{c.code}</td>
+                        <td style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', color: '#71717a', fontSize: 12 }}>{c.note ?? '—'}</td>
+                        <td style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                          {c.used
+                            ? <span style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>Utilisé</span>
+                            : <span style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.25)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>Disponible</span>}
+                        </td>
+                        <td style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', color: '#52525b', fontSize: 11 }}>{c.usedByEmail?.replace('@urcecret.app', '') ?? '—'}</td>
+                        <td style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', color: '#3f3f46', fontSize: 11, whiteSpace: 'nowrap' }}>{fmtDate(c.createdAt)}</td>
+                        <td style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                          {!c.used && (
+                            <button onClick={() => deleteCode(c.id)} style={{ padding: '4px 10px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', fontSize: 11, cursor: 'pointer' }}>
+                              Supprimer
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {codes.length === 0 && !codesLoading && (
+                      <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: '#3f3f46' }}>Aucun code — génère le premier ci-dessus</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 
