@@ -8,6 +8,7 @@ declare global {
       identify: (props: Record<string, unknown>) => void;
     };
     gtag?: (...args: unknown[]) => void;
+    fbq?: (action: string, event: string, params?: Record<string, unknown>) => void;
   }
 }
 

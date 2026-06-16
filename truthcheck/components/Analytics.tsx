@@ -4,22 +4,22 @@ import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-const TT_PIXEL_ID = process.env.NEXT_PUBLIC_TT_PIXEL_ID;
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const TT_PIXEL_ID   = process.env.NEXT_PUBLIC_TT_PIXEL_ID;
+const GA_ID         = process.env.NEXT_PUBLIC_GA_ID;
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
-/* Fire TikTok page() + GA4 page_view on soft navigations */
+/* Fire TikTok page() + GA4 page_view + Meta PageView on soft navigations */
 function RouteChangeTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    // TikTok page view
     window.ttq?.page();
-    // GA4 page_view
     window.gtag?.('event', 'page_view', {
       page_path: pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : ''),
     });
+    window.fbq?.('track', 'PageView');
   }, [pathname, searchParams]);
 
   return null;
@@ -28,6 +28,32 @@ function RouteChangeTracker() {
 export default function Analytics() {
   return (
     <>
+      {/* ── Meta (Facebook) Pixel ── */}
+      {META_PIXEL_ID && (
+        <>
+          <Script
+            id="meta-pixel"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','${META_PIXEL_ID}');
+fbq('track','PageView');
+              `,
+            }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <noscript><img height="1" width="1" style={{ display: 'none' }}
+            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+            alt=""
+          /></noscript>
+        </>
+      )}
+
       {/* ── TikTok Pixel ── */}
       {TT_PIXEL_ID && (
         <>
@@ -75,6 +101,9 @@ gtag('config','${GA_ID}',{page_path:window.location.pathname});
           {!TT_PIXEL_ID && <RouteChangeTracker />}
         </>
       )}
+
+      {/* RouteChangeTracker for Meta when no TikTok/GA */}
+      {META_PIXEL_ID && !TT_PIXEL_ID && !GA_ID && <RouteChangeTracker />}
     </>
   );
 }
