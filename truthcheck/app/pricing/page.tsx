@@ -13,11 +13,11 @@ const FREE_PERKS = [
 ];
 
 const PREMIUM_PERKS = [
-  'Analyse complète des 4 fonctions cognitives',
-  'Les 16 types détaillés — forces, faiblesses, amour, carrière',
-  'Tous les quiz relationnels — résultats complets',
-  'Mode Duo — comparaison de deux profils',
-  'Mises à jour incluses',
+  'Tu comprends enfin pourquoi tu réagis comme ça — en amour, en conflit, sous pression',
+  'Tu découvres tes vrais points forts (et ce qui te bloque sans que tu le saches)',
+  'Tu sors du doute sur tes relations les plus importantes',
+  'Tu te connais mieux en 10 minutes que certains en 10 ans',
+  'Accès à tous les futurs quiz dès leur sortie',
 ];
 
 function CheckoutButton({ label, annual, userEmail, highlighted }: {
@@ -102,7 +102,7 @@ export default function PricingPage() {
         {/* Titre */}
         <div className="text-center mb-8">
           <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-2">Tarifs</p>
-          <h1 className="text-2xl font-black text-gray-900">Choisissez votre formule</h1>
+          <h1 className="text-2xl font-black text-gray-900">Connais-toi vraiment</h1>
         </div>
 
         {/* Plan gratuit — plan actuel */}
@@ -143,7 +143,7 @@ export default function PricingPage() {
           <div className="flex items-center justify-between mb-4 mt-1">
             <div>
               <p className="text-gray-900 font-black text-lg">Accès complet</p>
-              <p className="text-gray-500 text-sm">Analyses + tous les quiz</p>
+              <p className="text-gray-500 text-sm">Clarté mentale · relations · confiance en soi</p>
             </div>
             <div className="text-right">
               <span className="text-4xl font-black text-gray-900">9,99 €</span>

@@ -326,14 +326,14 @@ export default function ResultsClient({ quiz }: Props) {
 
   // ── CTA button label — specific to quiz context ──
   const ctaLabel: Record<string, string> = {
-    infidelite: score >= 60 ? `Voir les signaux identifiés — 1,99€` : `Voir mon analyse complète — 1,99€`,
-    adopte: `Voir ce que mes réponses révèlent — 1,99€`,
-    amoureux: score >= 60 ? `Savoir si c'est vraiment de l'amour — 1,99€` : `Nommer ce que je ressens — 1,99€`,
-    'vrais-amis': score >= 60 ? `Voir le comportement #1 identifié — 1,99€` : `Voir l'analyse complète — 1,99€`,
-    orientation: `Voir la description précise de mon profil — 1,99€`,
-    personnalite: `Révéler mon type exact et mon profil caché — 1,99€`,
+    infidelite: score >= 60 ? `Sortir du doute maintenant — 1,99€` : `Comprendre la source de mon instinct — 1,99€`,
+    adopte: `Trouver la clarté que je cherche — 1,99€`,
+    amoureux: score >= 60 ? `Savoir si c'est vraiment de l'amour — 1,99€` : `Mettre un mot sur ce que je ressens — 1,99€`,
+    'vrais-amis': score >= 60 ? `Voir qui mérite vraiment ma confiance — 1,99€` : `Arrêter de douter de cette amitié — 1,99€`,
+    orientation: `Me comprendre vraiment — 1,99€`,
+    personnalite: `Me connaître vraiment, pas juste 4 lettres — 1,99€`,
   };
-  const ctaText = ctaLabel[quiz.slug] ?? `Voir mon résultat complet — 1,99€`;
+  const ctaText = ctaLabel[quiz.slug] ?? `Comprendre ce que ça dit vraiment de moi — 1,99€`;
 
   useEffect(() => {
     if (hasSaved.current) return;
@@ -892,20 +892,28 @@ export default function ResultsClient({ quiz }: Props) {
                   )}
                 </button>
 
-                {/* Benefit bullets — one-time focused */}
-                <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-5 px-1">
-                  {[
-                    'Score exact révélé',
-                    '10 révélations IA',
-                    'Paiement unique',
-                    'Accès immédiat',
-                  ].map(b => (
-                    <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                      <span className="text-emerald-400 text-[10px]">✓</span>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
+                {/* Benefit bullets — quiz-specific, outcome focused */}
+                {(() => {
+                  const BENEFIT_BULLETS: Record<string, string[]> = {
+                    infidelite: ['Tu sors du doute aujourd\'hui', 'Tu reprends le contrôle', 'Paiement unique, sans engagement', 'Résultat immédiat'],
+                    adopte: ['Tu trouves enfin la clarté que tu cherches', 'Tu avances sans cette question en tête', 'Paiement unique, sans engagement', 'Résultat immédiat'],
+                    amoureux: ['Tu mets un mot sur ce que tu ressens', 'Tu sais quoi faire maintenant', 'Paiement unique, sans engagement', 'Résultat immédiat'],
+                    'vrais-amis': ['Tu vois qui mérite vraiment ta confiance', 'Tu arrêtes de te remettre en question', 'Paiement unique, sans engagement', 'Résultat immédiat'],
+                    orientation: ['Tu te libères d\'une question qui traîne', 'Tu te comprends mieux, sans étiquette forcée', 'Paiement unique, sans engagement', 'Résultat immédiat'],
+                    personnalite: ['Tu te connais vraiment — pas juste 4 lettres', 'Tu comprends tes vraies réactions sous pression', 'Paiement unique, sans engagement', 'Résultat immédiat'],
+                  };
+                  const bullets = BENEFIT_BULLETS[quiz.slug] ?? ['Tu comprends enfin pourquoi tu réagis comme ça', 'Tu sors de l\'incertitude', 'Paiement unique, sans engagement', 'Résultat immédiat'];
+                  return (
+                    <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-5 px-1">
+                      {bullets.map(b => (
+                        <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                          <span className="text-emerald-400 text-[10px]">✓</span>
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                })()}
 
                 {/* Divider — for power users */}
                 <div className="flex items-center gap-3 mb-3">
