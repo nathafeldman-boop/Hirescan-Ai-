@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UrCecret – Career Ad</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+/* ── STAGE ───────────────────────────────────────────────────────────────── */
+#stage {
+  position: relative;
+  width: 1080px; height: 1920px;
+  overflow: hidden;
+  background: #0a0010;
+  transform-origin: top left;
+  flex-shrink: 0;
+}
+
+/* ── PLAY OVERLAY ────────────────────────────────────────────────────────── */
+#overlay {
+  position: absolute; inset: 0; z-index: 999;
+  background: rgba(0,0,0,0.82);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; user-select: none;
+}
+#overlay .btn-ring {
+  width: 180px; height: 180px; border-radius: 50%;
+  background: linear-gradient(135deg,#7c3aed,#ec4899);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 80px rgba(124,58,237,0.55);
+  margin-bottom: 52px;
+}
+#overlay svg { width: 72px; height: 72px; fill:#fff; margin-left:10px; }
+#overlay p { color:#fff; font-size:48px; font-weight:700; }
+
+/* ── SCENES ─────────────────────────────────────────────────────────────── */
+.scene {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.38s ease;
+}
+.scene.active { opacity: 1; pointer-events: auto; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCENE 1 · HOOK
+═══════════════════════════════════════════════════════════════════════════ */
+#s-hook {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 100px 80px;
+}
+#s-hook canvas { position: absolute; inset: 0; pointer-events: none; }
+
+.h-inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; }
+.h-logo {
+  font-size: 56px; font-weight: 900; letter-spacing: -1px;
+  background: linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 110px;
+  opacity: 0; transform: translateY(-24px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.h-question {
+  text-align: center; color: #fff;
+  font-size: 100px; font-weight: 900;
+  line-height: 1.08; letter-spacing: -2.5px;
+  opacity: 0; transform: scale(0.84) translateY(16px);
+  transition: opacity .55s ease, transform .6s cubic-bezier(.16,1,.3,1);
+}
+.h-question.line2 {
+  transition-delay: .15s;
+  font-size: 100px;
+  margin-top: 12px;
+}
+.h-grad {
+  background: linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.h-sub {
+  margin-top: 80px;
+  font-size: 56px; font-style: italic; font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .5s ease .1s, transform .5s ease .1s;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCENE 2 · BUILD — Quiz + Keywords
+═══════════════════════════════════════════════════════════════════════════ */
+#s-build {
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 100px 0 80px;
+  background: #0a0010;
+}
+
+/* Quiz header */
+.qz-logo {
+  font-size: 56px; font-weight: 900;
+  background: linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 56px;
+}
+.qz-label {
+  font-size: 30px; font-weight: 600; letter-spacing: 8px;
+  text-transform: uppercase; color: rgba(255,255,255,0.32);
+  margin-bottom: 48px;
+}
+
+/* Progress bar */
+.qz-progress-wrap {
+  width: 880px; height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px; margin-bottom: 64px;
+  overflow: hidden;
+}
+.qz-progress-bar {
+  height: 100%; border-radius: 8px;
+  background: linear-gradient(90deg,#7c3aed,#ec4899);
+  width: 0%;
+  transition: width .5s cubic-bezier(.16,1,.3,1);
+}
+
+/* Question card */
+.qz-card {
+  width: 940px;
+  border-radius: 40px;
+  background: rgba(124,58,237,0.08);
+  border: 1.5px solid rgba(124,58,237,0.25);
+  padding: 64px 72px 72px;
+  display: flex; flex-direction: column;
+  align-items: stretch;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.qz-card.show { opacity: 1; }
+.qz-q-text {
+  font-size: 54px; font-weight: 700; color: #fff;
+  line-height: 1.22; letter-spacing: -1px;
+  margin-bottom: 56px; text-align: center;
+}
+.qz-options {
+  display: flex; flex-direction: column; gap: 28px;
+}
+.qz-opt {
+  padding: 36px 52px; border-radius: 24px;
+  font-size: 48px; font-weight: 600; color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.10);
+  text-align: center;
+  transition: background .25s, border-color .25s, color .25s;
+}
+.qz-opt.selected {
+  background: rgba(124,58,237,0.22);
+  border-color: rgba(167,139,250,0.55);
+  color: #fff;
+}
+
+/* Keywords phase */
+.kw-area {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 60px;
+  flex: 1;
+  width: 100%;
+  padding: 0 60px;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.kw-word {
+  font-size: 70px; font-weight: 900; letter-spacing: -1.5px;
+  text-align: center;
+  background: linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0; transform: scale(0.7);
+  transition: opacity .4s ease, transform .45s cubic-bezier(.16,1,.3,1);
+}
+.kw-word.show { opacity: 1; transform: scale(1); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCENE 3 · REVEAL
+═══════════════════════════════════════════════════════════════════════════ */
+#s-reveal {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 100px 72px 80px;
+  background: #0a0010;
+}
+.r-eye {
+  font-size: 32px; font-weight: 600; letter-spacing: 8px;
+  text-transform: uppercase; color: rgba(255,255,255,0.32);
+  margin-bottom: 48px;
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.r-type-card {
+  width: 900px;
+  border-radius: 44px;
+  background: rgba(124,58,237,0.10);
+  border: 2px solid rgba(124,58,237,0.30);
+  box-shadow: 0 0 120px rgba(124,58,237,0.14);
+  padding: 72px 80px 80px;
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; transform: scale(0.85);
+  transition: opacity .6s ease, transform .7s cubic-bezier(.16,1,.3,1);
+  margin-bottom: 64px;
+}
+.r-type-code {
+  font-size: 150px; font-weight: 900; letter-spacing: -4px; line-height: 1;
+  background: linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+}
+.r-type-name {
+  font-size: 64px; font-weight: 800; color: #fff;
+  letter-spacing: -1px; margin-bottom: 20px;
+}
+.r-type-traits {
+  font-size: 42px; font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+}
+
+/* Strength rows */
+.str-rows {
+  width: 100%; display: flex; flex-direction: column; gap: 28px;
+}
+.str-row {
+  padding: 32px 52px; border-radius: 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1.5px solid rgba(124,58,237,0.22);
+  color: rgba(255,255,255,0.88);
+  font-size: 46px; font-weight: 500;
+  display: flex; align-items: center; gap: 28px;
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .4s ease, transform .45s cubic-bezier(.16,1,.3,1);
+}
+.str-row.show { opacity: 1; transform: translateY(0); }
+.str-icon { font-size: 52px; flex-shrink: 0; }
+
+/* Tagline */
+.r-tagline {
+  font-size: 52px; font-weight: 400; font-style: italic;
+  color: rgba(255,255,255,0.90); text-align: center;
+  margin-top: 56px;
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.r-tagline.show { opacity: 1; transform: translateY(0); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCENE 4 · CTA
+═══════════════════════════════════════════════════════════════════════════ */
+#s-cta {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px; text-align: center;
+}
+#s-cta::before {
+  content: '';
+  position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%);
+  width: 900px; height: 900px;
+  background: radial-gradient(ellipse, rgba(124,58,237,0.16), transparent 65%);
+  pointer-events: none;
+}
+.c-logo {
+  position: relative; font-size: 60px; font-weight: 900; letter-spacing: -1px;
+  background: linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 72px;
+  opacity: 0; transform: translateY(-20px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.c-head {
+  position: relative; color: #fff;
+  font-size: 92px; font-weight: 900;
+  line-height: 1.05; letter-spacing: -2.5px;
+  margin-bottom: 8px;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .5s ease .08s, transform .5s ease .08s;
+}
+.c-head-grad {
+  position: relative;
+  font-size: 92px; font-weight: 900; letter-spacing: -2.5px;
+  background: linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 48px;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .5s ease .14s, transform .5s ease .14s;
+}
+.c-badge {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 22px 48px; border-radius: 100px;
+  background: rgba(124,58,237,0.14);
+  border: 1.5px solid rgba(167,139,250,0.30);
+  font-size: 42px; font-weight: 600; color: rgba(255,255,255,0.75);
+  margin-bottom: 52px;
+  opacity: 0;
+  transition: opacity .5s ease .22s;
+}
+.c-chips {
+  position: relative;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 64px;
+  opacity: 0;
+  transition: opacity .5s ease .30s;
+}
+.c-chip {
+  padding: 20px 36px; border-radius: 100px;
+  font-size: 44px; font-weight: 800; color: #fff;
+}
+.c-chip.v {
+  background: rgba(124,58,237,0.2);
+  border: 2px solid rgba(124,58,237,0.40);
+}
+.c-chip.p {
+  background: rgba(236,72,153,0.16);
+  border: 2px solid rgba(236,72,153,0.35);
+}
+.c-chip.dim { opacity: 0.55; }
+.c-btn {
+  position: relative;
+  padding: 58px 130px; border-radius: 32px;
+  background: linear-gradient(135deg,#7c3aed,#ec4899);
+  color: #fff; font-size: 58px; font-weight: 800; letter-spacing: -0.5px;
+  margin-bottom: 48px;
+  box-shadow: 0 24px 64px rgba(124,58,237,0.42);
+  opacity: 0; transform: scale(0.88);
+  transition: opacity .5s ease .40s, transform .55s cubic-bezier(.16,1,.3,1) .40s;
+}
+.c-url {
+  position: relative;
+  font-size: 44px; color: rgba(255,255,255,0.35);
+  opacity: 0; transition: opacity .5s ease .56s;
+}
+
+/* ── SUBTITLES ───────────────────────────────────────────────────────────── */
+#subs {
+  position: absolute; bottom: 120px; left: 60px; right: 60px;
+  z-index: 90; pointer-events: none;
+  display: flex; align-items: flex-end; justify-content: center;
+  min-height: 180px;
+}
+.sub-pill {
+  background: rgba(0,0,0,0.62);
+  backdrop-filter: blur(4px);
+  border-radius: 18px; padding: 20px 44px;
+  color: #fff; font-size: 52px; font-weight: 600;
+  line-height: 1.32; text-align: center; max-width: 960px;
+}
+.sub-pill .hl { color: #c4b5fd; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- AUDIO -->
+  <audio id="vo" src="vo-career.mp3" preload="auto"></audio>
+
+  <!-- PLAY OVERLAY -->
+  <div id="overlay">
+    <div class="btn-ring">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <p>▶ Lancer</p>
+  </div>
+
+  <!-- ═══ SCENE 1 · HOOK ══════════════════════════════════════════════════ -->
+  <div class="scene" id="s-hook">
+    <canvas id="pc" width="1080" height="1920"></canvas>
+    <div class="h-inner">
+      <div class="h-logo" id="h-logo">UrCecret</div>
+      <div class="h-question" id="h-line1">Tu as parfois l'impression</div>
+      <div class="h-question line2" id="h-line2">de ne pas être <span class="h-grad">à ta place&nbsp;?</span></div>
+      <div class="h-sub" id="h-sub">Ça s'explique.</div>
+    </div>
+  </div>
+
+  <!-- ═══ SCENE 2 · BUILD — Quiz + Keywords ═══════════════════════════════ -->
+  <div class="scene" id="s-build">
+    <div class="qz-logo">UrCecret</div>
+    <div class="qz-label">Mode Orientation</div>
+
+    <div class="qz-progress-wrap">
+      <div class="qz-progress-bar" id="qz-bar"></div>
+    </div>
+
+    <!-- Quiz card -->
+    <div class="qz-card" id="qz-card">
+      <div class="qz-q-text" id="qz-q"></div>
+      <div class="qz-options" id="qz-opts"></div>
+    </div>
+
+    <!-- Keywords phase (hidden initially) -->
+    <div class="kw-area" id="kw-area" style="display:none;">
+      <div class="kw-word" id="kw1">TES FORCES</div>
+      <div class="kw-word" id="kw2">TON FONCTIONNEMENT</div>
+      <div class="kw-word" id="kw3">TES ENVIRONNEMENTS IDÉAUX</div>
+    </div>
+  </div>
+
+  <!-- ═══ SCENE 3 · REVEAL ════════════════════════════════════════════════ -->
+  <div class="scene" id="s-reveal">
+    <div class="r-eye" id="r-eye">TON PROFIL</div>
+
+    <div class="r-type-card" id="r-card">
+      <div class="r-type-code">INTJ</div>
+      <div class="r-type-name">Le Stratège</div>
+      <div class="r-type-traits">Analytique · Visionnaire · Indépendant</div>
+    </div>
+
+    <div class="str-rows">
+      <div class="str-row" id="str1">
+        <span class="str-icon">🧠</span> Vision long terme
+      </div>
+      <div class="str-row" id="str2">
+        <span class="str-icon">⚡</span> Autonomie &amp; efficacité
+      </div>
+      <div class="str-row" id="str3">
+        <span class="str-icon">🎯</span> Résolution de problèmes
+      </div>
+    </div>
+
+    <div class="r-tagline" id="r-tagline">Ton mode d'emploi, enfin.</div>
+  </div>
+
+  <!-- ═══ SCENE 4 · CTA ════════════════════════════════════════════════════ -->
+  <div class="scene" id="s-cta">
+    <div class="c-logo" id="c-logo">UrCecret</div>
+    <div class="c-head" id="c-head">Découvre ton profil</div>
+    <div class="c-head-grad" id="c-grad">gratuitement</div>
+    <div class="c-badge" id="c-badge">✓ Sans carte bancaire</div>
+    <div class="c-chips" id="c-chips">
+      <div class="c-chip v">INTJ</div>
+      <div class="c-chip p">ENFP</div>
+      <div class="c-chip v dim">ISFJ</div>
+      <div class="c-chip p dim">+13</div>
+    </div>
+    <div class="c-btn" id="c-btn">Commencer le test</div>
+    <div class="c-url" id="c-url">urcecret.site</div>
+  </div>
+
+  <!-- SUBTITLES -->
+  <div id="subs"><div class="sub-pill" id="sub"></div></div>
+
+</div><!-- /stage -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// TIMESTAMPS
+// ─────────────────────────────────────────────────────────────────────────────
+const T = {
+  hook:0.0, hLogo:0.2, hLine1:0.5, hLine2:1.8, hSub:3.1,
+  build:4.0,
+  q1:4.3, q1sel:5.3, q2:5.7, q2sel:6.7, q3:7.1, q3sel:8.1, q4:8.5, q4sel:9.5,
+  kw1:10.1, kw2:10.75, kw3:11.4,
+  reveal:12.0, rEye:12.3, rCard:12.7,
+  str1:14.2, str2:15.8, str3:17.3, tagline:19.2,
+  cta:22.0,
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUBTITLES
+// ─────────────────────────────────────────────────────────────────────────────
+const SUBS = [
+  {s:0.4,  e:1.8,  t:'Tu as parfois l\'impression…'},
+  {s:1.8,  e:3.1,  t:'…de ne pas être <span class="hl">à ta place ?</span>'},
+  {s:3.1,  e:4.0,  t:'Ça s\'explique.'},
+  {s:4.0,  e:5.5,  t:'Réponds à quelques questions…'},
+  {s:5.5,  e:9.8,  t:'Ton profil se dessine…'},
+  {s:9.8,  e:12.0, t:'Tes forces. Ton fonctionnement.'},
+  {s:12.0, e:14.2, t:'Ton profil : <span class="hl">INTJ</span> — Le Stratège.'},
+  {s:14.2, e:17.0, t:'Vision, autonomie, efficacité.'},
+  {s:17.0, e:19.2, t:'Résolution de problèmes complexes.'},
+  {s:19.2, e:22.0, t:'Ton mode d\'emploi, enfin.'},
+  {s:22.0, e:25.5, t:'Découvre ton profil <span class="hl">gratuitement</span>.'},
+  {s:25.5, e:29.5, t:'urcecret.site — commence maintenant.'},
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// QUIZ DATA
+// ─────────────────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    q: 'Tu préfères travailler seul·e ou en équipe ?',
+    opts: ['Seul·e', 'En équipe'],
+    sel: 0, showAt: T.q1, selAt: T.q1sel, prog: 25
+  },
+  {
+    q: 'Tu as besoin de comprendre le POURQUOI de chaque tâche ?',
+    opts: ['Oui, toujours', 'Non, je fais confiance'],
+    sel: 0, showAt: T.q2, selAt: T.q2sel, prog: 50
+  },
+  {
+    q: 'Tu fonctionnes mieux avec une structure claire ?',
+    opts: ['Oui', 'J\'improvise mieux'],
+    sel: 0, showAt: T.q3, selAt: T.q3sel, prog: 75
+  },
+  {
+    q: 'Tu es plutôt grand stratège ou dans les détails ?',
+    opts: ['Grand stratège', 'Dans les détails'],
+    sel: 0, showAt: T.q4, selAt: T.q4sel, prog: 100
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PARTICLES
+// ─────────────────────────────────────────────────────────────────────────────
+const pc   = document.getElementById('pc');
+const pctx = pc.getContext('2d');
+const rng  = (a,b) => a+(b-a)*Math.random();
+const DOTS = Array.from({length:65}, (_,i) => ({
+  x: Math.random()*1080,
+  y: Math.random()*1920,
+  vx: rng(-0.28,0.28),
+  vy: rng(-0.28,0.28),
+  r: rng(1.2,4.2),
+  a: rng(0.06,0.28),
+  c: i < 32 ? 'rgba(167,139,250,' : 'rgba(236,72,153,',
+}));
+
+function drawParticles() {
+  pctx.clearRect(0,0,1080,1920);
+  for (const d of DOTS) {
+    d.x = (d.x+d.vx+1080)%1080;
+    d.y = (d.y+d.vy+1920)%1920;
+    pctx.beginPath();
+    pctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+    pctx.fillStyle = d.c+d.a+')';
+    pctx.fill();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────────────────────
+const vo      = document.getElementById('vo');
+const overlay = document.getElementById('overlay');
+const subEl   = document.getElementById('sub');
+
+function clamp(v,lo=0,hi=1){ return Math.max(lo,Math.min(hi,v)); }
+function ease(v){ return 1-(1-clamp(v))**3; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCENE MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+let activeScene = null;
+function showScene(id) {
+  if (activeScene===id) return;
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  activeScene = id;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HOOK
+// ─────────────────────────────────────────────────────────────────────────────
+let hookInit = false;
+function updateHook(t) {
+  if (!hookInit) {
+    hookInit = true;
+    setTimeout(()=>{
+      const l = document.getElementById('h-logo');
+      l.style.opacity = '1';
+      l.style.transform = 'translateY(0)';
+    }, 60);
+  }
+  drawParticles();
+
+  const showQ = (id, on) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.style.opacity = on ? '1' : '0';
+    el.style.transform = on ? 'scale(1) translateY(0)' : '';
+  };
+
+  if (t >= T.hLine1) showQ('h-line1', true);
+  if (t >= T.hLine2) showQ('h-line2', true);
+  if (t >= T.hSub) {
+    const h = document.getElementById('h-sub');
+    h.style.opacity = '1';
+    h.style.transform = 'translateY(0)';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD — Quiz + Keywords
+// ─────────────────────────────────────────────────────────────────────────────
+let lastQIdx  = -1;
+let kwShown   = false;
+
+function renderQuestion(idx, t) {
+  const q    = QUESTIONS[idx];
+  const card = document.getElementById('qz-card');
+  const bar  = document.getElementById('qz-bar');
+
+  // Update progress bar
+  bar.style.width = q.prog + '%';
+
+  // Render question text and options
+  document.getElementById('qz-q').textContent = q.q;
+  const optsEl = document.getElementById('qz-opts');
+  optsEl.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'qz-opt' + (t >= q.selAt && i === q.sel ? ' selected' : '');
+    div.textContent = opt;
+    optsEl.appendChild(div);
+  });
+
+  card.classList.add('show');
+}
+
+function updateBuild(t) {
+  const inKeywords = t >= T.kw1;
+  const card   = document.getElementById('qz-card');
+  const kwArea = document.getElementById('kw-area');
+
+  if (inKeywords) {
+    // Switch to keywords mode
+    if (!kwShown) {
+      kwShown = true;
+      card.style.opacity = '0';
+      card.classList.remove('show');
+      kwArea.style.display = 'flex';
+      // trigger reflow then fade in
+      requestAnimationFrame(()=>{
+        kwArea.style.opacity = '1';
+      });
+    }
+    if (t >= T.kw1)  document.getElementById('kw1').classList.add('show');
+    if (t >= T.kw2)  document.getElementById('kw2').classList.add('show');
+    if (t >= T.kw3)  document.getElementById('kw3').classList.add('show');
+  } else {
+    // Quiz mode: determine which question to show
+    let activeIdx = -1;
+    for (let i = QUESTIONS.length-1; i >= 0; i--) {
+      if (t >= QUESTIONS[i].showAt) { activeIdx = i; break; }
+    }
+    if (activeIdx < 0) return;
+
+    if (activeIdx !== lastQIdx) {
+      lastQIdx = activeIdx;
+      renderQuestion(activeIdx, t);
+    } else {
+      // update selection state in-place without full re-render
+      const opts = document.querySelectorAll('.qz-opt');
+      const q    = QUESTIONS[activeIdx];
+      opts.forEach((el, i) => {
+        if (t >= q.selAt && i === q.sel) {
+          el.classList.add('selected');
+        } else {
+          el.classList.remove('selected');
+        }
+      });
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REVEAL
+// ─────────────────────────────────────────────────────────────────────────────
+let revealInit = false;
+function updateReveal(t) {
+  if (!revealInit) {
+    revealInit = true;
+    setTimeout(()=>{
+      const e = document.getElementById('r-eye');
+      e.style.opacity = '1'; e.style.transform = 'translateY(0)';
+      const c = document.getElementById('r-card');
+      c.style.opacity = '1'; c.style.transform = 'scale(1)';
+    }, 60);
+  }
+
+  if (t >= T.rEye) {
+    const e = document.getElementById('r-eye');
+    e.style.opacity = '1'; e.style.transform = 'translateY(0)';
+  }
+  if (t >= T.rCard) {
+    const c = document.getElementById('r-card');
+    c.style.opacity = '1'; c.style.transform = 'scale(1)';
+  }
+  if (t >= T.str1) document.getElementById('str1').classList.add('show');
+  if (t >= T.str2) document.getElementById('str2').classList.add('show');
+  if (t >= T.str3) document.getElementById('str3').classList.add('show');
+  if (t >= T.tagline) document.getElementById('r-tagline').classList.add('show');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CTA
+// ─────────────────────────────────────────────────────────────────────────────
+let ctaInit = false;
+function initCTA() {
+  if (ctaInit) return; ctaInit = true;
+  const ids = ['c-logo','c-head','c-grad','c-badge','c-chips','c-btn','c-url'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.opacity='1'; el.style.transform='scale(1) translateY(0)'; }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUBTITLES
+// ─────────────────────────────────────────────────────────────────────────────
+function updateSubs(t) {
+  const w = SUBS.find(s => t >= s.s && t < s.e);
+  subEl.innerHTML = w ? w.t : '';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN LOOP
+// ─────────────────────────────────────────────────────────────────────────────
+let raf = null, fi = 0;
+
+function tick() {
+  const t = vo.currentTime;
+  fi++;
+
+  if (t < T.build) {
+    showScene('hook'); updateHook(t);
+  } else if (t < T.reveal) {
+    showScene('build'); updateBuild(t);
+  } else if (t < T.cta) {
+    showScene('reveal'); updateReveal(t);
+  } else {
+    showScene('cta'); initCTA();
+  }
+
+  updateSubs(t);
+  raf = requestAnimationFrame(tick);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// START
+// ─────────────────────────────────────────────────────────────────────────────
+overlay.addEventListener('click', () => {
+  overlay.style.display = 'none';
+  showScene('hook');
+  vo.play().catch(()=>{});
+  raf = requestAnimationFrame(tick);
+});
+
+vo.addEventListener('ended', () => { if (raf) { cancelAnimationFrame(raf); raf = null; } });
+
+showScene('hook');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCALE STAGE
+// ─────────────────────────────────────────────────────────────────────────────
+function scaleStage() {
+  const st = document.getElementById('stage');
+  const sc = Math.min(window.innerWidth/1080, window.innerHeight/1920);
+  st.style.transform  = `scale(${sc})`;
+  st.style.marginLeft = ((window.innerWidth  - 1080*sc)/2) + 'px';
+  st.style.marginTop  = ((window.innerHeight - 1920*sc)/2) + 'px';
+}
+scaleStage();
+window.addEventListener('resize', scaleStage);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RECORDER
+// ─────────────────────────────────────────────────────────────────────────────
+const recBtn    = document.getElementById('rec-btn');
+const recStatus = document.getElementById('rec-status');
+let   recorder  = null;
+
+recBtn.addEventListener('click', async () => {
+  if (recorder && recorder.state === 'recording') {
+    recorder.stop(); recBtn.textContent = '⏺ Enregistrer'; return;
+  }
+  recStatus.textContent = 'Sélectionne cet onglet (avec audio) dans la fenêtre…';
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate:60, displaySurface:'browser' },
+      audio: true, preferCurrentTab: true
+    });
+  } catch(e) { recStatus.textContent = 'Enregistrement annulé.'; return; }
+
+  const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+    ? 'video/webm;codecs=vp9,opus' : 'video/webm';
+  recorder = new MediaRecorder(stream, { mimeType: mime });
+  const chunks = [];
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'meta-career-v1.webm';
+    a.click();
+    recStatus.textContent = '✅ WebM téléchargé — convertis en MP4 avec FFmpeg.';
+    recBtn.textContent = '⏺ Enregistrer'; recorder = null;
+  };
+  recorder.start(100); recBtn.textContent = '⏹ Arrêter';
+  recStatus.textContent = '🔴 Enregistrement en cours (31s)…';
+  setTimeout(() => overlay.click(), 800);
+  setTimeout(() => { if (recorder && recorder.state === 'recording') recorder.stop(); }, 31500);
+});
+</script>
+
+<!-- RECORDING UI -->
+<div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;z-index:9999;">
+  <button id="rec-btn" style="padding:16px 40px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;font-size:18px;font-weight:700;box-shadow:0 8px 24px rgba(124,58,237,0.4);">⏺ Enregistrer</button>
+  <span id="rec-status" style="color:rgba(255,255,255,0.55);font-size:14px;font-family:system-ui;"></span>
+</div>
+</body>
+</html>
