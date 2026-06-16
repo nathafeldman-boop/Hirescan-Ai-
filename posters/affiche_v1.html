@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 390px;
+    height: 844px;
+    overflow: hidden;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    background: #06010f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .poster {
+    width: 390px;
+    height: 844px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 52px 30px 44px;
+    overflow: hidden;
+  }
+
+  /* Background blobs */
+  .blob1 {
+    position: absolute;
+    top: -80px;
+    left: -60px;
+    width: 340px;
+    height: 340px;
+    background: radial-gradient(circle, rgba(139,92,246,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .blob2 {
+    position: absolute;
+    bottom: 60px;
+    right: -80px;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(236,72,153,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .blob3 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(99,60,180,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Noise grain overlay */
+  .grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* Top section */
+  .top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .social-proof {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 100px;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 28px;
+  }
+  .social-proof .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    flex-shrink: 0;
+  }
+  .social-proof span {
+    color: rgba(255,255,255,0.65);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    font-weight: 500;
+  }
+
+  /* Central eye / orb */
+  .orb-wrapper {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 34px;
+  }
+  .orb-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(139,92,246,0.35);
+    animation: pulse-ring 3s ease-in-out infinite;
+  }
+  .orb-ring2 {
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    border: 1px solid rgba(139,92,246,0.15);
+    animation: pulse-ring 3s ease-in-out infinite 1s;
+  }
+  @keyframes pulse-ring {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+  }
+  .orb {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+    box-shadow:
+      0 0 60px rgba(139,92,246,0.55),
+      0 0 120px rgba(139,92,246,0.20),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+  }
+
+  /* Main headline */
+  .middle {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .kicker {
+    color: rgba(255,255,255,0.38);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+
+  .headline {
+    font-size: 46px;
+    font-weight: 900;
+    line-height: 1.05;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .headline em {
+    font-style: normal;
+    background: linear-gradient(90deg, #a78bfa, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .sub-headline {
+    font-size: 18px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.90);
+    line-height: 1.3;
+    margin-bottom: 22px;
+    letter-spacing: -0.01em;
+  }
+
+  .body-text {
+    font-size: 14.5px;
+    color: rgba(255,255,255,0.50);
+    line-height: 1.65;
+    max-width: 300px;
+    font-weight: 400;
+  }
+
+  /* Divider */
+  .divider {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    border-radius: 2px;
+    margin: 20px auto;
+    opacity: 0.6;
+  }
+
+  /* Testimonial pill */
+  .testimonial {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 14px 18px;
+    max-width: 310px;
+    text-align: left;
+  }
+  .testimonial .quote {
+    font-size: 13px;
+    color: rgba(255,255,255,0.70);
+    line-height: 1.55;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .testimonial .author {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  /* Bottom CTA */
+  .bottom {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cta-btn {
+    width: 100%;
+    padding: 19px 24px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    box-shadow: 0 8px 48px rgba(139,92,246,0.55), 0 2px 8px rgba(0,0,0,0.4);
+    text-align: center;
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.01em;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent);
+    border-radius: 18px 18px 0 0;
+  }
+  .cta-btn .arrow {
+    display: inline-block;
+    margin-left: 6px;
+  }
+
+  .cta-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.30);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Logo */
+  .logo {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    z-index: 3;
+  }
+  .logo .ur { color: #f472b6; }
+  .logo .c { color: #a78bfa; }
+  .logo .ecret { color: #fff; }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="blob1"></div>
+  <div class="blob2"></div>
+  <div class="blob3"></div>
+  <div class="grain"></div>
+
+  <!-- Logo -->
+  <div class="logo">
+    <span class="ur">Ur</span><span class="c">C</span><span class="ecret">ecret</span>
+  </div>
+
+  <!-- Top -->
+  <div class="top" style="margin-top: 24px;">
+    <div class="social-proof">
+      <span class="dot"></span>
+      <span>+94 000 personnes ont testé</span>
+    </div>
+
+    <div class="orb-wrapper">
+      <div class="orb-ring"></div>
+      <div class="orb-ring2"></div>
+      <div class="orb">🔮</div>
+    </div>
+  </div>
+
+  <!-- Middle -->
+  <div class="middle">
+    <p class="kicker">Psychologie · Personnalité</p>
+    <h1 class="headline">Tu crois te<br>connaître ?<br><em>Vraiment ?</em></h1>
+
+    <div class="divider"></div>
+
+    <div class="testimonial">
+      <p class="quote">« j'ai peur c'est vraiment moi 😰 c'est hyper précis... je pensais que c'était juste un quiz... »</p>
+      <p class="author">Camille, 24 ans · Certifié Google ⭐⭐⭐⭐⭐</p>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="bottom">
+    <div class="cta-btn">
+      Fais le test gratuit <span class="arrow">→</span>
+    </div>
+    <p class="cta-sub">urcecret.site · lien en bio</p>
+  </div>
+
+</div>
+</body>
+</html>

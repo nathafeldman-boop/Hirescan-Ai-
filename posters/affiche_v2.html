@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 390px;
+    height: 844px;
+    overflow: hidden;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    background: #06010f;
+  }
+
+  .poster {
+    width: 390px;
+    height: 844px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Bold color block top */
+  .top-block {
+    background: linear-gradient(160deg, #5b21b6 0%, #7c3aed 40%, #be185d 100%);
+    padding: 52px 30px 36px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .top-block::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 0; right: 0;
+    height: 60px;
+    background: #06010f;
+    clip-path: ellipse(60% 100% at 50% 100%);
+  }
+
+  /* Abstract shapes in top */
+  .shape1 {
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .shape2 {
+    position: absolute;
+    top: 20px; right: 20px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 100px;
+    padding: 5px 13px;
+    margin-bottom: 20px;
+  }
+  .badge .live {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    flex-shrink: 0;
+  }
+  .badge span {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .big-question {
+    font-size: 48px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    position: relative;
+    z-index: 1;
+  }
+  .big-question .highlight {
+    background: rgba(255,255,255,0.20);
+    border-radius: 8px;
+    padding: 0 6px;
+    display: inline-block;
+  }
+
+  /* Middle dark section */
+  .middle {
+    flex: 1;
+    padding: 40px 30px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .reveal-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .reveal-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 15px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+  }
+  .reveal-card .icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .reveal-card .text {
+    flex: 1;
+  }
+  .reveal-card .text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.90);
+    margin-bottom: 2px;
+  }
+  .reveal-card .text span {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.4;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+  }
+  .stat {
+    flex: 1;
+    padding: 14px 12px;
+    background: rgba(139,92,246,0.10);
+    border: 1px solid rgba(139,92,246,0.20);
+    border-radius: 14px;
+    text-align: center;
+  }
+  .stat .num {
+    font-size: 22px;
+    font-weight: 900;
+    color: #a78bfa;
+    letter-spacing: -0.02em;
+  }
+  .stat .label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.40);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* Bottom */
+  .bottom {
+    padding: 0 24px 36px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta {
+    width: 100%;
+    padding: 20px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    box-shadow: 0 10px 50px rgba(139,92,246,0.50);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, transparent 50%);
+    border-radius: 18px;
+  }
+  .cta .main-label {
+    display: block;
+    font-size: 19px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 3px;
+  }
+  .cta .sub-label {
+    display: block;
+    font-size: 12px;
+    color: rgba(255,255,255,0.70);
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-text {
+    text-align: center;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Logo overlay */
+  .logo {
+    position: absolute;
+    top: 26px;
+    left: 30px;
+    font-size: 21px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    z-index: 10;
+  }
+  .logo .ur { color: #fbb6f2; }
+  .logo .c { color: #c4b5fd; }
+  .logo .ecret { color: #fff; }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- Logo -->
+  <div class="logo"><span class="ur">Ur</span><span class="c">C</span><span class="ecret">ecret</span></div>
+
+  <!-- Top bold block -->
+  <div class="top-block">
+    <div class="shape1"></div>
+    <div class="shape2"></div>
+
+    <div class="badge">
+      <span class="live"></span>
+      <span>+94 000 tests complétés</span>
+    </div>
+
+    <h1 class="big-question">
+      Ce que tu<br>vas découvrir<br>sur toi va te<br><span class="highlight">surprendre.</span>
+    </h1>
+  </div>
+
+  <!-- Middle cards -->
+  <div class="middle">
+    <div class="reveal-cards">
+      <div class="reveal-card">
+        <div class="icon">🧠</div>
+        <div class="text">
+          <strong>Ton vrai type de personnalité</strong>
+          <span>Pas juste 4 lettres — les raisons profondes de tes réactions</span>
+        </div>
+      </div>
+      <div class="reveal-card">
+        <div class="icon">💞</div>
+        <div class="text">
+          <strong>Tes compatibilités réelles</strong>
+          <span>En amour, en amitié — qui te fait vraiment du bien</span>
+        </div>
+      </div>
+      <div class="reveal-card">
+        <div class="icon">🔍</div>
+        <div class="text">
+          <strong>Ce que même tes proches ignorent</strong>
+          <span>Des vérités que tu ressentais sans pouvoir les formuler</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="num">4.9★</div>
+        <div class="label">Note moyenne</div>
+      </div>
+      <div class="stat">
+        <div class="num">10 min</div>
+        <div class="label">Pour tout savoir</div>
+      </div>
+      <div class="stat">
+        <div class="num">100%</div>
+        <div class="label">Gratuit au départ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="bottom">
+    <div class="cta">
+      <span class="main-label">Découvre qui tu es vraiment →</span>
+      <span class="sub-label">urcecret.site · Gratuit · 10 minutes</span>
+    </div>
+    <p class="footer-text">lien en bio · tape « urcecret » sur google</p>
+  </div>
+
+</div>
+</body>
+</html>
