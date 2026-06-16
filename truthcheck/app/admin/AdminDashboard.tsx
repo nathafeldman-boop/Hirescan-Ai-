@@ -4,7 +4,25 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates' | 'codes';
+type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates' | 'codes' | 'activite';
+
+interface RecentConv {
+  id: string;
+  affiliateSlug: string;
+  affiliateName: string;
+  amountCents: number;
+  commissionCents: number;
+  createdAt: string;
+  stripeSessionId?: string | null;
+}
+
+interface RecentSignup {
+  id: string;
+  email: string | null;
+  name: string | null;
+  tier: string;
+  createdAt: string;
+}
 
 interface Stats {
   totalUsers: number; premiumUsers: number;
@@ -27,6 +45,23 @@ interface Stats {
   }>;
   affiliateClicks: Record<string, number>;
   totalPageViews: number;
+  recentConversions?: RecentConv[];
+  recentSignups?: RecentSignup[];
+}
+
+interface StripeStats {
+  mrr: number;
+  monthlyCount: number;
+  annualCount: number;
+  churnedLast30: number;
+  recentCharges: Array<{
+    id: string;
+    amount: number;
+    currency: string;
+    created: number;
+    description: string | null;
+    receiptEmail: string | null;
+  }>;
 }
 
 const QUIZ_NAMES: Record<string, string> = {
@@ -41,6 +76,16 @@ function fmt(cents: number) {
   return (cents / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
 function fmtDate(iso: string) { return new Date(iso).toLocaleDateString('fr-FR'); }
+function fmtDateTime(iso: string | number) {
+  const d = typeof iso === 'number' ? new Date(iso * 1000) : new Date(iso);
+  return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+function maskEmail(email: string | null) {
+  if (!email) return '—';
+  const [u, d] = email.split('@');
+  if (!d) return email;
+  return u.slice(0, 2) + '***@' + d;
+}
 
 function getLast12Keys(): string[] {
   const now = new Date();
@@ -51,6 +96,18 @@ function getLast12Keys(): string[] {
 }
 function keyToLabel(key: string) {
   return new Date(key + '-01').toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '');
+}
+
+// 80% commission for first 30 days of an affiliate's activity, 30% after
+function calcCommission(conversions: Array<{ amountCents: number; commissionCents: number; createdAt: string }>): number {
+  if (!conversions.length) return 0;
+  const sorted = [...conversions].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  const firstDate = new Date(sorted[0].createdAt);
+  const cutoff = new Date(firstDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+  return sorted.reduce((sum, c) => {
+    const rate = new Date(c.createdAt) <= cutoff ? 0.80 : 0.30;
+    return sum + Math.round(c.amountCents * rate);
+  }, 0);
 }
 
 // ── KPI Card ─────────────────────────────────────────────────────────────────
@@ -128,49 +185,33 @@ function LineChart({
               </linearGradient>
             ))}
           </defs>
-
-          {/* grid */}
           {[0.25, 0.5, 0.75, 1].map((p, i) => (
             <line key={i} x1={PAD.l} y1={yOf(maxVal * p)} x2={W - PAD.r} y2={yOf(maxVal * p)}
               stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="4,6" />
           ))}
-
-          {/* hover line */}
           {hovIdx !== null && (
             <line x1={xOf(hovIdx)} y1={PAD.t} x2={xOf(hovIdx)} y2={PAD.t + iH}
               stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
           )}
-
-          {/* areas */}
           {series.map((s, si) => <path key={`a${si}`} d={areaPath(s.values)} fill={`url(#lg${si})`} />)}
-
-          {/* lines */}
           {series.map((s, si) => (
             <path key={`l${si}`} d={curvePath(s.values)}
               fill="none" stroke={s.color} strokeWidth={2.5} strokeLinecap="round" />
           ))}
-
-          {/* hover dots */}
           {hovIdx !== null && series.map((s, si) => (
             <circle key={`hd${si}`} cx={xOf(hovIdx)} cy={yOf(s.values[hovIdx] ?? 0)} r={5}
               fill={s.color} stroke="#0a0a0f" strokeWidth={2} />
           ))}
-
-          {/* hover zones */}
           {xLabels.map((_, i) => (
             <rect key={`hz${i}`} x={xOf(i) - iW / n / 2} y={0} width={iW / n} height={h}
               fill="transparent" style={{ cursor: 'default' }}
               onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)} />
           ))}
-
-          {/* x labels */}
           {xLabels.map((l, i) => (
             <text key={i} x={xOf(i)} y={h - 5} textAnchor="middle" fontSize={9} fill="#3f3f46">{l}</text>
           ))}
-
-          {/* tooltip */}
           {hovIdx !== null && (() => {
-            const tipW = 120, tipH = 18 + series.length * 18;
+            const tipW = 130, tipH = 18 + series.length * 18;
             const hx = xOf(hovIdx);
             const safeTipX = Math.min(Math.max(hx - tipW / 2, 4), W - tipW - 4);
             return (
@@ -203,7 +244,28 @@ function HorizBar({ label, value, max, color, valueLabel }: {
       <div style={{ flex: 1, height: 14, borderRadius: 999, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 999, transition: 'width .5s cubic-bezier(.4,0,.2,1)' }} />
       </div>
-      <div style={{ width: 72, fontSize: 12, color: '#d4d4d8', fontWeight: 600, textAlign: 'right', flexShrink: 0 }}>{valueLabel}</div>
+      <div style={{ width: 80, fontSize: 12, color: '#d4d4d8', fontWeight: 600, textAlign: 'right', flexShrink: 0 }}>{valueLabel}</div>
+    </div>
+  );
+}
+
+// ── Funnel step ───────────────────────────────────────────────────────────────
+function FunnelStep({ label, value, pct, color }: { label: string; value: number; pct?: number; color: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
+      <div style={{ flex: 1 }}>
+        <p style={{ color: '#d4d4d8', fontSize: 13, fontWeight: 500, margin: 0 }}>{label}</p>
+        {pct !== undefined && (
+          <div style={{ marginTop: 4, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', maxWidth: 240 }}>
+            <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 999 }} />
+          </div>
+        )}
+      </div>
+      <div style={{ textAlign: 'right' }}>
+        <p style={{ color: '#fff', fontSize: 18, fontWeight: 800, margin: 0, lineHeight: 1 }}>{value.toLocaleString('fr-FR')}</p>
+        {pct !== undefined && <p style={{ color, fontSize: 11, margin: '2px 0 0' }}>{pct.toFixed(1)}%</p>}
+      </div>
     </div>
   );
 }
@@ -215,6 +277,11 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   const [search, setSearch] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'premium' | 'free'>('all');
   const [lastRefresh, setLastRefresh] = useState(() => new Date().toLocaleTimeString('fr-FR'));
+  const [stripeStats, setStripeStats] = useState<StripeStats | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [affiliateSearch, setAffiliateSearch] = useState('');
+  const [affiliateSort, setAffiliateSort] = useState<'ca' | 'clicks' | 'commission' | 'sales'>('ca');
+  const [expandedAffiliate, setExpandedAffiliate] = useState<string | null>(null);
 
   // Access codes tab state
   type AccessCodeRow = { id: string; code: string; note: string | null; used: boolean; usedAt: string | null; usedByEmail: string | null; createdAt: string };
@@ -257,15 +324,34 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
     setCodes(prev => prev.filter(c => c.id !== id));
   }
 
+  async function fetchStripeStats() {
+    setStripeLoading(true);
+    try {
+      const res = await fetch('/api/admin/stripe-stats', {
+        headers: { 'x-admin-token': process.env.NEXT_PUBLIC_ADMIN_TOKEN ?? 'urcecret-admin-2026' },
+      });
+      if (res.ok) setStripeStats(await res.json());
+    } catch { /* no-op */ } finally { setStripeLoading(false); }
+  }
+
+  useEffect(() => {
+    fetchStripeStats();
+  }, []);
+
   useEffect(() => {
     if (tab === 'codes' && !codesLoaded) loadCodes();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
-  // Auto-refresh every 60 s
+  // Auto-refresh every 30s
   useEffect(() => {
-    const id = setInterval(() => { router.refresh(); setLastRefresh(new Date().toLocaleTimeString('fr-FR')); }, 60_000);
+    const id = setInterval(() => {
+      router.refresh();
+      fetchStripeStats();
+      setLastRefresh(new Date().toLocaleTimeString('fr-FR'));
+    }, 30_000);
     return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   const last12 = useMemo(() => getLast12Keys(), []);
@@ -297,34 +383,49 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
 
   const sortedMonths = Object.entries(stats.revenueByMonth).sort(([a], [b]) => b.localeCompare(a)).slice(0, 12);
 
-  const totalAffilRevenue    = stats.affiliates.reduce((s, a) => s + a.conversions.reduce((ss, c) => ss + c.amountCents, 0), 0);
-  const totalAffilCommission = stats.affiliates.reduce((s, a) => s + a.conversions.reduce((ss, c) => ss + c.commissionCents, 0), 0);
+  const affiliateRanking = useMemo(() => {
+    return stats.affiliates
+      .map(a => {
+        const ca = a.conversions.reduce((s, c) => s + c.amountCents, 0);
+        const commissionDue = calcCommission(a.conversions);
+        return {
+          id: a.id,
+          name: a.name,
+          slug: a.slug,
+          email: a.email,
+          ca,
+          sales: a.conversions.length,
+          clicks: stats.affiliateClicks[a.slug] ?? 0,
+          commission: commissionDue,
+          conversions: a.conversions,
+        };
+      })
+      .filter(a => !affiliateSearch || a.name.toLowerCase().includes(affiliateSearch.toLowerCase()) || a.slug.includes(affiliateSearch.toLowerCase()))
+      .sort((a, b) => {
+        if (affiliateSort === 'ca') return b.ca - a.ca;
+        if (affiliateSort === 'clicks') return b.clicks - a.clicks;
+        if (affiliateSort === 'commission') return b.commission - a.commission;
+        return b.sales - a.sales;
+      });
+  }, [stats.affiliates, stats.affiliateClicks, affiliateSearch, affiliateSort]);
 
-  const affiliateRanking = useMemo(() =>
-    stats.affiliates.map(a => ({
-      name: a.name, slug: a.slug,
-      ca: a.conversions.reduce((s, c) => s + c.amountCents, 0),
-      sales: a.conversions.length,
-      clicks: stats.affiliateClicks[a.slug] ?? 0,
-      commission: a.conversions.reduce((s, c) => s + c.commissionCents, 0),
-    })).sort((a, b) => b.ca - a.ca),
-    [stats.affiliates, stats.affiliateClicks]);
-
-  const maxAffilCA = Math.max(...affiliateRanking.map(a => a.ca), 1);
+  const totalAffilCA         = affiliateRanking.reduce((s, a) => s + a.ca, 0);
+  const totalAffilCommission = affiliateRanking.reduce((s, a) => s + a.commission, 0);
+  const maxAffilCA     = Math.max(...affiliateRanking.map(a => a.ca), 1);
   const maxAffilClicks = Math.max(...affiliateRanking.map(a => a.clicks), 1);
-  const maxQuizCount = Math.max(...sortedQuizzes.map(q => q.count), 1);
+  const maxQuizCount   = Math.max(...sortedQuizzes.map(q => q.count), 1);
 
-  // MBTI top types
-  const topMbti = Object.entries(stats.mbtiDistribution ?? {}).sort(([, a], [, b]) => b - a).slice(0, 8);
-  const maxMbti = Math.max(...topMbti.map(([, v]) => v), 1);
+  const topMbti  = Object.entries(stats.mbtiDistribution ?? {}).sort(([, a], [, b]) => b - a).slice(0, 8);
+  const maxMbti  = Math.max(...topMbti.map(([, v]) => v), 1);
 
   const TABS: { id: Tab; label: string }[] = [
     { id: 'overview',   label: '📊 Vue d\'ensemble' },
+    { id: 'activite',   label: '⚡ Activité' },
     { id: 'users',      label: '👥 Utilisateurs' },
     { id: 'revenue',    label: '💰 Revenus' },
     { id: 'quizzes',    label: '🧩 Quiz' },
     { id: 'affiliates', label: '🔗 Affiliés' },
-    { id: 'codes',      label: '🎟️ Codes accès' },
+    { id: 'codes',      label: '🎟️ Codes' },
   ];
 
   const card = (content: React.ReactNode) => (
@@ -357,10 +458,15 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <Link href="/" style={{ fontSize: 18, fontWeight: 900, textDecoration: 'none' }}>
             <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span style={{ color: '#fff' }}>Cecret</span>
+            <span style={{ fontSize: 11, color: '#3f3f46', fontWeight: 400, marginLeft: 8 }}>Admin</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            {stripeStats && (
+              <span style={{ fontSize: 12, color: '#34d399', fontWeight: 600 }}>
+                MRR {fmt(stripeStats.mrr)}
+              </span>
+            )}
             <span style={{ fontSize: 11, color: '#3f3f46' }}>↻ {lastRefresh}</span>
-            <Link href="/admin/affiliates" style={{ fontSize: 12, color: '#a78bfa', textDecoration: 'none' }}>Gérer affiliés →</Link>
           </div>
         </div>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', display: 'flex', gap: 4, overflowX: 'auto' }}>
@@ -383,21 +489,44 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {sectionTitle('Vue d\'ensemble', 'Statistiques en temps réel')}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-              <KpiCard label="Utilisateurs" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} color="#a78bfa" />
-              <KpiCard label="Premium" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#f472b6" />
-              <KpiCard label="Tests MBTI" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} color="#34d399" />
-              <KpiCard label="CA affiliés total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} color="#fbbf24" />
-            </div>
+            {/* Stripe KPIs */}
+            {stripeStats ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+                <KpiCard label="MRR (Stripe)" value={fmt(stripeStats.mrr)} sub="revenu mensuel récurrent" color="#34d399" />
+                <KpiCard label="Abonnés actifs" value={(stripeStats.monthlyCount + stripeStats.annualCount).toLocaleString('fr-FR')} sub={`${stripeStats.monthlyCount} mensuel · ${stripeStats.annualCount} annuel`} color="#34d399" />
+                <KpiCard label="Churn (30j)" value={stripeStats.churnedLast30} sub="abonnements résiliés" color="#f87171" />
+                <KpiCard label="CA affiliés total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} color="#fbbf24" />
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+                <KpiCard label="MRR" value={stripeLoading ? '...' : '—'} sub="chargement Stripe" color="#34d399" />
+                <KpiCard label="Abonnés actifs" value="—" color="#34d399" />
+                <KpiCard label="Churn (30j)" value="—" color="#f87171" />
+                <KpiCard label="CA affiliés total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} color="#fbbf24" />
+              </div>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-              <KpiCard label="Vues de page total" value={stats.totalPageViews.toLocaleString('fr-FR')} sub="total cumulé" color="#0ea5e9" />
-              <KpiCard label="Nouveaux aujourd'hui" value={stats.newToday} color="#a78bfa" />
-              <KpiCard label="Unlocks payants" value={stats.paidResults} sub={`+${stats.paidToday} auj.`} color="#34d399" />
-              <KpiCard label="Revenus cette semaine" value={fmt(stats.weekRevenueCents)} color="#fbbf24" />
+              <KpiCard label="Total inscrits" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} color="#a78bfa" />
+              <KpiCard label="Premium (DB)" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#f472b6" />
+              <KpiCard label="Tests MBTI" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} color="#0ea5e9" />
+              <KpiCard label="Vues de page" value={stats.totalPageViews.toLocaleString('fr-FR')} sub="total cumulé" color="#0ea5e9" />
             </div>
 
-            {/* Combined growth line chart */}
+            {/* Acquisition funnel */}
+            {cardP(
+              <>
+                <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Entonnoir d&apos;acquisition</p>
+                <FunnelStep label="Visiteurs uniques (vues de page)" value={stats.totalPageViews} color="#71717a" />
+                <FunnelStep label="Inscrits (comptes créés)" value={stats.totalUsers} pct={stats.totalPageViews > 0 ? (stats.totalUsers / stats.totalPageViews) * 100 : 0} color="#a78bfa" />
+                <FunnelStep label="Payants (premium)" value={stats.premiumUsers} pct={stats.totalUsers > 0 ? (stats.premiumUsers / stats.totalUsers) * 100 : 0} color="#f472b6" />
+                {stripeStats && (
+                  <FunnelStep label="Abonnés actifs Stripe" value={stripeStats.monthlyCount + stripeStats.annualCount} pct={stats.premiumUsers > 0 ? ((stripeStats.monthlyCount + stripeStats.annualCount) / stats.premiumUsers) * 100 : 0} color="#34d399" />
+                )}
+              </>
+            )}
+
+            {/* Growth chart */}
             {cardP(
               <>
                 <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 20 }}>Croissance · 12 derniers mois</p>
@@ -419,9 +548,9 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Top types MBTI</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '4px 24px' }}>
                   {topMbti.map(([type, count]) => (
-                    <HorizBar key={type} label={type} value={count} max={maxMbti}
+                    <HorizBar key={type} label={type.toUpperCase()} value={count} max={maxMbti}
                       color="linear-gradient(90deg,#7c3aed,#a78bfa)"
-                      valueLabel={`${count} users (${((count / stats.totalUsers) * 100).toFixed(1)}%)`} />
+                      valueLabel={`${count} (${((count / stats.totalUsers) * 100).toFixed(1)}%)`} />
                   ))}
                 </div>
               </>
@@ -444,10 +573,118 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                         <tr key={u.id} style={{ transition: 'background .1s' }}
                           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
                           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                          <td style={{ ...tdStyle, color: '#d4d4d8' }}>{u.email ?? '—'}</td>
+                          <td style={{ ...tdStyle, color: '#d4d4d8' }}>{maskEmail(u.email)}</td>
                           <td style={tdStyle}><TierBadge tier={u.tier} /></td>
                           <td style={{ ...tdStyle, color: '#52525b' }}>{fmtDate(u.createdAt)}</td>
                           <td style={{ ...tdStyle, color: '#71717a' }}>{u._count.quizResults}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── ACTIVITÉ ── */}
+        {tab === 'activite' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {sectionTitle('Activité', 'Paiements Stripe & inscriptions récentes · refresh auto 30s')}
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              {/* Stripe charges */}
+              {card(
+                <>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600, fontSize: 14 }}>Derniers paiements Stripe</span>
+                    <button onClick={fetchStripeStats} style={{ padding: '4px 10px', borderRadius: 8, fontSize: 11, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399', cursor: 'pointer' }}>
+                      {stripeLoading ? '...' : '↻ Rafraîchir'}
+                    </button>
+                  </div>
+                  {stripeStats ? (
+                    stripeStats.recentCharges.length === 0 ? (
+                      <p style={{ padding: '32px 20px', textAlign: 'center', color: '#3f3f46', fontSize: 13 }}>Aucun paiement récent</p>
+                    ) : (
+                      <div>
+                        {stripeStats.recentCharges.map(c => (
+                          <div key={c.id} style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399', flexShrink: 0 }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ color: '#34d399', fontWeight: 700, fontSize: 14, margin: 0 }}>
+                                {(c.amount / 100).toFixed(2)} {c.currency.toUpperCase()}
+                              </p>
+                              <p style={{ color: '#52525b', fontSize: 11, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {maskEmail(c.receiptEmail)} · {c.description ?? '—'}
+                              </p>
+                            </div>
+                            <p style={{ color: '#3f3f46', fontSize: 11, flexShrink: 0 }}>{fmtDateTime(c.created)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  ) : (
+                    <p style={{ padding: '32px 20px', textAlign: 'center', color: '#3f3f46', fontSize: 13 }}>
+                      {stripeLoading ? 'Chargement Stripe...' : 'Clé Stripe non configurée'}
+                    </p>
+                  )}
+                </>
+              )}
+
+              {/* Recent signups */}
+              {card(
+                <>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <span style={{ fontWeight: 600, fontSize: 14 }}>Dernières inscriptions</span>
+                  </div>
+                  {(stats.recentSignups ?? stats.recentUsers.slice(0, 20)).length === 0 ? (
+                    <p style={{ padding: '32px 20px', textAlign: 'center', color: '#3f3f46', fontSize: 13 }}>Aucune inscription récente</p>
+                  ) : (
+                    <div>
+                      {(stats.recentSignups ?? stats.recentUsers.slice(0, 20)).map(u => (
+                        <div key={u.id} style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: u.tier === 'premium' ? '#f472b6' : '#3f3f46', flexShrink: 0 }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ color: '#d4d4d8', fontSize: 13, fontWeight: 500, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {maskEmail(u.email)}
+                            </p>
+                            <p style={{ margin: '2px 0 0' }}><TierBadge tier={u.tier} /></p>
+                          </div>
+                          <p style={{ color: '#3f3f46', fontSize: 11, flexShrink: 0 }}>{fmtDateTime(u.createdAt)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Recent affiliate conversions */}
+            {stats.recentConversions && stats.recentConversions.length > 0 && card(
+              <>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <span style={{ fontWeight: 600, fontSize: 14 }}>Dernières conversions affiliées</span>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead><tr>
+                      <th style={thStyle}>Affilié</th>
+                      <th style={thStyle}>Montant</th>
+                      <th style={thStyle}>Commission</th>
+                      <th style={thStyle}>Date</th>
+                    </tr></thead>
+                    <tbody>
+                      {stats.recentConversions.map(c => (
+                        <tr key={c.id}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                          <td style={tdStyle}>
+                            <p style={{ color: '#d4d4d8', margin: 0 }}>{c.affiliateName}</p>
+                            <p style={{ color: '#3f3f46', fontSize: 11, margin: 0 }}>/{c.affiliateSlug}</p>
+                          </td>
+                          <td style={{ ...tdStyle, color: '#fbbf24', fontWeight: 600 }}>{fmt(c.amountCents)}</td>
+                          <td style={{ ...tdStyle, color: '#f472b6' }}>{fmt(c.commissionCents)}</td>
+                          <td style={{ ...tdStyle, color: '#3f3f46', fontSize: 11 }}>{fmtDateTime(c.createdAt)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -541,10 +778,18 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <KpiCard label="Aujourd'hui"    value={fmt(stats.todayRevenueCents)}  color="#fbbf24" />
             </div>
 
+            {stripeStats && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+                <KpiCard label="MRR Stripe" value={fmt(stripeStats.mrr)} sub="revenu mensuel récurrent" color="#34d399" />
+                <KpiCard label="Abonnés Stripe" value={stripeStats.monthlyCount + stripeStats.annualCount} sub={`${stripeStats.monthlyCount} mensuel · ${stripeStats.annualCount} annuel`} color="#34d399" />
+                <KpiCard label="Churn (30j)" value={stripeStats.churnedLast30} sub="résiliations récentes" color="#f87171" />
+              </div>
+            )}
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
               <KpiCard label="Unlocks payants (total)" value={stats.paidResults}     sub="résultats débloqués"    color="#34d399" />
               <KpiCard label="Unlocks ce mois"         value={stats.paidThisMonth}   sub={`+${stats.paidToday} auj.`} color="#34d399" />
-              <KpiCard label="Stripe" value="→" sub="Voir le dashboard Stripe" color="#a78bfa" />
+              <KpiCard label="Taux de conversion"      value={`${conversionRate}%`} sub="inscrits → premium"  color="#a78bfa" />
             </div>
 
             {cardP(
@@ -688,22 +933,22 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
         {tab === 'affiliates' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-              {sectionTitle('Affiliés', `${stats.affiliates.length} affiliés actifs`)}
+              {sectionTitle('Affiliés', `${stats.affiliates.length} affiliés · règle 80% (30j) → 30%`)}
               <Link href="/admin/affiliates" style={{ padding: '8px 16px', borderRadius: 12, fontSize: 13, fontWeight: 600, textDecoration: 'none', background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)', flexShrink: 0 }}>
                 Gérer →
               </Link>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-              <KpiCard label="Total affiliés"     value={stats.affiliates.length} color="#a78bfa" />
-              <KpiCard label="Total conversions"  value={stats.affiliates.reduce((s, a) => s + a.conversions.length, 0)} color="#a78bfa" />
-              <KpiCard label="CA total affiliés"  value={fmt(totalAffilRevenue)}    color="#fbbf24" />
-              <KpiCard label="Commissions dues"   value={fmt(totalAffilCommission)} color="#f472b6" />
+              <KpiCard label="Total affiliés"       value={stats.affiliates.length}                                                   color="#a78bfa" />
+              <KpiCard label="Total conversions"    value={stats.affiliates.reduce((s, a) => s + a.conversions.length, 0)}            color="#a78bfa" />
+              <KpiCard label="CA total affiliés"    value={fmt(totalAffilCA)}    sub="toutes conversions"  color="#fbbf24" />
+              <KpiCard label="Commissions (80/30)"  value={fmt(totalAffilCommission)} sub="à payer"        color="#f472b6" />
             </div>
 
             {cardP(
               <>
-                <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 20 }}>Revenus affiliés · 12 mois</p>
+                <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 20 }}>CA affiliés & commissions · 12 mois</p>
                 <LineChart
                   xLabels={monthLabels}
                   series={[
@@ -716,65 +961,139 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               </>
             )}
 
-            {affiliateRanking.length > 0 && cardP(
-              <>
-                <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>🏆 Classement CA généré</p>
-                {affiliateRanking.map((a, i) => (
-                  <HorizBar key={a.name}
-                    label={`${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`} ${a.name}`}
-                    value={a.ca} max={maxAffilCA}
-                    color="linear-gradient(90deg,#7c3aed,#fbbf24)"
-                    valueLabel={fmt(a.ca)} />
-                ))}
-              </>
-            )}
+            {/* Sort + Search */}
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="Rechercher un affilié…"
+                value={affiliateSearch}
+                onChange={e => setAffiliateSearch(e.target.value)}
+                style={{ flex: 1, minWidth: 200, padding: '10px 14px', borderRadius: 10, fontSize: 13, color: '#fff', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', outline: 'none' }}
+              />
+              {(['ca', 'clicks', 'sales', 'commission'] as const).map(s => (
+                <button key={s} onClick={() => setAffiliateSort(s)} style={{
+                  padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                  background: affiliateSort === s ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.04)',
+                  color: affiliateSort === s ? '#a78bfa' : '#52525b',
+                  border: affiliateSort === s ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.07)',
+                }}>
+                  {s === 'ca' ? 'CA ↓' : s === 'clicks' ? 'Clics ↓' : s === 'sales' ? 'Ventes ↓' : 'Commission ↓'}
+                </button>
+              ))}
+            </div>
 
-            {affiliateRanking.length > 0 && cardP(
-              <>
-                <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>👆 Classement clics</p>
-                {[...affiliateRanking].sort((a, b) => b.clicks - a.clicks).map(a => (
-                  <HorizBar key={a.name} label={a.name}
-                    value={a.clicks} max={maxAffilClicks}
-                    color="linear-gradient(90deg,#0ea5e9,#a78bfa)"
-                    valueLabel={a.clicks.toLocaleString('fr-FR') + ' clics'} />
-                ))}
-              </>
-            )}
-
+            {/* Affiliate leaderboard */}
             {card(
               <>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600, fontSize: 14 }}>Détail par affilié</div>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                    <thead><tr>
-                      {['Nom','Lien','Email','%','Clics','Ventes','CTR','CA'].map(h => <th key={h} style={thStyle}>{h}</th>)}
-                    </tr></thead>
-                    <tbody>
-                      {stats.affiliates.map(a => {
-                        const ca = a.conversions.reduce((s, c) => s + c.amountCents, 0);
-                        const clicks = stats.affiliateClicks[a.slug] ?? 0;
-                        const ctr = clicks > 0 ? ((a.conversions.length / clicks) * 100).toFixed(1) + '%' : '—';
-                        return (
-                          <tr key={a.id}
-                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
-                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                            <td style={{ ...tdStyle, color: '#fff', fontWeight: 500 }}>{a.name}</td>
-                            <td style={tdStyle}><code style={{ color: '#a78bfa', fontSize: 11 }}>/?ref={a.slug}</code></td>
-                            <td style={{ ...tdStyle, color: '#52525b', fontSize: 12 }}>{a.email ?? '—'}</td>
-                            <td style={{ ...tdStyle, color: '#d4d4d8' }}>{a.commissionPct}%</td>
-                            <td style={{ ...tdStyle, color: '#d4d4d8' }}>{clicks.toLocaleString('fr-FR')}</td>
-                            <td style={{ ...tdStyle, color: '#d4d4d8' }}>{a.conversions.length}</td>
-                            <td style={{ ...tdStyle, color: '#34d399', fontWeight: 600 }}>{ctr}</td>
-                            <td style={{ ...tdStyle, color: '#fbbf24', fontWeight: 600 }}>{fmt(ca)}</td>
-                          </tr>
-                        );
-                      })}
-                      {stats.affiliates.length === 0 && (
-                        <tr><td colSpan={8} style={{ ...tdStyle, textAlign: 'center', color: '#3f3f46', padding: '32px' }}>Aucun affilié</td></tr>
-                      )}
-                    </tbody>
-                  </table>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600, fontSize: 14 }}>
+                  Classement affiliés
                 </div>
+                {affiliateRanking.length === 0 ? (
+                  <p style={{ padding: '32px', textAlign: 'center', color: '#3f3f46', fontSize: 13 }}>Aucun affilié</p>
+                ) : (
+                  affiliateRanking.map((a, i) => (
+                    <div key={a.id}>
+                      <div
+                        onClick={() => setExpandedAffiliate(expandedAffiliate === a.id ? null : a.id)}
+                        style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', transition: 'background .1s' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                          <span style={{ fontSize: 16, width: 28, flexShrink: 0 }}>
+                            {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}
+                          </span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ color: '#fff', fontWeight: 600, fontSize: 14, margin: 0 }}>{a.name}</p>
+                            <p style={{ color: '#3f3f46', fontSize: 11, margin: '2px 0 0' }}>/{a.slug} · {a.email ?? '—'}</p>
+                          </div>
+                          <div style={{ display: 'flex', gap: 24, flexShrink: 0 }}>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ color: '#fbbf24', fontWeight: 700, fontSize: 14, margin: 0 }}>{fmt(a.ca)}</p>
+                              <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>CA</p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ color: '#f472b6', fontWeight: 700, fontSize: 14, margin: 0 }}>{fmt(a.commission)}</p>
+                              <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>Commission due</p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ color: '#a78bfa', fontWeight: 700, fontSize: 14, margin: 0 }}>{a.clicks.toLocaleString('fr-FR')}</p>
+                              <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>Clics</p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ color: '#d4d4d8', fontWeight: 700, fontSize: 14, margin: 0 }}>{a.sales}</p>
+                              <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>Ventes</p>
+                            </div>
+                            <span style={{ color: expandedAffiliate === a.id ? '#a78bfa' : '#3f3f46', fontSize: 12, alignSelf: 'center' }}>
+                              {expandedAffiliate === a.id ? '▲' : '▼'}
+                            </span>
+                          </div>
+                        </div>
+                        {/* CA bar */}
+                        <div style={{ marginTop: 8, marginLeft: 44, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${(a.ca / maxAffilCA) * 100}%`, background: 'linear-gradient(90deg,#7c3aed,#fbbf24)', borderRadius: 999 }} />
+                        </div>
+                      </div>
+
+                      {/* Expanded: commission breakdown */}
+                      {expandedAffiliate === a.id && (
+                        <div style={{ background: 'rgba(139,92,246,0.05)', borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '16px 20px 20px 64px' }}>
+                          <p style={{ fontSize: 12, color: '#a78bfa', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            Règle commission : 80% premiers 30j · 30% ensuite
+                          </p>
+                          {a.conversions.length === 0 ? (
+                            <p style={{ color: '#3f3f46', fontSize: 13 }}>Aucune conversion</p>
+                          ) : (() => {
+                            const sorted = [...a.conversions].sort((x, y) => new Date(x.createdAt).getTime() - new Date(y.createdAt).getTime());
+                            const firstDate = new Date(sorted[0].createdAt);
+                            const cutoff = new Date(firstDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+                            return (
+                              <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                                  <thead><tr>
+                                    {['Date','Montant','Taux','Commission due','Période'].map(h => (
+                                      <th key={h} style={{ ...thStyle, fontSize: 10, padding: '8px 12px' }}>{h}</th>
+                                    ))}
+                                  </tr></thead>
+                                  <tbody>
+                                    {sorted.map((c, ci) => {
+                                      const isEarlyBird = new Date(c.createdAt) <= cutoff;
+                                      const rate = isEarlyBird ? 0.80 : 0.30;
+                                      const due = Math.round(c.amountCents * rate);
+                                      return (
+                                        <tr key={ci}>
+                                          <td style={{ ...tdStyle, fontSize: 11, padding: '8px 12px', color: '#71717a' }}>{fmtDate(c.createdAt)}</td>
+                                          <td style={{ ...tdStyle, fontSize: 12, padding: '8px 12px', color: '#fbbf24', fontWeight: 600 }}>{fmt(c.amountCents)}</td>
+                                          <td style={{ ...tdStyle, fontSize: 12, padding: '8px 12px', color: isEarlyBird ? '#34d399' : '#71717a', fontWeight: 600 }}>{(rate * 100).toFixed(0)}%</td>
+                                          <td style={{ ...tdStyle, fontSize: 12, padding: '8px 12px', color: '#f472b6', fontWeight: 600 }}>{fmt(due)}</td>
+                                          <td style={{ ...tdStyle, fontSize: 11, padding: '8px 12px' }}>
+                                            <span style={{
+                                              background: isEarlyBird ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)',
+                                              color: isEarlyBird ? '#34d399' : '#52525b',
+                                              border: `1px solid ${isEarlyBird ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.07)'}`,
+                                              padding: '2px 8px', borderRadius: 999, fontSize: 10,
+                                            }}>
+                                              {isEarlyBird ? 'Premiers 30j' : 'Après 30j'}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                    <tr style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                                      <td colSpan={3} style={{ padding: '10px 12px', fontSize: 12, color: '#71717a', fontWeight: 600 }}>Total commission due</td>
+                                      <td style={{ padding: '10px 12px', color: '#f472b6', fontWeight: 800, fontSize: 14 }}>{fmt(a.commission)}</td>
+                                      <td />
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
               </>
             )}
           </div>
@@ -782,13 +1101,12 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
 
         {/* ── ACCESS CODES ── */}
         {tab === 'codes' && (
-          <div className="space-y-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div>
-              <h1 className="text-2xl font-black text-white mb-1">Codes d&apos;accès affiliés</h1>
-              <p className="text-zinc-500 text-sm">Codes à usage unique pour tester l&apos;app gratuitement</p>
+              <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: 0 }}>Codes d&apos;accès affiliés</h1>
+              <p style={{ fontSize: 13, color: '#52525b', marginTop: 4 }}>Codes à usage unique pour tester l&apos;app gratuitement</p>
             </div>
 
-            {/* Generate new code */}
             <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, padding: '20px 24px' }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#a78bfa', marginBottom: 16 }}>Générer un nouveau code</p>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -798,11 +1116,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                   placeholder="Note (ex: NomAffiliéX)"
                   style={{ flex: 1, minWidth: 180, padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, outline: 'none' }}
                 />
-                <button
-                  onClick={generateCode}
-                  disabled={codesLoading}
-                  style={{ padding: '10px 20px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer', opacity: codesLoading ? 0.6 : 1 }}
-                >
+                <button onClick={generateCode} disabled={codesLoading} style={{ padding: '10px 20px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer', opacity: codesLoading ? 0.6 : 1 }}>
                   {codesLoading ? '...' : '+ Générer'}
                 </button>
               </div>
@@ -814,7 +1128,6 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               )}
             </div>
 
-            {/* Codes list */}
             <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, overflow: 'hidden' }}>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>

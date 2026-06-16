@@ -50,13 +50,26 @@ export default async function AdminTokenPage({ params }: { params: { token: stri
     }),
   ]);
 
-  const [allConversions, affiliates] = await Promise.all([
+  const [allConversions, affiliates, recentConversions, recentSignups] = await Promise.all([
     prisma.affiliateConversion.findMany({
       select: { amountCents: true, commissionCents: true, createdAt: true, affiliateId: true },
     }),
     prisma.affiliate.findMany({
       include: { conversions: { orderBy: { createdAt: 'desc' } } },
       orderBy: { createdAt: 'desc' },
+    }),
+    prisma.affiliateConversion.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: {
+        id: true, amountCents: true, commissionCents: true, createdAt: true, stripeSessionId: true,
+        affiliate: { select: { slug: true, name: true } },
+      },
+    }),
+    prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: { id: true, email: true, name: true, tier: true, createdAt: true },
     }),
   ]);
 
@@ -89,12 +102,24 @@ export default async function AdminTokenPage({ params }: { params: { token: stri
   const monthRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
   const yearRevenueCents = allConversions.filter(c => new Date(c.createdAt) >= startOfYear).reduce((s, c) => s + c.amountCents, 0);
 
+  const recentConvsMapped = recentConversions.map(c => ({
+    id: c.id,
+    affiliateSlug: c.affiliate.slug,
+    affiliateName: c.affiliate.name,
+    amountCents: c.amountCents,
+    commissionCents: c.commissionCents,
+    createdAt: c.createdAt.toISOString(),
+    stripeSessionId: c.stripeSessionId,
+  }));
+
   const stats = JSON.parse(JSON.stringify({
     totalUsers, premiumUsers, newToday, newThisWeek, newThisMonth,
     recentUsers, usersByMonth,
     totalResults, paidResults, paidToday, paidThisMonth, byQuiz,
     totalRevenueCents, todayRevenueCents, weekRevenueCents, monthRevenueCents, yearRevenueCents,
     revenueByMonth, affiliates,
+    recentConversions: recentConvsMapped,
+    recentSignups,
   }));
 
   return <AdminDashboard stats={stats} />;

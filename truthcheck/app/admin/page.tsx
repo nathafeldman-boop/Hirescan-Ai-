@@ -17,6 +17,8 @@ export default async function AdminPage() {
     mbtiUsers,
     allConversions, affiliates, affiliateClickViews,
     totalPageViews,
+    recentConversions,
+    recentSignups,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { tier: 'premium' } }),
@@ -40,6 +42,19 @@ export default async function AdminPage() {
     prisma.affiliate.findMany({ include: { conversions: { orderBy: { createdAt: 'desc' } } }, orderBy: { createdAt: 'desc' } }),
     prisma.pageView.findMany({ where: { path: { startsWith: '/__aff/' } }, select: { path: true } }),
     prisma.pageView.count(),
+    prisma.affiliateConversion.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: {
+        id: true, amountCents: true, commissionCents: true, createdAt: true, stripeSessionId: true,
+        affiliate: { select: { slug: true, name: true } },
+      },
+    }),
+    prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: { id: true, email: true, name: true, tier: true, createdAt: true },
+    }),
   ]);
 
   // Group users by month
@@ -104,6 +119,16 @@ export default async function AdminPage() {
   const yearRevenueCents   = allConversions.filter(c => new Date(c.createdAt) >= startOfYear).reduce((s, c)  => s + c.amountCents, 0);
   const weekRevenueCents   = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
 
+  const recentConvsMapped = recentConversions.map(c => ({
+    id: c.id,
+    affiliateSlug: c.affiliate.slug,
+    affiliateName: c.affiliate.name,
+    amountCents: c.amountCents,
+    commissionCents: c.commissionCents,
+    createdAt: c.createdAt.toISOString(),
+    stripeSessionId: c.stripeSessionId,
+  }));
+
   const stats = JSON.parse(JSON.stringify({
     totalUsers, premiumUsers, newToday, newThisWeek, newThisMonth,
     recentUsers, usersByMonth, premiumByMonth,
@@ -113,6 +138,8 @@ export default async function AdminPage() {
     revenueByMonth,
     affiliates, affiliateClicks,
     totalPageViews,
+    recentConversions: recentConvsMapped,
+    recentSignups,
   }));
 
   return <AdminDashboard stats={stats} />;
