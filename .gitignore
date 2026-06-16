@@ -5,3 +5,4 @@ smartapp-website/.vercel/
 smartapp-website/tsconfig.tsbuildinfo
 smartapp-website/next-env.d.ts
 .claude/
+truthcheck/tsconfig.tsbuildinfo
