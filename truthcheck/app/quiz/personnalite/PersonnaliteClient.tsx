@@ -677,8 +677,6 @@ export default function PersonnaliteClient() {
   });
   const [answers, setAnswers] = useState<Answers>({});
   const [mbtiType, setMbtiType] = useState('');
-  const [inAppWarning, setInAppWarning] = useState(false);
-
   const questions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
   const t = ui[lang].quiz;
 
@@ -689,20 +687,6 @@ export default function PersonnaliteClient() {
     const intent = params.get('intent') ?? null;
     diagLog('page_load', { phase, hasPending: !!pending, pendingType: pending, urlIntent: intent });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Detect in-app browser (TikTok, Instagram, Snapchat…) — block immediately
-  useEffect(() => {
-    const ua = navigator.userAgent || '';
-    // Android WebView adds "wv" token — covers TikTok "Navigateur Web" and all other in-app browsers
-    const isAndroidWebView = /Android/.test(ua) && /\bwv\b/.test(ua);
-    // iOS WebView has AppleWebKit but no "Safari" in UA
-    const isIOSWebView = /iP(hone|ad|od)/.test(ua) && /AppleWebKit/.test(ua) && !/Safari/.test(ua);
-    const isSocialApp = /FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/.test(ua);
-    if (isAndroidWebView || isIOSWebView || isSocialApp) {
-      setInAppWarning(true);
-      diagLog('inapp_detected', { ua: ua.slice(0, 120) });
-    }
   }, []);
 
   // Affiliate tracking — persist ref in localStorage as fallback (cookie set by middleware, httpOnly)
@@ -816,8 +800,6 @@ export default function PersonnaliteClient() {
 
   return (
     <main className="min-h-screen text-stone-900" style={{ background: '#faf9f7' }}>
-      {/* InAppBrowserOverlay: shown only at paywall — quiz itself works in TikTok/Instagram browser */}
-      {inAppWarning && phase === 'result' && <InAppBrowserOverlay />}
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
