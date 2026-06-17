@@ -6,4 +6,9 @@ smartapp-website/tsconfig.tsbuildinfo
 smartapp-website/next-env.d.ts
 .claude/*
 !.claude/settings.json
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/react-best-practices/
+.claude/skills/react-best-practices/*
+!.claude/skills/react-best-practices/SKILL.md
 truthcheck/tsconfig.tsbuildinfo
