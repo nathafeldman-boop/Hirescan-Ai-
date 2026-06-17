@@ -4,7 +4,7 @@ import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
-const BOT_PATTERNS = /bot|crawler|spider|scraper|headless|prerender|lighthouse|pagespeed/i;
+const BOT_PATTERNS = /bot|crawler|spider|scraper|headless|prerender|lighthouse|pagespeed|google-inspection|googleother|google-extended|google-adstxt|adsbot|mediapartners|facebookexternalhit|twitterbot|linkedinbot|slackbot|discordbot|whatsapp|telegram/i;
 
 export async function POST(req: NextRequest) {
   const ua = req.headers.get('user-agent') ?? '';
