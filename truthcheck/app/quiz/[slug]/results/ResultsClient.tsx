@@ -109,7 +109,7 @@ export default function ResultsClient({ quiz }: Props) {
 
   const tier = getResultTier(quiz, score);
 
-  const [contractAccepted, setContractAccepted] = useState(false);
+  const [contractAccepted] = useState(true);
   const [strokeOffset, setStrokeOffset] = useState(CIRCUMFERENCE);
   const [shareId, setShareId] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -355,18 +355,18 @@ export default function ResultsClient({ quiz }: Props) {
     return () => clearTimeout(t);
   }, [score]);
 
-  // Auto-scroll to paywall after contract accepted
+  // Auto-scroll to paywall — delay so user sees their score/tier first
   useEffect(() => {
-    if (isPremium || sessionLoading || !contractAccepted) return;
+    if (isPremium || sessionLoading) return;
     const t = setTimeout(() => {
       paywallRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 500);
+    }, 2000);
     return () => clearTimeout(t);
-  }, [isPremium, sessionLoading, contractAccepted]);
+  }, [isPremium, sessionLoading]);
 
-  // Track paywall impression once per session (only after contract)
+  // Track paywall impression once per session
   useEffect(() => {
-    if (isPremium || sessionLoading || !contractAccepted) return;
+    if (isPremium || sessionLoading) return;
     try {
       const key = `pw_seen_${quiz.slug}`;
       if (!sessionStorage.getItem(key)) {
@@ -375,11 +375,11 @@ export default function ResultsClient({ quiz }: Props) {
       }
     } catch {}
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPremium, sessionLoading, contractAccepted]);
+  }, [isPremium, sessionLoading]);
 
   // Exit intent — desktop (mouse leaves top) + mobile (tab switch)
   useEffect(() => {
-    if (isPremium || sessionLoading || !contractAccepted) return;
+    if (isPremium || sessionLoading) return;
     const trigger = () => {
       if (!exitTriggered.current) {
         exitTriggered.current = true;
@@ -394,7 +394,7 @@ export default function ResultsClient({ quiz }: Props) {
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [isPremium, sessionLoading, contractAccepted]);
+  }, [isPremium, sessionLoading]);
 
   // Exit modal countdown
   useEffect(() => {
@@ -520,15 +520,7 @@ export default function ResultsClient({ quiz }: Props) {
   return (
     <main className="min-h-screen bg-[#09090b] flex flex-col relative overflow-hidden">
 
-      {/* ── Contract screen — shown before results for non-premium users ── */}
-      {!sessionLoading && !isPremium && !contractAccepted && (
-        <ContractScreen
-          quizTitle={quiz.title}
-          quizSlug={quiz.slug}
-          accentColor={tier.glowColor}
-          onAccept={() => setContractAccepted(true)}
-        />
-      )}
+      {/* ContractScreen removed — results visible immediately after test */}
 
       {/* Ambient glow */}
       <div className="pointer-events-none fixed inset-0">
