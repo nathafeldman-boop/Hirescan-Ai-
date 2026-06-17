@@ -5,7 +5,7 @@ const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Test MBTI Gratuit — 16 Types de Personnalité | UrCecret',
-  description: 'Découvre ton type MBTI en 100 questions · 15 quiz anonymes sur l\'infidélité, l\'amour et tes amis. Gratuit, instantané, sans inscription.',
+  description: 'Découvre ton type MBTI en 70 questions · 15 quiz anonymes sur l\'infidélité, l\'amour et tes amis. Gratuit, instantané, sans inscription.',
   keywords: [
     'UrCecret', 'urcecret', 'urcecret.site',
     'test MBTI', 'MBTI gratuit', 'test de personnalité gratuit', '16 types personnalité',

@@ -163,7 +163,7 @@ export default function QuizzesPage() {
                     </span>
                   </div>
                   <p className="text-stone-400 text-xs leading-relaxed">
-                    100 questions · INFJ, ENFP, INTJ et 13 autres · Résultat instantané
+                    70 questions · INFJ, ENFP, INTJ et 13 autres · Résultat instantané
                   </p>
                 </div>
                 <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
