@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaunchForge — From 0 to SaaS in 2 minutes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+[data-theme="dark"]{
+  --bg:#09090b;--surface:#111113;--surface2:#18181b;--border:#27272a;
+  --text:#fafafa;--text2:#a1a1aa;--text3:#52525b;--accent:#fff;--ring:rgba(255,255,255,.07);
+}
+[data-theme="light"]{
+  --bg:#f8f8fa;--surface:#ffffff;--surface2:#f4f4f5;--border:#e4e4e7;
+  --text:#09090b;--text2:#71717a;--text3:#a1a1aa;--accent:#09090b;--ring:rgba(0,0,0,.05);
+}
+
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes dashIn{to{stroke-dashoffset:var(--target-offset)}}
+
+.au{animation:fadeUp .38s ease both}
+.af{animation:fadeIn .3s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.16s}.d4{animation-delay:.22s}.d5{animation-delay:.28s}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);background:var(--bg)}
+
+#screen{min-height:100vh;padding-top:56px}
+
+.btn-p{background:var(--text);color:var(--bg);border:none;border-radius:9px;padding:13px 22px;font-size:.9375rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:opacity .15s;letter-spacing:-.01em}
+.btn-p:hover{opacity:.82}
+.btn-g{background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:9px;padding:11px 20px;font-size:.875rem;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-g:hover{background:var(--surface2);color:var(--text)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px}
+
+.opt{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;cursor:pointer;transition:all .14s;display:flex;align-items:flex-start;gap:12px;user-select:none;position:relative}
+.opt:hover{background:var(--surface2);border-color:var(--text3)}
+.opt.sel{background:var(--ring);border-color:var(--text)}
+
+.tag{display:inline-flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:12px;font-weight:500;color:var(--text2)}
+
+.mono{font-family:'JetBrains Mono',monospace}
+
+.code{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:18px;white-space:pre-wrap;word-break:break-word;color:var(--text2);max-height:300px;overflow-y:auto}
+
+.prog-track{height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--text);border-radius:2px;transition:width .4s ease}
+
+.cp-btn{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 11px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.cp-btn:hover{background:var(--surface2)}
+.cp-btn.ok{color:#22c55e;border-color:#22c55e}
+
+.sh{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--text2);animation:pulse 1.2s ease-in-out infinite}
+.ldot:nth-child(2){animation-delay:.2s}
+.ldot:nth-child(3){animation-delay:.4s}
+
+.ring-svg circle.tr{stroke:var(--border)}
+.ring-svg circle.fr{stroke:var(--text);transition:stroke-dashoffset 1s cubic-bezier(.34,1.56,.64,1)}
+
+.rm-item{display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--border)}
+.rm-item:last-child{border-bottom:none}
+.comp-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.comp-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center;gap:9px">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M9 1.5L2 6.5v10h4.5V12h5v4.5H16v-10L9 1.5z" fill="var(--text)" opacity=".9"/>
+      <rect x="7" y="11" width="4" height="4" fill="var(--bg)"/>
+    </svg>
+    <span style="font-size:14px;font-weight:700;letter-spacing:-.02em">LaunchForge</span>
+  </div>
+  <button onclick="toggleTheme()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;color:var(--text2);font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px">
+    <span id="ti">☾</span><span id="tl">Dark</span>
+  </button>
+</nav>
+
+<div id="screen"></div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const S = { step:0, ans:{}, result:null, theme:'dark' };
+
+// ─── QUESTIONS ────────────────────────────────────────────────────────────────
+const QS = [
+  { id:'devLevel', q:"What's your development level?", sub:"We'll tailor the complexity to match you",
+    multi:false, opts:[
+      {v:'none',    l:'No-code',          s:'Webflow, Zapier, Notion'},
+      {v:'beginner',l:'Beginner',         s:'< 1 year'},
+      {v:'mid',     l:'Intermediate',     s:'1–3 years'},
+      {v:'senior',  l:'Senior / Staff',   s:'3+ years'},
+    ]},
+  { id:'budget', q:"What's your monthly budget?", sub:"For APIs, hosting, and tools",
+    multi:false, opts:[
+      {v:'zero',  l:'$0 / month',    s:'Fully bootstrapped'},
+      {v:'low',   l:'Up to $100',    s:'Lean spending'},
+      {v:'mid',   l:'$100 – $500',   s:'Some runway'},
+      {v:'high',  l:'$500+',         s:'Ready to invest'},
+    ]},
+  { id:'time', q:"How much time can you dedicate?", sub:"Per week, realistically",
+    multi:false, opts:[
+      {v:'low',      l:'< 5h / week',    s:'Side project mode'},
+      {v:'mid',      l:'5–15h / week',   s:'Serious side hustle'},
+      {v:'high',     l:'15–40h / week',  s:'Part-time focus'},
+      {v:'fulltime', l:'Full-time',       s:'40h+ per week'},
+    ]},
+  { id:'mrr', q:"What's your MRR goal?", sub:"Monthly Recurring Revenue — be ambitious",
+    multi:false, opts:[
+      {v:'ramen',  l:'$500 – $2k / mo',   s:'Ramen profitable'},
+      {v:'mid',    l:'$2k – $10k / mo',   s:'Real side income'},
+      {v:'high',   l:'$10k – $50k / mo',  s:'Serious business'},
+      {v:'big',    l:'$50k+ / mo',         s:'Go big or go home'},
+    ]},
+  { id:'type', q:"Who are you selling to?", sub:"Your primary customer segment",
+    multi:false, opts:[
+      {v:'b2c',  l:'Consumers',       s:'Individuals, creators, students'},
+      {v:'smb',  l:'Small businesses',s:'Freelancers, startups, agencies'},
+      {v:'b2b',  l:'B2B / Enterprise',s:'Teams, companies'},
+      {v:'both', l:'Both',            s:'Flexible GTM'},
+    ]},
+  { id:'ai', q:"Do you want AI at the core?", sub:"AI = higher prices, higher API costs",
+    multi:false, opts:[
+      {v:'yes',   l:'Yes — AI-first',     s:'Claude, GPT, or similar'},
+      {v:'maybe', l:'AI as a feature',    s:'Not the main thing'},
+      {v:'no',    l:'No AI',              s:'Pure logic & data'},
+      {v:'tools', l:'AI dev tools',       s:'For Claude / Cursor users'},
+    ]},
+  { id:'channel', q:"How will you acquire users?", sub:"Your strongest or preferred channel",
+    multi:false, opts:[
+      {v:'tiktok',  l:'TikTok / Short video', s:'Viral content'},
+      {v:'seo',     l:'SEO / Content',        s:'Long-term organic'},
+      {v:'ph',      l:'Product Hunt',          s:'Dev & indie community'},
+      {v:'outreach',l:'Cold outreach',         s:'Direct sales, LinkedIn'},
+    ]},
+  { id:'skill', q:"What's your strongest skill?", sub:"This shapes how we position you",
+    multi:false, opts:[
+      {v:'code',   l:'Engineering',   s:'You ship fast'},
+      {v:'design', l:'Design / UX',   s:'You make it beautiful'},
+      {v:'mktg',   l:'Marketing',     s:'You grow fast'},
+      {v:'sales',  l:'Sales',         s:'You close deals'},
+    ]},
+  { id:'markets', q:"Which markets excite you?", sub:"Pick up to 3",
+    multi:true, max:3, opts:[
+      {v:'devtools',    l:'Dev Tools'},
+      {v:'creator',     l:'Creator Economy'},
+      {v:'productivity',l:'Productivity'},
+      {v:'health',      l:'Health / Wellness'},
+      {v:'fintech',     l:'Fintech'},
+      {v:'education',   l:'Education'},
+      {v:'marketing',   l:'Marketing / SEO'},
+      {v:'ai',          l:'AI / Automation'},
+    ]},
+  { id:'mvp', q:"Max time to ship your MVP?", sub:"Constraints breed creativity",
+    multi:false, opts:[
+      {v:'3d',  l:'3 days',   s:'Weekend warrior'},
+      {v:'1w',  l:'1 week',   s:'Sprint mode'},
+      {v:'2w',  l:'2 weeks',  s:'Steady pace'},
+      {v:'1m',  l:'1 month',  s:'Full build'},
+    ]},
+];
+
+// ─── IDEAS ────────────────────────────────────────────────────────────────────
+const IDEAS = [
+  {
+    id:'pushlog', name:'PushLog',
+    tagline:'AI changelogs that write themselves from your git commits.',
+    whyNow:'Developers hate writing changelogs — users love reading them. AI can parse git history and produce beautiful, human-readable entries in seconds. No one owns the indie $9/mo tier.',
+    markets:['devtools','productivity','ai'],
+    devLevels:['mid','senior'],
+    channels:['ph','seo','tiktok'],
+    types:['b2b','both'],
+    ais:['yes','maybe','tools'],
+    stack:['Next.js 14','Supabase','Claude API','GitHub OAuth','Stripe'],
+    apiRequired:true,
+    apiCost:'$20–50/mo at 500 users',
+    pricing:'$9/mo solo · $29/mo team',
+    mrr:'$3k – $15k',
+    time:'5–7 days',
+    competitors:[
+      {n:'Headway',p:'Enterprise-focused, overpriced for indie devs'},
+      {n:'Changelogfy',p:'Outdated UI, no AI generation'},
+      {n:'Beamer',p:'Feature bloat, $50+/mo starting price'},
+    ],
+    pos:'"The changelog that writes itself"',
+    vir:74, com:58, dif:35,
+    roadmap:[
+      'Next.js + Supabase auth + GitHub OAuth app',
+      'Webhook listener — receive push events',
+      'Commit parser → Claude prompt → human summary',
+      'Public changelog page at /changelog/:repo',
+      'Email digest to subscribers via Resend',
+      'Stripe billing — $9/mo with 3-repo limit',
+      'Launch: Product Hunt + 3 demo TikToks',
+    ],
+    claude:`Build a SaaS called PushLog — AI changelog generator from git commits.
+
+STACK: Next.js 14 (App Router), Supabase, Claude API (claude-sonnet-4-6), Stripe, Resend, Vercel
+
+FEATURES:
+1. GitHub OAuth login + install GitHub App on repos
+2. Webhook: receive push events → parse commits
+3. Claude generates changelog entry from commits
+4. Public page: yourdomain.com/changelog/{repo}
+5. Embeddable widget (<script> tag)
+6. Email digest (weekly) via Resend
+7. Stripe: $9/mo (3 repos), $29/mo (unlimited)
+
+CLAUDE PROMPT:
+"You are a technical writer. Convert these git commits into a concise user-facing changelog. Use present tense. Group by: ✨ Features, 🐛 Fixes, ⚡ Improvements. Under 120 words total. Commits: {commits}"
+
+DB SCHEMA:
+- users(id, github_id, email, plan, stripe_customer_id)
+- repos(id, user_id, name, github_id, webhook_id)
+- entries(id, repo_id, version, content_md, published_at)
+- subscribers(id, repo_id, email, confirmed_at)
+
+START: npx create-next-app@latest pushlog --typescript --tailwind --app
+npm install @supabase/supabase-js @anthropic-ai/sdk stripe resend`,
+    hooks:[
+      'POV: your changelog just wrote itself while you slept 👀',
+      'Why I\'m making $8k/mo from 50 lines of glue code',
+      'The SaaS idea developers will actually pay for in 2025',
+    ],
+    affiliates:[
+      'Dev YouTubers — Theo, Fireship, Jack Herrington',
+      'Open source maintainers with 1k+ GitHub stars',
+      'Startup newsletters — Indie Hackers, TLDR Dev',
+    ],
+  },
+  {
+    id:'reelscript', name:'ReelScript',
+    tagline:'Generate viral TikTok scripts tailored to your niche in 10 seconds.',
+    whyNow:'TikTok has 1.7B users. Creators post daily but run out of ideas weekly. AI now generates on-format, hook-first scripts that actually convert. The creator economy is $250B and growing.',
+    markets:['creator','ai','marketing'],
+    devLevels:['none','beginner','mid','senior'],
+    channels:['tiktok','ph'],
+    types:['b2c','both'],
+    ais:['yes','maybe'],
+    stack:['Next.js 14','Supabase','Claude API','Stripe'],
+    apiRequired:true,
+    apiCost:'$30–80/mo at 1000 users',
+    pricing:'$19/mo unlimited',
+    mrr:'$5k – $25k',
+    time:'4–5 days',
+    competitors:[
+      {n:'Copy.ai',p:'Generic writing, not TikTok-optimized'},
+      {n:'Jasper',p:'Enterprise priced, not creator-focused'},
+      {n:'VidIQ',p:'YouTube-first, weak on short-form'},
+    ],
+    pos:'"The only AI that thinks in TikTok virality"',
+    vir:89, com:45, dif:22,
+    roadmap:[
+      'Next.js + Supabase + magic link auth',
+      'Onboarding: niche, tone, hook style preferences',
+      'Claude API: generate 5 script variations per topic',
+      'Script editor — Hook / Body / CTA structure',
+      'Library: save, tag, and search scripts',
+      'Stripe: $19/mo with 3-day free trial',
+      'Launch: 5 TikToks using scripts the app generated',
+    ],
+    claude:`Build a SaaS called ReelScript — AI TikTok script generator for creators.
+
+STACK: Next.js 14 (App Router), Supabase, Claude API (claude-sonnet-4-6), Stripe
+
+FEATURES:
+1. Onboarding: niche (fitness/finance/tech/lifestyle/etc), tone (funny/educational/hype), hook style
+2. Input: type a topic → generate 3 script options
+3. Script structure: [HOOK 3s] + [BODY 15-45s] + [CTA 5s]
+4. Inline editor — edit any section
+5. Script library: save favorites, search history
+6. Stripe: $19/mo unlimited, 3-day trial (no card required)
+
+CLAUDE SYSTEM PROMPT:
+"You are a top TikTok creator with 10M followers. Write scripts that grab attention in the first 2 seconds. Always start with a pattern interrupt or bold claim."
+
+CLAUDE USER PROMPT:
+"Topic: {topic}. Niche: {niche}. Tone: {tone}. Generate 3 script variations. For each return JSON: {hook: string, body: string[], cta: string, estimated_seconds: number}"
+
+DB: users(id, email, niche, tone, plan), scripts(id, user_id, topic, content_json, is_favorite, created_at)
+
+START: npx create-next-app@latest reelscript --typescript --tailwind --app
+npm install @supabase/supabase-js @anthropic-ai/sdk stripe`,
+    hooks:[
+      'I asked AI to write my TikToks for 30 days — my views tripled',
+      'The script format that got me 2M views (and how to copy it)',
+      'Stop writing TikTok scripts from scratch — do this instead',
+    ],
+    affiliates:[
+      'TikTok coaches with 100k+ followers',
+      'Social media course sellers',
+      'Content creation YouTubers — Creative Rebellion, Jade Beason',
+    ],
+  },
+  {
+    id:'streakforge', name:'StreakForge',
+    tagline:'Habit tracking with real money on the line. Commit or pay.',
+    whyNow:'Beeminder proved financial stakes make habits stick. But it\'s ugly and built for nerds. A beautiful, Gen Z-ready version with social proof hasn\'t been built. The wellness app market is $15B.',
+    markets:['health','productivity'],
+    devLevels:['none','beginner','mid','senior'],
+    channels:['tiktok','seo'],
+    types:['b2c','both'],
+    ais:['no','maybe'],
+    stack:['Next.js 14','Supabase','Stripe','Resend'],
+    apiRequired:false,
+    apiCost:'$5–15/mo',
+    pricing:'$4.99/mo basic · $9.99/mo social',
+    mrr:'$2k – $12k',
+    time:'4–5 days',
+    competitors:[
+      {n:'Beeminder',p:'Ugly UI, complex setup, built for 2012'},
+      {n:'Habitica',p:'Game-focused, stakes are gamified not real'},
+      {n:'Streaks',p:'iOS only, no financial commitment'},
+    ],
+    pos:'"The habit app that bets on you — literally"',
+    vir:85, com:55, dif:20,
+    roadmap:[
+      'Next.js + Supabase + magic link auth',
+      'Create habit: name, frequency, stake ($5–$50)',
+      'Stripe: save card, create payment intent (manual capture)',
+      'Daily check-in: confirm via link or app',
+      'Cron at midnight: if no check-in → capture charge',
+      'Streak stats + shareable card image',
+      'Launch: "I bet $50 I ship every day" TikTok',
+    ],
+    claude:`Build a SaaS called StreakForge — commitment-based habit tracker with financial stakes.
+
+STACK: Next.js 14, Supabase, Stripe (manual capture), Resend, Vercel Cron
+
+CORE FLOW:
+1. User creates habit: name + daily/weekly + stake amount ($5–$50)
+2. Stripe: SetupIntent → save PaymentMethod → create PaymentIntent(capture_method: 'manual')
+3. User receives daily check-in email at 8pm (Resend)
+4. If confirmed before midnight: cancel PaymentIntent, create new one for tomorrow
+5. If missed: capture PaymentIntent (charge fires)
+
+FEATURES:
+- Habit dashboard with streak counter
+- Calendar heatmap of completions
+- Shareable streak card (OG image via Vercel/Satori)
+- Social: public profile link
+- Stripe: $4.99/mo (3 habits), $9.99/mo (unlimited + public profile)
+
+CRON JOB (Vercel):
+- Every night at 00:05 UTC: check all active habits with no check-in today → capture PaymentIntent → send "you failed" email
+
+DB: users(id, email, plan), habits(id, user_id, name, stake_cents, payment_intent_id, stripe_pm_id), checkins(id, habit_id, date)
+
+START: npx create-next-app@latest streakforge --typescript --tailwind --app
+npm install @supabase/supabase-js stripe resend`,
+    hooks:[
+      'I put $50 on the line to post every day for 30 days',
+      'This app charged me $15 last week and I\'ve never felt more motivated',
+      'The only habit tracker that actually works (it hurts a little)',
+    ],
+    affiliates:[
+      'Fitness creators — gym TikTok, wellness influencers',
+      '#BuildInPublic Twitter / X community',
+      'Productivity YouTubers — Ali Abdaal, Thomas Frank',
+    ],
+  },
+  {
+    id:'vidtopost', name:'VidToPost',
+    tagline:'Turn any video or Loom into a publish-ready blog post in 30 seconds.',
+    whyNow:'Creators record everything but write nothing. AI transcription is now 95%+ accurate and cheap. Content repurposing is the #1 pain point in the creator economy right now.',
+    markets:['creator','marketing','ai'],
+    devLevels:['beginner','mid','senior'],
+    channels:['tiktok','seo','ph'],
+    types:['b2c','smb','both'],
+    ais:['yes','maybe'],
+    stack:['Next.js 14','AssemblyAI','Claude API','Supabase','Stripe'],
+    apiRequired:true,
+    apiCost:'$50–150/mo at 500 users',
+    pricing:'$15/mo (20 posts) · $39/mo unlimited',
+    mrr:'$5k – $22k',
+    time:'5–6 days',
+    competitors:[
+      {n:'Castmagic',p:'Podcast-first, overpriced at $39+/mo'},
+      {n:'Descript',p:'Video editor — not a content repurpose tool'},
+      {n:'Otter.ai',p:'Transcription only, no blog output'},
+    ],
+    pos:'"Record once. Publish everywhere."',
+    vir:78, com:46, dif:35,
+    roadmap:[
+      'Next.js + Supabase + auth setup',
+      'File upload: MP4/MOV + Loom URL parser',
+      'AssemblyAI: transcription with speaker labels',
+      'Claude: transcript → blog (title, sections, CTA)',
+      'Rich text editor for post refinement',
+      'Export: Markdown / HTML / clipboard',
+      'Launch: Product Hunt + TikTok demo of full flow',
+    ],
+    claude:`Build a SaaS called VidToPost — video to blog post AI converter.
+
+STACK: Next.js 14, AssemblyAI (transcription), Claude API (claude-sonnet-4-6), Supabase, Vercel Blob, Stripe
+
+PIPELINE:
+1. Upload video (MP4/MOV/WebM) → store in Vercel Blob
+2. Submit to AssemblyAI → poll until transcript ready
+3. Send transcript to Claude → receive structured blog post
+4. Display in rich text editor → allow edits
+5. Export as Markdown, HTML, or copy
+
+CLAUDE PROMPT:
+System: "You are a professional blog writer. Convert video transcripts into polished, SEO-friendly articles."
+User: "Transcript: {transcript}\n\nReturn JSON: {title: string, meta_description: string, sections: [{heading: string, content: string}], key_takeaways: string[], estimated_read_time: string}"
+
+LOOM URL SUPPORT:
+- Extract video ID from loom.com URL
+- Download via Loom's CDN (check their API or use yt-dlp)
+
+STRIPE PLANS:
+- $15/mo: 20 videos/month
+- $39/mo: unlimited videos + team seats
+
+DB: users(id, email, plan, videos_used_this_month), jobs(id, user_id, blob_url, transcript, post_json, status, created_at)
+
+START: npx create-next-app@latest vidtopost --typescript --tailwind --app
+npm install @anthropic-ai/sdk assemblyai @vercel/blob stripe`,
+    hooks:[
+      'I recorded a 10-min Loom. AI turned it into a blog post in 30 seconds',
+      'How I repurpose ONE video into 5 pieces of content every week',
+      'Stop letting good ideas die in your video library',
+    ],
+    affiliates:[
+      'Creator economy coaches on YouTube',
+      'Content marketing agencies',
+      'Solo founder communities — Indie Hackers, MicroConf',
+    ],
+  },
+  {
+    id:'apishield', name:'APIShield',
+    tagline:'Monitor, alert, and control your AI API spend before it explodes.',
+    whyNow:'Every team using Claude or GPT gets surprise bills. No lightweight $19/mo tool exists to set real spend limits with automatic blocking. OpenAI\'s native alerts are email-only and too slow.',
+    markets:['devtools','ai','productivity'],
+    devLevels:['mid','senior'],
+    channels:['tiktok','ph','seo'],
+    types:['b2b','smb','both'],
+    ais:['tools','yes','maybe'],
+    stack:['Next.js 14','Supabase','Resend','Stripe','Vercel Edge'],
+    apiRequired:false,
+    apiCost:'$8–20/mo',
+    pricing:'$19/mo indie · $49/mo team',
+    mrr:'$3k – $15k',
+    time:'5–7 days',
+    competitors:[
+      {n:'Helicone',p:'Logging-focused, no billing hard-limits'},
+      {n:'Datadog',p:'$30+/host/mo, complex, overkill'},
+      {n:'Anthropic Console',p:'Single provider, no alerts API'},
+    ],
+    pos:'"Your AI API bill, tamed"',
+    vir:67, com:53, dif:42,
+    roadmap:[
+      'Next.js + Supabase + auth',
+      'Proxy architecture: Vercel Edge intercepts API calls',
+      'Log each call: model, tokens, cost estimate',
+      'Alert rules: daily/monthly budget thresholds',
+      'Hard block: reject calls when limit hit',
+      'Dashboard: cost by model/day/project',
+      'Stripe billing + launch on HN + Twitter',
+    ],
+    claude:`Build APIShield — AI API cost monitoring and control proxy.
+
+STACK: Next.js 14, Vercel Edge Functions, Supabase, Resend, Stripe
+
+ARCHITECTURE:
+User sets APIShield proxy URL in code instead of api.anthropic.com
+→ Vercel Edge Function receives request
+→ Logs to Supabase (model, tokens_in, tokens_out, cost_usd)
+→ Checks budget rules → block if over limit
+→ Forwards to real API → returns response
+
+EDGE FUNCTION FLOW (/api/proxy/anthropic):
+1. Read Authorization header (user's Anthropic key stored server-side)
+2. Forward request to https://api.anthropic.com/v1/messages
+3. Parse response: extract usage.input_tokens, usage.output_tokens
+4. Calculate cost (claude-sonnet-4-6: $3/1M in, $15/1M out)
+5. Insert into api_calls table
+6. Check against user's budget rules → send alert if needed
+
+COST CALCULATION MAP:
+const COSTS = {
+  'claude-sonnet-4-6': { in: 3/1e6, out: 15/1e6 },
+  'claude-haiku-4-5': { in: 0.8/1e6, out: 4/1e6 },
+  'gpt-4o': { in: 2.5/1e6, out: 10/1e6 },
+}
+
+STRIPE: $19/mo indie (1 key, 100k calls/mo), $49/mo team (5 keys, unlimited)
+
+START: npx create-next-app@latest apishield --typescript --tailwind --app
+npm install @supabase/supabase-js stripe resend`,
+    hooks:[
+      'My Claude API bill hit $800 in one night — here\'s what I use now',
+      'The $19 tool every AI startup needs (most don\'t know it exists)',
+      'How I know exactly how much each feature costs in tokens',
+    ],
+    affiliates:[
+      'AI dev YouTubers — Theo t3.gg, Matt Pocock, Fireship',
+      'Cursor and Claude Code communities on Discord',
+      'YC Startup School community',
+    ],
+  },
+  {
+    id:'pricepulse', name:'PricePulse',
+    tagline:'Track competitor pricing changes automatically. React before your customers notice.',
+    whyNow:'SaaS pricing pages change constantly and quietly. Businesses lose deals because they didn\'t notice a competitor slashed prices last week. No lightweight sub-$100/mo tool fills this gap.',
+    markets:['marketing','productivity','fintech'],
+    devLevels:['mid','senior'],
+    channels:['outreach','seo','ph'],
+    types:['b2b','smb'],
+    ais:['maybe','no'],
+    stack:['Next.js 14','Playwright','Supabase','Resend','Stripe'],
+    apiRequired:false,
+    apiCost:'$15–30/mo (scraping infra)',
+    pricing:'$49/mo startup · $149/mo growth',
+    mrr:'$5k – $30k',
+    time:'6–8 days',
+    competitors:[
+      {n:'Prisync',p:'E-commerce focused, expensive for SaaS'},
+      {n:'Kompyte',p:'Full competitive intel suite, complex'},
+      {n:'Crayon',p:'Enterprise only, $1k+/mo'},
+    ],
+    pos:'"The lightweight pricing radar for SaaS teams"',
+    vir:62, com:35, dif:52,
+    roadmap:[
+      'Next.js + Supabase + email auth',
+      'Playwright scraper: screenshot + parse pricing text',
+      'Diff engine: detect price/plan changes vs snapshot',
+      'Alerts: email + Slack webhook on any change',
+      'Dashboard: competitor grid + change history',
+      'Stripe: $49/mo (10 URLs), $149/mo (50 URLs)',
+      'Cold outreach to 100 SaaS founders on LinkedIn',
+    ],
+    claude:`Build PricePulse — competitor pricing change tracker for SaaS teams.
+
+STACK: Next.js 14, Playwright, Supabase, Resend, Stripe, Vercel Cron
+
+SCRAPING FLOW (Vercel Cron, runs daily):
+1. Fetch all active competitor URLs from DB
+2. For each URL: launch Playwright, load page, extract text + screenshot
+3. Compare new text to stored snapshot (simple diff algorithm)
+4. If changed: create change_event, send alert email + Slack webhook
+5. Store new snapshot
+
+PLAYWRIGHT SETUP:
+- Use playwright-core + @sparticuz/chromium (Vercel compatible)
+- Stealth: set realistic userAgent, viewport, headers
+- Extract pricing: look for $ signs, "per month", plan names
+
+DIFF ALGORITHM:
+- Store full page text as snapshot
+- On rescan: compare sentences containing $ or pricing keywords
+- Change threshold: > 3 changed pricing-relevant lines = alert
+
+ALERT SYSTEM:
+- Email via Resend: "🚨 {competitor} changed their pricing"
+- Slack webhook: post to #competitive-intel channel
+- Dashboard notification
+
+STRIPE: $49/mo (10 URLs, daily scans), $149/mo (50 URLs, 4x/day scans)
+
+START: npx create-next-app@latest pricepulse --typescript --tailwind --app
+npm install playwright-core @sparticuz/chromium stripe resend`,
+    hooks:[
+      'How I found out my competitor dropped prices before my own sales team did',
+      'The $49 tool that saved a $50k enterprise deal',
+      'Every SaaS founder should be tracking this (most aren\'t)',
+    ],
+    affiliates:[
+      'SaaS founders and operators on Twitter/X',
+      'RevOps and competitive intel consultants',
+      'SaaStr, Lenny\'s Newsletter, SaaS Weekly',
+    ],
+  },
+  {
+    id:'inboxzero', name:'InboxZero AI',
+    tagline:'Smart email triage that reads, prioritizes, and drafts replies — automatically.',
+    whyNow:'Professionals spend 28% of their workday on email. AI can now read full context and draft perfect replies. Gmail\'s API is mature, and Superhuman at $30/mo left a massive gap at $12/mo.',
+    markets:['productivity','ai'],
+    devLevels:['mid','senior'],
+    channels:['seo','ph','outreach'],
+    types:['b2c','smb','both'],
+    ais:['yes'],
+    stack:['Next.js 14','Gmail API','Claude API','Supabase','Stripe'],
+    apiRequired:true,
+    apiCost:'$40–100/mo at 500 users',
+    pricing:'$12/mo basic · $29/mo pro',
+    mrr:'$4k – $20k',
+    time:'6–8 days',
+    competitors:[
+      {n:'Superhuman',p:'$30/mo, complex onboarding, niche audience'},
+      {n:'SaneBox',p:'Rule-based, no AI drafting capability'},
+      {n:'HEY',p:'Full email client replacement, not a layer'},
+    ],
+    pos:'"The AI layer that makes any inbox intelligent"',
+    vir:68, com:40, dif:48,
+    roadmap:[
+      'Google OAuth + Gmail API read/compose scopes',
+      'Fetch unread emails, classify with Claude',
+      'AI draft generation for action-needed emails',
+      'Priority inbox dashboard view',
+      'One-click send draft / archive / snooze',
+      'Stripe: $12/mo basic, $29/mo pro',
+      'SEO campaign: "AI email assistant" content',
+    ],
+    claude:`Build InboxZero AI — intelligent email triage and AI reply drafting.
+
+STACK: Next.js 14, Google OAuth (Gmail API), Claude API (claude-sonnet-4-6), Supabase, Stripe
+
+GMAIL SCOPES: gmail.readonly, gmail.compose, gmail.modify
+
+PIPELINE:
+1. On login: fetch last 50 unread emails via Gmail API
+2. Batch classify with Claude (single request, multiple emails)
+3. For ACTION_NEEDED emails: generate draft reply
+4. Store in Supabase, serve to dashboard
+
+CLAUDE CLASSIFICATION PROMPT:
+"Classify these emails. For each return JSON: {id, category: 'action|fyi|newsletter|spam', priority: 1-5, summary: string, draft_reply: string|null}
+Emails: {emails_json}"
+
+DASHBOARD FEATURES:
+- Sorted inbox: ACTION_NEEDED first, then FYI
+- Email card: summary, AI label, priority score
+- Draft reply: shown below email, editable
+- Actions: Send Draft / Archive / Snooze 24h / Mark FYI
+
+GMAIL API TIPS:
+- Use batch requests to classify multiple emails in one API call
+- Store message IDs to avoid re-fetching
+- Handle token refresh gracefully
+
+STRIPE: $12/mo basic (50 emails/day processed), $29/mo pro (unlimited + Slack)
+
+START: npx create-next-app@latest inboxzero-ai --typescript --tailwind --app
+npm install @supabase/supabase-js @anthropic-ai/sdk stripe googleapis`,
+    hooks:[
+      'I haven\'t touched my inbox in 2 weeks and my stress is gone',
+      'AI reads my emails so I don\'t have to (and it\'s actually good)',
+      'How busy people handle 200 emails/day without burning out',
+    ],
+    affiliates:[
+      'Productivity YouTubers — Ali Abdaal, Thomas Frank, Matt D\'Avella',
+      'Freelancer and solopreneur communities',
+      'Morning Brew, Superhuman newsletter readers',
+    ],
+  },
+  {
+    id:'reviewloop', name:'ReviewLoop',
+    tagline:'Automate review collection. Turn happy customers into public social proof.',
+    whyNow:'Reviews drive 95% of purchase decisions. Most businesses ask for them manually or not at all. AI-personalized review asks convert 3x better than generic templates.',
+    markets:['marketing','fintech'],
+    devLevels:['none','beginner','mid','senior'],
+    channels:['outreach','seo','ph'],
+    types:['b2b','smb'],
+    ais:['maybe','yes','no'],
+    stack:['Next.js 14','Resend','Supabase','Claude API','Stripe'],
+    apiRequired:true,
+    apiCost:'$15–40/mo at 500 users',
+    pricing:'$29/mo starter · $79/mo growth',
+    mrr:'$4k – $20k',
+    time:'5–6 days',
+    competitors:[
+      {n:'Birdeye',p:'Enterprise pricing, minimum $299/mo'},
+      {n:'Podium',p:'$300+/mo, heavy sales process'},
+      {n:'NiceJob',p:'Feature bloat, confusing pricing'},
+    ],
+    pos:'"Review collection on autopilot for small business"',
+    vir:56, com:42, dif:28,
+    roadmap:[
+      'Next.js + Supabase + magic link auth',
+      'Business setup: name, logo, review platform URLs',
+      'Customer import: CSV upload or Zapier webhook',
+      'AI-personalized review ask email via Resend',
+      'Smart routing: 4–5★ → Google/Yelp · <4★ → private form',
+      'Dashboard: response rate, avg score, recent reviews',
+      'Cold email 100 local businesses with a free trial offer',
+    ],
+    claude:`Build ReviewLoop — automated review collection for small businesses.
+
+STACK: Next.js 14, Supabase, Resend, Claude API (claude-sonnet-4-6), Stripe
+
+CORE FLOW:
+1. Business adds customers (CSV or webhook)
+2. 3 days after purchase: send AI-personalized review request email
+3. Customer clicks link → score collection page (1–5 stars)
+4. 4–5 stars: show Google/Yelp/Trustpilot link buttons
+5. 1–3 stars: show private feedback form (never sent to public)
+
+CLAUDE PROMPT (personalized email):
+"Write a friendly review request email for {business_name}. Customer: {first_name}. Purchase: {product_name}. Tone: warm, not salesy. Max 80 words. Subject line included."
+
+EMAIL SEQUENCE:
+- Day 3: initial ask
+- Day 7: one reminder if no response (different tone)
+- Day 10: stop
+
+SMART ROUTING PAGE:
+- URL: /review/{token}
+- Show star selector
+- On ≥4: "Great! Share on Google:" + platform buttons
+- On <4: "We're sorry — tell us what went wrong:" + textarea → stored privately
+
+STRIPE: $29/mo starter (200 contacts/mo), $79/mo growth (unlimited + Zapier)
+
+START: npx create-next-app@latest reviewloop --typescript --tailwind --app
+npm install @supabase/supabase-js @anthropic-ai/sdk resend stripe`,
+    hooks:[
+      'How local businesses get 50+ Google reviews without asking manually',
+      'The $29 tool that\'s getting my clients 10x more reviews',
+      'Why your business has no Google reviews (and how to fix it today)',
+    ],
+    affiliates:[
+      'Local business marketing agencies',
+      'Restaurant and service industry coaches on TikTok',
+      'Small business communities on Facebook and Reddit',
+    ],
+  },
+];
+
+// ─── SCORING ──────────────────────────────────────────────────────────────────
+function score(idea, ans) {
+  let s = 0;
+  const mks = ans.markets || [];
+  if (mks.length) {
+    const ov = idea.markets.filter(m => mks.includes(m)).length;
+    s += (ov / Math.min(idea.markets.length, mks.length)) * 40;
+  }
+  if (idea.devLevels.includes(ans.devLevel)) s += 20;
+  else if (ans.devLevel === 'senior') s += 16;
+  else s += 5;
+  if (idea.channels.includes(ans.channel)) s += 15;
+  if (idea.types.includes(ans.type) || idea.types.includes('both') || ans.type === 'both') s += 10;
+  if (idea.ais.includes(ans.ai)) s += 10;
+  if (!idea.apiRequired || ans.budget !== 'zero') s += 5;
+  return s;
+}
+
+function genResult(ans) {
+  const ranked = IDEAS.map(i => ({i, s: score(i, ans)})).sort((a,b) => b.s - a.s);
+  const best = ranked[0].i;
+  let dAdj = 0;
+  if (ans.devLevel === 'senior') dAdj = -12;
+  if (ans.devLevel === 'beginner') dAdj = 12;
+  if (ans.devLevel === 'none') dAdj = 25;
+  return { ...best, dif: Math.min(100, Math.max(5, best.dif + dAdj)) };
+}
+
+// ─── THEME ────────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  S.theme = S.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', S.theme);
+  document.getElementById('ti').textContent = S.theme === 'dark' ? '☾' : '☀';
+  document.getElementById('tl').textContent = S.theme === 'dark' ? 'Dark' : 'Light';
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const el = document.getElementById('screen');
+  if (S.step === 0) { el.innerHTML = landing(); }
+  else if (S.step >= 1 && S.step <= QS.length) { el.innerHTML = question(QS[S.step-1], S.step-1); }
+  else if (S.step === QS.length + 1) { el.innerHTML = loading(); setTimeout(startLoad, 60); }
+  else { el.innerHTML = results(S.result); setTimeout(() => animateRings(S.result), 120); }
+  window.scrollTo(0,0);
+}
+
+function go(n) { S.step = n; render(); }
+function next() { go(S.step + 1); }
+function back() { S.step > 1 ? go(S.step - 1) : go(0); }
+
+// ─── LANDING ─────────────────────────────────────────────────────────────────
+function landing() {
+  const feats = ['Idea match','Claude Code prompt','7-day roadmap','MRR estimate','TikTok hooks','Competitor analysis'];
+  return `
+  <div style="min-height:calc(100vh - 56px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;max-width:640px;margin:0 auto">
+    <div class="au" style="display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:5px 13px;margin-bottom:28px;font-size:12px;font-weight:500;color:var(--text2)">
+      <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block"></span>
+      Beta · Free for early adopters
+    </div>
+    <h1 class="au d1" style="font-size:clamp(2.4rem,6vw,4.25rem);font-weight:800;letter-spacing:-.035em;line-height:1.05;margin-bottom:18px">
+      From 0 to SaaS.<br>In 2 minutes.
+    </h1>
+    <p class="au d2" style="font-size:1.1rem;color:var(--text2);line-height:1.65;max-width:440px;margin-bottom:36px">
+      Answer 10 questions. Get your complete blueprint — idea, stack, roadmap, Claude Code prompt, and your first TikTok script.
+    </p>
+    <div class="au d3" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:260px">
+      <button class="btn-p" style="width:100%;justify-content:center;font-size:1rem;padding:14px" onclick="go(1)">
+        Start Building
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2.5 7.5h10M8.5 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p style="font-size:12px;color:var(--text3)">~2 minutes · No signup required</p>
+    </div>
+    <div class="au d4" style="display:flex;gap:24px;margin-top:56px;flex-wrap:wrap;justify-content:center">
+      ${feats.map(f=>`
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text3)">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          ${f}
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ─── QUESTION ─────────────────────────────────────────────────────────────────
+function question(q, idx) {
+  const pct = (idx / QS.length) * 100;
+  const sel = S.ans[q.id];
+  const arr = q.multi ? (S.ans[q.id] || []) : null;
+  const grid = q.multi || q.opts.length > 4;
+  return `
+  <div style="min-height:calc(100vh - 56px);display:flex;flex-direction:column">
+    <div style="padding:20px 24px 0;max-width:680px;margin:0 auto;width:100%">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+        <button onclick="back()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;padding:0">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M8.5 2.5l-5 5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </button>
+        <span style="font-size:12px;color:var(--text3);font-weight:500">${idx+1} / ${QS.length}</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:36px 24px 60px;max-width:680px;margin:0 auto;width:100%">
+      <div class="au">
+        <p style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Question ${idx+1}</p>
+        <h2 style="font-size:clamp(1.5rem,3.5vw,2.1rem);font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:7px">${q.q}</h2>
+        <p style="color:var(--text2);font-size:14px;margin-bottom:28px">${q.sub}</p>
+      </div>
+      <div class="au d1" style="display:grid;grid-template-columns:${grid ? 'repeat(auto-fill,minmax(150px,1fr))' : '1fr 1fr'};gap:9px">
+        ${q.opts.map((o,i) => {
+          const isSel = q.multi ? (arr||[]).includes(o.v) : sel === o.v;
+          return `
+          <div class="opt${isSel?' sel':''}" onclick="pick('${q.id}','${o.v}',${!!q.multi},${q.max||99})">
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;line-height:1.3">${o.l}</div>
+              ${o.s ? `<div style="font-size:12px;color:var(--text2);margin-top:2px">${o.s}</div>` : ''}
+            </div>
+            ${!grid ? `<span class="mono" style="font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 5px">${i+1}</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      ${q.multi ? `
+      <div class="au d2" style="margin-top:22px;display:flex;justify-content:flex-end">
+        <button class="btn-p" onclick="contMulti('${q.id}')">
+          Continue
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+function pick(qid, val, isMulti, max) {
+  if (isMulti) {
+    const a = S.ans[qid] || [];
+    const i = a.indexOf(val);
+    if (i === -1) { if (a.length < max) S.ans[qid] = [...a, val]; }
+    else S.ans[qid] = a.filter(v => v !== val);
+    render();
+  } else {
+    S.ans[qid] = val;
+    render();
+    setTimeout(() => { if (S.step <= QS.length) next(); }, 200);
+  }
+}
+function contMulti(qid) { if ((S.ans[qid]||[]).length >= 1) next(); }
+
+// ─── LOADING ──────────────────────────────────────────────────────────────────
+const LMSGS = [
+  'Scanning your profile…',
+  'Mapping 1,200 opportunities…',
+  'Calculating market potential…',
+  'Writing your roadmap…',
+  'Forging your SaaS…',
+];
+
+function loading() {
+  return `
+  <div style="min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;padding:40px 24px">
+    <div style="text-align:center;max-width:380px">
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:28px">
+        <div class="ldot"></div><div class="ldot"></div><div class="ldot"></div>
+      </div>
+      <p id="lmsg" style="font-size:17px;font-weight:600;margin-bottom:8px">Scanning your profile…</p>
+      <p style="font-size:13px;color:var(--text3)">Building your personalized SaaS blueprint</p>
+      <div class="prog-track" style="margin-top:28px;max-width:180px;margin-left:auto;margin-right:auto">
+        <div id="lbar" class="prog-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function startLoad() {
+  S.result = genResult(S.ans);
+  let step = 0;
+  function tick() {
+    const m = document.getElementById('lmsg');
+    const b = document.getElementById('lbar');
+    if (m) m.textContent = LMSGS[step] || LMSGS[LMSGS.length-1];
+    if (b) b.style.width = ((step+1)/LMSGS.length*100)+'%';
+    step++;
+    if (step < LMSGS.length) setTimeout(tick, 460);
+    else setTimeout(() => go(QS.length + 2), 400);
+  }
+  tick();
+}
+
+// ─── RESULTS ─────────────────────────────────────────────────────────────────
+function results(r) {
+  const C = 2 * Math.PI * 34;
+  function ring(score, label, id) {
+    return `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:9px">
+      <div style="position:relative;width:80px;height:80px">
+        <svg class="ring-svg" width="80" height="80" viewBox="0 0 80 80" style="transform:rotate(-90deg)">
+          <circle class="tr" cx="40" cy="40" r="34" fill="none" stroke-width="5"/>
+          <circle class="fr" cx="40" cy="40" r="34" fill="none" stroke-width="5"
+            stroke-dasharray="${C}" stroke-dashoffset="${C}" stroke-linecap="round" id="r-${id}"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <span style="font-size:16px;font-weight:700;letter-spacing:-.03em">${score}</span>
+        </div>
+      </div>
+      <span style="font-size:12px;font-weight:500;color:var(--text2)">${label}</span>
+    </div>`;
+  }
+
+  const overallScore = Math.round((r.vir + (100-r.com) + (100-r.dif)) / 3);
+
+  return `
+  <div style="max-width:740px;margin:0 auto;padding:36px 20px 80px">
+
+    <div class="au" style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <span class="tag">✦ Your Blueprint</span>
+        <span class="tag">Score ${overallScore}/100</span>
+        <span class="tag">${r.time} to ship</span>
+      </div>
+      <h1 style="font-size:clamp(2rem,5vw,3.25rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:11px">${r.name}</h1>
+      <p style="font-size:1.15rem;color:var(--text2);line-height:1.55;max-width:520px">${r.tagline}</p>
+    </div>
+
+    <div class="card au d1" style="margin-bottom:14px">
+      <p class="sh">Why Now?</p>
+      <p style="font-size:15px;color:var(--text2);line-height:1.65">${r.whyNow}</p>
+    </div>
+
+    <div class="card au d2" style="margin-bottom:14px">
+      <p class="sh">Potential Scores</p>
+      <div style="display:flex;gap:28px;flex-wrap:wrap;justify-content:center;padding:4px 0 10px">
+        ${ring(r.vir, 'Virality', 'vir')}
+        ${ring(100-r.com, 'Market Ease', 'com')}
+        ${ring(100-r.dif, 'Build Ease', 'dif')}
+      </div>
+      <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Higher = better across all three</p>
+    </div>
+
+    <div class="card au d3" style="margin-bottom:14px">
+      <p class="sh">Economics</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px">
+        ${[['⏱ Time to ship',r.time],['💳 API cost',r.apiCost],['💰 Pricing',r.pricing],['📈 MRR potential',r.mrr]]
+          .map(([k,v])=>`<div style="background:var(--surface2);padding:14px 16px"><p style="font-size:11px;color:var(--text3);font-weight:500;margin-bottom:3px">${k}</p><p style="font-size:13px;font-weight:600">${v}</p></div>`).join('')}
+      </div>
+      <p style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Tech Stack</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${r.stack.map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+    </div>
+
+    <div class="card au" style="margin-bottom:14px">
+      <p class="sh">Competitive Landscape</p>
+      <p style="font-size:14px;color:var(--text2);font-style:italic;margin-bottom:16px;padding:12px 14px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--border)">${r.pos}</p>
+      ${r.competitors.map(c=>`
+        <div class="comp-row">
+          <span style="font-size:14px;font-weight:600">${c.n}</span>
+          <span style="font-size:12px;color:var(--text3);max-width:55%;text-align:right">${c.p}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="card au" style="margin-bottom:14px">
+      <p class="sh">7-Day Roadmap</p>
+      ${r.roadmap.map((item,i)=>`
+        <div class="rm-item">
+          <span class="mono" style="font-size:11px;color:var(--text3);min-width:38px;padding-top:2px">Day ${i+1}</span>
+          <span style="font-size:14px;color:var(--text2)">${item}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="card au" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <p class="sh" style="margin:0">Claude Code Prompt</p>
+        <button class="cp-btn" onclick="cp('cprompt',this)">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x=".5" y="3.5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 2.5V2A1 1 0 0 1 4.5 1h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="code" id="cprompt">${r.claude.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>
+
+    <div class="card au" style="margin-bottom:14px">
+      <p class="sh">TikTok Launch Plan</p>
+      ${r.hooks.map((h,i)=>`
+        <div style="padding:11px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start">
+          <span class="mono" style="font-size:11px;color:var(--text3);min-width:24px;padding-top:2px">V${i+1}</span>
+          <p style="font-size:14px;color:var(--text2)">${h}</p>
+        </div>`).join('')}
+      <div style="margin-top:14px;padding:12px 14px;background:var(--surface2);border-radius:8px">
+        <p style="font-size:13px;color:var(--text2);line-height:1.6"><strong style="color:var(--text)">Strategy:</strong> Post V1 on launch day. V2 next day (demo screen-record). V3 day 3 ("I built this in ${r.time}"). Cross-post to X + Instagram Reels.</p>
+      </div>
+    </div>
+
+    <div class="card au" style="margin-bottom:32px">
+      <p class="sh">Affiliate Partners</p>
+      ${r.affiliates.map((a,i)=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface2);border-radius:8px;margin-bottom:7px">
+          <span class="mono" style="font-size:11px;color:var(--text3);min-width:18px">${i+1}</span>
+          <span style="font-size:14px;color:var(--text2)">${a}</span>
+        </div>`).join('')}
+      <div style="margin-top:10px;padding:12px 14px;background:var(--surface2);border-radius:8px">
+        <p style="font-size:13px;color:var(--text2)">Suggested: <strong style="color:var(--text)">30% recurring for 3 months</strong>. Reach out with a free account + 3-min Loom demo personalized to them.</p>
+      </div>
+    </div>
+
+    <div class="au" style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn-p" onclick="window.open('https://claude.ai/code','_blank')" style="flex:1;min-width:190px;justify-content:center">
+        Build with Claude Code
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M7.5 2.5l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn-g" onclick="restart()" style="flex:1;min-width:130px;justify-content:center">Start Over</button>
+    </div>
+  </div>`;
+}
+
+function animateRings(r) {
+  const C = 2 * Math.PI * 34;
+  [
+    { id:'r-vir', s: r.vir },
+    { id:'r-com', s: 100 - r.com },
+    { id:'r-dif', s: 100 - r.dif },
+  ].forEach(({ id, s }) => {
+    const el = document.getElementById(id);
+    if (el) el.style.strokeDashoffset = C * (1 - s / 100);
+  });
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function cp(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    btn.classList.add('ok');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1.5 6.5l3 3 6-6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;
+    setTimeout(() => {
+      btn.classList.remove('ok');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x=".5" y="3.5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 2.5V2A1 1 0 0 1 4.5 1h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Copy`;
+    }, 2200);
+  });
+}
+
+function restart() { S.step = 0; S.ans = {}; S.result = null; render(); }
+
+// ─── KEYBOARD ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (S.step === 0 && e.key === 'Enter') { go(1); return; }
+  if (S.step >= 1 && S.step <= QS.length) {
+    const q = QS[S.step - 1];
+    if (!q.multi && ['1','2','3','4'].includes(e.key)) {
+      const i = parseInt(e.key) - 1;
+      if (i < q.opts.length) pick(q.id, q.opts[i].v, false, 99);
+    }
+    if (e.key === 'Escape') back();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
