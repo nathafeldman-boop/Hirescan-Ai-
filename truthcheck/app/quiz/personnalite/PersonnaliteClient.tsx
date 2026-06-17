@@ -502,419 +502,159 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
   }, [typeCode, userEmail]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ background: '#faf9f7' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: '#faf9f7' }}>
       <div className="w-full max-w-sm">
 
-        {/* Header with character illustration */}
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-3 animate-bounce" style={{ animationDuration: '2s' }}>🔮</div>
+        {/* Header */}
+        <div className="text-center mb-5">
+          <div className="text-5xl mb-3">🔮</div>
           <div
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black mb-4 tracking-widest"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black mb-3 tracking-widest"
             style={{ background: 'rgba(109,40,217,0.08)', border: '1px solid rgba(109,40,217,0.2)', color: '#7c3aed' }}
           >
             {typeCode.slice(0, 2)}<span className="blur-[4px] select-none opacity-40">??</span>
           </div>
-
-          <h1 className="text-2xl font-black text-stone-900 mb-2">
-            {isFr ? 'Ton type est prêt ✨' : 'Your type is ready ✨'}
+          <h1 className="text-2xl font-black text-stone-900 mb-1">
+            {isFr ? 'Ton profil est prêt 🔒' : 'Your profile is ready 🔒'}
           </h1>
-          <p className="text-stone-500 text-sm leading-relaxed">
+          <p className="text-stone-500 text-sm">
             {isFr
-              ? `Seulement ${type?.rarity} de la population partagent ce profil.`
-              : `Only ${type?.rarity} of the population share this profile.`}
+              ? `${type?.rarity ?? 'Rare'} de la population partagent ce profil.`
+              : `${type?.rarity ?? 'Rare'} of people share this profile.`}
           </p>
         </div>
 
-        {/* Locked type card — shows real type data to create FOMO */}
-        <div
-          className="rounded-2xl p-5 mb-4 relative overflow-hidden"
-          style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
-        >
-          <div className="space-y-3">
-            {/* Type identity — emoji + code + name */}
-            <div className="flex items-center gap-3">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                style={{ background: 'rgba(109,40,217,0.08)' }}
-              >
-                {type?.emoji ?? typeCode.slice(0, 2)}
-              </div>
-              <div>
-                <div className="text-sm font-black text-stone-900 tracking-widest">
-                  {typeCode.slice(0, 2)}<span className="blur-sm opacity-30">??</span>
-                </div>
-                {type?.name && (
-                  <div className="text-xs font-semibold text-stone-500 mt-0.5">{type.name}</div>
-                )}
-              </div>
+        {/* Locked type preview */}
+        <div className="rounded-2xl p-4 mb-4 relative overflow-hidden" style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'rgba(109,40,217,0.08)' }}>
+              {type?.emoji ?? typeCode.slice(0, 2)}
             </div>
-            {/* Tagline visible + shortDesc: first sentence clear, rest blurred */}
-            {type && (
-              <div className="select-none">
-                <p className="text-[10px] italic text-stone-400 mb-1 leading-relaxed">{type.tagline}</p>
-                <p className="text-[11px] text-stone-700 leading-relaxed">
-                  {type.shortDesc.split('.')[0]}.
-                  <span className="blur-[3px] opacity-40 pointer-events-none">
-                    {' '}{type.shortDesc.split('.').slice(1, 3).join('. ').trim()}.
-                  </span>
-                </p>
+            <div>
+              <div className="text-sm font-black text-stone-900 tracking-widest">
+                {typeCode.slice(0, 2)}<span className="blur-sm opacity-30">??</span>
               </div>
-            )}
+              {type?.name && <div className="text-xs text-stone-500">{type.name}</div>}
+            </div>
           </div>
-          <div
-            className="absolute inset-0 flex items-end justify-center pb-4 rounded-2xl"
-            style={{ background: 'linear-gradient(to top, rgba(250,249,247,0.98) 0%, rgba(250,249,247,0.65) 40%, transparent 100%)' }}
-          >
-            <div className="text-center">
-              <div className="mb-1 flex justify-center" style={{ color: '#7c3aed' }}><LockIcon /></div>
-              <p className="text-xs text-stone-500 font-semibold">
-                {isFr ? 'Ton profil complet est verrouillé 🔒' : 'Your full profile is locked 🔒'}
-              </p>
-            </div>
+          {type && (
+            <p className="text-[11px] text-stone-700 leading-relaxed">
+              {type.shortDesc.split('.')[0]}.
+              <span className="blur-[3px] opacity-40 pointer-events-none select-none">
+                {' '}{type.shortDesc.split('.').slice(1, 3).join('. ').trim()}.
+              </span>
+            </p>
+          )}
+          <div className="absolute inset-0 flex items-end justify-center pb-3 rounded-2xl" style={{ background: 'linear-gradient(to top, rgba(250,249,247,0.97) 0%, transparent 60%)' }}>
+            <p className="text-xs text-stone-500 font-semibold flex items-center gap-1">
+              <LockIcon />{isFr ? 'Profil complet verrouillé' : 'Full profile locked'}
+            </p>
           </div>
         </div>
 
-        {/* What's inside — personalized per type */}
-        <div
-          className="rounded-xl px-4 py-3 mb-4"
-          style={{ background: 'rgba(109,40,217,0.05)', border: '1px solid rgba(109,40,217,0.15)' }}
-        >
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-2.5" style={{ color: '#7c3aed' }}>
-            {isFr ? '✦ Ce que tu vas ressentir' : '✦ What you\'ll feel'}
-          </p>
-          <ul className="space-y-2">
-            {/* First strength visible, rest blurred */}
-            <li className="flex items-start gap-2 text-xs text-stone-700">
-              <span className="flex-shrink-0 text-base leading-none mt-0.5">⚡</span>
-              <span>
-                {isFr ? 'Tes forces : ' : 'Your strengths: '}
-                <span className="font-semibold text-stone-800">{type?.strengths?.[0]}</span>
-                <span className="blur-[3px] opacity-40 select-none pointer-events-none">
-                  {`, ${type?.strengths?.[1]}, ${type?.strengths?.[2]}...`}
-                </span>
-              </span>
-            </li>
-            {/* First compatible type visible, others blurred */}
-            <li className="flex items-start gap-2 text-xs text-stone-700">
-              <span className="flex-shrink-0 text-base leading-none mt-0.5">❤️</span>
-              <span>
-                {isFr ? 'Compatible avec : ' : 'Compatible with: '}
-                <span className="font-semibold text-stone-800">{type?.compatibleWith?.[0]}</span>
-                <span className="blur-[3px] opacity-40 select-none pointer-events-none">
-                  {`, ${type?.compatibleWith?.[1]}, ${type?.compatibleWith?.[2]}, ${type?.compatibleWith?.[3]}`}
-                </span>
-              </span>
-            </li>
-            {/* First celebrity visible, others blurred */}
-            <li className="flex items-start gap-2 text-xs text-stone-700">
-              <span className="flex-shrink-0 text-base leading-none mt-0.5">🌟</span>
-              <span>
-                {isFr ? 'Comme eux : ' : 'Famous examples: '}
-                <span className="font-semibold text-stone-800">{type?.famousExamples?.[0]}</span>
-                <span className="blur-[3px] opacity-40 select-none pointer-events-none">
-                  {`, ${type?.famousExamples?.[1]}, ${type?.famousExamples?.[2]}...`}
-                </span>
-              </span>
-            </li>
-            {/* Generic last item */}
-            <li className="flex items-start gap-2 text-xs text-stone-700">
-              <span className="flex-shrink-0 text-base leading-none mt-0.5">🧠</span>
-              <span>{isFr ? 'Analyse amour, travail, axes de croissance' : 'Love, career & growth full analysis'}</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Countdown timer */}
         <CountdownTimer isFr={isFr} />
 
-        {/* Premium features teaser */}
-        <div className="mb-5 rounded-2xl overflow-hidden" style={{ border: '1.5px solid rgba(124,58,237,0.25)', background: 'linear-gradient(135deg,rgba(124,58,237,0.05),rgba(236,72,153,0.03))' }}>
-          <div className="px-4 pt-4 pb-2">
-            <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#7c3aed' }}>
-              {isFr ? '✦ Réservé aux membres Premium' : '✦ Premium members only'}
-            </p>
-            <h3 className="text-sm font-black text-stone-900 leading-snug">
-              {isFr
-                ? `Ce qui change concrètement avec l'abonnement :`
-                : 'What concretely changes with a subscription:'}
-            </h3>
-          </div>
+        {/* 3 offers */}
+        <div className="space-y-3 mt-4">
 
-          {/* Suivi 15 jours */}
-          <div className="mx-4 mb-3 rounded-xl p-3.5" style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-            <div className="flex items-start gap-3">
-              <span className="text-xl flex-shrink-0">🧠</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-stone-900 mb-0.5">
-                  {isFr ? 'Suivi psychologique 15 jours' : '15-day psychological journey'}
-                </p>
-                <p className="text-[11px] text-stone-500 leading-relaxed">
-                  {isFr
-                    ? `Un programme personnalisé pour ton type ${typeCode ?? ''}. 15 jours de conseils, exercices et révélations sur toi-même — en 3 phases : te connaître, tes relations, tes projets.`
-                    : `A personalized program for your ${typeCode ?? ''} type. 15 days of insights, exercises and self-discovery.`}
-                </p>
-                <div className="flex gap-1 mt-2 flex-wrap">
-                  {(isFr ? ['🧠 Me connaître', '💝 Mes relations', '🎯 Mes projets'] : ['🧠 Know yourself', '💝 Relationships', '🎯 Projects']).map(tag => (
-                    <span key={tag} className="text-[9px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'rgba(124,58,237,0.1)', color: '#7c3aed' }}>{tag}</span>
-                  ))}
-                </div>
-                {/* Locked day preview */}
-                <div className="mt-2 rounded-lg px-3 py-2 flex items-center gap-2" style={{ background: 'rgba(0,0,0,0.06)' }}>
-                  <span className="text-sm">🔒</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-stone-500">{isFr ? 'Aperçu Jour 1' : 'Day 1 preview'}</p>
-                    <p className="text-[10px] text-stone-400 truncate">{isFr ? 'Ton moteur secret — découvre ce qui te motive vraiment...' : 'Your secret engine — discover what truly drives you...'}</p>
-                  </div>
-                </div>
-              </div>
+          {/* 1 — Résultat unique (hero) */}
+          <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.07),rgba(236,72,153,0.05))', border: '2px solid rgba(124,58,237,0.3)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
+                {isFr ? '⚡ Résultat unique' : '⚡ One-time result'}
+              </span>
+              <span className="text-lg font-black text-stone-900">1,99 €</span>
             </div>
-          </div>
-
-          {/* Compatibilité 240 paires */}
-          <div className="mx-4 mb-3 rounded-xl p-3.5" style={{ background: 'rgba(236,72,153,0.07)', border: '1px solid rgba(236,72,153,0.2)' }}>
-            <div className="flex items-start gap-3">
-              <span className="text-xl flex-shrink-0">💑</span>
-              <div>
-                <p className="text-xs font-black text-stone-900 mb-0.5">
-                  {isFr ? 'Compatibilité MBTI — 240 paires analysées' : 'MBTI Compatibility — 240 pairs analyzed'}
-                </p>
-                <p className="text-[11px] text-stone-500 leading-relaxed">
-                  {isFr
-                    ? `Tes dynamiques avec chacun des 15 autres types. Amour, amitié, travail — ce qui se passe réellement entre ${typeCode ?? 'toi'} et les autres.`
-                    : `Your dynamics with each of the 15 other types. Love, friendship, work.`}
-                </p>
-                <div className="mt-2 flex gap-1.5 overflow-hidden">
-                  {['INFJ','ENFP','INTJ','ENTP','ISFJ'].map(t => (
-                    <span key={t} className="text-[9px] font-black px-2 py-1 rounded-lg flex-shrink-0" style={{ background: 'rgba(236,72,153,0.1)', color: '#ec4899' }}>
-                      🔒 {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Fusion mode */}
-          <div className="mx-4 mb-4 rounded-xl p-3.5" style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)' }}>
-            <div className="flex items-start gap-3">
-              <span className="text-xl flex-shrink-0">⚗️</span>
-              <div>
-                <p className="text-xs font-black text-stone-900 mb-0.5">
-                  {isFr ? 'Mode Fusion — profil de groupe' : 'Fusion Mode — group profile'}
-                </p>
-                <p className="text-[11px] text-stone-500 leading-relaxed">
-                  {isFr
-                    ? '2 à 10 personnes répondent ensemble. Découvrez votre personnalité collective, vos forces en groupe et vos dynamiques d\'équipe.'
-                    : '2-10 people answer together. Discover your group personality and team dynamics.'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="px-4 pb-4">
-            <p className="text-[10px] text-center font-semibold" style={{ color: '#7c3aed', opacity: 0.8 }}>
-              {isFr
-                ? '+ Accès illimité à tous les quiz · Nouveaux contenus chaque mois'
-                : '+ Unlimited quiz access · New content every month'}
-            </p>
-          </div>
-        </div>
-
-        {/* Persuasive value section */}
-        <div className="mb-5">
-
-          {/* Headline + intro */}
-          <div className="text-center mb-4 px-1">
-            <h2 className="text-base font-black text-stone-900 mb-2 leading-snug">
-              {isFr ? 'Ton résultat n\'est que le début.' : 'Your result is just the beginning.'}
-            </h2>
-            <p className="text-[11px] text-stone-500 leading-relaxed">
-              {isFr
-                ? 'Ton profil révèle bien plus qu\'un simple type. Débloque des analyses exclusives sur tes relations, tes compatibilités, tes points forts cachés — et les comportements que tu reproduis sans t\'en rendre compte.'
-                : 'Your profile reveals far more than a simple type. Unlock exclusive insights into your relationships, compatibilities, hidden strengths — and the patterns you repeat without realising.'}
-            </p>
-          </div>
-
-          {/* Tier cards */}
-          <div className="space-y-2.5">
-
-            {/* PASS RÉSULTAT */}
-            <div className="rounded-xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
-                  {isFr ? 'PASS RÉSULTAT' : 'RESULT PASS'}
-                </span>
-                <span className="text-sm font-black text-stone-900">1,99 €</span>
-              </div>
-              <ul className="space-y-1.5 mb-2.5">
-                {(isFr ? [
-                  'Tu sais enfin qui tu es vraiment',
-                  'Tu comprends tes vraies réactions',
-                  'Tu mets des mots sur ce que tu ressens',
-                ] : [
-                  'You finally know who you truly are',
-                  'You understand your real reactions',
-                  'You put words to what you feel',
-                ]).map(item => (
-                  <li key={item} className="flex items-start gap-2 text-[11px] text-stone-600">
-                    <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#10b981' }}>✔</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[10px] text-stone-400 italic">
-                {isFr ? 'Pour ceux qui veulent se comprendre, pas juste avoir 4 lettres.' : 'For those who want to understand themselves, not just get 4 letters.'}
-              </p>
-            </div>
-
-            {/* PREMIUM */}
-            <div className="rounded-xl p-4" style={{ background: 'white', border: '1.5px solid rgba(124,58,237,0.25)' }}>
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
-                  PREMIUM
-                </span>
-                <span className="text-sm font-black text-stone-900">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
-              </div>
-              <ul className="space-y-1.5 mb-2.5">
-                {(isFr ? [
-                  'Tu comprends pourquoi tu réagis comme ça — en amour, en conflit, sous pression',
-                  'Tu sors du doute sur tes relations les plus importantes',
-                  'Tu te connais mieux en 10 min qu\'en 10 ans d\'introspection',
-                  'Tu découvres tes vrais points forts (et ce qui te bloque)',
-                  'Tu deviens meilleur·e dans ta peau chaque mois',
-                ] : [
-                  'You understand why you react the way you do — in love, conflict, under pressure',
-                  'You get clarity on your most important relationships',
-                  'You know yourself better in 10 min than in 10 years of introspection',
-                  'You discover your real strengths (and what blocks you)',
-                  'You feel better about yourself every month',
-                ]).map(item => (
-                  <li key={item} className="flex items-start gap-2 text-[11px] text-stone-600">
-                    <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#7c3aed' }}>✔</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[10px] text-stone-400 italic">
-                {isFr
-                  ? 'Pour ceux qui veulent vraiment se libérer mentalement et mieux vivre leurs relations.'
-                  : 'For those who want mental freedom and better relationships.'}
-              </p>
-            </div>
-
-            {/* PASS ANNUEL — highlighted */}
-            <div
-              className="rounded-xl p-4 relative overflow-hidden"
-              style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.07),rgba(236,72,153,0.05))', border: '2px solid rgba(124,58,237,0.35)' }}
+            <ul className="space-y-1.5 mb-4">
+              {(isFr ? [
+                `Ton profil ${typeCode} complet déverrouillé`,
+                'Tes forces, faiblesses, amour, travail',
+                'Accès immédiat · Paiement unique',
+              ] : [
+                `Your full ${typeCode} profile unlocked`,
+                'Strengths, weaknesses, love, career',
+                'Instant access · One-time payment',
+              ]).map(b => (
+                <li key={b} className="flex items-center gap-2 text-xs text-stone-700">
+                  <span className="text-emerald-500 font-bold flex-shrink-0">✓</span>{b}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => doCheckout('onetime')}
+              disabled={loading}
+              className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.35)' }}
             >
-              <span
-                className="absolute top-0 right-0 text-white text-[9px] font-black tracking-wider px-2.5 py-1 rounded-bl-lg"
-                style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
-              >
-                {isFr ? 'LE PLUS POPULAIRE' : 'MOST POPULAR'}
+              {loading ? '…' : isFr ? `🔓 Révéler mon profil ${typeCode} →` : `🔓 Reveal my ${typeCode} profile →`}
+            </button>
+          </div>
+
+          {/* 2 — Annuel (best value) */}
+          <div className="rounded-2xl p-4 relative" style={{ background: 'white', border: '1.5px solid #d6d3d1' }}>
+            <span className="absolute top-0 right-0 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+              −75%
+            </span>
+            <div className="flex items-center justify-between mb-3 pr-12">
+              <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">
+                {isFr ? '🗓 Annuel' : '🗓 Annual'}
               </span>
-              <div className="flex items-center justify-between mb-2.5 pr-16">
-                <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
-                  {isFr ? 'PASS ANNUEL' : 'ANNUAL PASS'}
-                </span>
-                <span className="text-sm font-black text-stone-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+              <div className="text-right">
+                <span className="text-lg font-black text-stone-900">29,99 €</span>
+                <span className="text-stone-400 text-xs">{isFr ? '/an' : '/yr'}</span>
               </div>
-              <ul className="space-y-1.5 mb-2.5">
-                {(isFr ? [
-                  'Tout ce que le Premium offre — pour un an de transformation',
-                  'Tu te libères mentalement sur la durée',
-                  'Tu construis une vraie connaissance de toi-même',
-                  'Meilleure offre — 2,50€/mois seulement',
-                ] : [
-                  'Everything Premium — for a full year of transformation',
-                  'Long-term mental freedom',
-                  'You build real self-knowledge over time',
-                  'Best value — only €2.50/month',
-                ]).map(item => (
-                  <li key={item} className="flex items-start gap-2 text-[11px] text-stone-700">
-                    <span className="font-bold flex-shrink-0 mt-px" style={{ color: '#7c3aed' }}>✔</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[10px] italic" style={{ color: '#7c3aed', opacity: 0.8 }}>
-                {isFr ? 'Économise 70 % par rapport au mensuel.' : 'Save 70% compared to monthly.'}
-              </p>
             </div>
-
-          </div>
-        </div>
-
-        {/* Paywall buttons — DO NOT MODIFY onClick handlers */}
-        <div className="space-y-2">
-          {/* Hero CTA — 1,99€ */}
-          <button
-            onClick={() => doCheckout('onetime')}
-            disabled={loading}
-            className="w-full py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.35)' }}>
-            {loading
-              ? (isFr ? 'Chargement…' : 'Loading…')
-              : isFr
-                ? `🔓 Révéler le profil ${type?.name ?? typeCode} — 1,99 €`
-                : `🔓 Reveal the ${type?.name ?? typeCode} profile — €1.99`}
-          </button>
-          <p className="text-center text-[11px] text-stone-400">
-            {isFr ? 'Sans compte requis · Accès immédiat · Paiement unique' : 'No account needed · Instant access · One-time payment'}
-          </p>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 pt-2 pb-1">
-            <div className="flex-1 h-px bg-stone-200" />
-            <span className="text-[10px] text-stone-400 uppercase tracking-wider whitespace-nowrap">
-              {isFr ? 'Accès illimité' : 'Unlimited access'}
-            </span>
-            <div className="flex-1 h-px bg-stone-200" />
-          </div>
-
-          <button
-            onClick={() => doCheckout('annual')}
-            disabled={loading}
-            className="w-full rounded-xl text-left px-4 pt-3 pb-3.5 relative overflow-hidden transition-all hover:shadow-md disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.07),rgba(236,72,153,0.05))', border: '2px solid rgba(124,58,237,0.35)', boxShadow: '0 2px 8px rgba(124,58,237,0.08)' }}>
-            <span className="absolute top-0 right-0 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>−75%</span>
-            <span className="flex items-center justify-between pr-8 mb-2.5">
-              <span className="flex flex-col gap-0.5">
-                <span className="font-bold text-stone-900 text-xs">{isFr ? `🗓 ${typeCode} + 15 profils · Quiz illimités · Duo` : `🗓 ${typeCode} + 15 profiles · Unlimited quizzes · Duo`}</span>
-                <span className="text-stone-400 text-[11px]">{isFr ? '2,50 €/mois seulement' : 'Only €2.50/month'}</span>
-              </span>
-              <span className="flex flex-col items-end ml-2 flex-shrink-0">
-                <span className="font-black text-stone-900 text-sm">{isFr ? '29,99 €' : '€29.99'}</span>
-                <span className="text-stone-400 text-[10px]">{isFr ? '/an' : '/yr'}</span>
-              </span>
-            </span>
-            <div className="text-center py-2 rounded-lg text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+            <ul className="space-y-1.5 mb-4">
+              {(isFr ? [
+                `${typeCode} + 15 profils MBTI débloqués`,
+                'Compatibilités · Quiz illimités · Duo',
+                '2,50 €/mois seulement',
+              ] : [
+                `${typeCode} + all 15 MBTI profiles unlocked`,
+                'Compatibility · Unlimited quizzes · Duo',
+                'Only €2.50/month',
+              ]).map(b => (
+                <li key={b} className="flex items-center gap-2 text-xs text-stone-700">
+                  <span style={{ color: '#7c3aed' }} className="font-bold flex-shrink-0">✓</span>{b}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => doCheckout('annual')}
+              disabled={loading}
+              className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+              style={{ border: '1.5px solid rgba(124,58,237,0.4)', color: '#7c3aed', background: 'rgba(124,58,237,0.05)' }}
+            >
               {loading ? '…' : isFr ? 'Souscrire maintenant →' : 'Subscribe now →'}
+            </button>
+          </div>
+
+          {/* 3 — Mensuel */}
+          <div className="rounded-xl px-4 py-3.5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold text-stone-500">{isFr ? '🔄 Mensuel · sans engagement' : '🔄 Monthly · cancel anytime'}</span>
+              <span className="text-sm font-black text-stone-900">9,99 €<span className="text-stone-400 text-xs font-normal">{isFr ? '/mois' : '/mo'}</span></span>
             </div>
-          </button>
-          <button
-            onClick={() => doCheckout('monthly')}
-            disabled={loading}
-            className="w-full rounded-xl text-left px-4 pt-3 pb-3.5 transition-all hover:bg-stone-50 disabled:opacity-60"
-            style={{ background: 'white', border: '1.5px solid #d6d3d1' }}>
-            <span className="flex items-center justify-between mb-2.5">
-              <span className="flex flex-col gap-0.5">
-                <span className="font-semibold text-stone-800 text-xs">{isFr ? `🔄 Accès complet ${type?.name ?? typeCode} · Sans engagement` : `🔄 Full ${type?.name ?? typeCode} access · No commitment`}</span>
-                <span className="text-stone-400 text-[11px]">{isFr ? 'Annule quand tu veux' : 'Cancel anytime'}</span>
-              </span>
-              <span className="flex flex-col items-end ml-2 flex-shrink-0">
-                <span className="font-black text-stone-900 text-sm">{isFr ? '9,99 €' : '€9.99'}</span>
-                <span className="text-stone-400 text-[10px]">{isFr ? '/mois' : '/mo'}</span>
-              </span>
-            </span>
-            <div className="text-center py-2 rounded-lg text-xs font-semibold border border-stone-300 text-stone-700">
+            <ul className="space-y-1 mb-3">
+              {(isFr ? ['Accès illimité à tout', 'Résilie quand tu veux'] : ['Unlimited access to everything', 'Cancel whenever you want']).map(b => (
+                <li key={b} className="flex items-center gap-2 text-xs text-stone-500">
+                  <span className="text-emerald-500 font-bold flex-shrink-0 text-[10px]">✓</span>{b}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => doCheckout('monthly')}
+              disabled={loading}
+              className="w-full py-2.5 rounded-lg font-semibold text-xs text-stone-600 border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-all active:scale-[0.98] disabled:opacity-60"
+            >
               {loading ? '…' : isFr ? 'Choisir ce plan →' : 'Choose this plan →'}
-            </div>
-          </button>
+            </button>
+          </div>
+
         </div>
 
-        <p className="text-center text-[11px] text-stone-400 mt-3">
-          {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe payment · Card, Apple Pay, Google Pay'}
+        <p className="text-center text-[11px] text-stone-400 mt-4">
+          {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe · Card, Apple Pay, Google Pay'}
         </p>
       </div>
     </div>
