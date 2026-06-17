@@ -846,42 +846,32 @@ export default function ResultsClient({ quiz }: Props) {
 
               {/* Main paywall card */}
               <div
-                className="rounded-2xl p-6 mb-6 border border-white/10"
+                className="rounded-2xl p-7 mb-6 border border-white/10"
                 style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(236,72,153,0.10))' }}
               >
-                <div className="text-center mb-5">
-                  <h2 className="text-xl font-black text-white mb-2">{pw.headline}</h2>
+                <div className="text-center mb-6">
+                  <h2 className="text-xl font-black text-white mb-3 leading-snug">{pw.headline}</h2>
                   <p className="text-zinc-400 text-sm leading-relaxed">
                     {pw.subline}
                   </p>
                 </div>
 
-                {/* Scary stat */}
-                <div
-                  className="rounded-xl p-3 mb-4 border text-center"
-                  style={{ background: `${tier.glowColor}0a`, borderColor: `${tier.glowColor}25` }}
-                >
-                  <p className="text-xs font-semibold leading-relaxed" style={{ color: tier.glowColor }}>
-                    📊 {scaryStat}
-                  </p>
-                </div>
-
                 {/* Social proof */}
-                <div className="flex items-center justify-center gap-2 mb-4 py-2 rounded-xl border border-white/5 bg-white/[0.03]">
+                <div className="flex items-center justify-center gap-2 mb-6 py-2.5 rounded-xl border border-white/8 bg-white/[0.04]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs text-zinc-500">{pw.social}</span>
+                  <span className="text-xs text-zinc-400">{pw.social}</span>
                 </div>
 
                 {/* CTA — 1,99€ one-time: primary hero */}
-                <div className="flex justify-center mb-2">
+                <div className="flex justify-center mb-3">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 tracking-wide">
-                    ⚡ Choix #1 — rapide, sans engagement
+                    ⚡ Accès immédiat · Sans engagement
                   </span>
                 </div>
                 <button
                   onClick={handleOneTimeClick}
                   disabled={isCheckingOut}
-                  className="w-full py-5 rounded-2xl font-black text-white text-lg mb-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                  className="w-full py-5 rounded-2xl font-black text-white text-lg mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
                   style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 6px 32px rgba(139,92,246,0.55)' }}
                 >
                   {isCheckingOut ? (
@@ -900,19 +890,19 @@ export default function ResultsClient({ quiz }: Props) {
                 {/* Benefit bullets — quiz-specific, outcome focused */}
                 {(() => {
                   const BENEFIT_BULLETS: Record<string, string[]> = {
-                    infidelite: ['Tu sors du doute aujourd\'hui', 'Tu reprends le contrôle', 'Paiement unique, sans engagement', 'Résultat immédiat'],
-                    adopte: ['Tu trouves enfin la clarté que tu cherches', 'Tu avances sans cette question en tête', 'Paiement unique, sans engagement', 'Résultat immédiat'],
-                    amoureux: ['Tu mets un mot sur ce que tu ressens', 'Tu sais quoi faire maintenant', 'Paiement unique, sans engagement', 'Résultat immédiat'],
-                    'vrais-amis': ['Tu vois qui mérite vraiment ta confiance', 'Tu arrêtes de te remettre en question', 'Paiement unique, sans engagement', 'Résultat immédiat'],
-                    orientation: ['Tu te libères d\'une question qui traîne', 'Tu te comprends mieux, sans étiquette forcée', 'Paiement unique, sans engagement', 'Résultat immédiat'],
-                    personnalite: ['Tu te connais vraiment — pas juste 4 lettres', 'Tu comprends tes vraies réactions sous pression', 'Paiement unique, sans engagement', 'Résultat immédiat'],
+                    infidelite: ['Tu sors du doute aujourd\'hui', 'Tu reprends le contrôle', 'Paiement unique · 1,99€', 'Résultat immédiat'],
+                    adopte: ['Tu trouves la clarté que tu cherches', 'Tu avances l\'esprit libre', 'Paiement unique · 1,99€', 'Résultat immédiat'],
+                    amoureux: ['Tu mets un mot sur ce que tu ressens', 'Tu sais quoi faire maintenant', 'Paiement unique · 1,99€', 'Résultat immédiat'],
+                    'vrais-amis': ['Tu vois qui mérite ta confiance', 'Tu arrêtes de te remettre en question', 'Paiement unique · 1,99€', 'Résultat immédiat'],
+                    orientation: ['Tu te libères d\'une question qui traîne', 'Tu te comprends mieux, sans étiquette', 'Paiement unique · 1,99€', 'Résultat immédiat'],
+                    personnalite: ['Ton type exact — pas juste 4 lettres', 'Ton profil sous pression dévoilé', 'Paiement unique · 1,99€', 'Résultat immédiat'],
                   };
-                  const bullets = BENEFIT_BULLETS[quiz.slug] ?? ['Tu comprends enfin pourquoi tu réagis comme ça', 'Tu sors de l\'incertitude', 'Paiement unique, sans engagement', 'Résultat immédiat'];
+                  const bullets = BENEFIT_BULLETS[quiz.slug] ?? ['Tu comprends pourquoi tu réagis comme ça', 'Tu sors de l\'incertitude', 'Paiement unique · 1,99€', 'Résultat immédiat'];
                   return (
-                    <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-5 px-1">
+                    <ul className="grid grid-cols-2 gap-x-4 gap-y-2 mb-7 px-1">
                       {bullets.map(b => (
-                        <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                          <span className="text-emerald-400 text-[10px]">✓</span>
+                        <li key={b} className="flex items-center gap-2 text-xs text-zinc-300">
+                          <span className="text-emerald-400 text-sm flex-shrink-0">✓</span>
                           {b}
                         </li>
                       ))}
@@ -920,26 +910,14 @@ export default function ResultsClient({ quiz }: Props) {
                   );
                 })()}
 
-                {/* Divider — for power users */}
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="flex-1 h-px bg-white/5" />
-                  <span className="text-[10px] text-zinc-600 font-semibold tracking-wider uppercase whitespace-nowrap">Pour ceux qui s'y connaissent en MBTI</span>
-                  <div className="flex-1 h-px bg-white/5" />
+                {/* Divider */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-px bg-white/8" />
+                  <span className="text-[10px] text-zinc-500 font-semibold tracking-wider uppercase whitespace-nowrap">Accès illimité</span>
+                  <div className="flex-1 h-px bg-white/8" />
                 </div>
 
-                {/* Monthly sub — for power users */}
-                <button
-                  onClick={handlePayClick}
-                  disabled={isCheckingOut}
-                  className="w-full py-2.5 rounded-xl font-medium text-zinc-600 text-xs border border-white/6 bg-white/[0.02] hover:bg-white/5 hover:text-zinc-400 transition-all active:scale-[0.98] mb-2 disabled:opacity-60 text-left px-4"
-                >
-                  <span className="flex items-center justify-between">
-                    <span>Accès illimité · 15 quiz · analyses croisées</span>
-                    <span className="font-bold text-zinc-500">9,99€/mois</span>
-                  </span>
-                </button>
-
-                {/* Annual option */}
+                {/* Annual option — best value, highlighted */}
                 <button
                   onClick={() => {
                     if (!session?.user) {
@@ -954,16 +932,37 @@ export default function ResultsClient({ quiz }: Props) {
                     })();
                   }}
                   disabled={isCheckingOut}
-                  className="w-full py-2.5 rounded-xl font-medium text-zinc-600 text-xs border border-white/6 bg-white/[0.02] hover:bg-white/5 hover:text-zinc-400 transition-all active:scale-[0.98] mb-4 disabled:opacity-60 text-left px-4"
+                  className="w-full py-4 rounded-xl font-semibold text-white text-sm border border-white/15 bg-white/[0.07] hover:bg-white/10 transition-all active:scale-[0.98] mb-2.5 disabled:opacity-60 px-5"
                 >
                   <span className="flex items-center justify-between">
-                    <span>Accès annuel · meilleur rapport qualité/prix</span>
-                    <span className="font-bold text-zinc-500">29,99€/an</span>
+                    <span className="flex flex-col items-start gap-0.5">
+                      <span className="text-white font-bold">🗓 Annuel · 15 quiz · profil complet</span>
+                      <span className="text-zinc-400 text-xs font-normal">Meilleur rapport qualité/prix — 2,50€/mois</span>
+                    </span>
+                    <span className="flex flex-col items-end ml-3 flex-shrink-0">
+                      <span className="font-black text-white">29,99€</span>
+                      <span className="text-zinc-400 text-xs font-normal">-75%</span>
+                    </span>
+                  </span>
+                </button>
+
+                {/* Monthly sub */}
+                <button
+                  onClick={handlePayClick}
+                  disabled={isCheckingOut}
+                  className="w-full py-4 rounded-xl font-semibold text-white text-sm border border-white/10 bg-white/[0.04] hover:bg-white/7 transition-all active:scale-[0.98] mb-5 disabled:opacity-60 px-5"
+                >
+                  <span className="flex items-center justify-between">
+                    <span className="flex flex-col items-start gap-0.5">
+                      <span className="text-zinc-200 font-semibold">🔄 Mensuel · sans engagement</span>
+                      <span className="text-zinc-500 text-xs font-normal">Accès illimité · annule quand tu veux</span>
+                    </span>
+                    <span className="font-black text-zinc-200 ml-3 flex-shrink-0">9,99€<span className="font-normal text-zinc-500 text-xs">/mois</span></span>
                   </span>
                 </button>
 
                 <p className="text-center text-[11px] text-zinc-600">
-                  Paiement 100% sécurisé · Sans engagement pour le paiement unique
+                  🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay
                 </p>
               </div>
 
@@ -1082,7 +1081,7 @@ export default function ResultsClient({ quiz }: Props) {
               </div>
               <p className="text-white font-black text-sm leading-snug mb-1">Découvre ton type MBTI</p>
               <p className="text-zinc-500 text-xs mb-3 leading-relaxed">
-                100 questions — trouve ton vrai profil parmi les 16 types de personnalité.
+                70 questions — trouve ton vrai profil parmi les 16 types de personnalité.
               </p>
               <Link
                 href="/quiz/personnalite"

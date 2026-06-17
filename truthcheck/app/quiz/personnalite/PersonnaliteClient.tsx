@@ -8,7 +8,6 @@ import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
-import ContractScreen from '@/components/ContractScreen';
 
 const TOTAL = mbtiQuestions.length;
 
@@ -462,15 +461,12 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
-  const [contractAccepted, setContractAccepted] = useState(false);
 
-  // Track paywall view only after contract accepted
   useEffect(() => {
-    if (!contractAccepted) return;
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractAccepted]);
+  }, []);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
     diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail });
@@ -504,17 +500,6 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
       setLoading(false);
     }
   }, [typeCode, userEmail]);
-
-  if (!contractAccepted) {
-    return (
-      <ContractScreen
-        quizTitle={isFr ? 'Test de personnalité MBTI' : 'MBTI Personality Test'}
-        quizSlug="personnalite"
-        accentColor="#7c3aed"
-        onAccept={() => setContractAccepted(true)}
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ background: '#faf9f7' }}>
@@ -890,23 +875,41 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
           <button
             onClick={() => doCheckout('annual')}
             disabled={loading}
-            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 relative overflow-hidden transition-all hover:shadow-md disabled:opacity-60"
-            style={{ background: 'white', border: '2px solid #e7e5e0', color: '#57534e', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            className="w-full rounded-xl text-left px-4 pt-3 pb-3.5 relative overflow-hidden transition-all hover:shadow-md disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.07),rgba(236,72,153,0.05))', border: '2px solid rgba(124,58,237,0.35)', boxShadow: '0 2px 8px rgba(124,58,237,0.08)' }}>
             <span className="absolute top-0 right-0 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>−75%</span>
-            <span className="flex items-center justify-between pr-8">
-              <span>{isFr ? `${type?.emoji ?? '✨'} ${typeCode} + 15 profils · Quiz illimités · Duo` : `${type?.emoji ?? '✨'} ${typeCode} + 15 profiles · Unlimited quizzes · Duo`}</span>
-              <span className="font-bold text-stone-900">{isFr ? '29,99 €/an' : '€29.99/yr'}</span>
+            <span className="flex items-center justify-between pr-8 mb-2.5">
+              <span className="flex flex-col gap-0.5">
+                <span className="font-bold text-stone-900 text-xs">{isFr ? `🗓 ${typeCode} + 15 profils · Quiz illimités · Duo` : `🗓 ${typeCode} + 15 profiles · Unlimited quizzes · Duo`}</span>
+                <span className="text-stone-400 text-[11px]">{isFr ? '2,50 €/mois seulement' : 'Only €2.50/month'}</span>
+              </span>
+              <span className="flex flex-col items-end ml-2 flex-shrink-0">
+                <span className="font-black text-stone-900 text-sm">{isFr ? '29,99 €' : '€29.99'}</span>
+                <span className="text-stone-400 text-[10px]">{isFr ? '/an' : '/yr'}</span>
+              </span>
             </span>
+            <div className="text-center py-2 rounded-lg text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+              {loading ? '…' : isFr ? 'Souscrire maintenant →' : 'Subscribe now →'}
+            </div>
           </button>
           <button
             onClick={() => doCheckout('monthly')}
             disabled={loading}
-            className="w-full py-3 rounded-xl font-medium text-xs text-left px-4 transition-all hover:bg-stone-100 disabled:opacity-60"
-            style={{ background: 'white', border: '1px solid #e7e5e0', color: '#78716c' }}>
-            <span className="flex items-center justify-between">
-              <span>{isFr ? `Accès complet ${type?.name ?? typeCode} · Sans engagement` : `Full ${type?.name ?? typeCode} access · No commitment`}</span>
-              <span className="font-semibold text-stone-600">{isFr ? '9,99 €/mois' : '€9.99/mo'}</span>
+            className="w-full rounded-xl text-left px-4 pt-3 pb-3.5 transition-all hover:bg-stone-50 disabled:opacity-60"
+            style={{ background: 'white', border: '1.5px solid #d6d3d1' }}>
+            <span className="flex items-center justify-between mb-2.5">
+              <span className="flex flex-col gap-0.5">
+                <span className="font-semibold text-stone-800 text-xs">{isFr ? `🔄 Accès complet ${type?.name ?? typeCode} · Sans engagement` : `🔄 Full ${type?.name ?? typeCode} access · No commitment`}</span>
+                <span className="text-stone-400 text-[11px]">{isFr ? 'Annule quand tu veux' : 'Cancel anytime'}</span>
+              </span>
+              <span className="flex flex-col items-end ml-2 flex-shrink-0">
+                <span className="font-black text-stone-900 text-sm">{isFr ? '9,99 €' : '€9.99'}</span>
+                <span className="text-stone-400 text-[10px]">{isFr ? '/mois' : '/mo'}</span>
+              </span>
             </span>
+            <div className="text-center py-2 rounded-lg text-xs font-semibold border border-stone-300 text-stone-700">
+              {loading ? '…' : isFr ? 'Choisir ce plan →' : 'Choose this plan →'}
+            </div>
           </button>
         </div>
 

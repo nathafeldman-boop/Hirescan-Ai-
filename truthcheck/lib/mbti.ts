@@ -1,6 +1,6 @@
 // MBTI-equivalent personality test — French version
-// 100 statements · 4 dimensions · agree/disagree format
-// EI(30) · SN(24) · TF(22) · JP(24)
+// 70 statements · 4 dimensions · agree/disagree format
+// EI(20) · SN(20) · TF(20) · JP(10)
 
 export type MbtiPole = 'E' | 'I' | 'S' | 'N' | 'T' | 'F' | 'J' | 'P';
 
@@ -123,46 +123,6 @@ export const mbtiQuestions: MbtiQuestion[] = [
   { id: 68, dimension: 'TF', text: "Je prends en compte le ressenti de chacun.",                               optionA: { text: OUI, pole: 'F' }, optionB: { text: NON, pole: 'T' } },
   { id: 69, dimension: 'TF', text: "Je préfère évaluer les performances avec des mesures claires.",            optionA: { text: OUI, pole: 'T' }, optionB: { text: NON, pole: 'F' } },
   { id: 70, dimension: 'TF', text: "Je préfère tenir compte du contexte humain.",                              optionA: { text: OUI, pole: 'F' }, optionB: { text: NON, pole: 'T' } },
-
-  // ── J vs P — Q71-80 ──
-  { id: 71, dimension: 'JP', text: "Un emploi du temps structuré me rassure.",                                 optionA: { text: OUI, pole: 'J' }, optionB: { text: NON, pole: 'P' } },
-  { id: 72, dimension: 'JP', text: "J'aime adapter mes plans selon les circonstances.",                        optionA: { text: OUI, pole: 'P' }, optionB: { text: NON, pole: 'J' } },
-  { id: 73, dimension: 'JP', text: "Je range les choses rapidement après usage.",                              optionA: { text: OUI, pole: 'J' }, optionB: { text: NON, pole: 'P' } },
-  { id: 74, dimension: 'JP', text: "Je tolère facilement le désordre temporaire.",                             optionA: { text: OUI, pole: 'P' }, optionB: { text: NON, pole: 'J' } },
-  { id: 75, dimension: 'JP', text: "J'aime clôturer les sujets rapidement.",                                   optionA: { text: OUI, pole: 'J' }, optionB: { text: NON, pole: 'P' } },
-  { id: 76, dimension: 'JP', text: "Je continue souvent à explorer d'autres possibilités.",                    optionA: { text: OUI, pole: 'P' }, optionB: { text: NON, pole: 'J' } },
-  { id: 77, dimension: 'JP', text: "Les routines me conviennent bien.",                                        optionA: { text: OUI, pole: 'J' }, optionB: { text: NON, pole: 'P' } },
-  { id: 78, dimension: 'JP', text: "J'aime varier fréquemment mes habitudes.",                                 optionA: { text: OUI, pole: 'P' }, optionB: { text: NON, pole: 'J' } },
-  { id: 79, dimension: 'JP', text: "Je prends mes décisions sans trop tarder.",                                optionA: { text: OUI, pole: 'J' }, optionB: { text: NON, pole: 'P' } },
-  { id: 80, dimension: 'JP', text: "Je repousse parfois une décision pour obtenir plus d'informations.",       optionA: { text: OUI, pole: 'P' }, optionB: { text: NON, pole: 'J' } },
-
-  // ── E vs I — Q81-90 ──
-  { id: 81, dimension: 'EI', text: "Je me sens énergisé après une fête.",                                      optionA: { text: OUI, pole: 'E' }, optionB: { text: NON, pole: 'I' } },
-  { id: 82, dimension: 'EI', text: "Les interactions sociales prolongées peuvent m'épuiser.",                  optionA: { text: OUI, pole: 'I' }, optionB: { text: NON, pole: 'E' } },
-  { id: 83, dimension: 'EI', text: "Je pense souvent à haute voix.",                                           optionA: { text: OUI, pole: 'E' }, optionB: { text: NON, pole: 'I' } },
-  { id: 84, dimension: 'EI', text: "Je préfère élaborer mes idées intérieurement.",                            optionA: { text: OUI, pole: 'I' }, optionB: { text: NON, pole: 'E' } },
-  { id: 85, dimension: 'EI', text: "Je vais facilement vers les autres.",                                      optionA: { text: OUI, pole: 'E' }, optionB: { text: NON, pole: 'I' } },
-  { id: 86, dimension: 'EI', text: "Je suis plutôt réservé au premier abord.",                                 optionA: { text: OUI, pole: 'I' }, optionB: { text: NON, pole: 'E' } },
-  { id: 87, dimension: 'EI', text: "J'aime participer activement aux discussions.",                            optionA: { text: OUI, pole: 'E' }, optionB: { text: NON, pole: 'I' } },
-  { id: 88, dimension: 'EI', text: "Je préfère écouter et analyser.",                                          optionA: { text: OUI, pole: 'I' }, optionB: { text: NON, pole: 'E' } },
-  { id: 89, dimension: 'EI', text: "Je suis à l'aise dans les grands groupes.",                                optionA: { text: OUI, pole: 'E' }, optionB: { text: NON, pole: 'I' } },
-  { id: 90, dimension: 'EI', text: "Je préfère les petits groupes ou les échanges individuels.",               optionA: { text: OUI, pole: 'I' }, optionB: { text: NON, pole: 'E' } },
-
-  // ── S vs N — Q91-94 ──
-  { id: 91, dimension: 'SN', text: "J'aime suivre une méthode éprouvée.",                                      optionA: { text: OUI, pole: 'S' }, optionB: { text: NON, pole: 'N' } },
-  { id: 92, dimension: 'SN', text: "J'aime expérimenter de nouvelles approches.",                              optionA: { text: OUI, pole: 'N' }, optionB: { text: NON, pole: 'S' } },
-  { id: 93, dimension: 'SN', text: "Je privilégie les résultats pratiques.",                                    optionA: { text: OUI, pole: 'S' }, optionB: { text: NON, pole: 'N' } },
-  { id: 94, dimension: 'SN', text: "J'accorde de l'importance à l'inspiration et à la vision.",                optionA: { text: OUI, pole: 'N' }, optionB: { text: NON, pole: 'S' } },
-
-  // ── T vs F — Q95-96 ──
-  { id: 95, dimension: 'TF', text: "Je recherche la cohérence logique.",                                       optionA: { text: OUI, pole: 'T' }, optionB: { text: NON, pole: 'F' } },
-  { id: 96, dimension: 'TF', text: "Je recherche la cohésion humaine.",                                        optionA: { text: OUI, pole: 'F' }, optionB: { text: NON, pole: 'T' } },
-
-  // ── J vs P — Q97-100 ──
-  { id: 97,  dimension: 'JP', text: "J'apprécie les décisions définitives.",                                   optionA: { text: OUI, pole: 'J' }, optionB: { text: NON, pole: 'P' } },
-  { id: 98,  dimension: 'JP', text: "Je préfère laisser les choses évoluer naturellement.",                    optionA: { text: OUI, pole: 'P' }, optionB: { text: NON, pole: 'J' } },
-  { id: 99,  dimension: 'JP', text: "Je me considère comme une personne organisée.",                           optionA: { text: OUI, pole: 'J' }, optionB: { text: NON, pole: 'P' } },
-  { id: 100, dimension: 'JP', text: "Je me considère comme une personne adaptable.",                           optionA: { text: OUI, pole: 'P' }, optionB: { text: NON, pole: 'J' } },
 ];
 
 export function computeMbtiType(answers: Record<number, QuizAnswer>): string {
