@@ -491,28 +491,12 @@ export default function ResultsClient({ quiz }: Props) {
 
   function handlePayClick() {
     trackEvent('checkout_click');
-    if (!session?.user) {
-      try {
-        sessionStorage.setItem('pending_checkout', '1');
-        sessionStorage.setItem('pending_checkout_type', 'sub');
-      } catch {}
-      setShowAuthModal(true);
-      return;
-    }
-    void doCheckout();
+    void doCheckout(session?.user?.email ?? undefined);
   }
 
   function handleOneTimeClick() {
     trackEvent('checkout_click');
-    if (!session?.user) {
-      try {
-        sessionStorage.setItem('pending_checkout', '1');
-        sessionStorage.setItem('pending_checkout_type', 'onetime');
-      } catch {}
-      setShowAuthModal(true);
-      return;
-    }
-    void doOneTimeCheckout();
+    void doOneTimeCheckout(session?.user?.email ?? undefined);
   }
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
@@ -920,13 +904,9 @@ export default function ResultsClient({ quiz }: Props) {
                 {/* Annual option — best value, highlighted */}
                 <button
                   onClick={() => {
-                    if (!session?.user) {
-                      try { sessionStorage.setItem('pending_checkout', '1'); sessionStorage.setItem('pending_checkout_type', 'annual'); } catch {}
-                      setShowAuthModal(true); return;
-                    }
                     void (async () => {
                       setIsCheckingOut(true);
-                      const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quizSlug: quiz.slug, score, origin: window.location.origin, userEmail: session.user?.email ?? undefined, annual: true }) });
+                      const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quizSlug: quiz.slug, score, origin: window.location.origin, userEmail: session?.user?.email ?? undefined, annual: true }) });
                       const data = await res.json() as { url?: string };
                       if (data.url) window.location.href = data.url; else setIsCheckingOut(false);
                     })();
