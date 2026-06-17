@@ -357,12 +357,12 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   const last12 = useMemo(() => getLast12Keys(), []);
   const monthLabels = useMemo(() => last12.map(keyToLabel), [last12]);
 
-  const usersSeries    = useMemo(() => last12.map(k => stats.usersByMonth[k] ?? 0), [last12, stats.usersByMonth]);
-  const premiumSeries  = useMemo(() => last12.map(k => stats.premiumByMonth[k] ?? 0), [last12, stats.premiumByMonth]);
-  const quizSeries     = useMemo(() => last12.map(k => stats.quizByMonth[k] ?? 0), [last12, stats.quizByMonth]);
-  const paidSeries     = useMemo(() => last12.map(k => stats.paidByMonth[k] ?? 0), [last12, stats.paidByMonth]);
-  const revSeries      = useMemo(() => last12.map(k => (stats.revenueByMonth[k]?.revenue ?? 0)), [last12, stats.revenueByMonth]);
-  const commSeries     = useMemo(() => last12.map(k => (stats.revenueByMonth[k]?.commission ?? 0)), [last12, stats.revenueByMonth]);
+  const usersSeries    = useMemo(() => last12.map(k => (stats.usersByMonth ?? {})[k] ?? 0), [last12, stats.usersByMonth]);
+  const premiumSeries  = useMemo(() => last12.map(k => (stats.premiumByMonth ?? {})[k] ?? 0), [last12, stats.premiumByMonth]);
+  const quizSeries     = useMemo(() => last12.map(k => (stats.quizByMonth ?? {})[k] ?? 0), [last12, stats.quizByMonth]);
+  const paidSeries     = useMemo(() => last12.map(k => (stats.paidByMonth ?? {})[k] ?? 0), [last12, stats.paidByMonth]);
+  const revSeries      = useMemo(() => last12.map(k => ((stats.revenueByMonth ?? {})[k]?.revenue ?? 0)), [last12, stats.revenueByMonth]);
+  const commSeries     = useMemo(() => last12.map(k => ((stats.revenueByMonth ?? {})[k]?.commission ?? 0)), [last12, stats.revenueByMonth]);
 
   const conversionRate = stats.totalUsers > 0 ? ((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1) : '0';
 
@@ -395,7 +395,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           email: a.email,
           ca,
           sales: a.conversions.length,
-          clicks: stats.affiliateClicks[a.slug] ?? 0,
+          clicks: (stats.affiliateClicks ?? {})[a.slug] ?? 0,
           commission: commissionDue,
           conversions: a.conversions,
         };
