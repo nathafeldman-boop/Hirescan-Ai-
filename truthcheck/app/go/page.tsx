@@ -3,28 +3,39 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+function isRealBrowser(): boolean {
+  if (typeof window === 'undefined') return false;
+  const ua = navigator.userAgent.toLowerCase();
+  // Explicit TikTok signals → NOT a real browser
+  if (
+    ua.includes('musical_ly') ||
+    ua.includes('tiktok') ||
+    ua.includes('bytedance') ||
+    ua.includes('musical.ly') ||
+    ua.includes('tt_webview') ||
+    ua.includes('com.zhiliaoapp')
+  ) return false;
+  // Desktop browsers are real browsers — show quiz directly
+  if (!/mobile|android|iphone|ipad/.test(ua)) return true;
+  // On mobile: real browsers don't include "wv" WebView flag AND have full UA
+  const isWebView = ua.includes(' wv)') || ua.includes(';wv)');
+  return !isWebView;
+}
+
 export default function GoPage() {
   const router = useRouter();
-  const [show, setShow] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(true);
 
   useEffect(() => {
-    const ua = navigator.userAgent.toLowerCase();
-    const isTikTok =
-      ua.includes('musical_ly') ||
-      ua.includes('tiktok') ||
-      ua.includes('bytedance') ||
-      ua.includes('musical.ly') ||
-      ua.includes('tt_webview');
-
-    if (isTikTok) {
-      setShow(true);
-    } else {
-      // Real browser — go straight to the quiz
+    if (isRealBrowser()) {
       router.replace('/quiz/personnalite');
+    } else {
+      setReady(true);
     }
   }, [router]);
 
-  if (!show) return null;
+  if (!ready) return null;
 
   return (
     <div
@@ -121,7 +132,7 @@ export default function GoPage() {
         </h1>
 
         {/* Steps */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
           <div
             style={{
               background: '#262626',
@@ -187,6 +198,23 @@ export default function GoPage() {
             </span>
           </div>
         </div>
+
+        {/* Fallback for real browser users who land here anyway */}
+        <button
+          onClick={() => router.push('/quiz/personnalite')}
+          style={{
+            width: '100%',
+            padding: '12px',
+            borderRadius: 12,
+            background: 'transparent',
+            border: '1px solid #3f3f46',
+            color: '#71717a',
+            fontSize: 13,
+            cursor: 'pointer',
+          }}
+        >
+          Déjà dans mon navigateur → Continuer
+        </button>
       </div>
     </div>
   );
