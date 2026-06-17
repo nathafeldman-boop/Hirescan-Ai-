@@ -7,7 +7,6 @@ import Link from 'next/link';
 import type { Quiz } from '@/lib/quizzes';
 import { getResultTier } from '@/lib/quizzes';
 import { track } from '@/lib/analytics';
-import ContractScreen from '@/components/ContractScreen';
 
 interface Props {
   quiz: Quiz;
@@ -907,8 +906,8 @@ export default function ResultsClient({ quiz }: Props) {
                     void (async () => {
                       setIsCheckingOut(true);
                       const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quizSlug: quiz.slug, score, origin: window.location.origin, userEmail: session?.user?.email ?? undefined, annual: true }) });
-                      const data = await res.json() as { url?: string };
-                      if (data.url) window.location.href = data.url; else setIsCheckingOut(false);
+                      const data = await res.json() as { url?: string; error?: string };
+                      if (data.url) window.location.href = data.url; else { alert(data.error ?? 'Erreur de paiement'); setIsCheckingOut(false); }
                     })();
                   }}
                   disabled={isCheckingOut}
