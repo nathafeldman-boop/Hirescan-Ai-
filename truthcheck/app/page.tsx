@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import LandingPage from '@/components/LandingPage';
+import TikTokRedirect from '@/components/TikTokRedirect';
 
 const BASE = 'https://urcecret.site';
 
@@ -94,6 +95,7 @@ const homeFaqSchema = {
 export default function HomePage() {
   return (
     <>
+      <TikTokRedirect />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(landingSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homeFaqSchema) }} />
       <LandingPage />
