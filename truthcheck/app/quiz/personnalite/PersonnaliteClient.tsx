@@ -9,7 +9,31 @@ import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
 
-const TOTAL = mbtiQuestions.length;
+// ─── In-app browser detection ───────────────────────────────────────────────────
+function detectInAppBrowser(): boolean {
+  if (typeof window === 'undefined') return false;
+  const ua = navigator.userAgent;
+  if (/musical_ly|tiktok|bytedance|instagram|fbav|fban|snapchat|line|kakaotalk|wechat|micromessenger/i.test(ua)) return true;
+  if (/android/i.test(ua) && / wv[);]/i.test(ua)) return true;
+  if (/iphone|ipad/i.test(ua)) {
+    const hasSafariVersion = /version\/[\d.]+.*safari/i.test(ua);
+    const isChrome = /crios\//i.test(ua);
+    const isFirefox = /fxios\//i.test(ua);
+    if (!hasSafariVersion && !isChrome && !isFirefox) return true;
+  }
+  return false;
+}
+
+// ─── Short quiz: 8 questions per dimension = 32 total ───────────────────────────
+function getShortQuestions(all: MbtiQuestion[]): MbtiQuestion[] {
+  const seen: Record<string, number> = {};
+  const result: MbtiQuestion[] = [];
+  for (const q of all) {
+    seen[q.dimension] = (seen[q.dimension] ?? 0) + 1;
+    if (seen[q.dimension] <= 8) result.push(q);
+  }
+  return result;
+}
 
 // ─── Diagnostic logger ──────────────────────────────────────────────────────────
 // Writes to browser console AND to the PageView DB so steps are visible in admin.
@@ -455,12 +479,13 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
 // Auth gate removed: user goes straight to Stripe which collects their email.
 // The success page creates the account automatically from the Stripe email.
 
-function ResultTeaser({ typeCode, lang, userEmail }: {
-  typeCode: string; lang: string; userEmail?: string | null;
+function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
+  typeCode: string; lang: string; userEmail?: string | null; isInApp?: boolean;
 }) {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
+  const [showPayOverlay, setShowPayOverlay] = useState(false);
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
@@ -469,12 +494,14 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
   }, []);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
-    diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail });
+    diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail, isInApp });
     track('checkout_click', {
       quiz: 'personnalite',
       value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
       currency: 'EUR',
     });
+    // In-app browser (TikTok etc.) — Stripe doesn't redirect reliably; show overlay
+    if (isInApp) { setShowPayOverlay(true); return; }
     setLoading(true);
     try {
       let affiliateRef = '';
@@ -499,10 +526,41 @@ function ResultTeaser({ typeCode, lang, userEmail }: {
       alert('Erreur réseau. Réessaie.');
       setLoading(false);
     }
-  }, [typeCode, userEmail]);
+  }, [typeCode, userEmail, isInApp]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: '#faf9f7' }}>
+      {/* Pay overlay for TikTok/in-app browser users */}
+      {showPayOverlay && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#0d0d0d', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+          <div style={{ position: 'absolute', top: 18, right: 18, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M6 30L30 6M30 6H14M30 6V22" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <div style={{ background: '#0ea5e9', color: 'white', fontWeight: 700, fontSize: 14, padding: '8px 14px', borderRadius: 20, whiteSpace: 'nowrap' }}>Appuie sur ••• ici</div>
+          </div>
+          <div style={{ background: '#1a1a1a', borderRadius: 24, padding: '32px 24px', width: '100%', maxWidth: 380, marginTop: 80 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
+              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'linear-gradient(135deg,#4c1d95,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, marginBottom: 12 }}>🔮</div>
+              <div style={{ color: 'white', fontWeight: 700, fontSize: 16 }}>Profil {typeCode} prêt !</div>
+            </div>
+            <h2 style={{ color: 'white', fontSize: 20, fontWeight: 800, textAlign: 'center', lineHeight: 1.3, marginBottom: 24 }}>
+              Pour payer, ouvre dans ton navigateur :
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+              <div style={{ background: '#262626', borderRadius: 14, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#3f3f46', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>1</div>
+                <span style={{ color: '#e5e7eb', fontSize: 15, lineHeight: 1.4 }}>Appuie sur <strong style={{ color: 'white' }}>•••</strong> en haut à droite</span>
+              </div>
+              <div style={{ background: '#262626', borderRadius: 14, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#3f3f46', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>2</div>
+                <span style={{ color: '#e5e7eb', fontSize: 15, lineHeight: 1.4 }}>Puis appuie sur <strong style={{ color: '#0ea5e9' }}>« Ouvrir dans le navigateur »</strong></span>
+              </div>
+            </div>
+            <button onClick={() => setShowPayOverlay(false)} style={{ width: '100%', padding: '11px', borderRadius: 12, background: 'transparent', border: '1px solid #3f3f46', color: '#71717a', fontSize: 13, cursor: 'pointer' }}>
+              ← Retour
+            </button>
+          </div>
+        </div>
+      )}
       <div className="w-full max-w-sm">
 
         {/* Header */}
@@ -677,7 +735,9 @@ export default function PersonnaliteClient() {
   });
   const [answers, setAnswers] = useState<Answers>({});
   const [mbtiType, setMbtiType] = useState('');
-  const questions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
+  const [isInApp] = useState(() => detectInAppBrowser());
+  const baseQuestions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
+  const questions = isInApp ? getShortQuestions(baseQuestions) : baseQuestions;
   const t = ui[lang].quiz;
 
   // Log initial phase and URL params on first render
@@ -815,7 +875,7 @@ export default function PersonnaliteClient() {
         </div>
       )}
       {phase === 'result' && (
-        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} />
+        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} isInApp={isInApp} />
       )}
     </main>
   );

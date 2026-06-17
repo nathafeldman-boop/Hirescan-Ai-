@@ -5,7 +5,6 @@ import Tracker from './Tracker';
 import { Suspense } from 'react';
 import AffiliateTracker from '@/components/AffiliateTracker';
 import Analytics from '@/components/Analytics';
-import InAppBrowserGate from '@/components/InAppBrowserGate';
 
 const BASE = 'https://urcecret.site';
 
@@ -122,9 +121,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Suspense>
           <Suspense fallback={null}>
             <Analytics />
-          </Suspense>
-          <Suspense fallback={null}>
-            <InAppBrowserGate />
           </Suspense>
           {children}
         </Providers>
