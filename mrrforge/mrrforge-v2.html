@@ -6,7 +6,6 @@
 <title>MRRForge — Discover Your SaaS Idea</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Cormorant+Garamond:wght@400;500;600&display=swap">
-<script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
   theme: {
@@ -24,6 +23,7 @@ tailwind.config = {
   }
 }
 </script>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
@@ -31,6 +31,9 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 /* ── Router ──────────────────────────────────── */
 .spa-page { display: none !important; }
 .spa-page.active { display: block !important; }
+/* Show landing page immediately — no JS flicker */
+#page-index { display: block !important; }
+#page-index.hidden-by-router { display: none !important; }
 #page-quiz.active { display: flex !important; flex-direction: column; min-height: 100vh; }
 #page-analyzing.active { display: flex !important; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
 
@@ -715,8 +718,13 @@ var nav = (function(){
   var _hist = [];
   function _activate(page, params){
     document.querySelectorAll('.spa-page').forEach(function(el){ el.classList.remove('active'); });
+    var idx = document.getElementById('page-index');
+    if(idx) idx.classList.add('hidden-by-router');
     var el = document.getElementById('page-' + page);
-    if(el) el.classList.add('active');
+    if(el) {
+      el.classList.remove('hidden-by-router');
+      el.classList.add('active');
+    }
     window.scrollTo(0,0);
     if(page==='index')     init_index();
     else if(page==='quiz')      init_quiz();
