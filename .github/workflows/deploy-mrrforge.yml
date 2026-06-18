@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main, claude/install-frontend-design-skills-1z0zc2]
-    paths:
-      - "mrrforge/**"
-      - "vercel.json"
 
 jobs:
   deploy:
