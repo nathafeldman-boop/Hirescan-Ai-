@@ -172,6 +172,98 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+
+/* ── Potential badges ────────────────────────── */
+.badge-low      { background:rgba(107,114,128,.18); color:#9ca3af; border:1px solid rgba(107,114,128,.3); }
+.badge-medium   { background:rgba(59,130,246,.14);  color:#93c5fd; border:1px solid rgba(59,130,246,.25); }
+.badge-high     { background:rgba(52,211,153,.14);  color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
+.badge-very_high{ background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(245,158,11,.18)); color:#fbbf24; border:1px solid rgba(245,158,11,.3); }
+
+/* ── AI idea card ────────────────────────────── */
+.ai-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all .2s ease;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(14px);
+}
+.ai-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,transparent,rgba(167,139,250,.5),transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.ai-card:hover { transform: translateY(-2px) !important; border-color: rgba(167,139,250,.3); }
+.ai-card:hover::before { opacity: 1; }
+.ai-card.locked { pointer-events: none; user-select: none; }
+
+/* ── Idea number badge ───────────────────────── */
+.idea-num {
+  width: 26px; height: 26px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: #9ca3af; flex-shrink: 0;
+}
+
+/* ── Payment modal ───────────────────────────── */
+.pay-modal {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(8,8,12,.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.pay-modal.show { opacity: 1; pointer-events: auto; }
+.pay-modal .modal-box {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(24px);
+  border-radius: 24px;
+  padding: 32px 28px;
+  width: calc(100% - 32px);
+  max-width: 380px;
+  position: relative;
+}
+.pay-input {
+  width: 100%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'DM Sans',sans-serif;
+  outline: none;
+  transition: border-color .2s;
+}
+.pay-input:focus { border-color: rgba(167,139,250,.5); }
+.pay-input::placeholder { color: #4b5563; }
+
+/* ── Toast ───────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 24px;
+  left: 50%; transform: translateX(-50%) translateY(16px);
+  background: rgba(52,211,153,.15);
+  border: 1px solid rgba(52,211,153,.3);
+  color: #6ee7b7;
+  padding: 11px 20px;
+  border-radius: 99px;
+  font-size: 13px; font-weight: 500;
+  opacity: 0;
+  transition: all .3s ease;
+  z-index: 500; pointer-events: none;
+  white-space: nowrap;
+}
 </style>
 </head>
 <body>
@@ -409,8 +501,8 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 <div id="page-analyzing" class="spa-page" style="padding:24px 16px;">
   <div style="width:100%;max-width:380px;text-align:center;">
     <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#5b5ef8,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;">⚡</div>
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:8px;">Analyzing your profile</h2>
-    <p style="font-size:13px;color:#9ca3af;margin-bottom:28px;">Scoring 20 ideas against your answers…</p>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:8px;">Analyse en cours…</h2>
+    <p style="font-size:13px;color:#9ca3af;margin-bottom:28px;">L'IA génère vos idées personnalisées…</p>
 
     <div style="height:6px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin-bottom:8px;">
       <div id="analyzing-progress" class="progress-emerald" style="height:100%;width:0%;"></div>
@@ -420,23 +512,23 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
     <div style="text-align:left;display:flex;flex-direction:column;gap:10px;" id="analyzing-steps">
       <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="0">
         <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Detecting your archetype</span>
+        <span>Détection de votre archétype</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="1">
         <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Scoring market timing</span>
+        <span>Analyse de votre profil</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="2">
         <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Matching skill alignment</span>
+        <span id="ai-step-label">Appel à l'IA Mistral…</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="3">
         <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Ranking 20 opportunities</span>
+        <span>Classement des opportunités</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="4">
         <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Generating your blueprint</span>
+        <span>Génération de votre blueprint</span>
       </div>
     </div>
   </div>
@@ -487,6 +579,44 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
   <div style="max-width:820px;margin:0 auto;padding:28px 16px 60px;" id="dash-content"></div>
 </div><!-- /#page-dashboard -->
 
+
+<!-- ════════════════════════════════════════
+     PAYMENT MODAL
+════════════════════════════════════════ -->
+<div id="payment-modal" class="pay-modal">
+  <div class="modal-box">
+    <button onclick="closePaywall()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#9ca3af;font-size:22px;cursor:pointer;line-height:1;padding:4px;">×</button>
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:36px;margin-bottom:8px;">🔓</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;margin-bottom:4px;">Accès complet MRRForge</h3>
+      <p style="font-size:13px;color:#9ca3af;">Paiement unique · 20€ · Accès à vie</p>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px;">Numéro de carte</label>
+      <input class="pay-input" id="pay-card" type="text" placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div>
+        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px;">Expiration</label>
+        <input class="pay-input" id="pay-exp" type="text" placeholder="MM / AA" maxlength="7">
+      </div>
+      <div>
+        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px;">CVC</label>
+        <input class="pay-input" id="pay-cvc" type="text" placeholder="123" maxlength="3">
+      </div>
+    </div>
+
+    <button id="pay-confirm-btn" class="btn-primary" style="width:100%;padding:15px;font-size:15px;justify-content:center;box-shadow:0 6px 30px rgba(91,94,248,.4);" onclick="confirmPayment()">
+      🔒 Payer 20€ maintenant
+    </button>
+    <p style="font-size:11px;color:#6b7280;text-align:center;margin-top:10px;">🔐 Paiement sécurisé SSL · Accès immédiat · Remboursé si non satisfait 7j</p>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
 
 <script>
 // ════════════════════════════════════════
@@ -700,6 +830,42 @@ function _showIntel(intel,cb){
 }
 
 // ════════════════════════════════════════
+// MISTRAL AI CALL
+// ════════════════════════════════════════
+async function callMistralAI(ans){
+  var skillMap={dev:'Développeur/Ingénieur',design:'Designer/Créateur',sales:'Vente/Marketing',ops:'Ops/Business'};
+  var timeMap={low:'moins de 5h/semaine',medium:'5–15h/semaine',high:'15–30h/semaine',fulltime:'40h+/semaine'};
+  var targetMap={'1k':'1 000€/mois','5k':'5 000€/mois','10k':'10 000€/mois','50k':'50 000€+/mois'};
+  var modelMap={sub:'abonnements mensuels',usage:'facturation à l\'usage',oneoff:'paiement unique',mixed:'modèle mixte (abo + upsell)'};
+  var fearMap={tech:'complexité technique',competition:'trop de concurrence',customers:'acquisition de clients',time:'manque de temps'};
+
+  var prompt='Tu es un expert en micro-SaaS B2B. Génère 10 idées de SaaS UNIQUES et très PERSONNALISÉES pour ce fondateur :\n\n'
+    +'- Compétences : '+(skillMap[ans.skill]||'non renseigné')+'\n'
+    +'- Temps disponible : '+(timeMap[ans.time]||'non renseigné')+'\n'
+    +'- Objectif MRR : '+(targetMap[ans.target]||'non renseigné')+'\n'
+    +'- Modèle préféré : '+(modelMap[ans.model]||'non renseigné')+'\n'
+    +'- Plus grande crainte : '+(fearMap[ans.fear]||'non renseigné')+'\n\n'
+    +'Réponds UNIQUEMENT avec un tableau JSON valide de 10 objets (pas de texte autour, pas de markdown), format strict :\n'
+    +'[{"id":"kebab-case-id","name":"Nom Produit","tagline":"Accroche courte et percutante","category":"Catégorie","potential":"high","potentialMrr":"€X 000–Y 000/mo","description":"2-3 phrases concrètes.","targetCustomer":"Qui paie exactement"}]\n\n'
+    +'potential doit être : "low" | "medium" | "high" | "very_high"\n'
+    +'Sois créatif, spécifique, réaliste. Les idées doivent correspondre aux contraintes exactes du fondateur.';
+
+  var resp=await fetch('https://api.mistral.ai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer 4PtEe397ANJtMuPHfxeYIlwtFQsTRt3a'},
+    body:JSON.stringify({model:'mistral-small-latest',messages:[{role:'user',content:prompt}],temperature:0.82,max_tokens:3000})
+  });
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  var data=await resp.json();
+  var content=data.choices[0].message.content;
+  var m=content.match(/\[[\s\S]*\]/);
+  if(!m) throw new Error('No JSON array in response');
+  var ideas=JSON.parse(m[0]);
+  if(!Array.isArray(ideas)||ideas.length===0) throw new Error('Empty array');
+  return ideas;
+}
+
+// ════════════════════════════════════════
 // INIT_ANALYZING
 // ════════════════════════════════════════
 var _analyzeTimer=null;
@@ -708,34 +874,65 @@ function init_analyzing(){
   var prog=document.getElementById('analyzing-progress');
   var pctEl=document.getElementById('analyzing-pct');
   var stepEls=document.querySelectorAll('#analyzing-steps [data-step]');
-  var pct=0;
-  function tick(){
-    pct=Math.min(100,pct+Math.random()*7+3);
-    var p=Math.round(pct);
+  var pct=0, _apiDone=false, _waitingForApi=false;
+
+  var ans={};
+  try{ans=JSON.parse(localStorage.getItem('mrrforge_answers')||'{}');}catch(e){}
+  var arch=detectArchetype(ans);
+
+  // Fire Mistral API call immediately in parallel
+  callMistralAI(ans).then(function(ideas){
+    localStorage.setItem('mrrforge_ai_ideas',JSON.stringify(ideas));
+    _apiDone=true;
+    var lbl=document.getElementById('ai-step-label');
+    if(lbl) lbl.textContent='✨ Idées IA générées !';
+    if(_waitingForApi){ _waitingForApi=false; fastFinish(); }
+  }).catch(function(err){
+    console.warn('Mistral fallback:',err.message);
+    // Use local IDEAS as fallback
+    var fallback=IDEAS.slice(0,10).map(function(idea){
+      return {id:idea.id,name:idea.name,tagline:idea.tagline,category:idea.category,potential:'high',potentialMrr:idea.mrr,description:idea.desc,targetCustomer:'Indie hackers & petites équipes'};
+    });
+    localStorage.setItem('mrrforge_ai_ideas',JSON.stringify(fallback));
+    _apiDone=true;
+    if(_waitingForApi){ _waitingForApi=false; fastFinish(); }
+  });
+
+  function setUI(p){
     if(prog) prog.style.width=p+'%';
     if(pctEl) pctEl.textContent=p+'%';
-    var si=Math.floor(pct/20);
+    var si=Math.floor(p/20);
     stepEls.forEach(function(s,i){
       var icon=s.querySelector('.step-icon');
-      if(i<si){
-        s.style.color='#34d399';
-        if(icon){icon.textContent='✓';icon.style.background='#34d399';icon.style.border='none';icon.style.color='#08080c';}
-      } else if(i===si){
-        s.style.color='#fff';
-        if(icon) icon.textContent='◉';
-      }
+      if(i<si){ s.style.color='#34d399'; if(icon){icon.textContent='✓';icon.style.background='#34d399';icon.style.border='none';icon.style.color='#08080c';} }
+      else if(i===si){ s.style.color='#fff'; if(icon) icon.textContent='◉'; }
     });
-    if(pct<100){
-      _analyzeTimer=setTimeout(tick,180+Math.random()*280);
-    } else {
-      var ans={};
-      try{ans=JSON.parse(localStorage.getItem('mrrforge_answers')||'{}');}catch(e){}
-      var arch=detectArchetype(ans);
-      var ranked=IDEAS.map(function(idea){ return {id:idea.id,score:scoreIdea(idea,ans,arch)}; })
-                       .sort(function(a,b){ return b.score-a.score; });
-      localStorage.setItem('mrrforge_results',JSON.stringify({arch:arch,ranked:ranked}));
-      _analyzeTimer=setTimeout(function(){ nav.go('results'); },500);
+  }
+
+  function fastFinish(){
+    if(_analyzeTimer) clearTimeout(_analyzeTimer);
+    (function ft(){
+      pct=Math.min(100,pct+6); setUI(Math.round(pct));
+      if(pct<100){ _analyzeTimer=setTimeout(ft,55); }
+      else{
+        var ranked=IDEAS.map(function(idea){return{id:idea.id,score:scoreIdea(idea,ans,arch)};}).sort(function(a,b){return b.score-a.score;});
+        localStorage.setItem('mrrforge_results',JSON.stringify({arch:arch,ranked:ranked}));
+        _analyzeTimer=setTimeout(function(){nav.go('results');},450);
+      }
+    })();
+  }
+
+  function tick(){
+    // Slow near 68%, waiting for API
+    if(pct>=68&&!_apiDone){
+      pct=Math.min(73,pct+0.4); setUI(Math.round(pct));
+      _waitingForApi=true;
+      _analyzeTimer=setTimeout(tick,450);
+      return;
     }
+    if(_apiDone&&pct>=68){ fastFinish(); return; }
+    pct=Math.min(68,pct+Math.random()*6+4); setUI(Math.round(pct));
+    _analyzeTimer=setTimeout(tick,190+Math.random()*240);
   }
   tick();
 }
@@ -744,72 +941,149 @@ function init_analyzing(){
 // INIT_RESULTS
 // ════════════════════════════════════════
 function init_results(){
-  var data={},ans={};
-  try{data=JSON.parse(localStorage.getItem('mrrforge_results')||'{}');}catch(e){}
-  try{ans=JSON.parse(localStorage.getItem('mrrforge_answers')||'{}');}catch(e){}
-  var arch=data.arch||'builder', ranked=data.ranked||[];
+  var aiIdeas=[], arch='builder';
+  try{ aiIdeas=JSON.parse(localStorage.getItem('mrrforge_ai_ideas')||'[]'); }catch(e){}
+  try{ var d=JSON.parse(localStorage.getItem('mrrforge_results')||'{}'); arch=d.arch||'builder'; }catch(e){}
   var am=ARCHETYPE_META[arch]||ARCHETYPE_META.builder;
-  var map={}; IDEAS.forEach(function(i){ map[i.id]=i; });
+
+  // Fallback if no AI ideas yet
+  if(!aiIdeas.length){
+    aiIdeas=IDEAS.slice(0,10).map(function(idea){
+      return {id:idea.id,name:idea.name,tagline:idea.tagline,category:idea.category,potential:'high',potentialMrr:idea.mrr,description:idea.desc,targetCustomer:'Indie hackers & petites équipes'};
+    });
+  }
+
+  var isPremium=localStorage.getItem('mrrforge_premium')==='1';
+  var UNLOCK_AT=isPremium?10:7;
   var cont=document.getElementById('results-content'); if(!cont) return;
+
+  var BADGE={
+    low:     {label:'Potentiel Faible',  cls:'badge-low'},
+    medium:  {label:'Potentiel Moyen',   cls:'badge-medium'},
+    high:    {label:'Potentiel Élevé',   cls:'badge-high'},
+    very_high:{label:'Potentiel ✦ Très Élevé',cls:'badge-very_high'},
+  };
+
   var html='';
 
-  // Archetype
-  html+='<div style="text-align:center;margin-bottom:36px;" class="fade-up">';
-  html+='<div class="glass" style="display:inline-flex;align-items:center;gap:8px;border-radius:99px;padding:8px 16px;margin-bottom:16px;">';
+  // ── Header ──
+  html+='<div style="text-align:center;margin-bottom:32px;">';
+  html+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;">';
+  html+='<div class="glass" style="display:inline-flex;align-items:center;gap:7px;border-radius:99px;padding:7px 14px;">';
   html+='<span>'+am.icon+'</span><span style="font-size:13px;font-weight:500;color:'+am.color+';">'+am.label+'</span></div>';
-  html+='<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(26px,5vw,38px);font-weight:500;margin-bottom:8px;">Your top matches</h1>';
+  html+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);border-radius:99px;padding:6px 12px;">';
+  html+='<span style="font-size:11px;">✨</span><span style="font-size:11px;color:#6ee7b7;font-weight:600;">Généré par Mistral AI</span></div></div>';
+  html+='<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(26px,5vw,40px);font-weight:500;margin-bottom:8px;">Vos 10 idées SaaS personnalisées</h1>';
   html+='<p style="font-size:13px;color:#9ca3af;max-width:440px;margin:0 auto;line-height:1.6;">'+am.desc+'</p></div>';
 
-  // Top 3
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:14px;">Top Picks</p>';
-  html+='<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:36px;">';
-  for(var i=0;i<Math.min(3,ranked.length);i++){
-    var item=ranked[i], idea=map[item.id]; if(!idea) continue;
-    var isTop=(i===0);
-    html+='<div class="glass idea-card" style="border-radius:20px;padding:18px 20px;'+(isTop?'border-color:rgba(167,139,250,.35)!important;':'')+'" onclick="goDetail(\''+idea.id+'\')">';
-    html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">';
-    html+='<div style="flex:1;">';
-    if(isTop) html+='<span style="font-size:11px;background:rgba(167,139,250,.15);color:#c4b5fd;padding:2px 10px;border-radius:99px;font-weight:500;margin-bottom:6px;display:inline-block;">#1 Match</span>';
-    html+='<h3 style="font-weight:600;font-size:15px;margin-bottom:2px;">'+(i===0?'':'')+idea.name+'</h3>';
-    html+='<p style="font-size:12px;color:#9ca3af;">'+idea.tagline+'</p></div>';
-    html+='<div style="text-align:right;margin-left:12px;">';
-    html+='<div class="text-eg" style="font-size:24px;font-weight:700;">'+item.score+'</div>';
-    html+='<div style="font-size:11px;color:#6b7280;">score</div></div></div>';
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;">';
-    html+='<div class="text-eg" style="font-size:14px;font-weight:600;">'+idea.mrr+'<span style="font-size:11px;color:#6b7280;font-weight:400;margin-left:4px;">MRR</span></div>';
-    html+='<span class="tag">'+idea.difficulty+'</span></div>';
-    html+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;">';
-    (idea.tags||[]).forEach(function(t){ html+='<span class="tag">'+t+'</span>'; });
-    html+='</div></div>';
-  }
-  html+='</div>';
+  // ── Ideas list ──
+  html+='<div style="position:relative;">';
+  html+='<div style="display:flex;flex-direction:column;gap:12px;" id="ideas-list">';
 
-  // Secondary grid
-  if(ranked.length>3){
-    html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:14px;">More Matches</p>';
-    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:36px;">';
-    for(var j=3;j<Math.min(8,ranked.length);j++){
-      var it=ranked[j], id2=map[it.id]; if(!id2) continue;
-      html+='<div class="glass idea-card" style="border-radius:16px;padding:14px 16px;" onclick="goDetail(\''+id2.id+'\')">';
-      html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">';
-      html+='<div><div style="font-weight:500;font-size:13px;">'+id2.name+'</div>';
-      html+='<div style="font-size:11px;color:#6b7280;margin-top:1px;">'+id2.category+'</div></div>';
-      html+='<div class="text-eg" style="font-weight:700;font-size:15px;">'+it.score+'</div></div>';
-      html+='<div class="text-eg" style="font-size:12px;font-weight:600;">'+id2.mrr+'</div>';
-      html+='</div>';
-    }
+  aiIdeas.forEach(function(idea,i){
+    var bc=BADGE[idea.potential]||BADGE.high;
+    var locked=(i>=UNLOCK_AT);
+    html+='<div class="ai-card'+(locked?' locked':'')+'" '
+      +(locked?'style="filter:blur(3.5px);"':'style="" onclick="openAiDetail('+i+')"')+'>';
+
+    // Top row
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">';
+    html+='<div style="display:flex;align-items:center;gap:8px;">';
+    html+='<div class="idea-num">'+(i+1)+'</div>';
+    html+='<span class="tag">'+idea.category+'</span></div>';
+    html+='<span class="'+bc.cls+'" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;">'+bc.label+'</span></div>';
+
+    // Name + tagline
+    html+='<h3 style="font-family:\'Cormorant Garamond\',serif;font-size:21px;font-weight:500;margin-bottom:4px;line-height:1.25;">'+idea.name+'</h3>';
+    html+='<p style="font-size:13px;color:#a78bfa;font-weight:500;margin-bottom:10px;">'+idea.tagline+'</p>';
+
+    // Description
+    html+='<p style="font-size:13px;color:#9ca3af;line-height:1.65;margin-bottom:12px;">'+idea.description+'</p>';
+
+    // Bottom row
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);">';
+    html+='<div style="font-size:12px;color:#6b7280;">👤 '+idea.targetCustomer+'</div>';
+    html+='<div class="text-eg" style="font-size:13px;font-weight:600;">'+idea.potentialMrr+'</div></div>';
+
+    html+='</div>'; // end ai-card
+  });
+
+  html+='</div>'; // end ideas-list
+
+  // Paywall gradient mask + lock overlay (only if not premium)
+  if(!isPremium){
+    html+='<div style="position:absolute;bottom:0;left:0;right:0;height:300px;background:linear-gradient(transparent,#08080c 58%);pointer-events:none;z-index:10;"></div>';
+    html+='<div style="position:absolute;bottom:50px;left:0;right:0;text-align:center;z-index:20;display:flex;flex-direction:column;align-items:center;gap:6px;">';
+    html+='<div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(8px);">🔒</div>';
+    html+='<p style="font-size:13px;color:#9ca3af;">+ 3 idées verrouillées</p></div>';
+  }
+
+  html+='</div>'; // end relative
+
+  // ── PAYWALL SECTION ──
+  if(!isPremium){
+    html+='<div style="margin-top:44px;padding:36px 24px 32px;border-radius:28px;background:linear-gradient(135deg,rgba(91,94,248,.1),rgba(124,58,237,.07));border:1px solid rgba(167,139,250,.22);text-align:center;position:relative;overflow:hidden;">';
+
+    // BG orbs
+    html+='<div style="position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(91,94,248,.14);filter:blur(70px);top:-80px;right:-60px;pointer-events:none;"></div>';
+    html+='<div style="position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(52,211,153,.09);filter:blur(60px);bottom:-50px;left:-30px;pointer-events:none;"></div>';
+
+    html+='<div style="position:relative;z-index:1;">';
+
+    // Fire badge
+    html+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:5px 14px;margin-bottom:18px;">';
+    html+='<span style="font-size:13px;">🔥</span><span style="font-size:11px;color:#fbbf24;font-weight:600;letter-spacing:.1em;text-transform:uppercase;">Accès Complet</span></div>';
+
+    html+='<h2 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(26px,5vw,38px);font-weight:500;margin-bottom:10px;line-height:1.2;">Prêt à lancer<br>votre aventure SaaS ?</h2>';
+    html+='<p style="font-size:14px;color:#9ca3af;max-width:400px;margin:0 auto 28px;line-height:1.7;">Débloquez les 3 idées restantes, les angles marketing personnalisés, la stratégie d\'acquisition et votre dashboard de lancement.</p>';
+
+    // Features grid
+    html+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:400px;margin:0 auto 28px;text-align:left;">';
+    var features=[
+      ['🎯','Angles marketing ciblés'],
+      ['📊','Dashboard de lancement'],
+      ['🚀','Stratégie d\'acquisition'],
+      ['🔓','3 idées supplémentaires'],
+      ['🛠️','Stack technique détaillée'],
+      ['📈','Roadmap 90 jours'],
+    ];
+    features.forEach(function(f){
+      html+='<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:9px 10px;">';
+      html+='<span style="font-size:15px;">'+f[0]+'</span><span style="font-size:12px;color:#d1d5db;">'+f[1]+'</span></div>';
+    });
+    html+='</div>';
+
+    // Price display
+    html+='<div style="margin-bottom:20px;">';
+    html+='<div style="font-size:13px;color:#9ca3af;margin-bottom:4px;text-decoration:line-through;opacity:.6;">Valeur réelle : 199€</div>';
+    html+='<div><span style="font-size:52px;font-weight:700;line-height:1;">20</span><span style="font-size:22px;font-weight:700;">€</span><span style="font-size:15px;color:#9ca3af;margin-left:6px;">accès unique · à vie</span></div></div>';
+
+    // CTA button
+    html+='<button class="btn-primary" style="font-size:17px;padding:20px 44px;border-radius:16px;width:100%;max-width:380px;justify-content:center;box-shadow:0 10px 50px rgba(91,94,248,.45);" onclick="openPaywall()">';
+    html+='🚀 Propulser mon SaaS · 20€</button>';
+
+    html+='<p style="font-size:12px;color:#6b7280;margin-top:14px;">🔐 Paiement sécurisé · ✓ Accès immédiat · ✓ Remboursé si non satisfait 7 jours</p>';
+
+    html+='</div></div>'; // end z-index + paywall section
+  } else {
+    // Already premium — show "Go to detail" CTA
+    var firstId=(aiIdeas[0]&&aiIdeas[0].id)||IDEAS[0].id;
+    html+='<div style="margin-top:32px;text-align:center;">';
+    html+='<button class="btn-primary" style="font-size:15px;padding:16px 36px;justify-content:center;" onclick="openAiDetail(0)">Ouvrir le Blueprint #1 →</button>';
     html+='</div>';
   }
 
-  // Premium upsell
-  html+='<div class="glass" style="border-radius:22px;padding:28px;border-color:rgba(167,139,250,.2)!important;text-align:center;">';
-  html+='<div style="font-size:36px;margin-bottom:10px;">🔓</div>';
-  html+='<h3 style="font-family:\'Cormorant Garamond\',serif;font-size:24px;font-weight:500;margin-bottom:8px;">Unlock the full blueprint</h3>';
-  html+='<p style="font-size:13px;color:#9ca3af;margin-bottom:20px;line-height:1.6;">Get the complete execution plan for your #1 match: tech stack, pricing strategy, 90-day roadmap, and launch checklist.</p>';
-  if(ranked.length>0) html+='<button class="btn-primary" style="padding:14px 28px;font-size:14px;" onclick="activatePremium(\''+ranked[0].id+'\')">Unlock Blueprint — $29 →</button>';
-  html+='</div>';
-
   cont.innerHTML=html;
+
+  // Staggered card entrance animation
+  var cards=cont.querySelectorAll('.ai-card');
+  cards.forEach(function(card,i){
+    setTimeout(function(){
+      card.style.transition='opacity .36s ease, transform .36s ease';
+      card.style.opacity='1';
+      card.style.transform='translateY(0)';
+    }, i*55);
+  });
 }
 
 // ════════════════════════════════════════
@@ -818,8 +1092,20 @@ function init_results(){
 function init_detail(params){
   var id=params.id, premium=params.premium||localStorage.getItem('mrrforge_premium')==='1';
   var idea=null; for(var i=0;i<IDEAS.length;i++) if(IDEAS[i].id===id){idea=IDEAS[i];break;}
+  // Fall back to AI-generated idea if not in local IDEAS
+  if(!idea){
+    var aiArr=[];
+    try{aiArr=JSON.parse(localStorage.getItem('mrrforge_ai_ideas')||'[]');}catch(e){}
+    for(var k=0;k<aiArr.length;k++){
+      if(aiArr[k].id===id){
+        var ai=aiArr[k];
+        idea={id:ai.id,name:ai.name,tagline:ai.tagline,category:ai.category,mrr:ai.potentialMrr,mrrMin:2000,difficulty:'Medium',arch:[],tags:[ai.category],desc:ai.description,market:'Client cible : '+ai.targetCustomer,stack:'Next.js + Supabase + Stripe + Vercel',pricing:'€29/mo starter · €79/mo pro · €199/mo agency',roadmap:['Semaine 1–2 : MVP & landing page','Semaine 3–4 : Bêta & premiers utilisateurs','Mois 2 : Acquisition & croissance','Mois 3 : Optimisation & scaling']};
+        break;
+      }
+    }
+  }
   var cont=document.getElementById('detail-content');
-  if(!idea){cont.innerHTML='<p style="color:#9ca3af;">Idea not found.</p>';return;}
+  if(!idea){cont.innerHTML='<p style="color:#9ca3af;">Idée introuvable.</p>';return;}
   localStorage.setItem('mrrforge_selected_id',id);
   var titleEl=document.getElementById('detail-nav-title');
   if(titleEl) titleEl.textContent=idea.name;
@@ -1009,6 +1295,58 @@ window.toggleFaq=function(btn){
     body.style.display='none';
     if(icon) icon.textContent='+';
   }
+};
+
+// ── Paywall modal ──
+window.openPaywall=function(){
+  var modal=document.getElementById('payment-modal');
+  if(modal) modal.classList.add('show');
+};
+window.closePaywall=function(){
+  var modal=document.getElementById('payment-modal');
+  if(modal) modal.classList.remove('show');
+};
+window.confirmPayment=function(){
+  var btn=document.getElementById('pay-confirm-btn');
+  if(!btn) return;
+  btn.textContent='Traitement en cours…';
+  btn.disabled=true;
+  btn.style.opacity='0.7';
+  setTimeout(function(){
+    closePaywall();
+    localStorage.setItem('mrrforge_premium','1');
+    showToast('✅ Accès Premium activé ! Bienvenue 🚀');
+    // Re-render results with premium unlocked
+    setTimeout(function(){ init_results(); }, 500);
+  }, 1800);
+};
+
+// ── Card formatter ──
+window.fmtCard=function(inp){
+  var v=inp.value.replace(/\D/g,'').slice(0,16);
+  inp.value=v.replace(/(\d{4})(?=\d)/g,'$1 ').trim();
+};
+
+// ── Toast ──
+window.showToast=function(msg){
+  var t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.style.opacity='1';
+  t.style.transform='translateX(-50%) translateY(0)';
+  setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(16px)'; },3200);
+};
+
+// ── Open AI idea detail ──
+window.openAiDetail=function(idx){
+  var ideas=[];
+  try{ ideas=JSON.parse(localStorage.getItem('mrrforge_ai_ideas')||'[]'); }catch(e){}
+  var idea=ideas[idx]; if(!idea) return;
+  // Check if id matches a local idea
+  var matchLocal=null;
+  for(var i=0;i<IDEAS.length;i++) if(IDEAS[i].id===idea.id){ matchLocal=IDEAS[i]; break; }
+  var idToUse=idea.id; // init_detail will handle both local + AI lookup
+  nav.go('detail',{id:idToUse});
 };
 
 document.addEventListener('DOMContentLoaded',function(){ nav._activate('index',{}); });
