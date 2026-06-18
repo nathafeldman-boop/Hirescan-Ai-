@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MRRForge — Turn ideas into recurring revenue</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#09090b;--surface:#0f0f13;--card:#18181b;
+  --border:#27272a;--borderl:#3f3f46;
+  --text:#fafafa;--text2:#a1a1aa;--muted:#52525b;
+  --green:#22c55e;--gbg:rgba(34,197,94,.08);--gborder:rgba(34,197,94,.25);
+  --blue:#60a5fa;--bbg:rgba(96,165,250,.08);
+  --purple:#c084fc;--pbg:rgba(192,132,252,.08);--pborder:rgba(192,132,252,.25);
+  --orange:#fb923c;--obg:rgba(251,146,60,.08);
+  --red:#f87171;--rbg:rgba(248,113,113,.08);
+  --r:10px;--rl:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.screen{display:none}.screen.active{display:block}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px}
+.modal-overlay.active{display:flex}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes growBar{from{width:0}to{width:var(--w)}}
+
+.au{animation:fadeUp .5s ease both}
+.ai{animation:fadeIn .5s ease both}
+
+/* ─── SHARED COMPONENTS ─── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r);cursor:pointer;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;border:none;transition:all .18s;text-decoration:none;line-height:1}
+.btn-green{background:var(--green);color:#000}
+.btn-green:hover{background:#16a34a;transform:translateY(-1px);box-shadow:0 4px 20px rgba(34,197,94,.25)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--borderl);color:var(--text)}
+.btn-ghost{background:transparent;border:none;color:var(--text2);padding:8px 12px}
+.btn-ghost:hover{color:var(--text)}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn-lg{padding:13px 28px;font-size:15px}
+
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer}
+.logo-icon{width:28px;height:28px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+
+.tag{padding:3px 9px;border-radius:100px;font-size:11px;font-weight:500;border:1px solid var(--border);color:var(--text2)}
+.tag-g{border-color:var(--gborder);color:var(--green);background:var(--gbg)}
+.tag-b{border-color:rgba(96,165,250,.25);color:var(--blue);background:var(--bbg)}
+.tag-o{border-color:rgba(251,146,60,.25);color:var(--orange);background:var(--obg)}
+.tag-r{border-color:rgba(248,113,113,.25);color:var(--red);background:var(--rbg)}
+
+/* ═══════════════════════════════
+   LANDING
+═══════════════════════════════ */
+#s-landing{min-height:100vh;display:flex;flex-direction:column}
+
+.lnav{padding:18px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.lnav-links{display:flex;align-items:center;gap:6px}
+@media(max-width:600px){.lnav-links .btn-outline{display:none}}
+
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px 60px;text-align:center;position:relative}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(34,197,94,.06),transparent);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text2);margin-bottom:24px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.hero-h1{font-size:clamp(2.8rem,7vw,5.2rem);font-weight:800;line-height:1.03;letter-spacing:-.04em;color:var(--text);max-width:840px;margin-bottom:18px}
+.h1-g{color:var(--green)}
+.hero-sub{font-size:17px;color:var(--text2);line-height:1.65;max-width:500px;margin-bottom:36px}
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.hero-note{font-size:12px;color:var(--muted)}
+
+.proof-strip{margin-top:56px;padding-top:40px;border-top:1px solid var(--border);width:100%;max-width:560px}
+.proof-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px}
+.proof-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.proof-val{font-size:2rem;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+.proof-txt{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* ═══════════════════════════════
+   QUIZ
+═══════════════════════════════ */
+#s-quiz{min-height:100vh;display:flex;flex-direction:column}
+
+.qnav{padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.qprog-wrap{flex:1;max-width:440px;margin:0 auto;padding:0 32px}
+.qprog-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.qprog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .5s ease}
+.qprog-txt{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+
+.qbody{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.qstep{display:none;width:100%;max-width:620px;animation:fadeUp .4s ease}
+.qstep.active{display:block}
+.qstep-tag{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;display:block}
+.qstep-h{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-.025em}
+.qstep-p{font-size:14px;color:var(--text2);margin-bottom:28px}
+
+.fi{width:100%;padding:12px 14px;border-radius:var(--r);background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:14px;font-family:'Inter',sans-serif;transition:border-color .2s;outline:none}
+.fi:focus{border-color:var(--green)}
+.fi::placeholder{color:var(--muted)}
+textarea.fi{resize:none}
+
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.frow{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fl{font-size:12px;color:var(--text2);font-weight:500}
+
+.help-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:'Inter';padding:4px 0;margin-top:8px;transition:color .2s}
+.help-btn:hover{color:var(--text2)}
+
+.prob-examples{display:none;margin-top:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px;flex-direction:column;gap:6px}
+.prob-examples.show{display:flex}
+.prob-ex{padding:9px 12px;border-radius:8px;border:1px solid var(--border);font-size:13px;color:var(--text2);cursor:pointer;transition:all .18s;line-height:1.4}
+.prob-ex:hover{border-color:var(--green);color:var(--text);background:var(--gbg)}
+
+.rcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.rcards{grid-template-columns:1fr}}
+.rcard{padding:16px;border-radius:var(--r);border:1px solid var(--border);cursor:pointer;transition:all .18s;background:var(--surface)}
+.rcard:hover{border-color:var(--borderl)}
+.rcard.sel{border-color:var(--green);background:var(--gbg)}
+.rcard-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.rcard-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 14px;border-radius:100px;border:1px solid var(--border);cursor:pointer;font-size:13px;color:var(--text2);transition:all .18s;display:flex;align-items:center;gap:5px;background:var(--surface);user-select:none}
+.chip:hover{border-color:var(--borderl);color:var(--text)}
+.chip.sel{border-color:var(--green);background:var(--gbg);color:var(--green)}
+
+.qfoot{display:flex;align-items:center;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
+
+/* ═══════════════════════════════
+   ANALYZING
+═══════════════════════════════ */
+#s-analyzing{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.abox{text-align:center;max-width:440px;padding:24px}
+.aicon{width:60px;height:60px;border-radius:14px;background:var(--gbg);border:1px solid var(--gborder);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.aicon svg{animation:spin 2s linear infinite}
+.at{font-size:1.7rem;font-weight:700;letter-spacing:-.025em;margin-bottom:6px}
+.as{font-size:14px;color:var(--text2);margin-bottom:32px}
+.asteps{display:flex;flex-direction:column;gap:8px;text-align:left}
+.astep{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--r);background:var(--surface);border:1px solid var(--border);font-size:13px;color:var(--muted);transition:all .4s}
+.astep.active{border-color:var(--gborder);color:var(--text);background:var(--gbg)}
+.astep.done{border-color:rgba(34,197,94,.15);color:var(--text2)}
+.astep-dot{width:18px;height:18px;border-radius:50%;background:var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .4s}
+.astep.active .astep-dot{background:var(--green);animation:pulse 1s infinite}
+.astep.done .astep-dot{background:var(--green)}
+
+/* ═══════════════════════════════
+   RESULTS
+═══════════════════════════════ */
+#s-results{min-height:100vh}
+.rh{padding:22px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.rh-left{display:flex;align-items:center;gap:12px}
+.arch-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;border-radius:100px;background:var(--pbg);border:1px solid var(--pborder);font-size:13px;color:var(--purple);font-weight:500}
+
+.rbody{max-width:1120px;margin:0 auto;padding:36px 24px}
+.rbody-intro{margin-bottom:36px}
+.ri-h{font-size:1.5rem;font-weight:700;letter-spacing:-.025em;margin-bottom:6px}
+.ri-p{font-size:14px;color:var(--text2)}
+
+.top3-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.top3-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.top3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:44px}
+@media(max-width:900px){.top3{grid-template-columns:1fr}}
+
+.icard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.icard:hover{border-color:var(--borderl);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.icard.top{border-color:var(--gborder)}
+.icard.top::after{content:'#1 Match';position:absolute;top:0;right:0;padding:4px 11px;background:var(--green);color:#000;font-size:10px;font-weight:700;border-radius:0 var(--rl) 0 var(--r);letter-spacing:.02em}
+
+.ic-name{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.01em}
+.ic-one{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:14px}
+
+.ic-scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ic-score-lbl{font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.ic-score-row{display:flex;align-items:center;gap:6px}
+.ic-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.ic-bar-fill{height:100%;border-radius:2px;width:0;transition:width 1s ease .2s}
+.ic-bar-fill.g{background:var(--green)}
+.ic-bar-fill.b{background:var(--blue)}
+.ic-score-num{font-size:11px;font-weight:700;width:22px;text-align:right}
+
+.ic-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.ic-mrr{font-size:1.1rem;font-weight:800;color:var(--green);letter-spacing:-.02em}
+.ic-mrr-sub{font-size:11px;color:var(--muted);margin-left:2px;font-weight:400}
+.ic-cta{margin-top:14px;width:100%;padding:9px;border-radius:var(--r);background:transparent;border:1px solid var(--border);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter';transition:all .18s}
+.ic-cta:hover{border-color:var(--green);color:var(--green)}
+.icard.top .ic-cta{background:var(--green);border-color:var(--green);color:#000}
+.icard.top .ic-cta:hover{background:#16a34a}
+
+.sec-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
+.scard{padding:13px 15px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.scard:hover{border-color:var(--borderl);background:var(--card)}
+.sc-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.sc-desc{font-size:11px;color:var(--muted)}
+.sc-score{font-size:13px;font-weight:800;color:var(--green);flex-shrink:0}
+
+/* ═══════════════════════════════
+   IDEA DETAIL
+═══════════════════════════════ */
+#s-detail{min-height:100vh}
+.dh{padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.back-btn{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);cursor:pointer;border:1px solid var(--border);background:none;font-family:'Inter';padding:7px 12px;border-radius:var(--r);transition:all .18s}
+.back-btn:hover{color:var(--text);border-color:var(--borderl)}
+
+.dbody{max-width:860px;margin:0 auto;padding:40px 24px}
+
+.d-name{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.04em;margin-bottom:8px}
+.d-one{font-size:16px;color:var(--text2);margin-bottom:22px;line-height:1.6}
+
+.d-scores{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+.dscore{flex:1;min-width:130px;padding:16px;border-radius:var(--r);background:var(--surface);border:1px solid var(--border);text-align:center}
+.dscore-val{font-size:2rem;font-weight:800;line-height:1}
+.dscore-val.g{color:var(--green)}.dscore-val.b{color:var(--blue)}.dscore-val.o{color:var(--orange)}
+.dscore-lbl{font-size:11px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+
+.d2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:600px){.d2col{grid-template-columns:1fr}}
+.dsec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.dsec-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.dsec-c{font-size:13px;color:var(--text2);line-height:1.7}
+
+.roadmap{list-style:none}
+.rm-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.rm-item:last-child{border-bottom:none}
+.rm-day{width:44px;flex-shrink:0;font-size:11px;color:var(--muted);font-weight:600;padding-top:2px}
+.rm-task{font-size:13px;color:var(--text2)}
+
+.paywall-wall{margin-top:28px;border-radius:var(--rl);overflow:hidden;position:relative}
+.pw-blur{filter:blur(5px);pointer-events:none;user-select:none;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl) var(--rl) 0 0;font-size:13px;color:var(--text2);line-height:2}
+.pw-gate{padding:28px;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--rl) var(--rl);text-align:center;position:relative}
+.pw-gate::before{content:'';position:absolute;top:-60px;left:0;right:0;height:60px;background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
+.pw-icon{font-size:2rem;margin-bottom:12px}
+.pw-title{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.pw-desc{font-size:13px;color:var(--text2);margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6}
+.pw-features{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:24px}
+
+/* ═══════════════════════════════
+   PAYWALL MODAL
+═══════════════════════════════ */
+.pm-box{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:30px;max-width:460px;width:100%;position:relative;animation:fadeUp .3s ease}
+.pm-close{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--border);width:28px;height:28px;border-radius:6px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.pm-close:hover{color:var(--text);border-color:var(--borderl)}
+.pm-title{font-size:1.3rem;font-weight:700;margin-bottom:4px;letter-spacing:-.02em}
+.pm-sub{font-size:13px;color:var(--text2);margin-bottom:22px}
+
+.pm-toggle{display:flex;gap:3px;padding:3px;background:var(--surface);border-radius:var(--r);width:fit-content;margin-bottom:20px}
+.pt-btn{padding:5px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:'Inter';color:var(--text2);background:none;transition:all .18s}
+.pt-btn.on{background:var(--border);color:var(--text)}
+
+.pm-plans{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.pm-plan{padding:16px;border-radius:var(--r);border:1px solid var(--border);cursor:pointer;transition:all .18s}
+.pm-plan:hover{border-color:var(--borderl)}
+.pm-plan.on{border-color:var(--green);background:var(--gbg)}
+.pm-plan-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.pm-plan-name{font-size:13px;font-weight:600;color:var(--text)}
+.pm-plan-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:var(--green);color:#000}
+.pm-plan-price{font-size:1.4rem;font-weight:800;color:var(--text)}
+.pm-plan-note{font-size:11px;color:var(--text2);font-weight:400}
+.pm-plan-feats{display:flex;flex-direction:column;gap:4px}
+.pm-plan-feat{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+
+.pm-unlock{width:100%;padding:13px;border-radius:var(--r);background:var(--green);color:#000;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'Inter';transition:all .18s}
+.pm-unlock:hover{background:#16a34a;transform:translateY(-1px)}
+.pm-footer{font-size:11px;color:var(--muted);text-align:center;margin-top:10px}
+
+/* ═══════════════════════════════
+   DASHBOARD
+═══════════════════════════════ */
+#s-dashboard{min-height:100vh}
+.dbh{padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.dbb{max-width:900px;margin:0 auto;padding:36px 24px}
+
+.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:26px;margin-bottom:20px}
+.proj-hrow{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.proj-name{font-size:1.25rem;font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+.proj-one{font-size:13px;color:var(--text2)}
+.proj-prog-val{font-size:2.2rem;font-weight:800;color:var(--green);line-height:1}
+.proj-prog-lbl{font-size:11px;color:var(--muted);text-align:right}
+
+.cklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.ck-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);cursor:pointer;transition:all .18s;border:1px solid var(--border)}
+.ck-item:hover{background:var(--card)}
+.ck-item.done{background:var(--gbg);border-color:rgba(34,197,94,.2)}
+.ck-box{width:18px;height:18px;border-radius:5px;flex-shrink:0;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .18s}
+.ck-item.done .ck-box{background:var(--green);border-color:var(--green)}
+.ck-label{font-size:13px;color:var(--text2);transition:color .18s}
+.ck-item.done .ck-label{color:var(--text)}
+
+.int-section{margin-top:32px}
+.int-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+.int-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.int-card{padding:14px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);text-align:center;cursor:pointer;transition:all .18s;position:relative}
+.int-card:hover{border-color:var(--borderl);background:var(--card)}
+.int-card.connected{border-color:var(--gborder)}
+.int-name{font-size:13px;font-weight:500;color:var(--text);margin-top:8px}
+.int-status{font-size:11px;color:var(--muted);margin-top:2px}
+.int-status.on{color:var(--green)}
+.int-icon{font-size:1.5rem}
+
+.divider{height:1px;background:var(--border);margin:20px 0}
+</style>
+</head>
+<body>
+
+<!-- ═══ LANDING ═══ -->
+<div id="s-landing" class="screen active">
+  <nav class="lnav">
+    <div class="logo" onclick="goTo('s-landing')">
+      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11L7 2l4 9M5 7.5h4" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="logo-text">MRRForge</span>
+    </div>
+    <div class="lnav-links">
+      <button class="btn btn-outline btn-sm">Sign in</button>
+      <button class="btn btn-green btn-sm" onclick="goTo('s-quiz');startQuiz()">Start free</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-badge au" style="animation-delay:.05s">
+      <span class="badge-dot"></span>
+      AI Co-Founder for solo builders
+    </div>
+    <h1 class="hero-h1 au" style="animation-delay:.12s">
+      Turn ideas into<br><span class="h1-g">recurring revenue.</span>
+    </h1>
+    <p class="hero-sub au" style="animation-delay:.2s">
+      Answer 10 questions. MRRForge analyzes your profile, matches you with validated SaaS opportunities, and delivers a complete go-to-market blueprint.
+    </p>
+    <div class="hero-ctas au" style="animation-delay:.28s">
+      <button class="btn btn-green btn-lg" onclick="goTo('s-quiz');startQuiz()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v6.5M7.5 7.5l3.5-3.5M7.5 7.5L4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 10v3h11v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Start free — No card needed
+      </button>
+      <button class="btn btn-outline btn-lg">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M6 5l4 2.5L6 10V5z" fill="currentColor"/></svg>
+        Watch demo
+      </button>
+    </div>
+    <p class="hero-note au" style="animation-delay:.36s">Free forever · No credit card · Results in 60 seconds</p>
+
+    <div class="proof-strip au" style="animation-delay:.44s">
+      <p class="proof-label">Trusted by indie builders</p>
+      <div class="proof-nums">
+        <div><div class="proof-val">4.2k+</div><div class="proof-txt">Blueprints generated</div></div>
+        <div><div class="proof-val">$280k</div><div class="proof-txt">MRR unlocked</div></div>
+        <div><div class="proof-val">72%</div><div class="proof-txt">Ship within 30 days</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div id="s-quiz" class="screen">
+  <nav class="qnav">
+    <div class="logo" onclick="goTo('s-landing')">
+      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11L7 2l4 9M5 7.5h4" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="logo-text">MRRForge</span>
+    </div>
+    <div class="qprog-wrap">
+      <div class="qprog-bar"><div class="qprog-fill" id="qbar" style="width:20%"></div></div>
+      <div class="qprog-txt" id="qprog-txt">Step 1 of 5</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="qskip-btn" onclick="skipToResults()">Skip →</button>
+  </nav>
+
+  <div class="qbody">
+
+    <!-- Step A: Problem -->
+    <div class="qstep active" id="qstep-a">
+      <span class="qstep-tag">Step 1 · Problem</span>
+      <h2 class="qstep-h">What problem keeps coming back?</h2>
+      <p class="qstep-p">Describe a recurring frustration you or others around you face. The more specific, the better the match.</p>
+
+      <textarea class="fi" id="q-problem" rows="4" placeholder="e.g. I waste 2 hours every week repurposing my YouTube content to Twitter and LinkedIn..."></textarea>
+
+      <button class="help-btn" onclick="toggleExamples()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Not sure? Show me example problems
+      </button>
+
+      <div class="prob-examples" id="prob-examples">
+        <div class="prob-ex" onclick="fillProblem(this)">I spend 3+ hours writing TikTok scripts every week and half of them flop</div>
+        <div class="prob-ex" onclick="fillProblem(this)">I keep forgetting to send follow-up emails and losing potential clients</div>
+        <div class="prob-ex" onclick="fillProblem(this)">I pay for 8 AI tools and have no idea which ones actually save me time</div>
+        <div class="prob-ex" onclick="fillProblem(this)">My users churn in week 1 because I don't have a proper onboarding flow</div>
+        <div class="prob-ex" onclick="fillProblem(this)">I have no idea what my competitors are charging until I lose a deal</div>
+      </div>
+
+      <div class="qfoot">
+        <div></div>
+        <button class="btn btn-green" onclick="nextStep('a','b')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step B: Context -->
+    <div class="qstep" id="qstep-b">
+      <span class="qstep-tag">Step 2 · Your profile</span>
+      <h2 class="qstep-h">Tell us about yourself.</h2>
+      <p class="qstep-p">We use this to filter ideas that actually fit your life — not some hypothetical founder.</p>
+
+      <div class="frow">
+        <div class="fg">
+          <label class="fl">Age</label>
+          <input type="number" class="fi" id="q-age" placeholder="e.g. 26" min="16" max="70"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Job / Status</label>
+          <input type="text" class="fi" id="q-job" placeholder="e.g. Designer, student, dev..."/>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Passions & interests</label>
+        <input type="text" class="fi" id="q-passions" placeholder="e.g. content creation, fitness, finance, gaming..."/>
+      </div>
+      <div class="fg">
+        <label class="fl">Your strongest skills</label>
+        <input type="text" class="fi" id="q-skills" placeholder="e.g. design, writing, coding, marketing, sales..."/>
+      </div>
+      <div class="fg">
+        <label class="fl">Hours available per day</label>
+        <input type="number" class="fi" id="q-hours" placeholder="e.g. 2" min="0.5" max="16" step="0.5"/>
+      </div>
+
+      <div class="qfoot">
+        <button class="btn btn-outline btn-sm" onclick="prevStep('b','a')">← Back</button>
+        <button class="btn btn-green" onclick="nextStep('b','c')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step C: Build capacity -->
+    <div class="qstep" id="qstep-c">
+      <span class="qstep-tag">Step 3 · Build capacity</span>
+      <h2 class="qstep-h">Can you build it?</h2>
+      <p class="qstep-p">No wrong answers — we'll recommend ideas and stacks that fit your technical level.</p>
+
+      <div class="rcards" id="code-cards">
+        <div class="rcard sel" data-val="yes" onclick="selectRcard('code-cards',this)">
+          <div class="rcard-title">Yes, I can code</div>
+          <div class="rcard-desc">I'm comfortable writing code and shipping software</div>
+        </div>
+        <div class="rcard" data-val="no" onclick="selectRcard('code-cards',this)">
+          <div class="rcard-title">No-code / Beginner</div>
+          <div class="rcard-desc">I use tools like Bubble, Webflow, or I'm just starting out</div>
+        </div>
+      </div>
+
+      <div id="vibe-row" style="margin-top:14px">
+        <p class="qstep-p" style="margin-bottom:12px">How do you prefer to build?</p>
+        <div class="rcards" id="vibe-cards">
+          <div class="rcard sel" data-val="vibe" onclick="selectRcard('vibe-cards',this)">
+            <div class="rcard-title">Vibe coding</div>
+            <div class="rcard-desc">AI-assisted, Claude Code, v0 — ship fast with AI pair programming</div>
+          </div>
+          <div class="rcard" data-val="classic" onclick="selectRcard('vibe-cards',this)">
+            <div class="rcard-title">Classic dev</div>
+            <div class="rcard-desc">Traditional stack, full control, I know what I'm doing</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qfoot">
+        <button class="btn btn-outline btn-sm" onclick="prevStep('c','b')">← Back</button>
+        <button class="btn btn-green" onclick="nextStep('c','d')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step D: Constraints -->
+    <div class="qstep" id="qstep-d">
+      <span class="qstep-tag">Step 4 · Resources</span>
+      <h2 class="qstep-h">What's your runway?</h2>
+      <p class="qstep-p">We'll match you with ideas that fit your budget — including zero-budget plays.</p>
+
+      <div class="frow">
+        <div class="fg">
+          <label class="fl">Total startup budget</label>
+          <select class="fi" id="q-budget">
+            <option value="zero">$0 — bootstrapped</option>
+            <option value="low" selected>$1 – $500</option>
+            <option value="medium">$500 – $2,000</option>
+            <option value="high">$2,000 – $10,000</option>
+            <option value="funded">$10,000+</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl">Monthly ads budget</label>
+          <select class="fi" id="q-ads">
+            <option value="zero">$0 — organic only</option>
+            <option value="low" selected>$1 – $100</option>
+            <option value="medium">$100 – $500</option>
+            <option value="high">$500+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl" style="margin-bottom:10px">Preferred acquisition channel (select all that apply)</label>
+        <div class="chips" id="channel-chips">
+          <div class="chip sel" data-val="tiktok" onclick="toggleChip(this)">🎵 TikTok</div>
+          <div class="chip" data-val="seo" onclick="toggleChip(this)">🔍 SEO</div>
+          <div class="chip" data-val="instagram" onclick="toggleChip(this)">📷 Instagram</div>
+          <div class="chip" data-val="reddit" onclick="toggleChip(this)">🟠 Reddit</div>
+          <div class="chip" data-val="x" onclick="toggleChip(this)">𝕏 Twitter/X</div>
+          <div class="chip" data-val="youtube" onclick="toggleChip(this)">▶️ YouTube</div>
+          <div class="chip" data-val="cold_email" onclick="toggleChip(this)">✉️ Cold email</div>
+        </div>
+      </div>
+
+      <div class="qfoot">
+        <button class="btn btn-outline btn-sm" onclick="prevStep('d','c')">← Back</button>
+        <button class="btn btn-green" onclick="nextStep('d','e')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step E: Business model -->
+    <div class="qstep" id="qstep-e">
+      <span class="qstep-tag">Step 5 · Business model</span>
+      <h2 class="qstep-h">Who's your customer?</h2>
+      <p class="qstep-p">This determines the pricing strategy, sales cycle, and acquisition playbook we recommend.</p>
+
+      <div class="rcards" style="grid-template-columns:repeat(3,1fr)" id="model-cards">
+        <div class="rcard" data-val="b2c" onclick="selectRcard('model-cards',this)">
+          <div class="rcard-title">B2C</div>
+          <div class="rcard-desc">Individual consumers, creators, freelancers</div>
+        </div>
+        <div class="rcard sel" data-val="b2b" onclick="selectRcard('model-cards',this)">
+          <div class="rcard-title">B2B</div>
+          <div class="rcard-desc">Businesses, teams, startups, agencies</div>
+        </div>
+        <div class="rcard" data-val="both" onclick="selectRcard('model-cards',this)">
+          <div class="rcard-title">Both</div>
+          <div class="rcard-desc">Starts B2C, expands to teams later</div>
+        </div>
+      </div>
+
+      <div class="qfoot">
+        <button class="btn btn-outline btn-sm" onclick="prevStep('e','d')">← Back</button>
+        <button class="btn btn-green btn-lg" onclick="runAnalysis()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7l2 2 2-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Analyze my profile →
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /qbody -->
+</div>
+
+<!-- ═══ ANALYZING ═══ -->
+<div id="s-analyzing" class="screen">
+  <div class="abox">
+    <div class="aicon">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <path d="M13 3v4M13 19v4M3 13h4M19 13h4M5.8 5.8l2.8 2.8M17.4 17.4l2.8 2.8M5.8 20.2l2.8-2.8M17.4 8.6l2.8-2.8" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2 class="at">Analyzing your profile…</h2>
+    <p class="as">Matching your profile against 847 validated opportunities.</p>
+    <div class="asteps" id="asteps">
+      <div class="astep" id="as0"><div class="astep-dot"></div>Detecting founder archetype</div>
+      <div class="astep" id="as1"><div class="astep-dot"></div>Filtering market opportunities</div>
+      <div class="astep" id="as2"><div class="astep-dot"></div>Scoring MRR potential</div>
+      <div class="astep" id="as3"><div class="astep-dot"></div>Building acquisition strategies</div>
+      <div class="astep" id="as4"><div class="astep-dot"></div>Generating launch blueprints</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULTS ═══ -->
+<div id="s-results" class="screen">
+  <div class="rh">
+    <div class="rh-left">
+      <div class="logo" onclick="goTo('s-landing')">
+        <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11L7 2l4 9M5 7.5h4" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="logo-text">MRRForge</span>
+      </div>
+      <div class="arch-badge" id="arch-badge">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1l1.5 4H12L8.5 7.5l1.3 4L6.5 9l-3.3 2.5 1.3-4L1 5h4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        <span id="arch-name">Builder Archetype</span>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="goTo('s-quiz');startQuiz()">← Redo quiz</button>
+  </div>
+
+  <div class="rbody">
+    <div class="rbody-intro">
+      <h2 class="ri-h" id="ri-h">Your 3 best SaaS opportunities</h2>
+      <p class="ri-p" id="ri-p">Matched to your profile · Ranked by MRR potential × ease of build</p>
+    </div>
+
+    <div class="top3-label">Top 3 matches</div>
+    <div class="top3" id="top3-grid"></div>
+
+    <div class="sec-label">17 more opportunities for your profile</div>
+    <div class="sec-grid" id="sec-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ IDEA DETAIL ═══ -->
+<div id="s-detail" class="screen">
+  <div class="dh">
+    <button class="back-btn" onclick="goTo('s-results')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 12L4 7l5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Back to results
+    </button>
+    <div class="logo">
+      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11L7 2l4 9M5 7.5h4" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="logo-text">MRRForge</span>
+    </div>
+  </div>
+  <div class="dbody" id="detail-body"></div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="s-dashboard" class="screen">
+  <div class="dbh">
+    <div class="logo" onclick="goTo('s-landing')">
+      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11L7 2l4 9M5 7.5h4" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="logo-text">MRRForge</span>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="goTo('s-results')">← All ideas</button>
+  </div>
+  <div class="dbb" id="dashboard-body"></div>
+</div>
+
+<!-- ═══ PAYWALL MODAL ═══ -->
+<div id="modal-paywall" class="modal-overlay">
+  <div class="pm-box">
+    <button class="pm-close" onclick="closePaywall()">×</button>
+    <h2 class="pm-title">🔓 Unlock full blueprint</h2>
+    <p class="pm-sub">Get the complete go-to-market strategy, Claude Code prompts, TikTok scripts, and 30-day launch plan.</p>
+
+    <div class="pm-toggle">
+      <button class="pt-btn on" id="ptm" onclick="setPricing('monthly')">Monthly</button>
+      <button class="pt-btn" id="pty" onclick="setPricing('yearly')">Yearly <span style="color:var(--green);font-size:10px">–40%</span></button>
+    </div>
+
+    <div class="pm-plans">
+      <div class="pm-plan on" id="plan-indie" onclick="selectPlan('indie')">
+        <div class="pm-plan-row">
+          <div>
+            <div class="pm-plan-name">Indie</div>
+            <div class="pm-plan-price" id="price-indie">$19<span class="pm-plan-note">/mo</span></div>
+          </div>
+          <span class="pm-plan-badge">Popular</span>
+        </div>
+        <div class="pm-plan-feats">
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> 5 full blueprints/month</div>
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> Claude Code prompts & stack</div>
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> TikTok scripts + SEO strategy</div>
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> 30-day launch plan</div>
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> Competitor analysis</div>
+        </div>
+      </div>
+      <div class="pm-plan" id="plan-studio" onclick="selectPlan('studio')">
+        <div class="pm-plan-row">
+          <div>
+            <div class="pm-plan-name">Studio</div>
+            <div class="pm-plan-price" id="price-studio">$49<span class="pm-plan-note">/mo</span></div>
+          </div>
+        </div>
+        <div class="pm-plan-feats">
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> Unlimited blueprints</div>
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> Team collaboration</div>
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> API access</div>
+          <div class="pm-plan-feat"><span style="color:var(--green)">✓</span> Everything in Indie</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="pm-unlock" onclick="activatePremium()">Unlock now →</button>
+    <p class="pm-footer">Cancel anytime · 7-day money-back guarantee</p>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+const S = {
+  screen: 's-landing',
+  answers: { problem:'', age:'', job:'', passions:'', skills:'', hours:2, canCode:true, vibeCode:true, budget:'low', ads:'low', channels:['tiktok'], model:'b2b' },
+  archetype: 'builder',
+  ranked: [],
+  top3: [],
+  secondary: [],
+  selected: null,
+  premium: false,
+  checklist: {},
+  pricing: 'monthly',
+  plan: 'indie'
+};
+
+/* ════════════════════════════════════════════
+   IDEAS DATABASE — 20 ideas
+════════════════════════════════════════════ */
+const IDEAS = [
+  { id:'reelscript', name:'ReelScript', one:'AI writes TikTok scripts from your product in 10 seconds', problem:'Founders waste 2+ hrs/week writing content that flops', whyNow:'Short-form video is the fastest path to 0→MRR for solo SaaS', mrrScore:84, viralScore:93, competition:'low', mvpDiff:3, buildTime:'3–4 days', pricing:'$19/mo starter · $49/mo growth', mrrLow:1500, mrrMid:8000, mrrHigh:22000, angle:'Post before/after script comparisons on TikTok', archetypes:['creator','marketer','beginner'], channels:['tiktok','instagram','youtube'], budgets:['zero','low','medium'], b2c:true, b2b:false, stack:'Next.js + OpenAI + Stripe + Supabase', roadmap:['Day 1: Auth + Stripe checkout + basic UI','Day 2: OpenAI script generation API','Day 3: Script editor + templates library','Day 4: User dashboard + history','Day 5: TikTok style presets + tone selector','Day 6: Analytics + usage limits','Day 7: Landing page + launch on PH'] },
+  { id:'streakforge', name:'StreakForge', one:'Habit tracker where you bet money on your own consistency', problem:'Habit apps don\'t work — no real financial consequence for failing', whyNow:'Behavioral finance + Stripe makes this finally buildable solo', mrrScore:78, viralScore:87, competition:'low', mvpDiff:4, buildTime:'5–6 days', pricing:'$9/mo basic · $19/mo premium', mrrLow:2000, mrrMid:10000, mrrHigh:35000, angle:'"I bet $50 I\'d workout 30 days straight. Here\'s what happened."', archetypes:['builder','creator','beginner'], channels:['tiktok','reddit','x'], budgets:['zero','low','medium'], b2c:true, b2b:false, stack:'Next.js + Stripe + Supabase', roadmap:['Day 1: Auth + onboarding flow','Day 2: Habit creation + bet amount setup','Day 3: Stripe payment hold integration','Day 4: Daily check-in + streak tracking','Day 5: Failure logic + payout flow','Day 6: Social sharing + leaderboard','Day 7: Landing page + beta launch'] },
+  { id:'vidtopost', name:'VidToPost', one:'Convert any video into blog post, thread, and LinkedIn post', problem:'Creators have hours of content locked in video format', whyNow:'Whisper + GPT-4o makes transcription → repurposing trivial', mrrScore:80, viralScore:76, competition:'medium', mvpDiff:3, buildTime:'3–4 days', pricing:'$29/mo starter · $79/mo agency', mrrLow:2500, mrrMid:12000, mrrHigh:40000, angle:'"Repurpose 1 video to 5 formats in 60 seconds"', archetypes:['creator','marketer'], channels:['youtube','tiktok','instagram'], budgets:['zero','low','medium'], b2c:true, b2b:true, stack:'Next.js + Whisper + GPT-4o + Stripe', roadmap:['Day 1: Upload + Whisper transcription pipeline','Day 2: GPT-4o content transformation API','Day 3: Output formats: blog/thread/LinkedIn','Day 4: Editor + one-click copy','Day 5: URL import (YouTube/Loom)','Day 6: Bulk processing + history','Day 7: Launch + demo video on TikTok'] },
+  { id:'apishield', name:'APIShield', one:'Monitor AI API costs and cap spend before it ruins you', problem:'Devs wake up to $1,000+ surprise OpenAI bills every month', whyNow:'AI API cost overruns are killing small SaaS — no indie tool exists', mrrScore:85, viralScore:68, competition:'low', mvpDiff:5, buildTime:'5–7 days', pricing:'$19/mo solo · $49/mo team · $149/mo agency', mrrLow:3000, mrrMid:18000, mrrHigh:60000, angle:'"My startup almost died from a $4k OpenAI bill. Here\'s the fix."', archetypes:['builder','operator'], channels:['reddit','x','youtube'], budgets:['low','medium','high'], b2c:true, b2b:true, stack:'Next.js + Node.js + PostgreSQL + Stripe', roadmap:['Day 1: API key proxy architecture','Day 2: Real-time usage tracking + DB','Day 3: Spend cap + alert system','Day 4: Dashboard + cost breakdown UI','Day 5: Email/Slack alerts integration','Day 6: Multi-project + team features','Day 7: Launch on HN + Indie Hackers'] },
+  { id:'pricepulse', name:'PricePulse', one:'Track competitor prices and get alerts before you lose deals', problem:'B2B founders lose deals because competitors quietly changed pricing', whyNow:'LLM-powered scraping makes competitive monitoring finally affordable', mrrScore:82, viralScore:55, competition:'medium', mvpDiff:6, buildTime:'6–7 days', pricing:'$49/mo starter · $149/mo growth · $399/mo agency', mrrLow:4000, mrrMid:20000, mrrHigh:80000, angle:'"We found out our competitor dropped pricing 2hrs before a sales call"', archetypes:['operator','marketer'], channels:['reddit','x','cold_email'], budgets:['medium','high'], b2c:false, b2b:true, stack:'Next.js + Playwright + OpenAI + Stripe + PostgreSQL', roadmap:['Day 1: Competitor URL crawler setup','Day 2: Pricing extraction with GPT-4o','Day 3: Change detection + diff logic','Day 4: Alert system (email + Slack)','Day 5: Dashboard + competitor profiles','Day 6: Scheduling + monitoring intervals','Day 7: Cold email launch to B2B founders'] },
+  { id:'pushlog', name:'PushLog', one:'AI turns your git commits into a beautiful public changelog', problem:'Writing changelogs is tedious — most SaaS skip them and lose trust', whyNow:'Public changelogs became a trust signal and acquisition channel', mrrScore:73, viralScore:61, competition:'medium', mvpDiff:4, buildTime:'4–5 days', pricing:'$12/mo solo · $29/mo team · $79/mo agency', mrrLow:1500, mrrMid:7000, mrrHigh:25000, angle:'"Ship in public: every commit becomes content"', archetypes:['builder','operator'], channels:['x','reddit','youtube'], budgets:['zero','low','medium'], b2c:true, b2b:true, stack:'Next.js + GitHub API + OpenAI + Stripe', roadmap:['Day 1: GitHub OAuth + repo connection','Day 2: Commit fetching + GPT-4o summarizer','Day 3: Changelog page generator + themes','Day 4: Public URL + embed widget','Day 5: Webhook for auto-publishing','Day 6: Custom domain support','Day 7: Launch with your own changelog'] },
+  { id:'reviewloop', name:'ReviewLoop', one:'Automated review requests that turn users into testimonials', problem:'SaaS founders have happy users but no social proof on their page', whyNow:'Social proof is the #1 conversion lever and most founders ignore it', mrrScore:77, viralScore:58, competition:'high', mvpDiff:3, buildTime:'2–3 days', pricing:'$19/mo starter · $49/mo growth', mrrLow:1000, mrrMid:5000, mrrHigh:18000, angle:'"Add 10 testimonials to your landing page in 48 hours"', archetypes:['operator','marketer','beginner'], channels:['reddit','x','cold_email'], budgets:['zero','low','medium'], b2c:false, b2b:true, stack:'Next.js + Resend + Stripe + Supabase', roadmap:['Day 1: Review request email flow + Resend','Day 2: Testimonial collection landing page','Day 3: Embeddable widget (JS snippet)','Day 4: Automated follow-up sequences','Day 5: Wall of love page generator','Day 6: CSV export + CRM webhooks','Day 7: Cold email to indie SaaS founders'] },
+  { id:'onboardflow', name:'OnboardFlow', one:'No-code onboarding email sequences with AI copywriting', problem:'New users churn in 7 days because SaaS don\'t onboard them', whyNow:'Email onboarding has 40% higher conversion — yet most founders skip it', mrrScore:80, viralScore:52, competition:'high', mvpDiff:5, buildTime:'5–7 days', pricing:'$29/mo starter · $79/mo growth · $199/mo agency', mrrLow:2000, mrrMid:12000, mrrHigh:45000, angle:'"Our churn dropped 40% after adding this email sequence"', archetypes:['operator','marketer'], channels:['reddit','x','cold_email','seo'], budgets:['low','medium','high'], b2c:false, b2b:true, stack:'Next.js + Resend + OpenAI + Stripe + PostgreSQL', roadmap:['Day 1: Visual sequence builder UI','Day 2: Email template engine + OpenAI copy','Day 3: Resend integration + scheduling','Day 4: User segmentation + triggers','Day 5: A/B testing framework','Day 6: Analytics + open rate tracking','Day 7: Integrate with top SaaS stacks'] },
+  { id:'aiaudit', name:'AIAudit', one:'Track ROI of every AI tool your team uses — cut what doesn\'t pay', problem:'Teams pay $3k+/mo in AI tools with no idea which ones work', whyNow:'AI tool sprawl is the #1 SaaS expense problem in 2025', mrrScore:83, viralScore:62, competition:'low', mvpDiff:4, buildTime:'4–6 days', pricing:'$29/mo team · $99/mo company · $299/mo enterprise', mrrLow:3000, mrrMid:18000, mrrHigh:70000, angle:'"We were paying $4,200/mo in AI tools. This showed us what to cut."', archetypes:['operator','builder'], channels:['x','reddit','cold_email','seo'], budgets:['medium','high'], b2c:false, b2b:true, stack:'Next.js + OAuth integrations + PostgreSQL + Stripe', roadmap:['Day 1: Auth + team onboarding','Day 2: Manual tool entry + cost tracking','Day 3: ROI calculation engine','Day 4: Usage survey flows for team','Day 5: Dashboard + waste calculator','Day 6: Slack bot integration','Day 7: Cold email to ops teams at startups'] },
+  { id:'landingai', name:'LandingAI', one:'Generate a full converting landing page from one sentence', problem:'Founders spend weeks on landing pages instead of building', whyNow:'V0/Claude made this workflow mainstream — indie conversion-focused version is open', mrrScore:80, viralScore:85, competition:'medium', mvpDiff:4, buildTime:'4–5 days', pricing:'$19/mo starter · $49/mo growth', mrrLow:2000, mrrMid:10000, mrrHigh:38000, angle:'"I built a $10k MRR landing page in 60 seconds"', archetypes:['marketer','creator','beginner'], channels:['tiktok','x','youtube'], budgets:['zero','low','medium'], b2c:true, b2b:false, stack:'Next.js + OpenAI + Vercel + Stripe', roadmap:['Day 1: Prompt → page generation pipeline','Day 2: Section components (hero/features/CTA)','Day 3: Theme system + dark/light mode','Day 4: One-click deploy to Vercel','Day 5: Custom domain support','Day 6: A/B variant generation','Day 7: TikTok demo video launch'] },
+  { id:'waitkit', name:'WaitKit', one:'Viral waitlist with referral loops — validate before you build', problem:'Founders build 3 months then find out nobody wants it', whyNow:'Pre-launch validation with viral loops is the fastest 0→users strategy', mrrScore:72, viralScore:82, competition:'medium', mvpDiff:3, buildTime:'2–3 days', pricing:'$19/mo unlimited projects', mrrLow:1200, mrrMid:6000, mrrHigh:20000, angle:'"Build your audience before your product"', archetypes:['marketer','creator','beginner'], channels:['tiktok','x','reddit'], budgets:['zero','low'], b2c:true, b2b:true, stack:'Next.js + Resend + Stripe + Supabase', roadmap:['Day 1: Waitlist page builder + embed','Day 2: Referral tracking + unique links','Day 3: Email confirmation + sequence','Day 4: Referral leaderboard','Day 5: Admin dashboard + CSV export','Day 6: Custom domain support','Day 7: Launch with your own waitlist'] },
+  { id:'outreachai', name:'OutreachAI', one:'AI writes hyper-personalized cold emails from a LinkedIn URL', problem:'Cold email response rates below 2% because messages aren\'t personal', whyNow:'LLM personalization at scale makes cold email competitive with paid ads', mrrScore:81, viralScore:63, competition:'medium', mvpDiff:4, buildTime:'4–5 days', pricing:'$39/mo starter · $99/mo growth · $299/mo agency', mrrLow:3000, mrrMid:16000, mrrHigh:60000, angle:'"We booked 47 meetings in 30 days with $0 ad spend"', archetypes:['marketer','operator'], channels:['x','reddit','cold_email'], budgets:['low','medium','high'], b2c:false, b2b:true, stack:'Next.js + OpenAI + Resend + Stripe', roadmap:['Day 1: LinkedIn scraper + OpenAI pipeline','Day 2: Email generation with personalization','Day 3: Sequence builder + scheduling','Day 4: Reply tracking + inbox connect','Day 5: Campaign analytics dashboard','Day 6: Bulk upload + CSV import','Day 7: Launch to B2B sales communities'] },
+  { id:'shipstatus', name:'ShipStatus', one:'Beautiful status pages that build trust and kill support tickets', problem:'When products go down, founders get 50 DMs — status pages stop that', whyNow:'Statuspage by Atlassian costs $299/mo — indie market is open', mrrScore:74, viralScore:54, competition:'medium', mvpDiff:3, buildTime:'2–3 days', pricing:'$9/mo solo · $29/mo team · $79/mo agency', mrrLow:1000, mrrMid:5000, mrrHigh:20000, angle:'"Stop getting DMs when your server goes down"', archetypes:['builder','operator'], channels:['x','reddit','seo'], budgets:['zero','low','medium'], b2c:true, b2b:true, stack:'Next.js + uptime monitoring + Stripe + PostgreSQL', roadmap:['Day 1: Service entry + status page generator','Day 2: Uptime monitoring cron jobs','Day 3: Incident creation + updates','Day 4: Public page + subscriber emails','Day 5: Custom domain support','Day 6: Webhook integrations','Day 7: Launch on PH + X'] },
+  { id:'heatsynk', name:'HeatSync', one:'Lightweight heatmap + session replay — Hotjar for solo founders', problem:'Hotjar is $99/mo and too complex for MVPs and landing pages', whyNow:'Every founder needs UX data — nobody can justify $99/mo pre-traction', mrrScore:77, viralScore:58, competition:'high', mvpDiff:7, buildTime:'6–7 days', pricing:'$9/mo starter · $29/mo growth', mrrLow:1500, mrrMid:8000, mrrHigh:30000, angle:'"See exactly why users aren\'t converting — for $9/mo"', archetypes:['builder','operator'], channels:['x','reddit','seo'], budgets:['low','medium'], b2c:true, b2b:true, stack:'Next.js + WebSocket + canvas recording + PostgreSQL', roadmap:['Day 1: JS snippet + event capture','Day 2: Session recording storage','Day 3: Heatmap generation logic','Day 4: Playback UI + timeline','Day 5: Click + scroll maps','Day 6: Dashboard + project management','Day 7: Launch with free tier'] },
+  { id:'formblast', name:'FormBlast', one:'No-code forms that notify you on Slack, email, and text', problem:'Every project needs a form — building one costs days and $200', whyNow:'Formspree raised prices and Tally has gaps — indie alt is open', mrrScore:69, viralScore:67, competition:'high', mvpDiff:2, buildTime:'1–2 days', pricing:'$9/mo solo · $29/mo team', mrrLow:800, mrrMid:4000, mrrHigh:14000, angle:'"Add a contact form to any website in 60 seconds"', archetypes:['builder','beginner'], channels:['tiktok','youtube','reddit'], budgets:['zero','low'], b2c:true, b2b:true, stack:'Next.js + Resend + Stripe + Supabase', roadmap:['Day 1: Form builder UI + embed code','Day 2: Submission handler + Resend notifications','Day 3: Slack webhook integration','Day 4: Spam filtering + CAPTCHA','Day 5: Submission dashboard + CSV','Day 6: Custom redirect + success page','Day 7: Launch with your own contact form'] },
+  { id:'siterank', name:'SiteRank', one:'Automated weekly SEO audit with AI-written fix instructions', problem:'Founders know SEO matters but have no idea what to fix', whyNow:'LLMs can explain technical SEO in plain English — no agency needed', mrrScore:79, viralScore:60, competition:'medium', mvpDiff:5, buildTime:'4–6 days', pricing:'$19/mo solo · $49/mo team', mrrLow:2000, mrrMid:10000, mrrHigh:35000, angle:'"I found $50k/mo in lost traffic with this free audit"', archetypes:['marketer','operator'], channels:['seo','reddit','x'], budgets:['low','medium','high'], b2c:true, b2b:true, stack:'Next.js + Playwright + OpenAI + Stripe', roadmap:['Day 1: Site crawler + technical audit logic','Day 2: GPT-4o fix explanations pipeline','Day 3: Audit report UI + export','Day 4: Weekly scheduling + email delivery','Day 5: Keyword tracking integration','Day 6: Competitor comparison feature','Day 7: SEO launch — rank for "SEO audit tool"'] },
+  { id:'affkit', name:'AffKit', one:'Launch your affiliate program in 15 minutes with zero code', problem:'Affiliate programs require weeks of dev or $299/mo platforms', whyNow:'Every SaaS needs affiliates but Rewardful is overpriced', mrrScore:76, viralScore:55, competition:'medium', mvpDiff:6, buildTime:'6–7 days', pricing:'$29/mo starter · $79/mo growth · $199/mo scale', mrrLow:2500, mrrMid:13000, mrrHigh:50000, angle:'"Replace your $299/mo affiliate tool for $29"', archetypes:['builder','operator'], channels:['x','reddit','cold_email','seo'], budgets:['low','medium','high'], b2c:false, b2b:true, stack:'Next.js + Stripe Connect + PostgreSQL', roadmap:['Day 1: Affiliate signup + unique link gen','Day 2: Conversion tracking pixel','Day 3: Stripe Connect payout integration','Day 4: Affiliate dashboard','Day 5: Admin panel + approval flow','Day 6: Email notifications + reports','Day 7: Launch with your own affiliate program'] },
+  { id:'contentcal', name:'ContentCal', one:'AI content calendar that writes posts AND schedules them', problem:'Creators spend more time planning content than creating it', whyNow:'Scheduling + AI writing in one tool is underserved for solo creators', mrrScore:74, viralScore:78, competition:'high', mvpDiff:4, buildTime:'4–6 days', pricing:'$19/mo creator · $49/mo agency', mrrLow:1500, mrrMid:7000, mrrHigh:28000, angle:'"30 days of content in 30 minutes"', archetypes:['creator','marketer'], channels:['tiktok','instagram','youtube'], budgets:['zero','low','medium'], b2c:true, b2b:false, stack:'Next.js + OpenAI + Social APIs + Stripe', roadmap:['Day 1: Calendar UI + post creation','Day 2: OpenAI content generation','Day 3: Social API (Twitter/LinkedIn) scheduling','Day 4: Template library + voice settings','Day 5: Repurposing engine (1 → 5 formats)','Day 6: Team collaboration features','Day 7: Launch targeting content creators'] },
+  { id:'socialsnap', name:'SocialSnap', one:'Collect, style, and embed customer testimonials in 60 seconds', problem:'Testimonial collection is ugly and developers still copy-paste HTML', whyNow:'Social proof widget market is growing but tools are overpriced', mrrScore:71, viralScore:64, competition:'high', mvpDiff:3, buildTime:'2–3 days', pricing:'$9/mo solo · $29/mo growth', mrrLow:800, mrrMid:4000, mrrHigh:15000, angle:'"Add social proof to any landing page without coding"', archetypes:['marketer','beginner'], channels:['tiktok','instagram','reddit'], budgets:['zero','low'], b2c:true, b2b:true, stack:'Next.js + Stripe + Supabase + embeddable widget', roadmap:['Day 1: Collection form builder','Day 2: Wall of love widget + embed','Day 3: Import from Twitter/G2/Capterra','Day 4: Style editor + themes','Day 5: Auto-request emails via Resend','Day 6: Video testimonial recording','Day 7: Launch + demo your own testimonials'] },
+  { id:'calsnap', name:'CalSnap', one:'Beautiful booking pages for creators — Cal.com made personal', problem:'Calendly charges $10+ and looks corporate. Creators want brand.', whyNow:'"Indie vs corporate" positioning gap is wide open in scheduling tools', mrrScore:68, viralScore:70, competition:'high', mvpDiff:4, buildTime:'4–5 days', pricing:'$9/mo basic · $19/mo pro', mrrLow:800, mrrMid:4000, mrrHigh:16000, angle:'"Ditch Calendly. Your booking page should actually look good."', archetypes:['creator','beginner'], channels:['tiktok','instagram','x'], budgets:['zero','low'], b2c:true, b2b:false, stack:'Next.js + Google Calendar API + Stripe + Supabase', roadmap:['Day 1: Google Calendar OAuth + availability','Day 2: Booking form + confirmation emails','Day 3: Custom page builder + themes','Day 4: Buffer time + meeting types','Day 5: Zoom/Meet link auto-generation','Day 6: Reminders + reschedule flow','Day 7: TikTok video comparing to Calendly'] }
+];
+
+/* ════════════════════════════════════════════
+   ARCHETYPE DETECTION
+════════════════════════════════════════════ */
+const ARCHETYPES = {
+  builder:  { name:'Builder',   emoji:'🛠️', desc:'You ship fast and think in systems. Best suited for technical SaaS with deep moats.' },
+  creator:  { name:'Creator',   emoji:'🎬', desc:'Your audience is your unfair advantage. Distribution-first strategy will win.' },
+  marketer: { name:'Marketer',  emoji:'📈', desc:'You understand acquisition better than most. Growth-led products are your lane.' },
+  operator: { name:'Operator',  emoji:'⚙️', desc:'You turn chaos into process. B2B workflow tools are your superpower.' },
+  beginner: { name:'Beginner',  emoji:'🚀', desc:'Fresh perspective is a superpower. Focus on simple, viral, zero-code tools.' }
+};
+
+function detectArchetype(ans) {
+  const skills = (ans.skills || '').toLowerCase();
+  const job    = (ans.job || '').toLowerCase();
+  const chs    = ans.channels || [];
+  const hasCode = ans.canCode;
+  const viral  = ['tiktok','instagram','youtube'];
+  const growthCh = ['seo','cold_email','reddit'];
+
+  if (hasCode && (skills.includes('cod') || skills.includes('dev') || skills.includes('eng'))) return 'builder';
+  if (chs.some(c => viral.includes(c)) && (skills.includes('content') || skills.includes('video') || skills.includes('creat'))) return 'creator';
+  if (chs.some(c => growthCh.includes(c)) || skills.includes('market') || job.includes('market')) return 'marketer';
+  if (ans.model === 'b2b' && (job.includes('manager') || job.includes('ops') || job.includes('founder') || skills.includes('ops'))) return 'operator';
+  return 'beginner';
+}
+
+/* ════════════════════════════════════════════
+   SCORING
+════════════════════════════════════════════ */
+function scoreIdea(idea, ans, arch) {
+  let s = 40;
+  const chs = ans.channels || [];
+
+  // Channel match (25 pts)
+  if (chs.some(c => idea.channels.includes(c))) s += 25;
+  else if (idea.channels.length > 2) s += 8;
+
+  // Budget match (15 pts)
+  if (idea.budgets.includes(ans.budget)) s += 15;
+
+  // B2B/B2C match (15 pts)
+  if (ans.model === 'b2c' && idea.b2c) s += 15;
+  else if (ans.model === 'b2b' && idea.b2b) s += 15;
+  else if (ans.model === 'both' && (idea.b2b || idea.b2c)) s += 10;
+
+  // Archetype match (15 pts)
+  if (idea.archetypes.includes(arch)) s += 15;
+  else if (idea.archetypes.length > 2) s += 5;
+
+  // Skill/complexity match (10 pts)
+  if (!ans.canCode && idea.mvpDiff <= 4) s += 10;
+  else if (ans.canCode && idea.mvpDiff <= 6) s += 6;
+
+  // Time match (5 pts)
+  const hrs = parseFloat(ans.hours) || 2;
+  if (hrs <= 2 && idea.mvpDiff <= 4) s += 5;
+  else if (hrs >= 4) s += 5;
+
+  return Math.min(99, s);
+}
+
+/* ════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════ */
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  S.screen = id;
+  window.scrollTo(0, 0);
+}
+
+function startQuiz() {
+  // Reset steps
+  document.querySelectorAll('.qstep').forEach(s => s.classList.remove('active'));
+  document.getElementById('qstep-a').classList.add('active');
+  updateProgress(1, 5);
+}
+
+function updateProgress(step, total) {
+  document.getElementById('qbar').style.width = ((step/total)*100)+'%';
+  document.getElementById('qprog-txt').textContent = `Step ${step} of ${total}`;
+}
+
+function nextStep(from, to) {
+  collectStep(from);
+  document.getElementById('qstep-'+from).classList.remove('active');
+  document.getElementById('qstep-'+to).classList.add('active');
+  const order = {a:1, b:2, c:3, d:4, e:5};
+  updateProgress(order[to], 5);
+}
+
+function prevStep(from, to) {
+  document.getElementById('qstep-'+from).classList.remove('active');
+  document.getElementById('qstep-'+to).classList.add('active');
+  const order = {a:1, b:2, c:3, d:4, e:5};
+  updateProgress(order[to], 5);
+}
+
+function collectStep(step) {
+  if (step === 'a') {
+    S.answers.problem = document.getElementById('q-problem').value;
+  }
+  if (step === 'b') {
+    S.answers.age     = document.getElementById('q-age').value;
+    S.answers.job     = document.getElementById('q-job').value;
+    S.answers.passions= document.getElementById('q-passions').value;
+    S.answers.skills  = document.getElementById('q-skills').value;
+    S.answers.hours   = document.getElementById('q-hours').value || 2;
+  }
+  if (step === 'c') {
+    const codeCard = document.querySelector('#code-cards .rcard.sel');
+    S.answers.canCode = codeCard ? codeCard.dataset.val === 'yes' : true;
+    const vibeCard = document.querySelector('#vibe-cards .rcard.sel');
+    S.answers.vibeCode = vibeCard ? vibeCard.dataset.val === 'vibe' : true;
+  }
+  if (step === 'd') {
+    S.answers.budget   = document.getElementById('q-budget').value;
+    S.answers.ads      = document.getElementById('q-ads').value;
+    S.answers.channels = [...document.querySelectorAll('#channel-chips .chip.sel')].map(c => c.dataset.val);
+    if (!S.answers.channels.length) S.answers.channels = ['tiktok'];
+  }
+  if (step === 'e') {
+    const mc = document.querySelector('#model-cards .rcard.sel');
+    S.answers.model = mc ? mc.dataset.val : 'b2b';
+  }
+}
+
+function collectAll() {
+  collectStep('a'); collectStep('b'); collectStep('c');
+  collectStep('d'); collectStep('e');
+}
+
+function skipToResults() {
+  collectAll();
+  runAnalysis();
+}
+
+/* ════════════════════════════════════════════
+   QUIZ UI HELPERS
+════════════════════════════════════════════ */
+function toggleExamples() {
+  const el = document.getElementById('prob-examples');
+  el.classList.toggle('show');
+}
+function fillProblem(el) {
+  document.getElementById('q-problem').value = el.textContent;
+  document.getElementById('prob-examples').classList.remove('show');
+}
+function selectRcard(groupId, el) {
+  document.querySelectorAll('#'+groupId+' .rcard').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  if (groupId === 'code-cards') {
+    const show = el.dataset.val === 'yes';
+    document.getElementById('vibe-row').style.display = show ? '' : 'none';
+  }
+}
+function toggleChip(el) { el.classList.toggle('sel'); }
+
+/* ════════════════════════════════════════════
+   ANALYSIS
+════════════════════════════════════════════ */
+function runAnalysis() {
+  collectAll();
+  goTo('s-analyzing');
+  S.archetype = detectArchetype(S.answers);
+
+  // Score all ideas
+  S.ranked = IDEAS.map(idea => ({ ...idea, score: scoreIdea(idea, S.answers, S.archetype) }))
+    .sort((a,b) => b.score - a.score);
+  S.top3      = S.ranked.slice(0, 3);
+  S.secondary = S.ranked.slice(3);
+
+  // Animate analysis steps
+  const steps = ['as0','as1','as2','as3','as4'];
+  let i = 0;
+  steps.forEach(id => { document.getElementById(id).className = 'astep'; });
+
+  function tick() {
+    if (i < steps.length) {
+      if (i > 0) {
+        const prev = document.getElementById(steps[i-1]);
+        prev.className = 'astep done';
+        prev.querySelector('.astep-dot').innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#000" stroke-width="1.4" stroke-linecap="round"/></svg>';
+      }
+      document.getElementById(steps[i]).className = 'astep active';
+      i++;
+      setTimeout(tick, 700);
+    } else {
+      // done
+      document.getElementById(steps[steps.length-1]).className = 'astep done';
+      setTimeout(() => { renderResults(); goTo('s-results'); }, 400);
+    }
+  }
+  setTimeout(tick, 300);
+}
+
+/* ════════════════════════════════════════════
+   RESULTS RENDER
+════════════════════════════════════════════ */
+function compTag(c) {
+  if (c === 'low')    return '<span class="tag tag-g">Low competition</span>';
+  if (c === 'medium') return '<span class="tag tag-o">Med competition</span>';
+  return '<span class="tag tag-r">High competition</span>';
+}
+function fmtMRR(n) { return n >= 1000 ? '$'+(n/1000).toFixed(0)+'k' : '$'+n; }
+
+function renderResults() {
+  const arch = ARCHETYPES[S.archetype];
+  document.getElementById('arch-name').textContent = arch.emoji+' '+arch.name+' Archetype';
+  document.getElementById('ri-h').textContent = 'Your '+S.top3.length+' best SaaS opportunities';
+  document.getElementById('ri-p').textContent = arch.desc;
+
+  // Top 3
+  const grid = document.getElementById('top3-grid');
+  grid.innerHTML = '';
+  S.top3.forEach((idea, idx) => {
+    const card = document.createElement('div');
+    card.className = 'icard' + (idx === 0 ? ' top' : '');
+    card.innerHTML = `
+      <div class="ic-name">${idea.name}</div>
+      <div class="ic-one">${idea.one}</div>
+      <div class="ic-scores">
+        <div>
+          <div class="ic-score-lbl">MRR potential</div>
+          <div class="ic-score-row">
+            <div class="ic-bar"><div class="ic-bar-fill g" style="--w:${idea.mrrScore}%"></div></div>
+            <span class="ic-score-num" style="color:var(--green)">${idea.mrrScore}</span>
+          </div>
+        </div>
+        <div>
+          <div class="ic-score-lbl">Viral TikTok</div>
+          <div class="ic-score-row">
+            <div class="ic-bar"><div class="ic-bar-fill b" style="--w:${idea.viralScore}%"></div></div>
+            <span class="ic-score-num" style="color:var(--blue)">${idea.viralScore}</span>
+          </div>
+        </div>
+      </div>
+      <div class="ic-tags">
+        ${compTag(idea.competition)}
+        <span class="tag">MVP ${idea.buildTime}</span>
+        <span class="tag">Diff ${idea.mvpDiff}/10</span>
+      </div>
+      <div>
+        <span class="ic-mrr">${fmtMRR(idea.mrrMid)}<span class="ic-mrr-sub">/mo realistic MRR</span></span>
+      </div>
+      <button class="ic-cta" onclick="openDetail('${idea.id}')">View full blueprint →</button>
+    `;
+    grid.appendChild(card);
+    // animate bars after paint
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        card.querySelectorAll('.ic-bar-fill').forEach(b => b.style.width = b.style.getPropertyValue('--w') || getComputedStyle(b).getPropertyValue('--w'));
+      }, 100 + idx * 100);
+    });
+  });
+
+  // Secondary grid
+  const sg = document.getElementById('sec-grid');
+  sg.innerHTML = '';
+  S.secondary.forEach(idea => {
+    const c = document.createElement('div');
+    c.className = 'scard';
+    c.innerHTML = `
+      <div class="sc-name">${idea.name}</div>
+      <div class="sc-desc">${idea.one}</div>
+    `;
+    const scoreDiv = document.createElement('div');
+    scoreDiv.className = 'sc-score';
+    scoreDiv.textContent = idea.mrrScore;
+    c.appendChild(scoreDiv);
+    c.onclick = () => openDetail(idea.id);
+    sg.appendChild(c);
+  });
+}
+
+/* ════════════════════════════════════════════
+   IDEA DETAIL
+════════════════════════════════════════════ */
+function openDetail(id) {
+  const idea = IDEAS.find(i => i.id === id);
+  if (!idea) return;
+  S.selected = idea;
+  renderDetail(idea);
+  goTo('s-detail');
+}
+
+function renderDetail(idea) {
+  const body = document.getElementById('detail-body');
+  const roadmapItems = (idea.roadmap || []).map((t,i) => `<li class="rm-item"><span class="rm-day">Day ${i+1}</span><span class="rm-task">${t}</span></li>`).join('');
+
+  const premiumContent = S.premium ? `
+    <div class="d2col">
+      <div class="dsec">
+        <div class="dsec-t">Marketing angle</div>
+        <div class="dsec-c">${idea.angle}</div>
+      </div>
+      <div class="dsec">
+        <div class="dsec-t">Recommended stack</div>
+        <div class="dsec-c">${idea.stack}</div>
+      </div>
+    </div>
+    <div class="dsec" style="margin-bottom:20px">
+      <div class="dsec-t">TikTok hooks (3 scripts)</div>
+      <div class="dsec-c">
+        <b>Hook 1:</b> "${idea.angle}"<br>
+        <b>Hook 2:</b> "Most indie hackers don't know about ${idea.name}. Here's why it changes everything..."<br>
+        <b>Hook 3:</b> "I built ${idea.name} in 7 days. Here's the exact Claude Code prompt I used..."
+      </div>
+    </div>
+    <div class="dsec" style="margin-bottom:20px">
+      <div class="dsec-t">Claude Code prompt</div>
+      <div class="dsec-c" style="font-family:monospace;font-size:12px;background:var(--bg);padding:12px;border-radius:8px;white-space:pre-wrap">Build a SaaS called ${idea.name}: ${idea.one}
+
+Stack: ${idea.stack}
+MVP scope (7 days):
+${(idea.roadmap||[]).map((t,i)=>`Day ${i+1}: ${t}`).join('\n')}
+
+Key features:
+- Auth (Supabase or NextAuth)
+- Stripe subscription billing
+- Core feature: ${idea.problem}
+- Dashboard + usage tracking
+- Responsive dark UI (Linear-inspired)
+
+Start with the database schema, then API routes, then UI components.</div>
+    </div>
+    <div style="text-align:center;margin-top:24px">
+      <button class="btn btn-green btn-lg" onclick="openDashboard()">
+        Open project dashboard →
+      </button>
+    </div>
+  ` : `
+    <div class="paywall-wall">
+      <div class="pw-blur">
+        Marketing angle: "${idea.angle}" · Stack: ${idea.stack} · TikTok Hook 1: "... Hook 2: "... Hook 3: "...
+        Claude Code prompt: Build a SaaS called ${idea.name}... Key features: Auth, Stripe, Core logic...
+        30-day launch plan: Week 1 build MVP, Week 2 soft launch, Week 3 TikTok content push...
+      </div>
+      <div class="pw-gate">
+        <div class="pw-icon">🔒</div>
+        <div class="pw-title">Unlock the full blueprint</div>
+        <div class="pw-desc">Get the complete go-to-market strategy, Claude Code scaffold prompt, 3 TikTok scripts, 30-day launch plan, affiliate strategy, and SEO plan.</div>
+        <div class="pw-features">
+          <span class="tag tag-g">Claude Code prompts</span>
+          <span class="tag tag-g">TikTok scripts</span>
+          <span class="tag tag-g">30-day plan</span>
+          <span class="tag tag-g">Full stack</span>
+          <span class="tag tag-g">SEO strategy</span>
+          <span class="tag tag-g">Affiliate plan</span>
+        </div>
+        <button class="btn btn-green btn-lg" onclick="openPaywall()">🔓 Unlock Premium — $19/mo</button>
+      </div>
+    </div>
+  `;
+
+  body.innerHTML = `
+    <div class="d-name">${idea.name}</div>
+    <div class="d-one">${idea.one}</div>
+    <div class="d-scores">
+      <div class="dscore"><div class="dscore-val g">${idea.mrrScore}</div><div class="dscore-lbl">MRR score</div></div>
+      <div class="dscore"><div class="dscore-val b">${idea.viralScore}</div><div class="dscore-lbl">Viral TikTok</div></div>
+      <div class="dscore"><div class="dscore-val o">${idea.mvpDiff}/10</div><div class="dscore-lbl">MVP difficulty</div></div>
+      <div class="dscore"><div class="dscore-val" style="color:var(--text);font-size:1.4rem">${idea.buildTime}</div><div class="dscore-lbl">Build time</div></div>
+    </div>
+    <div class="d2col">
+      <div class="dsec">
+        <div class="dsec-t">Problem solved</div>
+        <div class="dsec-c">${idea.problem}</div>
+      </div>
+      <div class="dsec">
+        <div class="dsec-t">Why now</div>
+        <div class="dsec-c">${idea.whyNow}</div>
+      </div>
+      <div class="dsec">
+        <div class="dsec-t">Pricing</div>
+        <div class="dsec-c">${idea.pricing}</div>
+      </div>
+      <div class="dsec">
+        <div class="dsec-t">MRR potential</div>
+        <div class="dsec-c">
+          <span style="color:var(--muted);font-size:12px">Low: </span>${fmtMRR(idea.mrrLow)} &nbsp;
+          <span style="color:var(--muted);font-size:12px">Mid: </span><span style="color:var(--green);font-weight:700">${fmtMRR(idea.mrrMid)}</span> &nbsp;
+          <span style="color:var(--muted);font-size:12px">High: </span>${fmtMRR(idea.mrrHigh)}
+        </div>
+      </div>
+    </div>
+    <div class="dsec" style="margin-bottom:20px">
+      <div class="dsec-t">7-day MVP roadmap</div>
+      <ul class="roadmap">${roadmapItems}</ul>
+    </div>
+    ${premiumContent}
+  `;
+}
+
+/* ════════════════════════════════════════════
+   PAYWALL
+════════════════════════════════════════════ */
+function openPaywall() { document.getElementById('modal-paywall').classList.add('active'); }
+function closePaywall() { document.getElementById('modal-paywall').classList.remove('active'); }
+
+function setPricing(mode) {
+  S.pricing = mode;
+  document.getElementById('ptm').className = 'pt-btn'+(mode==='monthly'?' on':'');
+  document.getElementById('pty').className = 'pt-btn'+(mode==='yearly'?' on':'');
+  const m = mode === 'monthly';
+  document.getElementById('price-indie').innerHTML  = (m ? '$19' : '$11') + '<span class="pm-plan-note">/mo</span>';
+  document.getElementById('price-studio').innerHTML = (m ? '$49' : '$29') + '<span class="pm-plan-note">/mo</span>';
+}
+
+function selectPlan(plan) {
+  S.plan = plan;
+  document.getElementById('plan-indie').className  = 'pm-plan'+(plan==='indie'?' on':'');
+  document.getElementById('plan-studio').className = 'pm-plan'+(plan==='studio'?' on':'');
+}
+
+function activatePremium() {
+  S.premium = true;
+  closePaywall();
+  if (S.selected) renderDetail(S.selected);
+}
+
+/* ════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════ */
+const CHECKLIST_ITEMS = [
+  {id:'mvp',       label:'Build MVP'},
+  {id:'landing',   label:'Landing page'},
+  {id:'stripe',    label:'Stripe integration'},
+  {id:'backend',   label:'Backend API'},
+  {id:'frontend',  label:'Frontend UI'},
+  {id:'analytics', label:'Analytics (PostHog)'},
+  {id:'tiktok',    label:'TikTok acquisition'},
+  {id:'seo',       label:'SEO setup'},
+  {id:'ads',       label:'Ads setup'},
+  {id:'affiliates',label:'Affiliate program'},
+  {id:'firstusers',label:'First 10 users'},
+  {id:'firstmrr',  label:'First MRR 💰'},
+];
+
+const INTEGRATIONS = [
+  {name:'TikTok',    icon:'🎵', connected:false},
+  {name:'Instagram', icon:'📷', connected:false},
+  {name:'Stripe',    icon:'💳', connected:false},
+  {name:'PostHog',   icon:'📊', connected:false},
+  {name:'GitHub',    icon:'🐙', connected:false},
+  {name:'Supabase',  icon:'⚡', connected:false},
+  {name:'Vercel',    icon:'▲',  connected:false},
+  {name:'Analytics', icon:'📈', connected:false},
+];
+
+function openDashboard() {
+  if (!S.selected) return;
+  renderDashboard(S.selected);
+  goTo('s-dashboard');
+}
+
+function renderDashboard(idea) {
+  if (!S.checklist[idea.id]) S.checklist[idea.id] = {};
+  const ck = S.checklist[idea.id];
+
+  const doneCount = CHECKLIST_ITEMS.filter(i => ck[i.id]).length;
+  const pct = Math.round((doneCount / CHECKLIST_ITEMS.length) * 100);
+
+  const ckHTML = CHECKLIST_ITEMS.map(item => `
+    <div class="ck-item${ck[item.id] ? ' done' : ''}" id="ck-${item.id}" onclick="toggleCheck('${idea.id}','${item.id}')">
+      <div class="ck-box">
+        ${ck[item.id] ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#000" stroke-width="1.4" stroke-linecap="round"/></svg>' : ''}
+      </div>
+      <span class="ck-label">${item.label}</span>
+    </div>
+  `).join('');
+
+  const intHTML = INTEGRATIONS.map((int,i) => `
+    <div class="int-card${int.connected?' connected':''}" onclick="connectIntegration(${i})">
+      <div class="int-icon">${int.icon}</div>
+      <div class="int-name">${int.name}</div>
+      <div class="int-status${int.connected?' on':''}">${int.connected ? '✓ Connected' : 'Connect'}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('dashboard-body').innerHTML = `
+    <div class="proj-card">
+      <div class="proj-hrow">
+        <div>
+          <div class="proj-name">${idea.name}</div>
+          <div class="proj-one">${idea.one}</div>
+        </div>
+        <div class="proj-progress">
+          <div class="proj-prog-val">${pct}%</div>
+          <div class="proj-prog-lbl">${doneCount}/${CHECKLIST_ITEMS.length} done</div>
+        </div>
+      </div>
+      <div class="cklist" id="cklist">${ckHTML}</div>
+    </div>
+
+    <div class="int-section">
+      <div class="int-title">Integrations</div>
+      <div class="int-grid" id="int-grid">${intHTML}</div>
+      <p style="font-size:12px;color:var(--muted);margin-top:10px">Integrations coming soon — architecture is ready.</p>
+    </div>
+  `;
+}
+
+function toggleCheck(ideaId, itemId) {
+  if (!S.checklist[ideaId]) S.checklist[ideaId] = {};
+  S.checklist[ideaId][itemId] = !S.checklist[ideaId][itemId];
+  renderDashboard(S.selected);
+}
+
+function connectIntegration(idx) {
+  INTEGRATIONS[idx].connected = !INTEGRATIONS[idx].connected;
+  if (S.selected) renderDashboard(S.selected);
+}
+
+/* ════════════════════════════════════════════
+   BAR ANIMATION (results)
+════════════════════════════════════════════ */
+// Animate score bars on results screen
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.ic-bar-fill').forEach(b => {
+      const w = b.style.getPropertyValue('--w') || b.dataset.w;
+      if (w) b.style.width = w;
+    });
+  });
+}, { threshold: 0.3 });
+</script>
+</body>
+</html>
