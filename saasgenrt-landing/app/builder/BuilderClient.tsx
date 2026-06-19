@@ -340,11 +340,14 @@ function SelectionCard({ selected, onClick, icon, label, desc, accent = '#8B5CF6
   selected: boolean; onClick: () => void; icon?: string; label: string; desc?: string
   accent?: string; index?: number; big?: boolean
 }) {
+  const reduce = useReducedMotion()
   return (
     <motion.button
-      initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.15 + index * 0.05 }}
-      whileHover={{ scale: 1.025, y: -3 }} whileTap={{ scale: 0.975 }}
+      initial={reduce ? false : { opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: reduce ? 0 : 0.15 + index * 0.05 }}
+      whileHover={reduce ? undefined : { scale: 1.025, y: -3 }}
+      whileTap={reduce ? undefined : { scale: 0.975 }}
       onClick={onClick}
       style={{
         padding: big ? '22px 20px' : '16px 14px', borderRadius: 16, cursor: 'pointer', textAlign: 'left',
@@ -382,18 +385,21 @@ function ChoiceStep({ progressN, badgeN, pre, accent, post, subtitle, options, v
   value: string; onSelect: (v: string) => void; onNext: () => void; onBack: () => void
   columns?: number; illustration?: React.ReactNode
 }) {
+  const reduce = useReducedMotion()
+  const rise = (delay: number) => reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } }
+
   return (
     <div>
       <ProgressBar current={progressN} />
-      <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 40, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 300 }}>
           <StepBadge n={badgeN} />
           <StepHeading pre={pre} accent={accent} post={post} subtitle={subtitle} />
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 12, marginBottom: 26 }}>
+          <motion.div {...rise(0.18)} style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 11, marginBottom: 26 }}>
             {options.map((o, i) => (
               <SelectionCard key={o.value} selected={value === o.value} onClick={() => onSelect(o.value)} icon={o.icon} label={o.label} desc={o.desc} index={i} />
             ))}
-          </div>
+          </motion.div>
           <StepNav onBack={onBack} onNext={onNext} disabled={!value} />
         </div>
         {illustration && <div style={{ width: 260, flexShrink: 0 }}>{illustration}</div>}
@@ -1252,6 +1258,7 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
 function AcquisitionStep({ value, onChange, onNext, onBack }: {
   value: string; onChange: (v: string) => void; onNext: () => void; onBack: () => void
 }) {
+  const reduce = useReducedMotion()
   const selected = value ? value.split(',').filter(Boolean) : []
   const toggle = (v: string) => {
     if (selected.includes(v)) onChange(selected.filter(x => x !== v).join(','))
@@ -1261,31 +1268,61 @@ function AcquisitionStep({ value, onChange, onNext, onBack }: {
     <div>
       <ProgressBar current={9} />
       <StepBadge n={9} />
-      <StepHeading pre="How will you" accent="reach customers?" subtitle="Pick up to 3 channels you're most excited to use. We'll tailor your marketing plan around them." />
+      <StepHeading
+        pre="How will you"
+        accent="reach customers?"
+        subtitle="Pick up to 3 channels you're most excited to use. We'll tailor your marketing plan around them."
+      />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 14 }}>
         {ACQUISITION_CHANNELS.map((c, i) => {
           const on = selected.includes(c.value)
           const disabled = !on && selected.length >= 3
           return (
-            <motion.button key={c.value} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 + i * 0.04 }}
-              whileHover={disabled ? undefined : { scale: 1.03, y: -2 }} whileTap={disabled ? undefined : { scale: 0.97 }} onClick={() => toggle(c.value)}
-              style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '14px 16px', borderRadius: 14, cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'inherit', textAlign: 'left',
-                background: on ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.04)', border: `1.5px solid ${on ? '#8B5CF6' : 'rgba(255,255,255,0.09)'}`,
-                opacity: disabled ? 0.4 : 1, boxShadow: on ? '0 6px 24px rgba(139,92,246,0.18)' : 'none', transition: 'background 0.18s, border-color 0.18s, opacity 0.18s' }}>
-              <span style={{ fontSize: '20px' }}>{c.icon}</span>
-              <span style={{ fontSize: '13.5px', fontWeight: 600, color: on ? '#fff' : 'rgba(255,255,255,0.82)', flex: 1 }}>{c.value}</span>
+            <motion.button
+              key={c.value}
+              initial={reduce ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: reduce ? 0 : 0.1 + i * 0.04 }}
+              whileHover={disabled || reduce ? undefined : { scale: 1.03, y: -2 }}
+              whileTap={disabled || reduce ? undefined : { scale: 0.97 }}
+              onClick={() => toggle(c.value)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 11,
+                padding: '13px 16px', borderRadius: 14,
+                cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                background: on ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.04)',
+                border: `1.5px solid ${on ? '#8B5CF6' : 'rgba(255,255,255,0.08)'}`,
+                opacity: disabled ? 0.38 : 1,
+                boxShadow: on ? '0 0 0 1px rgba(139,92,246,0.24), 0 6px 22px rgba(139,92,246,0.16)' : 'none',
+                transition: 'background 0.18s, border-color 0.18s, opacity 0.18s, box-shadow 0.18s',
+                position: 'relative', overflow: 'hidden',
+              }}
+            >
               {on && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 340 }}
-                  style={{ width: 18, height: 18, borderRadius: '50%', background: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Check style={{ width: 10, height: 10, color: 'white' }} strokeWidth={3} />
-                </motion.div>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #8B5CF6, transparent)', opacity: 0.55 }} />
               )}
+              <span style={{ fontSize: '20px' }}>{c.icon}</span>
+              <span style={{ fontSize: '13.5px', fontWeight: 600, color: on ? '#fff' : 'rgba(255,255,255,0.8)', flex: 1 }}>{c.value}</span>
+              <AnimatePresence>
+                {on && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    style={{ width: 18, height: 18, borderRadius: '50%', background: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                  >
+                    <Check style={{ width: 10, height: 10, color: 'white' }} strokeWidth={3} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.button>
           )
         })}
       </div>
-      <div style={{ fontSize: '11.5px', color: selected.length === 3 ? '#fbbf24' : 'rgba(255,255,255,0.35)', marginBottom: 22, textAlign: 'center' }}>
-        {selected.length} / 3 selected{selected.length === 3 ? ' — max reached' : ''}
+      <div style={{
+        fontSize: '11.5px', marginBottom: 22, textAlign: 'center',
+        color: selected.length === 3 ? '#fbbf24' : 'rgba(255,255,255,0.32)',
+      }}>
+        {selected.length} / 3 selected{selected.length === 3 ? ' — maximum reached' : ''}
       </div>
       <StepNav onBack={onBack} onNext={onNext} disabled={selected.length === 0} />
     </div>
@@ -1295,37 +1332,62 @@ function AcquisitionStep({ value, onChange, onNext, onBack }: {
 // ─── Step 10: B2C or B2B ──────────────────────────────────────────────────────
 
 function MarketTypeStep({ value, onSelect, onNext, onBack }: { value: string; onSelect: (v: string) => void; onNext: () => void; onBack: () => void }) {
+  const reduce = useReducedMotion()
   const tones: Record<string, string> = { b2c: '#ec4899', b2b: '#0ea5e9' }
   return (
     <div>
       <ProgressBar current={10} />
       <StepBadge n={10} />
-      <StepHeading pre="Who will you" accent="sell to?" subtitle="This shapes your pricing, your marketing tone, and how you'll find your first customers." />
+      <StepHeading
+        pre="Who will you"
+        accent="sell to?"
+        subtitle="This shapes your pricing, your marketing tone, and how you'll find your first customers."
+      />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14, marginBottom: 28 }}>
         {MARKET_TYPE_OPTIONS.map((o, i) => {
-          const selected = value === o.value
-          const accent = tones[o.value]
+          const sel = value === o.value
+          const ac = tones[o.value]
           return (
-            <motion.button key={o.value} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.15 + i * 0.08 }}
-              whileHover={{ scale: 1.02, y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => onSelect(o.value)}
-              style={{ textAlign: 'left', padding: '22px 20px', borderRadius: 18, cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
-                background: selected ? `${accent}1f` : 'rgba(255,255,255,0.04)', border: `1.5px solid ${selected ? accent : 'rgba(255,255,255,0.09)'}`,
-                boxShadow: selected ? `0 0 0 1px ${accent}30, 0 10px 34px ${accent}26` : '0 2px 10px rgba(0,0,0,0.18)', transition: 'background 0.18s, border-color 0.18s, box-shadow 0.18s' }}>
+            <motion.button
+              key={o.value}
+              initial={reduce ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.38, delay: reduce ? 0 : 0.16 + i * 0.09, ease: EASE }}
+              whileHover={reduce ? undefined : { scale: 1.022, y: -4 }}
+              whileTap={reduce ? undefined : { scale: 0.978 }}
+              onClick={() => onSelect(o.value)}
+              style={{
+                textAlign: 'left', padding: '24px 20px', borderRadius: 20,
+                cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
+                background: sel ? `${ac}1f` : 'rgba(255,255,255,0.04)',
+                border: `1.5px solid ${sel ? ac : 'rgba(255,255,255,0.09)'}`,
+                boxShadow: sel ? `0 0 0 1px ${ac}30, 0 12px 36px ${ac}26` : '0 2px 10px rgba(0,0,0,0.18)',
+                transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
+              }}
+            >
+              {/* Top accent line when selected */}
+              {sel && (
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${ac}, transparent)`, opacity: 0.7 }} />
+              )}
               <AnimatePresence>
-                {selected && (
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: 'spring', stiffness: 340 }}
-                    style={{ position: 'absolute', top: 12, right: 12, width: 22, height: 22, borderRadius: '50%', background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {sel && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    style={{ position: 'absolute', top: 14, right: 14, width: 22, height: 22, borderRadius: '50%', background: ac, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
                     <Check style={{ width: 12, height: 12, color: 'white' }} strokeWidth={3} />
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div style={{ fontSize: '30px', marginBottom: 10 }}>{o.icon}</div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: selected ? '#fff' : 'rgba(255,255,255,0.9)', marginBottom: 3 }}>{o.label}</div>
-              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', marginBottom: 14 }}>{o.sub}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: '30px', marginBottom: 12 }}>{o.icon}</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: sel ? '#fff' : 'rgba(255,255,255,0.9)', marginBottom: 3, letterSpacing: '-0.02em' }}>{o.label}</div>
+              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.42)', marginBottom: 16 }}>{o.sub}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {o.examples.map((ex) => (
-                  <div key={ex} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: '11.5px', color: 'rgba(255,255,255,0.55)' }}>
-                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: accent, flexShrink: 0 }} />{ex}
+                  <div key={ex} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '11.5px', color: sel ? 'rgba(255,255,255,0.58)' : 'rgba(255,255,255,0.45)' }}>
+                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: ac, flexShrink: 0 }} />
+                    {ex}
                   </div>
                 ))}
               </div>
@@ -1341,25 +1403,60 @@ function MarketTypeStep({ value, onSelect, onNext, onBack }: { value: string; on
 // ─── Step 13: Loading ideas ───────────────────────────────────────────────────
 
 function LoadingIdeasStep({ loadingStep }: { loadingStep: number }) {
+  const reduce = useReducedMotion()
   return (
-    <div style={{ textAlign: 'center', padding: '48px 0' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28, position: 'relative' }}>
-        <motion.div animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} style={{ position: 'absolute', width: 72, height: 72, borderRadius: '50%', background: 'rgba(139,92,246,0.2)' }} />
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }} style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(139,92,246,0.15)', borderTop: '2px solid #8B5CF6' }} />
+    <div style={{ textAlign: 'center', padding: '52px 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, position: 'relative' }}>
+        {!reduce && (
+          <motion.div
+            animate={{ scale: [1, 1.22, 1], opacity: [0.18, 0.06, 0.18] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ position: 'absolute', width: 88, height: 88, borderRadius: '50%', background: 'rgba(139,92,246,0.22)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+          />
+        )}
+        <div style={{ position: 'absolute', width: 60, height: 60, borderRadius: '50%', background: 'rgba(139,92,246,0.1)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+        <motion.div
+          animate={reduce ? undefined : { rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+          style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(139,92,246,0.12)', borderTop: '2px solid #8B5CF6', flexShrink: 0 }}
+        />
       </div>
-      <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'white', letterSpacing: '-0.02em', marginBottom: 6 }}>Generating your 10 SaaS ideas</h2>
-      <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.38)', marginBottom: 36 }}>Our AI is scanning thousands of opportunities for you</p>
+      <h2 style={{ fontSize: '21px', fontWeight: 700, color: 'white', letterSpacing: '-0.03em', marginBottom: 8 }}>
+        Generating your 10 SaaS ideas
+      </h2>
+      <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.36)', marginBottom: 36 }}>
+        Our AI is scanning thousands of opportunities for you
+      </p>
       <div style={{ textAlign: 'left', maxWidth: 360, margin: '0 auto' }}>
         {LOADING_STEPS_IDEAS.map((msg, i) => {
           const isDone = i < loadingStep, isActive = i === loadingStep
           return (
-            <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: isDone || isActive ? 1 : 0.28, x: 0 }} transition={{ duration: 0.3, delay: i * 0.04 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 13 }}>
-              <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, background: isDone ? '#39FF88' : isActive ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.07)', border: `1.5px solid ${isDone ? '#39FF88' : isActive ? '#8B5CF6' : 'rgba(255,255,255,0.10)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <motion.div
+              key={i}
+              initial={reduce ? false : { opacity: 0, x: -8 }}
+              animate={{ opacity: isDone || isActive ? 1 : 0.25, x: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.04 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}
+            >
+              <div style={{
+                width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                background: isDone ? '#39FF88' : isActive ? 'rgba(139,92,246,0.22)' : 'rgba(255,255,255,0.07)',
+                border: `1.5px solid ${isDone ? '#39FF88' : isActive ? '#8B5CF6' : 'rgba(255,255,255,0.10)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
                 {isDone && <Check style={{ width: 11, height: 11, color: '#090B11' }} strokeWidth={3} />}
-                {isActive && <motion.div animate={{ scale: [1, 1.4, 1] }} transition={{ duration: 0.7, repeat: Infinity }} style={{ width: 6, height: 6, borderRadius: '50%', background: '#8B5CF6' }} />}
+                {isActive && !reduce && (
+                  <motion.div
+                    animate={{ scale: [1, 1.4, 1] }}
+                    transition={{ duration: 0.7, repeat: Infinity }}
+                    style={{ width: 6, height: 6, borderRadius: '50%', background: '#8B5CF6' }}
+                  />
+                )}
+                {isActive && reduce && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#8B5CF6' }} />}
               </div>
-              <span style={{ fontSize: '13px', lineHeight: 1.4, color: isDone ? 'rgba(255,255,255,0.65)' : isActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.22)', fontWeight: isActive ? 500 : 400 }}>{msg}</span>
+              <span style={{ fontSize: '13px', lineHeight: 1.4, fontWeight: isActive ? 500 : 400, color: isDone ? 'rgba(255,255,255,0.62)' : isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.2)' }}>
+                {msg}
+              </span>
             </motion.div>
           )
         })}
@@ -1373,44 +1470,67 @@ function LoadingIdeasStep({ loadingStep }: { loadingStep: number }) {
 function IdeaSelectionStep({ ideas, selectedIndex, onSelect, onNext, onBack }: {
   ideas: SaaSIdea[]; selectedIndex: string; onSelect: (i: string) => void; onNext: () => void; onBack: () => void
 }) {
+  const reduce = useReducedMotion()
   const list = ideas.length ? ideas : FALLBACK_IDEAS
   return (
     <div>
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        <StepBadge n="20 IDEAS → PICK 1" tone="green" />
+        <StepBadge n="10 IDEAS → PICK 1" tone="green" />
         <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'white', marginBottom: 6 }}>Your SaaS opportunities</h2>
-        <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.4)' }}>Select the idea you want a full blueprint for.</p>
+        <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.4)' }}>Select the one idea you want a full blueprint for.</p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 11, marginBottom: 24 }}>
         {list.map((idea, i) => {
-          const selected = selectedIndex === String(i)
-          const accent = IDEA_ACCENT[i % IDEA_ACCENT.length]
+          const sel = selectedIndex === String(i)
+          const ac = IDEA_ACCENT[i % IDEA_ACCENT.length]
           const comp = competitionLabel(idea.competitionScore)
           return (
-            <motion.button key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.045 }}
-              whileHover={{ scale: 1.02, y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => onSelect(String(i))}
-              style={{ textAlign: 'left', padding: '16px 16px 14px', borderRadius: 16, cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
-                background: selected ? `${accent}1c` : 'rgba(17,24,39,0.7)', border: `1.5px solid ${selected ? accent : 'rgba(255,255,255,0.09)'}`,
-                boxShadow: selected ? `0 0 0 1px ${accent}30, 0 10px 32px ${accent}26` : '0 2px 10px rgba(0,0,0,0.2)', transition: 'background 0.18s, border-color 0.18s, box-shadow 0.18s' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: accent }} />
+            <motion.button
+              key={i}
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: reduce ? 0 : i * 0.04, ease: EASE }}
+              whileHover={reduce ? undefined : { scale: 1.02, y: -3 }}
+              whileTap={reduce ? undefined : { scale: 0.98 }}
+              onClick={() => onSelect(String(i))}
+              style={{
+                textAlign: 'left', padding: '16px 15px 14px', borderRadius: 16,
+                cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
+                background: sel ? `${ac}1c` : 'rgba(17,24,39,0.68)',
+                border: `1.5px solid ${sel ? ac : 'rgba(255,255,255,0.08)'}`,
+                boxShadow: sel ? `0 0 0 1px ${ac}30, 0 10px 32px ${ac}22` : '0 2px 10px rgba(0,0,0,0.2)',
+                transition: 'background 0.18s, border-color 0.18s, box-shadow 0.18s',
+              }}
+            >
+              {/* Colored top bar — always present for quick scan */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: ac, opacity: sel ? 0.9 : 0.45 }} />
+
               <AnimatePresence>
-                {selected && (
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: 'spring', stiffness: 340 }}
-                    style={{ position: 'absolute', top: 12, right: 12, width: 20, height: 20, borderRadius: '50%', background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {sel && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    style={{ position: 'absolute', top: 12, right: 12, width: 20, height: 20, borderRadius: '50%', background: ac, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
                     <Check style={{ width: 11, height: 11, color: 'white' }} strokeWidth={3} />
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 3, paddingRight: 26, marginTop: 4 }}>{idea.name}</div>
-              <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.45, marginBottom: 11, minHeight: 32 }}>{idea.tagline}</div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 99, background: 'rgba(57,255,136,0.12)', border: '1px solid rgba(57,255,136,0.25)', marginBottom: 10 }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: '#39FF88' }}>{idea.mrrPotential}</span>
-                <span style={{ fontSize: '9.5px', color: 'rgba(57,255,136,0.6)' }}>MRR</span>
+
+              <div style={{ fontSize: '14.5px', fontWeight: 700, color: 'white', marginBottom: 3, paddingRight: sel ? 28 : 0, marginTop: 5, letterSpacing: '-0.015em' }}>
+                {idea.name}
               </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: `${comp.color}1a`, color: comp.color }}>{comp.label} comp.</span>
-                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.55)' }}>{idea.techComplexity}</span>
-                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 8px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.55)' }}>{idea.timeToMvp}</span>
+              <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5, marginBottom: 10, minHeight: 30 }}>
+                {idea.tagline}
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 99, background: 'rgba(57,255,136,0.12)', border: '1px solid rgba(57,255,136,0.22)', marginBottom: 9 }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#39FF88' }}>{idea.mrrPotential}</span>
+                <span style={{ fontSize: '9.5px', color: 'rgba(57,255,136,0.55)' }}>MRR</span>
+              </div>
+              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 7px', borderRadius: 6, background: `${comp.color}1a`, color: comp.color }}>{comp.label} comp.</span>
+                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 7px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>{idea.techComplexity}</span>
+                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 7px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>{idea.timeToMvp}</span>
               </div>
             </motion.button>
           )
