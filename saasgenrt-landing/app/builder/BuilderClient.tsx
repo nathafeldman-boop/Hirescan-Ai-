@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, ArrowLeft, Check, Lock, Zap, Sparkles, TrendingUp, Target, Rocket, Calendar, Code2, Megaphone, Clock, Globe, Building2 } from 'lucide-react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { ArrowRight, ArrowLeft, Check, Sparkles, TrendingUp, Target, Rocket, Calendar, Megaphone, Clock, Lightbulb, UserRound, Map, ShieldCheck } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -141,14 +141,6 @@ const LOADING_STEPS_IDEAS = [
   'Filtering low-competition niches...',
   'Tailoring marketing to your channels...',
   'Generating your 10 best SaaS ideas...',
-]
-
-const OVERVIEW_STEPS = [
-  { icon: '🔍', title: 'Find your problem', desc: 'Describe a frustration, market gap, or domain you want to explore.' },
-  { icon: '👤', title: 'Understand your profile', desc: "We'll tailor ideas to fit your skills, time, and budget." },
-  { icon: '🎯', title: 'Validate opportunities', desc: 'Our AI compares each idea against existing businesses.' },
-  { icon: '🗺️', title: 'Generate your roadmap', desc: 'Marketing strategy, validation steps, and launch plan.' },
-  { icon: '🚀', title: 'Launch faster', desc: 'Receive a complete, actionable SaaS blueprint.' },
 ]
 
 const IDEA_ACCENT = ['#8B5CF6', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7', '#22d3ee']
@@ -539,47 +531,107 @@ function PaymentIllustration() {
 
 // ─── Step 0: Intro ────────────────────────────────────────────────────────────
 
+const JOURNEY = [
+  { Icon: Lightbulb, title: 'Find a problem worth solving', desc: 'Start from a real frustration, or pick a domain you know.' },
+  { Icon: UserRound, title: 'Map your founder profile', desc: 'Budget, skills and time shape every recommendation.' },
+  { Icon: Target, title: 'Validate the opportunity', desc: 'Each idea is scored against its real competitors.' },
+  { Icon: Map, title: 'Get your launch roadmap', desc: 'A marketing plan and a 30-day path, ready to run.' },
+  { Icon: Rocket, title: 'Launch your SaaS', desc: 'Leave with a complete, actionable blueprint.', payoff: true },
+]
+
+const INTRO_TRUST = [
+  { Icon: ShieldCheck, label: 'No credit card to start' },
+  { Icon: Sparkles, label: 'AI-powered analysis' },
+  { Icon: Clock, label: 'About 2 minutes' },
+]
+
 function IntroStep({ onStart }: { onStart: () => void }) {
+  const reduce = useReducedMotion()
+  const rise = (delay: number) => reduce
+    ? { initial: false as const, animate: { opacity: 1 } }
+    : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.55, delay, ease: EASE } }
+
   return (
     <div>
-      <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 99, marginBottom: 18, background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.28)' }}>
-          <Zap style={{ width: 12, height: 12, color: '#c4b5fd' }} />
-          <span style={{ fontSize: '11px', color: '#c4b5fd', fontWeight: 600, letterSpacing: '0.06em' }}>PRODUCT BUILDER</span>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: 30 }}>
+        <motion.div {...rise(0)}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 13px', borderRadius: 99, marginBottom: 20, background: 'rgba(139,92,246,0.14)', border: '1px solid rgba(139,92,246,0.28)' }}>
+          <motion.span aria-hidden
+            animate={reduce ? undefined : { opacity: [1, 0.35, 1] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ width: 6, height: 6, borderRadius: '50%', background: '#a78bfa', boxShadow: '0 0 8px rgba(167,139,250,0.8)' }} />
+          <span style={{ fontSize: '12px', color: '#c4b5fd', fontWeight: 500, letterSpacing: '0.01em' }}>AI Product Builder</span>
         </motion.div>
-        <motion.h1 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}
-          style={{ fontSize: 'clamp(30px, 5vw, 46px)', fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 1.1, color: 'white', marginBottom: 14 }}>
+
+        <motion.h1 {...rise(0.08)}
+          style={{ fontSize: 'clamp(32px, 4.6vw, 46px)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.04, color: 'white', marginBottom: 16, textWrap: 'balance' }}>
           {`Let's build your next `}
           <span style={{ background: 'linear-gradient(135deg, #c4b5fd 20%, #8B5CF6 80%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>SaaS.</span>
         </motion.h1>
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.15 }}
-          style={{ fontSize: '15px', lineHeight: 1.65, color: 'rgba(255,255,255,0.45)', maxWidth: 460, margin: '0 auto' }}>
-          Answer a few questions. We&apos;ll analyze your experience, budget, available time and acquisition strategy to generate personalized SaaS opportunities.
+
+        <motion.p {...rise(0.16)}
+          style={{ fontSize: '15px', lineHeight: 1.6, color: 'rgba(255,255,255,0.5)', maxWidth: 392, margin: '0 auto' }}>
+          Answer 12 quick questions. We turn your experience, budget and time into SaaS ideas actually worth building.
         </motion.p>
       </div>
-      <div style={{ background: '#111827', borderRadius: 18, border: '1px solid rgba(255,255,255,0.07)', padding: '4px 0', marginBottom: 24 }}>
-        {OVERVIEW_STEPS.map((s, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, delay: 0.2 + i * 0.07 }}
-            style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 20px', borderBottom: i < OVERVIEW_STEPS.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>{s.icon}</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.88)', marginBottom: 2 }}>{s.title}</div>
-              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', lineHeight: 1.5 }}>{s.desc}</div>
-            </div>
-            <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: 99, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.22)', fontWeight: 700 }}>{i + 1}</div>
-          </motion.div>
-        ))}
-      </div>
-      <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} onClick={onStart}
-        style={{ width: '100%', padding: '14px', borderRadius: 14, background: 'linear-gradient(135deg, #8B5CF6, #6d28d9)', boxShadow: '0 8px 32px rgba(139,92,246,0.4), inset 0 1px 0 rgba(255,255,255,0.13)', color: 'white', fontWeight: 600, fontSize: '15px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16, fontFamily: 'inherit' }}>
-        Start the Builder<ArrowRight style={{ width: 16, height: 16 }} strokeWidth={2.5} />
+
+      {/* Journey — outer shell + inner core (double-bezel) */}
+      <motion.div {...rise(0.24)}
+        style={{ borderRadius: 24, padding: 6, background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', marginBottom: 26 }}>
+        <div style={{ position: 'relative', borderRadius: 18, padding: '22px 22px 20px', background: 'rgba(10,13,20,0.6)', border: '1px solid rgba(255,255,255,0.05)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+          {/* connecting line */}
+          <motion.div aria-hidden
+            initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }}
+            transition={{ duration: 0.9, delay: 0.4, ease: EASE }}
+            style={{ position: 'absolute', left: 40, top: 40, bottom: 42, width: 2, transformOrigin: 'top', borderRadius: 2, background: 'linear-gradient(180deg, #8B5CF6 0%, #7c5fe0 55%, #39FF88 100%)', opacity: 0.55 }} />
+
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {JOURNEY.map(({ Icon, title, desc, payoff }, i) => {
+              const tint = payoff ? '#39FF88' : '#a78bfa'
+              const tileBg = payoff ? 'rgba(57,255,136,0.12)' : 'rgba(139,92,246,0.14)'
+              const tileBorder = payoff ? 'rgba(57,255,136,0.3)' : 'rgba(139,92,246,0.3)'
+              return (
+                <motion.div key={i}
+                  initial={reduce ? false : { opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.45, delay: 0.42 + i * 0.09, ease: EASE }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
+                  <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 11, background: tileBg, border: `1px solid ${tileBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: payoff ? '0 0 16px rgba(57,255,136,0.18)' : '0 0 14px rgba(139,92,246,0.14)' }}>
+                    <Icon style={{ width: 17, height: 17, color: tint }} strokeWidth={1.75} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: payoff ? '#eafff2' : 'rgba(255,255,255,0.92)', letterSpacing: '-0.01em', marginBottom: 2 }}>{title}</div>
+                    <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.45 }}>{desc}</div>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* CTA — button-in-button */}
+      <motion.button {...rise(0.34)}
+        onClick={onStart} initial={reduce ? false : 'rest'} whileHover={reduce ? undefined : 'hover'} whileTap={reduce ? undefined : { scale: 0.985 }}
+        variants={{ rest: { scale: 1, boxShadow: '0 0 0 1px rgba(139,92,246,0.5), 0 8px 32px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.14)' }, hover: { scale: 1.02, boxShadow: '0 0 0 1px rgba(139,92,246,0.6), 0 12px 40px rgba(139,92,246,0.48), inset 0 1px 0 rgba(255,255,255,0.14)' } }}
+        animate="rest"
+        style={{ width: '100%', padding: '13px 14px 13px 24px', borderRadius: 16, background: 'linear-gradient(135deg, #8B5CF6 0%, #6d28d9 100%)', color: 'white', fontWeight: 600, fontSize: '15px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 18, fontFamily: 'inherit' }}>
+        <span style={{ paddingLeft: 2 }}>Start building</span>
+        <motion.span variants={{ rest: { x: 0 }, hover: { x: 3 } }} transition={{ duration: 0.3, ease: EASE }}
+          style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <ArrowRight style={{ width: 15, height: 15 }} strokeWidth={2.5} />
+        </motion.span>
       </motion.button>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
-        {['🔒 Secure', '⚡ AI-powered', '✓ No credit card to start'].map(t => (
-          <span key={t} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)' }}>{t}</span>
+
+      {/* Trust row */}
+      <motion.div {...rise(0.42)}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, flexWrap: 'wrap' }}>
+        {INTRO_TRUST.map(({ Icon, label }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Icon style={{ width: 13, height: 13, color: '#a78bfa', flexShrink: 0 }} strokeWidth={2} />
+            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.42)' }}>{label}</span>
+          </div>
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }
@@ -1388,7 +1440,10 @@ export function BuilderClient() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#090B11', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <div style={{ position: 'fixed', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '500px', pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse, rgba(139,92,246,0.10) 0%, transparent 70%)' }} />
+      {/* Ambient background — inherited from the landing page (grid + dual purple glow) */}
+      <div className="grid-bg" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, opacity: 0.5, maskImage: 'radial-gradient(ellipse 90% 60% at 50% 0%, #000 30%, transparent 80%)', WebkitMaskImage: 'radial-gradient(ellipse 90% 60% at 50% 0%, #000 30%, transparent 80%)' }} />
+      <div style={{ position: 'fixed', top: '-22%', left: '50%', transform: 'translateX(-50%)', width: '760px', height: '540px', pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(circle, rgba(139,92,246,0.16) 0%, rgba(139,92,246,0.06) 38%, transparent 72%)' }} />
+      <div style={{ position: 'fixed', top: '8%', left: '12%', width: '420px', height: '420px', pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%)' }} />
 
       {/* Top nav */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', background: 'rgba(9,11,17,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
