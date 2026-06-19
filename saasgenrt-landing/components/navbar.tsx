@@ -41,21 +41,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <a href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div
-            className="flex items-center justify-center flex-shrink-0"
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 7,
-              background: 'linear-gradient(135deg, #8B5CF6 0%, #6d28d9 100%)',
-              boxShadow: '0 4px 14px rgba(139,92,246,0.32)',
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M7 1.5L12 4.25V9.75L7 12.5L2 9.75V4.25L7 1.5Z" fill="white" fillOpacity="0.92" />
-              <circle cx="7" cy="7" r="2.2" fill="white" fillOpacity="0.45" />
-            </svg>
-          </div>
+          <img src="/logo.png" alt="SaaSGenrt" style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }} />
           <span className="text-white font-semibold" style={{ fontSize: '15px', letterSpacing: '-0.01em' }}>
             SaaSGenrt
           </span>

@@ -1991,9 +1991,7 @@ export function BuilderClient() {
       {/* Top nav */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', background: 'rgba(9,11,17,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, background: 'linear-gradient(135deg, #8B5CF6, #6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12 4.25V9.75L7 12.5L2 9.75V4.25L7 1.5Z" fill="white" fillOpacity="0.92" /><circle cx="7" cy="7" r="2.2" fill="white" fillOpacity="0.45" /></svg>
-          </div>
+          <img src="/logo.png" alt="SaaSGenrt" style={{ width: 26, height: 26, objectFit: 'contain', flexShrink: 0 }} />
           <span style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>SaaSGenrt</span>
         </a>
         {step >= 1 && step <= 12 && (
