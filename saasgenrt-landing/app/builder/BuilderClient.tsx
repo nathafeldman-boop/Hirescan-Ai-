@@ -641,56 +641,200 @@ function IntroStep({ onStart }: { onStart: () => void }) {
 function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
   userData: UserData; setDomain: (v: string) => void; setDomainChip: (v: string) => void; onNext: () => void; onBack: () => void
 }) {
+  const reduce = useReducedMotion()
   const [focused, setFocused] = useState(false)
   const charCount = userData.domain.length
   const canContinue = userData.domain.trim().length >= 30 || !!userData.domainChip
 
   function handleTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const ta = e.target
-    ta.style.height = 'auto'; ta.style.height = Math.max(180, ta.scrollHeight) + 'px'
+    ta.style.height = 'auto'; ta.style.height = Math.max(148, ta.scrollHeight) + 'px'
     setDomain(e.target.value); if (e.target.value) setDomainChip('')
   }
+
+  const rise = (delay: number) => reduce
+    ? {}
+    : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } }
 
   return (
     <div>
       <ProgressBar current={1} />
-      <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 40, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        {/* ── Left column ── */}
         <div style={{ flex: 1, minWidth: 300 }}>
           <StepBadge n={1} />
-          <StepHeading pre="What recurring problem" accent="do you want to solve?" subtitle="Every successful SaaS starts by solving a real problem. Describe something frustrating that happens repeatedly in your work, studies or everyday life." />
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.22 }}
-            style={{ borderRadius: 18, marginBottom: 18, background: 'rgba(17,24,39,0.7)', border: `1px solid ${focused ? 'rgba(139,92,246,0.48)' : 'rgba(255,255,255,0.09)'}`, boxShadow: focused ? '0 0 0 3px rgba(139,92,246,0.09), 0 4px 24px rgba(0,0,0,0.3)' : '0 4px 24px rgba(0,0,0,0.2)', transition: 'border-color 0.2s, box-shadow 0.2s' }}>
-            <div style={{ padding: '16px 18px 10px' }}>
-              <textarea value={userData.domain} onChange={handleTextChange}
+          <StepHeading
+            pre="What recurring problem"
+            accent="do you want to solve?"
+            subtitle="Describe something frustrating that repeats in your work or daily life — the more specific, the better."
+          />
+
+          {/* Double-bezel textarea */}
+          <motion.div
+            {...rise(0.22)}
+            style={{
+              borderRadius: 22, padding: 5, marginBottom: 20,
+              background: 'rgba(255,255,255,0.025)',
+              border: `1px solid ${focused ? 'rgba(139,92,246,0.42)' : 'rgba(255,255,255,0.06)'}`,
+              boxShadow: focused ? '0 0 0 3px rgba(139,92,246,0.08), 0 8px 32px rgba(0,0,0,0.28)' : '0 4px 20px rgba(0,0,0,0.18)',
+              transition: 'border-color 0.2s, box-shadow 0.25s',
+            }}
+          >
+            <div style={{
+              borderRadius: 17, overflow: 'hidden',
+              background: 'rgba(10,13,20,0.68)',
+              border: `1px solid ${focused ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)'}`,
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+              transition: 'border-color 0.2s',
+            }}>
+              <textarea
+                value={userData.domain}
+                onChange={handleTextChange}
                 onFocus={() => { setFocused(true); if (userData.domainChip) { setDomain(''); setDomainChip('') } }}
-                onBlur={() => setFocused(false)} placeholder="I waste hours every week doing..." maxLength={500}
-                style={{ width: '100%', minHeight: '180px', border: 'none', outline: 'none', background: 'transparent', color: 'white', fontSize: '15px', lineHeight: 1.7, resize: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', padding: 0 }} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 18px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-              <motion.span animate={{ color: charCount >= 30 ? '#39FF88' : 'rgba(255,255,255,0.25)' }} transition={{ duration: 0.3 }} style={{ fontSize: '11.5px' }}>
-                {charCount >= 30 ? '✓ Ready to continue' : charCount > 0 ? `${30 - charCount} more characters needed` : 'Write at least 30 characters'}
-              </motion.span>
-              <span style={{ fontSize: '11.5px', color: charCount > 450 ? '#fbbf24' : 'rgba(255,255,255,0.22)' }}>{charCount} / 500</span>
+                onBlur={() => setFocused(false)}
+                placeholder="e.g. I waste hours every week reconciling invoices manually..."
+                maxLength={500}
+                style={{
+                  width: '100%', minHeight: '148px', border: 'none', outline: 'none',
+                  background: 'transparent', color: 'white', fontSize: '14.5px', lineHeight: 1.72,
+                  resize: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box',
+                  padding: '16px 18px 12px',
+                }}
+              />
+              {/* Footer strip */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '8px 18px 10px', borderTop: '1px solid rgba(255,255,255,0.05)',
+              }}>
+                <motion.span
+                  animate={{ color: charCount >= 30 ? '#39FF88' : 'rgba(255,255,255,0.28)' }}
+                  transition={{ duration: 0.3 }}
+                  style={{ fontSize: '11.5px', display: 'flex', alignItems: 'center', gap: 5 }}
+                >
+                  <AnimatePresence mode="wait">
+                    {charCount >= 30 && (
+                      <motion.span key="check"
+                        initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 380, damping: 20 }}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                      >
+                        <Check style={{ width: 10, height: 10 }} strokeWidth={3} />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                  {charCount >= 30 ? 'Ready to continue' : charCount > 0 ? `${30 - charCount} more characters` : 'Write at least 30 characters'}
+                </motion.span>
+                <span style={{ fontSize: '11px', color: charCount > 450 ? '#fbbf24' : 'rgba(255,255,255,0.2)' }}>
+                  {charCount} / 500
+                </span>
+              </div>
             </div>
           </motion.div>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.3 }} style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 700, letterSpacing: '0.07em', marginBottom: 10 }}>OR PICK A DOMAIN</div>
+
+          {/* Domain chips — with centered divider */}
+          <motion.div {...rise(0.3)} style={{ marginBottom: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.26)', fontWeight: 600, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                or pick a domain
+              </span>
+              <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+            </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-              {DOMAIN_CHIPS.map((chip) => (
-                <motion.button key={chip} whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}
+              {DOMAIN_CHIPS.map((chip, i) => (
+                <motion.button
+                  key={chip}
+                  initial={reduce ? false : { opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.26, delay: 0.32 + i * 0.028, ease: EASE }}
+                  whileHover={reduce ? undefined : { scale: 1.04, y: -1 }}
+                  whileTap={reduce ? undefined : { scale: 0.96 }}
                   onClick={() => { setDomainChip(chip === userData.domainChip ? '' : chip); setDomain('') }}
-                  style={{ padding: '7px 14px', borderRadius: 99, fontSize: '12.5px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', background: userData.domainChip === chip ? 'rgba(139,92,246,0.22)' : 'rgba(255,255,255,0.05)', border: `1px solid ${userData.domainChip === chip ? 'rgba(139,92,246,0.55)' : 'rgba(255,255,255,0.09)'}`, color: userData.domainChip === chip ? '#c4b5fd' : 'rgba(255,255,255,0.55)', transition: 'background 0.15s, border-color 0.15s, color 0.15s' }}>
+                  style={{
+                    padding: '6px 13px', borderRadius: 99, fontSize: '12px', fontWeight: 500,
+                    cursor: 'pointer', fontFamily: 'inherit',
+                    background: userData.domainChip === chip ? 'rgba(139,92,246,0.22)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${userData.domainChip === chip ? 'rgba(139,92,246,0.52)' : 'rgba(255,255,255,0.08)'}`,
+                    color: userData.domainChip === chip ? '#c4b5fd' : 'rgba(255,255,255,0.5)',
+                    transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+                    boxShadow: userData.domainChip === chip ? '0 0 10px rgba(139,92,246,0.18)' : 'none',
+                  }}
+                >
                   {chip}
                 </motion.button>
               ))}
             </div>
           </motion.div>
+
           <StepNav onBack={onBack} onNext={onNext} disabled={!canContinue} />
         </div>
-        <div style={{ width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+        {/* ── Right column ── */}
+        <div style={{ width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <StickyWallIllustration />
-          <AIHelperCard onUseExample={(t) => { setDomain(t); setDomainChip('') }} />
+
+          {/* Premium inspiration card — double-bezel */}
+          <motion.div
+            {...rise(0.36)}
+            style={{
+              borderRadius: 20, padding: 4,
+              background: 'rgba(255,255,255,0.025)',
+              border: '1px solid rgba(139,92,246,0.18)',
+            }}
+          >
+            <div style={{
+              borderRadius: 16, padding: '15px 14px',
+              background: 'rgba(10,13,20,0.72)',
+              border: '1px solid rgba(139,92,246,0.1)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                  background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.28)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Sparkles style={{ width: 13, height: 13, color: '#a78bfa' }} strokeWidth={2} />
+                </div>
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>Need inspiration?</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {AI_EXAMPLES.map((ex, i) => (
+                  <motion.button
+                    key={i}
+                    whileHover={reduce ? undefined : { x: 3 }}
+                    transition={{ duration: 0.16, ease: EASE }}
+                    onClick={() => { setDomain(ex); setDomainChip('') }}
+                    style={{
+                      padding: '9px 11px', borderRadius: 9, textAlign: 'left', cursor: 'pointer',
+                      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                      fontSize: '11.5px', color: 'rgba(255,255,255,0.46)', lineHeight: 1.55,
+                      transition: 'background 0.14s, border-color 0.14s, color 0.14s',
+                      fontFamily: 'inherit', display: 'flex', alignItems: 'flex-start', gap: 7,
+                    }}
+                    onMouseEnter={(e) => {
+                      const el = e.currentTarget as HTMLElement
+                      el.style.background = 'rgba(139,92,246,0.09)'
+                      el.style.borderColor = 'rgba(139,92,246,0.24)'
+                      el.style.color = 'rgba(255,255,255,0.74)'
+                    }}
+                    onMouseLeave={(e) => {
+                      const el = e.currentTarget as HTMLElement
+                      el.style.background = 'rgba(255,255,255,0.03)'
+                      el.style.borderColor = 'rgba(255,255,255,0.06)'
+                      el.style.color = 'rgba(255,255,255,0.46)'
+                    }}
+                  >
+                    <ArrowRight style={{ width: 10, height: 10, flexShrink: 0, marginTop: 2, color: 'rgba(139,92,246,0.55)' }} strokeWidth={2.5} />
+                    <span>&quot;{ex}&quot;</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
+
       </div>
     </div>
   )
