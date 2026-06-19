@@ -31,7 +31,9 @@ jobs:
 
           cd saasgenrt-landing
           npm install --legacy-peer-deps
-          URL=$(npx vercel deploy --prod --yes --token "$K" --scope "$T" 2>&1 | tail -1)
+          VERCEL_OUT=$(npx vercel deploy --prod --yes --token "$K" --scope "$T" 2>&1)
+          echo "$VERCEL_OUT"
+          URL=$(echo "$VERCEL_OUT" | grep -oE 'https://[^ ]+\.vercel\.app' | tail -1)
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed to: $URL"
 
