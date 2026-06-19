@@ -3,1369 +3,828 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SaaSGenrt — Trouve ton idée SaaS</title>
+<title>SaaSGenrt — Profitable SaaS Ideas. Build MRR.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Cormorant+Garamond:wght@400;500;600&display=swap">
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        display: ['Cormorant Garamond', 'Georgia', 'serif'],
-      },
-      colors: {
-        ink:     '#08080c',
-        surface: '#0e0e14',
-        card:    '#13131a',
-      },
-    }
-  }
-}
-</script>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--bg1:#0d0d1c;--bg2:#111124;--bg3:#15152a;
+  --c1:rgba(255,255,255,.032);--cb:rgba(255,255,255,.07);--cbh:rgba(124,58,237,.4);
+  --p:#7c3aed;--pl:#a78bfa;--pd:#6d28d9;
+  --g:#059669;--gl:#34d399;--b:#2563eb;--bl:#93c5fd;
+  --t1:#f8fafc;--t2:#94a3b8;--t3:#475569;--t4:#1e293b;
+  --r:#e11d48;--rl:#fda4af;--y:#d97706;--yl:#fcd34d;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:4px}
+::selection{background:rgba(124,58,237,.3);color:#fff}
 
-/* ── Router ──────────────────────────────────── */
-.spa-page { display: none !important; }
-.spa-page.active { display: block !important; }
-#page-quiz.active { display: flex !important; flex-direction: column; min-height: 100vh; }
-#page-analyzing.active { display: flex !important; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+/* SPA */
+.pg{display:none!important}
+.pg.on{display:block!important}
+#p-step1.on,#p-step2.on,#p-analyzing.on,#p-paywall.on{display:flex!important;flex-direction:column;min-height:100vh}
+#p-dash.on,#p-detail.on,#p-growth.on,#p-integrations.on,#p-problems.on{display:flex!important;min-height:100vh}
 
-/* ── Glass card ──────────────────────────────── */
-.glass {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
+/* Glass */
+.g1{background:var(--c1);border:1px solid var(--cb);border-radius:14px;backdrop-filter:blur(20px)}
+.gcard{background:var(--c1);border:1px solid var(--cb);border-radius:14px;transition:border-color .2s,transform .18s,box-shadow .2s}
+.gcard:hover{border-color:rgba(124,58,237,.35);transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,58,237,.1)}
 
-/* ── Gradient text ───────────────────────────── */
-.text-eg {
-  background: linear-gradient(135deg,#34d399,#14b8a6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.text-vg {
-  background: linear-gradient(135deg,#a78bfa,#818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* Gradient text */
+.grt{background:linear-gradient(130deg,#fff 0%,#c4b5fd 30%,#818cf8 60%,#34d399 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grg{background:linear-gradient(130deg,#059669,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-/* ── Buttons ─────────────────────────────────── */
-.btn-primary {
-  background: linear-gradient(135deg,#5b5ef8,#7c3aed);
-  color: #fff;
-  font-weight: 600;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all .2s ease;
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(91,94,248,.4); }
-.btn-primary:active { transform: translateY(0); }
-.btn-outline {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,.12);
-  color: #fff;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: border-color .2s;
-  font-weight: 500;
-}
-.btn-outline:hover { border-color: rgba(255,255,255,.3); }
+h1,h2,h3,h4,h5{line-height:1.15;letter-spacing:-.025em}
 
-/* ── Progress bar ────────────────────────────── */
-.progress-emerald {
-  background: linear-gradient(90deg,#34d399,#14b8a6);
-  box-shadow: 0 0 20px rgba(52,211,153,.3);
-  transition: width .5s ease;
-  border-radius: 99px;
-}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:9px;font-weight:600;font-size:13.5px;cursor:pointer;border:none;transition:all .18s;text-decoration:none;white-space:nowrap;font-family:inherit;letter-spacing:-.01em}
+.btn-p{background:linear-gradient(135deg,var(--pd),var(--p));color:#fff}
+.btn-p:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 8px 28px rgba(124,58,237,.4)}
+.btn-g{background:linear-gradient(135deg,var(--g),#10b981);color:#fff}
+.btn-g:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 8px 28px rgba(16,185,129,.35)}
+.btn-o{background:transparent;color:var(--t2);border:1px solid var(--cb)}
+.btn-o:hover{background:var(--c1);color:var(--t1);border-color:rgba(124,58,237,.35)}
+.btn-lg{padding:13px 28px;font-size:15px;border-radius:11px}
+.btn-sm{padding:6px 13px;font-size:12px;border-radius:7px}
+.btn-w{width:100%;justify-content:center}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 
-/* ── Tag pill ────────────────────────────────── */
-.tag {
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 99px;
-  font-size: 11px;
-  padding: 2px 8px;
-  color: #9ca3af;
-}
+/* Inputs */
+.inp{width:100%;background:rgba(255,255,255,.035);border:1px solid var(--cb);border-radius:9px;padding:11px 15px;color:var(--t1);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.inp:focus{border-color:rgba(124,58,237,.55);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+.inp::placeholder{color:var(--t3)}
+textarea.inp{resize:vertical;line-height:1.65;min-height:110px}
+select.inp{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%2394a3b8' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.lbl{font-size:11.5px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;display:block}
 
-/* ── Orb ─────────────────────────────────────── */
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
-}
+/* Chips */
+.chip{padding:7px 15px;border-radius:7px;border:1px solid var(--cb);font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;background:var(--c1);user-select:none}
+.chip:hover{border-color:rgba(124,58,237,.4);color:var(--t1)}
+.chip.on{background:rgba(124,58,237,.14);border-color:rgba(124,58,237,.55);color:var(--pl)}
 
-/* ── Quiz option cards ───────────────────────── */
-.opt-card {
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 16px;
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: all .18s ease;
-  user-select: none;
-}
-.opt-card:hover { border-color: rgba(167,139,250,.4); background: rgba(167,139,250,.07); transform: translateY(-1px); }
-.opt-card.selected { border-color: #a78bfa; background: rgba(167,139,250,.12); }
+/* Badges */
+.bdg{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.bdg-p{background:rgba(124,58,237,.14);color:var(--pl);border:1px solid rgba(124,58,237,.22)}
+.bdg-g{background:rgba(5,150,105,.14);color:var(--gl);border:1px solid rgba(5,150,105,.22)}
+.bdg-b{background:rgba(37,99,235,.14);color:var(--bl);border:1px solid rgba(37,99,235,.22)}
+.bdg-y{background:rgba(217,119,6,.14);color:var(--yl);border:1px solid rgba(217,119,6,.22)}
+.bdg-r{background:rgba(225,29,72,.14);color:var(--rl);border:1px solid rgba(225,29,72,.22)}
 
-/* ── Intel overlay ───────────────────────────── */
-.intel-overlay {
-  position: fixed; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(8,8,12,.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 200;
-  opacity: 0; pointer-events: none;
-  transition: opacity .3s ease;
-}
-.intel-overlay.show { opacity: 1; pointer-events: auto; }
+/* Progress bar */
+.pb{height:4px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden}
+.pbf{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.pb-p{background:linear-gradient(90deg,var(--pd),var(--pl))}
+.pb-g{background:linear-gradient(90deg,var(--g),var(--gl))}
+.pb-b{background:linear-gradient(90deg,var(--b),var(--bl))}
 
-/* ── Idea card ───────────────────────────────── */
-.idea-card {
-  cursor: pointer;
-  transition: transform .18s ease, border-color .18s ease;
-}
-.idea-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,.3) !important; }
+/* Table */
+.twrap{border-radius:11px;border:1px solid var(--cb);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:rgba(255,255,255,.025)}
+th{padding:9px 14px;text-align:left;font-weight:600;color:var(--t3);font-size:11px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--cb);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.032);color:var(--t1);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{cursor:pointer;transition:background .12s}
+tbody tr:hover{background:rgba(255,255,255,.022)}
 
-/* ── Checklist ───────────────────────────────── */
-.check-item { cursor: pointer; transition: all .15s ease; }
-.check-box {
-  width: 20px; height: 20px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,.2);
-  flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .15s ease;
-}
-.check-item.done .check-box { background: #34d399; border-color: #34d399; }
-.check-item.done .check-label { text-decoration: line-through; opacity: .45; }
+/* Stat card */
+.sc{padding:18px 20px}
+.sc-lbl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.sc-val{font-size:24px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.sc-ch{font-size:11.5px;font-weight:500;margin-top:5px}
+.up{color:var(--gl)}.dn{color:var(--rl)}.mu{color:var(--t3)}
 
-/* ── Animations ──────────────────────────────── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.fade-up { animation: fadeUp .38s ease forwards; }
+/* Score */
+.score{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.sh{background:rgba(5,150,105,.13);color:var(--gl);border:1px solid rgba(5,150,105,.22)}
+.sm{background:rgba(217,119,6,.13);color:var(--yl);border:1px solid rgba(217,119,6,.22)}
+.sl{background:rgba(225,29,72,.13);color:var(--rl);border:1px solid rgba(225,29,72,.22)}
 
-@keyframes pulse-dot {
-  0%,100% { opacity: 1; }
-  50%      { opacity: .25; }
-}
-.pulse { animation: pulse-dot 2s infinite; }
+/* Sidebar */
+.sb{width:210px;flex-shrink:0;background:var(--bg1);border-right:1px solid var(--cb);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-logo{padding:18px 16px 16px;border-bottom:1px solid var(--cb)}
+.sb-body{padding:10px 8px;flex:1}
+.sb-sec{font-size:10.5px;font-weight:700;color:var(--t4);letter-spacing:.08em;text-transform:uppercase;padding:14px 10px 4px}
+.nv{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.nv:hover{background:rgba(255,255,255,.038);color:var(--t1)}
+.nv.on{background:rgba(124,58,237,.12);color:var(--pl)}
+.nv svg{flex-shrink:0;opacity:.6;transition:opacity .15s}
+.nv.on svg,.nv:hover svg{opacity:1}
+.sb-foot{padding:10px 8px;border-top:1px solid var(--cb)}
 
-/* ── Scrollbar ───────────────────────────────── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+/* Main layout */
+.mc{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:100vh}
+.tbar{padding:13px 22px;border-bottom:1px solid var(--cb);display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,15,.9);backdrop-filter:blur(16px);position:sticky;top:0;z-index:20;flex-shrink:0}
+.ca{padding:22px;flex:1}
 
-/* ── Responsive ──────────────────────────────── */
-@media (max-width: 640px) {
-  nav > div { padding: 0 12px !important; }
-  .btn-primary, .btn-outline { padding: 10px 18px !important; font-size: 14px !important; }
-  section { padding-left: 14px !important; padding-right: 14px !important; }
-  .pay-modal .modal-box { padding: 24px 18px !important; }
-  #quiz-step-container { padding: 80px 14px 24px !important; }
-}
-@media (max-width: 480px) {
-  h1 { font-size: clamp(34px,9vw,52px) !important; }
-  h2 { font-size: clamp(22px,6vw,32px) !important; }
-  .glass { padding: 16px !important; }
-  .ai-card { padding: 16px !important; }
-  .opt-card { padding: 12px 14px !important; }
-}
+/* Step tracker */
+.stk{display:flex;align-items:center;gap:0;margin-bottom:36px}
+.sn{display:flex;flex-direction:column;align-items:center;gap:5px}
+.sc2{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;border:2px solid var(--t3);color:var(--t3);transition:all .3s}
+.sc2.act{border-color:var(--p);color:var(--pl);background:rgba(124,58,237,.12)}
+.sc2.done{border-color:var(--g);color:var(--gl);background:rgba(5,150,105,.1)}
+.sl2{height:2px;width:56px;background:var(--cb);margin:0 6px;margin-bottom:22px;transition:background .3s}
+.sl2.done{background:var(--g)}
+.slbl{font-size:11px;color:var(--t3);font-weight:500;transition:color .3s}
+.slbl.act{color:var(--pl)}.slbl.done{color:var(--gl)}
 
-/* ── Potential badges ────────────────────────── */
-.badge-low      { background:rgba(107,114,128,.18); color:#9ca3af; border:1px solid rgba(107,114,128,.3); }
-.badge-medium   { background:rgba(59,130,246,.14);  color:#93c5fd; border:1px solid rgba(59,130,246,.25); }
-.badge-high     { background:rgba(52,211,153,.14);  color:#6ee7b7; border:1px solid rgba(52,211,153,.25); }
-.badge-very_high{ background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(245,158,11,.18)); color:#fbbf24; border:1px solid rgba(245,158,11,.3); }
+/* Landing nav */
+.lnav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.046);background:rgba(8,8,15,.82);backdrop-filter:blur(24px)}
+.logo{font-size:16px;font-weight:800;letter-spacing:-.03em;cursor:pointer}
 
-/* ── AI idea card ────────────────────────────── */
-.ai-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 20px;
-  padding: 20px;
-  cursor: pointer;
-  transition: all .2s ease;
-  position: relative;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(14px);
-}
-.ai-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg,transparent,rgba(167,139,250,.5),transparent);
-  opacity: 0; transition: opacity .2s;
-}
-.ai-card:hover { transform: translateY(-2px) !important; border-color: rgba(167,139,250,.3); }
-.ai-card:hover::before { opacity: 1; }
-.ai-card.locked { pointer-events: none; user-select: none; }
+/* Hero glow */
+.hglow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:1000px;height:680px;background:radial-gradient(ellipse at center,rgba(109,40,217,.11) 0%,rgba(37,99,235,.05) 45%,transparent 70%);pointer-events:none;z-index:0}
 
-/* ── Idea number badge ───────────────────────── */
-.idea-num {
-  width: 26px; height: 26px;
-  border-radius: 8px;
-  background: rgba(255,255,255,.06);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600; color: #9ca3af; flex-shrink: 0;
-}
+/* Analyzing */
+.orb{width:68px;height:68px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(167,139,250,.9),rgba(124,58,237,.75));box-shadow:0 0 50px rgba(124,58,237,.45);animation:opulse 2s ease-in-out infinite;position:relative;z-index:1;display:flex;align-items:center;justify-content:center}
+@keyframes opulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.ring{position:absolute;width:68px;height:68px;border-radius:50%;border:1.5px solid rgba(124,58,237,.28);animation:ringout 2.2s ease-out infinite}
+.ring:nth-child(2){animation-delay:.6s}.ring:nth-child(3){animation-delay:1.2s}
+@keyframes ringout{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.2);opacity:0}}
+.an-row{display:flex;align-items:center;gap:11px;padding:9px 0;font-size:13px;color:var(--t3);transition:color .3s}
+.an-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .3s,box-shadow .3s}
+.an-row.act{color:var(--t1)}.an-row.act .an-dot{background:var(--pl);box-shadow:0 0 8px rgba(167,139,250,.6)}
+.an-row.done{color:var(--gl)}.an-row.done .an-dot{background:var(--gl)}
 
-/* ── Payment modal ───────────────────────────── */
-.pay-modal {
-  position: fixed; inset: 0; z-index: 300;
-  background: rgba(8,8,12,.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none;
-  transition: opacity .3s ease;
-}
-.pay-modal.show { opacity: 1; pointer-events: auto; }
-.pay-modal .modal-box {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.1);
-  backdrop-filter: blur(24px);
-  border-radius: 24px;
-  padding: 32px 28px;
-  width: calc(100% - 32px);
-  max-width: 380px;
-  position: relative;
-}
-.pay-input {
-  width: 100%;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 10px;
-  padding: 12px 14px;
-  color: #fff;
-  font-size: 14px;
-  font-family: 'DM Sans',sans-serif;
-  outline: none;
-  transition: border-color .2s;
-}
-.pay-input:focus { border-color: rgba(167,139,250,.5); }
-.pay-input::placeholder { color: #4b5563; }
+/* Spinner */
+.spin{width:15px;height:15px;border:2px solid rgba(124,58,237,.2);border-top-color:var(--pl);border-radius:50%;animation:sp .65s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
 
-/* ── Toast ───────────────────────────────────── */
-#toast {
-  position: fixed; bottom: 24px;
-  left: 50%; transform: translateX(-50%) translateY(16px);
-  background: rgba(52,211,153,.15);
-  border: 1px solid rgba(52,211,153,.3);
-  color: #6ee7b7;
-  padding: 11px 20px;
-  border-radius: 99px;
-  font-size: 13px; font-weight: 500;
-  opacity: 0;
-  transition: all .3s ease;
-  z-index: 500; pointer-events: none;
-  white-space: nowrap;
-}
+/* Skeleton */
+.skel{background:linear-gradient(90deg,rgba(255,255,255,.038) 25%,rgba(255,255,255,.065) 50%,rgba(255,255,255,.038) 75%);background-size:200% 100%;animation:shim 1.6s infinite;border-radius:5px}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Toast */
+#toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;pointer-events:none;display:flex;flex-direction:column;gap:8px}
+.ti{background:var(--bg2);border:1px solid var(--cb);border-radius:9px;padding:10px 15px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;animation:tin .22s ease;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.ti.ok{border-color:rgba(5,150,105,.3);color:var(--gl)}
+.ti.er{border-color:rgba(225,29,72,.3);color:var(--rl)}
+@keyframes tin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Divider */
+.div{height:1px;background:var(--cb);margin:20px 0}
+
+/* Chart SVG */
+.csv{display:block;width:100%}
+
+/* Responsive */
+@media(max-width:768px){.sb{display:none}.lnav{padding:0 14px}.ca{padding:14px}.hglow{display:none}}
+@media(max-width:480px){h1{font-size:clamp(36px,10vw,56px)!important}}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════
-     PAGE: INDEX
-════════════════════════════════════════ -->
-<div id="page-index" class="spa-page active">
-
-  <!-- Navbar -->
-  <nav style="position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(8,8,12,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);">
-    <div style="max-width:1080px;margin:0 auto;padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5b5ef8,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">M</div>
-        <span style="font-weight:600;font-size:15px;">SaaSGenrt</span>
-      </div>
-      <button class="btn-primary" style="padding:8px 18px;font-size:13px;" onclick="nav.go('quiz')">Commencer gratuitement →</button>
+<!-- ══════ PAGE 1: LANDING ══════ -->
+<div id="p-index" class="pg on">
+  <nav class="lnav">
+    <div class="logo" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn btn-o btn-sm" onclick="R.go('dash')">Démo →</button>
+      <button class="btn btn-p btn-sm" onclick="R.go('step1')">Commencer</button>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <section style="position:relative;padding:120px 16px 80px;overflow:hidden;min-height:100vh;display:flex;align-items:center;">
-    <div class="orb" style="width:500px;height:500px;background:rgba(91,94,248,.15);top:-100px;left:-120px;"></div>
-    <div class="orb" style="width:400px;height:400px;background:rgba(52,211,153,.1);top:60px;right:-80px;"></div>
-    <div style="max-width:860px;margin:0 auto;text-align:center;position:relative;z-index:1;width:100%;">
-      <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:99px;padding:6px 14px;font-size:12px;color:#c4b5fd;margin-bottom:28px;font-weight:500;">
-        <span class="pulse" style="width:7px;height:7px;border-radius:50%;background:#34d399;display:inline-block;"></span>
-        Matcheur d'idées SaaS par IA — 100% gratuit
+  <div style="position:relative;overflow:hidden;padding-top:60px">
+    <div class="hglow"></div>
+    <section style="max-width:880px;margin:0 auto;padding:88px 32px 56px;text-align:center;position:relative;z-index:1">
+      <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:99px;border:1px solid rgba(124,58,237,.28);background:rgba(124,58,237,.07);margin-bottom:26px">
+        <span style="width:5px;height:5px;border-radius:50%;background:var(--gl);box-shadow:0 0 8px rgba(52,211,153,.7);flex-shrink:0"></span>
+        <span style="font-size:11.5px;font-weight:600;color:var(--pl)">IA générative · Mistral · 2 847 fondateurs actifs</span>
       </div>
-
-      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(42px,8vw,82px);font-weight:500;line-height:1.08;margin-bottom:22px;letter-spacing:-1px;">
-        Trouve ton<br>
-        <span class="text-eg">idée SaaS à 5k€/mois</span><br>
-        en 60 secondes.
+      <h1 style="font-size:clamp(44px,7.5vw,82px);font-weight:900;line-height:1.02;margin-bottom:22px">
+        <span class="grt">Profitable SaaS Ideas.</span><br><span style="color:var(--t1)">Build MRR.</span>
       </h1>
-
-      <p style="font-size:17px;color:#9ca3af;max-width:500px;margin:0 auto 36px;line-height:1.7;">
-        Réponds à 5 questions. Notre IA évalue 20 idées micro-SaaS validées selon tes compétences, objectifs et la demande du marché.
+      <p style="font-size:16px;color:var(--t2);max-width:500px;margin:0 auto 36px;line-height:1.7">
+        Décris ton problème. Notre IA génère 10 idées SaaS personnalisées avec MRR potentiel, blueprint et roadmap complète.
       </p>
-
-      <button class="btn-primary" style="font-size:17px;padding:16px 36px;" onclick="nav.go('quiz')">
-        Découvrir mon idée →
-      </button>
-      <p style="font-size:12px;color:#4b5563;margin-top:12px;">Sans e-mail · 60 secondes · Gratuit à vie</p>
-
-      <!-- Stats -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:560px;margin:56px auto 0;">
-        <div class="glass" style="border-radius:20px;padding:18px 12px;text-align:center;">
-          <div class="text-eg" style="font-size:26px;font-weight:700;" id="stat-ideas">20</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Idées validées</div>
-        </div>
-        <div class="glass" style="border-radius:20px;padding:18px 12px;text-align:center;">
-          <div class="text-eg" style="font-size:26px;font-weight:700;">4 200+</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Créateurs matchés</div>
-        </div>
-        <div class="glass" style="border-radius:20px;padding:18px 12px;text-align:center;">
-          <div class="text-eg" style="font-size:26px;font-weight:700;">5k€</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">MRR cible moyen</div>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-g btn-lg" onclick="R.go('step1')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Démarrer l'analyse gratuite
+        </button>
+        <button class="btn btn-o btn-lg" onclick="R.go('dash')">Voir un exemple →</button>
       </div>
-    </div>
-  </section>
-
-  <!-- How it works -->
-  <section style="padding:80px 16px;background:rgba(14,14,20,.6);">
-    <div style="max-width:1000px;margin:0 auto;">
-      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Processus</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">Comment fonctionne SaaSGenrt</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
-        <div class="glass" style="border-radius:20px;padding:24px;">
-          <div style="width:40px;height:40px;border-radius:12px;background:rgba(91,94,248,.15);display:flex;align-items:center;justify-content:center;font-weight:700;color:#818cf8;margin-bottom:14px;">1</div>
-          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">Réponds à 5 questions</h3>
-          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Dis-nous tes compétences, ton temps disponible, ton objectif de revenus et ton modèle préféré.</p>
-        </div>
-        <div class="glass" style="border-radius:20px;padding:24px;">
-          <div style="width:40px;height:40px;border-radius:12px;background:rgba(52,211,153,.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#34d399;margin-bottom:14px;">2</div>
-          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">L'IA évalue 20 idées</h3>
-          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Notre algorithme score chaque idée selon ton profil, la demande du marché et la concurrence.</p>
-        </div>
-        <div class="glass" style="border-radius:20px;padding:24px;">
-          <div style="width:40px;height:40px;border-radius:12px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#60a5fa;margin-bottom:14px;">3</div>
-          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">Reçois ton blueprint</h3>
-          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Débloque le plan d'exécution complet : stack, pricing, roadmap 90 jours, checklist de lancement.</p>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:36px;margin-top:52px;flex-wrap:wrap">
+        <div style="text-align:center"><div style="font-size:26px;font-weight:900;letter-spacing:-.04em" class="grg">2 847</div><div style="font-size:11.5px;color:var(--t3);margin-top:2px">fondateurs actifs</div></div>
+        <div style="width:1px;height:28px;background:var(--cb)"></div>
+        <div style="text-align:center"><div style="font-size:26px;font-weight:900;letter-spacing:-.04em">94%</div><div style="font-size:11.5px;color:var(--t3);margin-top:2px">satisfaction</div></div>
+        <div style="width:1px;height:28px;background:var(--cb)"></div>
+        <div style="text-align:center"><div style="font-size:26px;font-weight:900;letter-spacing:-.04em">12 min</div><div style="font-size:11.5px;color:var(--t3);margin-top:2px">temps moyen</div></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Testimonials -->
-  <section style="padding:80px 16px;">
-    <div style="max-width:1000px;margin:0 auto;">
-      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Témoignages</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">De 0 à MRR</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
-        <div class="glass" style="border-radius:20px;padding:22px;">
-          <div style="color:#fbbf24;font-size:13px;margin-bottom:10px;">★★★★★</div>
-          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">« SaaSGenrt m'a matché avec l'idée email warm-up. 4 mois plus tard je suis à 3 200€/mois. »</p>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:32px;height:32px;border-radius:50%;background:rgba(167,139,250,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#c4b5fd;">AK</div>
-            <div><div style="font-size:12px;font-weight:500;">Alex K.</div><div style="font-size:11px;color:#6b7280;">Indie hacker · 3 200€/mois</div></div>
+    <section style="max-width:840px;margin:0 auto;padding:0 32px 80px;position:relative;z-index:1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:680px;margin:0 auto 52px">
+        <div class="gcard" style="padding:18px;cursor:pointer" onclick="R.go('step1')">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:11px">
+            <div style="font-size:14px;font-weight:700">AI Content Repurposer</div><span class="bdg bdg-g">B2B SaaS</span>
           </div>
-        </div>
-        <div class="glass" style="border-radius:20px;padding:22px;">
-          <div style="color:#fbbf24;font-size:13px;margin-bottom:10px;">★★★★★</div>
-          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">« Le quiz a pris 2 minutes. L'idée trouvée correspondait parfaitement à mes compétences React. »</p>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:32px;height:32px;border-radius:50%;background:rgba(52,211,153,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#6ee7b7;">MR</div>
-            <div><div style="font-size:12px;font-weight:500;">Marie R.</div><div style="font-size:11px;color:#6b7280;">Dev full-stack · 1 800€/mois</div></div>
+          <p style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:14px">Transforme tes posts LinkedIn en threads Twitter, newsletters et scripts vidéo en 1 clic.</p>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end">
+            <div><div style="font-size:10px;color:var(--t3);margin-bottom:2px">MRR POTENTIEL</div><div style="font-size:16px;font-weight:800;color:var(--gl)">€8 200/mo</div></div>
+            <div style="text-align:right"><div style="font-size:10px;color:var(--t3);margin-bottom:2px">SCORE</div><div style="font-size:16px;font-weight:800;color:var(--pl)">92</div></div>
           </div>
+          <div class="pb" style="margin-top:10px"><div class="pbf pb-g" style="width:92%"></div></div>
         </div>
-        <div class="glass" style="border-radius:20px;padding:22px;">
-          <div style="color:#fbbf24;font-size:13px;margin-bottom:10px;">★★★★★</div>
-          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">« Le blueprint m'a économisé des mois de recherche. Stack, pricing, acquisition — tout était planifié. »</p>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#93c5fd;">JL</div>
-            <div><div style="font-size:12px;font-weight:500;">James L.</div><div style="font-size:11px;color:#6b7280;">Builder no-code · 5 400€/mois</div></div>
+        <div class="gcard" style="padding:18px;cursor:pointer" onclick="R.go('step1')">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:11px">
+            <div style="font-size:14px;font-weight:700">Invoice Automation</div><span class="bdg bdg-p">Dev Tools</span>
           </div>
+          <p style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:14px">API de facturation récurrente pour freelances. Relances auto + intégration Stripe native.</p>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end">
+            <div><div style="font-size:10px;color:var(--t3);margin-bottom:2px">MRR POTENTIEL</div><div style="font-size:16px;font-weight:800;color:var(--gl)">€12 400/mo</div></div>
+            <div style="text-align:right"><div style="font-size:10px;color:var(--t3);margin-bottom:2px">SCORE</div><div style="font-size:16px;font-weight:800;color:var(--pl)">87</div></div>
+          </div>
+          <div class="pb" style="margin-top:10px"><div class="pbf pb-p" style="width:87%"></div></div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Pricing -->
-  <section style="padding:80px 16px;background:rgba(14,14,20,.5);">
-    <div style="max-width:720px;margin:0 auto;">
-      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Tarifs</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">Simple et transparent</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
-        <div class="glass" style="border-radius:22px;padding:28px;">
-          <div style="font-size:12px;font-weight:600;color:#9ca3af;margin-bottom:8px;">Gratuit</div>
-          <div style="font-size:40px;font-weight:700;margin-bottom:4px;">0€</div>
-          <p style="font-size:13px;color:#9ca3af;margin-bottom:22px;">Vois tes 3 meilleures idées et ton archétype.</p>
-          <ul style="list-style:none;space-y:6px;margin-bottom:24px;">
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Quiz 5 questions</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Top 3 idées matchées</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Fourchette MRR potentiel</li>
-            <li style="font-size:13px;color:#4b5563;display:flex;gap:8px;margin-bottom:7px;"><span>✗</span> Blueprint complet</li>
-            <li style="font-size:13px;color:#4b5563;display:flex;gap:8px;"><span>✗</span> Roadmap 90 jours</li>
-          </ul>
-          <button class="btn-outline" style="width:100%;padding:12px;font-size:13px;" onclick="nav.go('quiz')">Commencer gratuitement →</button>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div class="gcard" style="padding:22px 18px;text-align:center">
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--pl)" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">10 Idées IA</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.55">Générées par Mistral en fonction de ton profil exact.</div>
         </div>
-        <div class="glass" style="border-radius:22px;padding:28px;border-color:rgba(167,139,250,.3)!important;position:relative;">
-          <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#7c3aed,#5b5ef8);color:#fff;font-size:11px;font-weight:600;padding:4px 14px;border-radius:99px;">Le plus populaire</div>
-          <div style="font-size:12px;font-weight:600;color:#c4b5fd;margin-bottom:8px;">Premium</div>
-          <div style="font-size:40px;font-weight:700;margin-bottom:4px;">20€ <span style="font-size:16px;color:#9ca3af;font-weight:400;">unique</span></div>
-          <p style="font-size:13px;color:#9ca3af;margin-bottom:22px;">Blueprint complet pour une idée, à vie.</p>
-          <ul style="list-style:none;margin-bottom:24px;">
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Tout ce qui est gratuit</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Blueprint d'exécution complet</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Guide tech stack</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Roadmap 90 jours</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;"><span style="color:#34d399;">✓</span> Dashboard de lancement</li>
-          </ul>
-          <button class="btn-primary" style="width:100%;padding:12px;font-size:13px;justify-content:center;" onclick="nav.go('quiz')">Débloquer le Blueprint →</button>
+        <div class="gcard" style="padding:22px 18px;text-align:center">
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gl)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">Score Faisabilité</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.55">Chaque idée notée sur 100 : CAC, LTV, difficulté.</div>
+        </div>
+        <div class="gcard" style="padding:22px 18px;text-align:center">
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--bl)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">Blueprint 90j</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.55">Roadmap MVP + acquisition + intégrations recommandées.</div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section style="padding:80px 16px;">
-    <div style="max-width:640px;margin:0 auto;">
-      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">FAQ</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:40px;">Questions fréquentes</h2>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Comment fonctionne le scoring ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">On score 20 idées sur 8 critères : alignement compétences, taille de marché, concurrence, monétisation, temps de mise sur le marché, archétype, tendance et complexité. Chaque idée reçoit un score composite de 0 à 99.</div>
-        </div>
-        <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Que veut dire « paiement unique » ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Tu paies une seule fois et accèdes au blueprint complet en permanence. Pas d'abonnement, pas de frais récurrents.</div>
-        </div>
-        <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Ce sont de vraies opportunités ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Oui. Chaque idée est validée avec des données de revenus concurrents, des tendances de volume de recherche et des signaux de demande issus des communautés de développeurs et Product Hunt.</div>
-        </div>
-        <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Puis-je refaire le quiz ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Oui, autant de fois que tu veux. Les résultats sont sauvegardés localement pour comparer différents profils.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer CTA -->
-  <section style="padding:80px 16px;text-align:center;">
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,52px);font-weight:500;margin-bottom:12px;">Ton idée à 5k€/mois t'attend.</h2>
-    <p style="font-size:15px;color:#9ca3af;margin-bottom:32px;">60 secondes pour la trouver.</p>
-    <button class="btn-primary" style="font-size:17px;padding:16px 36px;" onclick="nav.go('quiz')">Faire le quiz gratuitement →</button>
-  </section>
-
-  <footer style="border-top:1px solid rgba(255,255,255,.05);padding:28px 16px;text-align:center;font-size:12px;color:#374151;">
-    © 2025 SaaSGenrt · Fait pour les indie hackers
-  </footer>
-</div><!-- /#page-index -->
-
-
-<!-- ════════════════════════════════════════
-     PAGE: QUIZ
-════════════════════════════════════════ -->
-<div id="page-quiz" class="spa-page">
-
-  <!-- Progress bar -->
-  <div style="position:fixed;top:0;left:0;right:0;z-index:60;">
-    <div style="height:3px;background:rgba(255,255,255,.05);">
-      <div id="quiz-progress" class="progress-emerald" style="height:100%;width:0%;"></div>
-    </div>
-  </div>
-
-  <!-- Header -->
-  <div style="position:fixed;top:3px;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
-    <button style="font-size:13px;color:#6b7280;background:none;border:none;cursor:pointer;" onclick="nav.go('index')">← Retour</button>
-    <span style="font-size:12px;color:#6b7280;" id="quiz-step-label">Étape 1 sur 5</span>
-    <div style="width:50px;"></div>
-  </div>
-
-  <!-- Step container -->
-  <div id="quiz-step-container" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 16px 24px;min-height:100vh;"></div>
-
-  <!-- Intel overlay -->
-  <div id="intel-overlay" class="intel-overlay">
-    <div class="glass" style="border-radius:28px;padding:36px 28px;max-width:320px;margin:0 16px;text-align:center;">
-      <div style="font-size:44px;margin-bottom:10px;" id="intel-icon">🧠</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin-bottom:6px;" id="intel-msg">Intéressant…</div>
-      <div style="font-size:13px;color:#9ca3af;" id="intel-sub">Voyons qui peut résoudre ça.</div>
-    </div>
-  </div>
-</div><!-- /#page-quiz -->
-
-
-<!-- ════════════════════════════════════════
-     PAGE: ANALYZING
-════════════════════════════════════════ -->
-<div id="page-analyzing" class="spa-page" style="padding:24px 16px;">
-  <div style="width:100%;max-width:380px;text-align:center;">
-    <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#5b5ef8,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;">⚡</div>
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:8px;">Analyse en cours…</h2>
-    <p style="font-size:13px;color:#9ca3af;margin-bottom:28px;">L'IA génère vos idées personnalisées…</p>
-
-    <div style="height:6px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;margin-bottom:8px;">
-      <div id="analyzing-progress" class="progress-emerald" style="height:100%;width:0%;"></div>
-    </div>
-    <div style="font-size:12px;color:#6b7280;margin-bottom:32px;" id="analyzing-pct">0%</div>
-
-    <div style="text-align:left;display:flex;flex-direction:column;gap:10px;" id="analyzing-steps">
-      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="0">
-        <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Détection de votre archétype</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="1">
-        <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Analyse de votre profil</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="2">
-        <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span id="ai-step-label">Appel à l'IA Mistral…</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="3">
-        <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Classement des opportunités</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;" data-step="4">
-        <div class="step-icon" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">·</div>
-        <span>Génération de votre blueprint</span>
-      </div>
-    </div>
-  </div>
-</div><!-- /#page-analyzing -->
-
-
-<!-- ════════════════════════════════════════
-     PAGE: RESULTS
-════════════════════════════════════════ -->
-<div id="page-results" class="spa-page">
-  <div style="position:sticky;top:0;z-index:40;background:rgba(8,8,12,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);">
-    <div style="max-width:1000px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;">
-      <button style="font-size:13px;color:#9ca3af;background:none;border:none;cursor:pointer;" onclick="nav.go('index')">← SaaSGenrt</button>
-      <span style="font-size:14px;font-weight:600;">Vos résultats</span>
-      <button style="font-size:13px;color:#a78bfa;background:none;border:none;cursor:pointer;" onclick="nav.go('quiz')">Refaire →</button>
-    </div>
-  </div>
-  <div style="max-width:820px;margin:0 auto;padding:32px 16px 60px;" id="results-content"></div>
-</div><!-- /#page-results -->
-
-
-<!-- ════════════════════════════════════════
-     PAGE: DETAIL
-════════════════════════════════════════ -->
-<div id="page-detail" class="spa-page">
-  <div style="position:sticky;top:0;z-index:40;background:rgba(8,8,12,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);">
-    <div style="max-width:800px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;">
-      <button style="font-size:13px;color:#9ca3af;background:none;border:none;cursor:pointer;" onclick="nav.back()">← Résultats</button>
-      <span style="font-size:14px;font-weight:600;" id="detail-nav-title">Blueprint</span>
-      <div style="width:50px;"></div>
-    </div>
-  </div>
-  <div style="max-width:680px;margin:0 auto;padding:28px 16px 60px;" id="detail-content"></div>
-</div><!-- /#page-detail -->
-
-
-<!-- ════════════════════════════════════════
-     PAGE: DASHBOARD
-════════════════════════════════════════ -->
-<div id="page-dashboard" class="spa-page">
-  <div style="position:sticky;top:0;z-index:40;background:rgba(8,8,12,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);">
-    <div style="max-width:900px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;">
-      <button style="font-size:13px;color:#9ca3af;background:none;border:none;cursor:pointer;" onclick="nav.back()">← Blueprint</button>
-      <span style="font-size:14px;font-weight:600;">Dashboard</span>
-      <div style="width:50px;"></div>
-    </div>
-  </div>
-  <div style="max-width:820px;margin:0 auto;padding:28px 16px 60px;" id="dash-content"></div>
-</div><!-- /#page-dashboard -->
-
-
-<!-- ════════════════════════════════════════
-     PAYMENT MODAL
-════════════════════════════════════════ -->
-<div id="payment-modal" class="pay-modal">
-  <div class="modal-box">
-    <button onclick="closePaywall()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#9ca3af;font-size:22px;cursor:pointer;line-height:1;padding:4px;">×</button>
-
-    <div style="text-align:center;margin-bottom:24px;">
-      <div style="font-size:36px;margin-bottom:8px;">🔓</div>
-      <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;margin-bottom:4px;">Accès complet SaaSGenrt</h3>
-      <p style="font-size:13px;color:#9ca3af;">Paiement unique · 20€ · Accès à vie</p>
-    </div>
-
-    <div style="margin-bottom:14px;">
-      <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px;">Numéro de carte</label>
-      <input class="pay-input" id="pay-card" type="text" placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-      <div>
-        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px;">Expiration</label>
-        <input class="pay-input" id="pay-exp" type="text" placeholder="MM / AA" maxlength="7">
-      </div>
-      <div>
-        <label style="font-size:12px;color:#9ca3af;display:block;margin-bottom:5px;">CVC</label>
-        <input class="pay-input" id="pay-cvc" type="text" placeholder="123" maxlength="3">
-      </div>
-    </div>
-
-    <button id="pay-confirm-btn" class="btn-primary" style="width:100%;padding:15px;font-size:15px;justify-content:center;box-shadow:0 6px 30px rgba(91,94,248,.4);" onclick="confirmPayment()">
-      🔒 Payer 20€ maintenant
-    </button>
-    <p style="font-size:11px;color:#6b7280;text-align:center;margin-top:10px;">🔐 Paiement sécurisé SSL · Accès immédiat · Remboursé si non satisfait 7j</p>
+    </section>
   </div>
 </div>
 
-<!-- Toast -->
-<div id="toast"></div>
+<!-- ══════ PAGE 2: STEP 1 ══════ -->
+<div id="p-step1" class="pg">
+  <nav class="lnav">
+    <div class="logo" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div>
+    <button class="btn btn-o btn-sm" onclick="R.go('index')">← Accueil</button>
+  </nav>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px 40px">
+    <div class="stk">
+      <div class="sn"><div class="sc2 act">1</div><div class="slbl act">Problème</div></div>
+      <div class="sl2"></div>
+      <div class="sn"><div class="sc2">2</div><div class="slbl">Contexte</div></div>
+    </div>
+    <div style="width:100%;max-width:520px">
+      <h2 style="font-size:26px;font-weight:800;margin-bottom:7px">Quel problème résous-tu ?</h2>
+      <p style="color:var(--t2);font-size:13.5px;margin-bottom:28px;line-height:1.65">Plus tu es précis sur le problème, plus les idées générées seront pertinentes et actionnables.</p>
+      <div style="margin-bottom:18px">
+        <label class="lbl">Décris le problème</label>
+        <textarea class="inp" id="s1-pb" rows="5" placeholder="Ex : Les freelances passent 3h/semaine à relancer leurs clients pour les factures impayées. Il n'existe pas d'outil simple qui automatise ça avec des relances personnalisées..."></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px">
+        <div>
+          <label class="lbl">Secteur cible</label>
+          <select class="inp" id="s1-sec">
+            <option value="">Sélectionne...</option>
+            <option value="b2b">B2B SaaS</option>
+            <option value="devtools">Dev Tools</option>
+            <option value="marketing">Marketing & Growth</option>
+            <option value="finance">Finance & Compta</option>
+            <option value="rh">RH & Recrutement</option>
+            <option value="ecom">E-commerce</option>
+            <option value="sante">Santé & Bien-être</option>
+            <option value="edu">Éducation</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Niveau technique</label>
+          <select class="inp" id="s1-tech">
+            <option value="">Sélectionne...</option>
+            <option value="nocode">No-code / Low-code</option>
+            <option value="junior">Développeur Junior</option>
+            <option value="senior">Développeur Senior</option>
+            <option value="nontech">Non technique</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-p btn-lg btn-w" onclick="s1next()">Continuer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 3: STEP 2 ══════ -->
+<div id="p-step2" class="pg">
+  <nav class="lnav">
+    <div class="logo" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div>
+    <button class="btn btn-o btn-sm" onclick="R.go('step1')">← Retour</button>
+  </nav>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px 40px">
+    <div class="stk">
+      <div class="sn"><div class="sc2 done">✓</div><div class="slbl done">Problème</div></div>
+      <div class="sl2 done"></div>
+      <div class="sn"><div class="sc2 act">2</div><div class="slbl act">Contexte</div></div>
+    </div>
+    <div style="width:100%;max-width:520px">
+      <h2 style="font-size:26px;font-weight:800;margin-bottom:7px">Ton contexte</h2>
+      <p style="color:var(--t2);font-size:13.5px;margin-bottom:28px;line-height:1.65">Ces informations calibrent les idées selon tes contraintes réelles.</p>
+      <div style="margin-bottom:20px">
+        <label class="lbl" style="margin-bottom:9px">Objectif MRR à 12 mois</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="mrr-chips">
+          <div class="chip" data-v="500">€500 – €1 000/mo</div>
+          <div class="chip" data-v="5k">€1 000 – €5 000/mo</div>
+          <div class="chip" data-v="10k">€5 000 – €10 000/mo</div>
+          <div class="chip" data-v="50k">€10 000+/mo</div>
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <label class="lbl" style="margin-bottom:9px">Temps disponible / semaine</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="time-chips">
+          <div class="chip" data-v="5h">5h</div>
+          <div class="chip" data-v="10h">10h</div>
+          <div class="chip" data-v="20h">20h</div>
+          <div class="chip" data-v="full">Temps plein</div>
+        </div>
+      </div>
+      <div style="margin-bottom:28px">
+        <label class="lbl">Budget initial</label>
+        <select class="inp" id="s2-budget">
+          <option value="0">€0 — Bootstrapped pur</option>
+          <option value="500">Jusqu'à €500</option>
+          <option value="2000">Jusqu'à €2 000</option>
+          <option value="10000">€5 000 – €10 000</option>
+          <option value="plus">€10 000+</option>
+        </select>
+      </div>
+      <button class="btn btn-g btn-lg btn-w" onclick="s2gen()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Générer mes idées SaaS
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 4: ANALYZING ══════ -->
+<div id="p-analyzing" class="pg">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center">
+    <div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:38px">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="orb"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+    </div>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Analyse en cours…</h2>
+    <p style="color:var(--t2);font-size:13.5px;margin-bottom:36px;max-width:340px;line-height:1.65">Mistral AI étudie ton problème et génère 10 idées SaaS personnalisées pour ton profil.</p>
+    <div style="width:300px;text-align:left">
+      <div class="an-row" id="a1"><div class="an-dot"></div><span>Analyse du problème</span></div>
+      <div class="an-row" id="a2"><div class="an-dot"></div><span>Identification du marché</span></div>
+      <div class="an-row" id="a3"><div class="an-dot"></div><span>Évaluation concurrence</span></div>
+      <div class="an-row" id="a4"><div class="an-dot"></div><span>Calcul métriques MRR</span></div>
+      <div class="an-row" id="a5"><div class="an-dot"></div><span>Génération des blueprints</span></div>
+      <div class="an-row" id="a6"><div class="an-dot"></div><span>Finalisation</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 5: DASHBOARD ══════ -->
+<div id="p-dash" class="pg">
+  <nav class="sb">
+    <div class="sb-logo"><div class="logo" style="font-size:15px" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div></div>
+    <div class="sb-body">
+      <div class="sb-sec">Analyse</div>
+      <button class="nv on" onclick="R.go('dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Idées SaaS</button>
+      <button class="nv" onclick="R.go('problems')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Problèmes</button>
+      <div class="sb-sec">Outils</div>
+      <button class="nv" onclick="R.go('growth')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Growth</button>
+      <button class="nv" onclick="R.go('integrations')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Intégrations</button>
+    </div>
+    <div class="sb-foot"><button class="nv" onclick="R.go('step1')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Nouvelle analyse</button></div>
+  </nav>
+  <div class="mc">
+    <div class="tbar">
+      <div><div style="font-size:14.5px;font-weight:700">Idées SaaS</div><div style="font-size:11.5px;color:var(--t3);margin-top:1px">10 idées générées</div></div>
+      <div style="display:flex;gap:7px">
+        <button class="btn btn-o btn-sm" onclick="R.go('step1')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Régénérer</button>
+        <button class="btn btn-p btn-sm" onclick="R.go('paywall')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Déverrouiller</button>
+      </div>
+    </div>
+    <div class="ca">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div class="gcard sc"><div class="sc-lbl">Idées</div><div class="sc-val" id="db-cnt">10</div><div class="sc-ch mu">Session active</div></div>
+        <div class="gcard sc"><div class="sc-lbl">Max MRR</div><div class="sc-val" id="db-mrr">—</div><div class="sc-ch up">↑ top idée</div></div>
+        <div class="gcard sc"><div class="sc-lbl">Score Moyen</div><div class="sc-val" id="db-avg">—</div><div class="sc-ch mu">sur 100</div></div>
+        <div class="gcard sc"><div class="sc-lbl">Faciles</div><div class="sc-val" id="db-easy">—</div><div class="sc-ch mu">accessibles</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="chip on" id="f-all" onclick="filt('all')">Toutes</button>
+        <button class="chip" id="f-b2b" onclick="filt('b2b')">B2B</button>
+        <button class="chip" id="f-dev" onclick="filt('dev')">Dev Tools</button>
+        <button class="chip" id="f-mkt" onclick="filt('mkt')">Marketing</button>
+        <div style="margin-left:auto">
+          <select class="inp" style="width:auto;padding:6px 30px 6px 11px;font-size:12px" onchange="sortI(this.value)">
+            <option value="score">Score ↓</option>
+            <option value="mrr">MRR ↓</option>
+            <option value="diff">Difficulté ↑</option>
+          </select>
+        </div>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead><tr><th style="width:28px">#</th><th>Idée SaaS</th><th>Catégorie</th><th>MRR Potentiel</th><th>Difficulté</th><th>Score</th><th></th></tr></thead>
+          <tbody id="ideas-body"><tr><td colspan="7" style="text-align:center;padding:38px;color:var(--t3)"><div style="display:inline-flex;align-items:center;gap:9px"><div class="spin"></div>Chargement…</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 6: DETAIL ══════ -->
+<div id="p-detail" class="pg">
+  <nav class="sb">
+    <div class="sb-logo"><div class="logo" style="font-size:15px" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div></div>
+    <div class="sb-body">
+      <div class="sb-sec">Analyse</div>
+      <button class="nv" onclick="R.go('dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Idées SaaS</button>
+      <button class="nv on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Détail</button>
+      <div class="sb-sec">Outils</div>
+      <button class="nv" onclick="R.go('growth')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Growth</button>
+      <button class="nv" onclick="R.go('integrations')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Intégrations</button>
+    </div>
+  </nav>
+  <div class="mc">
+    <div class="tbar">
+      <button class="btn btn-o btn-sm" onclick="R.go('dash')">← Retour</button>
+      <button class="btn btn-p btn-sm" onclick="R.go('paywall')">Blueprint complet →</button>
+    </div>
+    <div class="ca" id="detail-area"><div style="text-align:center;padding:60px;color:var(--t3)">Sélectionne une idée dans le tableau.</div></div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 7: PAYWALL ══════ -->
+<div id="p-paywall" class="pg">
+  <nav class="lnav">
+    <div class="logo" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div>
+    <button class="btn btn-o btn-sm" onclick="R.go('dash')">← Retour</button>
+  </nav>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:80px 20px 40px">
+    <div style="width:100%;max-width:420px">
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(37,99,235,.1));border:1px solid rgba(124,58,237,.28);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--pl)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h2 style="font-size:24px;font-weight:800;margin-bottom:9px">Déverrouille ton Blueprint</h2>
+        <p style="color:var(--t2);font-size:13.5px;line-height:1.65">Accès à vie. Toutes les idées, blueprints et growth dashboard.</p>
+      </div>
+      <div style="border:2px solid rgba(124,58,237,.45);border-radius:18px;padding:28px;background:linear-gradient(145deg,rgba(124,58,237,.06),rgba(37,99,235,.02))">
+        <div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:20px">
+          <div style="font-size:38px;font-weight:900;letter-spacing:-.04em">€9</div>
+          <div><div style="font-size:11px;color:var(--t3)">paiement</div><div style="font-size:12.5px;font-weight:600;color:var(--t2)">unique</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:22px">
+          <div style="display:flex;align-items:center;gap:9px;font-size:13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gl)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>10 blueprints SaaS complets</div>
+          <div style="display:flex;align-items:center;gap:9px;font-size:13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gl)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Roadmap 90 jours par idée</div>
+          <div style="display:flex;align-items:center;gap:9px;font-size:13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gl)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Analyse concurrence + positionnement</div>
+          <div style="display:flex;align-items:center;gap:9px;font-size:13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gl)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Growth Dashboard personnalisé</div>
+          <div style="display:flex;align-items:center;gap:9px;font-size:13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gl)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Accès à vie — pas d'abonnement</div>
+        </div>
+        <button class="btn btn-g btn-lg btn-w" onclick="unlock()">Débloquer maintenant — €9</button>
+        <div style="display:flex;justify-content:center;gap:18px;margin-top:12px">
+          <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Paiement sécurisé</span>
+          <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Remboursement 7j</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 8: PROBLEMS ══════ -->
+<div id="p-problems" class="pg">
+  <nav class="sb">
+    <div class="sb-logo"><div class="logo" style="font-size:15px" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div></div>
+    <div class="sb-body">
+      <div class="sb-sec">Analyse</div>
+      <button class="nv" onclick="R.go('dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Idées SaaS</button>
+      <button class="nv on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Problèmes</button>
+      <div class="sb-sec">Outils</div>
+      <button class="nv" onclick="R.go('growth')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Growth</button>
+      <button class="nv" onclick="R.go('integrations')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Intégrations</button>
+    </div>
+  </nav>
+  <div class="mc">
+    <div class="tbar"><div><div style="font-size:14.5px;font-weight:700">Analyse Problèmes</div><div style="font-size:11.5px;color:var(--t3)">Cartographie de ton marché</div></div></div>
+    <div class="ca">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+        <div class="gcard" style="padding:18px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Intensité du problème</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12.5px">Fréquence</span><span style="font-size:12px;color:var(--pl);font-weight:600">Haute</span></div><div class="pb"><div class="pbf pb-p" style="width:85%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12.5px">Impact économique</span><span style="font-size:12px;color:var(--gl);font-weight:600">Élevé</span></div><div class="pb"><div class="pbf pb-g" style="width:78%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12.5px">Manque de solutions</span><span style="font-size:12px;color:var(--bl);font-weight:600">Moyen</span></div><div class="pb"><div class="pbf pb-b" style="width:55%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12.5px">Willingness to pay</span><span style="font-size:12px;color:var(--gl);font-weight:600">Forte</span></div><div class="pb"><div class="pbf pb-g" style="width:82%"></div></div></div>
+          </div>
+        </div>
+        <div class="gcard" style="padding:18px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Taille de marché</div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px">TAM</span><span style="font-size:14px;font-weight:800;color:var(--pl)">€2.4B</span></div>
+            <div class="div" style="margin:2px 0"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px">SAM</span><span style="font-size:14px;font-weight:800;color:var(--bl)">€340M</span></div>
+            <div class="div" style="margin:2px 0"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px">SOM</span><span style="font-size:14px;font-weight:800;color:var(--gl)">€28M</span></div>
+            <div class="div" style="margin:2px 0"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px">ICP principal</span><span class="bdg bdg-g">PME B2B</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="gcard" style="padding:18px">
+        <div style="font-size:11.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Concurrents directs</div>
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Concurrent</th><th>Modèle</th><th>Prix</th><th>Faiblesse</th><th>Opportunité</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">FreshBooks</td><td><span class="bdg bdg-b">SaaS</span></td><td>€25/mo</td><td style="color:var(--t2);font-size:12px">Interface complexe</td><td><span class="bdg bdg-g">UX simplifiée</span></td></tr>
+              <tr><td style="font-weight:600">Wave</td><td><span class="bdg bdg-g">Freemium</span></td><td>Gratuit</td><td style="color:var(--t2);font-size:12px">Pas d'automatisation</td><td><span class="bdg bdg-p">IA native</span></td></tr>
+              <tr><td style="font-weight:600">Zoho Invoice</td><td><span class="bdg bdg-p">Suite</span></td><td>€15/mo</td><td style="color:var(--t2);font-size:12px">Trop généraliste</td><td><span class="bdg bdg-y">Niche focus</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 9: INTEGRATIONS ══════ -->
+<div id="p-integrations" class="pg">
+  <nav class="sb">
+    <div class="sb-logo"><div class="logo" style="font-size:15px" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div></div>
+    <div class="sb-body">
+      <div class="sb-sec">Analyse</div>
+      <button class="nv" onclick="R.go('dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Idées SaaS</button>
+      <button class="nv" onclick="R.go('problems')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Problèmes</button>
+      <div class="sb-sec">Outils</div>
+      <button class="nv" onclick="R.go('growth')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Growth</button>
+      <button class="nv on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Intégrations</button>
+    </div>
+  </nav>
+  <div class="mc">
+    <div class="tbar"><div><div style="font-size:14.5px;font-weight:700">Intégrations</div><div style="font-size:11.5px;color:var(--t3)">Connecte tes outils</div></div></div>
+    <div class="ca"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="int-grid"></div></div>
+  </div>
+</div>
+
+<!-- ══════ PAGE 10: GROWTH ══════ -->
+<div id="p-growth" class="pg">
+  <nav class="sb">
+    <div class="sb-logo"><div class="logo" style="font-size:15px" onclick="R.go('index')"><span class="grt">SaaSGenrt</span></div></div>
+    <div class="sb-body">
+      <div class="sb-sec">Analyse</div>
+      <button class="nv" onclick="R.go('dash')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Idées SaaS</button>
+      <button class="nv" onclick="R.go('problems')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Problèmes</button>
+      <div class="sb-sec">Outils</div>
+      <button class="nv on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Growth</button>
+      <button class="nv" onclick="R.go('integrations')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Intégrations</button>
+    </div>
+  </nav>
+  <div class="mc">
+    <div class="tbar"><div><div style="font-size:14.5px;font-weight:700">Growth Dashboard</div><div style="font-size:11.5px;color:var(--t3)">Projection MRR</div></div><button class="btn btn-o btn-sm">Exporter</button></div>
+    <div class="ca">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div class="gcard sc"><div class="sc-lbl">MRR Actuel</div><div class="sc-val">€0</div><div class="sc-ch mu">Démarrer →</div></div>
+        <div class="gcard sc"><div class="sc-lbl">Clients Actifs</div><div class="sc-val">0</div><div class="sc-ch mu">Objectif : 10</div></div>
+        <div class="gcard sc"><div class="sc-lbl">Churn Rate</div><div class="sc-val">—</div><div class="sc-ch mu">En attente</div></div>
+        <div class="gcard sc"><div class="sc-lbl">ARR Projeté</div><div class="sc-val">—</div><div class="sc-ch mu">selon objectif</div></div>
+      </div>
+      <div class="gcard" style="padding:18px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:13.5px;font-weight:700">Projection MRR — 12 mois</div>
+          <span class="bdg bdg-p">Basé sur ton objectif</span>
+        </div>
+        <svg class="csv" viewBox="0 0 660 150" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c3aed" stop-opacity=".22"/><stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/></linearGradient></defs>
+          <line x1="0" y1="38" x2="660" y2="38" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+          <line x1="0" y1="76" x2="660" y2="76" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+          <line x1="0" y1="114" x2="660" y2="114" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+          <path d="M0 148 L60 142 L120 133 L180 120 L240 105 L300 87 L360 68 L420 50 L480 32 L540 18 L600 9 L640 5 L660 148 Z" fill="url(#gf)"/>
+          <path d="M0 148 L60 142 L120 133 L180 120 L240 105 L300 87 L360 68 L420 50 L480 32 L540 18 L600 9 L640 5" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+          <text x="0" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Jan</text><text x="53" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Fév</text><text x="112" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Mar</text><text x="170" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Avr</text><text x="228" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Mai</text><text x="288" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Jun</text><text x="348" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Jul</text><text x="408" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Aoû</text><text x="467" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Sep</text><text x="528" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Oct</text><text x="585" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Nov</text><text x="635" y="148" font-size="9" fill="#475569" font-family="Inter,sans-serif">Déc</text>
+        </svg>
+      </div>
+      <div class="gcard" style="padding:18px">
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">Jalons</div>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div style="display:flex;align-items:center;gap:11px"><div style="width:26px;height:26px;border-radius:50%;border:2px solid var(--cb);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);flex-shrink:0">1</div><div style="flex:1"><div style="font-size:13px">10 interviews problème</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Semaines 1-2</div></div><span class="bdg bdg-g">À faire</span></div>
+          <div style="display:flex;align-items:center;gap:11px"><div style="width:26px;height:26px;border-radius:50%;border:2px solid var(--cb);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);flex-shrink:0">2</div><div style="flex:1"><div style="font-size:13px">Landing + waitlist</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Semaine 3</div></div><span class="bdg bdg-g">À faire</span></div>
+          <div style="display:flex;align-items:center;gap:11px"><div style="width:26px;height:26px;border-radius:50%;border:2px solid var(--cb);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);flex-shrink:0">3</div><div style="flex:1"><div style="font-size:13px">MVP + Stripe live</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Semaines 4-6</div></div><span class="bdg bdg-y">En cours</span></div>
+          <div style="display:flex;align-items:center;gap:11px"><div style="width:26px;height:26px;border-radius:50%;border:2px solid var(--cb);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);flex-shrink:0">4</div><div style="flex:1"><div style="font-size:13px">Atteindre €1 000 MRR</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Mois 2-3</div></div><span class="bdg" style="background:rgba(255,255,255,.04);color:var(--t3);border-color:var(--cb)">Verrouillé</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
 
 <script>
-// ════════════════════════════════════════
-// GLOBAL DATA
-// ════════════════════════════════════════
-var IDEAS = [
-  {id:'email-warmup',name:'Email Warm-up Tool',tagline:'Automated inbox reputation builder for cold emailers',category:'Email Marketing',mrr:'$2,000–8,000',mrrMin:2000,mrrMax:8000,difficulty:'Medium',arch:['marketer','operator'],tags:['Email','B2B','Automation'],desc:'A tool that gradually warms up new email inboxes by simulating real engagement patterns, preventing spam filters and improving deliverability for cold outreach campaigns.',market:'Cold email market: 400M+ business emails sent daily. Lemwarm at $29-99/mo. Underserved SMB segment seeking $19-29/mo entry point.',stack:'Node.js + PostgreSQL + SendGrid API. Cron jobs for sending/receiving loops. Straightforward CRUD — ships in 2 weeks.',pricing:'$19/mo starter (3 inboxes) · $49/mo pro · $149/mo agency (unlimited)',roadmap:['Week 1–2: Core warming engine + inbox auth','Week 3–4: Dashboard + analytics','Month 2: Multi-inbox support + alerts','Month 3: API + Zapier integration']},
-  {id:'api-monitor',name:'API Health Monitor',tagline:'Real-time uptime and latency tracking for SaaS dependencies',category:'Developer Tools',mrr:'$3,000–15,000',mrrMin:3000,mrrMax:15000,difficulty:'Low',arch:['builder','operator'],tags:['DevTools','APIs','Monitoring'],desc:'Lightweight monitoring for third-party APIs your app depends on. Get alerted before your customers notice the outage. Simpler and cheaper than Datadog.',market:'$1.2B APM market. Datadog too complex, StatusPage too expensive for indie devs. $19-49/mo sweet spot is wide open.',stack:'Next.js + Vercel + PlanetScale. Cron monitors, Resend for alerts, status page generation. Ships in 2 weeks.',pricing:'Free (5 endpoints) · $19/mo starter · $49/mo pro · $149/mo team',roadmap:['Week 1: Monitor engine + webhook alerts','Week 2: Dashboard + public status page','Month 2: Custom checks + team features','Month 3: Slack/Teams integrations + SLA reports']},
-  {id:'resume-optimizer',name:'AI Resume Optimizer',tagline:'ATS-beating resume rewrites tailored to each job description',category:'Career Tools',mrr:'$1,500–6,000',mrrMin:1500,mrrMax:6000,difficulty:'Low',arch:['creator','marketer'],tags:['AI','Career','B2C'],desc:'Upload your resume, paste a job description, receive a tailored rewrite that passes ATS filters and surfaces your most relevant experience for that specific role.',market:'Resume writing: $3B+ US market. Resumeworded, Kickresume at $19-29/mo. Claude API dramatically cuts cost to serve — high-margin business.',stack:'Next.js + Claude API + Stripe + Vercel. Pure prompt engineering. Weekend project to MVP.',pricing:'Pay-per-use $5/resume · $19/mo unlimited · $49/mo with coaching notes',roadmap:['Week 1: Claude integration + basic UI','Week 2: Stripe checkout + PDF export','Month 2: JD keyword matching + scoring','Month 3: LinkedIn profile optimization']},
-  {id:'client-portal',name:'Client Portal Builder',tagline:'Branded portals for freelancers and agencies',category:'Client Management',mrr:'$3,000–12,000',mrrMin:3000,mrrMax:12000,difficulty:'Medium',arch:['creator','operator'],tags:['Freelance','Agencies','No-code'],desc:'White-label portals where clients view project status, approve deliverables, pay invoices, and communicate — all in one branded space you set up in minutes.',market:'17M+ US freelancers. Copilot, SuiteDash at $29-99/mo. Simple product focused on one workflow wins market share.',stack:'Next.js + Supabase + Stripe + Cloudflare R2. Multi-tenancy, custom domains. 4-6 weeks.',pricing:'$29/mo solo (3 clients) · $79/mo studio · $199/mo agency (unlimited)',roadmap:['Week 1–2: Auth + portal builder + file upload','Week 3–4: Approval flows + client comms','Month 2: Stripe invoicing + payments','Month 3: Custom domains + white-label branding']},
-  {id:'saas-metrics',name:'SaaS Metrics Dashboard',tagline:'Plug-in MRR, churn and LTV analytics for Stripe',category:'Analytics',mrr:'$2,500–10,000',mrrMin:2500,mrrMax:10000,difficulty:'Low',arch:['builder','operator'],tags:['Analytics','Stripe','SaaS'],desc:'Connect your Stripe account and instantly see MRR, ARR, churn rate, LTV, and cohort analysis. No data warehouse, no SQL, no setup.',market:'Baremetrics at $50-300/mo is too expensive for early-stage founders. $19-39/mo sweet spot with 200k+ Stripe-powered SaaS businesses.',stack:'Next.js + Stripe API + PostgreSQL + Recharts. Mostly data wrangling. 2-3 week build.',pricing:'Free (1 workspace) · $19/mo starter · $49/mo growth · $99/mo scale',roadmap:['Week 1: Stripe sync + core metric calculations','Week 2: Charts + responsive dashboard','Month 2: Revenue alerts + email digests','Month 3: Multi-workspace + team access']},
-  {id:'waitlist-mgr',name:'Viral Waitlist Manager',tagline:'Referral-powered waitlists that drive pre-launch buzz',category:'Growth',mrr:'$1,500–5,000',mrrMin:1500,mrrMax:5000,difficulty:'Low',arch:['marketer','creator'],tags:['Growth','Launch','Viral'],desc:'Embed a waitlist widget on any site. Users move up the queue by referring friends. Collect 10x more leads before you write a line of code.',market:'Every SaaS launch needs this. Launchrockly went dark. Gap in market at $15-39/mo. Pure embedding business — very low churn.',stack:'React widget + Supabase + Resend + Next.js admin. 1-week build.',pricing:'Free (1,000 signups) · $19/mo starter · $49/mo pro (unlimited)',roadmap:['Week 1: Core waitlist + embeddable widget','Week 2: Referral mechanics + email sequences','Month 2: Analytics + A/B testing','Month 3: Zapier + integrations']},
-  {id:'newsletter-tool',name:'Newsletter Monetization Hub',tagline:'Sponsors + paid subscriptions in one creator dashboard',category:'Creator Tools',mrr:'$2,000–7,000',mrrMin:2000,mrrMax:7000,difficulty:'Medium',arch:['creator','marketer'],tags:['Newsletter','Creator','Monetization'],desc:'Everything newsletter creators need to monetize: sponsor deal management, paid tier checkout, subscriber segmentation, and revenue analytics.',market:'4M+ newsletters. Beehiiv charges 10% rev share on paid tiers. Creators want a flat-fee alternative with full data ownership.',stack:'Next.js + Stripe + Resend API + PostgreSQL. Standard SaaS patterns.',pricing:'Free · $29/mo creator (1,000 subs) · $79/mo publisher (unlimited)',roadmap:['Week 1–2: Stripe paid tiers + subscriber checkout','Week 3–4: Sponsor CRM + deal tracking','Month 2: Analytics + segmentation + revenue reports','Month 3: Resend/ConvertKit integration']},
-  {id:'doc-generator',name:'Dev Documentation AI',tagline:'Auto-generate beautiful docs from GitHub repos and OpenAPI',category:'Developer Tools',mrr:'$2,500–9,000',mrrMin:2500,mrrMax:9000,difficulty:'Medium',arch:['builder','creator'],tags:['DevTools','Docs','AI'],desc:'Point it at a GitHub repo or OpenAPI spec. Get a Mintlify-quality documentation site generated automatically, with prose written by Claude.',market:'Readme.io, Mintlify at $150-500/mo. Indie dev segment wants $29-49/mo. 80% of devs skip docs because it takes too long.',stack:'Next.js + GitHub API + OpenAPI parser + Claude + Vercel. 3-4 weeks.',pricing:'$19/mo starter (1 project) · $49/mo pro · $99/mo team',roadmap:['Week 1–2: GitHub + OpenAPI parsing + structure','Week 3–4: Claude prose generation + styling','Month 2: Custom themes + auto-deploy','Month 3: Auto-update on git push + search']},
-  {id:'invoice-auto',name:'Freelancer Invoice Automator',tagline:'Time tracking → invoice → Stripe payment in one click',category:'Finance',mrr:'$2,000–8,000',mrrMin:2000,mrrMax:8000,difficulty:'Low',arch:['creator','operator'],tags:['Freelance','Finance','Automation'],desc:'Track time, auto-generate invoices from your rate card, and collect payment via Stripe or bank transfer — all in one flow that takes 30 seconds.',market:'59M US freelancers. FreshBooks/Bonsai at $25-50/mo. Simpler product at $15/mo wins the solo freelancer segment.',stack:'Next.js + Stripe + PostgreSQL + pdf-lib. Standard CRUD + PDF generation. 2 weeks.',pricing:'Free (3 clients) · $15/mo solo · $39/mo studio (unlimited)',roadmap:['Week 1–2: Time tracking + invoice generation','Week 3–4: Stripe payment collection','Month 2: PDF export + email delivery','Month 3: Recurring invoices + tax line items']},
-  {id:'churn-predictor',name:'SaaS Churn Predictor',tagline:'ML-powered churn risk scores for every customer',category:'Analytics',mrr:'$4,000–20,000',mrrMin:4000,mrrMax:20000,difficulty:'Hard',arch:['builder','operator'],tags:['ML','SaaS','Analytics'],desc:'Connect your product usage and billing data. Get a churn risk score for every customer with specific intervention playbooks surfaced in a dashboard.',market:'$320M churn management market. Gainsight is enterprise-only. SMB gap at $99-299/mo is massive and unserved.',stack:'Python + FastAPI + Scikit-learn + PostgreSQL + Next.js frontend. Requires ML knowledge.',pricing:'$99/mo startup · $299/mo growth · $799/mo scale',roadmap:['Month 1: Data connectors + feature engineering pipeline','Month 2: ML model training + scoring API','Month 3: Dashboard + risk alerts','Month 4: Intervention playbooks + Slack bot']},
-  {id:'lead-enrichment',name:'B2B Lead Enrichment API',tagline:'Email → full company profile in one API call',category:'Sales Tools',mrr:'$3,000–18,000',mrrMin:3000,mrrMax:18000,difficulty:'Hard',arch:['builder','marketer'],tags:['B2B','Sales','API'],desc:'Send a business email, get back company size, tech stack, funding stage, LinkedIn URL, and key contacts — via a clean REST API with 50ms average response.',market:'Clearbit was $999/mo (acquired). Apollo is complex. Clean indie API at $49-199/mo is wide open. Developer-first positioning.',stack:'Python + FastAPI + multiple data source aggregation + Redis cache + PostgreSQL.',pricing:'Pay-per-call $0.02 · $49/mo 3,000 calls · $199/mo 20k calls · $499/mo 100k',roadmap:['Month 1: Data source aggregation + normalization','Month 2: REST API + auth + rate limiting','Month 3: Web dashboard + billing','Month 4: CRM integrations (HubSpot, Salesforce)']},
-  {id:'course-platform',name:'Micro-Course Platform',tagline:'Ship and sell short video courses in 10 minutes',category:'Creator Tools',mrr:'$2,500–10,000',mrrMin:2500,mrrMax:10000,difficulty:'Medium',arch:['creator','marketer'],tags:['Creator','Education','No-code'],desc:'The simplest way to create, host, and sell a short video course. No Teachable complexity. Drag in your videos, set a price, share your link.',market:'$7B online course market. Teachable/Kajabi too complex. Podia losing ground. Simplicity wins at $29/mo.',stack:'Next.js + Supabase + Stripe + Cloudflare R2 for video storage. 5-6 weeks.',pricing:'$0 (15% rev share) · $29/mo (5% fee) · $79/mo (no fee)',roadmap:['Week 1–2: Video hosting + player + upload','Week 3–4: Stripe checkout + course access gating','Month 2: Analytics + coupons + affiliates','Month 3: Drip content + community tab']},
-  {id:'affiliate-dash',name:'Affiliate Program Manager',tagline:'Launch your own affiliate program in 5 minutes',category:'Growth',mrr:'$2,000–9,000',mrrMin:2000,mrrMax:9000,difficulty:'Medium',arch:['marketer','operator'],tags:['Growth','Affiliates','SaaS'],desc:'Embed a full affiliate program on any website — unique tracking links, click attribution, and automatic commission payouts via Stripe Connect.',market:'Rewardful, Tapfiliate at $49-199/mo. Simpler entry point at $29/mo serves solo founders and small SaaS teams.',stack:'Next.js + Stripe Connect + PostgreSQL + tracking pixel. 3-4 weeks.',pricing:'$29/mo starter (100 affiliates) · $79/mo growth (500) · $199/mo scale',roadmap:['Week 1–2: Link generation + click tracking','Week 3–4: Stripe Connect payouts','Month 2: Dashboard + monthly reports','Month 3: Multi-tier commissions + custom rates']},
-  {id:'linkedin-scheduler',name:'LinkedIn Post Scheduler',tagline:'AI-drafted LinkedIn content calendar with scheduling',category:'Social Media',mrr:'$1,500–6,000',mrrMin:1500,mrrMax:6000,difficulty:'Low',arch:['creator','marketer'],tags:['LinkedIn','Content','AI'],desc:'Generate a week of LinkedIn posts from your topics, schedule them for optimal times, and track which content drives profile views and connection requests.',market:'Buffer at $15-99/mo is generic. LinkedIn-specific tool with AI drafting is underserved. $19/mo hits a clear need.',stack:'Next.js + LinkedIn OAuth API + Claude + PostgreSQL + Vercel cron. 2-3 weeks.',pricing:'Free (5 posts/mo) · $19/mo creator · $49/mo team',roadmap:['Week 1–2: LinkedIn OAuth + post scheduling','Week 3–4: Claude content generation + calendar UI','Month 2: Analytics + best-time detection','Month 3: Team collaboration + content repurposing']},
-  {id:'heatmap-lite',name:'Website Heatmap Lite',tagline:'Click heatmaps and session recordings at $19/mo',category:'Analytics',mrr:'$1,500–7,000',mrrMin:1500,mrrMax:7000,difficulty:'Medium',arch:['builder','operator'],tags:['Analytics','UX','CRO'],desc:'Hotjar-style heatmaps, click maps, and session recordings — the 80% of features people actually use — at 1/10th the price.',market:'Hotjar at $32-208/mo. Microsoft Clarity is free but no recordings beyond 30 days. $19/mo with recordings is the obvious gap.',stack:'Vanilla JS tracking script + Python + ClickHouse + Next.js dashboard. Requires ClickHouse expertise.',pricing:'Free (500 sessions) · $19/mo starter · $49/mo pro · $99/mo growth',roadmap:['Month 1: JS tracking library + event capture','Month 2: Heatmap rendering + session recordings','Month 3: Dashboard + funnel analysis','Month 4: Integrations + conversion goals']},
-  {id:'podcast-seo',name:'Podcast SEO Engine',tagline:'Transcribe episodes, write show notes, rank on Google',category:'Creator Tools',mrr:'$1,500–5,000',mrrMin:1500,mrrMax:5000,difficulty:'Low',arch:['creator','marketer'],tags:['Podcast','SEO','AI'],desc:'Feed your podcast RSS feed and get transcripts, SEO-optimized show notes, keyword clusters, and an auto-generated landing page for each episode.',market:'3M+ active podcasts. Descript at $24-96/mo is an editor not an SEO tool. Specific SEO tooling gap.',stack:'Next.js + Whisper API + Claude + PostgreSQL + Vercel. 2-3 weeks.',pricing:'$19/mo (20 episodes/mo) · $49/mo unlimited · $99/mo agency (10 shows)',roadmap:['Week 1–2: RSS import + Whisper transcription','Week 3–4: Claude show notes + SEO analysis','Month 2: Episode landing pages + schema markup','Month 3: RSS publishing + embed players']},
-  {id:'idea-validator',name:'SaaS Idea Validator',tagline:'Go/no-go report for any business idea in 5 minutes',category:'Founder Tools',mrr:'$1,000–4,000',mrrMin:1000,mrrMax:4000,difficulty:'Low',arch:['builder','creator','marketer'],tags:['Validation','Founder','Research'],desc:'Enter your idea and get a comprehensive report: competitor analysis, keyword demand, Reddit and HN sentiment, and a scored go/no-go recommendation.',market:'No direct competitor. Founders manually research for 20+ hours. $29/report is an obvious no-brainer sale.',stack:'Next.js + Google Trends API + Reddit API + Claude + PostgreSQL. 1-2 weeks.',pricing:'$9/report · $29/mo unlimited reports · $79/mo agency (white-label reports)',roadmap:['Week 1–2: Data API aggregation + normalization','Week 3–4: Claude analysis engine + scoring','Month 2: PDF report generation + export','Month 3: Trend monitoring + weekly alerts']},
-  {id:'community-platform',name:'Paid Community Builder',tagline:'Subscription communities with channels and events',category:'Creator Tools',mrr:'$3,000–15,000',mrrMin:3000,mrrMax:15000,difficulty:'Hard',arch:['creator','marketer'],tags:['Community','Memberships','Creator'],desc:'Launch a paid community with topic channels, live events, and direct messaging. Simpler than Circle, cheaper than Mighty Networks, faster to set up.',market:'Circle at $89-399/mo. Massive market. 500k+ online communities. Simpler product at $39/mo serves the solo creator.',stack:'Next.js + Supabase realtime + Stripe + Cloudflare R2. Complex realtime architecture.',pricing:'$39/mo starter (100 members) · $99/mo growth · $249/mo scale (unlimited)',roadmap:['Month 1: Auth + channels + real-time messaging','Month 2: Stripe memberships + event scheduling','Month 3: Member directory + DMs + notifications','Month 4: Analytics + white-label + custom domain']},
-  {id:'landing-analyzer',name:'Landing Page AI Critique',tagline:'Identify conversion leaks on any landing page',category:'Growth',mrr:'$1,000–4,000',mrrMin:1000,mrrMax:4000,difficulty:'Low',arch:['marketer','creator'],tags:['CRO','AI','Growth'],desc:'Enter a URL and get a conversion rate optimization report: missing social proof, weak CTA, unclear value prop, and prioritized fixes with before/after examples.',market:'CRO consultants charge $2,000-10,000 for audits. $29/report democratizes this. Landing page builders need this add-on.',stack:'Next.js + Puppeteer + Claude + PostgreSQL. 1-2 weeks.',pricing:'$9/report · $29/mo (10/mo) · $79/mo unlimited + benchmarks',roadmap:['Week 1–2: Puppeteer crawler + screenshots','Week 3–4: Claude scoring + recommendations','Month 2: PDF reports + industry benchmarks','Month 3: Competitor comparison + A/B suggestions']},
-  {id:'mrr-tracker',name:'Indie Maker MRR Tracker',tagline:'Public MRR milestones and accountability for builders',category:'Founder Tools',mrr:'$800–3,000',mrrMin:800,mrrMax:3000,difficulty:'Low',arch:['builder','creator'],tags:['MRR','IndieHacker','Community'],desc:'Connect Stripe and display your MRR on a public milestone page. Join a leaderboard of indie makers with weekly check-ins and accountability partners.',market:'Indie Hackers, MakerLog. No one has nailed Stripe sync + social accountability. $9/mo premium analytics.',stack:'Next.js + Stripe API + PostgreSQL. 1-week build.',pricing:'Free (public page) · $9/mo premium analytics + private goals',roadmap:['Week 1: Stripe sync + public page generation','Week 2: Leaderboard + follow/unfollow','Month 2: Weekly digest email + milestones','Month 3: Accountability partners + DMs']},
-];
+var S={problem:'',sector:'',tech:'',mrr:'',time:'',budget:'',ideas:[],sel:null,unlocked:false};
+var KEY='4PtEe397ANJtMuPHfxeYIlwtFQsTRt3a';
 
-var CHECKLIST = [
-  {id:'c1', text:'Définir ton ICP (Profil Client Idéal)'},
-  {id:'c2', text:'Valider avec 10 clients potentiels'},
-  {id:'c3', text:'Créer une landing page avec liste d\'attente'},
-  {id:'c4', text:'Construire le MVP en ≤ 4 semaines'},
-  {id:'c5', text:'Lancer sur Product Hunt'},
-  {id:'c6', text:'Signer les 5 premiers clients payants'},
-  {id:'c7', text:'Configurer Stripe + flux de paiement'},
-  {id:'c8', text:'Atteindre 1 000€ MRR'},
-  {id:'c9', text:'Mettre en place analytics + tunnel de conversion'},
-  {id:'c10', text:'Ajouter la première intégration (Zapier/Slack)'},
-  {id:'c11', text:'Atteindre 3 000€ MRR'},
-  {id:'c12', text:'Embaucher le premier freelance'},
-];
-
-var ARCHETYPE_META = {
-  builder:  {label:'Le Builder',    icon:'⚙️', color:'#60a5fa', desc:'Tu ship vite et tu t\'occupes des ventes ensuite. Idéal : outils développeurs, APIs, automatisation.'},
-  creator:  {label:'Le Créateur',   icon:'✍️', color:'#a78bfa', desc:'Tu grandis par le contenu et la communauté. Idéal : outils créateurs, newsletters, plateformes de cours.'},
-  marketer: {label:'Le Marketeur',  icon:'📣', color:'#fb923c', desc:'Tu sais acquérir des clients. Idéal : outils de croissance, génération de leads, analytics SaaS.'},
-  operator: {label:'L\'Opérateur',  icon:'📊', color:'#34d399', desc:'Tu systématises et tu scales. Idéal : automatisation workflow, dashboards, productivité B2B.'},
-  beginner: {label:'Le Débutant',   icon:'🚀', color:'#f472b6', desc:'Tu apprends les bases. Idéal : outils B2C simples, projets low-code, et victoires rapides.'},
-};
-
-var INTEL_MSGS = [
-  {icon:'🧠', msg:'Intéressant…',             sub:'Voyons qui peut résoudre ça.'},
-  {icon:'⚡', msg:'On a déjà vu ce profil.',  sub:'Détection de ton archétype.'},
-  {icon:'🎯', msg:'Bon signal.',              sub:'Adaptation des recommandations.'},
-  {icon:'📈', msg:'Demande croissante ici.',  sub:'Scoring presque terminé.'},
-];
-
-var QUIZ_QUESTIONS = [
-  {q:'Quelle est ta compétence principale ?', sub:'Sois honnête — ça change tout.', key:'skill', options:[
-    {val:'dev',    label:'Développeur / Ingénieur', sub:'Je construis avec du code'},
-    {val:'design', label:'Designer / Créateur',     sub:'Je crée de belles choses'},
-    {val:'sales',  label:'Vente / Marketing',       sub:'Je génère de la croissance'},
-    {val:'ops',    label:'Ops / Business',          sub:'Je systématise et je scale'},
-  ]},
-  {q:'Combien d\'heures par semaine peux-tu consacrer ?', sub:'Phase démarrage — sois réaliste.', key:'time', options:[
-    {val:'low',      label:'< 5 heures',    sub:'Mode projet secondaire'},
-    {val:'medium',   label:'5–15 heures',   sub:'Side hustle sérieux'},
-    {val:'high',     label:'15–30 heures',  sub:'Tout-in à mi-temps'},
-    {val:'fulltime', label:'40+ heures',    sub:'Engagement à temps plein'},
-  ]},
-  {q:'Quel est ton objectif MRR à 12 mois ?', sub:'Vois grand mais sois précis.', key:'target', options:[
-    {val:'1k',  label:'1 000€/mois',    sub:'Revenu complémentaire'},
-    {val:'5k',  label:'5 000€/mois',    sub:'Remplacer mon salaire'},
-    {val:'10k', label:'10 000€/mois',   sub:'Liberté financière'},
-    {val:'50k', label:'50 000€+/mois',  sub:'Construire une vraie boîte'},
-  ]},
-  {q:'Quel modèle économique te correspond ?', sub:'Comment veux-tu gagner de l\'argent ?', key:'model', options:[
-    {val:'sub',    label:'Abonnements mensuels',    sub:'Revenus récurrents prévisibles'},
-    {val:'usage',  label:'Facturation à l\'usage',  sub:'Les clients paient ce qu\'ils consomment'},
-    {val:'oneoff', label:'Paiement unique',         sub:'Produits numériques, licences'},
-    {val:'mixed',  label:'Modèle mixte',            sub:'Abonnements + upsells'},
-  ]},
-  {q:'Quelle est ta plus grande crainte en lançant ?', sub:'Ta réponse honnête façonne ton blueprint.', key:'fear', options:[
-    {val:'tech',        label:'Complexité technique',  sub:'Suis-je capable de le construire ?'},
-    {val:'competition', label:'Trop de concurrence',   sub:'Le marché est-il déjà pris ?'},
-    {val:'customers',   label:'Trouver des clients',   sub:'Est-ce que quelqu\'un paiera vraiment ?'},
-    {val:'time',        label:'Manque de temps',       sub:'Puis-je intégrer ça dans ma vie ?'},
-  ]},
-];
-
-// ════════════════════════════════════════
-// ROUTER
-// ════════════════════════════════════════
-var nav = (function(){
-  var _hist = [];
-  function _activate(page, params){
-    document.querySelectorAll('.spa-page').forEach(function(el){ el.classList.remove('active'); });
-    var el = document.getElementById('page-' + page);
-    if(el) el.classList.add('active');
+/* Router */
+var R=(function(){
+  var MAP={index:'p-index',step1:'p-step1',step2:'p-step2',analyzing:'p-analyzing',
+    dash:'p-dash',detail:'p-detail',paywall:'p-paywall',problems:'p-problems',
+    integrations:'p-integrations',growth:'p-growth'};
+  function act(id){
+    Object.values(MAP).forEach(function(p){var e=document.getElementById(p);if(e)e.classList.remove('on');});
+    var el=document.getElementById(MAP[id]);
+    if(el)el.classList.add('on');
     window.scrollTo(0,0);
-    if(page==='index')     init_index();
-    else if(page==='quiz')      init_quiz();
-    else if(page==='analyzing') init_analyzing();
-    else if(page==='results')   init_results();
-    else if(page==='detail')    init_detail(params||{});
-    else if(page==='dashboard') init_dashboard(params||{});
+    ({step1:function(){iS1();},step2:function(){iS2();},analyzing:function(){runAn();},
+      dash:function(){iDash();},detail:function(){renderDet(S.sel);},
+      problems:function(){},integrations:function(){renderInts();},growth:function(){}
+    }[id]||function(){})();
   }
-  return {
-    go: function(page, params){ _hist.push({page:page,params:params||{}}); _activate(page,params||{}); },
-    back: function(){
-      if(_hist.length>1){ _hist.pop(); var p=_hist[_hist.length-1]; _activate(p.page,p.params); }
-      else _activate('index',{});
-    },
-    _activate: _activate
-  };
+  function go(id){window.location.hash=id;act(id);}
+  window.addEventListener('hashchange',function(){var h=window.location.hash.replace('#','')||'index';if(MAP[h])act(h);});
+  var init=window.location.hash.replace('#','')||'index';
+  if(init!=='index')act(init);
+  return{go:go};
 })();
 
-// ════════════════════════════════════════
-// HELPERS
-// ════════════════════════════════════════
-function detectArchetype(ans){
-  var s = ans.skill||'';
-  if(s==='dev')    return 'builder';
-  if(s==='design') return 'creator';
-  if(s==='sales')  return 'marketer';
-  if(s==='ops')    return 'operator';
-  return 'beginner';
+/* Toast */
+function toast(msg,type){
+  var w=document.getElementById('toast-wrap'),d=document.createElement('div');
+  d.className='ti '+(type==='er'?'er':'ok');d.textContent=(type==='er'?'✕  ':'✓  ')+msg;w.appendChild(d);
+  setTimeout(function(){d.style.transition='.25s';d.style.opacity='0';setTimeout(function(){d.remove();},260);},3200);
 }
 
-function scoreIdea(idea, ans, arch){
-  var base = 48;
-  if(idea.arch && idea.arch.indexOf(arch)>=0) base+=18;
-  var t = ans.time||'low';
-  if(idea.difficulty==='Low'   && (t==='low'||t==='medium'))  base+=10;
-  if(idea.difficulty==='Medium'&& (t==='medium'||t==='high')) base+=8;
-  if(idea.difficulty==='Hard'  && (t==='high'||t==='fulltime'))base+=12;
-  else if(idea.difficulty==='Hard' && t==='low') base-=16;
-  var tgt=ans.target||'1k', mx=idea.mrrMax||3000;
-  if(tgt==='1k'  && mx>=1000)  base+=5;
-  if(tgt==='5k'  && mx>=5000)  base+=8;
-  if(tgt==='10k' && mx>=8000)  base+=10;
-  if(tgt==='50k' && mx>=15000) base+=12;
-  var model=ans.model||'sub', p=idea.pricing||'';
-  if(model==='sub'    && p.indexOf('/mo')>=0)  base+=6;
-  if(model==='oneoff' && p.indexOf('one-time')>=0) base+=8;
-  if(model==='usage'  && (p.indexOf('/call')>=0||p.indexOf('per-')>=0||p.indexOf('per use')>=0)) base+=6;
-  // Deterministic jitter
-  var h=0; for(var i=0;i<idea.id.length;i++) h=(h*31+idea.id.charCodeAt(i))&0xFFFF;
-  base += (h%9)-4;
-  return Math.max(12, Math.min(99, Math.round(base)));
+/* Chip helper */
+function chipSel(cid,val){document.querySelectorAll('#'+cid+' .chip').forEach(function(c){c.classList.toggle('on',c.dataset.v===val);});}
+
+/* Step 1 */
+function iS1(){
+  if(S.problem)document.getElementById('s1-pb').value=S.problem;
+  if(S.sector)document.getElementById('s1-sec').value=S.sector;
+  if(S.tech)document.getElementById('s1-tech').value=S.tech;
+}
+function s1next(){
+  var pb=document.getElementById('s1-pb').value.trim();
+  if(!pb){toast('Décris ton problème pour continuer.','er');return;}
+  S.problem=pb;S.sector=document.getElementById('s1-sec').value;S.tech=document.getElementById('s1-tech').value;
+  R.go('step2');
 }
 
-// ════════════════════════════════════════
-// INIT_INDEX
-// ════════════════════════════════════════
-var _idxDone=false;
-function init_index(){
-  if(_idxDone) return; _idxDone=true;
-  // Counter animation for stat-ideas
-  var el=document.getElementById('stat-ideas'); if(!el) return;
-  var s=Date.now();
-  (function tick(){ var p=Math.min(1,(Date.now()-s)/1200); el.textContent=Math.round(p*20); if(p<1) requestAnimationFrame(tick); })();
+/* Step 2 */
+function iS2(){
+  document.querySelectorAll('#mrr-chips .chip').forEach(function(c){c.onclick=function(){S.mrr=c.dataset.v;chipSel('mrr-chips',c.dataset.v);};});
+  document.querySelectorAll('#time-chips .chip').forEach(function(c){c.onclick=function(){S.time=c.dataset.v;chipSel('time-chips',c.dataset.v);};});
+  if(S.mrr)chipSel('mrr-chips',S.mrr);if(S.time)chipSel('time-chips',S.time);
+}
+function s2gen(){
+  if(!S.mrr){toast('Sélectionne un objectif MRR.','er');return;}
+  if(!S.time){toast('Sélectionne ton temps disponible.','er');return;}
+  S.budget=document.getElementById('s2-budget').value;R.go('analyzing');
 }
 
-// ════════════════════════════════════════
-// INIT_QUIZ
-// ════════════════════════════════════════
-var _qStep=0, _qAns={};
-function init_quiz(){ _qStep=0; _qAns={}; _renderStep(0); }
-
-function _renderStep(step){
-  var q=QUIZ_QUESTIONS[step];
-  var pct=(step/QUIZ_QUESTIONS.length)*100;
-  document.getElementById('quiz-progress').style.width=pct+'%';
-  document.getElementById('quiz-step-label').textContent='Étape '+(step+1)+' sur '+QUIZ_QUESTIONS.length;
-
-  var html='<div style="width:100%;max-width:420px;" class="fade-up">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Question '+(step+1)+'</p>';
-  html+='<h2 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(22px,5vw,30px);font-weight:500;margin-bottom:6px;">'+q.q+'</h2>';
-  html+='<p style="font-size:13px;color:#9ca3af;margin-bottom:26px;">'+q.sub+'</p>';
-  html+='<div style="display:flex;flex-direction:column;gap:10px;">';
-  q.options.forEach(function(opt){
-    html+='<div class="opt-card" onclick="selectOpt(\''+q.key+'\',\''+opt.val+'\')">';
-    html+='<div style="font-weight:500;font-size:14px;">'+opt.label+'</div>';
-    html+='<div style="font-size:12px;color:#9ca3af;margin-top:2px;">'+opt.sub+'</div>';
-    html+='</div>';
-  });
-  html+='</div></div>';
-  document.getElementById('quiz-step-container').innerHTML=html;
+/* Analyzing */
+function runAn(){
+  var ids=['a1','a2','a3','a4','a5','a6'];
+  ids.forEach(function(id){document.getElementById(id).className='an-row';});
+  var i=0;
+  function tick(){if(i>0)document.getElementById(ids[i-1]).className='an-row done';if(i<ids.length){document.getElementById(ids[i]).className='an-row act';i++;setTimeout(tick,820+Math.random()*380);}}
+  tick();callMistral();
 }
 
-window.selectOpt=function(key,val){
-  _qAns[key]=val;
-  if(_qStep<QUIZ_QUESTIONS.length-1){
-    var intel=INTEL_MSGS[_qStep%INTEL_MSGS.length];
-    _showIntel(intel,function(){ _qStep++; _renderStep(_qStep); });
-  } else {
-    localStorage.setItem('saasgenrt_answers',JSON.stringify(_qAns));
-    setTimeout(function(){ nav.go('analyzing'); },350);
-  }
-};
-
-function _showIntel(intel,cb){
-  var ov=document.getElementById('intel-overlay');
-  document.getElementById('intel-icon').textContent=intel.icon;
-  document.getElementById('intel-msg').textContent=intel.msg;
-  document.getElementById('intel-sub').textContent=intel.sub;
-  ov.classList.add('show');
-  setTimeout(function(){ ov.classList.remove('show'); setTimeout(cb,280); },1300);
-}
-
-// ════════════════════════════════════════
-// MISTRAL AI CALL
-// ════════════════════════════════════════
-async function callMistralAI(ans){
-  var skillMap={dev:'Développeur/Ingénieur',design:'Designer/Créateur',sales:'Vente/Marketing',ops:'Ops/Business'};
-  var timeMap={low:'moins de 5h/semaine',medium:'5–15h/semaine',high:'15–30h/semaine',fulltime:'40h+/semaine'};
-  var targetMap={'1k':'1 000€/mois','5k':'5 000€/mois','10k':'10 000€/mois','50k':'50 000€+/mois'};
-  var modelMap={sub:'abonnements mensuels',usage:'facturation à l\'usage',oneoff:'paiement unique',mixed:'modèle mixte (abo + upsell)'};
-  var fearMap={tech:'complexité technique',competition:'trop de concurrence',customers:'acquisition de clients',time:'manque de temps'};
-
-  var prompt='Tu es un expert en micro-SaaS B2B. Génère 10 idées de SaaS UNIQUES et très PERSONNALISÉES pour ce fondateur :\n\n'
-    +'- Compétences : '+(skillMap[ans.skill]||'non renseigné')+'\n'
-    +'- Temps disponible : '+(timeMap[ans.time]||'non renseigné')+'\n'
-    +'- Objectif MRR : '+(targetMap[ans.target]||'non renseigné')+'\n'
-    +'- Modèle préféré : '+(modelMap[ans.model]||'non renseigné')+'\n'
-    +'- Plus grande crainte : '+(fearMap[ans.fear]||'non renseigné')+'\n\n'
-    +'Réponds UNIQUEMENT avec un tableau JSON valide de 10 objets (pas de texte autour, pas de markdown), format strict :\n'
-    +'[{"id":"kebab-case-id","name":"Nom Produit","tagline":"Accroche courte et percutante","category":"Catégorie","potential":"high","potentialMrr":"€X 000–Y 000/mo","description":"2-3 phrases concrètes.","targetCustomer":"Qui paie exactement"}]\n\n'
-    +'potential doit être : "low" | "medium" | "high" | "very_high"\n'
-    +'Sois créatif, spécifique, réaliste. Les idées doivent correspondre aux contraintes exactes du fondateur.';
-
-  var resp=await fetch('https://api.mistral.ai/v1/chat/completions',{
+/* Mistral */
+function callMistral(){
+  var prompt='Tu es un expert SaaS B2B. Génère EXACTEMENT 10 idées SaaS en JSON strict.\n\n'
+    +'Contexte:\n- Problème: '+S.problem+'\n- Secteur: '+S.sector+'\n- Tech: '+S.tech
+    +'\n- Objectif MRR: '+S.mrr+'\n- Temps/semaine: '+S.time+'\n- Budget: '+S.budget
+    +'\n\nRéponds UNIQUEMENT avec du JSON valide, sans markdown:\n'
+    +'{"ideas":[{"id":1,"name":"","tagline":"","description":"2 phrases","category":"B2B SaaS|Dev Tools|Marketing|Finance|RH",'
+    +'"mrr_low":1000,"mrr_high":8000,"difficulty":"Faible|Moyen|Élevé","difficulty_score":30,"fit_score":85,'
+    +'"time_to_market":"3 semaines","tech_stack":"","cac":120,"ltv":960,'
+    +'"key_features":["f1","f2","f3"],"roadmap":["étape1","étape2","étape3"]},...]}'
+    +'\n\nGénère 10 idées variées, réalistes, adaptées au profil.';
+  fetch('https://api.mistral.ai/v1/chat/completions',{
     method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer 4PtEe397ANJtMuPHfxeYIlwtFQsTRt3a'},
-    body:JSON.stringify({model:'mistral-small-latest',messages:[{role:'user',content:prompt}],temperature:0.82,max_tokens:3000})
-  });
-  if(!resp.ok) throw new Error('HTTP '+resp.status);
-  var data=await resp.json();
-  var content=data.choices[0].message.content;
-  var m=content.match(/\[[\s\S]*\]/);
-  if(!m) throw new Error('No JSON array in response');
-  var ideas=JSON.parse(m[0]);
-  if(!Array.isArray(ideas)||ideas.length===0) throw new Error('Empty array');
-  return ideas;
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+KEY},
+    body:JSON.stringify({model:'mistral-small-latest',temperature:.82,max_tokens:3500,messages:[{role:'user',content:prompt}]})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    var c=d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content;
+    if(!c)throw new Error();
+    S.ideas=JSON.parse(c.replace(/```json|```/g,'').trim()).ideas||[];
+    setTimeout(function(){R.go('dash');},1000);
+  }).catch(function(){S.ideas=DEMO;setTimeout(function(){R.go('dash');},1000);});
 }
 
-// ════════════════════════════════════════
-// INIT_ANALYZING
-// ════════════════════════════════════════
-var _analyzeTimer=null;
-function init_analyzing(){
-  if(_analyzeTimer){ clearTimeout(_analyzeTimer); _analyzeTimer=null; }
-  var prog=document.getElementById('analyzing-progress');
-  var pctEl=document.getElementById('analyzing-pct');
-  var stepEls=document.querySelectorAll('#analyzing-steps [data-step]');
-  var pct=0, _apiDone=false, _waitingForApi=false;
+/* Demo ideas */
+var DEMO=[
+  {id:1,name:'InvoiceFlow AI',tagline:'Facturation automatique pour freelances',description:'Génère et envoie des factures en 1 clic. Relances auto par email et SMS.',category:'Finance',mrr_low:4000,mrr_high:12000,difficulty:'Faible',difficulty_score:25,fit_score:94,time_to_market:'3 semaines',tech_stack:'Next.js · Stripe · Resend',cac:45,ltv:540,key_features:['Génération PDF auto','Relances programmées','Dashboard paiements'],roadmap:['S1: Maquettes + validation','S2-3: MVP Stripe','M2: Lancement public']},
+  {id:2,name:'ContentSpin',tagline:'Repurpose tes contenus automatiquement',description:'Transforme un article en 15 formats : threads, newsletters, scripts vidéo.',category:'Marketing',mrr_low:3000,mrr_high:9000,difficulty:'Moyen',difficulty_score:45,fit_score:88,time_to_market:'5 semaines',tech_stack:'React · Mistral API · Vercel',cac:60,ltv:480,key_features:['15 formats output','Scheduled publishing','Brand voice IA'],roadmap:['S1-2: Core','S3-4: Intégrations','M2: Growth']},
+  {id:3,name:'HireTrack Pro',tagline:'ATS léger pour PME, setup 5 min',description:'Suivi des candidatures sans la complexité des gros ATS.',category:'RH',mrr_low:5000,mrr_high:18000,difficulty:'Moyen',difficulty_score:50,fit_score:82,time_to_market:'2 mois',tech_stack:'Next.js · Supabase · Resend',cac:120,ltv:1440,key_features:['Kanban candidats','Email templates','Calendrier entretiens'],roadmap:['M1: MVP','M2: Beta privée','M3: Launch']},
+  {id:4,name:'MeetingSynth',tagline:'Résumés de réunions automatiques',description:'Enregistre, transcrit et génère des résumés actionnables de tes réunions.',category:'B2B SaaS',mrr_low:2000,mrr_high:7000,difficulty:'Faible',difficulty_score:30,fit_score:90,time_to_market:'3 semaines',tech_stack:'Whisper API · GPT-4 · React',cac:35,ltv:420,key_features:['Transcription auto','Action items','Slack sync'],roadmap:['S1: Core','S2-3: Intégrations','M2: Scale']},
+  {id:5,name:'PricingLab',tagline:'A/B testing de prix SaaS',description:'Teste différentes stratégies de pricing et identifie le prix optimal.',category:'Dev Tools',mrr_low:3000,mrr_high:11000,difficulty:'Élevé',difficulty_score:70,fit_score:76,time_to_market:'3 mois',tech_stack:'React · Node.js · Stripe',cac:200,ltv:2400,key_features:['A/B testing','Cohort analysis','Revenue modeling'],roadmap:['M1: Research','M2: MVP','M3: Beta']},
+  {id:6,name:'OnboardWave',tagline:'Onboarding SaaS en 5 minutes',description:"Flows d'onboarding interactifs avec checklist, tooltips et tours produit.",category:'B2B SaaS',mrr_low:4000,mrr_high:14000,difficulty:'Moyen',difficulty_score:55,fit_score:85,time_to_market:'6 semaines',tech_stack:'React · Supabase · Segment',cac:90,ltv:1080,key_features:['No-code builder','Checklist gamifiée','Analytics conversion'],roadmap:['S1-2: Builder','S3-4: Analytics','M2: Launch']},
+  {id:7,name:'RetentionRadar',tagline:"Prédit le churn avant qu'il arrive",description:'Détecte les signaux faibles de churn 30 jours avant.',category:'Marketing',mrr_low:6000,mrr_high:22000,difficulty:'Élevé',difficulty_score:72,fit_score:79,time_to_market:'4 mois',tech_stack:'Python · FastAPI · React',cac:300,ltv:3600,key_features:['Health score IA','Alertes proactives','Playbooks auto'],roadmap:['M1-2: ML model','M3: Dashboard','M4: Beta']},
+  {id:8,name:'DocSign Lite',tagline:'Signature électronique minimaliste',description:'Envoi et signature de documents en moins de 60 secondes.',category:'B2B SaaS',mrr_low:3500,mrr_high:10000,difficulty:'Moyen',difficulty_score:48,fit_score:87,time_to_market:'5 semaines',tech_stack:'Next.js · PDF.js · Stripe',cac:55,ltv:660,key_features:['Signature 1 clic','Templates prêts','Audit trail'],roadmap:['S1-2: Core','S3: Stripe','M2: Launch']},
+  {id:9,name:'FeedbackLoop',tagline:'Feedback produit en 2 lignes de code',description:'Widget NPS, feature requests et bugs intégré instantanément.',category:'Dev Tools',mrr_low:2000,mrr_high:8000,difficulty:'Faible',difficulty_score:28,fit_score:91,time_to_market:'2 semaines',tech_stack:'Vanilla JS · Node.js · Supabase',cac:30,ltv:360,key_features:['Widget JS embed','Voting system','Roadmap public'],roadmap:['S1: Widget','S2: Dashboard','M2: Roadmap']},
+  {id:10,name:'APImonitor',tagline:'Monitoring APIs tierces temps réel',description:'Surveille les APIs dont ton SaaS dépend. Alertes Slack en cas de panne.',category:'Dev Tools',mrr_low:2500,mrr_high:9000,difficulty:'Moyen',difficulty_score:42,fit_score:83,time_to_market:'3 semaines',tech_stack:'Node.js · React · Twilio',cac:50,ltv:600,key_features:['Checks toutes 1min','Status page','Alertes multi-canal'],roadmap:['S1: Checker','S2: Dashboard','M2: Scale']},
+];
 
-  var ans={};
-  try{ans=JSON.parse(localStorage.getItem('saasgenrt_answers')||'{}');}catch(e){}
-  var arch=detectArchetype(ans);
-
-  // Fire Mistral API call immediately in parallel
-  callMistralAI(ans).then(function(ideas){
-    localStorage.setItem('saasgenrt_ai_ideas',JSON.stringify(ideas));
-    _apiDone=true;
-    var lbl=document.getElementById('ai-step-label');
-    if(lbl) lbl.textContent='✨ Idées IA générées !';
-    if(_waitingForApi){ _waitingForApi=false; fastFinish(); }
-  }).catch(function(err){
-    console.warn('Mistral fallback:',err.message);
-    // Use local IDEAS as fallback
-    var fallback=IDEAS.slice(0,10).map(function(idea){
-      return {id:idea.id,name:idea.name,tagline:idea.tagline,category:idea.category,potential:'high',potentialMrr:idea.mrr,description:idea.desc,targetCustomer:'Indie hackers & petites équipes'};
-    });
-    localStorage.setItem('saasgenrt_ai_ideas',JSON.stringify(fallback));
-    _apiDone=true;
-    if(_waitingForApi){ _waitingForApi=false; fastFinish(); }
-  });
-
-  function setUI(p){
-    if(prog) prog.style.width=p+'%';
-    if(pctEl) pctEl.textContent=p+'%';
-    var si=Math.floor(p/20);
-    stepEls.forEach(function(s,i){
-      var icon=s.querySelector('.step-icon');
-      if(i<si){ s.style.color='#34d399'; if(icon){icon.textContent='✓';icon.style.background='#34d399';icon.style.border='none';icon.style.color='#08080c';} }
-      else if(i===si){ s.style.color='#fff'; if(icon) icon.textContent='◉'; }
-    });
-  }
-
-  function fastFinish(){
-    if(_analyzeTimer) clearTimeout(_analyzeTimer);
-    (function ft(){
-      pct=Math.min(100,pct+6); setUI(Math.round(pct));
-      if(pct<100){ _analyzeTimer=setTimeout(ft,55); }
-      else{
-        var ranked=IDEAS.map(function(idea){return{id:idea.id,score:scoreIdea(idea,ans,arch)};}).sort(function(a,b){return b.score-a.score;});
-        localStorage.setItem('saasgenrt_results',JSON.stringify({arch:arch,ranked:ranked}));
-        _analyzeTimer=setTimeout(function(){nav.go('results');},450);
-      }
-    })();
-  }
-
-  function tick(){
-    // Slow near 68%, waiting for API
-    if(pct>=68&&!_apiDone){
-      pct=Math.min(73,pct+0.4); setUI(Math.round(pct));
-      _waitingForApi=true;
-      _analyzeTimer=setTimeout(tick,450);
-      return;
-    }
-    if(_apiDone&&pct>=68){ fastFinish(); return; }
-    pct=Math.min(68,pct+Math.random()*6+4); setUI(Math.round(pct));
-    _analyzeTimer=setTimeout(tick,190+Math.random()*240);
-  }
-  tick();
+/* Dashboard */
+function iDash(){if(!S.ideas.length)S.ideas=DEMO;renderTable(S.ideas);updateStats(S.ideas);}
+function nk(n){return n>=1000?(n/1000).toFixed(0)+'k':n;}
+function updateStats(a){
+  document.getElementById('db-cnt').textContent=a.length;
+  document.getElementById('db-mrr').textContent='€'+nk(Math.max.apply(null,a.map(function(i){return i.mrr_high||0;})));
+  document.getElementById('db-avg').textContent=Math.round(a.reduce(function(s,i){return s+(i.fit_score||0);},0)/a.length);
+  document.getElementById('db-easy').textContent=a.filter(function(i){return(i.difficulty_score||99)<40;}).length;
+}
+function renderTable(arr){
+  var b=document.getElementById('ideas-body');
+  if(!arr||!arr.length){b.innerHTML='<tr><td colspan="7" style="text-align:center;padding:36px;color:var(--t3)">Aucune idée.</td></tr>';return;}
+  b.innerHTML=arr.map(function(idea,i){
+    var locked=!S.unlocked&&i>2;
+    var db=idea.difficulty==='Faible'?'bdg-g':idea.difficulty==='Moyen'?'bdg-y':'bdg-r';
+    var sc=idea.fit_score||0,sc2=sc>=85?'sh':sc>=70?'sm':'sl';
+    if(locked)return '<tr onclick="R.go(\'paywall\')">'
+      +'<td style="color:var(--t3);font-weight:700">'+(i+1)+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1"><div class="skel" style="width:130px;height:12px;margin-bottom:5px"></div><div class="skel" style="width:190px;height:10px"></div></div><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div></td>'
+      +'<td><div class="skel" style="width:56px;height:18px;border-radius:9px"></div></td>'
+      +'<td><div class="skel" style="width:72px;height:12px"></div></td>'
+      +'<td><div class="skel" style="width:50px;height:18px;border-radius:9px"></div></td>'
+      +'<td><div class="skel" style="width:34px;height:12px"></div></td>'
+      +'<td><button class="btn btn-p btn-sm" onclick="R.go(\'paywall\');event.stopPropagation()">Unlock</button></td></tr>';
+    return '<tr onclick="openDet('+i+')">'
+      +'<td style="color:var(--t3);font-weight:700">'+(i+1)+'</td>'
+      +'<td><div style="font-size:13px;font-weight:600">'+idea.name+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px">'+idea.tagline+'</div></td>'
+      +'<td><span class="bdg bdg-b">'+idea.category+'</span></td>'
+      +'<td style="font-weight:700;color:var(--gl)">€'+nk(idea.mrr_high)+'/mo</td>'
+      +'<td><span class="bdg '+db+'">'+idea.difficulty+'</span></td>'
+      +'<td><div class="score '+sc2+'">'+sc+'</div></td>'
+      +'<td><button class="btn btn-o btn-sm" onclick="openDet('+i+');event.stopPropagation()">Voir →</button></td></tr>';
+  }).join('');
+}
+function filt(k){
+  ['all','b2b','dev','mkt'].forEach(function(fk){var e=document.getElementById('f-'+fk);if(e)e.classList.toggle('on',fk===k);});
+  renderTable(S.ideas.filter(function(i){
+    if(k==='all')return true;
+    if(k==='b2b')return i.category&&(i.category.includes('B2B')||i.category.includes('Finance')||i.category.includes('RH'));
+    if(k==='dev')return i.category&&i.category.includes('Dev');
+    if(k==='mkt')return i.category&&i.category.includes('Marketing');
+    return true;
+  }));
+}
+function sortI(k){
+  renderTable(S.ideas.slice().sort(function(a,b){
+    if(k==='mrr')return(b.mrr_high||0)-(a.mrr_high||0);
+    if(k==='diff')return(a.difficulty_score||0)-(b.difficulty_score||0);
+    return(b.fit_score||0)-(a.fit_score||0);
+  }));
 }
 
-// ════════════════════════════════════════
-// INIT_RESULTS
-// ════════════════════════════════════════
-function init_results(){
-  var aiIdeas=[], arch='builder';
-  try{ aiIdeas=JSON.parse(localStorage.getItem('saasgenrt_ai_ideas')||'[]'); }catch(e){}
-  try{ var d=JSON.parse(localStorage.getItem('saasgenrt_results')||'{}'); arch=d.arch||'builder'; }catch(e){}
-  var am=ARCHETYPE_META[arch]||ARCHETYPE_META.builder;
-
-  // Fallback if no AI ideas yet
-  if(!aiIdeas.length){
-    aiIdeas=IDEAS.slice(0,10).map(function(idea){
-      return {id:idea.id,name:idea.name,tagline:idea.tagline,category:idea.category,potential:'high',potentialMrr:idea.mrr,description:idea.desc,targetCustomer:'Indie hackers & petites équipes'};
-    });
-  }
-
-  var isPremium=localStorage.getItem('saasgenrt_premium')==='1';
-  var UNLOCK_AT=isPremium?10:7;
-  var cont=document.getElementById('results-content'); if(!cont) return;
-
-  var BADGE={
-    low:     {label:'Potentiel Faible',  cls:'badge-low'},
-    medium:  {label:'Potentiel Moyen',   cls:'badge-medium'},
-    high:    {label:'Potentiel Élevé',   cls:'badge-high'},
-    very_high:{label:'Potentiel ✦ Très Élevé',cls:'badge-very_high'},
-  };
-
-  var html='';
-
-  // ── Header ──
-  html+='<div style="text-align:center;margin-bottom:32px;">';
-  html+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;">';
-  html+='<div class="glass" style="display:inline-flex;align-items:center;gap:7px;border-radius:99px;padding:7px 14px;">';
-  html+='<span>'+am.icon+'</span><span style="font-size:13px;font-weight:500;color:'+am.color+';">'+am.label+'</span></div>';
-  html+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);border-radius:99px;padding:6px 12px;">';
-  html+='<span style="font-size:11px;">✨</span><span style="font-size:11px;color:#6ee7b7;font-weight:600;">Généré par Mistral AI</span></div></div>';
-  html+='<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(26px,5vw,40px);font-weight:500;margin-bottom:8px;">Vos 10 idées SaaS personnalisées</h1>';
-  html+='<p style="font-size:13px;color:#9ca3af;max-width:440px;margin:0 auto;line-height:1.6;">'+am.desc+'</p></div>';
-
-  // ── Ideas list ──
-  html+='<div style="position:relative;">';
-  html+='<div style="display:flex;flex-direction:column;gap:12px;" id="ideas-list">';
-
-  aiIdeas.forEach(function(idea,i){
-    var bc=BADGE[idea.potential]||BADGE.high;
-    var locked=(i>=UNLOCK_AT);
-    html+='<div class="ai-card'+(locked?' locked':'')+'" '
-      +(locked?'style="filter:blur(3.5px);"':'style="" onclick="openAiDetail('+i+')"')+'>';
-
-    // Top row
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">';
-    html+='<div style="display:flex;align-items:center;gap:8px;">';
-    html+='<div class="idea-num">'+(i+1)+'</div>';
-    html+='<span class="tag">'+idea.category+'</span></div>';
-    html+='<span class="'+bc.cls+'" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;">'+bc.label+'</span></div>';
-
-    // Name + tagline
-    html+='<h3 style="font-family:\'Cormorant Garamond\',serif;font-size:21px;font-weight:500;margin-bottom:4px;line-height:1.25;">'+idea.name+'</h3>';
-    html+='<p style="font-size:13px;color:#a78bfa;font-weight:500;margin-bottom:10px;">'+idea.tagline+'</p>';
-
-    // Description
-    html+='<p style="font-size:13px;color:#9ca3af;line-height:1.65;margin-bottom:12px;">'+idea.description+'</p>';
-
-    // Bottom row
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);">';
-    html+='<div style="font-size:12px;color:#6b7280;">👤 '+idea.targetCustomer+'</div>';
-    html+='<div class="text-eg" style="font-size:13px;font-weight:600;">'+idea.potentialMrr+'</div></div>';
-
-    html+='</div>'; // end ai-card
-  });
-
-  html+='</div>'; // end ideas-list
-
-  // Paywall gradient mask + lock overlay (only if not premium)
-  if(!isPremium){
-    html+='<div style="position:absolute;bottom:0;left:0;right:0;height:300px;background:linear-gradient(transparent,#08080c 58%);pointer-events:none;z-index:10;"></div>';
-    html+='<div style="position:absolute;bottom:50px;left:0;right:0;text-align:center;z-index:20;display:flex;flex-direction:column;align-items:center;gap:6px;">';
-    html+='<div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:20px;backdrop-filter:blur(8px);">🔒</div>';
-    html+='<p style="font-size:13px;color:#9ca3af;">+ 3 idées verrouillées</p></div>';
-  }
-
-  html+='</div>'; // end relative
-
-  // ── PAYWALL SECTION ──
-  if(!isPremium){
-    html+='<div style="margin-top:44px;padding:36px 24px 32px;border-radius:28px;background:linear-gradient(135deg,rgba(91,94,248,.1),rgba(124,58,237,.07));border:1px solid rgba(167,139,250,.22);text-align:center;position:relative;overflow:hidden;">';
-
-    // BG orbs
-    html+='<div style="position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(91,94,248,.14);filter:blur(70px);top:-80px;right:-60px;pointer-events:none;"></div>';
-    html+='<div style="position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(52,211,153,.09);filter:blur(60px);bottom:-50px;left:-30px;pointer-events:none;"></div>';
-
-    html+='<div style="position:relative;z-index:1;">';
-
-    // Fire badge
-    html+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:5px 14px;margin-bottom:18px;">';
-    html+='<span style="font-size:13px;">🔥</span><span style="font-size:11px;color:#fbbf24;font-weight:600;letter-spacing:.1em;text-transform:uppercase;">Accès Complet</span></div>';
-
-    html+='<h2 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(26px,5vw,38px);font-weight:500;margin-bottom:10px;line-height:1.2;">Prêt à lancer<br>votre aventure SaaS ?</h2>';
-    html+='<p style="font-size:14px;color:#9ca3af;max-width:400px;margin:0 auto 28px;line-height:1.7;">Débloquez les 3 idées restantes, les angles marketing personnalisés, la stratégie d\'acquisition et votre dashboard de lancement.</p>';
-
-    // Features grid
-    html+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:400px;margin:0 auto 28px;text-align:left;">';
-    var features=[
-      ['🎯','Angles marketing ciblés'],
-      ['📊','Dashboard de lancement'],
-      ['🚀','Stratégie d\'acquisition'],
-      ['🔓','3 idées supplémentaires'],
-      ['🛠️','Stack technique détaillée'],
-      ['📈','Roadmap 90 jours'],
-    ];
-    features.forEach(function(f){
-      html+='<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:9px 10px;">';
-      html+='<span style="font-size:15px;">'+f[0]+'</span><span style="font-size:12px;color:#d1d5db;">'+f[1]+'</span></div>';
-    });
-    html+='</div>';
-
-    // Price display
-    html+='<div style="margin-bottom:20px;">';
-    html+='<div style="font-size:13px;color:#9ca3af;margin-bottom:4px;text-decoration:line-through;opacity:.6;">Valeur réelle : 199€</div>';
-    html+='<div><span style="font-size:52px;font-weight:700;line-height:1;">20</span><span style="font-size:22px;font-weight:700;">€</span><span style="font-size:15px;color:#9ca3af;margin-left:6px;">accès unique · à vie</span></div></div>';
-
-    // CTA button
-    html+='<button class="btn-primary" style="font-size:17px;padding:20px 44px;border-radius:16px;width:100%;max-width:380px;justify-content:center;box-shadow:0 10px 50px rgba(91,94,248,.45);" onclick="openPaywall()">';
-    html+='🚀 Propulser mon SaaS · 20€</button>';
-
-    html+='<p style="font-size:12px;color:#6b7280;margin-top:14px;">🔐 Paiement sécurisé · ✓ Accès immédiat · ✓ Remboursé si non satisfait 7 jours</p>';
-
-    html+='</div></div>'; // end z-index + paywall section
-  } else {
-    // Already premium — show "Go to detail" CTA
-    var firstId=(aiIdeas[0]&&aiIdeas[0].id)||IDEAS[0].id;
-    html+='<div style="margin-top:32px;text-align:center;">';
-    html+='<button class="btn-primary" style="font-size:16px;padding:16px 36px;justify-content:center;" onclick="openAiDetail(0)">Ouvrir le Blueprint #1 →</button>';
-    html+='</div>';
-  }
-
-  cont.innerHTML=html;
-
-  // Staggered card entrance animation
-  var cards=cont.querySelectorAll('.ai-card');
-  cards.forEach(function(card,i){
-    setTimeout(function(){
-      card.style.transition='opacity .36s ease, transform .36s ease';
-      card.style.opacity='1';
-      card.style.transform='translateY(0)';
-    }, i*55);
-  });
+/* Detail */
+function openDet(i){var idea=S.ideas[i];if(!idea)return;if(!S.unlocked&&i>2){R.go('paywall');return;}S.sel=idea;R.go('detail');}
+function renderDet(idea){
+  var a=document.getElementById('detail-area');
+  if(!idea){a.innerHTML='<div style="text-align:center;padding:60px;color:var(--t3)">Sélectionne une idée.</div>';return;}
+  var sc=idea.fit_score||0,s2=sc>=85?'sh':sc>=70?'sm':'sl',db=idea.difficulty==='Faible'?'bdg-g':idea.difficulty==='Moyen'?'bdg-y':'bdg-r';
+  a.innerHTML=''
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:24px">'
+    +'<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><h2 style="font-size:22px">'+idea.name+'</h2><div class="score '+s2+'">'+sc+'</div></div>'
+    +'<p style="color:var(--t2);font-size:13.5px;max-width:520px;line-height:1.6;margin-bottom:10px">'+idea.tagline+'</p>'
+    +'<div style="display:flex;gap:7px;flex-wrap:wrap"><span class="bdg bdg-b">'+idea.category+'</span><span class="bdg '+db+'">'+idea.difficulty+'</span><span class="bdg bdg-p">'+idea.time_to_market+'</span></div></div>'
+    +'<button class="btn btn-p btn-sm" onclick="R.go(\'paywall\')">Blueprint complet →</button></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px">'
+    +'<div class="gcard sc"><div class="sc-lbl">MRR Max</div><div class="sc-val" style="font-size:20px">€'+nk(idea.mrr_high)+'/mo</div></div>'
+    +'<div class="gcard sc"><div class="sc-lbl">CAC</div><div class="sc-val" style="font-size:20px">€'+(idea.cac||'—')+'</div></div>'
+    +'<div class="gcard sc"><div class="sc-lbl">LTV</div><div class="sc-val" style="font-size:20px">€'+(idea.ltv||'—')+'</div></div>'
+    +'<div class="gcard sc"><div class="sc-lbl">LTV/CAC</div><div class="sc-val" style="font-size:20px">'+(idea.ltv&&idea.cac?(idea.ltv/idea.cac).toFixed(1)+'x':'—')+'</div></div></div>'
+    +'<div class="gcard" style="padding:18px;margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px">Description</div><p style="font-size:13.5px;color:var(--t2);line-height:1.7">'+idea.description+'</p></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">'
+    +'<div class="gcard" style="padding:18px"><div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:11px">Features</div>'
+    +(idea.key_features||[]).map(function(f){return'<div style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gl)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'+f+'</div>';}).join('')+'</div>'
+    +'<div class="gcard" style="padding:18px"><div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:11px">Roadmap</div>'
+    +(idea.roadmap||[]).map(function(r,i){return'<div style="display:flex;align-items:flex-start;gap:9px;font-size:13px;margin-bottom:9px"><div style="width:18px;height:18px;border-radius:50%;background:rgba(124,58,237,.13);border:1px solid rgba(124,58,237,.22);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--pl);flex-shrink:0;margin-top:1px">'+(i+1)+'</div><span style="color:var(--t2)">'+r+'</span></div>';}).join('')+'</div></div>'
+    +'<div class="gcard" style="padding:14px 18px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Stack</span><span style="font-size:13px;color:var(--t2)">'+idea.tech_stack+'</span></div></div>';
 }
 
-// ════════════════════════════════════════
-// INIT_DETAIL
-// ════════════════════════════════════════
-function init_detail(params){
-  var id=params.id, premium=params.premium||localStorage.getItem('saasgenrt_premium')==='1';
-  var idea=null; for(var i=0;i<IDEAS.length;i++) if(IDEAS[i].id===id){idea=IDEAS[i];break;}
-  // Fall back to AI-generated idea if not in local IDEAS
-  if(!idea){
-    var aiArr=[];
-    try{aiArr=JSON.parse(localStorage.getItem('saasgenrt_ai_ideas')||'[]');}catch(e){}
-    for(var k=0;k<aiArr.length;k++){
-      if(aiArr[k].id===id){
-        var ai=aiArr[k];
-        idea={id:ai.id,name:ai.name,tagline:ai.tagline,category:ai.category,mrr:ai.potentialMrr,mrrMin:2000,difficulty:'Medium',arch:[],tags:[ai.category],desc:ai.description,market:'Client cible : '+ai.targetCustomer,stack:'Next.js + Supabase + Stripe + Vercel',pricing:'€29/mo starter · €79/mo pro · €199/mo agency',roadmap:['Semaine 1–2 : MVP & landing page','Semaine 3–4 : Bêta & premiers utilisateurs','Mois 2 : Acquisition & croissance','Mois 3 : Optimisation & scaling']};
-        break;
-      }
-    }
-  }
-  var cont=document.getElementById('detail-content');
-  if(!idea){cont.innerHTML='<p style="color:#9ca3af;">Idée introuvable.</p>';return;}
-  localStorage.setItem('saasgenrt_selected_id',id);
-  var titleEl=document.getElementById('detail-nav-title');
-  if(titleEl) titleEl.textContent=idea.name;
+/* Paywall */
+function unlock(){S.unlocked=true;toast('Accès déverrouillé ! Bienvenue dans SaaSGenrt Premium.');R.go('dash');}
 
-  var score=75;
-  try{var d=JSON.parse(localStorage.getItem('saasgenrt_results')||'{}');(d.ranked||[]).forEach(function(r){if(r.id===id)score=r.score;});}catch(e){}
-
-  var html='';
-
-  // Hero
-  html+='<div style="margin-bottom:24px;" class="fade-up">';
-  html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">';
-  html+='<div>';
-  html+='<div style="display:flex;gap:6px;margin-bottom:8px;">';
-  html+='<span class="tag">'+idea.category+'</span><span class="tag">'+idea.difficulty+'</span></div>';
-  html+='<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:clamp(24px,5vw,34px);font-weight:500;line-height:1.15;">'+idea.name+'</h1>';
-  html+='<p style="font-size:13px;color:#9ca3af;margin-top:4px;">'+idea.tagline+'</p></div>';
-  html+='<div class="glass" style="border-radius:16px;padding:14px 16px;text-align:center;min-width:72px;flex-shrink:0;">';
-  html+='<div class="text-eg" style="font-size:28px;font-weight:700;">'+score+'</div>';
-  html+='<div style="font-size:11px;color:#6b7280;margin-top:2px;">score</div></div></div>';
-  html+='<div class="glass" style="border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">';
-  html+='<div><div style="font-size:11px;color:#6b7280;margin-bottom:4px;">Potentiel MRR</div>';
-  html+='<div class="text-eg" style="font-size:22px;font-weight:700;">'+idea.mrr+'</div></div>';
-  html+='<div style="text-align:right;"><div style="font-size:11px;color:#6b7280;margin-bottom:4px;">Difficulté</div>';
-  html+='<div style="font-size:14px;font-weight:500;">'+idea.difficulty+'</div></div></div></div>';
-
-  // Description
-  html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
-  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:10px;">Vue d\'ensemble</h2>';
-  html+='<p style="font-size:13px;color:#d1d5db;line-height:1.7;">'+idea.desc+'</p></div>';
-
-  // Market
-  html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
-  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:10px;">Opportunité de marché</h2>';
-  html+='<p style="font-size:13px;color:#d1d5db;line-height:1.7;">'+(idea.market||'Marché en croissance avec une demande validée et un chemin de monétisation clair.')+'</p></div>';
-
-  // Pricing tiers
-  html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
-  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:12px;">Modèle de prix</h2>';
-  (idea.pricing||'$29/mo starter · $79/mo pro').split('·').forEach(function(t){
-    html+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:7px;">';
-    html+='<span style="color:#34d399;font-size:14px;">→</span><span style="font-size:13px;color:#d1d5db;">'+t.trim()+'</span></div>';
-  });
-  html+='</div>';
-
-  if(premium){
-    // Stack
-    html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
-    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">';
-    html+='<h2 style="font-weight:600;font-size:14px;">Stack technique</h2>';
-    html+='<span style="font-size:11px;background:rgba(52,211,153,.12);color:#34d399;padding:2px 8px;border-radius:99px;">Premium</span></div>';
-    html+='<p style="font-size:13px;color:#d1d5db;line-height:1.7;">'+(idea.stack||'Next.js + Supabase + Stripe + Vercel')+'</p></div>';
-
-    // Roadmap
-    html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:20px;">';
-    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">';
-    html+='<h2 style="font-weight:600;font-size:14px;">Roadmap 90 jours</h2>';
-    html+='<span style="font-size:11px;background:rgba(52,211,153,.12);color:#34d399;padding:2px 8px;border-radius:99px;">Premium</span></div>';
-    (idea.roadmap||['Week 1-2: Core MVP','Week 3-4: Beta','Month 2: Growth','Month 3: Scale']).forEach(function(step,i){
-      html+='<div style="display:flex;gap:10px;margin-bottom:10px;">';
-      html+='<div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#a78bfa;flex-shrink:0;margin-top:1px;">'+(i+1)+'</div>';
-      html+='<div style="font-size:13px;color:#d1d5db;padding-top:3px;">'+step+'</div></div>';
-    });
-    html+='</div>';
-
-    html+='<button class="btn-primary" style="width:100%;padding:16px;font-size:14px;justify-content:center;" onclick="nav.go(\'dashboard\',{id:\''+id+'\'})">Ouvrir le Dashboard de Lancement →</button>';
-  } else {
-    // Gate
-    html+='<div class="glass" style="border-radius:18px;padding:28px;border-color:rgba(167,139,250,.2)!important;text-align:center;">';
-    html+='<div style="font-size:32px;margin-bottom:10px;">🔒</div>';
-    html+='<h3 style="font-weight:600;font-size:15px;margin-bottom:6px;">Stack technique & Roadmap 90 jours</h3>';
-    html+='<p style="font-size:13px;color:#9ca3af;margin-bottom:18px;line-height:1.6;">Débloque le blueprint d\'exécution complet : stack exacte, roadmap 90 jours, canaux d\'acquisition et ton dashboard de lancement.</p>';
-    html+='<button class="btn-primary" style="padding:14px 28px;font-size:13px;" onclick="activatePremium(\''+id+'\')">Débloquer le Blueprint — 20€ →</button>';
-    html+='</div>';
-  }
-
-  cont.innerHTML=html;
+/* Integrations */
+function renderInts(){
+  var data=[{n:'Stripe',ic:'💳',d:'Paiements & abonnements',s:1},{n:'Paddle',ic:'🏓',d:'Revenue ops & fiscalité',s:1},
+    {n:'Zapier',ic:'⚡',d:'Automatisations no-code',s:1},{n:'Slack',ic:'💬',d:'Notifications & alertes',s:0},
+    {n:'Notion',ic:'📝',d:'Base de connaissance',s:0},{n:'PostHog',ic:'🦔',d:'Analytics & funnels',s:1},
+    {n:'Resend',ic:'📧',d:'Emails transactionnels',s:1},{n:'Supabase',ic:'⚙️',d:'Backend & database',s:1},
+    {n:'Airtable',ic:'📊',d:'Base de données produit',s:0}];
+  document.getElementById('int-grid').innerHTML=data.map(function(x){
+    var b=x.s?'<span class="bdg bdg-g">Disponible</span>':'<span class="bdg bdg-y">Bientôt</span>';
+    var btn=x.s?'<button class="btn btn-o btn-sm" style="width:100%;justify-content:center;margin-top:11px">Connecter</button>'
+               :'<button class="btn btn-o btn-sm" style="width:100%;justify-content:center;margin-top:11px;opacity:.35" disabled>Bientôt</button>';
+    return'<div class="gcard" style="padding:16px"><div style="display:flex;align-items:center;gap:11px;margin-bottom:6px">'
+      +'<div style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+x.ic+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">'+x.n+'</div><div style="font-size:12px;color:var(--t2)">'+x.d+'</div></div>'+b+'</div>'+btn+'</div>';
+  }).join('');
 }
-
-// ════════════════════════════════════════
-// INIT_DASHBOARD
-// ════════════════════════════════════════
-function init_dashboard(params){
-  var id=params.id||localStorage.getItem('saasgenrt_selected_id');
-  var idea=null; for(var i=0;i<IDEAS.length;i++) if(IDEAS[i].id===id){idea=IDEAS[i];break;}
-  var cont=document.getElementById('dash-content');
-  if(!idea){cont.innerHTML='<p style="color:#9ca3af;">Aucune idée sélectionnée.</p>';return;}
-
-  var key='saasgenrt_dash_'+id, state={};
-  try{state=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){}
-  var done=CHECKLIST.filter(function(c){return state[c.id];}).length;
-  var pct=Math.round((done/CHECKLIST.length)*100);
-  var mrr=parseInt(state.mrr||'0',10);
-  var tgt=idea.mrrMin||2000, mrrPct=Math.min(100,Math.round((mrr/tgt)*100));
-  var circ=220, offset=circ-(pct/100)*circ;
-
-  var html='';
-
-  // Header
-  html+='<div style="margin-bottom:24px;" class="fade-up">';
-  html+='<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:28px;font-weight:500;">'+idea.name+'</h1>';
-  html+='<p style="font-size:13px;color:#9ca3af;margin-top:4px;">Votre dashboard de lancement</p></div>';
-
-  // 2-col grid
-  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px;">';
-
-  // Ring
-  html+='<div class="glass" style="border-radius:20px;padding:20px;display:flex;flex-direction:column;align-items:center;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:16px;">Progression</p>';
-  html+='<svg width="88" height="88" viewBox="0 0 88 88">';
-  html+='<circle cx="44" cy="44" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>';
-  html+='<circle cx="44" cy="44" r="34" fill="none" stroke="url(#rg'+id.replace(/-/g,'')+')" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 44 44)"/>';
-  html+='<defs><linearGradient id="rg'+id.replace(/-/g,'')+'" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs>';
-  html+='<text x="44" y="49" text-anchor="middle" fill="white" font-size="18" font-weight="700">'+pct+'%</text>';
-  html+='</svg>';
-  html+='<p style="font-size:12px;color:#9ca3af;margin-top:10px;">'+done+' / '+CHECKLIST.length+' tâches</p></div>';
-
-  // MRR
-  html+='<div class="glass" style="border-radius:20px;padding:20px;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:12px;">Tracker MRR</p>';
-  html+='<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px;">';
-  html+='<span class="text-eg" style="font-size:28px;font-weight:700;">$</span>';
-  html+='<input id="dash-mrr-input" type="number" value="'+mrr+'" min="0" style="background:transparent;border:none;outline:none;font-size:28px;font-weight:700;color:#34d399;width:100px;font-family:\'DM Sans\',sans-serif;" onchange="saveMrrVal(this.value,\''+id+'\')">';
-  html+='</div>';
-  html+='<div style="font-size:12px;color:#9ca3af;margin-bottom:12px;">Objectif : <span style="color:#34d399;">'+tgt.toLocaleString()+'€/mois</span></div>';
-  html+='<div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;">';
-  html+='<div class="progress-emerald" style="height:100%;width:'+mrrPct+'%;"></div></div>';
-  html+='<div style="font-size:11px;color:#6b7280;margin-top:5px;">'+mrrPct+'% de l\'objectif</div></div>';
-
-  html+='</div>'; // end grid
-
-  // Checklist
-  html+='<div class="glass" style="border-radius:20px;padding:20px;margin-bottom:12px;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:16px;">Checklist de lancement</p>';
-  CHECKLIST.forEach(function(item){
-    var isDone=!!state[item.id];
-    html+='<div class="check-item'+(isDone?' done':'')+'" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);" onclick="toggleCheck(\''+item.id+'\',\''+id+'\')">';
-    html+='<div class="check-box">'+(isDone?'<span style="font-size:10px;color:#08080c;font-weight:700;">✓</span>':'')+'</div>';
-    html+='<span class="check-label" style="font-size:13px;">'+item.text+'</span></div>';
-  });
-  html+='</div>';
-
-  // Integrations
-  html+='<div class="glass" style="border-radius:20px;padding:20px;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:14px;">Intégrations</p>';
-  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-  ['Stripe','Supabase','Vercel','SendGrid','PostHog','Notion'].forEach(function(name){
-    html+='<div class="glass" style="border-radius:12px;padding:12px;text-align:center;cursor:pointer;">';
-    html+='<div style="font-size:12px;font-weight:500;color:#d1d5db;">'+name+'</div>';
-    html+='<div style="font-size:11px;color:#6b7280;margin-top:2px;">Connecter →</div></div>';
-  });
-  html+='</div></div>';
-
-  cont.innerHTML=html;
-}
-
-// ════════════════════════════════════════
-// DASHBOARD HELPERS
-// ════════════════════════════════════════
-window.toggleCheck=function(cid,ideaId){
-  var k='saasgenrt_dash_'+ideaId, s={};
-  try{s=JSON.parse(localStorage.getItem(k)||'{}');}catch(e){}
-  s[cid]=!s[cid];
-  localStorage.setItem(k,JSON.stringify(s));
-  init_dashboard({id:ideaId});
-};
-window.saveMrrVal=function(val,ideaId){
-  var k='saasgenrt_dash_'+ideaId, s={};
-  try{s=JSON.parse(localStorage.getItem(k)||'{}');}catch(e){}
-  s.mrr=val; localStorage.setItem(k,JSON.stringify(s));
-};
-
-// ════════════════════════════════════════
-// GLOBAL HELPERS
-// ════════════════════════════════════════
-window.goDetail=function(id){ nav.go('detail',{id:id}); };
-window.activatePremium=function(id){
-  localStorage.setItem('saasgenrt_premium','1');
-  nav.go('detail',{id:id,premium:true});
-};
-window.toggleFaq=function(btn){
-  var body=btn.nextElementSibling, icon=btn.querySelector('span:last-child');
-  if(body.style.display==='none'||!body.style.display||body.style.display===''){
-    body.style.display='block';
-    if(icon) icon.textContent='−';
-  } else {
-    body.style.display='none';
-    if(icon) icon.textContent='+';
-  }
-};
-
-// ── Paywall modal ──
-window.openPaywall=function(){
-  var modal=document.getElementById('payment-modal');
-  if(modal) modal.classList.add('show');
-};
-window.closePaywall=function(){
-  var modal=document.getElementById('payment-modal');
-  if(modal) modal.classList.remove('show');
-};
-window.confirmPayment=function(){
-  var btn=document.getElementById('pay-confirm-btn');
-  if(!btn) return;
-  btn.textContent='Traitement en cours…';
-  btn.disabled=true;
-  btn.style.opacity='0.7';
-  setTimeout(function(){
-    closePaywall();
-    localStorage.setItem('saasgenrt_premium','1');
-    showToast('✅ Accès Premium activé ! Bienvenue 🚀');
-    // Re-render results with premium unlocked
-    setTimeout(function(){ init_results(); }, 500);
-  }, 1800);
-};
-
-// ── Card formatter ──
-window.fmtCard=function(inp){
-  var v=inp.value.replace(/\D/g,'').slice(0,16);
-  inp.value=v.replace(/(\d{4})(?=\d)/g,'$1 ').trim();
-};
-
-// ── Toast ──
-window.showToast=function(msg){
-  var t=document.getElementById('toast');
-  if(!t) return;
-  t.textContent=msg;
-  t.style.opacity='1';
-  t.style.transform='translateX(-50%) translateY(0)';
-  setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(16px)'; },3200);
-};
-
-// ── Open AI idea detail ──
-window.openAiDetail=function(idx){
-  var ideas=[];
-  try{ ideas=JSON.parse(localStorage.getItem('saasgenrt_ai_ideas')||'[]'); }catch(e){}
-  var idea=ideas[idx]; if(!idea) return;
-  // Check if id matches a local idea
-  var matchLocal=null;
-  for(var i=0;i<IDEAS.length;i++) if(IDEAS[i].id===idea.id){ matchLocal=IDEAS[i]; break; }
-  var idToUse=idea.id; // init_detail will handle both local + AI lookup
-  nav.go('detail',{id:idToUse});
-};
-
-document.addEventListener('DOMContentLoaded',function(){ nav._activate('index',{}); });
 </script>
 </body>
 </html>
