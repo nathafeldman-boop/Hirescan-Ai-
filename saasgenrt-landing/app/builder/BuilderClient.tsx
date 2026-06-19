@@ -843,21 +843,57 @@ function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
 // ─── Step 2: Who experiences it ───────────────────────────────────────────────
 
 function WhoStep({ value, onSelect, onNext, onBack }: { value: string; onSelect: (v: string) => void; onNext: () => void; onBack: () => void }) {
+  const reduce = useReducedMotion()
+  const rise = (delay: number) => reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } }
+
   return (
     <div>
       <ProgressBar current={2} />
-      <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 40, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 300 }}>
           <StepBadge n={2} />
-          <StepHeading pre="Who experiences" accent="this problem?" subtitle="This helps us find opportunities with real market demand." />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 28 }}>
+          <StepHeading
+            pre="Who experiences"
+            accent="this problem?"
+            subtitle="The audience shapes the whole product. Pick who feels this frustration most."
+          />
+          <motion.div
+            {...rise(0.18)}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 11, marginBottom: 14 }}
+          >
             {WHO_OPTIONS.map((o, i) => (
               <SelectionCard key={o.value} selected={value === o.value} onClick={() => onSelect(o.value)} icon={o.icon} label={o.label} desc={o.desc} index={i} />
             ))}
+          </motion.div>
+
+          {/* Context hint — appears when a card is selected */}
+          <div style={{ minHeight: 44, marginBottom: 16 }}>
+            <AnimatePresence mode="wait">
+              {value && (
+                <motion.div
+                  key={value}
+                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.26, ease: EASE }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '9px 13px', borderRadius: 10,
+                    background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.18)',
+                  }}
+                >
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#a78bfa', flexShrink: 0 }} />
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.48)', lineHeight: 1.45 }}>
+                    {WHO_OPTIONS.find(o => o.value === value)?.desc}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
+
           <StepNav onBack={onBack} onNext={onNext} disabled={!value} />
         </div>
-        <div style={{ width: 260, flexShrink: 0 }}><PeopleTableIllustration /></div>
+        <div style={{ width: 260, flexShrink: 0 }}>
+          <PeopleTableIllustration />
+        </div>
       </div>
     </div>
   )
@@ -865,26 +901,112 @@ function WhoStep({ value, onSelect, onNext, onBack }: { value: string; onSelect:
 
 // ─── Step 3: Do you know your problem? ────────────────────────────────────────
 
+const KNOWS_CHOICES = [
+  {
+    value: 'yes', emoji: '🎯',
+    label: 'Yes, I know it',
+    desc: 'I have a clear problem in mind that I want to validate and build around.',
+    tag: 'Skip exploration',
+    accent: '#8B5CF6', accentFill: 'rgba(139,92,246,0.14)', accentBorder: 'rgba(139,92,246,0.36)',
+  },
+  {
+    value: 'no', emoji: '🧭',
+    label: 'Help me find one',
+    desc: "I'm not sure yet — guide me to a great opportunity based on my background.",
+    tag: 'AI-guided discovery',
+    accent: '#0ea5e9', accentFill: 'rgba(14,165,233,0.12)', accentBorder: 'rgba(14,165,233,0.30)',
+  },
+]
+
 function KnowsProblemStep({ value, onSelect, onNext, onBack }: { value: string; onSelect: (v: string) => void; onNext: () => void; onBack: () => void }) {
-  const tones: Record<string, string> = { yes: '#8B5CF6', no: '#0ea5e9' }
+  const reduce = useReducedMotion()
+
   return (
     <div>
       <ProgressBar current={3} />
-      <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: 300 }}>
-          <StepBadge n={3} />
-          <StepHeading pre="Do you already" accent="know your problem?" subtitle="If you have a clear idea, we'll dive straight in. If not, we'll guide you to a great opportunity." />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 14, marginBottom: 28 }}>
-            {[
-              { value: 'yes', icon: '🎯', label: 'Yes, I know it', desc: 'I have a clear problem in mind that I want to solve.' },
-              { value: 'no', icon: '🧭', label: 'Help me find one', desc: "I'm not sure yet — guide me to a great opportunity." },
-            ].map((o, i) => (
-              <SelectionCard key={o.value} selected={value === o.value} onClick={() => onSelect(o.value)} icon={o.icon} label={o.label} desc={o.desc} accent={tones[o.value]} index={i} big />
-            ))}
-          </div>
-          <StepNav onBack={onBack} onNext={onNext} disabled={!value} />
+      <div style={{ maxWidth: 680, margin: '0 auto' }}>
+        <StepBadge n={3} />
+        <StepHeading
+          pre="Do you already"
+          accent="know your problem?"
+          subtitle="If you have a clear idea, we'll dive straight in. If not, our AI surfaces the best opportunity for you."
+        />
+
+        {/* Side-by-side hero choice cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 26 }}>
+          {KNOWS_CHOICES.map((c, i) => {
+            const sel = value === c.value
+            return (
+              <motion.button
+                key={c.value}
+                initial={reduce ? false : { opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.42, delay: 0.18 + i * 0.09, ease: EASE }}
+                whileHover={reduce ? undefined : { scale: 1.025, y: -5 }}
+                whileTap={reduce ? undefined : { scale: 0.975 }}
+                onClick={() => onSelect(c.value)}
+                style={{
+                  position: 'relative', textAlign: 'left',
+                  padding: '24px 22px 22px', borderRadius: 20,
+                  cursor: 'pointer', fontFamily: 'inherit', overflow: 'hidden',
+                  background: sel ? c.accentFill : 'rgba(255,255,255,0.035)',
+                  border: `1.5px solid ${sel ? c.accent : 'rgba(255,255,255,0.09)'}`,
+                  boxShadow: sel
+                    ? `0 0 0 1px ${c.accentBorder}, 0 12px 40px ${c.accentFill}`
+                    : '0 2px 12px rgba(0,0,0,0.2)',
+                  transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
+                }}
+              >
+                {/* Top accent line when selected */}
+                {sel && (
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+                    background: `linear-gradient(90deg, transparent, ${c.accent}, transparent)`,
+                    opacity: 0.65,
+                  }} />
+                )}
+
+                {/* Spring checkmark */}
+                <AnimatePresence>
+                  {sel && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                      style={{
+                        position: 'absolute', top: 14, right: 14,
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: c.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}
+                    >
+                      <Check style={{ width: 11, height: 11, color: 'white' }} strokeWidth={3} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div style={{ fontSize: '26px', marginBottom: 14, lineHeight: 1 }}>{c.emoji}</div>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: sel ? '#fff' : 'rgba(255,255,255,0.9)', letterSpacing: '-0.02em', marginBottom: 8 }}>
+                  {c.label}
+                </div>
+                <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.42)', lineHeight: 1.62, marginBottom: 18 }}>
+                  {c.desc}
+                </div>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '4px 10px', borderRadius: 99,
+                  background: sel ? `${c.accent}22` : 'rgba(255,255,255,0.05)',
+                  border: `1px solid ${sel ? c.accentBorder : 'rgba(255,255,255,0.08)'}`,
+                  transition: 'background 0.2s, border-color 0.2s',
+                }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: sel ? c.accent : 'rgba(255,255,255,0.38)', letterSpacing: '0.02em' }}>
+                    {c.tag}
+                  </span>
+                </div>
+              </motion.button>
+            )
+          })}
         </div>
-        <div style={{ width: 260, flexShrink: 0 }}><BifurcationIllustration /></div>
+
+        <StepNav onBack={onBack} onNext={onNext} disabled={!value} />
       </div>
     </div>
   )
@@ -897,14 +1019,35 @@ function DiscoveryField({ label, hint, value, onChange, placeholder, rows = 2 }:
 }) {
   const [focused, setFocused] = useState(false)
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 7 }}>
-        <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>{label}</span>
-        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{hint}</span>
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+        <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.82)' }}>{label}</span>
+        {hint && <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.28)' }}>{hint}</span>}
       </div>
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={rows}
-        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-        style={{ width: '100%', borderRadius: 12, padding: '12px 14px', background: 'rgba(17,24,39,0.7)', border: `1px solid ${focused ? 'rgba(139,92,246,0.48)' : 'rgba(255,255,255,0.09)'}`, color: 'white', fontSize: '14px', lineHeight: 1.6, resize: 'vertical', fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box', boxShadow: focused ? '0 0 0 3px rgba(139,92,246,0.09)' : 'none', transition: 'border-color 0.2s, box-shadow 0.2s' }} />
+      {/* Double-bezel textarea */}
+      <div style={{
+        borderRadius: 16, padding: 4,
+        background: 'rgba(255,255,255,0.02)',
+        border: `1px solid ${focused ? 'rgba(139,92,246,0.4)' : 'rgba(255,255,255,0.07)'}`,
+        boxShadow: focused ? '0 0 0 3px rgba(139,92,246,0.07)' : 'none',
+        transition: 'border-color 0.2s, box-shadow 0.2s',
+      }}>
+        <textarea
+          value={value} onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder} rows={rows}
+          onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+          style={{
+            width: '100%', display: 'block', borderRadius: 12,
+            padding: '11px 14px', boxSizing: 'border-box',
+            background: 'rgba(10,13,20,0.65)',
+            border: `1px solid ${focused ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.05)'}`,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+            color: 'white', fontSize: '14px', lineHeight: 1.65,
+            resize: 'vertical', fontFamily: 'Inter, sans-serif', outline: 'none',
+            transition: 'background 0.18s, border-color 0.2s',
+          }}
+        />
+      </div>
     </div>
   )
 }
@@ -912,22 +1055,52 @@ function DiscoveryField({ label, hint, value, onChange, placeholder, rows = 2 }:
 function DiscoveryStep({ userData, setField, onNext, onBack }: {
   userData: UserData; setField: (k: keyof UserData, v: string) => void; onNext: () => void; onBack: () => void
 }) {
+  const reduce = useReducedMotion()
   const canContinue = userData.dailyFrustrations.trim().length >= 10 || userData.passions.trim().length >= 5 || userData.profession.trim().length >= 3
+  const rise = (delay: number) => reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } }
+
   return (
     <div>
       <ProgressBar current={4} />
-      <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 40, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 300 }}>
           <StepBadge n={4} tone="green" />
-          <StepHeading pre="Let's find your" accent="perfect problem" subtitle="A few quick questions and our AI will surface 5 real problems worth solving — tailored to you." />
-          <DiscoveryField label="What frustrates you daily?" hint="you or someone close" value={userData.dailyFrustrations} onChange={(v) => setField('dailyFrustrations', v)} placeholder="Things that waste your time, annoy you, or feel broken..." rows={3} />
-          <DiscoveryField label="What are your passions?" hint="optional" value={userData.passions} onChange={(v) => setField('passions', v)} placeholder="Hobbies, topics you love, communities you're part of..." rows={2} />
-          <DiscoveryField label="Your profession or field of study?" hint="optional" value={userData.profession} onChange={(v) => setField('profession', v)} placeholder="e.g. Marketing student, freelance designer, nurse..." rows={1} />
-          <div style={{ marginTop: 22 }}>
+          <StepHeading
+            pre="Let's find your"
+            accent="perfect problem"
+            subtitle="A few quick questions and our AI surfaces 5 real problems worth solving — tailored to your life."
+          />
+          <motion.div {...rise(0.18)}>
+            <DiscoveryField
+              label="What frustrates you daily?" hint="you or someone close"
+              value={userData.dailyFrustrations} onChange={(v) => setField('dailyFrustrations', v)}
+              placeholder="Things that waste your time, annoy you, or feel broken..."
+              rows={3}
+            />
+          </motion.div>
+          <motion.div {...rise(0.26)}>
+            <DiscoveryField
+              label="What are your passions?" hint="optional"
+              value={userData.passions} onChange={(v) => setField('passions', v)}
+              placeholder="Hobbies, topics you love, communities you're part of..."
+              rows={2}
+            />
+          </motion.div>
+          <motion.div {...rise(0.34)}>
+            <DiscoveryField
+              label="Your profession or field of study?" hint="optional"
+              value={userData.profession} onChange={(v) => setField('profession', v)}
+              placeholder="e.g. Marketing student, freelance designer, nurse..."
+              rows={1}
+            />
+          </motion.div>
+          <motion.div {...rise(0.42)} style={{ marginTop: 22 }}>
             <StepNav onBack={onBack} onNext={onNext} disabled={!canContinue} label="Find my problems" isAnalyze />
-          </div>
+          </motion.div>
         </div>
-        <div style={{ width: 260, flexShrink: 0 }}><DiscoveryIllustration /></div>
+        <div style={{ width: 260, flexShrink: 0 }}>
+          <DiscoveryIllustration />
+        </div>
       </div>
     </div>
   )
@@ -938,6 +1111,7 @@ function DiscoveryStep({ userData, setField, onNext, onBack }: {
 function ProblemListStep({ userData, onSelect, onNext, onBack }: {
   userData: UserData; onSelect: (title: string) => void; onNext: () => void; onBack: () => void
 }) {
+  const reduce = useReducedMotion()
   const [loading, setLoading] = useState(true)
   const [problems, setProblems] = useState<ProblemSuggestion[]>([])
   const [msgIndex, setMsgIndex] = useState(0)
@@ -959,15 +1133,37 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '48px 0' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28, position: 'relative' }}>
-          <motion.div animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} style={{ position: 'absolute', width: 72, height: 72, borderRadius: '50%', background: 'rgba(139,92,246,0.2)' }} />
-          <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }} style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(139,92,246,0.15)', borderTop: '2px solid #8B5CF6' }} />
+      <div style={{ textAlign: 'center', padding: '52px 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 30, position: 'relative' }}>
+          {/* Outer pulse ring */}
+          {!reduce && (
+            <motion.div
+              animate={{ scale: [1, 1.22, 1], opacity: [0.18, 0.06, 0.18] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ position: 'absolute', width: 88, height: 88, borderRadius: '50%', background: 'rgba(139,92,246,0.22)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
+            />
+          )}
+          {/* Inner glow */}
+          <div style={{ position: 'absolute', width: 60, height: 60, borderRadius: '50%', background: 'rgba(139,92,246,0.1)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+          {/* Spinner ring */}
+          <motion.div
+            animate={reduce ? undefined : { rotate: 360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+            style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid rgba(139,92,246,0.12)', borderTop: '2px solid #8B5CF6', flexShrink: 0 }}
+          />
         </div>
-        <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'white', letterSpacing: '-0.02em', marginBottom: 6 }}>Finding your best problems</h2>
+        <h2 style={{ fontSize: '21px', fontWeight: 700, color: 'white', letterSpacing: '-0.03em', marginBottom: 8 }}>
+          Finding your best problems
+        </h2>
         <AnimatePresence mode="wait">
-          <motion.p key={msgIndex} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.3 }}
-            style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.45)' }}>{LOADING_STEPS_PROBLEMS[msgIndex]}</motion.p>
+          <motion.p
+            key={msgIndex}
+            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.28 }}
+            style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.4)', marginBottom: 0 }}
+          >
+            {LOADING_STEPS_PROBLEMS[msgIndex]}
+          </motion.p>
         </AnimatePresence>
       </div>
     )
@@ -977,29 +1173,70 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
     <div>
       <ProgressBar current={5} />
       <StepBadge n={5} tone="green" />
-      <StepHeading pre="Pick the problem" accent="worth solving" subtitle="We found 5 real opportunities based on your profile. Choose the one that resonates most." />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 26 }}>
+      <StepHeading
+        pre="Pick the problem"
+        accent="worth solving"
+        subtitle="5 real opportunities scored for your profile. Choose the one that resonates most."
+      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 26 }}>
         {problems.map((p, i) => {
           const selected = userData.selectedProblem === p.title
+          const fc = freqColor(p.frequency)
           return (
-            <motion.button key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: i * 0.07 }}
-              whileHover={{ scale: 1.01, y: -2 }} whileTap={{ scale: 0.99 }} onClick={() => onSelect(p.title)}
-              style={{ textAlign: 'left', padding: '16px 18px', borderRadius: 16, cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
-                background: selected ? 'rgba(139,92,246,0.13)' : 'rgba(17,24,39,0.7)', border: `1.5px solid ${selected ? '#8B5CF6' : 'rgba(255,255,255,0.09)'}`,
-                boxShadow: selected ? '0 0 0 1px rgba(139,92,246,0.3), 0 8px 30px rgba(139,92,246,0.16)' : '0 2px 10px rgba(0,0,0,0.2)', transition: 'background 0.18s, border-color 0.18s, box-shadow 0.18s' }}>
+            <motion.button
+              key={i}
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: i * 0.065, ease: EASE }}
+              whileHover={reduce ? undefined : { scale: 1.012, y: -2 }}
+              whileTap={reduce ? undefined : { scale: 0.988 }}
+              onClick={() => onSelect(p.title)}
+              style={{
+                textAlign: 'left', padding: '15px 18px', borderRadius: 16,
+                cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden',
+                background: selected ? 'rgba(139,92,246,0.13)' : 'rgba(17,24,39,0.65)',
+                border: `1.5px solid ${selected ? '#8B5CF6' : 'rgba(255,255,255,0.08)'}`,
+                boxShadow: selected
+                  ? '0 0 0 1px rgba(139,92,246,0.28), 0 10px 36px rgba(139,92,246,0.16)'
+                  : '0 2px 10px rgba(0,0,0,0.18)',
+                transition: 'background 0.18s, border-color 0.18s, box-shadow 0.18s',
+              }}
+            >
+              {/* Top accent line when selected */}
+              {selected && (
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+                  background: 'linear-gradient(90deg, transparent, #8B5CF6, transparent)',
+                  opacity: 0.6,
+                }} />
+              )}
+
+              {/* Spring checkmark */}
               <AnimatePresence>
                 {selected && (
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: 'spring', stiffness: 340 }}
-                    style={{ position: 'absolute', top: 14, right: 14, width: 22, height: 22, borderRadius: '50%', background: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    style={{ position: 'absolute', top: 14, right: 14, width: 22, height: 22, borderRadius: '50%', background: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
                     <Check style={{ width: 12, height: 12, color: 'white' }} strokeWidth={3} />
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: selected ? '#fff' : 'rgba(255,255,255,0.9)', marginBottom: 5, paddingRight: 30 }}>{p.title}</div>
-              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.55, marginBottom: 11 }}>{p.description}</div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: `${freqColor(p.frequency)}1a`, color: freqColor(p.frequency), border: `1px solid ${freqColor(p.frequency)}33` }}>⏱ {p.frequency}</span>
-                <span style={{ fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.08)' }}>📊 {p.marketSize}</span>
+
+              <div style={{ fontSize: '14.5px', fontWeight: 700, color: selected ? '#fff' : 'rgba(255,255,255,0.9)', marginBottom: 4, paddingRight: 34, letterSpacing: '-0.015em' }}>
+                {p.title}
+              </div>
+              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.42)', lineHeight: 1.58, marginBottom: 10 }}>
+                {p.description}
+              </div>
+              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11px', fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: `${fc}1a`, color: fc, border: `1px solid ${fc}30` }}>
+                  {p.frequency}
+                </span>
+                <span style={{ fontSize: '11px', fontWeight: 500, padding: '3px 9px', borderRadius: 99, background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.48)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  {p.marketSize}
+                </span>
               </div>
             </motion.button>
           )
