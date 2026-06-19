@@ -1552,8 +1552,8 @@ function IdeaSelectionStep({ ideas, selectedIndex, onSelect, onNext, onBack }: {
 
 const PLANS = [
   { id: 'week', price: '€7.90', period: '/week', name: 'Weekly', tagline: 'Start this week', accent: '#0ea5e9', badge: '', save: '' },
-  { id: 'month', price: '€25', period: '/month', name: 'Monthly', tagline: 'For serious builders', accent: '#8B5CF6', badge: 'MOST POPULAR', save: 'Save 21% vs weekly' },
-  { id: 'year', price: '€75', period: '/year', name: 'Annual', tagline: 'Best long-term value', accent: '#39FF88', badge: 'BEST VALUE', save: 'Save 75% vs monthly' },
+  { id: 'month', price: '€23', period: '/month', name: 'Monthly', tagline: 'For serious builders', accent: '#8B5CF6', badge: 'MOST POPULAR', save: 'Save 19% vs weekly' },
+  { id: 'year', price: '€75', period: '/year', name: 'Annual', tagline: 'Best long-term value', accent: '#39FF88', badge: 'BEST VALUE', save: 'Save 73% vs monthly' },
 ]
 
 const PLAN_FEATURES = ['Full SaaS analysis', 'Tailored marketing strategy', 'Competitor research', 'All 10 SaaS ideas unlocked', '30-day launch roadmap', 'Workspace dashboard access']
