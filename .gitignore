@@ -11,4 +11,7 @@ smartapp-website/next-env.d.ts
 !.claude/skills/react-best-practices/
 .claude/skills/react-best-practices/*
 !.claude/skills/react-best-practices/SKILL.md
+!.claude/skills/emil-design-eng/
+!.claude/skills/review-animations/
+!.claude/skills/impeccable/
 truthcheck/tsconfig.tsbuildinfo
