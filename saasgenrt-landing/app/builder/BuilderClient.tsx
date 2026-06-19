@@ -476,16 +476,36 @@ function ResultsStep({ ideas, userData, onRestart }: {
   ideas: SaaSIdea[]; userData: UserData; onRestart: () => void
 }) {
   const domain = userData.domainChip || userData.domain || 'your domain'
+  const [current, setCurrent] = useState(0)
+  const [ideaDir, setIdeaDir] = useState(1)
+
   const displayIdeas = ideas.length >= 3 ? ideas : [
     { name: 'ContractPilot AI', tagline: 'Auto-review B2B contracts in seconds', mrrPotential: '$2.4K–$9K', competitionScore: 3, techComplexity: 'Medium', timeToMvp: '4–6 weeks', why: 'Matches your domain and available time', targetCustomer: 'SMBs with vendor contracts' },
     { name: 'StatusBoard Pro', tagline: 'Real-time API monitoring for dev teams', mrrPotential: '$1.8K–$6K', competitionScore: 4, techComplexity: 'Low', timeToMvp: '2–4 weeks', why: 'Low competition niche for your tech level', targetCustomer: 'Dev teams at 5–50 person SaaS' },
     { name: 'ChurnGuard', tagline: 'Predict and prevent SaaS churn', mrrPotential: '$3.2K–$14K', competitionScore: 5, techComplexity: 'Medium', timeToMvp: '5–8 weeks', why: 'High MRR ceiling, clear ROI for buyers', targetCustomer: 'B2B SaaS with 50–500 customers' },
   ]
 
+  const total = displayIdeas.slice(0, 3).length
+
+  function navigate(next: number) {
+    setIdeaDir(next > current ? 1 : -1)
+    setCurrent(next)
+  }
+
+  const idea = displayIdeas[current]
+  const comp = competitionLabel(idea.competitionScore)
+  const cx = complexityStyle(idea.techComplexity)
+
+  const ideaSlide = {
+    enter: (d: number) => ({ x: d > 0 ? 40 : -40, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -40 : 40, opacity: 0 }),
+  }
+
   return (
     <div>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 32 }}>
+      <div style={{ textAlign: 'center', marginBottom: 28 }}>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -502,90 +522,146 @@ function ResultsStep({ ideas, userData, onRestart }: {
           </span>
         </motion.div>
         <h2 style={{ fontSize: '26px', fontWeight: 800, letterSpacing: '-0.03em', color: 'white', marginBottom: 6 }}>
-          3 ideas tailored for you
+          Your SaaS opportunities
         </h2>
         <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.38)' }}>
           Based on {domain} + your profile
         </p>
       </div>
 
-      {/* Idea cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 16 }}>
-        {displayIdeas.slice(0, 3).map((idea, i) => {
-          const comp = competitionLabel(idea.competitionScore)
-          const cx = complexityStyle(idea.techComplexity)
-          return (
-            <motion.div
+      {/* Carousel navigation bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <button
+          onClick={() => navigate(current - 1)}
+          disabled={current === 0}
+          style={{
+            width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(255,255,255,0.05)', cursor: current === 0 ? 'not-allowed' : 'pointer',
+            opacity: current === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.15s', flexShrink: 0,
+          }}
+        >
+          <ArrowLeft style={{ width: 15, height: 15, color: 'white' }} />
+        </button>
+
+        {/* Dot indicators */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {Array.from({ length: total }).map((_, i) => (
+            <button
               key={i}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
+              onClick={() => navigate(i)}
               style={{
-                borderRadius: 18, padding: '20px', position: 'relative', overflow: 'hidden',
-                background: IDEA_GLOW[i], border: `1px solid ${IDEA_BORDER[i]}`,
+                height: 7, borderRadius: 99, border: 'none', cursor: 'pointer',
+                transition: 'all 0.25s ease',
+                width: i === current ? 22 : 7,
+                background: i === current ? IDEA_ACCENT[i] : 'rgba(255,255,255,0.15)',
               }}
-            >
-              {/* Top accent */}
-              <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-                background: IDEA_ACCENT[i], borderRadius: '18px 18px 0 0',
-              }} />
+            />
+          ))}
+        </div>
 
-              {/* Name + MRR row */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
-                <div>
-                  <div style={{ fontSize: '16px', fontWeight: 700, color: 'white', marginBottom: 2 }}>{idea.name}</div>
-                  <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)' }}>{idea.tagline}</div>
-                </div>
-                <div style={{
-                  padding: '5px 11px', borderRadius: 99, flexShrink: 0, marginLeft: 12,
-                  background: 'rgba(57,255,136,0.12)', border: '1px solid rgba(57,255,136,0.25)',
-                  textAlign: 'center',
-                }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#39FF88', whiteSpace: 'nowrap' }}>{idea.mrrPotential}</div>
-                  <div style={{ fontSize: '9px', color: 'rgba(57,255,136,0.55)' }}>MRR potential</div>
-                </div>
-              </div>
+        <button
+          onClick={() => navigate(current + 1)}
+          disabled={current === total - 1}
+          style={{
+            width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(255,255,255,0.05)', cursor: current === total - 1 ? 'not-allowed' : 'pointer',
+            opacity: current === total - 1 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.15s', flexShrink: 0,
+          }}
+        >
+          <ArrowRight style={{ width: 15, height: 15, color: 'white' }} />
+        </button>
+      </div>
 
-              {/* Stats chips */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-                <div style={{ padding: '4px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.3)', marginBottom: 1 }}>Competition</div>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: comp.color }}>{comp.label} ({idea.competitionScore}/10)</div>
-                </div>
-                <div style={{ padding: '4px 10px', borderRadius: 8, background: cx.bg, border: `1px solid ${cx.border}` }}>
-                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.3)', marginBottom: 1 }}>Tech level</div>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: cx.color }}>{idea.techComplexity}</div>
-                </div>
-                <div style={{ padding: '4px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.3)', marginBottom: 1 }}>Time to MVP</div>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>{idea.timeToMvp}</div>
-                </div>
-                <div style={{ padding: '4px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <div style={{ fontSize: '9.5px', color: 'rgba(255,255,255,0.3)', marginBottom: 1 }}>Target</div>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>{idea.targetCustomer}</div>
-                </div>
-              </div>
+      {/* Single idea card with slide animation */}
+      <div style={{ overflow: 'hidden', marginBottom: 16, minHeight: 280 }}>
+        <AnimatePresence mode="wait" custom={ideaDir}>
+          <motion.div
+            key={current}
+            custom={ideaDir}
+            variants={ideaSlide}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              borderRadius: 18, padding: '22px', position: 'relative', overflow: 'hidden',
+              background: IDEA_GLOW[current], border: `1px solid ${IDEA_BORDER[current]}`,
+            }}
+          >
+            {/* Index label */}
+            <div style={{
+              position: 'absolute', top: 16, right: 16,
+              fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.22)',
+              letterSpacing: '0.05em',
+            }}>
+              {current + 1} / {total}
+            </div>
 
-              {/* Why for you */}
-              <div style={{
-                padding: '9px 12px', borderRadius: 10,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-              }}>
-                <span style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.42)', fontStyle: 'italic' }}>
-                  💡 {idea.why}
-                </span>
+            {/* Top accent bar */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+              background: IDEA_ACCENT[current], borderRadius: '18px 18px 0 0',
+            }} />
+
+            {/* Name + MRR */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14, paddingRight: 48 }}>
+              <div>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: 'white', marginBottom: 3 }}>{idea.name}</div>
+                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>{idea.tagline}</div>
               </div>
-            </motion.div>
-          )
-        })}
+            </div>
+
+            {/* MRR badge */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 16,
+              padding: '6px 14px', borderRadius: 99,
+              background: 'rgba(57,255,136,0.12)', border: '1px solid rgba(57,255,136,0.25)',
+            }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#39FF88' }} />
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#39FF88' }}>{idea.mrrPotential}</span>
+              <span style={{ fontSize: '11px', color: 'rgba(57,255,136,0.55)' }}>MRR potential</span>
+            </div>
+
+            {/* Stats chips */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 14 }}>
+              <div style={{ padding: '8px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>Competition</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: comp.color }}>{comp.label} ({idea.competitionScore}/10)</div>
+              </div>
+              <div style={{ padding: '8px 12px', borderRadius: 10, background: cx.bg, border: `1px solid ${cx.border}` }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>Tech complexity</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: cx.color }}>{idea.techComplexity}</div>
+              </div>
+              <div style={{ padding: '8px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>Time to MVP</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>{idea.timeToMvp}</div>
+              </div>
+              <div style={{ padding: '8px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>Target customer</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>{idea.targetCustomer}</div>
+              </div>
+            </div>
+
+            {/* Why for you */}
+            <div style={{
+              padding: '10px 14px', borderRadius: 10,
+              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontStyle: 'italic' }}>
+                💡 {idea.why}
+              </span>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Locked card */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.35 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
         style={{
           borderRadius: 18, padding: '18px 20px', marginBottom: 18,
           background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
@@ -598,8 +674,8 @@ function ResultsStep({ ideas, userData, onRestart }: {
             <div style={{ height: 18, width: 70, borderRadius: 5, background: 'rgba(57,255,136,0.22)' }} />
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            {[80, 60, 90, 100].map((w, i) => (
-              <div key={i} style={{ height: 32, width: w, borderRadius: 8, background: 'rgba(255,255,255,0.08)' }} />
+            {[80, 60, 90, 100].map((w, k) => (
+              <div key={k} style={{ height: 32, width: w, borderRadius: 8, background: 'rgba(255,255,255,0.08)' }} />
             ))}
           </div>
         </div>
@@ -617,7 +693,7 @@ function ResultsStep({ ideas, userData, onRestart }: {
         href="/#pricing"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.45 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           width: '100%', padding: '14px', borderRadius: 14, marginBottom: 10,
