@@ -1233,7 +1233,7 @@ function init_dashboard(params){
   html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:16px;">Progression</p>';
   html+='<svg width="88" height="88" viewBox="0 0 88 88">';
   html+='<circle cx="44" cy="44" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>';
-  html+='<circle cx="44" cy="44" r="34" fill="none" stroke="url(#rg'+id.replace(/-/g,'')+\')" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 44 44)"/>';
+  html+='<circle cx="44" cy="44" r="34" fill="none" stroke="url(#rg'+id.replace(/-/g,'')+')" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 44 44)"/>';
   html+='<defs><linearGradient id="rg'+id.replace(/-/g,'')+'" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs>';
   html+='<text x="44" y="49" text-anchor="middle" fill="white" font-size="18" font-weight="700">'+pct+'%</text>';
   html+='</svg>';
