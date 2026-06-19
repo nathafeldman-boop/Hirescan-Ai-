@@ -413,8 +413,9 @@ function ChoiceStep({ progressN, badgeN, pre, accent, post, subtitle, options, v
 // ─── Illustrations ────────────────────────────────────────────────────────────
 
 function StickyWallIllustration() {
+  const reduce = useReducedMotion()
   return (
-    <motion.div animate={{ y: [0, -7, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}>
+    <motion.div animate={reduce ? undefined : { y: [0, -7, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}>
       <svg width="280" height="338" viewBox="0 0 280 338" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="280" height="338" rx="20" fill="rgba(17,24,39,0.75)" />
         <rect width="280" height="338" rx="20" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
@@ -459,8 +460,9 @@ function AIHelperCard({ onUseExample }: { onUseExample: (text: string) => void }
 }
 
 function PeopleTableIllustration() {
+  const reduce = useReducedMotion()
   return (
-    <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}>
+    <motion.div animate={reduce ? undefined : { y: [0, -6, 0] }} transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}>
       <svg width="260" height="320" viewBox="0 0 260 320" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="260" height="320" rx="20" fill="rgba(17,24,39,0.75)" /><rect width="260" height="320" rx="20" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
         <ellipse cx="130" cy="45" rx="90" ry="50" fill="rgba(139,92,246,0.07)" />
@@ -479,8 +481,9 @@ function PeopleTableIllustration() {
 }
 
 function BifurcationIllustration() {
+  const reduce = useReducedMotion()
   return (
-    <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }}>
+    <motion.div animate={reduce ? undefined : { y: [0, -6, 0] }} transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }}>
       <svg width="260" height="320" viewBox="0 0 260 320" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="260" height="320" rx="20" fill="rgba(17,24,39,0.75)" /><rect width="260" height="320" rx="20" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
         <ellipse cx="130" cy="270" rx="100" ry="44" fill="rgba(139,92,246,0.06)" />
@@ -501,8 +504,9 @@ function BifurcationIllustration() {
 }
 
 function DiscoveryIllustration() {
+  const reduce = useReducedMotion()
   return (
-    <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}>
+    <motion.div animate={reduce ? undefined : { y: [0, -6, 0] }} transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}>
       <svg width="260" height="320" viewBox="0 0 260 320" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="260" height="320" rx="20" fill="rgba(17,24,39,0.75)" /><rect width="260" height="320" rx="20" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
         <ellipse cx="130" cy="120" rx="95" ry="80" fill="rgba(139,92,246,0.05)" />
@@ -519,8 +523,9 @@ function DiscoveryIllustration() {
 }
 
 function PaymentIllustration() {
+  const reduce = useReducedMotion()
   return (
-    <motion.div animate={{ y: [0, -7, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}>
+    <motion.div animate={reduce ? undefined : { y: [0, -7, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}>
       <svg width="220" height="240" viewBox="0 0 220 240" fill="none" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="110" cy="120" rx="90" ry="90" fill="rgba(57,255,136,0.05)" />
         <rect x="55" y="40" width="110" height="150" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
@@ -528,10 +533,10 @@ function PaymentIllustration() {
         <line x1="70" y1="74" x2="150" y2="74" stroke="rgba(255,255,255,0.12)" strokeWidth="2" strokeLinecap="round" /><line x1="70" y1="90" x2="130" y2="90" stroke="rgba(255,255,255,0.08)" strokeWidth="2" strokeLinecap="round" /><line x1="70" y1="106" x2="140" y2="106" stroke="rgba(255,255,255,0.08)" strokeWidth="2" strokeLinecap="round" />
         <line x1="70" y1="132" x2="120" y2="132" stroke="rgba(57,255,136,0.5)" strokeWidth="2" strokeLinecap="round" /><text x="150" y="137" textAnchor="end" fill="rgba(57,255,136,0.8)" fontSize="13" fontWeight="800" fontFamily="Inter, sans-serif">€25</text>
         <circle cx="110" cy="170" r="14" fill="rgba(57,255,136,0.15)" stroke="rgba(57,255,136,0.5)" strokeWidth="1.5" /><path d="M104 170 L108 174 L116 165" stroke="rgba(57,255,136,0.95)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }}>
+        <motion.g animate={reduce ? undefined : { opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }}>
           <path d="M180 60 L183 68 L191 68 L184 73 L187 82 L180 77 L173 82 L176 73 L169 68 L177 68 Z" fill="rgba(251,191,36,0.7)" />
         </motion.g>
-        <motion.circle cx="40" cy="100" r="3" fill="rgba(139,92,246,0.6)" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2.5, repeat: Infinity }} />
+        <motion.circle cx="40" cy="100" r="3" fill="rgba(139,92,246,0.6)" animate={reduce ? undefined : { opacity: [0.3, 1, 0.3] }} transition={{ duration: 2.5, repeat: Infinity }} />
       </svg>
     </motion.div>
   )
@@ -723,8 +728,8 @@ function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
                   <AnimatePresence mode="wait">
                     {charCount >= 30 && (
                       <motion.span key="check"
-                        initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 380, damping: 20 }}
+                        initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduce ? {} : { scale: 0, opacity: 0 }}
+                        transition={reduce ? {} : { type: 'spring', stiffness: 380, damping: 20 }}
                         style={{ display: 'flex', alignItems: 'center' }}
                       >
                         <Check style={{ width: 10, height: 10 }} strokeWidth={3} />
