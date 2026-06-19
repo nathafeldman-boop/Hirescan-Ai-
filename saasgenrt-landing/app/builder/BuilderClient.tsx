@@ -259,13 +259,14 @@ function StepNav({ onBack, onNext, disabled, label = 'Continue', isAnalyze }: {
 }
 
 function StepBadge({ n, tone = 'purple' }: { n: number | string; tone?: 'purple' | 'green' }) {
+  const reduce = useReducedMotion()
   const c = tone === 'green'
     ? { bg: 'rgba(57,255,136,0.1)', border: 'rgba(57,255,136,0.28)', dot: '#39FF88', text: '#39FF88' }
     : { bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.28)', dot: '#8B5CF6', text: '#c4b5fd' }
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: EASE }}
+      initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      transition={reduce ? {} : { duration: 0.4, ease: EASE }}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 7,
         padding: '4px 13px', borderRadius: 99, marginBottom: 18,
@@ -273,7 +274,7 @@ function StepBadge({ n, tone = 'purple' }: { n: number | string; tone?: 'purple'
       }}
     >
       <motion.div
-        animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+        animate={reduce ? undefined : { scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
         style={{ width: 7, height: 7, borderRadius: '50%', background: c.dot }}
       />
@@ -285,11 +286,12 @@ function StepBadge({ n, tone = 'purple' }: { n: number | string; tone?: 'purple'
 }
 
 function StepHeading({ pre, accent, post, subtitle }: { pre: string; accent?: string; post?: string; subtitle: string }) {
+  const reduce = useReducedMotion()
   return (
     <>
       <motion.h2
-        initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.08, ease: EASE }}
+        initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+        transition={reduce ? {} : { duration: 0.5, delay: 0.08, ease: EASE }}
         style={{ fontSize: 'clamp(23px, 3.1vw, 33px)', fontWeight: 800, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 11 }}
       >
         {pre}
@@ -304,8 +306,8 @@ function StepHeading({ pre, accent, post, subtitle }: { pre: string; accent?: st
         {post}
       </motion.h2>
       <motion.p
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.16, ease: EASE }}
+        initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        transition={reduce ? {} : { duration: 0.4, delay: 0.16, ease: EASE }}
         style={{ fontSize: '14px', lineHeight: 1.68, color: 'rgba(255,255,255,0.45)', marginBottom: 26 }}
       >
         {subtitle}
@@ -361,8 +363,8 @@ function SelectionCard({ selected, onClick, icon, label, desc, accent = '#8B5CF6
       <AnimatePresence>
         {selected && (
           <motion.div
-            initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-            transition={{ duration: 0.2, type: 'spring', stiffness: 340 }}
+            initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduce ? {} : { scale: 0, opacity: 0 }}
+            transition={reduce ? {} : { duration: 0.2, type: 'spring', stiffness: 340 }}
             style={{ position: 'absolute', top: 10, right: 10, width: 20, height: 20, borderRadius: '50%', background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <Check style={{ width: 11, height: 11, color: 'white' }} strokeWidth={3} />
@@ -878,8 +880,8 @@ function WhoStep({ value, onSelect, onNext, onBack }: { value: string; onSelect:
               {value && (
                 <motion.div
                   key={value}
-                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.26, ease: EASE }}
+                  initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduce ? 0 : -4 }}
+                  transition={reduce ? {} : { duration: 0.26, ease: EASE }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '9px 13px', borderRadius: 10,
@@ -976,8 +978,8 @@ function KnowsProblemStep({ value, onSelect, onNext, onBack }: { value: string; 
                 <AnimatePresence>
                   {sel && (
                     <motion.div
-                      initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                      transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                      initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduce ? {} : { scale: 0, opacity: 0 }}
+                      transition={reduce ? {} : { type: 'spring', stiffness: 360, damping: 22 }}
                       style={{
                         position: 'absolute', top: 14, right: 14,
                         width: 22, height: 22, borderRadius: '50%',
@@ -1164,8 +1166,8 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
         <AnimatePresence mode="wait">
           <motion.p
             key={msgIndex}
-            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.28 }}
+            initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduce ? 0 : -5 }}
+            transition={reduce ? {} : { duration: 0.28 }}
             style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.4)', marginBottom: 0 }}
           >
             {LOADING_STEPS_PROBLEMS[msgIndex]}
@@ -1221,8 +1223,8 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
               <AnimatePresence>
                 {selected && (
                   <motion.div
-                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduce ? {} : { scale: 0, opacity: 0 }}
+                    transition={reduce ? {} : { type: 'spring', stiffness: 360, damping: 22 }}
                     style={{ position: 'absolute', top: 14, right: 14, width: 22, height: 22, borderRadius: '50%', background: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Check style={{ width: 12, height: 12, color: 'white' }} strokeWidth={3} />
@@ -1306,8 +1308,8 @@ function AcquisitionStep({ value, onChange, onNext, onBack }: {
               <AnimatePresence>
                 {on && (
                   <motion.div
-                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduce ? {} : { scale: 0, opacity: 0 }}
+                    transition={reduce ? {} : { type: 'spring', stiffness: 360, damping: 22 }}
                     style={{ width: 18, height: 18, borderRadius: '50%', background: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                   >
                     <Check style={{ width: 10, height: 10, color: 'white' }} strokeWidth={3} />
@@ -1372,8 +1374,8 @@ function MarketTypeStep({ value, onSelect, onNext, onBack }: { value: string; on
               <AnimatePresence>
                 {sel && (
                   <motion.div
-                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduce ? {} : { scale: 0, opacity: 0 }}
+                    transition={reduce ? {} : { type: 'spring', stiffness: 360, damping: 22 }}
                     style={{ position: 'absolute', top: 14, right: 14, width: 22, height: 22, borderRadius: '50%', background: ac, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Check style={{ width: 12, height: 12, color: 'white' }} strokeWidth={3} />
@@ -1508,8 +1510,8 @@ function IdeaSelectionStep({ ideas, selectedIndex, onSelect, onNext, onBack }: {
               <AnimatePresence>
                 {sel && (
                   <motion.div
-                    initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 360, damping: 22 }}
+                    initial={reduce ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={reduce ? {} : { scale: 0, opacity: 0 }}
+                    transition={reduce ? {} : { type: 'spring', stiffness: 360, damping: 22 }}
                     style={{ position: 'absolute', top: 12, right: 12, width: 20, height: 20, borderRadius: '50%', background: ac, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Check style={{ width: 11, height: 11, color: 'white' }} strokeWidth={3} />
