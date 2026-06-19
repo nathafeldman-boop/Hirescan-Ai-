@@ -9,6 +9,7 @@ import { ArrowRight, ArrowLeft, Check, Lock, Zap } from 'lucide-react'
 interface UserData {
   domain: string
   domainChip: string
+  problemOwner: string
   timePerWeek: string
   techLevel: string
   budget: string
@@ -67,6 +68,15 @@ const PRICING_OPTIONS = [
   { value: 'One-time purchase', label: 'One-time', desc: 'Buy once forever' },
   { value: 'Usage-based', label: 'Usage-based', desc: 'Pay per use' },
   { value: 'Freemium', label: 'Freemium', desc: 'Free + paid tiers' },
+]
+
+const WHO_OPTIONS = [
+  { value: 'myself', icon: '👤', label: 'Me', desc: 'A problem you personally experience.' },
+  { value: 'company', icon: '🏢', label: 'My company', desc: 'A recurring issue inside your business.' },
+  { value: 'clients', icon: '🤝', label: 'My clients', desc: 'A problem your clients regularly face.' },
+  { value: 'family', icon: '👨‍👩‍👧', label: 'Friends & Family', desc: 'Someone close to you experiences this.' },
+  { value: 'community', icon: '🌍', label: 'A community', desc: 'A niche or audience you know well.' },
+  { value: 'unsure', icon: '❓', label: "I'm not sure", desc: "We'll help identify the best opportunity." },
 ]
 
 const LOADING_STEPS = [
@@ -719,6 +729,239 @@ function Step1({
   )
 }
 
+function PeopleTableIllustration() {
+  return (
+    <motion.div
+      animate={{ y: [0, -6, 0] }}
+      transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
+    >
+      <svg width="260" height="320" viewBox="0 0 260 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Background */}
+        <rect width="260" height="320" rx="20" fill="rgba(17,24,39,0.75)" />
+        <rect width="260" height="320" rx="20" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        {/* Top glow */}
+        <ellipse cx="130" cy="45" rx="90" ry="50" fill="rgba(139,92,246,0.07)" />
+        {/* Table (top-down) */}
+        <ellipse cx="130" cy="162" rx="62" ry="54" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.09)" strokeWidth="1" />
+        <ellipse cx="118" cy="148" rx="20" ry="13" fill="rgba(255,255,255,0.035)" />
+        {/* Chair pads */}
+        <rect x="110" y="97" width="40" height="16" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <rect x="110" y="233" width="40" height="16" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <rect x="58" y="146" width="16" height="36" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <rect x="186" y="146" width="16" height="36" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        {/* Person 1 — top, purple (founder) */}
+        <circle cx="130" cy="78" r="17" fill="rgba(139,92,246,0.16)" stroke="rgba(139,92,246,0.38)" strokeWidth="1" />
+        <circle cx="130" cy="74" r="7" fill="rgba(167,139,250,0.48)" />
+        <path d="M118 91 Q118 97 130 97 Q142 97 142 91" fill="rgba(139,92,246,0.14)" />
+        {/* Person 2 — left, blue */}
+        <circle cx="40" cy="162" r="16" fill="rgba(14,165,233,0.14)" stroke="rgba(14,165,233,0.32)" strokeWidth="1" />
+        <circle cx="40" cy="158" r="7" fill="rgba(56,189,248,0.40)" />
+        <path d="M28 174 Q28 180 40 180 Q52 180 52 174" fill="rgba(14,165,233,0.12)" />
+        {/* Person 3 — right, green */}
+        <circle cx="220" cy="162" r="16" fill="rgba(57,255,136,0.10)" stroke="rgba(57,255,136,0.26)" strokeWidth="1" />
+        <circle cx="220" cy="158" r="7" fill="rgba(57,255,136,0.34)" />
+        <path d="M208 174 Q208 180 220 180 Q232 180 232 174" fill="rgba(57,255,136,0.10)" />
+        {/* Person 4 — bottom, rose */}
+        <circle cx="130" cy="246" r="16" fill="rgba(244,114,182,0.12)" stroke="rgba(244,114,182,0.28)" strokeWidth="1" />
+        <circle cx="130" cy="242" r="7" fill="rgba(249,168,212,0.36)" />
+        <path d="M118 258 Q118 264 130 264 Q142 264 142 258" fill="rgba(244,114,182,0.10)" />
+        {/* Connectors */}
+        <line x1="130" y1="95" x2="130" y2="108" stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="56" y1="162" x2="68" y2="162" stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="204" y1="162" x2="192" y2="162" stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="130" y1="229" x2="130" y2="216" stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="3,3" />
+        {/* Sticky notes on table */}
+        <g transform="rotate(-8,118,158)">
+          <rect x="106" y="148" width="24" height="20" rx="3" fill="rgba(251,191,36,0.18)" stroke="rgba(251,191,36,0.30)" strokeWidth="1" />
+          <text x="118" y="162" textAnchor="middle" fontSize="11">💡</text>
+        </g>
+        <g transform="rotate(6,145,168)">
+          <rect x="133" y="158" width="24" height="20" rx="3" fill="rgba(139,92,246,0.20)" stroke="rgba(139,92,246,0.35)" strokeWidth="1" />
+          <text x="145" y="173" textAnchor="middle" fontSize="9" fill="rgba(167,139,250,0.85)" fontWeight="700" fontFamily="Inter, system-ui">?</text>
+        </g>
+        <g transform="rotate(-5,121,178)">
+          <rect x="109" y="169" width="24" height="18" rx="3" fill="rgba(57,255,136,0.12)" stroke="rgba(57,255,136,0.24)" strokeWidth="1" />
+          <text x="121" y="182" textAnchor="middle" fontSize="8" fill="rgba(57,255,136,0.72)" fontWeight="700" fontFamily="Inter, system-ui">✓</text>
+        </g>
+        {/* Speech bubble — person 1 top */}
+        <rect x="150" y="54" width="62" height="24" rx="8" fill="rgba(139,92,246,0.16)" stroke="rgba(139,92,246,0.30)" strokeWidth="1" />
+        <polygon points="158,78 164,78 160,86" fill="rgba(139,92,246,0.16)" />
+        <text x="181" y="70" textAnchor="middle" fill="rgba(167,139,250,0.85)" fontSize="7.5" fontWeight="600" fontFamily="Inter, system-ui">Pain point?</text>
+        {/* Speech bubble — person 2 left */}
+        <rect x="14" y="138" width="60" height="22" rx="7" fill="rgba(14,165,233,0.14)" stroke="rgba(14,165,233,0.26)" strokeWidth="1" />
+        <polygon points="74,145 74,152 82,148" fill="rgba(14,165,233,0.14)" />
+        <text x="44" y="153" textAnchor="middle" fill="rgba(56,189,248,0.82)" fontSize="7.5" fontWeight="600" fontFamily="Inter, system-ui">Every week!</text>
+        {/* Speech bubble — person 3 right */}
+        <rect x="186" y="138" width="60" height="22" rx="7" fill="rgba(57,255,136,0.10)" stroke="rgba(57,255,136,0.22)" strokeWidth="1" />
+        <polygon points="178,145 178,152 186,148" fill="rgba(57,255,136,0.10)" />
+        <text x="216" y="153" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="7.5" fontWeight="600" fontFamily="Inter, system-ui">Big market!</text>
+        {/* Bottom analytics strip */}
+        <rect x="16" y="288" width="228" height="22" rx="7" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+        <circle cx="32" cy="299" r="4" fill="rgba(57,255,136,0.45)" />
+        <text x="42" y="303" fontSize="7.5" fill="rgba(255,255,255,0.35)" fontWeight="500" fontFamily="Inter, system-ui, sans-serif">4 personas identified</text>
+        <rect x="175" y="292" width="54" height="12" rx="3" fill="rgba(139,92,246,0.18)" />
+        <text x="202" y="302" textAnchor="middle" fontSize="7.5" fill="rgba(167,139,250,0.65)" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Market ↑</text>
+      </svg>
+    </motion.div>
+  )
+}
+
+function WhoStep({ value, onSelect, onNext, onBack }: {
+  value: string
+  onSelect: (v: string) => void
+  onNext: () => void
+  onBack: () => void
+}) {
+  return (
+    <div>
+      <ProgressBar current={2} total={8} />
+
+      <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        {/* LEFT — main content */}
+        <div style={{ flex: 1, minWidth: 300 }}>
+
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              padding: '4px 13px', borderRadius: 99, marginBottom: 18,
+              background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.28)',
+            }}
+          >
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#8B5CF6' }} />
+            <span style={{ fontSize: '11px', color: '#c4b5fd', fontWeight: 700, letterSpacing: '0.06em' }}>STEP 2</span>
+          </motion.div>
+
+          {/* Heading */}
+          <motion.h2
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800,
+              color: 'white', letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 10,
+            }}
+          >
+            Who experiences{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #c4b5fd 20%, #8B5CF6 80%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>
+              this problem?
+            </span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            style={{ fontSize: '14px', lineHeight: 1.68, color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}
+          >
+            This helps us find opportunities with real market demand.
+          </motion.p>
+
+          {/* 2×3 selection grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 28 }}>
+            {WHO_OPTIONS.map((option, i) => {
+              const selected = value === option.value
+              return (
+                <motion.button
+                  key={option.value}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: 0.2 + i * 0.055 }}
+                  whileHover={{ scale: 1.025, y: -2 }}
+                  whileTap={{ scale: 0.975 }}
+                  onClick={() => onSelect(option.value)}
+                  style={{
+                    padding: '16px 14px', borderRadius: 16, cursor: 'pointer', textAlign: 'left',
+                    background: selected ? 'rgba(139,92,246,0.13)' : 'rgba(255,255,255,0.04)',
+                    border: `1.5px solid ${selected ? '#8B5CF6' : 'rgba(255,255,255,0.09)'}`,
+                    boxShadow: selected
+                      ? '0 0 0 1px rgba(139,92,246,0.18), 0 6px 24px rgba(139,92,246,0.14)'
+                      : '0 2px 8px rgba(0,0,0,0.18)',
+                    position: 'relative', fontFamily: 'inherit', transition: 'all 0.15s',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Animated checkmark */}
+                  <AnimatePresence>
+                    {selected && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.18, type: 'spring', stiffness: 320 }}
+                        style={{
+                          position: 'absolute', top: 10, right: 10,
+                          width: 20, height: 20, borderRadius: '50%', background: '#8B5CF6',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                      >
+                        <Check style={{ width: 11, height: 11, color: 'white' }} strokeWidth={3} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div style={{ fontSize: '22px', marginBottom: 9, lineHeight: 1 }}>{option.icon}</div>
+                  <div style={{
+                    fontSize: '13.5px', fontWeight: 700, marginBottom: 5,
+                    color: selected ? '#e2d9fb' : 'rgba(255,255,255,0.85)',
+                  }}>
+                    {option.label}
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.38)', lineHeight: 1.5 }}>
+                    {option.desc}
+                  </div>
+                </motion.button>
+              )
+            })}
+          </div>
+
+          {/* Navigation */}
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={onBack}
+              style={{
+                padding: '12px 20px', borderRadius: 14, fontSize: '14px', fontWeight: 500,
+                color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.10)',
+                background: 'rgba(255,255,255,0.04)', cursor: 'pointer', flexShrink: 0,
+                display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s', fontFamily: 'inherit',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.color = 'rgba(255,255,255,0.72)'
+                el.style.borderColor = 'rgba(255,255,255,0.18)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.color = 'rgba(255,255,255,0.45)'
+                el.style.borderColor = 'rgba(255,255,255,0.10)'
+              }}
+            >
+              <ArrowLeft style={{ width: 14, height: 14 }} />
+              Back
+            </button>
+            <div style={{ flex: 1 }}>
+              <ContinueButton disabled={!value} onClick={onNext} label="Continue" />
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT — illustration */}
+        <div style={{ width: 260, flexShrink: 0 }}>
+          <PeopleTableIllustration />
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
 function Step2({
   userData, setTime, setTech, setBudget, onNext,
 }: {
@@ -726,7 +969,7 @@ function Step2({
 }) {
   return (
     <div>
-      <ProgressBar current={2} total={8} />
+      <ProgressBar current={3} total={8} />
       <StepHeader step={2} total={3} title="Tell us about yourself" subtitle="We'll tailor opportunities to your exact situation." />
       <OptionGroup label="Available time per week?" value={userData.timePerWeek} options={TIME_OPTIONS} onSelect={setTime} />
       <OptionGroup label="Your technical level?" value={userData.techLevel} options={TECH_OPTIONS} onSelect={setTech} />
@@ -743,7 +986,7 @@ function Step3({
 }) {
   return (
     <div>
-      <ProgressBar current={3} total={8} />
+      <ProgressBar current={4} total={8} />
       <StepHeader step={3} total={3} title="Your target market" subtitle="Who will you be selling to?" />
       <OptionGroup label="I want to sell to..." value={userData.customerType} options={CUSTOMER_OPTIONS} onSelect={setCustomer} />
       <OptionGroup label="Preferred pricing model" value={userData.pricingModel} options={PRICING_OPTIONS} onSelect={setPricing} />
@@ -1099,7 +1342,7 @@ export function BuilderClient() {
   const [step, setStep] = useState(0)
   const [dir, setDir] = useState(1)
   const [userData, setUserData] = useState<UserData>({
-    domain: '', domainChip: '', timePerWeek: '',
+    domain: '', domainChip: '', problemOwner: '', timePerWeek: '',
     techLevel: '', budget: '', customerType: '', pricingModel: '',
   })
   const [loadingStep, setLoadingStep] = useState(0)
@@ -1114,9 +1357,9 @@ export function BuilderClient() {
   const set = (key: keyof UserData, val: string) =>
     setUserData(prev => ({ ...prev, [key]: val }))
 
-  // Trigger loading + API on step 4
+  // Trigger loading + API on step 5
   useEffect(() => {
-    if (step !== 4) return
+    if (step !== 5) return
     setLoadingStep(0)
     setApiDone(false)
 
@@ -1138,16 +1381,17 @@ export function BuilderClient() {
 
   // Auto-advance to results when both animation + API complete
   useEffect(() => {
-    if (step === 4 && apiDone && loadingStep >= LOADING_STEPS.length) {
-      const t = setTimeout(() => { setDir(1); setStep(5) }, 500)
+    if (step === 5 && apiDone && loadingStep >= LOADING_STEPS.length) {
+      const t = setTimeout(() => { setDir(1); setStep(6) }, 500)
       return () => clearTimeout(t)
     }
   }, [step, apiDone, loadingStep])
 
   const canContinue = () => {
     if (step === 1) return !!(userData.domain.trim() || userData.domainChip)
-    if (step === 2) return !!(userData.timePerWeek && userData.techLevel && userData.budget)
-    if (step === 3) return !!(userData.customerType && userData.pricingModel)
+    if (step === 2) return !!userData.problemOwner
+    if (step === 3) return !!(userData.timePerWeek && userData.techLevel && userData.budget)
+    if (step === 4) return !!(userData.customerType && userData.pricingModel)
     return true
   }
 
@@ -1182,10 +1426,10 @@ export function BuilderClient() {
           <span style={{ fontSize: '14px', fontWeight: 600, color: 'white' }}>SaaSGenrt</span>
         </a>
 
-        {/* Progress dots for steps 1-3 */}
-        {step >= 1 && step <= 3 && (
+        {/* Progress dots for steps 1-4 */}
+        {step >= 1 && step <= 4 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {[1, 2, 3].map(s => (
+            {[1, 2, 3, 4].map(s => (
               <div key={s} style={{
                 height: 6, borderRadius: 99, transition: 'all 0.3s ease',
                 width: s === step ? 24 : 8,
@@ -1196,7 +1440,7 @@ export function BuilderClient() {
         )}
 
         {/* Back button */}
-        {step >= 1 && step < 4 ? (
+        {step >= 1 && step < 5 ? (
           <button
             onClick={() => goTo(step - 1)}
             style={{
@@ -1227,7 +1471,7 @@ export function BuilderClient() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             style={{
               width: '100%',
-              maxWidth: step === 1 ? 900 : step === 5 ? 680 : 520,
+              maxWidth: step === 1 || step === 2 ? 900 : step === 6 ? 680 : 520,
               padding: '40px 20px 60px',
               margin: '0 auto',
             }}
@@ -1243,29 +1487,37 @@ export function BuilderClient() {
               />
             )}
             {step === 2 && (
+              <WhoStep
+                value={userData.problemOwner}
+                onSelect={(v) => set('problemOwner', v)}
+                onNext={() => canContinue() && goTo(3)}
+                onBack={() => goTo(1)}
+              />
+            )}
+            {step === 3 && (
               <Step2
                 userData={userData}
                 setTime={(v) => set('timePerWeek', v)}
                 setTech={(v) => set('techLevel', v)}
                 setBudget={(v) => set('budget', v)}
-                onNext={() => canContinue() && goTo(3)}
+                onNext={() => canContinue() && goTo(4)}
               />
             )}
-            {step === 3 && (
+            {step === 4 && (
               <Step3
                 userData={userData}
                 setCustomer={(v) => set('customerType', v)}
                 setPricing={(v) => set('pricingModel', v)}
-                onNext={() => canContinue() && goTo(4)}
+                onNext={() => canContinue() && goTo(5)}
               />
             )}
-            {step === 4 && <LoadingStep loadingStep={loadingStep} />}
-            {step === 5 && (
+            {step === 5 && <LoadingStep loadingStep={loadingStep} />}
+            {step === 6 && (
               <ResultsStep
                 ideas={ideas}
                 userData={userData}
                 onRestart={() => {
-                  setUserData({ domain: '', domainChip: '', timePerWeek: '', techLevel: '', budget: '', customerType: '', pricingModel: '' })
+                  setUserData({ domain: '', domainChip: '', problemOwner: '', timePerWeek: '', techLevel: '', budget: '', customerType: '', pricingModel: '' })
                   setIdeas([])
                   goTo(0, -1)
                 }}
