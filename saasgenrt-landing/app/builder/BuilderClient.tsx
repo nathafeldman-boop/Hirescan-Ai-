@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, ArrowLeft, Check, Lock, Zap } from 'lucide-react'
 
@@ -83,6 +83,12 @@ const OVERVIEW_STEPS = [
   { icon: '🎯', title: 'Validate opportunities', desc: 'Our AI compares each idea against existing businesses.' },
   { icon: '🗺️', title: 'Generate your roadmap', desc: 'Marketing strategy, validation steps, and launch plan.' },
   { icon: '🚀', title: 'Launch faster', desc: 'Receive a complete, actionable SaaS blueprint.' },
+]
+
+const AI_EXAMPLES = [
+  'I spend too much time creating invoices.',
+  'I struggle to organize client feedback.',
+  'I never know what content to post.',
 ]
 
 const IDEA_ACCENT = ['#8B5CF6', '#0ea5e9', '#10b981']
@@ -314,55 +320,401 @@ function IntroStep({ onStart }: { onStart: () => void }) {
   )
 }
 
-function Step1({
-  userData, setDomain, setDomainChip, onNext,
-}: {
-  userData: UserData; setDomain: (v: string) => void; setDomainChip: (v: string) => void; onNext: () => void
-}) {
+function ProgressBar({ current, total }: { current: number; total: number }) {
+  const pct = Math.round((current / total) * 100)
   return (
-    <div>
-      <StepHeader step={1} total={3} title="What domain fascinates you?" subtitle="Tell us about the problem space you want to explore." />
+    <div style={{ marginBottom: 30 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
+        <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.07em' }}>
+          STEP {current} OF {total}
+        </span>
+        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>{pct}%</span>
+      </div>
+      <div style={{ height: 3, background: 'rgba(255,255,255,0.07)', borderRadius: 99, overflow: 'hidden' }}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          style={{ height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #7c3aed, #8B5CF6, #a78bfa)' }}
+        />
+      </div>
+    </div>
+  )
+}
 
-      <textarea
-        value={userData.domain}
-        onChange={(e) => { setDomain(e.target.value); if (e.target.value) setDomainChip('') }}
-        placeholder="e.g. I'm frustrated by how hard it is to onboard clients in agencies..."
-        rows={3}
-        style={{
-          width: '100%', padding: '14px 16px', borderRadius: 12, marginBottom: 20,
-          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
-          color: 'white', fontSize: '14px', lineHeight: 1.6, resize: 'none',
-          outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.15s',
-          boxSizing: 'border-box',
-        }}
-        onFocus={(e) => (e.target.style.borderColor = 'rgba(139,92,246,0.5)')}
-        onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.10)')}
-      />
+function StickyWallIllustration() {
+  return (
+    <motion.div
+      animate={{ y: [0, -7, 0] }}
+      transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+    >
+      <svg width="280" height="338" viewBox="0 0 280 338" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Outer card */}
+        <rect width="280" height="338" rx="20" fill="rgba(17,24,39,0.75)" />
+        <rect width="280" height="338" rx="20" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
 
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 10 }}>
-          OR PICK A DOMAIN
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {DOMAIN_CHIPS.map(chip => (
-            <button
-              key={chip}
-              onClick={() => { setDomainChip(chip === userData.domainChip ? '' : chip); setDomain('') }}
-              style={{
-                padding: '7px 14px', borderRadius: 99, fontSize: '12.5px', fontWeight: 500,
-                cursor: 'pointer', transition: 'all 0.15s',
-                background: userData.domainChip === chip ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.05)',
-                border: `1px solid ${userData.domainChip === chip ? 'rgba(139,92,246,0.45)' : 'rgba(255,255,255,0.09)'}`,
-                color: userData.domainChip === chip ? '#c4b5fd' : 'rgba(255,255,255,0.55)',
-              }}
-            >
-              {chip}
-            </button>
-          ))}
-        </div>
+        {/* Wall surface */}
+        <rect x="16" y="16" width="248" height="198" rx="10" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+
+        {/* Connecting lines (behind notes) */}
+        <line x1="96" y1="62" x2="118" y2="57" stroke="rgba(255,255,255,0.14)" strokeWidth="1.2" strokeDasharray="4,3" />
+        <line x1="180" y1="82" x2="180" y2="116" stroke="rgba(139,92,246,0.32)" strokeWidth="1.2" strokeDasharray="4,3" />
+        <line x1="64" y1="88" x2="66" y2="120" stroke="rgba(255,255,255,0.12)" strokeWidth="1.2" strokeDasharray="4,3" />
+        <line x1="202" y1="66" x2="210" y2="116" stroke="rgba(57,255,136,0.2)" strokeWidth="1.2" strokeDasharray="4,3" />
+
+        {/* Junction dots */}
+        <circle cx="107" cy="60" r="2.5" fill="rgba(255,255,255,0.22)" />
+        <circle cx="180" cy="99" r="2.5" fill="rgba(139,92,246,0.55)" />
+
+        {/* Note 1 — Yellow */}
+        <g transform="rotate(-3,64,62)">
+          <rect x="32" y="38" width="64" height="48" rx="5" fill="rgba(251,191,36,0.14)" stroke="rgba(251,191,36,0.30)" strokeWidth="1" />
+          <line x1="32" y1="50" x2="96" y2="50" stroke="rgba(251,191,36,0.12)" strokeWidth="1" />
+          <circle cx="64" cy="41" r="3" fill="rgba(251,191,36,0.48)" />
+          <text x="64" y="66" textAnchor="middle" fill="rgba(251,191,36,0.78)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Customer</text>
+          <text x="64" y="78" textAnchor="middle" fill="rgba(251,191,36,0.78)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Pain Point</text>
+        </g>
+
+        {/* Note 2 — Purple */}
+        <g transform="rotate(2,148,57)">
+          <rect x="116" y="32" width="64" height="50" rx="5" fill="rgba(139,92,246,0.18)" stroke="rgba(139,92,246,0.38)" strokeWidth="1" />
+          <line x1="116" y1="44" x2="180" y2="44" stroke="rgba(139,92,246,0.12)" strokeWidth="1" />
+          <circle cx="148" cy="35" r="3" fill="rgba(139,92,246,0.62)" />
+          <text x="148" y="60" textAnchor="middle" fill="rgba(167,139,250,0.88)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Market</text>
+          <text x="148" y="73" textAnchor="middle" fill="rgba(167,139,250,0.88)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Opportunity</text>
+        </g>
+
+        {/* Note 3 — Green */}
+        <g transform="rotate(-2,228,62)">
+          <rect x="198" y="40" width="60" height="44" rx="5" fill="rgba(57,255,136,0.12)" stroke="rgba(57,255,136,0.26)" strokeWidth="1" />
+          <line x1="198" y1="52" x2="258" y2="52" stroke="rgba(57,255,136,0.10)" strokeWidth="1" />
+          <circle cx="228" cy="43" r="3" fill="rgba(57,255,136,0.48)" />
+          <text x="228" y="65" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">MRR</text>
+          <text x="228" y="77" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Potential</text>
+        </g>
+
+        {/* Note 4 — Blue */}
+        <g transform="rotate(3,66,143)">
+          <rect x="36" y="120" width="60" height="46" rx="5" fill="rgba(14,165,233,0.14)" stroke="rgba(14,165,233,0.28)" strokeWidth="1" />
+          <line x1="36" y1="132" x2="96" y2="132" stroke="rgba(14,165,233,0.10)" strokeWidth="1" />
+          <circle cx="66" cy="123" r="3" fill="rgba(14,165,233,0.48)" />
+          <text x="66" y="145" textAnchor="middle" fill="rgba(56,189,248,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Solution</text>
+          <text x="66" y="157" textAnchor="middle" fill="rgba(56,189,248,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Concept</text>
+        </g>
+
+        {/* Note 5 — Rose */}
+        <g transform="rotate(-2,180,139)">
+          <rect x="148" y="116" width="64" height="48" rx="5" fill="rgba(244,114,182,0.13)" stroke="rgba(244,114,182,0.28)" strokeWidth="1" />
+          <line x1="148" y1="128" x2="212" y2="128" stroke="rgba(244,114,182,0.10)" strokeWidth="1" />
+          <circle cx="180" cy="119" r="3" fill="rgba(244,114,182,0.48)" />
+          <text x="180" y="140" textAnchor="middle" fill="rgba(249,168,212,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Target</text>
+          <text x="180" y="153" textAnchor="middle" fill="rgba(249,168,212,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, system-ui, sans-serif">Audience</text>
+        </g>
+
+        {/* Separator */}
+        <line x1="16" y1="230" x2="264" y2="230" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+
+        {/* Notebook */}
+        <rect x="18" y="246" width="78" height="74" rx="7" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.09)" strokeWidth="1" />
+        <rect x="18" y="246" width="9" height="74" rx="3" fill="rgba(139,92,246,0.22)" />
+        <line x1="35" y1="264" x2="88" y2="264" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <line x1="35" y1="275" x2="88" y2="275" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+        <line x1="35" y1="286" x2="88" y2="286" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+        <line x1="35" y1="297" x2="78" y2="297" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+        {/* Pen */}
+        <rect x="85" y="266" width="4" height="22" rx="2" fill="rgba(139,92,246,0.38)" transform="rotate(14, 87, 277)" />
+
+        {/* Coffee cup */}
+        <rect x="114" y="258" width="36" height="44" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" strokeWidth="1" />
+        <rect x="118" y="262" width="28" height="12" rx="3" fill="rgba(109,40,217,0.20)" />
+        <path d="M150 272 Q164 272 164 282 Q164 292 150 292" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M124 256 Q126 250 124 244" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M132 255 Q134 249 132 243" stroke="rgba(255,255,255,0.10)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <path d="M140 256 Q142 250 140 244" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+
+        {/* Tablet */}
+        <rect x="176" y="248" width="86" height="72" rx="9" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.09)" strokeWidth="1" />
+        <rect x="182" y="254" width="74" height="54" rx="5" fill="rgba(9,11,17,0.65)" />
+        {/* Bar chart */}
+        <rect x="192" y="294" width="9" height="10" rx="2" fill="rgba(139,92,246,0.45)" />
+        <rect x="204" y="287" width="9" height="17" rx="2" fill="rgba(139,92,246,0.55)" />
+        <rect x="216" y="279" width="9" height="25" rx="2" fill="rgba(139,92,246,0.70)" />
+        <rect x="228" y="272" width="9" height="32" rx="2" fill="rgba(57,255,136,0.65)" />
+        <rect x="240" y="266" width="9" height="38" rx="2" fill="rgba(57,255,136,0.85)" />
+        <line x1="190" y1="304" x2="252" y2="304" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <text x="219" y="267" textAnchor="middle" fill="rgba(57,255,136,0.55)" fontSize="6.5" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">MRR ↑</text>
+      </svg>
+    </motion.div>
+  )
+}
+
+function AIHelperCard({ onUseExample }: { onUseExample: (text: string) => void }) {
+  return (
+    <div style={{
+      borderRadius: 16, padding: '18px 16px',
+      background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
+        <div style={{
+          width: 30, height: 30, borderRadius: 9, flexShrink: 0,
+          background: 'rgba(139,92,246,0.14)', border: '1px solid rgba(139,92,246,0.24)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
+        }}>💡</div>
+        <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>Need inspiration?</span>
       </div>
 
-      <ContinueButton disabled={!(userData.domain.trim() || userData.domainChip)} onClick={onNext} label="Continue" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 14 }}>
+        {AI_EXAMPLES.map((ex, i) => (
+          <button
+            key={i}
+            onClick={() => onUseExample(ex)}
+            style={{
+              padding: '9px 12px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
+              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+              fontSize: '12px', color: 'rgba(255,255,255,0.52)', lineHeight: 1.5,
+              transition: 'all 0.15s', fontFamily: 'inherit',
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLElement
+              el.style.background = 'rgba(139,92,246,0.08)'
+              el.style.borderColor = 'rgba(139,92,246,0.28)'
+              el.style.color = 'rgba(255,255,255,0.78)'
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement
+              el.style.background = 'rgba(255,255,255,0.03)'
+              el.style.borderColor = 'rgba(255,255,255,0.07)'
+              el.style.color = 'rgba(255,255,255,0.52)'
+            }}
+          >
+            "{ex}"
+          </button>
+        ))}
+      </div>
+
+      <button
+        style={{
+          width: '100%', padding: '9px 12px', borderRadius: 10, cursor: 'pointer',
+          fontSize: '12px', fontWeight: 500, color: '#a78bfa',
+          border: '1px solid rgba(139,92,246,0.25)', background: 'rgba(139,92,246,0.06)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+          transition: 'all 0.15s', fontFamily: 'inherit',
+        }}
+        onMouseEnter={(e) => {
+          const el = e.currentTarget as HTMLElement
+          el.style.background = 'rgba(139,92,246,0.14)'
+          el.style.borderColor = 'rgba(139,92,246,0.42)'
+        }}
+        onMouseLeave={(e) => {
+          const el = e.currentTarget as HTMLElement
+          el.style.background = 'rgba(139,92,246,0.06)'
+          el.style.borderColor = 'rgba(139,92,246,0.25)'
+        }}
+      >
+        Generate ideas from examples
+        <ArrowRight style={{ width: 12, height: 12 }} />
+      </button>
+    </div>
+  )
+}
+
+function Step1({
+  userData, setDomain, setDomainChip, onNext, onBack,
+}: {
+  userData: UserData
+  setDomain: (v: string) => void
+  setDomainChip: (v: string) => void
+  onNext: () => void
+  onBack: () => void
+}) {
+  const [focused, setFocused] = useState(false)
+  const charCount = userData.domain.length
+  const canContinue = userData.domain.trim().length >= 30 || !!userData.domainChip
+
+  function handleTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const ta = e.target
+    ta.style.height = 'auto'
+    ta.style.height = Math.max(180, ta.scrollHeight) + 'px'
+    setDomain(e.target.value)
+    if (e.target.value) setDomainChip('')
+  }
+
+  function useExample(text: string) {
+    setDomain(text)
+    setDomainChip('')
+  }
+
+  return (
+    <div>
+      <ProgressBar current={1} total={8} />
+
+      <div style={{ display: 'flex', gap: 36, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        {/* LEFT — main content */}
+        <div style={{ flex: 1, minWidth: 300 }}>
+
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              padding: '4px 13px', borderRadius: 99, marginBottom: 18,
+              background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.28)',
+            }}
+          >
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#8B5CF6' }} />
+            <span style={{ fontSize: '11px', color: '#c4b5fd', fontWeight: 700, letterSpacing: '0.06em' }}>STEP 1</span>
+          </motion.div>
+
+          {/* Heading */}
+          <motion.h2
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              fontSize: 'clamp(24px, 3.2vw, 34px)', fontWeight: 800,
+              color: 'white', letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 12,
+            }}
+          >
+            What recurring problem<br />
+            <span style={{
+              background: 'linear-gradient(135deg, #c4b5fd 20%, #8B5CF6 80%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>
+              do you want to solve?
+            </span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            style={{ fontSize: '14px', lineHeight: 1.68, color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}
+          >
+            Every successful SaaS starts by solving a real problem. Describe something
+            frustrating that happens repeatedly in your work, studies or everyday life.
+          </motion.p>
+
+          {/* Glass card with textarea */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.22 }}
+            style={{
+              borderRadius: 18, marginBottom: 18,
+              background: 'rgba(17,24,39,0.7)',
+              border: `1px solid ${focused ? 'rgba(139,92,246,0.48)' : 'rgba(255,255,255,0.09)'}`,
+              boxShadow: focused ? '0 0 0 3px rgba(139,92,246,0.09), 0 4px 24px rgba(0,0,0,0.3)' : '0 4px 24px rgba(0,0,0,0.2)',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
+            }}
+          >
+            <div style={{ padding: '16px 18px 10px' }}>
+              <textarea
+                value={userData.domain}
+                onChange={handleTextChange}
+                onFocus={() => { setFocused(true); if (userData.domainChip) { setDomain(''); setDomainChip('') } }}
+                onBlur={() => setFocused(false)}
+                placeholder="I waste hours every week doing..."
+                maxLength={500}
+                style={{
+                  width: '100%', minHeight: '180px', border: 'none', outline: 'none',
+                  background: 'transparent', color: 'white', fontSize: '15px', lineHeight: 1.7,
+                  resize: 'none', fontFamily: 'Inter, system-ui, sans-serif',
+                  boxSizing: 'border-box', padding: 0,
+                }}
+              />
+            </div>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '8px 18px', borderTop: '1px solid rgba(255,255,255,0.05)',
+            }}>
+              <motion.span
+                animate={{ color: charCount >= 30 ? '#39FF88' : 'rgba(255,255,255,0.25)' }}
+                transition={{ duration: 0.3 }}
+                style={{ fontSize: '11.5px' }}
+              >
+                {charCount >= 30 ? '✓ Ready to continue' : charCount > 0 ? `${30 - charCount} more characters needed` : 'Write at least 30 characters'}
+              </motion.span>
+              <span style={{ fontSize: '11.5px', color: charCount > 450 ? '#fbbf24' : 'rgba(255,255,255,0.22)' }}>
+                {charCount} / 500
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Domain chips */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            style={{ marginBottom: 28 }}
+          >
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 700, letterSpacing: '0.07em', marginBottom: 10 }}>
+              OR PICK A DOMAIN
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+              {DOMAIN_CHIPS.map((chip) => (
+                <motion.button
+                  key={chip}
+                  whileHover={{ scale: 1.04, y: -1 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => {
+                    setDomainChip(chip === userData.domainChip ? '' : chip)
+                    setDomain('')
+                  }}
+                  style={{
+                    padding: '7px 14px', borderRadius: 99, fontSize: '12.5px', fontWeight: 500,
+                    cursor: 'pointer', fontFamily: 'inherit',
+                    background: userData.domainChip === chip ? 'rgba(139,92,246,0.22)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${userData.domainChip === chip ? 'rgba(139,92,246,0.55)' : 'rgba(255,255,255,0.09)'}`,
+                    color: userData.domainChip === chip ? '#c4b5fd' : 'rgba(255,255,255,0.55)',
+                    transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+                  }}
+                >
+                  {chip}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Navigation row */}
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={onBack}
+              style={{
+                padding: '12px 20px', borderRadius: 14, fontSize: '14px', fontWeight: 500,
+                color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.10)',
+                background: 'rgba(255,255,255,0.04)', cursor: 'pointer', flexShrink: 0,
+                display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s', fontFamily: 'inherit',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.color = 'rgba(255,255,255,0.72)'
+                el.style.borderColor = 'rgba(255,255,255,0.18)'
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement
+                el.style.color = 'rgba(255,255,255,0.45)'
+                el.style.borderColor = 'rgba(255,255,255,0.10)'
+              }}
+            >
+              <ArrowLeft style={{ width: 14, height: 14 }} />
+              Back
+            </button>
+            <div style={{ flex: 1 }}>
+              <ContinueButton disabled={!canContinue} onClick={onNext} label="Continue" />
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT — illustration + AI helper */}
+        <div style={{ width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <StickyWallIllustration />
+          <AIHelperCard onUseExample={useExample} />
+        </div>
+
+      </div>
     </div>
   )
 }
@@ -374,6 +726,7 @@ function Step2({
 }) {
   return (
     <div>
+      <ProgressBar current={2} total={8} />
       <StepHeader step={2} total={3} title="Tell us about yourself" subtitle="We'll tailor opportunities to your exact situation." />
       <OptionGroup label="Available time per week?" value={userData.timePerWeek} options={TIME_OPTIONS} onSelect={setTime} />
       <OptionGroup label="Your technical level?" value={userData.techLevel} options={TECH_OPTIONS} onSelect={setTech} />
@@ -390,6 +743,7 @@ function Step3({
 }) {
   return (
     <div>
+      <ProgressBar current={3} total={8} />
       <StepHeader step={3} total={3} title="Your target market" subtitle="Who will you be selling to?" />
       <OptionGroup label="I want to sell to..." value={userData.customerType} options={CUSTOMER_OPTIONS} onSelect={setCustomer} />
       <OptionGroup label="Preferred pricing model" value={userData.pricingModel} options={PRICING_OPTIONS} onSelect={setPricing} />
@@ -873,7 +1227,7 @@ export function BuilderClient() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             style={{
               width: '100%',
-              maxWidth: step === 5 ? 680 : 520,
+              maxWidth: step === 1 ? 900 : step === 5 ? 680 : 520,
               padding: '40px 20px 60px',
               margin: '0 auto',
             }}
@@ -885,6 +1239,7 @@ export function BuilderClient() {
                 setDomain={(v) => set('domain', v)}
                 setDomainChip={(v) => set('domainChip', v)}
                 onNext={() => canContinue() && goTo(2)}
+                onBack={() => goTo(0)}
               />
             )}
             {step === 2 && (
