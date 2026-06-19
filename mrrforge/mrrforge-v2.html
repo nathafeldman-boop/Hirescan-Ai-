@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MRRForge — Discover Your SaaS Idea</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRRForge — Trouve ton idée SaaS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Cormorant+Garamond:wght@400;500;600&display=swap">
 <script>
@@ -31,9 +31,6 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 /* ── Router ──────────────────────────────────── */
 .spa-page { display: none !important; }
 .spa-page.active { display: block !important; }
-/* Show landing page immediately — no JS flicker */
-#page-index { display: block !important; }
-#page-index.hidden-by-router { display: none !important; }
 #page-quiz.active { display: flex !important; flex-direction: column; min-height: 100vh; }
 #page-analyzing.active { display: flex !important; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
 
@@ -176,6 +173,22 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
 
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 640px) {
+  nav > div { padding: 0 12px !important; }
+  .btn-primary, .btn-outline { padding: 10px 18px !important; font-size: 14px !important; }
+  section { padding-left: 14px !important; padding-right: 14px !important; }
+  .pay-modal .modal-box { padding: 24px 18px !important; }
+  #quiz-step-container { padding: 80px 14px 24px !important; }
+}
+@media (max-width: 480px) {
+  h1 { font-size: clamp(34px,9vw,52px) !important; }
+  h2 { font-size: clamp(22px,6vw,32px) !important; }
+  .glass { padding: 16px !important; }
+  .ai-card { padding: 16px !important; }
+  .opt-card { padding: 12px 14px !important; }
+}
+
 /* ── Potential badges ────────────────────────── */
 .badge-low      { background:rgba(107,114,128,.18); color:#9ca3af; border:1px solid rgba(107,114,128,.3); }
 .badge-medium   { background:rgba(59,130,246,.14);  color:#93c5fd; border:1px solid rgba(59,130,246,.25); }
@@ -274,7 +287,7 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 <!-- ════════════════════════════════════════
      PAGE: INDEX
 ════════════════════════════════════════ -->
-<div id="page-index" class="spa-page">
+<div id="page-index" class="spa-page active">
 
   <!-- Navbar -->
   <nav style="position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(8,8,12,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);">
@@ -283,7 +296,7 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
         <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5b5ef8,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">M</div>
         <span style="font-weight:600;font-size:15px;">MRRForge</span>
       </div>
-      <button class="btn-primary" style="padding:8px 18px;font-size:13px;" onclick="nav.go('quiz')">Start Free →</button>
+      <button class="btn-primary" style="padding:8px 18px;font-size:13px;" onclick="nav.go('quiz')">Commencer gratuitement →</button>
     </div>
   </nav>
 
@@ -294,37 +307,37 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
     <div style="max-width:860px;margin:0 auto;text-align:center;position:relative;z-index:1;width:100%;">
       <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:99px;padding:6px 14px;font-size:12px;color:#c4b5fd;margin-bottom:28px;font-weight:500;">
         <span class="pulse" style="width:7px;height:7px;border-radius:50%;background:#34d399;display:inline-block;"></span>
-        AI-powered SaaS idea matcher — 100% free
+        Matcheur d'idées SaaS par IA — 100% gratuit
       </div>
 
       <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(42px,8vw,82px);font-weight:500;line-height:1.08;margin-bottom:22px;letter-spacing:-1px;">
-        Find your<br>
-        <span class="text-eg">$5k/mo SaaS idea</span><br>
-        in 60 seconds.
+        Trouve ton<br>
+        <span class="text-eg">idée SaaS à 5k€/mois</span><br>
+        en 60 secondes.
       </h1>
 
       <p style="font-size:17px;color:#9ca3af;max-width:500px;margin:0 auto 36px;line-height:1.7;">
-        Answer 5 questions. Our AI scores 20 validated micro-SaaS ideas against your skills, goals, and market timing.
+        Réponds à 5 questions. Notre IA évalue 20 idées micro-SaaS validées selon tes compétences, objectifs et la demande du marché.
       </p>
 
       <button class="btn-primary" style="font-size:17px;padding:16px 36px;" onclick="nav.go('quiz')">
-        Discover My Idea →
+        Découvrir mon idée →
       </button>
-      <p style="font-size:12px;color:#4b5563;margin-top:12px;">No email required · 60 seconds · Free forever</p>
+      <p style="font-size:12px;color:#4b5563;margin-top:12px;">Sans e-mail · 60 secondes · Gratuit à vie</p>
 
       <!-- Stats -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:560px;margin:56px auto 0;">
         <div class="glass" style="border-radius:20px;padding:18px 12px;text-align:center;">
           <div class="text-eg" style="font-size:26px;font-weight:700;" id="stat-ideas">20</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Validated Ideas</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Idées validées</div>
         </div>
         <div class="glass" style="border-radius:20px;padding:18px 12px;text-align:center;">
-          <div class="text-eg" style="font-size:26px;font-weight:700;">4,200+</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Builders Matched</div>
+          <div class="text-eg" style="font-size:26px;font-weight:700;">4 200+</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Créateurs matchés</div>
         </div>
         <div class="glass" style="border-radius:20px;padding:18px 12px;text-align:center;">
-          <div class="text-eg" style="font-size:26px;font-weight:700;">$5k</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px;">Avg MRR Target</div>
+          <div class="text-eg" style="font-size:26px;font-weight:700;">5k€</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:4px;">MRR cible moyen</div>
         </div>
       </div>
     </div>
@@ -333,23 +346,23 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
   <!-- How it works -->
   <section style="padding:80px 16px;background:rgba(14,14,20,.6);">
     <div style="max-width:1000px;margin:0 auto;">
-      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Process</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">How MRRForge works</h2>
+      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Processus</p>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">Comment fonctionne MRRForge</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
         <div class="glass" style="border-radius:20px;padding:24px;">
           <div style="width:40px;height:40px;border-radius:12px;background:rgba(91,94,248,.15);display:flex;align-items:center;justify-content:center;font-weight:700;color:#818cf8;margin-bottom:14px;">1</div>
-          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">Answer 5 questions</h3>
-          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Tell us your skills, time budget, target income, and preferred model.</p>
+          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">Réponds à 5 questions</h3>
+          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Dis-nous tes compétences, ton temps disponible, ton objectif de revenus et ton modèle préféré.</p>
         </div>
         <div class="glass" style="border-radius:20px;padding:24px;">
           <div style="width:40px;height:40px;border-radius:12px;background:rgba(52,211,153,.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#34d399;margin-bottom:14px;">2</div>
-          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">AI scores 20 ideas</h3>
-          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Our algorithm matches each idea against your profile, market timing, and competition.</p>
+          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">L'IA évalue 20 idées</h3>
+          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Notre algorithme score chaque idée selon ton profil, la demande du marché et la concurrence.</p>
         </div>
         <div class="glass" style="border-radius:20px;padding:24px;">
           <div style="width:40px;height:40px;border-radius:12px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:#60a5fa;margin-bottom:14px;">3</div>
-          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">Get your blueprint</h3>
-          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Unlock the full execution plan: stack, pricing, 90-day roadmap, launch checklist.</p>
+          <h3 style="font-weight:600;margin-bottom:8px;font-size:15px;">Reçois ton blueprint</h3>
+          <p style="font-size:13px;color:#9ca3af;line-height:1.6;">Débloque le plan d'exécution complet : stack, pricing, roadmap 90 jours, checklist de lancement.</p>
         </div>
       </div>
     </div>
@@ -358,31 +371,31 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
   <!-- Testimonials -->
   <section style="padding:80px 16px;">
     <div style="max-width:1000px;margin:0 auto;">
-      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Builders</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">From $0 to MRR</h2>
+      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Témoignages</p>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">De 0 à MRR</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
         <div class="glass" style="border-radius:20px;padding:22px;">
           <div style="color:#fbbf24;font-size:13px;margin-bottom:10px;">★★★★★</div>
-          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">"MRRForge matched me with the email warm-up idea. 4 months later I'm at $3,200/mo."</p>
+          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">« MRRForge m'a matché avec l'idée email warm-up. 4 mois plus tard je suis à 3 200€/mois. »</p>
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:32px;height:32px;border-radius:50%;background:rgba(167,139,250,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#c4b5fd;">AK</div>
-            <div><div style="font-size:12px;font-weight:500;">Alex K.</div><div style="font-size:11px;color:#6b7280;">Indie hacker · $3,200/mo</div></div>
+            <div><div style="font-size:12px;font-weight:500;">Alex K.</div><div style="font-size:11px;color:#6b7280;">Indie hacker · 3 200€/mois</div></div>
           </div>
         </div>
         <div class="glass" style="border-radius:20px;padding:22px;">
           <div style="color:#fbbf24;font-size:13px;margin-bottom:10px;">★★★★★</div>
-          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">"The quiz took 2 minutes. The idea it matched actually fit my React skills perfectly."</p>
+          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">« Le quiz a pris 2 minutes. L'idée trouvée correspondait parfaitement à mes compétences React. »</p>
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:32px;height:32px;border-radius:50%;background:rgba(52,211,153,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#6ee7b7;">MR</div>
-            <div><div style="font-size:12px;font-weight:500;">Marie R.</div><div style="font-size:11px;color:#6b7280;">Full-stack dev · $1,800/mo</div></div>
+            <div><div style="font-size:12px;font-weight:500;">Marie R.</div><div style="font-size:11px;color:#6b7280;">Dev full-stack · 1 800€/mois</div></div>
           </div>
         </div>
         <div class="glass" style="border-radius:20px;padding:22px;">
           <div style="color:#fbbf24;font-size:13px;margin-bottom:10px;">★★★★★</div>
-          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">"The blueprint saved months of research. Stack, pricing, acquisition — all mapped out."</p>
+          <p style="font-size:13px;color:#d1d5db;line-height:1.65;margin-bottom:16px;">« Le blueprint m'a économisé des mois de recherche. Stack, pricing, acquisition — tout était planifié. »</p>
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#93c5fd;">JL</div>
-            <div><div style="font-size:12px;font-weight:500;">James L.</div><div style="font-size:11px;color:#6b7280;">No-code builder · $5,400/mo</div></div>
+            <div><div style="font-size:12px;font-weight:500;">James L.</div><div style="font-size:11px;color:#6b7280;">Builder no-code · 5 400€/mois</div></div>
           </div>
         </div>
       </div>
@@ -392,35 +405,35 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
   <!-- Pricing -->
   <section style="padding:80px 16px;background:rgba(14,14,20,.5);">
     <div style="max-width:720px;margin:0 auto;">
-      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Pricing</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">Simple, fair pricing</h2>
+      <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">Tarifs</p>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:50px;">Simple et transparent</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
         <div class="glass" style="border-radius:22px;padding:28px;">
-          <div style="font-size:12px;font-weight:600;color:#9ca3af;margin-bottom:8px;">Free</div>
-          <div style="font-size:40px;font-weight:700;margin-bottom:4px;">$0</div>
-          <p style="font-size:13px;color:#9ca3af;margin-bottom:22px;">See your top 3 matches and archetype.</p>
+          <div style="font-size:12px;font-weight:600;color:#9ca3af;margin-bottom:8px;">Gratuit</div>
+          <div style="font-size:40px;font-weight:700;margin-bottom:4px;">0€</div>
+          <p style="font-size:13px;color:#9ca3af;margin-bottom:22px;">Vois tes 3 meilleures idées et ton archétype.</p>
           <ul style="list-style:none;space-y:6px;margin-bottom:24px;">
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> 5-question quiz</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Top 3 idea matches</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> MRR potential range</li>
-            <li style="font-size:13px;color:#4b5563;display:flex;gap:8px;margin-bottom:7px;"><span>✗</span> Full blueprint</li>
-            <li style="font-size:13px;color:#4b5563;display:flex;gap:8px;"><span>✗</span> 90-day roadmap</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Quiz 5 questions</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Top 3 idées matchées</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Fourchette MRR potentiel</li>
+            <li style="font-size:13px;color:#4b5563;display:flex;gap:8px;margin-bottom:7px;"><span>✗</span> Blueprint complet</li>
+            <li style="font-size:13px;color:#4b5563;display:flex;gap:8px;"><span>✗</span> Roadmap 90 jours</li>
           </ul>
-          <button class="btn-outline" style="width:100%;padding:12px;font-size:13px;" onclick="nav.go('quiz')">Start Free →</button>
+          <button class="btn-outline" style="width:100%;padding:12px;font-size:13px;" onclick="nav.go('quiz')">Commencer gratuitement →</button>
         </div>
         <div class="glass" style="border-radius:22px;padding:28px;border-color:rgba(167,139,250,.3)!important;position:relative;">
-          <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#7c3aed,#5b5ef8);color:#fff;font-size:11px;font-weight:600;padding:4px 14px;border-radius:99px;">Most Popular</div>
+          <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#7c3aed,#5b5ef8);color:#fff;font-size:11px;font-weight:600;padding:4px 14px;border-radius:99px;">Le plus populaire</div>
           <div style="font-size:12px;font-weight:600;color:#c4b5fd;margin-bottom:8px;">Premium</div>
-          <div style="font-size:40px;font-weight:700;margin-bottom:4px;">$29 <span style="font-size:16px;color:#9ca3af;font-weight:400;">one-time</span></div>
-          <p style="font-size:13px;color:#9ca3af;margin-bottom:22px;">Full blueprint for one idea, forever.</p>
+          <div style="font-size:40px;font-weight:700;margin-bottom:4px;">20€ <span style="font-size:16px;color:#9ca3af;font-weight:400;">unique</span></div>
+          <p style="font-size:13px;color:#9ca3af;margin-bottom:22px;">Blueprint complet pour une idée, à vie.</p>
           <ul style="list-style:none;margin-bottom:24px;">
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Everything in Free</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Full execution blueprint</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Tech stack guide</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> 90-day roadmap</li>
-            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;"><span style="color:#34d399;">✓</span> Launch dashboard</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Tout ce qui est gratuit</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Blueprint d'exécution complet</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Guide tech stack</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;margin-bottom:7px;"><span style="color:#34d399;">✓</span> Roadmap 90 jours</li>
+            <li style="font-size:13px;color:#d1d5db;display:flex;gap:8px;"><span style="color:#34d399;">✓</span> Dashboard de lancement</li>
           </ul>
-          <button class="btn-primary" style="width:100%;padding:12px;font-size:13px;justify-content:center;" onclick="nav.go('quiz')">Unlock Blueprint →</button>
+          <button class="btn-primary" style="width:100%;padding:12px;font-size:13px;justify-content:center;" onclick="nav.go('quiz')">Débloquer le Blueprint →</button>
         </div>
       </div>
     </div>
@@ -430,23 +443,23 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
   <section style="padding:80px 16px;">
     <div style="max-width:640px;margin:0 auto;">
       <p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;text-align:center;margin-bottom:10px;">FAQ</p>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:40px;">Questions</h2>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,40px);font-weight:500;text-align:center;margin-bottom:40px;">Questions fréquentes</h2>
       <div style="display:flex;flex-direction:column;gap:6px;">
         <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">How does the scoring work?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">We score 20 ideas across 8 factors: skill alignment, market size, competition, monetization, time-to-market, archetype fit, trend momentum, and complexity. Each idea gets a composite 0–99 score.</div>
+          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Comment fonctionne le scoring ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
+          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">On score 20 idées sur 8 critères : alignement compétences, taille de marché, concurrence, monétisation, temps de mise sur le marché, archétype, tendance et complexité. Chaque idée reçoit un score composite de 0 à 99.</div>
         </div>
         <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">What does "one-time" mean?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Pay once and get permanent access to the full blueprint. No subscriptions, no recurring fees.</div>
+          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Que veut dire « paiement unique » ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
+          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Tu paies une seule fois et accèdes au blueprint complet en permanence. Pas d'abonnement, pas de frais récurrents.</div>
         </div>
         <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Are these real opportunities?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Yes. Each idea is validated with competitor revenue data, search volume trends, and demand signals from developer communities and Product Hunt.</div>
+          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Ce sont de vraies opportunités ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
+          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Oui. Chaque idée est validée avec des données de revenus concurrents, des tendances de volume de recherche et des signaux de demande issus des communautés de développeurs et Product Hunt.</div>
         </div>
         <div class="glass" style="border-radius:14px;overflow:hidden;">
-          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Can I retake the quiz?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
-          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Yes, unlimited times. Results are saved locally so you can compare different runs.</div>
+          <button style="width:100%;text-align:left;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;background:transparent;border:none;color:#fff;cursor:pointer;" onclick="toggleFaq(this)">Puis-je refaire le quiz ?<span style="color:#6b7280;transition:transform .2s;">+</span></button>
+          <div class="faq-body" style="display:none;padding:0 18px 16px;font-size:13px;color:#9ca3af;line-height:1.6;">Oui, autant de fois que tu veux. Les résultats sont sauvegardés localement pour comparer différents profils.</div>
         </div>
       </div>
     </div>
@@ -454,13 +467,13 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 
   <!-- Footer CTA -->
   <section style="padding:80px 16px;text-align:center;">
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,52px);font-weight:500;margin-bottom:12px;">Your $5k/mo idea is waiting.</h2>
-    <p style="font-size:15px;color:#9ca3af;margin-bottom:32px;">60 seconds to find it.</p>
-    <button class="btn-primary" style="font-size:17px;padding:16px 36px;" onclick="nav.go('quiz')">Take the Quiz Free →</button>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,52px);font-weight:500;margin-bottom:12px;">Ton idée à 5k€/mois t'attend.</h2>
+    <p style="font-size:15px;color:#9ca3af;margin-bottom:32px;">60 secondes pour la trouver.</p>
+    <button class="btn-primary" style="font-size:17px;padding:16px 36px;" onclick="nav.go('quiz')">Faire le quiz gratuitement →</button>
   </section>
 
   <footer style="border-top:1px solid rgba(255,255,255,.05);padding:28px 16px;text-align:center;font-size:12px;color:#374151;">
-    © 2025 MRRForge · Built for indie hackers
+    © 2025 MRRForge · Fait pour les indie hackers
   </footer>
 </div><!-- /#page-index -->
 
@@ -479,8 +492,8 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 
   <!-- Header -->
   <div style="position:fixed;top:3px;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
-    <button style="font-size:13px;color:#6b7280;background:none;border:none;cursor:pointer;" onclick="nav.go('index')">← Back</button>
-    <span style="font-size:12px;color:#6b7280;" id="quiz-step-label">Step 1 of 5</span>
+    <button style="font-size:13px;color:#6b7280;background:none;border:none;cursor:pointer;" onclick="nav.go('index')">← Retour</button>
+    <span style="font-size:12px;color:#6b7280;" id="quiz-step-label">Étape 1 sur 5</span>
     <div style="width:50px;"></div>
   </div>
 
@@ -491,8 +504,8 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
   <div id="intel-overlay" class="intel-overlay">
     <div class="glass" style="border-radius:28px;padding:36px 28px;max-width:320px;margin:0 16px;text-align:center;">
       <div style="font-size:44px;margin-bottom:10px;" id="intel-icon">🧠</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin-bottom:6px;" id="intel-msg">Interesting…</div>
-      <div style="font-size:13px;color:#9ca3af;" id="intel-sub">Let's see who can solve this.</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin-bottom:6px;" id="intel-msg">Intéressant…</div>
+      <div style="font-size:13px;color:#9ca3af;" id="intel-sub">Voyons qui peut résoudre ça.</div>
     </div>
   </div>
 </div><!-- /#page-quiz -->
@@ -545,8 +558,8 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
   <div style="position:sticky;top:0;z-index:40;background:rgba(8,8,12,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);">
     <div style="max-width:1000px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;">
       <button style="font-size:13px;color:#9ca3af;background:none;border:none;cursor:pointer;" onclick="nav.go('index')">← MRRForge</button>
-      <span style="font-size:14px;font-weight:600;">Your Results</span>
-      <button style="font-size:13px;color:#a78bfa;background:none;border:none;cursor:pointer;" onclick="nav.go('quiz')">Retake →</button>
+      <span style="font-size:14px;font-weight:600;">Vos résultats</span>
+      <button style="font-size:13px;color:#a78bfa;background:none;border:none;cursor:pointer;" onclick="nav.go('quiz')">Refaire →</button>
     </div>
   </div>
   <div style="max-width:820px;margin:0 auto;padding:32px 16px 60px;" id="results-content"></div>
@@ -559,7 +572,7 @@ body { background: #08080c; color: #fff; font-family: 'DM Sans', sans-serif; ove
 <div id="page-detail" class="spa-page">
   <div style="position:sticky;top:0;z-index:40;background:rgba(8,8,12,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);">
     <div style="max-width:800px;margin:0 auto;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;">
-      <button style="font-size:13px;color:#9ca3af;background:none;border:none;cursor:pointer;" onclick="nav.back()">← Results</button>
+      <button style="font-size:13px;color:#9ca3af;background:none;border:none;cursor:pointer;" onclick="nav.back()">← Résultats</button>
       <span style="font-size:14px;font-weight:600;" id="detail-nav-title">Blueprint</span>
       <div style="width:50px;"></div>
     </div>
@@ -649,65 +662,65 @@ var IDEAS = [
 ];
 
 var CHECKLIST = [
-  {id:'c1', text:'Define your ICP (Ideal Customer Profile)'},
-  {id:'c2', text:'Validate with 10 potential customers'},
-  {id:'c3', text:'Set up landing page with waitlist'},
-  {id:'c4', text:'Build MVP in ≤ 4 weeks'},
-  {id:'c5', text:'Launch on Product Hunt'},
-  {id:'c6', text:'Close first 5 paying customers'},
-  {id:'c7', text:'Set up Stripe + billing flows'},
-  {id:'c8', text:'Reach $1,000 MRR'},
-  {id:'c9', text:'Set up analytics + conversion funnel'},
-  {id:'c10', text:'Add first integration (Zapier/Slack)'},
-  {id:'c11', text:'Reach $3,000 MRR'},
-  {id:'c12', text:'Hire first part-time contractor'},
+  {id:'c1', text:'Définir ton ICP (Profil Client Idéal)'},
+  {id:'c2', text:'Valider avec 10 clients potentiels'},
+  {id:'c3', text:'Créer une landing page avec liste d\'attente'},
+  {id:'c4', text:'Construire le MVP en ≤ 4 semaines'},
+  {id:'c5', text:'Lancer sur Product Hunt'},
+  {id:'c6', text:'Signer les 5 premiers clients payants'},
+  {id:'c7', text:'Configurer Stripe + flux de paiement'},
+  {id:'c8', text:'Atteindre 1 000€ MRR'},
+  {id:'c9', text:'Mettre en place analytics + tunnel de conversion'},
+  {id:'c10', text:'Ajouter la première intégration (Zapier/Slack)'},
+  {id:'c11', text:'Atteindre 3 000€ MRR'},
+  {id:'c12', text:'Embaucher le premier freelance'},
 ];
 
 var ARCHETYPE_META = {
-  builder:  {label:'The Builder',   icon:'⚙️', color:'#60a5fa', desc:'You ship fast and figure out sales later. Best path: developer tools, APIs, automation products.'},
-  creator:  {label:'The Creator',   icon:'✍️', color:'#a78bfa', desc:'You grow through content and community. Best path: creator tools, newsletters, course platforms.'},
-  marketer: {label:'The Marketer',  icon:'📣', color:'#fb923c', desc:'You know how to acquire customers. Best path: growth tools, lead gen, analytics SaaS.'},
-  operator: {label:'The Operator',  icon:'📊', color:'#34d399', desc:'You systemize and scale. Best path: workflow automation, dashboards, B2B productivity.'},
-  beginner: {label:'The Beginner',  icon:'🚀', color:'#f472b6', desc:'You\'re learning the ropes. Best path: simple B2C tools, low-code projects, and quick wins.'},
+  builder:  {label:'Le Builder',    icon:'⚙️', color:'#60a5fa', desc:'Tu ship vite et tu t\'occupes des ventes ensuite. Idéal : outils développeurs, APIs, automatisation.'},
+  creator:  {label:'Le Créateur',   icon:'✍️', color:'#a78bfa', desc:'Tu grandis par le contenu et la communauté. Idéal : outils créateurs, newsletters, plateformes de cours.'},
+  marketer: {label:'Le Marketeur',  icon:'📣', color:'#fb923c', desc:'Tu sais acquérir des clients. Idéal : outils de croissance, génération de leads, analytics SaaS.'},
+  operator: {label:'L\'Opérateur',  icon:'📊', color:'#34d399', desc:'Tu systématises et tu scales. Idéal : automatisation workflow, dashboards, productivité B2B.'},
+  beginner: {label:'Le Débutant',   icon:'🚀', color:'#f472b6', desc:'Tu apprends les bases. Idéal : outils B2C simples, projets low-code, et victoires rapides.'},
 };
 
 var INTEL_MSGS = [
-  {icon:'🧠', msg:'Interesting…',              sub:'Let\'s see who can solve this.'},
-  {icon:'⚡', msg:'We\'ve seen this pattern.',  sub:'Finding your archetype.'},
-  {icon:'🎯', msg:'Good signal.',               sub:'Adapting recommendations.'},
-  {icon:'📈', msg:'Growing demand here.',       sub:'Almost done scoring.'},
+  {icon:'🧠', msg:'Intéressant…',             sub:'Voyons qui peut résoudre ça.'},
+  {icon:'⚡', msg:'On a déjà vu ce profil.',  sub:'Détection de ton archétype.'},
+  {icon:'🎯', msg:'Bon signal.',              sub:'Adaptation des recommandations.'},
+  {icon:'📈', msg:'Demande croissante ici.',  sub:'Scoring presque terminé.'},
 ];
 
 var QUIZ_QUESTIONS = [
-  {q:'What\'s your primary skill set?', sub:'Be honest — this shapes everything.', key:'skill', options:[
-    {val:'dev',    label:'Developer / Engineer', sub:'I build things with code'},
-    {val:'design', label:'Designer / Creator',   sub:'I make things beautiful'},
-    {val:'sales',  label:'Sales / Marketing',    sub:'I drive growth'},
-    {val:'ops',    label:'Ops / Business',       sub:'I systemize and scale'},
+  {q:'Quelle est ta compétence principale ?', sub:'Sois honnête — ça change tout.', key:'skill', options:[
+    {val:'dev',    label:'Développeur / Ingénieur', sub:'Je construis avec du code'},
+    {val:'design', label:'Designer / Créateur',     sub:'Je crée de belles choses'},
+    {val:'sales',  label:'Vente / Marketing',       sub:'Je génère de la croissance'},
+    {val:'ops',    label:'Ops / Business',          sub:'Je systématise et je scale'},
   ]},
-  {q:'How many hours per week can you commit?', sub:'Early stage — be realistic.', key:'time', options:[
-    {val:'low',      label:'< 5 hours',    sub:'Side project mode'},
-    {val:'medium',   label:'5–15 hours',   sub:'Serious side hustle'},
-    {val:'high',     label:'15–30 hours',  sub:'Going all-in part-time'},
-    {val:'fulltime', label:'40+ hours',    sub:'Full-time commitment'},
+  {q:'Combien d\'heures par semaine peux-tu consacrer ?', sub:'Phase démarrage — sois réaliste.', key:'time', options:[
+    {val:'low',      label:'< 5 heures',    sub:'Mode projet secondaire'},
+    {val:'medium',   label:'5–15 heures',   sub:'Side hustle sérieux'},
+    {val:'high',     label:'15–30 heures',  sub:'Tout-in à mi-temps'},
+    {val:'fulltime', label:'40+ heures',    sub:'Engagement à temps plein'},
   ]},
-  {q:'What\'s your 12-month MRR target?', sub:'Dream big but be specific.', key:'target', options:[
-    {val:'1k',  label:'$1,000/mo',    sub:'Side income'},
-    {val:'5k',  label:'$5,000/mo',    sub:'Replace salary'},
-    {val:'10k', label:'$10,000/mo',   sub:'Financial freedom'},
-    {val:'50k', label:'$50,000+/mo',  sub:'Build a company'},
+  {q:'Quel est ton objectif MRR à 12 mois ?', sub:'Vois grand mais sois précis.', key:'target', options:[
+    {val:'1k',  label:'1 000€/mois',    sub:'Revenu complémentaire'},
+    {val:'5k',  label:'5 000€/mois',    sub:'Remplacer mon salaire'},
+    {val:'10k', label:'10 000€/mois',   sub:'Liberté financière'},
+    {val:'50k', label:'50 000€+/mois',  sub:'Construire une vraie boîte'},
   ]},
-  {q:'What business model feels right?', sub:'How do you want to make money?', key:'model', options:[
-    {val:'sub',    label:'Monthly subscriptions', sub:'Predictable recurring revenue'},
-    {val:'usage',  label:'Usage-based pricing',   sub:'Customers pay as they grow'},
-    {val:'oneoff', label:'One-time payments',     sub:'Digital products, licenses'},
-    {val:'mixed',  label:'Mixed model',           sub:'Subscriptions + upsells'},
+  {q:'Quel modèle économique te correspond ?', sub:'Comment veux-tu gagner de l\'argent ?', key:'model', options:[
+    {val:'sub',    label:'Abonnements mensuels',    sub:'Revenus récurrents prévisibles'},
+    {val:'usage',  label:'Facturation à l\'usage',  sub:'Les clients paient ce qu\'ils consomment'},
+    {val:'oneoff', label:'Paiement unique',         sub:'Produits numériques, licences'},
+    {val:'mixed',  label:'Modèle mixte',            sub:'Abonnements + upsells'},
   ]},
-  {q:'What\'s your biggest fear about building?', sub:'Honest answer shapes your blueprint.', key:'fear', options:[
-    {val:'tech',        label:'Technical complexity', sub:'Can I actually build this?'},
-    {val:'competition', label:'Too much competition', sub:'Is the market already taken?'},
-    {val:'customers',   label:'Getting customers',    sub:'Will anyone actually pay?'},
-    {val:'time',        label:'Running out of time',  sub:'Can I fit this into my life?'},
+  {q:'Quelle est ta plus grande crainte en lançant ?', sub:'Ta réponse honnête façonne ton blueprint.', key:'fear', options:[
+    {val:'tech',        label:'Complexité technique',  sub:'Suis-je capable de le construire ?'},
+    {val:'competition', label:'Trop de concurrence',   sub:'Le marché est-il déjà pris ?'},
+    {val:'customers',   label:'Trouver des clients',   sub:'Est-ce que quelqu\'un paiera vraiment ?'},
+    {val:'time',        label:'Manque de temps',       sub:'Puis-je intégrer ça dans ma vie ?'},
   ]},
 ];
 
@@ -718,13 +731,8 @@ var nav = (function(){
   var _hist = [];
   function _activate(page, params){
     document.querySelectorAll('.spa-page').forEach(function(el){ el.classList.remove('active'); });
-    var idx = document.getElementById('page-index');
-    if(idx) idx.classList.add('hidden-by-router');
     var el = document.getElementById('page-' + page);
-    if(el) {
-      el.classList.remove('hidden-by-router');
-      el.classList.add('active');
-    }
+    if(el) el.classList.add('active');
     window.scrollTo(0,0);
     if(page==='index')     init_index();
     else if(page==='quiz')      init_quiz();
@@ -800,7 +808,7 @@ function _renderStep(step){
   var q=QUIZ_QUESTIONS[step];
   var pct=(step/QUIZ_QUESTIONS.length)*100;
   document.getElementById('quiz-progress').style.width=pct+'%';
-  document.getElementById('quiz-step-label').textContent='Step '+(step+1)+' of '+QUIZ_QUESTIONS.length;
+  document.getElementById('quiz-step-label').textContent='Étape '+(step+1)+' sur '+QUIZ_QUESTIONS.length;
 
   var html='<div style="width:100%;max-width:420px;" class="fade-up">';
   html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Question '+(step+1)+'</p>';
@@ -1077,7 +1085,7 @@ function init_results(){
     // Already premium — show "Go to detail" CTA
     var firstId=(aiIdeas[0]&&aiIdeas[0].id)||IDEAS[0].id;
     html+='<div style="margin-top:32px;text-align:center;">';
-    html+='<button class="btn-primary" style="font-size:15px;padding:16px 36px;justify-content:center;" onclick="openAiDetail(0)">Ouvrir le Blueprint #1 →</button>';
+    html+='<button class="btn-primary" style="font-size:16px;padding:16px 36px;justify-content:center;" onclick="openAiDetail(0)">Ouvrir le Blueprint #1 →</button>';
     html+='</div>';
   }
 
@@ -1133,26 +1141,26 @@ function init_detail(params){
   html+='<p style="font-size:13px;color:#9ca3af;margin-top:4px;">'+idea.tagline+'</p></div>';
   html+='<div class="glass" style="border-radius:16px;padding:14px 16px;text-align:center;min-width:72px;flex-shrink:0;">';
   html+='<div class="text-eg" style="font-size:28px;font-weight:700;">'+score+'</div>';
-  html+='<div style="font-size:11px;color:#6b7280;margin-top:2px;">match</div></div></div>';
+  html+='<div style="font-size:11px;color:#6b7280;margin-top:2px;">score</div></div></div>';
   html+='<div class="glass" style="border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">';
-  html+='<div><div style="font-size:11px;color:#6b7280;margin-bottom:4px;">MRR Potential</div>';
+  html+='<div><div style="font-size:11px;color:#6b7280;margin-bottom:4px;">Potentiel MRR</div>';
   html+='<div class="text-eg" style="font-size:22px;font-weight:700;">'+idea.mrr+'</div></div>';
-  html+='<div style="text-align:right;"><div style="font-size:11px;color:#6b7280;margin-bottom:4px;">Difficulty</div>';
+  html+='<div style="text-align:right;"><div style="font-size:11px;color:#6b7280;margin-bottom:4px;">Difficulté</div>';
   html+='<div style="font-size:14px;font-weight:500;">'+idea.difficulty+'</div></div></div></div>';
 
   // Description
   html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
-  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:10px;">Overview</h2>';
+  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:10px;">Vue d\'ensemble</h2>';
   html+='<p style="font-size:13px;color:#d1d5db;line-height:1.7;">'+idea.desc+'</p></div>';
 
   // Market
   html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
-  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:10px;">Market Opportunity</h2>';
-  html+='<p style="font-size:13px;color:#d1d5db;line-height:1.7;">'+(idea.market||'Growing market with validated demand and clear monetization path.')+'</p></div>';
+  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:10px;">Opportunité de marché</h2>';
+  html+='<p style="font-size:13px;color:#d1d5db;line-height:1.7;">'+(idea.market||'Marché en croissance avec une demande validée et un chemin de monétisation clair.')+'</p></div>';
 
   // Pricing tiers
   html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
-  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:12px;">Pricing Model</h2>';
+  html+='<h2 style="font-weight:600;font-size:14px;margin-bottom:12px;">Modèle de prix</h2>';
   (idea.pricing||'$29/mo starter · $79/mo pro').split('·').forEach(function(t){
     html+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:7px;">';
     html+='<span style="color:#34d399;font-size:14px;">→</span><span style="font-size:13px;color:#d1d5db;">'+t.trim()+'</span></div>';
@@ -1163,14 +1171,14 @@ function init_detail(params){
     // Stack
     html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:12px;">';
     html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">';
-    html+='<h2 style="font-weight:600;font-size:14px;">Tech Stack</h2>';
+    html+='<h2 style="font-weight:600;font-size:14px;">Stack technique</h2>';
     html+='<span style="font-size:11px;background:rgba(52,211,153,.12);color:#34d399;padding:2px 8px;border-radius:99px;">Premium</span></div>';
     html+='<p style="font-size:13px;color:#d1d5db;line-height:1.7;">'+(idea.stack||'Next.js + Supabase + Stripe + Vercel')+'</p></div>';
 
     // Roadmap
     html+='<div class="glass" style="border-radius:18px;padding:20px;margin-bottom:20px;">';
     html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">';
-    html+='<h2 style="font-weight:600;font-size:14px;">90-Day Roadmap</h2>';
+    html+='<h2 style="font-weight:600;font-size:14px;">Roadmap 90 jours</h2>';
     html+='<span style="font-size:11px;background:rgba(52,211,153,.12);color:#34d399;padding:2px 8px;border-radius:99px;">Premium</span></div>';
     (idea.roadmap||['Week 1-2: Core MVP','Week 3-4: Beta','Month 2: Growth','Month 3: Scale']).forEach(function(step,i){
       html+='<div style="display:flex;gap:10px;margin-bottom:10px;">';
@@ -1179,14 +1187,14 @@ function init_detail(params){
     });
     html+='</div>';
 
-    html+='<button class="btn-primary" style="width:100%;padding:16px;font-size:14px;justify-content:center;" onclick="nav.go(\'dashboard\',{id:\''+id+'\'})">Open Launch Dashboard →</button>';
+    html+='<button class="btn-primary" style="width:100%;padding:16px;font-size:14px;justify-content:center;" onclick="nav.go(\'dashboard\',{id:\''+id+'\'})">Ouvrir le Dashboard de Lancement →</button>';
   } else {
     // Gate
     html+='<div class="glass" style="border-radius:18px;padding:28px;border-color:rgba(167,139,250,.2)!important;text-align:center;">';
     html+='<div style="font-size:32px;margin-bottom:10px;">🔒</div>';
-    html+='<h3 style="font-weight:600;font-size:15px;margin-bottom:6px;">Tech Stack & 90-Day Roadmap</h3>';
-    html+='<p style="font-size:13px;color:#9ca3af;margin-bottom:18px;line-height:1.6;">Unlock the full execution blueprint: exact tech stack, 90-day roadmap, acquisition channels, and your launch dashboard.</p>';
-    html+='<button class="btn-primary" style="padding:14px 28px;font-size:13px;" onclick="activatePremium(\''+id+'\')">Unlock Blueprint — $29 →</button>';
+    html+='<h3 style="font-weight:600;font-size:15px;margin-bottom:6px;">Stack technique & Roadmap 90 jours</h3>';
+    html+='<p style="font-size:13px;color:#9ca3af;margin-bottom:18px;line-height:1.6;">Débloque le blueprint d\'exécution complet : stack exacte, roadmap 90 jours, canaux d\'acquisition et ton dashboard de lancement.</p>';
+    html+='<button class="btn-primary" style="padding:14px 28px;font-size:13px;" onclick="activatePremium(\''+id+'\')">Débloquer le Blueprint — 20€ →</button>';
     html+='</div>';
   }
 
@@ -1200,7 +1208,7 @@ function init_dashboard(params){
   var id=params.id||localStorage.getItem('mrrforge_selected_id');
   var idea=null; for(var i=0;i<IDEAS.length;i++) if(IDEAS[i].id===id){idea=IDEAS[i];break;}
   var cont=document.getElementById('dash-content');
-  if(!idea){cont.innerHTML='<p style="color:#9ca3af;">No idea selected.</p>';return;}
+  if(!idea){cont.innerHTML='<p style="color:#9ca3af;">Aucune idée sélectionnée.</p>';return;}
 
   var key='mrrforge_dash_'+id, state={};
   try{state=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){}
@@ -1215,39 +1223,39 @@ function init_dashboard(params){
   // Header
   html+='<div style="margin-bottom:24px;" class="fade-up">';
   html+='<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:28px;font-weight:500;">'+idea.name+'</h1>';
-  html+='<p style="font-size:13px;color:#9ca3af;margin-top:4px;">Your launch dashboard</p></div>';
+  html+='<p style="font-size:13px;color:#9ca3af;margin-top:4px;">Votre dashboard de lancement</p></div>';
 
   // 2-col grid
   html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px;">';
 
   // Ring
   html+='<div class="glass" style="border-radius:20px;padding:20px;display:flex;flex-direction:column;align-items:center;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:16px;">Progress</p>';
+  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:16px;">Progression</p>';
   html+='<svg width="88" height="88" viewBox="0 0 88 88">';
   html+='<circle cx="44" cy="44" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>';
   html+='<circle cx="44" cy="44" r="34" fill="none" stroke="url(#rg'+id.replace(/-/g,'')+\')" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+offset+'" transform="rotate(-90 44 44)"/>';
   html+='<defs><linearGradient id="rg'+id.replace(/-/g,'')+'" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs>';
   html+='<text x="44" y="49" text-anchor="middle" fill="white" font-size="18" font-weight="700">'+pct+'%</text>';
   html+='</svg>';
-  html+='<p style="font-size:12px;color:#9ca3af;margin-top:10px;">'+done+' / '+CHECKLIST.length+' tasks</p></div>';
+  html+='<p style="font-size:12px;color:#9ca3af;margin-top:10px;">'+done+' / '+CHECKLIST.length+' tâches</p></div>';
 
   // MRR
   html+='<div class="glass" style="border-radius:20px;padding:20px;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:12px;">MRR Tracker</p>';
+  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:12px;">Tracker MRR</p>';
   html+='<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px;">';
   html+='<span class="text-eg" style="font-size:28px;font-weight:700;">$</span>';
   html+='<input id="dash-mrr-input" type="number" value="'+mrr+'" min="0" style="background:transparent;border:none;outline:none;font-size:28px;font-weight:700;color:#34d399;width:100px;font-family:\'DM Sans\',sans-serif;" onchange="saveMrrVal(this.value,\''+id+'\')">';
   html+='</div>';
-  html+='<div style="font-size:12px;color:#9ca3af;margin-bottom:12px;">Target: <span style="color:#34d399;">$'+tgt.toLocaleString()+'/mo</span></div>';
+  html+='<div style="font-size:12px;color:#9ca3af;margin-bottom:12px;">Objectif : <span style="color:#34d399;">'+tgt.toLocaleString()+'€/mois</span></div>';
   html+='<div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;">';
   html+='<div class="progress-emerald" style="height:100%;width:'+mrrPct+'%;"></div></div>';
-  html+='<div style="font-size:11px;color:#6b7280;margin-top:5px;">'+mrrPct+'% to target</div></div>';
+  html+='<div style="font-size:11px;color:#6b7280;margin-top:5px;">'+mrrPct+'% de l\'objectif</div></div>';
 
   html+='</div>'; // end grid
 
   // Checklist
   html+='<div class="glass" style="border-radius:20px;padding:20px;margin-bottom:12px;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:16px;">Launch Checklist</p>';
+  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:16px;">Checklist de lancement</p>';
   CHECKLIST.forEach(function(item){
     var isDone=!!state[item.id];
     html+='<div class="check-item'+(isDone?' done':'')+'" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);" onclick="toggleCheck(\''+item.id+'\',\''+id+'\')">';
@@ -1258,12 +1266,12 @@ function init_dashboard(params){
 
   // Integrations
   html+='<div class="glass" style="border-radius:20px;padding:20px;">';
-  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:14px;">Integrations</p>';
+  html+='<p style="font-size:11px;font-weight:600;letter-spacing:.14em;color:#6b7280;text-transform:uppercase;margin-bottom:14px;">Intégrations</p>';
   html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
   ['Stripe','Supabase','Vercel','SendGrid','PostHog','Notion'].forEach(function(name){
     html+='<div class="glass" style="border-radius:12px;padding:12px;text-align:center;cursor:pointer;">';
     html+='<div style="font-size:12px;font-weight:500;color:#d1d5db;">'+name+'</div>';
-    html+='<div style="font-size:11px;color:#6b7280;margin-top:2px;">Connect →</div></div>';
+    html+='<div style="font-size:11px;color:#6b7280;margin-top:2px;">Connecter →</div></div>';
   });
   html+='</div></div>';
 
