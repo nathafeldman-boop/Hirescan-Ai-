@@ -8,7 +8,7 @@ const navLinks = [
   { href: '#how-it-works', label: 'How it works' },
   { href: '#features', label: 'Features' },
   { href: '#pricing', label: 'Pricing' },
-  { href: '#blog', label: 'Blog' },
+  { href: '#faq', label: 'FAQ' },
   { href: '#resources', label: 'Resources' },
 ]
 
@@ -29,7 +29,7 @@ export function Navbar() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? 'rgba(8,8,15,0.88)' : 'transparent',
+        background: scrolled ? 'rgba(9,11,17,0.88)' : 'transparent',
         backdropFilter: scrolled ? 'blur(20px)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(20px)' : 'none',
         borderBottom: scrolled ? '1px solid rgba(255,255,255,0.055)' : '1px solid transparent',
@@ -37,9 +37,9 @@ export function Navbar() {
     >
       <div
         className="max-w-[1200px] mx-auto px-6 flex items-center justify-between"
-        style={{ height: '60px' }}
+        style={{ height: '80px' }}
       >
-        {/* ─── Logo ─── */}
+        {/* Logo */}
         <a href="/" className="flex items-center gap-2 flex-shrink-0">
           <div
             className="flex items-center justify-center flex-shrink-0"
@@ -47,29 +47,21 @@ export function Navbar() {
               width: 28,
               height: 28,
               borderRadius: 7,
-              background: 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)',
-              boxShadow: '0 4px 14px rgba(124,58,237,0.32)',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #6d28d9 100%)',
+              boxShadow: '0 4px 14px rgba(139,92,246,0.32)',
             }}
           >
-            {/* Hexagon icon */}
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M7 1.5L12 4.25V9.75L7 12.5L2 9.75V4.25L7 1.5Z"
-                fill="white"
-                fillOpacity="0.92"
-              />
+              <path d="M7 1.5L12 4.25V9.75L7 12.5L2 9.75V4.25L7 1.5Z" fill="white" fillOpacity="0.92" />
               <circle cx="7" cy="7" r="2.2" fill="white" fillOpacity="0.45" />
             </svg>
           </div>
-          <span
-            className="text-white font-semibold"
-            style={{ fontSize: '15px', letterSpacing: '-0.01em' }}
-          >
+          <span className="text-white font-semibold" style={{ fontSize: '15px', letterSpacing: '-0.01em' }}>
             SaaSGenrt
           </span>
         </a>
 
-        {/* ─── Desktop nav ─── */}
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-7">
           {navLinks.map((link) => (
             <a
@@ -85,7 +77,7 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* ─── CTA row ─── */}
+        {/* CTA row */}
         <div className="hidden md:flex items-center gap-5">
           <a
             href="#"
@@ -101,20 +93,26 @@ export function Navbar() {
             className="flex items-center gap-1.5 text-white font-semibold transition-all"
             style={{
               fontSize: '13px',
-              padding: '7px 18px',
-              borderRadius: '99px',
-              background: '#7c3aed',
-              boxShadow: '0 4px 16px rgba(124,58,237,0.3)',
+              padding: '8px 20px',
+              borderRadius: '14px',
+              background: '#8B5CF6',
+              boxShadow: '0 4px 16px rgba(139,92,246,0.3)',
             }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = '#6d28d9')}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = '#7c3aed')}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = '#7c3aed'
+              ;(e.currentTarget as HTMLElement).style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = '#8B5CF6'
+              ;(e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+            }}
           >
-            Start free
+            Start Free
             <ArrowRight style={{ width: 13, height: 13 }} strokeWidth={2.5} />
           </a>
         </div>
 
-        {/* ─── Mobile hamburger ─── */}
+        {/* Mobile hamburger */}
         <button
           className="md:hidden transition-colors"
           style={{ color: 'rgba(255,255,255,0.7)' }}
@@ -125,11 +123,11 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* ─── Mobile menu ─── */}
+      {/* Mobile menu */}
       {mobileOpen && (
         <div
           style={{
-            background: '#0e0e1a',
+            background: '#090B11',
             borderTop: '1px solid rgba(255,255,255,0.06)',
             padding: '16px 24px',
           }}
@@ -153,7 +151,7 @@ export function Navbar() {
           ))}
           <div style={{ display: 'flex', gap: 12, paddingTop: 16 }}>
             <a href="#" style={{ flex: 1, textAlign: 'center', padding: '10px', fontSize: '13.5px', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 99 }}>Sign In</a>
-            <a href="#pricing" style={{ flex: 1, textAlign: 'center', padding: '10px', fontSize: '13.5px', fontWeight: 600, color: 'white', background: '#7c3aed', borderRadius: 99 }}>Start free →</a>
+            <a href="#pricing" style={{ flex: 1, textAlign: 'center', padding: '10px', fontSize: '13.5px', fontWeight: 600, color: 'white', background: '#8B5CF6', borderRadius: 14 }}>Start Free →</a>
           </div>
         </div>
       )}

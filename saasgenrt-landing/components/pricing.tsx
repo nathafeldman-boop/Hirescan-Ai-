@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
-import { ArrowRight } from 'lucide-react'
 
 const plans = [
   {
@@ -45,12 +44,12 @@ const plans = [
       'Integration blueprint',
       'Priority support',
     ],
-    bg: 'rgba(124,58,237,0.09)',
-    border: 'rgba(124,58,237,0.42)',
-    ctaBg: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+    bg: 'rgba(139,92,246,0.09)',
+    border: 'rgba(139,92,246,0.42)',
+    ctaBg: 'linear-gradient(135deg, #8B5CF6, #6d28d9)',
     ctaBorder: 'transparent',
     ctaColor: 'white',
-    checkBg: 'rgba(124,58,237,0.28)',
+    checkBg: 'rgba(139,92,246,0.28)',
     checkColor: '#a78bfa',
   },
 ]
@@ -60,17 +59,17 @@ export function Pricing() {
     <section
       id="pricing"
       className="relative overflow-hidden"
-      style={{ background: '#08080f', paddingTop: '96px', paddingBottom: '96px' }}
+      style={{ background: '#090B11', paddingTop: '96px', paddingBottom: '96px' }}
     >
       {/* Divider glow */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ width: '640px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.32), transparent)' }}
+        style={{ width: '640px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.32), transparent)' }}
       />
       {/* Center radial glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 55% 50% at 50% 50%, rgba(124,58,237,0.10) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse 55% 50% at 50% 50%, rgba(139,92,246,0.10) 0%, transparent 70%)' }}
       />
 
       <div className="max-w-[1200px] mx-auto px-6 relative z-10">
@@ -83,11 +82,17 @@ export function Pricing() {
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
+          <div
+            className="inline-flex items-center gap-2 rounded-full mb-4"
+            style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)', padding: '4px 14px' }}
+          >
+            <span style={{ fontSize: '11px', color: '#c4b5fd', fontWeight: 500, letterSpacing: '0.04em' }}>PRICING</span>
+          </div>
           <h2
             className="font-bold text-white mb-3"
             style={{ fontSize: '40px', letterSpacing: '-0.025em' }}
           >
-            Pricing preview
+            Simple, honest pricing
           </h2>
           <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.48)' }}>
             One-time payment. No subscription. No surprises.
@@ -103,12 +108,18 @@ export function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="relative flex-1 w-full"
+              className="relative flex-1 w-full transition-all"
               style={{
                 borderRadius: '20px',
                 padding: '28px',
                 background: plan.bg,
                 border: `1px solid ${plan.border}`,
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
               }}
             >
               {/* Featured badge */}
@@ -119,9 +130,9 @@ export function Pricing() {
                     fontSize: '11px',
                     padding: '3px 14px',
                     borderRadius: 99,
-                    background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+                    background: 'linear-gradient(135deg, #8B5CF6, #6d28d9)',
                     whiteSpace: 'nowrap',
-                    boxShadow: '0 4px 14px rgba(124,58,237,0.4)',
+                    boxShadow: '0 4px 14px rgba(139,92,246,0.4)',
                   }}
                 >
                   ✦ Most popular
@@ -136,10 +147,7 @@ export function Pricing() {
 
               {/* Price */}
               <div className="flex items-end gap-2 mb-6">
-                <span
-                  className="font-bold text-white"
-                  style={{ fontSize: '48px', lineHeight: 1, letterSpacing: '-0.04em' }}
-                >
+                <span className="font-bold text-white" style={{ fontSize: '48px', lineHeight: 1, letterSpacing: '-0.04em' }}>
                   {plan.price}
                 </span>
                 <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.38)', paddingBottom: '6px' }}>
@@ -154,11 +162,17 @@ export function Pricing() {
                 style={{
                   fontSize: '13.5px',
                   padding: '11px 20px',
-                  borderRadius: '99px',
+                  borderRadius: '14px',
                   background: plan.ctaBg,
                   border: `1px solid ${plan.ctaBorder}`,
                   color: plan.ctaColor,
-                  boxShadow: plan.featured ? '0 8px 28px rgba(124,58,237,0.38), inset 0 1px 0 rgba(255,255,255,0.12)' : 'none',
+                  boxShadow: plan.featured ? '0 8px 28px rgba(139,92,246,0.38), inset 0 1px 0 rgba(255,255,255,0.12)' : 'none',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = 'scale(1.02)'
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
                 }}
               >
                 {plan.cta}

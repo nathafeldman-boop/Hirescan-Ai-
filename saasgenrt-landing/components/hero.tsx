@@ -2,19 +2,19 @@
 
 import { motion } from 'framer-motion'
 import { ArrowRight, Play, Check } from 'lucide-react'
-import { DashboardMockup } from './dashboard-mockup'
+import { FloatingCards } from './floating-cards'
 
 const trustItems = [
-  'No credit card',
-  'First idea free',
-  '10+ proven solutions',
+  'No credit card required',
+  'First project free',
+  'AI-powered validation',
 ]
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-[#08080f]">
+    <section className="relative min-h-screen flex items-center overflow-hidden" style={{ background: '#090B11' }}>
 
-      {/* ─── BACKGROUND: large dominant purple glow (right-center, behind mockup) ─── */}
+      {/* Background: large dominant purple glow (right-center) */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -22,7 +22,7 @@ export function Hero() {
           right: '-15%',
           width: '900px',
           height: '900px',
-          background: 'radial-gradient(circle, rgba(109,40,217,0.30) 0%, rgba(109,40,217,0.15) 30%, rgba(109,40,217,0.05) 60%, transparent 80%)',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(139,92,246,0.10) 30%, rgba(139,92,246,0.04) 60%, transparent 80%)',
         }}
       />
       {/* Secondary top-left accent glow */}
@@ -33,23 +33,19 @@ export function Hero() {
           left: '20%',
           width: '500px',
           height: '500px',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)',
         }}
       />
 
-      {/* Very subtle grid */}
+      {/* Subtle grid */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
-        }}
+        className="absolute inset-0 pointer-events-none grid-bg"
       />
 
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 w-full pt-32 pb-20">
         <div className="flex items-center gap-8 xl:gap-14">
 
-          {/* ─── LEFT COLUMN ─── */}
+          {/* LEFT COLUMN */}
           <div className="flex-1 min-w-0 max-w-[560px]">
 
             {/* Badge */}
@@ -59,16 +55,13 @@ export function Hero() {
               transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="inline-flex items-center gap-2 rounded-full mb-7"
               style={{
-                background: 'rgba(124,58,237,0.14)',
-                border: '1px solid rgba(124,58,237,0.28)',
+                background: 'rgba(139,92,246,0.14)',
+                border: '1px solid rgba(139,92,246,0.28)',
                 padding: '4px 12px',
               }}
             >
-              <span className="w-[6px] h-[6px] rounded-full bg-[#a78bfa] animate-pulse" />
-              <span
-                className="text-[12px] font-medium tracking-[0.01em]"
-                style={{ color: '#c4b5fd' }}
-              >
+              <span className="w-[6px] h-[6px] rounded-full animate-pulse" style={{ background: '#a78bfa' }} />
+              <span className="text-[12px] font-medium tracking-[0.01em]" style={{ color: '#c4b5fd' }}>
                 Powered by AI
               </span>
             </motion.div>
@@ -86,14 +79,7 @@ export function Hero() {
               }}
             >
               Build a{' '}
-              <span
-                style={{
-                  background: 'linear-gradient(135deg, #c4b5fd 20%, #8b5cf6 80%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
+              <span className="gradient-text">
                 SaaS
               </span>{' '}
               people
@@ -115,7 +101,7 @@ export function Hero() {
             >
               Discover profitable SaaS ideas, validate them
               <br className="hidden lg:block" />
-              and launch your first better than ever.
+              and launch your first product faster than ever.
             </motion.p>
 
             {/* CTA buttons */}
@@ -127,12 +113,21 @@ export function Hero() {
             >
               <a
                 href="#pricing"
-                className="flex items-center gap-2 text-white font-semibold rounded-full transition-all"
+                className="flex items-center gap-2 text-white font-semibold transition-all"
                 style={{
                   fontSize: '14px',
-                  padding: '11px 24px',
-                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                  boxShadow: '0 0 0 1px rgba(124,58,237,0.5), 0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.14)',
+                  padding: '12px 26px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, #8B5CF6 0%, #6d28d9 100%)',
+                  boxShadow: '0 0 0 1px rgba(139,92,246,0.5), 0 8px 32px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.14)',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = 'scale(1.02)'
+                  ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 0 1px rgba(139,92,246,0.6), 0 12px 40px rgba(139,92,246,0.45), inset 0 1px 0 rgba(255,255,255,0.14)'
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+                  ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 0 1px rgba(139,92,246,0.5), 0 8px 32px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.14)'
                 }}
               >
                 Start Building
@@ -140,27 +135,29 @@ export function Hero() {
               </a>
 
               <button
-                className="flex items-center gap-2.5 font-medium rounded-full transition-all"
+                className="flex items-center gap-2.5 font-medium transition-all"
                 style={{
                   fontSize: '14px',
-                  padding: '10px 18px',
+                  padding: '11px 20px',
+                  borderRadius: '14px',
                   color: 'rgba(255,255,255,0.78)',
                   border: '1px solid rgba(255,255,255,0.11)',
                   background: 'rgba(255,255,255,0.04)',
                 }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.18)'
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.11)'
+                }}
               >
                 <div
                   className="flex items-center justify-center rounded-full flex-shrink-0"
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    background: 'rgba(255,255,255,0.09)',
-                  }}
+                  style={{ width: '28px', height: '28px', background: 'rgba(255,255,255,0.09)' }}
                 >
-                  <Play
-                    style={{ width: '10px', height: '10px', marginLeft: '1px' }}
-                    className="fill-white text-white"
-                  />
+                  <Play style={{ width: '10px', height: '10px', marginLeft: '1px' }} className="fill-white text-white" />
                 </div>
                 Watch Demo
               </button>
@@ -175,22 +172,22 @@ export function Hero() {
             >
               {trustItems.map((item) => (
                 <div key={item} className="flex items-center gap-1.5">
-                  <Check
-                    style={{ width: '13px', height: '13px', color: '#a78bfa', flexShrink: 0 }}
-                    strokeWidth={2.5}
-                  />
-                  <span style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.42)' }}>
-                    {item}
-                  </span>
+                  <Check style={{ width: '13px', height: '13px', color: '#a78bfa', flexShrink: 0 }} strokeWidth={2.5} />
+                  <span style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.42)' }}>{item}</span>
                 </div>
               ))}
             </motion.div>
           </div>
 
-          {/* ─── RIGHT COLUMN — Dashboard Mockup ─── */}
-          <div className="hidden lg:block flex-shrink-0">
-            <DashboardMockup />
-          </div>
+          {/* RIGHT COLUMN — Floating Cards */}
+          <motion.div
+            className="hidden lg:block flex-shrink-0"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <FloatingCards />
+          </motion.div>
 
         </div>
       </div>

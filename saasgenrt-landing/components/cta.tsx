@@ -8,12 +8,12 @@ export function CTA() {
     <section
       id="cta"
       className="relative overflow-hidden"
-      style={{ background: '#08080f', paddingTop: '80px', paddingBottom: '96px' }}
+      style={{ background: '#090B11', paddingTop: '80px', paddingBottom: '96px' }}
     >
       {/* Section divider line */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ width: '640px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.32), transparent)' }}
+        style={{ width: '640px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.32), transparent)' }}
       />
 
       <div className="max-w-[1200px] mx-auto px-6 relative z-10">
@@ -26,8 +26,8 @@ export function CTA() {
           style={{
             borderRadius: '28px',
             padding: '72px 48px',
-            background: 'linear-gradient(145deg, rgba(124,58,237,0.13) 0%, rgba(109,40,217,0.06) 60%, rgba(255,255,255,0.025) 100%)',
-            border: '1px solid rgba(124,58,237,0.2)',
+            background: 'linear-gradient(145deg, rgba(139,92,246,0.13) 0%, rgba(109,40,217,0.06) 60%, rgba(255,255,255,0.025) 100%)',
+            border: '1px solid rgba(139,92,246,0.2)',
           }}
         >
           {/* Top-right corner glow */}
@@ -38,7 +38,7 @@ export function CTA() {
               right: 0,
               width: '350px',
               height: '350px',
-              background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, transparent 70%)',
               transform: 'translate(35%, -35%)',
             }}
           />
@@ -50,7 +50,7 @@ export function CTA() {
               left: 0,
               width: '250px',
               height: '250px',
-              background: 'radial-gradient(circle, rgba(124,58,237,0.13) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(139,92,246,0.13) 0%, transparent 70%)',
               transform: 'translate(-35%, 35%)',
             }}
           />
@@ -62,16 +62,7 @@ export function CTA() {
           >
             Ready to build your
             <br />
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #c4b5fd 20%, #8b5cf6 80%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              next SaaS?
-            </span>
+            <span className="gradient-text">next SaaS?</span>
           </h2>
 
           {/* Sub */}
@@ -93,12 +84,21 @@ export function CTA() {
           <div className="flex items-center justify-center gap-3 flex-wrap relative z-10">
             <a
               href="#pricing"
-              className="flex items-center gap-2 text-white font-semibold rounded-full transition-all"
+              className="flex items-center gap-2 text-white font-semibold transition-all"
               style={{
                 fontSize: '14px',
                 padding: '12px 28px',
-                background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                boxShadow: '0 8px 32px rgba(124,58,237,0.42), inset 0 1px 0 rgba(255,255,255,0.13)',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, #8B5CF6, #6d28d9)',
+                boxShadow: '0 8px 32px rgba(139,92,246,0.42), inset 0 1px 0 rgba(255,255,255,0.13)',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1.02)'
+                ;(e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(139,92,246,0.52), inset 0 1px 0 rgba(255,255,255,0.13)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+                ;(e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(139,92,246,0.42), inset 0 1px 0 rgba(255,255,255,0.13)'
               }}
             >
               Start Building Free
@@ -106,13 +106,22 @@ export function CTA() {
             </a>
             <a
               href="#how-it-works"
-              className="flex items-center font-medium rounded-full transition-all"
+              className="flex items-center font-medium transition-all"
               style={{
                 fontSize: '14px',
                 padding: '11px 24px',
+                borderRadius: '14px',
                 color: 'rgba(255,255,255,0.7)',
                 border: '1px solid rgba(255,255,255,0.11)',
                 background: 'rgba(255,255,255,0.04)',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.18)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.11)'
               }}
             >
               See how it works

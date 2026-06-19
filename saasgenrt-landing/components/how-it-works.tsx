@@ -9,7 +9,7 @@ function IllustrationProblem() {
     <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
       <circle cx="24" cy="20" r="9" fill="rgba(167,139,250,0.35)" />
       <path d="M10 52C10 41 17 36 24 36C31 36 38 41 38 52" stroke="rgba(167,139,250,0.45)" strokeWidth="3" strokeLinecap="round" fill="none" />
-      <circle cx="48" cy="44" r="9" stroke="rgba(167,139,250,0.65)" strokeWidth="2.5" fill="rgba(124,58,237,0.12)" />
+      <circle cx="48" cy="44" r="9" stroke="rgba(167,139,250,0.65)" strokeWidth="2.5" fill="rgba(139,92,246,0.12)" />
       <line x1="54.5" y1="50.5" x2="60" y2="56" stroke="rgba(167,139,250,0.65)" strokeWidth="2.5" strokeLinecap="round" />
       <line x1="43" y1="42" x2="52" y2="42" stroke="rgba(167,139,250,0.4)" strokeWidth="1.5" strokeLinecap="round" />
       <line x1="43" y1="46" x2="50" y2="46" stroke="rgba(167,139,250,0.3)" strokeWidth="1.5" strokeLinecap="round" />
@@ -64,9 +64,9 @@ const steps = [
     title: 'Find a real problem',
     desc: 'Describe your domain and our AI scans thousands of forums, reviews, and interviews to identify real pain points people will pay to solve.',
     illustration: <IllustrationProblem />,
-    gradFrom: 'rgba(124,58,237,0.14)',
+    gradFrom: 'rgba(139,92,246,0.14)',
     gradTo: 'rgba(109,40,217,0.05)',
-    border: 'rgba(124,58,237,0.18)',
+    border: 'rgba(139,92,246,0.18)',
   },
   {
     num: '02',
@@ -91,7 +91,7 @@ const steps = [
 /* ─── inline app preview panel (right column) ─── */
 function AppPreviewPanel() {
   const rows = [
-    { name: 'AI Invoice Scanner', mrr: '$8.2K', badge: '🔥 Top', badgeColor: '#c4b5fd', badgeBg: 'rgba(124,58,237,0.3)', dot: '#a78bfa' },
+    { name: 'AI Invoice Scanner', mrr: '$8.2K', badge: '🔥 Top', badgeColor: '#c4b5fd', badgeBg: 'rgba(139,92,246,0.3)', dot: '#a78bfa' },
     { name: 'SaaS Monitoring Pro', mrr: '$5.1K', badge: '✓ Bon', badgeColor: '#34d399', badgeBg: 'rgba(52,211,153,0.18)', dot: '#34d399' },
     { name: 'Churn Predictor AI', mrr: '$4.7K', badge: '✓ Bon', badgeColor: '#34d399', badgeBg: 'rgba(52,211,153,0.18)', dot: '#60a5fa' },
     { name: 'B2B Analytics Tool', mrr: '$3.9K', badge: '✓ Bon', badgeColor: '#34d399', badgeBg: 'rgba(52,211,153,0.18)', dot: '#60a5fa' },
@@ -115,7 +115,7 @@ function AppPreviewPanel() {
           ))}
         </div>
         <div style={{ flex: 1, height: 18, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 5, marginLeft: 8, display: 'flex', alignItems: 'center', paddingLeft: 8, gap: 4 }}>
-          <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'rgba(124,58,237,0.7)' }} />
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'rgba(139,92,246,0.7)' }} />
           <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace' }}>app.saasgenrt.com/dashboard</span>
         </div>
       </div>
@@ -129,7 +129,7 @@ function AppPreviewPanel() {
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>10 idées générées • Secteur: B2B SaaS</div>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
-            <div style={{ fontSize: 10.5, padding: '4px 12px', borderRadius: 99, background: 'rgba(124,58,237,0.25)', border: '1px solid rgba(124,58,237,0.35)', color: '#c4b5fd', fontWeight: 500 }}>Filtrer</div>
+            <div style={{ fontSize: 10.5, padding: '4px 12px', borderRadius: 99, background: 'rgba(139,92,246,0.25)', border: '1px solid rgba(139,92,246,0.35)', color: '#c4b5fd', fontWeight: 500 }}>Filtrer</div>
             <div style={{ fontSize: 10.5, padding: '4px 12px', borderRadius: 99, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.45)' }}>Trier</div>
           </div>
         </div>
@@ -167,8 +167,8 @@ function AppPreviewPanel() {
                 alignItems: 'center',
                 padding: '9px 10px',
                 borderRadius: 9,
-                background: i === 0 ? 'rgba(124,58,237,0.14)' : 'rgba(255,255,255,0.03)',
-                border: i === 0 ? '1px solid rgba(124,58,237,0.24)' : '1px solid rgba(255,255,255,0.05)',
+                background: i === 0 ? 'rgba(139,92,246,0.14)' : 'rgba(255,255,255,0.03)',
+                border: i === 0 ? '1px solid rgba(139,92,246,0.24)' : '1px solid rgba(255,255,255,0.05)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -203,12 +203,12 @@ function AppPreviewPanel() {
         </div>
 
         {/* unlock banner */}
-        <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(109,40,217,0.12))', border: '1px solid rgba(124,58,237,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(109,40,217,0.12))', border: '1px solid rgba(139,92,246,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>7 idées verrouillées</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>Débloquer pour €9</div>
           </div>
-          <div style={{ fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 99, background: 'rgba(124,58,237,0.85)', color: 'white', cursor: 'pointer' }}>€9 →</div>
+          <div style={{ fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 99, background: 'rgba(139,92,246,0.85)', color: 'white', cursor: 'pointer' }}>€9 →</div>
         </div>
       </div>
     </div>
@@ -220,7 +220,7 @@ export function HowItWorks() {
     <section
       id="how-it-works"
       className="relative overflow-hidden"
-      style={{ background: '#08080f', paddingTop: '96px', paddingBottom: '96px' }}
+      style={{ background: '#090B11', paddingTop: '96px', paddingBottom: '96px' }}
     >
       {/* Top line divider */}
       <div
@@ -228,7 +228,7 @@ export function HowItWorks() {
         style={{
           width: '640px',
           height: '1px',
-          background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.35), transparent)',
+          background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.35), transparent)',
         }}
       />
 
