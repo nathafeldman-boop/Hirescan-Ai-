@@ -83,7 +83,7 @@ export function CTA() {
           {/* Buttons */}
           <div className="flex items-center justify-center gap-3 flex-wrap relative z-10">
             <a
-              href="#pricing"
+              href="/builder"
               className="flex items-center gap-2 text-white font-semibold transition-all"
               style={{
                 fontSize: '14px',

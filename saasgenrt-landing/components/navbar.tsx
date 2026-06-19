@@ -89,7 +89,7 @@ export function Navbar() {
             Sign In
           </a>
           <a
-            href="#pricing"
+            href="/builder"
             className="flex items-center gap-1.5 text-white font-semibold transition-all"
             style={{
               fontSize: '13px',

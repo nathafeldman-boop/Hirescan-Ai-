@@ -112,7 +112,7 @@ export function Hero() {
               className="flex items-center gap-3 flex-wrap mb-8"
             >
               <a
-                href="#pricing"
+                href="/builder"
                 className="flex items-center gap-2 text-white font-semibold transition-all"
                 style={{
                   fontSize: '14px',
