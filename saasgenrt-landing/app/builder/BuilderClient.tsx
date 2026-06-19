@@ -1553,46 +1553,78 @@ const PLAN_FEATURES = ['Full SaaS analysis', 'Tailored marketing strategy', 'Com
 
 function PaymentStep({ ideaName, onPaid, onBack }: { ideaName: string; onPaid: () => void; onBack: () => void }) {
   const [processing, setProcessing] = useState<string | null>(null)
+  const reduce = useReducedMotion()
+  const rise = (delay: number) => reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } }
   const pick = (id: string) => { setProcessing(id); setTimeout(onPaid, 700) }
   return (
     <div>
-      <div style={{ textAlign: 'center', marginBottom: 26 }}>
+      <motion.div {...rise(0)} style={{ textAlign: 'center', marginBottom: 28 }}>
         <StepBadge n="UNLOCK" tone="purple" />
         <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'white', marginBottom: 6 }}>
           Unlock your <span style={{ background: 'linear-gradient(135deg,#c4b5fd,#8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{ideaName || 'SaaS'}</span> blueprint
         </h2>
         <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.4)' }}>Cancel anytime. Instant access to your full plan.</p>
-      </div>
+      </motion.div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18 }}>
         {PLANS.map((p, i) => {
           const popular = p.id === 'month'
           return (
-            <motion.div key={p.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: i * 0.08 }}
-              whileHover={{ y: -5 }}
-              style={{ position: 'relative', borderRadius: 18, padding: '20px 16px 18px', background: popular ? 'rgba(139,92,246,0.1)' : 'rgba(17,24,39,0.7)',
-                border: `1.5px solid ${popular ? 'rgba(139,92,246,0.5)' : 'rgba(255,255,255,0.09)'}`, boxShadow: popular ? '0 12px 40px rgba(139,92,246,0.22)' : '0 4px 18px rgba(0,0,0,0.25)',
-                transform: popular ? 'scale(1.04)' : 'scale(1)', zIndex: popular ? 2 : 1 }}>
+            <motion.div key={p.id}
+              initial={reduce ? false : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={reduce ? {} : { duration: 0.4, delay: i * 0.08 }}
+              whileHover={reduce ? undefined : { y: -5 }}
+              style={{
+                position: 'relative', zIndex: popular ? 2 : 1,
+                borderRadius: popular ? 22 : 18,
+                padding: popular ? 4 : '20px 16px 18px',
+                background: popular ? 'rgba(139,92,246,0.08)' : 'rgba(17,24,39,0.7)',
+                border: `1.5px solid ${popular ? 'rgba(139,92,246,0.5)' : 'rgba(255,255,255,0.09)'}`,
+                boxShadow: popular ? '0 0 0 4px rgba(139,92,246,0.07), 0 12px 40px rgba(139,92,246,0.22)' : '0 4px 18px rgba(0,0,0,0.25)',
+                transform: popular ? 'scale(1.04)' : 'scale(1)',
+              }}>
               {p.badge && (
                 <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', padding: '3px 12px', borderRadius: 99, fontSize: '9.5px', fontWeight: 800, letterSpacing: '0.05em', whiteSpace: 'nowrap',
                   background: p.accent, color: p.id === 'year' ? '#072' : '#fff', boxShadow: `0 4px 14px ${p.accent}66` }}>{p.badge}</div>
               )}
-              <div style={{ fontSize: '12px', fontWeight: 700, color: p.accent, letterSpacing: '0.04em', marginBottom: 8, marginTop: p.badge ? 6 : 0 }}>{p.name}</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 4 }}>
-                <span style={{ fontSize: '28px', fontWeight: 800, color: 'white', letterSpacing: '-0.03em' }}>{p.price}</span>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>{p.period}</span>
-              </div>
-              <div style={{ fontSize: '11px', color: p.save ? '#39FF88' : 'rgba(255,255,255,0.4)', marginBottom: 14, minHeight: 14 }}>{p.save || p.tagline}</div>
-              <motion.button whileTap={{ scale: 0.96 }} onClick={() => pick(p.id)} disabled={!!processing}
-                style={{ width: '100%', padding: '11px', borderRadius: 12, fontSize: '13px', fontWeight: 700, cursor: processing ? 'wait' : 'pointer', border: 'none', fontFamily: 'inherit',
-                  background: popular ? 'linear-gradient(135deg,#8B5CF6,#6d28d9)' : 'rgba(255,255,255,0.06)', color: popular ? '#fff' : 'rgba(255,255,255,0.85)',
-                  boxShadow: popular ? '0 6px 22px rgba(139,92,246,0.4)' : 'none' }}>
-                {processing === p.id ? 'Processing…' : 'Choose'}
-              </motion.button>
+              {popular ? (
+                <div style={{ borderRadius: 18, padding: '20px 16px 18px', position: 'relative', overflow: 'hidden',
+                  background: 'rgba(10,13,20,0.65)', border: '1px solid rgba(139,92,246,0.18)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, transparent, #8B5CF6, transparent)' }} />
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: p.accent, letterSpacing: '0.04em', marginBottom: 8, marginTop: p.badge ? 6 : 0 }}>{p.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 4 }}>
+                    <span style={{ fontSize: '28px', fontWeight: 800, color: 'white', letterSpacing: '-0.03em' }}>{p.price}</span>
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>{p.period}</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: p.save ? '#39FF88' : 'rgba(255,255,255,0.4)', marginBottom: 14, minHeight: 14 }}>{p.save || p.tagline}</div>
+                  <motion.button whileTap={reduce ? undefined : { scale: 0.96 }} onClick={() => pick(p.id)} disabled={!!processing}
+                    style={{ width: '100%', padding: '11px', borderRadius: 12, fontSize: '13px', fontWeight: 700, cursor: processing ? 'wait' : 'pointer', border: 'none', fontFamily: 'inherit',
+                      background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', color: '#fff', boxShadow: '0 6px 22px rgba(139,92,246,0.4)',
+                      opacity: processing && processing !== p.id ? 0.5 : 1 }}>
+                    {processing === p.id ? 'Processing…' : 'Choose'}
+                  </motion.button>
+                </div>
+              ) : (
+                <>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: p.accent, letterSpacing: '0.04em', marginBottom: 8, marginTop: p.badge ? 6 : 0 }}>{p.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 4 }}>
+                    <span style={{ fontSize: '28px', fontWeight: 800, color: 'white', letterSpacing: '-0.03em' }}>{p.price}</span>
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>{p.period}</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: p.save ? '#39FF88' : 'rgba(255,255,255,0.4)', marginBottom: 14, minHeight: 14 }}>{p.save || p.tagline}</div>
+                  <motion.button whileTap={reduce ? undefined : { scale: 0.96 }} onClick={() => pick(p.id)} disabled={!!processing}
+                    style={{ width: '100%', padding: '11px', borderRadius: 12, fontSize: '13px', fontWeight: 700, cursor: processing ? 'wait' : 'pointer', border: 'none', fontFamily: 'inherit',
+                      background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.85)',
+                      opacity: processing && processing !== p.id ? 0.5 : 1 }}>
+                    {processing === p.id ? 'Processing…' : 'Choose'}
+                  </motion.button>
+                </>
+              )}
             </motion.div>
           )
         })}
       </div>
-      <div style={{ borderRadius: 14, padding: '14px 18px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', marginBottom: 16 }}>
+      <motion.div {...rise(0.3)} style={{ borderRadius: 14, padding: '14px 18px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', marginBottom: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px 16px' }}>
           {PLAN_FEATURES.map((f) => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
@@ -1602,7 +1634,7 @@ function PaymentStep({ ideaName, onPaid, onBack }: { ideaName: string; onPaid: (
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
         <button onClick={onBack} style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
           <ArrowLeft style={{ width: 13, height: 13 }} /> Back to ideas
@@ -1628,6 +1660,8 @@ const LAUNCH_PLAN = [
 ]
 
 function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; userData: UserData; onDashboard: () => void }) {
+  const reduce = useReducedMotion()
+  const rise = (delay: number) => reduce ? {} : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } }
   const list = ideas.length ? ideas : FALLBACK_IDEAS
   const idea = list[Number(userData.selectedIdeaIndex) || 0] || list[0]
   const accent = IDEA_ACCENT[(Number(userData.selectedIdeaIndex) || 0) % IDEA_ACCENT.length]
@@ -1638,7 +1672,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
   return (
     <div>
       <div style={{ textAlign: 'center', marginBottom: 26 }}>
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4 }}
+        <motion.div initial={reduce ? false : { scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={reduce ? {} : { duration: 0.4 }}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 99, marginBottom: 14, background: 'rgba(57,255,136,0.1)', border: '1px solid rgba(57,255,136,0.28)' }}>
           <Sparkles style={{ width: 12, height: 12, color: '#39FF88' }} />
           <span style={{ fontSize: '11px', color: '#39FF88', fontWeight: 600, letterSpacing: '0.06em' }}>BLUEPRINT READY</span>
@@ -1648,7 +1682,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 18 }}>
         {/* LEFT */}
         <div style={{ flex: '1 1 340px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+          <motion.div initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.4 }}
             style={{ borderRadius: 18, padding: '22px', background: `${accent}14`, border: `1px solid ${accent}47`, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: accent }} />
             <div style={{ fontSize: '22px', fontWeight: 800, color: 'white', marginBottom: 4 }}>{idea.name}</div>
@@ -1685,7 +1719,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
             <div style={{ position: 'relative', paddingLeft: 22 }}>
               <div style={{ position: 'absolute', left: 6, top: 4, bottom: 4, width: 2, background: 'linear-gradient(180deg, #8B5CF6, rgba(57,255,136,0.6))' }} />
               {LAUNCH_PLAN.map((m, i) => (
-                <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: 0.1 + i * 0.08 }}
+                <motion.div key={i} initial={reduce ? false : { opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={reduce ? {} : { duration: 0.3, delay: 0.1 + i * 0.08 }}
                   style={{ position: 'relative', marginBottom: i < LAUNCH_PLAN.length - 1 ? 16 : 0 }}>
                   <div style={{ position: 'absolute', left: -22, top: 2, width: 12, height: 12, borderRadius: '50%', background: '#8B5CF6', border: '2px solid #090B11', boxShadow: '0 0 0 2px rgba(139,92,246,0.3)' }} />
                   <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#8B5CF6', letterSpacing: '0.04em', marginBottom: 2 }}>{m.day}</div>
@@ -1724,7 +1758,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 90, marginBottom: 8 }}>
               {bars.map((h, i) => (
-                <motion.div key={i} initial={{ height: 0 }} animate={{ height: `${h}%` }} transition={{ duration: 0.6, delay: 0.2 + i * 0.08, ease: EASE }}
+                <motion.div key={i} initial={reduce ? false : { height: 0 }} animate={{ height: `${h}%` }} transition={reduce ? {} : { duration: 0.6, delay: 0.2 + i * 0.08, ease: EASE }}
                   style={{ flex: 1, borderRadius: '4px 4px 0 0', background: i >= 4 ? 'linear-gradient(180deg,#39FF88,rgba(57,255,136,0.4))' : 'linear-gradient(180deg,#8B5CF6,rgba(139,92,246,0.4))' }} />
               ))}
             </div>
@@ -1743,7 +1777,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
           </div>
         </div>
       </div>
-      <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} onClick={onDashboard}
+      <motion.button whileHover={reduce ? undefined : { scale: 1.01 }} whileTap={reduce ? undefined : { scale: 0.99 }} onClick={onDashboard}
         style={{ width: '100%', padding: '15px', borderRadius: 14, background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', boxShadow: '0 8px 32px rgba(139,92,246,0.42)', color: 'white', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'inherit' }}>
         Open my dashboard <ArrowRight style={{ width: 17, height: 17 }} strokeWidth={2.5} />
       </motion.button>
@@ -1771,6 +1805,7 @@ const WEEK_TASKS = [
 ]
 
 function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; userData: UserData; onRestart: () => void }) {
+  const reduce = useReducedMotion()
   const list = ideas.length ? ideas : FALLBACK_IDEAS
   const idea = list[Number(userData.selectedIdeaIndex) || 0] || list[0]
   const [connected, setConnected] = useState<Record<string, boolean>>({})
@@ -1790,7 +1825,7 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
   return (
     <div>
       {/* Banner */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+      <motion.div initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.4 }}
         style={{ borderRadius: 20, padding: '26px 24px', marginBottom: 18, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(139,92,246,0.25), rgba(109,40,217,0.12))', border: '1px solid rgba(139,92,246,0.3)' }}>
         <div style={{ position: 'absolute', top: -40, right: -20, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.3), transparent 70%)' }} />
         <div style={{ fontSize: '11px', fontWeight: 700, color: '#c4b5fd', letterSpacing: '0.07em', marginBottom: 8 }}>YOUR WORKSPACE</div>
@@ -1801,7 +1836,7 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 18 }}>
         {stats.map((s, i) => (
-          <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.06 }}
+          <motion.div key={s.label} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.3, delay: i * 0.06 }}
             style={{ borderRadius: 14, padding: '14px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ fontSize: '16px', marginBottom: 6 }}>{s.icon}</div>
             <div style={{ fontSize: '15px', fontWeight: 800, color: s.color, marginBottom: 2, lineHeight: 1.1 }}>{s.value}</div>
@@ -1822,7 +1857,7 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
                 <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: `1px solid ${on ? s.accent + '55' : 'rgba(255,255,255,0.07)'}` }}>
                   <div style={{ width: 34, height: 34, borderRadius: 9, background: `${s.accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', flexShrink: 0 }}>{s.icon}</div>
                   <span style={{ flex: 1, fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{s.name}</span>
-                  <motion.button whileTap={{ scale: 0.95 }} onClick={() => setConnected(p => ({ ...p, [s.id]: !p[s.id] }))}
+                  <motion.button whileTap={reduce ? undefined : { scale: 0.95 }} onClick={() => setConnected(p => ({ ...p, [s.id]: !p[s.id] }))}
                     style={{ padding: '7px 14px', borderRadius: 9, fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: 'inherit',
                       background: on ? 'rgba(57,255,136,0.15)' : s.accent, color: on ? '#39FF88' : '#fff', display: 'flex', alignItems: 'center', gap: 5 }}>
                     {on ? <><Check style={{ width: 12, height: 12 }} strokeWidth={3} /> Connected</> : 'Connect'}
