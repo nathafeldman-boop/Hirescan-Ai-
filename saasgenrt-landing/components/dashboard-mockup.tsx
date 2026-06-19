@@ -12,7 +12,7 @@ const ideas = [
 ]
 
 const sidebarItems = [
-  { label: 'Dashboard', icon: '⬡', active: false },
+  { label: 'Dashboard', icon: '⊞', active: false },
   { label: 'My Ideas', icon: '◈', active: true },
   { label: 'Analysis', icon: '◎', active: false },
   { label: 'Growth', icon: '↗', active: false },
@@ -21,254 +21,226 @@ const sidebarItems = [
 
 export function DashboardMockup() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.7, ease: 'easeOut' }}
-      className="relative"
-      style={{ perspective: '1200px' }}
-    >
-      {/* Outer glow */}
-      <div className="absolute inset-0 bg-brand-600/20 rounded-2xl blur-[50px] scale-95 -z-10" />
-      <div className="absolute inset-0 bg-brand-600/8 rounded-2xl blur-[80px] scale-75 -z-10" />
-
-      {/* Dashboard window */}
-      <div
-        className="relative w-[520px] max-w-full overflow-hidden rounded-2xl shadow-2xl shadow-black/60"
-        style={{
-          transform: 'rotateX(6deg) rotateY(-10deg) rotateZ(1.5deg)',
-          transformStyle: 'preserve-3d',
-          background: 'linear-gradient(145deg, #111120 0%, #0d0c1d 50%, #0a0918 100%)',
-          border: '1px solid rgba(255,255,255,0.10)',
-        }}
+    /* perspective wrapper */
+    <div style={{ perspective: '1400px', perspectiveOrigin: '50% 40%' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 40, rotateX: 18, rotateY: -20 }}
+        animate={{ opacity: 1, y: 0, rotateX: 12, rotateY: -16 }}
+        transition={{ duration: 0.9, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
+        style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Titlebar */}
-        <div
-          className="flex items-center gap-3 px-4 py-2.5"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
+        {/* Floating animation wrapper */}
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="relative"
         >
-          <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-          </div>
+          {/* ─── Back glow ─── */}
           <div
-            className="flex-1 rounded-md h-[18px] mx-4 flex items-center px-3"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            <div className="w-2 h-2 rounded-full bg-brand-600/60 mr-1.5" />
-            <div className="text-white/25 text-[9px]">app.saasgenrt.com/ideas</div>
-          </div>
-        </div>
+            className="absolute pointer-events-none"
+            style={{
+              inset: '-30px',
+              background: 'radial-gradient(ellipse, rgba(109,40,217,0.55) 0%, rgba(109,40,217,0.2) 40%, transparent 70%)',
+              borderRadius: '32px',
+              zIndex: -1,
+              filter: 'blur(8px)',
+            }}
+          />
 
-        {/* App layout */}
-        <div className="flex" style={{ height: '340px' }}>
-          {/* Sidebar */}
+          {/* ─── Window ─── */}
           <div
-            className="w-[150px] flex-shrink-0 flex flex-col py-3"
-            style={{ borderRight: '1px solid rgba(255,255,255,0.05)' }}
+            style={{
+              width: '540px',
+              maxWidth: '100%',
+              borderRadius: '18px',
+              overflow: 'hidden',
+              background: 'linear-gradient(160deg, #131228 0%, #0f0e22 50%, #0b0a1c 100%)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: '0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(124,58,237,0.12)',
+            }}
           >
-            <div className="px-4 mb-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-4 h-4 rounded bg-brand-600/70 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-sm bg-white/80" />
-                </div>
-                <span className="text-white/80 text-[11px] font-semibold">SaaSGenrt</span>
-              </div>
-            </div>
-            <div className="px-2 space-y-0.5">
-              {sidebarItems.map((item) => (
-                <div
-                  key={item.label}
-                  className="flex items-center gap-2 px-2 py-[5px] rounded-md"
-                  style={{
-                    background: item.active ? 'rgba(124,58,237,0.25)' : 'transparent',
-                    border: item.active ? '1px solid rgba(124,58,237,0.3)' : '1px solid transparent',
-                  }}
-                >
-                  <span
-                    className="text-[11px]"
-                    style={{ color: item.active ? '#a78bfa' : 'rgba(255,255,255,0.3)' }}
-                  >
-                    {item.icon}
-                  </span>
-                  <span
-                    className="text-[10.5px] font-medium"
-                    style={{ color: item.active ? '#c4b5fd' : 'rgba(255,255,255,0.4)' }}
-                  >
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-            {/* User avatar bottom */}
-            <div className="mt-auto px-4 pb-1">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-brand-600/60 flex items-center justify-center">
-                  <span className="text-[8px] text-white">N</span>
-                </div>
-                <div>
-                  <div className="text-white/50 text-[9px]">Natha</div>
-                  <div className="text-white/25 text-[8px]">Free plan</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main content */}
-          <div className="flex-1 flex flex-col p-3 min-w-0">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-2.5">
-              <div>
-                <div className="text-white text-[12px] font-semibold">Mes idées SaaS</div>
-                <div className="text-white/35 text-[10px]">10 idées générées • Secteur: B2B SaaS</div>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="text-[9px] px-2 py-0.5 rounded-full font-medium text-brand-300"
-                  style={{ background: 'rgba(124,58,237,0.25)', border: '1px solid rgba(124,58,237,0.3)' }}
-                >
-                  Filtrer
-                </div>
-                <div
-                  className="text-[9px] px-2 py-0.5 rounded-full font-medium text-white/50"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-                >
-                  Trier
-                </div>
-              </div>
-            </div>
-
-            {/* Stats row */}
-            <div className="grid grid-cols-3 gap-1.5 mb-2.5">
-              {[
-                { label: 'MRR Potentiel', value: '$24K', color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.2)' },
-                { label: 'Idées Top', value: '3', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.2)' },
-                { label: 'Score Moyen', value: '8.9', color: '#60a5fa', bg: 'rgba(96,165,250,0.1)', border: 'rgba(96,165,250,0.2)' },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-lg p-2"
-                  style={{ background: s.bg, border: `1px solid ${s.border}` }}
-                >
-                  <div className="text-white/40 text-[8.5px] mb-0.5">{s.label}</div>
-                  <div className="text-[13px] font-bold" style={{ color: s.color }}>{s.value}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Table header */}
+            {/* Title bar */}
             <div
-              className="grid gap-1 px-2 mb-1"
-              style={{ gridTemplateColumns: '1fr 52px 60px 44px' }}
-            >
-              {['IDÉE', 'MRR', 'SCORE', 'TAG'].map((h) => (
-                <span key={h} className="text-white/25 text-[8px] font-semibold tracking-wide">{h}</span>
-              ))}
-            </div>
-
-            {/* Ideas rows */}
-            <div className="space-y-1 flex-1 overflow-hidden">
-              {ideas.map((idea, i) => (
-                <div
-                  key={i}
-                  className="grid items-center gap-1 px-2 py-[6px] rounded-lg"
-                  style={{
-                    gridTemplateColumns: '1fr 52px 60px 44px',
-                    background: i === 0
-                      ? 'rgba(124,58,237,0.15)'
-                      : idea.unlocked ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.015)',
-                    border: i === 0
-                      ? '1px solid rgba(124,58,237,0.25)'
-                      : idea.unlocked ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.03)',
-                  }}
-                >
-                  {/* Name */}
-                  <span
-                    className="text-[10px] font-medium truncate"
-                    style={{
-                      color: idea.unlocked ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.15)',
-                      filter: idea.unlocked ? 'none' : 'blur(3.5px)',
-                    }}
-                  >
-                    {idea.name}
-                  </span>
-                  {/* MRR */}
-                  <span
-                    className="text-[10px] font-semibold"
-                    style={{
-                      color: idea.unlocked ? '#34d399' : 'rgba(255,255,255,0.15)',
-                      filter: idea.unlocked ? 'none' : 'blur(3.5px)',
-                    }}
-                  >
-                    {idea.mrr}
-                  </span>
-                  {/* Score bar */}
-                  <div className="flex items-center gap-1">
-                    {idea.unlocked ? (
-                      <>
-                        <div className="flex-1 h-[3px] rounded-full bg-white/10 overflow-hidden">
-                          <div
-                            className="h-full rounded-full"
-                            style={{
-                              width: `${idea.score * 10}%`,
-                              background: i === 0 ? '#a78bfa' : '#60a5fa',
-                            }}
-                          />
-                        </div>
-                        <span className="text-white/50 text-[9px] w-5 text-right">{idea.score}</span>
-                      </>
-                    ) : (
-                      <div className="w-full h-[3px] rounded-full bg-white/5" />
-                    )}
-                  </div>
-                  {/* Tag */}
-                  <div>
-                    {idea.unlocked ? (
-                      <span
-                        className="text-[8px] font-semibold px-1.5 py-0.5 rounded"
-                        style={{
-                          background: idea.tagColor === 'purple' ? 'rgba(124,58,237,0.35)' : 'rgba(52,211,153,0.2)',
-                          color: idea.tagColor === 'purple' ? '#c4b5fd' : '#34d399',
-                        }}
-                      >
-                        {idea.tag === 'Top' ? '🔥 Top' : '✓ Bon'}
-                      </span>
-                    ) : (
-                      <span
-                        className="text-[8px] px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.2)' }}
-                      >
-                        🔒
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Unlock banner */}
-            <div
-              className="mt-2 px-3 py-2 rounded-lg flex items-center justify-between"
               style={{
-                background: 'linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(109,40,217,0.15) 100%)',
-                border: '1px solid rgba(124,58,237,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 16px',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(255,255,255,0.025)',
               }}
             >
-              <div>
-                <div className="text-[9.5px] text-white/70 font-medium">7 idées verrouillées</div>
-                <div className="text-[8.5px] text-white/40">Débloquer pour voir toutes les idées</div>
+              <div style={{ display: 'flex', gap: '5px' }}>
+                {['#ff5f57', '#febc2e', '#28c840'].map((c, i) => (
+                  <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: c, opacity: 0.85 }} />
+                ))}
               </div>
               <div
-                className="text-[9px] font-semibold px-2.5 py-1 rounded-full text-white"
-                style={{ background: 'rgba(124,58,237,0.8)' }}
+                style={{
+                  flex: 1,
+                  height: 18,
+                  borderRadius: 5,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0 10px',
+                  gap: 5,
+                  marginLeft: 12,
+                }}
               >
-                €9 →
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'rgba(124,58,237,0.7)' }} />
+                <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.22)', fontFamily: 'monospace' }}>app.saasgenrt.com/ideas</div>
+              </div>
+            </div>
+
+            {/* App body */}
+            <div style={{ display: 'flex', height: 360 }}>
+
+              {/* Sidebar */}
+              <div
+                style={{
+                  width: 148,
+                  flexShrink: 0,
+                  borderRight: '1px solid rgba(255,255,255,0.05)',
+                  padding: '12px 0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <div style={{ padding: '0 14px 10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 16, height: 16, borderRadius: 4, background: 'rgba(124,58,237,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: 7, height: 7, borderRadius: 2, background: 'rgba(255,255,255,0.8)' }} />
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>SaaSGenrt</span>
+                  </div>
+                </div>
+                <div style={{ padding: '0 6px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {sidebarItems.map((item) => (
+                    <div
+                      key={item.label}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '5px 8px',
+                        borderRadius: 7,
+                        background: item.active ? 'rgba(124,58,237,0.22)' : 'transparent',
+                        border: item.active ? '1px solid rgba(124,58,237,0.28)' : '1px solid transparent',
+                      }}
+                    >
+                      <span style={{ fontSize: 10, color: item.active ? '#a78bfa' : 'rgba(255,255,255,0.28)' }}>{item.icon}</span>
+                      <span style={{ fontSize: 10.5, fontWeight: 500, color: item.active ? '#c4b5fd' : 'rgba(255,255,255,0.38)' }}>{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* User */}
+                <div style={{ marginTop: 'auto', padding: '0 14px 4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(124,58,237,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 8, color: 'white' }}>N</span>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)' }}>Natha</div>
+                      <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.22)' }}>Free plan</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main */}
+              <div style={{ flex: 1, padding: '12px', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                {/* Header row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>Mes idées SaaS</div>
+                    <div style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.32)' }}>10 idées • B2B SaaS</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 5 }}>
+                    <div style={{ fontSize: 9, padding: '2px 8px', borderRadius: 99, background: 'rgba(124,58,237,0.25)', border: '1px solid rgba(124,58,237,0.35)', color: '#c4b5fd', fontWeight: 500 }}>Filtrer</div>
+                    <div style={{ fontSize: 9, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.45)' }}>Trier</div>
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 10 }}>
+                  {[
+                    { l: 'MRR Potentiel', v: '$24K', c: '#34d399', bg: 'rgba(52,211,153,0.1)', br: 'rgba(52,211,153,0.2)' },
+                    { l: 'Idées Top', v: '3', c: '#a78bfa', bg: 'rgba(167,139,250,0.1)', br: 'rgba(167,139,250,0.2)' },
+                    { l: 'Score Moyen', v: '8.9', c: '#60a5fa', bg: 'rgba(96,165,250,0.1)', br: 'rgba(96,165,250,0.2)' },
+                  ].map((s) => (
+                    <div key={s.l} style={{ background: s.bg, border: `1px solid ${s.br}`, borderRadius: 8, padding: '6px 8px' }}>
+                      <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.38)', marginBottom: 2 }}>{s.l}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: s.c }}>{s.v}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Table header */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 50px 64px 44px', gap: 4, padding: '0 8px', marginBottom: 4 }}>
+                  {['IDÉE', 'MRR', 'SCORE', 'TAG'].map((h) => (
+                    <span key={h} style={{ fontSize: 8, color: 'rgba(255,255,255,0.22)', fontWeight: 600, letterSpacing: '0.05em' }}>{h}</span>
+                  ))}
+                </div>
+
+                {/* Rows */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, overflow: 'hidden' }}>
+                  {ideas.map((idea, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 50px 64px 44px',
+                        gap: 4,
+                        alignItems: 'center',
+                        padding: '6px 8px',
+                        borderRadius: 8,
+                        background: i === 0 ? 'rgba(124,58,237,0.16)' : idea.unlocked ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.015)',
+                        border: i === 0 ? '1px solid rgba(124,58,237,0.28)' : idea.unlocked ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.025)',
+                      }}
+                    >
+                      <span style={{ fontSize: 10, fontWeight: 500, color: idea.unlocked ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.12)', filter: idea.unlocked ? 'none' : 'blur(4px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{idea.name}</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: idea.unlocked ? '#34d399' : 'rgba(255,255,255,0.12)', filter: idea.unlocked ? 'none' : 'blur(4px)' }}>{idea.mrr}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        {idea.unlocked ? (
+                          <>
+                            <div style={{ flex: 1, height: 3, borderRadius: 99, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                              <div style={{ height: '100%', borderRadius: 99, width: `${idea.score * 10}%`, background: i === 0 ? '#a78bfa' : '#60a5fa' }} />
+                            </div>
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.45)', minWidth: 20, textAlign: 'right' }}>{idea.score}</span>
+                          </>
+                        ) : (
+                          <div style={{ flex: 1, height: 3, borderRadius: 99, background: 'rgba(255,255,255,0.04)' }} />
+                        )}
+                      </div>
+                      <div>
+                        {idea.unlocked ? (
+                          <span style={{ fontSize: 8, fontWeight: 600, padding: '2px 6px', borderRadius: 5, background: idea.tagColor === 'purple' ? 'rgba(124,58,237,0.35)' : 'rgba(52,211,153,0.18)', color: idea.tagColor === 'purple' ? '#c4b5fd' : '#34d399' }}>
+                            {idea.tag === 'Top' ? '🔥 Top' : '✓ Bon'}
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: 8, padding: '2px 6px', borderRadius: 5, background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.18)' }}>🔒</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Unlock bar */}
+                <div style={{ marginTop: 8, padding: '8px 10px', borderRadius: 8, background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(109,40,217,0.12))', border: '1px solid rgba(124,58,237,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>7 idées verrouillées</div>
+                    <div style={{ fontSize: 8.5, color: 'rgba(255,255,255,0.38)' }}>Débloquer toutes les idées</div>
+                  </div>
+                  <div style={{ fontSize: 9, fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: 'rgba(124,58,237,0.85)', color: 'white' }}>€9 →</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </motion.div>
+        </motion.div>
+      </motion.div>
+    </div>
   )
 }

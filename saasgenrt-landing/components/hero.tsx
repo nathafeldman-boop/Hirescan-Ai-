@@ -10,74 +10,85 @@ const trustItems = [
   '10+ proven solutions',
 ]
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] },
-})
-
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-[#08080f]">
-      {/* Radial purple glow — matches right side of hero */}
+
+      {/* ─── BACKGROUND: large dominant purple glow (right-center, behind mockup) ─── */}
       <div
         className="absolute pointer-events-none"
         style={{
-          top: '-10%',
-          right: '-5%',
-          width: '680px',
-          height: '680px',
-          background: 'radial-gradient(ellipse, rgba(124,58,237,0.28) 0%, rgba(109,40,217,0.12) 40%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(1px)',
+          top: '-15%',
+          right: '-15%',
+          width: '900px',
+          height: '900px',
+          background: 'radial-gradient(circle, rgba(109,40,217,0.30) 0%, rgba(109,40,217,0.15) 30%, rgba(109,40,217,0.05) 60%, transparent 80%)',
         }}
       />
-      {/* Secondary softer glow left */}
+      {/* Secondary top-left accent glow */}
       <div
         className="absolute pointer-events-none"
         style={{
-          top: '30%',
-          left: '-10%',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 70%)',
-          borderRadius: '50%',
+          top: '-5%',
+          left: '20%',
+          width: '500px',
+          height: '500px',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)',
         }}
       />
 
-      {/* Subtle grid */}
-      <div className="absolute inset-0 grid-bg pointer-events-none opacity-100" />
+      {/* Very subtle grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 w-full pt-28 pb-16">
-        <div className="flex items-center gap-10 xl:gap-16">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 w-full pt-32 pb-20">
+        <div className="flex items-center gap-8 xl:gap-14">
 
           {/* ─── LEFT COLUMN ─── */}
-          <div className="flex-1 max-w-[520px]">
+          <div className="flex-1 min-w-0 max-w-[560px]">
 
             {/* Badge */}
             <motion.div
-              {...fadeUp(0.15)}
-              className="inline-flex items-center gap-2 rounded-full mb-6 px-3 py-[5px]"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-flex items-center gap-2 rounded-full mb-7"
               style={{
-                background: 'rgba(124,58,237,0.15)',
-                border: '1px solid rgba(124,58,237,0.3)',
+                background: 'rgba(124,58,237,0.14)',
+                border: '1px solid rgba(124,58,237,0.28)',
+                padding: '4px 12px',
               }}
             >
-              <span className="w-[5px] h-[5px] rounded-full bg-brand-400 animate-pulse" />
-              <span className="text-brand-300 text-[12px] font-medium tracking-[-0.01em]">
-                Powered by AI · 100% validated ideas
+              <span className="w-[6px] h-[6px] rounded-full bg-[#a78bfa] animate-pulse" />
+              <span
+                className="text-[12px] font-medium tracking-[0.01em]"
+                style={{ color: '#c4b5fd' }}
+              >
+                Powered by AI
               </span>
             </motion.div>
 
             {/* H1 */}
             <motion.h1
-              {...fadeUp(0.25)}
-              className="text-[50px] xl:text-[56px] font-bold leading-[1.08] tracking-[-0.03em] text-white mb-5"
+              initial={{ opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="font-extrabold text-white mb-5"
+              style={{
+                fontSize: 'clamp(48px, 5.5vw, 72px)',
+                lineHeight: 1.02,
+                letterSpacing: '-0.04em',
+              }}
             >
               Build a{' '}
               <span
                 style={{
-                  background: 'linear-gradient(135deg, #c4b5fd 0%, #7c3aed 60%)',
+                  background: 'linear-gradient(135deg, #c4b5fd 20%, #8b5cf6 80%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -92,9 +103,15 @@ export function Hero() {
 
             {/* Subtitle */}
             <motion.p
-              {...fadeUp(0.35)}
-              className="text-[16.5px] leading-[1.65] mb-8"
-              style={{ color: 'rgba(255,255,255,0.55)' }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontSize: '16px',
+                lineHeight: '1.65',
+                color: 'rgba(255,255,255,0.52)',
+                marginBottom: '32px',
+              }}
             >
               Discover profitable SaaS ideas, validate them
               <br className="hidden lg:block" />
@@ -102,48 +119,67 @@ export function Hero() {
             </motion.p>
 
             {/* CTA buttons */}
-            <motion.div {...fadeUp(0.42)} className="flex items-center gap-3 mb-8 flex-wrap">
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-3 flex-wrap mb-8"
+            >
               <a
                 href="#pricing"
-                className="flex items-center gap-2 text-white text-[14px] font-semibold px-[22px] py-[11px] rounded-full transition-all"
+                className="flex items-center gap-2 text-white font-semibold rounded-full transition-all"
                 style={{
+                  fontSize: '14px',
+                  padding: '11px 24px',
                   background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                  boxShadow: '0 8px 24px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.12)',
+                  boxShadow: '0 0 0 1px rgba(124,58,237,0.5), 0 8px 32px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.14)',
                 }}
               >
                 Start Building
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-[15px] h-[15px]" strokeWidth={2.5} />
               </a>
 
               <button
-                className="flex items-center gap-2.5 text-[14px] font-medium px-5 py-[10px] rounded-full transition-all"
+                className="flex items-center gap-2.5 font-medium rounded-full transition-all"
                 style={{
-                  color: 'rgba(255,255,255,0.8)',
-                  border: '1px solid rgba(255,255,255,0.12)',
+                  fontSize: '14px',
+                  padding: '10px 18px',
+                  color: 'rgba(255,255,255,0.78)',
+                  border: '1px solid rgba(255,255,255,0.11)',
                   background: 'rgba(255,255,255,0.04)',
                 }}
               >
                 <div
-                  className="w-[26px] h-[26px] rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.1)' }}
+                  className="flex items-center justify-center rounded-full flex-shrink-0"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    background: 'rgba(255,255,255,0.09)',
+                  }}
                 >
-                  <Play className="w-[10px] h-[10px] fill-white text-white" style={{ marginLeft: '1px' }} />
+                  <Play
+                    style={{ width: '10px', height: '10px', marginLeft: '1px' }}
+                    className="fill-white text-white"
+                  />
                 </div>
                 Watch Demo
               </button>
             </motion.div>
 
             {/* Trust indicators */}
-            <motion.div {...fadeUp(0.5)} className="flex items-center gap-5 flex-wrap">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.54 }}
+              className="flex items-center gap-5 flex-wrap"
+            >
               {trustItems.map((item) => (
                 <div key={item} className="flex items-center gap-1.5">
-                  <div
-                    className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(124,58,237,0.25)' }}
-                  >
-                    <Check className="w-2.5 h-2.5 text-brand-400" strokeWidth={3} />
-                  </div>
-                  <span className="text-[12.5px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <Check
+                    style={{ width: '13px', height: '13px', color: '#a78bfa', flexShrink: 0 }}
+                    strokeWidth={2.5}
+                  />
+                  <span style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.42)' }}>
                     {item}
                   </span>
                 </div>
@@ -152,9 +188,10 @@ export function Hero() {
           </div>
 
           {/* ─── RIGHT COLUMN — Dashboard Mockup ─── */}
-          <div className="hidden lg:flex flex-shrink-0 justify-center items-center" style={{ minWidth: 0 }}>
+          <div className="hidden lg:block flex-shrink-0">
             <DashboardMockup />
           </div>
+
         </div>
       </div>
     </section>
