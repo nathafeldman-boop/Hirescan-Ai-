@@ -1794,12 +1794,153 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
 
 // ─── Step 16: Dashboard ───────────────────────────────────────────────────────
 
-const SOCIALS = [
-  { id: 'tiktok', name: 'TikTok', icon: '🎵', accent: '#25F4EE', desc: 'Stratégie contenu court-format viral' },
-  { id: 'instagram', name: 'Instagram', icon: '📸', accent: '#E1306C', desc: 'Reels & stories adaptés à ta niche' },
-  { id: 'twitter', name: 'X / Twitter', icon: '🐦', accent: '#1DA1F2', desc: 'Threads & croissance organique' },
-  { id: 'linkedin', name: 'LinkedIn', icon: '💼', accent: '#0077B5', desc: 'Thought leadership & B2B outreach' },
-  { id: 'youtube', name: 'YouTube', icon: '▶️', accent: '#FF0000', desc: 'Long-form & tutoriels' },
+type DashTab = 'overview' | 'tiktok' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'metaads'
+
+interface PlatformStat { label: string; value: string; sub: string }
+interface ContentFormat { name: string; tip: string }
+interface PostSlot { day: string; times: string }
+interface PlatformCfg {
+  id: string; label: string; icon: string; accent: string; bg: string
+  stats: PlatformStat[]; strategy: string[]; schedule: PostSlot[]; formats: ContentFormat[]; unlocks: string[]
+}
+
+const PLATFORM_CFGS: PlatformCfg[] = [
+  {
+    id: 'tiktok', label: 'TikTok', icon: '🎵', accent: '#25F4EE', bg: 'rgba(37,244,238,0.06)',
+    stats: [
+      { label: 'Hook rate cible', value: '8–12 %', sub: 'vs 3 % moyen' },
+      { label: 'Vues / vidéo', value: '1 200+', sub: 'organique' },
+      { label: 'Créneau optimal', value: '19h–21h', sub: 'lun/mer/ven' },
+      { label: 'Fréquence', value: '1 / jour', sub: 'recommandé' },
+    ],
+    strategy: [
+      'Hook dans les 2 premières secondes',
+      'Texte incrusté sur toute la durée',
+      'Call-to-action à mi-vidéo et en fin',
+      'Audio trending : +40 % de portée',
+      '8 hashtags de niche (évite les massifs)',
+    ],
+    schedule: [
+      { day: 'Lundi', times: '19h · 21h' },
+      { day: 'Mercredi', times: '18h · 20h' },
+      { day: 'Vendredi', times: '19h · 22h' },
+      { day: 'Samedi', times: '14h · 20h' },
+    ],
+    formats: [
+      { name: 'Vidéo 15 s', tip: 'Hook fort, tempo rapide' },
+      { name: 'Tutoriel 60 s', tip: 'Valeur + CTA abonnement' },
+      { name: 'Story-time', tip: 'Narration avec twist final' },
+    ],
+    unlocks: ['Analyse de ton compte TikTok', 'Score de hook rate personnalisé', 'Calendrier éditorial auto-généré', 'Hashtags de niche sur mesure', "Suggestions d'audio trending"],
+  },
+  {
+    id: 'instagram', label: 'Instagram', icon: '📸', accent: '#E1306C', bg: 'rgba(225,48,108,0.06)',
+    stats: [
+      { label: 'Engagement Reels', value: '5–7 %', sub: 'vs 1 % posts statiques' },
+      { label: 'Portée stories', value: '×3', sub: 'vs posts classiques' },
+      { label: 'Créneau optimal', value: '18h–20h', sub: 'mar/jeu/sam' },
+      { label: 'Stories / jour', value: '3–5', sub: 'recommandé' },
+    ],
+    strategy: [
+      'Reels 15–30 s pour la portée maximale',
+      'Stories quotidiennes pour la visibilité',
+      'Carrousels pour sauvegardes & partages',
+      'Réponse aux commentaires sous 1 h',
+      'Bio + lien en bio optimisés',
+    ],
+    schedule: [
+      { day: 'Mardi', times: '12h · 18h' },
+      { day: 'Jeudi', times: '12h · 20h' },
+      { day: 'Samedi', times: '10h · 18h' },
+      { day: 'Dimanche', times: '10h · 19h' },
+    ],
+    formats: [
+      { name: 'Reels 15–30 s', tip: 'Portée organique maximale' },
+      { name: 'Carrousel 5–8 slides', tip: 'Sauvegardes & partages' },
+      { name: 'Story interactive', tip: 'Sondage, quiz, question' },
+    ],
+    unlocks: ['Stats de ton compte Instagram', "Taux d'engagement Reels", 'Planning stories auto-généré', 'Audit de ta bio', 'Hashtags de niche ciblés'],
+  },
+  {
+    id: 'twitter', label: 'X / Twitter', icon: '🐦', accent: '#1DA1F2', bg: 'rgba(29,161,242,0.06)',
+    stats: [
+      { label: 'Impressions cible', value: '15K+', sub: 'par mois' },
+      { label: 'CTR sur liens', value: '2–3 %', sub: 'dans les threads' },
+      { label: 'Créneau optimal', value: '8h · 18h', sub: 'lun/mer/ven' },
+      { label: 'Posts / jour', value: '2–3', sub: 'recommandé' },
+    ],
+    strategy: [
+      'Thread 5–7 tweets pour la viralité',
+      '1 post utile par jour minimum',
+      'Réponds aux gros comptes de ta niche',
+      'Build in public (#buildinpublic)',
+      'Engage 15 min avant de publier',
+    ],
+    schedule: [
+      { day: 'Lundi', times: '8h · 12h · 18h' },
+      { day: 'Mercredi', times: '8h · 18h' },
+      { day: 'Vendredi', times: '8h · 12h · 18h' },
+    ],
+    formats: [
+      { name: 'Thread 5–7 tweets', tip: 'Insight + hook fort en tweet 1' },
+      { name: 'Tweet opinion', tip: '< 280 car., prise de position' },
+      { name: 'Chiffre clé', tip: 'Données = partages ×2' },
+    ],
+    unlocks: ['Stats de ton compte X', "Taux d'impression moyen", 'Templates de threads', 'Suivi des mentions', 'Analyse des followers'],
+  },
+  {
+    id: 'linkedin', label: 'LinkedIn', icon: '💼', accent: '#0077B5', bg: 'rgba(0,119,181,0.06)',
+    stats: [
+      { label: 'Portée / post', value: '10–20K', sub: 'carrousel PDF' },
+      { label: 'Engagement B2B', value: '3–5 %', sub: 'cible' },
+      { label: 'Créneau optimal', value: '9h–11h', sub: 'mar–jeu' },
+      { label: 'Posts / semaine', value: '3–4', sub: 'recommandé' },
+    ],
+    strategy: [
+      'Carrousels PDF : +3× impressions',
+      '1 post témoignage client / semaine',
+      'Commente 5 posts avant de publier',
+      'Objectif 500 connexions en 90 jours',
+      'Profil optimisé : bannière + résumé',
+    ],
+    schedule: [
+      { day: 'Mardi', times: '9h · 12h' },
+      { day: 'Mercredi', times: '9h' },
+      { day: 'Jeudi', times: '9h · 12h' },
+    ],
+    formats: [
+      { name: 'Carrousel PDF', tip: 'Format n°1 LinkedIn 2024' },
+      { name: 'Post texte long', tip: 'Storytelling fondateur' },
+      { name: 'Sondage', tip: 'Engagement rapide + signal algo' },
+    ],
+    unlocks: ['Vue des stats profil', 'Portée de tes posts', 'Templates carrousels', 'Suivi des connexions', "Analyse de l'audience"],
+  },
+  {
+    id: 'youtube', label: 'YouTube', icon: '▶️', accent: '#FF0000', bg: 'rgba(255,0,0,0.05)',
+    stats: [
+      { label: 'Watch time cible', value: '6+ min', sub: 'durée moyenne' },
+      { label: 'CTR vignette', value: '7–10 %', sub: 'objectif' },
+      { label: 'Fréquence', value: '1–2 / sem', sub: 'recommandé' },
+      { label: 'Durée optimale', value: '10–15 min', sub: 'long-form' },
+    ],
+    strategy: [
+      'Vignette + titre : 80 % du succès',
+      'Hook dans les 30 premières secondes',
+      'Chapitres (timestamps) pour le SEO',
+      'CTA abonnement à 30 % et 70 % de la vidéo',
+      'Republier en Shorts pour plus de portée',
+    ],
+    schedule: [
+      { day: 'Mardi', times: '15h' },
+      { day: 'Vendredi', times: '15h · 17h' },
+    ],
+    formats: [
+      { name: 'Tutoriel 10–15 min', tip: 'Meilleur pour le watch time' },
+      { name: 'Short < 60 s', tip: 'Portée rapide + abonnés' },
+      { name: 'Vlog fondateur', tip: 'Authenticité = fidélisation' },
+    ],
+    unlocks: ['Stats de ta chaîne', 'Analyse du watch time', 'Idées de vidéos générées par IA', 'Optimisation SEO vidéo', 'Planning éditorial mensuel'],
+  },
 ]
 
 const WEEK_TASKS = [
@@ -1808,7 +1949,7 @@ const WEEK_TASKS = [
   'Rejoindre 3 communautés pertinentes',
   'Écrire 5 contenus pour tes canaux',
   'Contacter 10 utilisateurs potentiels',
-  'Mettre en place l\'analytics & tracking',
+  "Mettre en place l'analytics & tracking",
   'Rédiger ta première campagne pub',
 ]
 
@@ -1816,164 +1957,402 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
   const reduce = useReducedMotion()
   const list = ideas.length ? ideas : FALLBACK_IDEAS
   const idea = list[Number(userData.selectedIdeaIndex) || 0] || list[0]
+  const [tab, setTab] = useState<DashTab>('overview')
   const [connected, setConnected] = useState<Record<string, boolean>>({})
   const [tasks, setTasks] = useState<boolean[]>(new Array(WEEK_TASKS.length).fill(false))
   const doneCount = tasks.filter(Boolean).length
-  const connectedCount = Object.values(connected).filter(Boolean).length
 
-  const stats = [
-    { label: 'Objectif MRR', value: idea.mrrPotential, icon: '💰', color: '#39FF88' },
-    { label: 'Lancement estimé', value: idea.timeToMvp, icon: '🚀', color: '#8B5CF6' },
-    { label: 'Marché', value: userData.marketType === 'b2b' ? 'B2B' : 'B2C', icon: '🎯', color: '#0ea5e9' },
-    { label: 'Budget pub', value: userData.adsBudget || '0 €', icon: '📊', color: '#fbbf24' },
+  const DASH_TABS: { id: DashTab; label: string; icon: string; accent: string }[] = [
+    { id: 'overview', label: 'Vue d\'ensemble', icon: '🏠', accent: '#8B5CF6' },
+    { id: 'tiktok', label: 'TikTok', icon: '🎵', accent: '#25F4EE' },
+    { id: 'instagram', label: 'Instagram', icon: '📸', accent: '#E1306C' },
+    { id: 'twitter', label: 'X / Twitter', icon: '🐦', accent: '#1DA1F2' },
+    { id: 'linkedin', label: 'LinkedIn', icon: '💼', accent: '#0077B5' },
+    { id: 'youtube', label: 'YouTube', icon: '▶️', accent: '#FF0000' },
+    { id: 'metaads', label: 'Meta Ads', icon: '📣', accent: '#1877F2' },
   ]
 
-  const PLANS = [
-    { id: 'week', name: 'Hebdo', price: '7,90€', period: '/ sem', accent: '#0ea5e9', ctaBg: 'rgba(14,165,233,0.15)', ctaBorder: 'rgba(14,165,233,0.3)', ctaColor: '#7dd3fc', border: 'rgba(14,165,233,0.25)', bg: 'rgba(14,165,233,0.05)', featured: false, save: '' },
-    { id: 'month', name: 'Mensuel', price: '23€', period: '/ mois', save: 'Économisez 19 %', accent: '#8B5CF6', ctaBg: 'linear-gradient(135deg, #8B5CF6, #6d28d9)', ctaBorder: 'transparent', ctaColor: 'white', border: 'rgba(139,92,246,0.5)', bg: 'rgba(139,92,246,0.1)', featured: true },
-    { id: 'year', name: 'Annuel', price: '75€', period: '/ an', save: 'Économisez 73 %', accent: '#39FF88', ctaBg: 'rgba(57,255,136,0.12)', ctaBorder: 'rgba(57,255,136,0.3)', ctaColor: '#39FF88', border: 'rgba(57,255,136,0.25)', bg: 'rgba(57,255,136,0.04)', featured: false },
+  const dashPlans = [
+    { id: 'week', name: 'Hebdo', price: '7,90€', period: '/ sem', save: '', accent: '#0ea5e9', ctaBg: 'rgba(14,165,233,0.15)', ctaBorder: 'rgba(14,165,233,0.3)', ctaColor: '#7dd3fc', border: 'rgba(14,165,233,0.25)', bg: 'rgba(14,165,233,0.05)', featured: false },
+    { id: 'month', name: 'Mensuel', price: '23€', period: '/ mois', save: 'Économise 19 %', accent: '#8B5CF6', ctaBg: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', ctaBorder: 'transparent', ctaColor: 'white', border: 'rgba(139,92,246,0.5)', bg: 'rgba(139,92,246,0.1)', featured: true },
+    { id: 'year', name: 'Annuel', price: '75€', period: '/ an', save: 'Économise 73 %', accent: '#39FF88', ctaBg: 'rgba(57,255,136,0.12)', ctaBorder: 'rgba(57,255,136,0.3)', ctaColor: '#39FF88', border: 'rgba(57,255,136,0.25)', bg: 'rgba(57,255,136,0.04)', featured: false },
   ]
 
-  const strategyLines = [
-    'Hook rate cible : 8–12 %',
-    'Cadence : 3–5 posts / sem',
-    'Format priorité : Reels 15 s',
-    'Hashtags : 8 sélectionnés',
-    'Meilleur créneau : 19h–21h',
-  ]
+  const activeCfg = PLATFORM_CFGS.find(p => p.id === tab)
 
-  return (
-    <div>
-      {/* Banner */}
-      <motion.div initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.4 }}
-        style={{ borderRadius: 20, padding: '26px 24px', marginBottom: 18, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(139,92,246,0.25), rgba(109,40,217,0.12))', border: '1px solid rgba(139,92,246,0.3)' }}>
-        <div style={{ position: 'absolute', top: -40, right: -20, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.3), transparent 70%)' }} />
-        <div style={{ fontSize: '11px', fontWeight: 700, color: '#c4b5fd', letterSpacing: '0.07em', marginBottom: 8 }}>TON ESPACE DE TRAVAIL</div>
-        <div style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 800, color: 'white', letterSpacing: '-0.02em', marginBottom: 4 }}>{idea.name}</div>
-        <div style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.55)' }}>{idea.tagline}</div>
-      </motion.div>
+  // ── Tab bar ──────────────────────────────────────────────────────────────────
+  const TabBar = (
+    <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, marginBottom: 20, scrollbarWidth: 'none' }}>
+      {DASH_TABS.map(t => {
+        const active = tab === t.id
+        const isConnected = t.id !== 'overview' && t.id !== 'metaads' && connected[t.id]
+        return (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12.5px', fontWeight: active ? 700 : 500, transition: 'all 0.15s', flexShrink: 0,
+              background: active ? `${t.accent}22` : 'rgba(255,255,255,0.04)',
+              border: `1.5px solid ${active ? t.accent + '66' : 'rgba(255,255,255,0.08)'}`,
+              color: active ? t.accent : 'rgba(255,255,255,0.5)' }}>
+            <span style={{ fontSize: '14px' }}>{t.icon}</span>
+            {t.label}
+            {isConnected && <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#39FF88', flexShrink: 0, boxShadow: '0 0 6px #39FF88' }} />}
+          </button>
+        )
+      })}
+    </div>
+  )
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 18 }}>
-        {stats.map((s, i) => (
-          <motion.div key={s.label} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.3, delay: i * 0.06 }}
-            style={{ borderRadius: 14, padding: '14px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ fontSize: '16px', marginBottom: 6 }}>{s.icon}</div>
-            <div style={{ fontSize: '15px', fontWeight: 800, color: s.color, marginBottom: 2, lineHeight: 1.1 }}>{s.value}</div>
-            <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.4)' }}>{s.label}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Socials + locked strategy */}
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 18 }}>
-        {/* Connect accounts */}
-        <div style={{ flex: '1 1 300px', borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Connecte tes réseaux</div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>Chaque réseau connecté débloque ta stratégie de contenu sur mesure.</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {SOCIALS.map((s) => {
-              const on = connected[s.id]
-              return (
-                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: `1px solid ${on ? s.accent + '55' : 'rgba(255,255,255,0.07)'}`, transition: 'border-color 0.2s' }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 9, background: `${s.accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', flexShrink: 0 }}>{s.icon}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{s.name}</div>
-                    {on && <div style={{ fontSize: '10.5px', color: s.accent, marginTop: 2 }}>{s.desc}</div>}
-                  </div>
-                  <motion.button whileTap={reduce ? undefined : { scale: 0.95 }} onClick={() => setConnected(p => ({ ...p, [s.id]: !p[s.id] }))}
-                    style={{ padding: '7px 14px', borderRadius: 9, fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: 'inherit',
-                      background: on ? 'rgba(57,255,136,0.15)' : `${s.accent}33`, color: on ? '#39FF88' : s.accent, display: 'flex', alignItems: 'center', gap: 5 }}>
-                    {on ? <><Check style={{ width: 12, height: 12 }} strokeWidth={3} />Connecté</> : 'Connecter'}
-                  </motion.button>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Locked strategy preview */}
-        <div style={{ flex: '1 1 260px', borderRadius: 18, overflow: 'hidden', position: 'relative', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ padding: '20px' }}>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Stratégie de croissance</div>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>Basée sur tes réseaux connectés & ton profil</div>
-            <div style={{ position: 'relative' }}>
-              <div style={{ filter: connectedCount === 0 ? 'blur(5px)' : 'none', transition: 'filter 0.4s', userSelect: connectedCount === 0 ? 'none' : 'auto' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {strategyLines.map((line) => (
-                    <div key={line} style={{ padding: '10px 12px', borderRadius: 10, background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', fontSize: '12.5px', color: 'rgba(255,255,255,0.75)' }}>{line}</div>
-                  ))}
-                </div>
-              </div>
-              {connectedCount === 0 && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, pointerEvents: 'none' }}>
-                  <div style={{ fontSize: '28px' }}>🔒</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', textAlign: 'center' }}>Stratégie prête</div>
-                  <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>Connecte un réseau pour voir</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Payment section */}
-      <motion.div initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.45, delay: 0.1 }}
-        style={{ borderRadius: 18, padding: '22px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(139,92,246,0.22)', marginBottom: 18 }}>
-        <div style={{ textAlign: 'center', marginBottom: 18 }}>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Débloque ton blueprint complet ✦</div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Accès instantané · Annulation libre · Sans frais cachés</div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-          {PLANS.map((p) => (
-            <div key={p.id} style={{ borderRadius: 14, padding: '16px 14px', background: p.bg, border: `1.5px solid ${p.border}`, position: 'relative', transform: p.featured ? 'scale(1.04)' : 'scale(1)', transition: 'transform 0.15s' }}>
-              {p.featured && (
-                <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #8B5CF6, #6d28d9)', color: 'white', fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: 99, whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(139,92,246,0.4)' }}>✦ Populaire</div>
-              )}
-              <div style={{ fontSize: '10.5px', fontWeight: 700, color: p.accent, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 6, marginTop: p.featured ? 6 : 0 }}>{p.name}</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: p.save ? 2 : 12 }}>
-                <span style={{ fontSize: '26px', fontWeight: 800, color: 'white', letterSpacing: '-0.04em', lineHeight: 1 }}>{p.price}</span>
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>{p.period}</span>
-              </div>
-              {p.save && <div style={{ fontSize: '10px', color: '#39FF88', fontWeight: 600, marginBottom: 10 }}>{p.save}</div>}
-              <button style={{ width: '100%', padding: '9px', borderRadius: 10, fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${p.ctaBorder}`, background: p.ctaBg, color: p.ctaColor, fontFamily: 'inherit', boxShadow: p.featured ? '0 6px 18px rgba(139,92,246,0.35)' : 'none' }}>
-                Choisir →
-              </button>
+  // ── Overview tab ──────────────────────────────────────────────────────────────
+  const OverviewContent = (
+    <motion.div key="overview" initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={reduce ? {} : { duration: 0.25 }}>
+      {/* Project banner */}
+      <div style={{ borderRadius: 18, padding: '22px 24px', marginBottom: 16, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg,rgba(139,92,246,0.25),rgba(109,40,217,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
+        <div style={{ position: 'absolute', top: -40, right: -20, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle,rgba(139,92,246,0.3),transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#c4b5fd', letterSpacing: '0.07em', marginBottom: 6 }}>TON ESPACE DE TRAVAIL</div>
+        <div style={{ fontSize: 'clamp(20px,3vw,28px)', fontWeight: 800, color: 'white', letterSpacing: '-0.02em', marginBottom: 4 }}>{idea.name}</div>
+        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{idea.tagline}</div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
+          {[{ label: 'MRR cible', value: idea.mrrPotential, color: '#39FF88' }, { label: 'MVP estimé', value: idea.timeToMvp, color: '#8B5CF6' }, { label: 'Marché', value: userData.marketType === 'b2b' ? 'B2B' : 'B2C', color: '#0ea5e9' }, { label: 'Budget pub', value: userData.adsBudget || '—', color: '#fbbf24' }].map(s => (
+            <div key={s.label} style={{ borderRadius: 10, padding: '8px 12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 800, color: s.color }}>{s.value}</div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>{s.label}</div>
             </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
-      {/* Action plan */}
-      <div style={{ borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)', marginBottom: 18 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <span style={{ fontSize: '15px', fontWeight: 700, color: 'white' }}>Plan d&apos;action — semaine 1</span>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: doneCount === WEEK_TASKS.length ? '#39FF88' : 'rgba(255,255,255,0.4)' }}>{doneCount} / {WEEK_TASKS.length}</span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {WEEK_TASKS.map((t, i) => {
-            const done = tasks[i]
+      {/* Social accounts summary */}
+      <div style={{ borderRadius: 18, padding: '18px 20px', marginBottom: 16, background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ fontSize: '14px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Réseaux sociaux</div>
+        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>Connecte tes comptes pour débloquer ta stratégie sur mesure dans chaque onglet.</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
+          {PLATFORM_CFGS.map(p => {
+            const on = connected[p.id]
             return (
-              <button key={i} onClick={() => setTasks(p => p.map((v, j) => j === i ? !v : v))}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 11, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
-                  background: done ? 'rgba(57,255,136,0.07)' : 'rgba(255,255,255,0.03)', border: `1px solid ${done ? 'rgba(57,255,136,0.25)' : 'rgba(255,255,255,0.06)'}`, transition: 'all 0.15s' }}>
-                <div style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, background: done ? '#39FF88' : 'transparent', border: `1.5px solid ${done ? '#39FF88' : 'rgba(255,255,255,0.2)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {done && <Check style={{ width: 12, height: 12, color: '#090B11' }} strokeWidth={3} />}
-                </div>
-                <span style={{ fontSize: '13px', color: done ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.8)', textDecoration: done ? 'line-through' : 'none' }}>{t}</span>
+              <button key={p.id} onClick={() => setTab(p.id as DashTab)}
+                style={{ borderRadius: 12, padding: '12px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', position: 'relative',
+                  background: on ? `${p.accent}18` : 'rgba(255,255,255,0.03)', border: `1.5px solid ${on ? p.accent + '55' : 'rgba(255,255,255,0.07)'}` }}>
+                {on && <span style={{ position: 'absolute', top: 7, right: 7, width: 7, height: 7, borderRadius: '50%', background: '#39FF88', boxShadow: '0 0 5px #39FF88' }} />}
+                <span style={{ fontSize: '20px' }}>{p.icon}</span>
+                <span style={{ fontSize: '10px', fontWeight: 600, color: on ? p.accent : 'rgba(255,255,255,0.45)' }}>{p.label}</span>
+                <span style={{ fontSize: '9.5px', color: on ? '#39FF88' : 'rgba(255,255,255,0.3)' }}>{on ? 'Connecté' : 'Voir →'}</span>
               </button>
             )
           })}
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button style={{ flex: 1, padding: '13px', borderRadius: 14, fontSize: '13.5px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: 'inherit', background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', color: '#fff', boxShadow: '0 6px 22px rgba(139,92,246,0.35)' }}>Partager mon blueprint</button>
-        <button style={{ flex: 1, padding: '13px', borderRadius: 14, fontSize: '13.5px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.1)' }}>Télécharger (PDF)</button>
+      {/* Payment plans */}
+      <div style={{ borderRadius: 18, padding: '20px', marginBottom: 16, background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(139,92,246,0.22)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 3 }}>Débloque ton blueprint complet ✦</div>
+          <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.4)' }}>Accès instantané · Annulation libre · Sans frais cachés</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+          {dashPlans.map(p => (
+            <div key={p.id} style={{ borderRadius: 14, padding: '16px 12px', background: p.bg, border: `1.5px solid ${p.border}`, position: 'relative', transform: p.featured ? 'scale(1.04)' : 'scale(1)', transition: 'transform 0.15s' }}>
+              {p.featured && <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', color: 'white', fontSize: '9.5px', fontWeight: 700, padding: '3px 10px', borderRadius: 99, whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(139,92,246,0.4)' }}>✦ Populaire</div>}
+              <div style={{ fontSize: '10px', fontWeight: 700, color: p.accent, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 5, marginTop: p.featured ? 5 : 0 }}>{p.name}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: p.save ? 2 : 10 }}>
+                <span style={{ fontSize: '24px', fontWeight: 800, color: 'white', letterSpacing: '-0.04em', lineHeight: 1 }}>{p.price}</span>
+                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>{p.period}</span>
+              </div>
+              {p.save && <div style={{ fontSize: '9.5px', color: '#39FF88', fontWeight: 600, marginBottom: 9 }}>{p.save}</div>}
+              <button style={{ width: '100%', padding: '9px', borderRadius: 10, fontSize: '11.5px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${p.ctaBorder}`, background: p.ctaBg, color: p.ctaColor, fontFamily: 'inherit', boxShadow: p.featured ? '0 6px 18px rgba(139,92,246,0.35)' : 'none' }}>
+                Choisir →
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14 }}>
-        <button onClick={onRestart} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}>Démarrer un nouveau projet</button>
+
+      {/* Week tasks */}
+      <div style={{ borderRadius: 18, padding: '18px 20px', marginBottom: 16, background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Plan d&apos;action — semaine 1</span>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: doneCount === WEEK_TASKS.length ? '#39FF88' : 'rgba(255,255,255,0.4)' }}>{doneCount} / {WEEK_TASKS.length}</span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {WEEK_TASKS.map((t, i) => {
+            const done = tasks[i]
+            return (
+              <button key={i} onClick={() => setTasks(p => p.map((v, j) => j === i ? !v : v))}
+                style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '10px 13px', borderRadius: 10, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+                  background: done ? 'rgba(57,255,136,0.07)' : 'rgba(255,255,255,0.03)', border: `1px solid ${done ? 'rgba(57,255,136,0.22)' : 'rgba(255,255,255,0.06)'}`, transition: 'all 0.15s' }}>
+                <div style={{ width: 19, height: 19, borderRadius: 5, flexShrink: 0, background: done ? '#39FF88' : 'transparent', border: `1.5px solid ${done ? '#39FF88' : 'rgba(255,255,255,0.2)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {done && <Check style={{ width: 11, height: 11, color: '#090B11' }} strokeWidth={3} />}
+                </div>
+                <span style={{ fontSize: '12.5px', color: done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.8)', textDecoration: done ? 'line-through' : 'none' }}>{t}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
+
+      {/* Share / download */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+        <button style={{ flex: 1, padding: '12px', borderRadius: 13, fontSize: '13px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: 'inherit', background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', color: '#fff', boxShadow: '0 6px 22px rgba(139,92,246,0.35)' }}>Partager mon blueprint</button>
+        <button style={{ flex: 1, padding: '12px', borderRadius: 13, fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.1)' }}>Télécharger (PDF)</button>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <button onClick={onRestart} style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.3)', background: 'none', border: 'none', cursor: 'pointer' }}>Démarrer un nouveau projet</button>
+      </div>
+    </motion.div>
+  )
+
+  // ── Platform tab (TikTok / Instagram / Twitter / LinkedIn / YouTube) ──────────
+  const PlatformContent = activeCfg ? (
+    <motion.div key={activeCfg.id} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={reduce ? {} : { duration: 0.25 }}>
+      {connected[activeCfg.id] ? (
+        /* ── CONNECTED ──────────────────────────────────────────────────────── */
+        <div>
+          {/* Platform header */}
+          <div style={{ borderRadius: 18, padding: '18px 20px', marginBottom: 14, background: activeCfg.bg, border: `1.5px solid ${activeCfg.accent}44` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: `${activeCfg.accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>{activeCfg.icon}</div>
+              <div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'white' }}>{activeCfg.label}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#39FF88', display: 'inline-block', boxShadow: '0 0 6px #39FF88' }} />
+                  <span style={{ fontSize: '11.5px', color: '#39FF88', fontWeight: 600 }}>Compte connecté</span>
+                </div>
+              </div>
+              <button onClick={() => setConnected(p => ({ ...p, [activeCfg.id]: false }))}
+                style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                Déconnecter
+              </button>
+            </div>
+          </div>
+
+          {/* Stats cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 14 }}>
+            {activeCfg.stats.map(s => (
+              <div key={s.label} style={{ borderRadius: 14, padding: '14px 12px', background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: activeCfg.accent, lineHeight: 1.1, marginBottom: 4 }}>{s.value}</div>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>{s.label}</div>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>{s.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Strategy + Formats */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+            <div style={{ borderRadius: 16, padding: '16px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: 10 }}>Stratégie de contenu</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {activeCfg.strategy.map((s, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                    <div style={{ width: 5, height: 5, borderRadius: '50%', background: activeCfg.accent, flexShrink: 0, marginTop: 5 }} />
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ borderRadius: 16, padding: '16px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: 10 }}>Formats prioritaires</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {activeCfg.formats.map(f => (
+                  <div key={f.name} style={{ padding: '10px 12px', borderRadius: 10, background: `${activeCfg.accent}11`, border: `1px solid ${activeCfg.accent}33` }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: activeCfg.accent, marginBottom: 2 }}>{f.name}</div>
+                    <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.5)' }}>{f.tip}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Posting schedule */}
+          <div style={{ borderRadius: 16, padding: '16px 18px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: 12 }}>Calendrier de publication</div>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${activeCfg.schedule.length},1fr)`, gap: 8 }}>
+              {activeCfg.schedule.map(slot => (
+                <div key={slot.day} style={{ borderRadius: 12, padding: '12px 10px', textAlign: 'center', background: `${activeCfg.accent}0F`, border: `1px solid ${activeCfg.accent}33` }}>
+                  <div style={{ fontSize: '11.5px', fontWeight: 700, color: activeCfg.accent, marginBottom: 5 }}>{slot.day}</div>
+                  {slot.times.split(' · ').map(t => (
+                    <div key={t} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.65)', background: 'rgba(0,0,0,0.3)', borderRadius: 6, padding: '3px 6px', marginBottom: 4 }}>{t}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* ── NOT CONNECTED ──────────────────────────────────────────────────── */
+        <div>
+          {/* Platform header locked */}
+          <div style={{ borderRadius: 18, padding: '18px 20px', marginBottom: 14, background: 'rgba(17,24,39,0.7)', border: `1.5px solid ${activeCfg.accent}22` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: `${activeCfg.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>{activeCfg.icon}</div>
+              <div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'white' }}>{activeCfg.label}</div>
+                <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>Non connecté</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Blurred stats preview */}
+          <div style={{ borderRadius: 16, padding: '16px', marginBottom: 14, background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ filter: 'blur(6px)', userSelect: 'none', pointerEvents: 'none' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+                {activeCfg.stats.map(s => (
+                  <div key={s.label} style={{ borderRadius: 14, padding: '14px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontSize: '17px', fontWeight: 800, color: activeCfg.accent, marginBottom: 4 }}>{s.value}</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: 2 }}>{s.label}</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>{s.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <div style={{ fontSize: '32px' }}>🔒</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Statistiques personnalisées</div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Connecte ton compte pour voir tes vraies données</div>
+            </div>
+          </div>
+
+          {/* Unlocks list */}
+          <div style={{ borderRadius: 16, padding: '16px 18px', marginBottom: 18, background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: 10 }}>Ce que tu débloqueras</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              {activeCfg.unlocks.map((u, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px', borderRadius: 10, background: `${activeCfg.accent}0C`, border: `1px solid ${activeCfg.accent}22` }}>
+                  <span style={{ fontSize: '13px' }}>✦</span>
+                  <span style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.75)' }}>{u}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Connect CTA */}
+          <motion.button whileTap={reduce ? undefined : { scale: 0.97 }}
+            onClick={() => setConnected(p => ({ ...p, [activeCfg.id]: true }))}
+            style={{ width: '100%', padding: '16px', borderRadius: 16, fontSize: '15px', fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', color: 'white',
+              background: `linear-gradient(135deg, ${activeCfg.accent}CC, ${activeCfg.accent}88)`,
+              boxShadow: `0 8px 28px ${activeCfg.accent}44` }}>
+            Connecter {activeCfg.label} →
+          </motion.button>
+        </div>
+      )}
+    </motion.div>
+  ) : null
+
+  // ── Meta Ads tab ─────────────────────────────────────────────────────────────
+  const isB2B = userData.marketType === 'b2b'
+  const MetaAdsContent = (
+    <motion.div key="metaads" initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={reduce ? {} : { duration: 0.25 }}>
+      {/* Header */}
+      <div style={{ borderRadius: 18, padding: '18px 20px', marginBottom: 14, background: 'rgba(24,119,242,0.1)', border: '1.5px solid rgba(24,119,242,0.35)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(24,119,242,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>📣</div>
+          <div>
+            <div style={{ fontSize: '17px', fontWeight: 800, color: 'white' }}>Meta Ads</div>
+            <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Facebook & Instagram Ads</div>
+          </div>
+          <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Budget pub mensuel</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#1877F2' }}>{userData.adsBudget || '—'}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 14 }}>
+        {[
+          { label: 'CPM estimé', value: '3,80 €', sub: 'coût pour 1 000 vues', color: '#1877F2' },
+          { label: 'CPC moyen', value: '0,72 €', sub: 'coût par clic', color: '#8B5CF6' },
+          { label: 'ROAS cible', value: '3,2×', sub: 'retour sur dépense pub', color: '#39FF88' },
+          { label: 'CTR moyen', value: '2,4 %', sub: 'taux de clic', color: '#fbbf24' },
+        ].map(k => (
+          <div key={k.label} style={{ borderRadius: 14, padding: '14px 12px', background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ fontSize: '19px', fontWeight: 800, color: k.color, lineHeight: 1, marginBottom: 4 }}>{k.value}</div>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>{k.label}</div>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)' }}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Format recommendation */}
+      <div style={{ borderRadius: 16, padding: '16px 18px', marginBottom: 14, background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: 10 }}>Formats recommandés — {isB2B ? 'B2B' : 'B2C'}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {(isB2B ? [
+            { name: 'Lead Gen Form', tip: 'Capture directement dans Facebook', roi: 'Haute qualité lead' },
+            { name: 'Vidéo témoignage', tip: 'Client qui parle du résultat', roi: '+60 % de conversions' },
+            { name: 'Carrousel cas client', tip: 'Avant/Après ou chiffres clés', roi: 'CTR ×1.8' },
+            { name: 'Retargeting LinkedIn', tip: 'Audience visiteurs site web', roi: 'ROAS 4×' },
+          ] : [
+            { name: 'Vidéo UGC 15 s', tip: 'Utilisateur qui montre le produit', roi: '+42 % conversions' },
+            { name: 'Stories interactives', tip: 'Sondage → CTA achat', roi: 'Coût/conv. -30 %' },
+            { name: 'Réels sponsorisés', tip: 'Format natif, plus engageant', roi: 'CPM -25 %' },
+            { name: 'DPA catalogue', tip: 'Pub dynamique sur tes produits', roi: 'ROAS 5×' },
+          ]).map(f => (
+            <div key={f.name} style={{ padding: '11px 13px', borderRadius: 11, background: 'rgba(24,119,242,0.08)', border: '1px solid rgba(24,119,242,0.25)' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#60a5fa', marginBottom: 3 }}>{f.name}</div>
+              <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.5)', marginBottom: 3 }}>{f.tip}</div>
+              <div style={{ fontSize: '10px', color: '#39FF88', fontWeight: 600 }}>{f.roi}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Budget allocation */}
+      <div style={{ borderRadius: 16, padding: '16px 18px', marginBottom: 14, background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: 14 }}>Répartition du budget conseillée</div>
+        {[
+          { label: 'Notoriété (Awareness)', pct: 30, color: '#8B5CF6' },
+          { label: 'Conversion', pct: 50, color: '#1877F2' },
+          { label: 'Retargeting', pct: 20, color: '#39FF88' },
+        ].map(b => (
+          <div key={b.label} style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>{b.label}</span>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: b.color }}>{b.pct} %</span>
+            </div>
+            <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+              <div style={{ width: `${b.pct}%`, height: '100%', borderRadius: 99, background: b.color, boxShadow: `0 0 8px ${b.color}88` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mock campaigns */}
+      <div style={{ borderRadius: 16, padding: '16px 18px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: 12 }}>Campagnes à lancer</div>
+        {[
+          { name: '🎯 Campagne Notoriété', status: 'Prête à configurer', spend: '—', roas: '—', color: '#8B5CF6' },
+          { name: '💰 Campagne Conversion', status: 'Prête à configurer', spend: '—', roas: '—', color: '#1877F2' },
+          { name: '🔁 Campagne Retargeting', status: 'Nécessite le Pixel', spend: '—', roas: '—', color: '#39FF88' },
+        ].map(c => (
+          <div key={c.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 11, marginBottom: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'white', marginBottom: 2 }}>{c.name}</div>
+              <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.4)' }}>{c.status}</div>
+            </div>
+            <button style={{ padding: '6px 13px', borderRadius: 8, fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', border: `1px solid ${c.color}55`, background: `${c.color}18`, color: c.color }}>
+              Lancer →
+            </button>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  )
+
+  return (
+    <div>
+      {/* Top project name */}
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#c4b5fd', letterSpacing: '0.07em', marginBottom: 4 }}>TON DASHBOARD</div>
+        <div style={{ fontSize: 'clamp(20px,3vw,26px)', fontWeight: 800, color: 'white', letterSpacing: '-0.02em' }}>{idea.name}</div>
+      </div>
+
+      {/* Tab bar */}
+      {TabBar}
+
+      {/* Tab content */}
+      <AnimatePresence mode="wait">
+        {tab === 'overview' && OverviewContent}
+        {activeCfg && tab !== 'overview' && tab !== 'metaads' && PlatformContent}
+        {tab === 'metaads' && MetaAdsContent}
+      </AnimatePresence>
     </div>
   )
 }
