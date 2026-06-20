@@ -34,7 +34,7 @@ export default function PartenairePage() {
       {/* Header */}
       <header style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link href="/" style={{ textDecoration: 'none', fontSize: 20, fontWeight: 900 }}>
-          <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+          <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
           <span style={{ color: '#fff' }}>Cecret</span>
         </Link>
         <span style={{ color: '#52525b', fontSize: 13 }}>Programme affilié</span>
@@ -46,18 +46,18 @@ export default function PartenairePage() {
           <>
             {/* Hero */}
             <div style={{ textAlign: 'center', marginBottom: 48 }}>
-              <div style={{ display: 'inline-block', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: 20, padding: '4px 16px', fontSize: 13, color: '#a78bfa', marginBottom: 16 }}>
+              <div style={{ display: 'inline-block', background: 'rgba(209,125,82,0.1)', border: '1px solid rgba(209,125,82,0.2)', borderRadius: 20, padding: '4px 16px', fontSize: 13, color: '#d17d52', marginBottom: 16 }}>
                 Programme partenaires
               </div>
               <h1 style={{ fontSize: 40, fontWeight: 900, margin: '0 0 16px', lineHeight: 1.1 }}>
-                Gagne <span style={{ color: '#a78bfa' }}>80%</span> de commission<br />
+                Gagne <span style={{ color: '#d17d52' }}>80%</span> de commission<br />
                 sur chaque vente
               </h1>
               <p style={{ color: '#71717a', fontSize: 16, margin: '0 0 12px', lineHeight: 1.6 }}>
                 Partage ton lien UrCecret à ton audience. Chaque résultat débloqué te rapporte <strong style={{ color: '#fff' }}>1,59€</strong> automatiquement.
               </p>
               <p style={{ color: '#52525b', fontSize: 13, margin: '0 0 32px', lineHeight: 1.6 }}>
-                Commission sur vente uniquement (pas mensuel) · Après 2 mois consécutifs : <strong style={{ color: '#a78bfa' }}>30%</strong>
+                Commission sur vente uniquement (pas mensuel) · Après 2 mois consécutifs : <strong style={{ color: '#d17d52' }}>30%</strong>
               </p>
 
               {/* Stats */}
@@ -84,7 +84,7 @@ export default function PartenairePage() {
                 { n: '3', t: 'Tu reçois tes €', d: 'Virement mensuel, stats en temps réel' },
               ].map(({ n, t, d }) => (
                 <div key={n} style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(167,139,250,0.15)', color: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, flexShrink: 0 }}>{n}</div>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(209,125,82,0.15)', color: '#d17d52', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, flexShrink: 0 }}>{n}</div>
                   <div>
                     <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: '#fff' }}>{t}</p>
                     <p style={{ margin: '2px 0 0', fontSize: 13, color: '#71717a' }}>{d}</p>
@@ -128,7 +128,7 @@ export default function PartenairePage() {
                 disabled={loading}
                 style={{
                   width: '100%', padding: '16px', borderRadius: 12, border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                  background: loading ? '#3f3f46' : 'linear-gradient(135deg,#7c3aed,#ec4899)',
+                  background: loading ? '#3f3f46' : 'linear-gradient(135deg,#a94e18,#d17d52)',
                   color: '#fff', fontSize: 16, fontWeight: 700, letterSpacing: 0.3,
                 }}
               >
@@ -151,13 +151,13 @@ export default function PartenairePage() {
             </p>
 
             <div style={{ display: 'grid', gap: 16, marginBottom: 40 }}>
-              <div style={{ background: '#18181b', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 12, padding: '20px 24px' }}>
+              <div style={{ background: '#18181b', border: '1px solid rgba(209,125,82,0.3)', borderRadius: 12, padding: '20px 24px' }}>
                 <p style={{ margin: '0 0 6px', color: '#71717a', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Ton lien affilié</p>
-                <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: '#a78bfa', wordBreak: 'break-all' }}>{result.affiliateLink}</p>
+                <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: '#d17d52', wordBreak: 'break-all' }}>{result.affiliateLink}</p>
               </div>
               <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 12, padding: '20px 24px' }}>
                 <p style={{ margin: '0 0 6px', color: '#71717a', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Tes stats en temps réel</p>
-                <a href={result.dashboardUrl} style={{ color: '#a78bfa', fontSize: 15, textDecoration: 'none' }}>{result.dashboardUrl}</a>
+                <a href={result.dashboardUrl} style={{ color: '#d17d52', fontSize: 15, textDecoration: 'none' }}>{result.dashboardUrl}</a>
               </div>
             </div>
 

@@ -34,13 +34,13 @@ export default function DashboardClient({ user }: Props) {
       <header className="relative z-10 sticky top-0" style={{ background: 'rgba(9,9,11,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="text-lg font-black">
-            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-white">Cecret</span>
           </Link>
           <div className="flex items-center gap-3">
             {user.image
               ? <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-white/10" /> // eslint-disable-line @next/next/no-img-element
-              : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff' }}>{firstName[0]?.toUpperCase()}</div>
+              : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: '#fff' }}>{firstName[0]?.toUpperCase()}</div>
             }
             <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
               Déconnexion
@@ -58,7 +58,7 @@ export default function DashboardClient({ user }: Props) {
             <p className="text-sm text-zinc-500">{user.email}</p>
           </div>
           {isPremium
-            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: '#a78bfa', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)' }}>👑 Pro</span>
+            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: '#d17d52', background: 'rgba(209,125,82,0.12)', border: '1px solid rgba(209,125,82,0.25)' }}>👑 Pro</span>
             : <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-zinc-400" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>Gratuit</span>
           }
         </div>
@@ -70,7 +70,7 @@ export default function DashboardClient({ user }: Props) {
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
             {/* Color band */}
-            <div className="h-1 w-full" style={{ background: `linear-gradient(to right,${type.accentColor},#ec4899)` }} />
+            <div className="h-1 w-full" style={{ background: `linear-gradient(to right,${type.accentColor},#d17d52)` }} />
             <div className="p-5">
               <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Ton type de personnalité</p>
               <div className="flex items-center gap-4 mb-4">
@@ -85,7 +85,7 @@ export default function DashboardClient({ user }: Props) {
               <Link
                 href={`/types/${user.mbtiType!.toLowerCase()}`}
                 className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01]"
-                style={{ background: `linear-gradient(135deg,${type.accentColor},#ec4899)`, boxShadow: `0 4px 20px ${type.accentColor}30` }}
+                style={{ background: `linear-gradient(135deg,${type.accentColor},#d17d52)`, boxShadow: `0 4px 20px ${type.accentColor}30` }}
               >
                 Voir mon profil complet →
               </Link>
@@ -102,7 +102,7 @@ export default function DashboardClient({ user }: Props) {
         ) : (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: 'rgba(139,92,246,0.06)', border: '2px dashed rgba(139,92,246,0.25)' }}
+            style={{ background: 'rgba(194,97,31,0.06)', border: '2px dashed rgba(194,97,31,0.25)' }}
           >
             <div className="text-4xl mb-3">🧠</div>
             <p className="text-base font-black text-white mb-1">Découvre ton type MBTI</p>
@@ -110,7 +110,7 @@ export default function DashboardClient({ user }: Props) {
             <Link
               href="/quiz/personnalite"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.3)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.3)' }}
             >
               Passer le test →
             </Link>
@@ -127,7 +127,7 @@ export default function DashboardClient({ user }: Props) {
             <div className="flex items-start justify-between mb-3">
               <span className="text-2xl">💑</span>
               {!isPremium && (
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(167,139,250,0.15)', color: '#a78bfa' }}>Pro</span>
+                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(209,125,82,0.15)', color: '#d17d52' }}>Pro</span>
               )}
             </div>
             <p className="text-sm font-bold text-white">Compatibilité</p>
@@ -151,7 +151,7 @@ export default function DashboardClient({ user }: Props) {
         {!isPremium && (
           <div
             className="rounded-2xl p-5 flex items-center gap-4"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.12),rgba(236,72,153,0.08))', border: '1px solid rgba(139,92,246,0.2)' }}
+            style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.12),rgba(209,125,82,0.08))', border: '1px solid rgba(194,97,31,0.2)' }}
           >
             <div className="text-2xl flex-shrink-0">💎</div>
             <div className="flex-1 min-w-0">
@@ -161,7 +161,7 @@ export default function DashboardClient({ user }: Props) {
             <Link
               href="/pricing"
               className="px-4 py-2 rounded-xl font-bold text-white text-xs flex-shrink-0 transition-all hover:scale-[1.02]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
             >
               Voir →
             </Link>

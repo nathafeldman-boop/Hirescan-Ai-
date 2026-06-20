@@ -130,8 +130,8 @@ export default async function NathaAdminPage() {
     muted: '#71717a',
     green: '#4ade80',
     blue: '#38bdf8',
-    purple: '#a78bfa',
-    pink: '#f472b6',
+    purple: '#d17d52',
+    pink: '#e0a380',
     orange: '#fb923c',
     yellow: '#fbbf24',
     red: '#f87171',
@@ -152,7 +152,7 @@ export default async function NathaAdminPage() {
         {/* Header */}
         <div style={{ marginBottom: 36 }}>
           <h1 style={{ fontSize: 26, fontWeight: 900, margin: 0, letterSpacing: -1 }}>
-            <span style={{ background: 'linear-gradient(90deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ background: 'linear-gradient(90deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span style={{ color: '#fff' }}>Cecret</span>
             <span style={{ color: C.muted, fontWeight: 400, fontSize: 16, marginLeft: 12 }}>— tableau de bord</span>
           </h1>
@@ -383,9 +383,9 @@ export default async function NathaAdminPage() {
               </div>
               <span style={{
                 padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                background: u.tier === 'premium' ? 'rgba(167,139,250,0.15)' : 'rgba(255,255,255,0.05)',
+                background: u.tier === 'premium' ? 'rgba(209,125,82,0.15)' : 'rgba(255,255,255,0.05)',
                 color: u.tier === 'premium' ? C.purple : C.muted,
-                border: `1px solid ${u.tier === 'premium' ? 'rgba(167,139,250,0.3)' : C.border}`,
+                border: `1px solid ${u.tier === 'premium' ? 'rgba(209,125,82,0.3)' : C.border}`,
                 flexShrink: 0,
               }}>
                 {u.tier === 'premium' ? 'Premium' : 'Gratuit'}

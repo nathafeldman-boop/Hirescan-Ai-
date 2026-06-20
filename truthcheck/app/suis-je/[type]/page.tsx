@@ -219,8 +219,8 @@ function InLoveSection({ type }: { type: MbtiType }) {
       <div
         className="rounded-2xl px-6 py-6"
         style={{
-          background: 'rgba(244,114,182,0.05)',
-          border: '1px solid rgba(244,114,182,0.15)',
+          background: 'rgba(224,163,128,0.05)',
+          border: '1px solid rgba(224,163,128,0.15)',
         }}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -241,8 +241,8 @@ function AtWorkSection({ type }: { type: MbtiType }) {
       <div
         className="rounded-2xl px-6 py-6"
         style={{
-          background: 'rgba(99,102,241,0.05)',
-          border: '1px solid rgba(99,102,241,0.15)',
+          background: 'rgba(176,125,43,0.05)',
+          border: '1px solid rgba(176,125,43,0.15)',
         }}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -288,8 +288,8 @@ function CtaCard({ type }: { type: MbtiType }) {
       <div
         className="rounded-2xl px-6 py-8 text-center"
         style={{
-          background: 'linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(236,72,153,0.15) 100%)',
-          border: '1px solid rgba(167,139,250,0.25)',
+          background: 'linear-gradient(135deg, rgba(169,78,24,0.15) 0%, rgba(209,125,82,0.15) 100%)',
+          border: '1px solid rgba(209,125,82,0.25)',
         }}
       >
         <div className="text-4xl mb-3">{type.emoji}</div>
@@ -303,8 +303,8 @@ function CtaCard({ type }: { type: MbtiType }) {
           href="/quiz/personnalite"
           className="inline-block px-8 py-3.5 rounded-xl font-black text-sm text-white transition-transform hover:scale-105 active:scale-95"
           style={{
-            background: 'linear-gradient(to right, #7c3aed, #ec4899)',
-            boxShadow: '0 4px 24px rgba(124,58,237,0.4)',
+            background: 'linear-gradient(to right, #a94e18, #d17d52)',
+            boxShadow: '0 4px 24px rgba(169,78,24,0.4)',
           }}
         >
           Passer le test MBTI gratuit →
@@ -406,7 +406,7 @@ function Footer() {
       <Link href="/" className="text-lg font-black">
         <span
           style={{
-            background: 'linear-gradient(to right,#a78bfa,#f472b6)',
+            background: 'linear-gradient(to right,#d17d52,#e0a380)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
@@ -545,7 +545,7 @@ export default function SuisJePage({ params }: Props) {
             <Link href="/" className="text-xl font-black">
               <span
                 style={{
-                  background: 'linear-gradient(to right,#a78bfa,#f472b6)',
+                  background: 'linear-gradient(to right,#d17d52,#e0a380)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -558,7 +558,7 @@ export default function SuisJePage({ params }: Props) {
               href="/quiz/personnalite"
               className="px-4 py-2 rounded-xl text-xs font-black text-white transition-all hover:scale-105"
               style={{
-                background: 'linear-gradient(to right, #7c3aed, #ec4899)',
+                background: 'linear-gradient(to right, #a94e18, #d17d52)',
               }}
             >
               Test MBTI gratuit
@@ -596,7 +596,7 @@ export default function SuisJePage({ params }: Props) {
               Suis-je{' '}
               <span
                 style={{
-                  background: `linear-gradient(to right, ${type.accentColor}, #ec4899)`,
+                  background: `linear-gradient(to right, ${type.accentColor}, #d17d52)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -615,7 +615,7 @@ export default function SuisJePage({ params }: Props) {
           <div
             className="mb-8 rounded-2xl px-6 py-5"
             style={{
-              background: `linear-gradient(135deg, ${type.accentColor}10 0%, rgba(236,72,153,0.06) 100%)`,
+              background: `linear-gradient(135deg, ${type.accentColor}10 0%, rgba(209,125,82,0.06) 100%)`,
               border: `1px solid ${type.accentColor}25`,
             }}
           >

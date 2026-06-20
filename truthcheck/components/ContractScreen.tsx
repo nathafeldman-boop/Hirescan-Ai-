@@ -63,17 +63,17 @@ export default function ContractScreen({ quizTitle, quizSlug, accentColor, onAcc
           <div className="relative flex items-center justify-center" style={{ width: 88, height: 88 }}>
             <div
               className="absolute inset-0 rounded-full animate-ping"
-              style={{ background: 'rgba(139,92,246,0.18)', animationDuration: '2.8s' }}
+              style={{ background: 'rgba(194,97,31,0.18)', animationDuration: '2.8s' }}
             />
             <div
               className="absolute inset-3 rounded-full"
-              style={{ background: 'rgba(139,92,246,0.08)' }}
+              style={{ background: 'rgba(194,97,31,0.08)' }}
             />
             <div
               className="relative w-16 h-16 rounded-full flex items-center justify-center text-2xl text-white font-black select-none"
               style={{
-                background:  'linear-gradient(135deg, #7c3aed, #ec4899)',
-                boxShadow:   '0 0 50px rgba(139,92,246,0.75), 0 0 100px rgba(139,92,246,0.25)',
+                background:  'linear-gradient(135deg, #a94e18, #d17d52)',
+                boxShadow:   '0 0 50px rgba(194,97,31,0.75), 0 0 100px rgba(194,97,31,0.25)',
               }}
             >
               ✦
@@ -133,8 +133,8 @@ export default function ContractScreen({ quizTitle, quizSlug, accentColor, onAcc
             onClick={handleAccept}
             className="w-full py-5 rounded-2xl font-black text-white text-lg transition-all active:scale-[0.98]"
             style={{
-              background:  'linear-gradient(135deg, #8b5cf6, #ec4899)',
-              boxShadow:   '0 8px 48px rgba(139,92,246,0.65), 0 2px 8px rgba(0,0,0,0.4)',
+              background:  'linear-gradient(135deg, #c2611f, #d17d52)',
+              boxShadow:   '0 8px 48px rgba(194,97,31,0.65), 0 2px 8px rgba(0,0,0,0.4)',
             }}
           >
             Oui, je veux savoir →

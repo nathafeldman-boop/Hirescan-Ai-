@@ -66,7 +66,7 @@ function BarChart({ months }: { months: ReturnType<typeof groupByMonth> }) {
                onMouseLeave={() => setHov(null)}
                style={{ cursor: 'pointer' }}>
               {/* CA bar */}
-              <rect x={x}          y={H - h1} width={BW} height={h1} rx={3} fill="#a78bfa" opacity={isHov ? 1 : 0.7} style={{ transition: 'opacity .15s' }}/>
+              <rect x={x}          y={H - h1} width={BW} height={h1} rx={3} fill="#d17d52" opacity={isHov ? 1 : 0.7} style={{ transition: 'opacity .15s' }}/>
               {/* Commission bar */}
               <rect x={x + BW + INNER} y={H - h2} width={BW} height={h2} rx={3} fill="#34d399" opacity={isHov ? 1 : 0.7} style={{ transition: 'opacity .15s' }}/>
               {/* Month label */}
@@ -111,7 +111,7 @@ function CopyBtn({ text, label, style }: { text: string; label: string; style?: 
       className="text-xs font-bold px-3 py-1.5 rounded-lg border transition-all"
       style={copied
         ? { color: '#34d399', borderColor: '#34d39940', background: '#34d39910' }
-        : style ?? { color: '#a78bfa', borderColor: '#a78bfa40', background: '#a78bfa10' }
+        : style ?? { color: '#d17d52', borderColor: '#d17d5240', background: '#d17d5210' }
       }
     >
       {copied ? '✓ Copié !' : label}
@@ -153,7 +153,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
       <header className="border-b border-white/5 bg-[#09090b]/90 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center justify-between">
           <Link href="/" className="text-lg font-black">
-            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-white">Cecret</span>
           </Link>
           <div className="flex items-center gap-2">
@@ -174,9 +174,9 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
         {/* Hero KPIs — always visible */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <StatCard label="Clics"       value={clicks.toLocaleString('fr-FR')}                        icon="👁"  color="#60a5fa"/>
-          <StatCard label="Ventes"      value={affiliate.conversions.length.toString()}                icon="🛒"  color="#a78bfa"/>
+          <StatCard label="Ventes"      value={affiliate.conversions.length.toString()}                icon="🛒"  color="#d17d52"/>
           <StatCard label="Commission"  value={fmt(totalComm)}                                         icon="💸"  color="#34d399"/>
-          <StatCard label="Conversion"  value={clicks > 0 ? `${convRate.toFixed(1)}%` : '—'}          icon="📈"  color="#f472b6"/>
+          <StatCard label="Conversion"  value={clicks > 0 ? `${convRate.toFixed(1)}%` : '—'}          icon="📈"  color="#e0a380"/>
         </div>
 
         {/* Tab bar */}
@@ -187,7 +187,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
               onClick={() => setTab(t.id)}
               className="flex-1 py-2 px-1 rounded-lg text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1"
               style={tab === t.id
-                ? { background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff', boxShadow: '0 4px 14px rgba(124,58,237,.35)' }
+                ? { background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: '#fff', boxShadow: '0 4px 14px rgba(169,78,24,.35)' }
                 : { color: '#71717a' }
               }
             >
@@ -248,7 +248,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-3">
               {[
-                { label: 'CA total',      value: fmt(totalRevenue),  color: '#f472b6' },
+                { label: 'CA total',      value: fmt(totalRevenue),  color: '#e0a380' },
                 { label: 'Ta commission', value: fmt(totalComm),     color: '#34d399' },
                 { label: '€ / clic',      value: earningPerClick > 0 ? fmt(earningPerClick) : '—', color: '#60a5fa' },
               ].map(({ label, value, color }) => (
@@ -267,8 +267,8 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
             {/* Totals */}
             <div className="grid grid-cols-3 gap-3">
               {[
-                { label: 'Ventes',        value: affiliate.conversions.length.toString(), color: '#a78bfa' },
-                { label: 'CA généré',     value: fmt(totalRevenue),                       color: '#f472b6' },
+                { label: 'Ventes',        value: affiliate.conversions.length.toString(), color: '#d17d52' },
+                { label: 'CA généré',     value: fmt(totalRevenue),                       color: '#e0a380' },
                 { label: 'Ta commission', value: fmt(totalComm),                          color: '#34d399' },
               ].map(({ label, value, color }) => (
                 <div key={label} className="rounded-2xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -332,16 +332,16 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
             <div className="grid grid-cols-2 gap-3">
               <StatCard label="Clics totaux"     value={clicks.toLocaleString('fr-FR')}                      icon="👁"  color="#60a5fa"/>
               <StatCard label="Ventes"           value={affiliate.conversions.length.toString()}               icon="✓"   color="#34d399"/>
-              <StatCard label="Taux conversion"  value={clicks > 0 ? `${convRate.toFixed(2)}%` : '—'}        icon="📈"  color="#f472b6"/>
-              <StatCard label="Valeur / clic"    value={earningPerClick > 0 ? fmt(earningPerClick) : '—'}     icon="💡"  color="#a78bfa"/>
+              <StatCard label="Taux conversion"  value={clicks > 0 ? `${convRate.toFixed(2)}%` : '—'}        icon="📈"  color="#e0a380"/>
+              <StatCard label="Valeur / clic"    value={earningPerClick > 0 ? fmt(earningPerClick) : '—'}     icon="💡"  color="#d17d52"/>
             </div>
 
             {/* Conversion funnel */}
             <div className="rounded-2xl p-5 space-y-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <h2 className="text-sm font-bold">Entonnoir de conversion</h2>
               <FunnelBar label="Clics sur ton lien"        value={clicks.toLocaleString('fr-FR')}                                              pct={100}  color="#60a5fa"/>
-              <FunnelBar label="Test commencé (estimé)"    value={Math.round(clicks * 0.72).toLocaleString('fr-FR')}                           pct={72}   color="#a78bfa"/>
-              <FunnelBar label="Test complété (estimé)"    value={Math.round(clicks * 0.58).toLocaleString('fr-FR')}                           pct={58}   color="#f472b6"/>
+              <FunnelBar label="Test commencé (estimé)"    value={Math.round(clicks * 0.72).toLocaleString('fr-FR')}                           pct={72}   color="#d17d52"/>
+              <FunnelBar label="Test complété (estimé)"    value={Math.round(clicks * 0.58).toLocaleString('fr-FR')}                           pct={58}   color="#e0a380"/>
               <FunnelBar label="Achats réels"              value={`${affiliate.conversions.length} (${convRate.toFixed(1)}%)`}                  pct={clicks > 0 ? convRate : 0} color="#34d399"/>
               <p className="text-zinc-700 text-xs">* Étapes intermédiaires estimées sur les moyennes UrCecret</p>
             </div>
@@ -373,7 +373,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
         {tab === 'lien' && (
           <div className="space-y-4">
             {/* Link box */}
-            <div className="rounded-2xl p-6" style={{ border: '1px solid rgba(167,139,250,.3)', background: 'rgba(167,139,250,.05)' }}>
+            <div className="rounded-2xl p-6" style={{ border: '1px solid rgba(209,125,82,.3)', background: 'rgba(209,125,82,.05)' }}>
               <p className="text-xs text-violet-400 font-bold uppercase tracking-widest mb-3">Ton lien affilié</p>
               <div className="bg-black/40 rounded-xl px-4 py-3 mb-4">
                 <code className="text-violet-300 text-sm font-mono break-all">{link}</code>
@@ -399,8 +399,8 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
               {[
                 { label: 'Commission par vente',  value: `${affiliate.commissionPct}%`,                               color: '#34d399' },
                 { label: 'Durée du cookie',       value: '30 jours',                                                  color: '#60a5fa' },
-                { label: 'Prix du test',          value: '1,99 €',                                                    color: '#a78bfa' },
-                { label: 'Tu gagnes par vente',   value: fmt(Math.round(199 * affiliate.commissionPct / 100)),         color: '#f472b6' },
+                { label: 'Prix du test',          value: '1,99 €',                                                    color: '#d17d52' },
+                { label: 'Tu gagnes par vente',   value: fmt(Math.round(199 * affiliate.commissionPct / 100)),         color: '#e0a380' },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex items-center justify-between px-5 py-3.5 border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
                   <span className="text-zinc-400 text-sm">{label}</span>

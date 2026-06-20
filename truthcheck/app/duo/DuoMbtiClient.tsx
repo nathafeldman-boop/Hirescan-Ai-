@@ -7,7 +7,7 @@ import { ALL_MBTI_TYPES, mbtiTypes } from '@/lib/mbti';
 import { getMbtiCompatibility } from '@/lib/mbtiCompatibility';
 
 const GROUPS = [
-  { label: 'Analystes', codes: ['INTJ','INTP','ENTJ','ENTP'], color: '#7c3aed' },
+  { label: 'Analystes', codes: ['INTJ','INTP','ENTJ','ENTP'], color: '#a94e18' },
   { label: 'Diplomates', codes: ['INFJ','INFP','ENFJ','ENFP'], color: '#059669' },
   { label: 'Sentinelles', codes: ['ISTJ','ISFJ','ESTJ','ESFJ'], color: '#0284c7' },
   { label: 'Explorateurs', codes: ['ISTP','ISFP','ESTP','ESFP'], color: '#d97706' },
@@ -61,7 +61,7 @@ function PremiumGate({ onUpgrade, loading }: { onUpgrade: (annual: boolean) => v
           onClick={() => onUpgrade(true)}
           disabled={loading}
           className="w-full py-3.5 rounded-2xl font-black text-white text-sm relative overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 6px 20px rgba(124,58,237,0.3)' }}>
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 20px rgba(169,78,24,0.3)' }}>
           <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg">
             −75%
           </span>
@@ -191,7 +191,7 @@ export default function DuoMbtiClient() {
           <p className="text-xs text-gray-500 mb-4">Forces, faiblesses, amour, carrière — le rapport complet de ton type.</p>
           <Link href={`/types/${typeA.toLowerCase()}`}
             className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
             Voir mon profil {typeA} →
           </Link>
         </div>
@@ -222,7 +222,7 @@ export default function DuoMbtiClient() {
           <div className="flex gap-2 justify-center">
             <button onClick={handleShare}
               className="px-4 py-2.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
               {copied ? '✓ Lien copié !' : '🔗 Copier mon lien à partager'}
             </button>
             <Link href="/quiz/personnalite"
@@ -237,7 +237,7 @@ export default function DuoMbtiClient() {
       {typeA && typeB && (
         <button onClick={() => setMode('result')}
           className="w-full py-4 rounded-2xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 30px rgba(124,58,237,0.35)' }}>
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 30px rgba(169,78,24,0.35)' }}>
           Analyser notre compatibilité {mbtiTypes[typeA]?.emoji} + {mbtiTypes[typeB]?.emoji} →
         </button>
       )}

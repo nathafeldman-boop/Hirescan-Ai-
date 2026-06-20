@@ -24,7 +24,7 @@ export default function TeamCodeEntry() {
   return (
     <div
       className="rounded-2xl border p-5 mb-8"
-      style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(236,72,153,0.04))', borderColor: 'rgba(139,92,246,0.3)' }}
+      style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.08), rgba(209,125,82,0.04))', borderColor: 'rgba(194,97,31,0.3)' }}
     >
       <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-1">Tu as reçu un code ?</p>
       <p className="text-gray-400 text-xs mb-4">Entre le code de 6 lettres partagé par ton coéquipier(e)</p>
@@ -43,7 +43,7 @@ export default function TeamCodeEntry() {
         <button
           type="submit"
           className="px-5 py-3 rounded-xl font-black text-white text-sm transition-all active:scale-[0.97]"
-          style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', boxShadow: '0 4px 16px rgba(139,92,246,0.35)' }}
+          style={{ background: 'linear-gradient(135deg,#c2611f,#d17d52)', boxShadow: '0 4px 16px rgba(194,97,31,0.35)' }}
         >
           Rejoindre →
         </button>

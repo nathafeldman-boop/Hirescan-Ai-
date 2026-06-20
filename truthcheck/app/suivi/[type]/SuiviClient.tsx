@@ -7,8 +7,8 @@ import { SuiviData, SuiviJour, PHASE_LABELS } from '@/lib/suivi';
 const PHASES: SuiviJour['phase'][] = ['moi', 'relations', 'projet'];
 
 const PHASE_CONFIG = {
-  moi:       { color: '#7c3aed', bg: 'rgba(124,58,237,0.1)',  border: 'rgba(124,58,237,0.3)',  glow: 'rgba(124,58,237,0.2)'  },
-  relations: { color: '#ec4899', bg: 'rgba(236,72,153,0.1)', border: 'rgba(236,72,153,0.3)', glow: 'rgba(236,72,153,0.2)' },
+  moi:       { color: '#a94e18', bg: 'rgba(169,78,24,0.1)',  border: 'rgba(169,78,24,0.3)',  glow: 'rgba(169,78,24,0.2)'  },
+  relations: { color: '#d17d52', bg: 'rgba(209,125,82,0.1)', border: 'rgba(209,125,82,0.3)', glow: 'rgba(209,125,82,0.2)' },
   projet:    { color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)', glow: 'rgba(16,185,129,0.2)' },
 };
 
@@ -37,7 +37,7 @@ export default function SuiviClient({ suivi }: { suivi: SuiviData }) {
       <header className="sticky top-0 z-20" style={{ background: 'rgba(9,9,11,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-black">
-            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-white">Cecret</span>
           </Link>
           <div className="flex items-center gap-3">

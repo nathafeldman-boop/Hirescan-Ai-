@@ -85,13 +85,13 @@ const S = {
   h1: { fontSize: 26, fontWeight: 900, color: '#fff', marginBottom: 4 } as React.CSSProperties,
   sub: { color: '#52525b', fontSize: 13, marginTop: 0, marginBottom: 32 } as React.CSSProperties,
   card: { background: '#18181b', border: '1px solid #27272a', borderRadius: 14, padding: '20px 24px', marginBottom: 20 } as React.CSSProperties,
-  badge: { display: 'inline-block', background: 'rgba(167,139,250,0.15)', color: '#a78bfa', border: '1px solid rgba(167,139,250,0.3)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700, marginBottom: 10 } as React.CSSProperties,
+  badge: { display: 'inline-block', background: 'rgba(209,125,82,0.15)', color: '#d17d52', border: '1px solid rgba(209,125,82,0.3)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700, marginBottom: 10 } as React.CSSProperties,
   hook: { fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 14 } as React.CSSProperties,
   label: { fontSize: 11, fontWeight: 700, color: '#52525b', textTransform: 'uppercase' as const, letterSpacing: 1, marginBottom: 6 },
   pre: { background: '#09090b', border: '1px solid #27272a', borderRadius: 8, padding: '12px 16px', color: '#e4e4e7', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap' as const, marginBottom: 14 },
   row: { display: 'flex', gap: 16, flexWrap: 'wrap' as const, marginBottom: 12 },
   chip: { background: 'rgba(255,255,255,0.04)', border: '1px solid #27272a', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#a1a1aa' },
-  hashtags: { fontSize: 12, color: '#6366f1', marginBottom: 0 },
+  hashtags: { fontSize: 12, color: '#b07d2b', marginBottom: 0 },
 };
 
 export default function ContentKitPage() {
@@ -126,8 +126,8 @@ export default function ContentKitPage() {
         </div>
       ))}
 
-      <div style={{ ...S.card, background: 'rgba(167,139,250,0.05)', border: '1px solid rgba(167,139,250,0.2)' }}>
-        <p style={{ margin: 0, color: '#a78bfa', fontWeight: 700, fontSize: 15, marginBottom: 8 }}>💡 Tips performance</p>
+      <div style={{ ...S.card, background: 'rgba(209,125,82,0.05)', border: '1px solid rgba(209,125,82,0.2)' }}>
+        <p style={{ margin: 0, color: '#d17d52', fontWeight: 700, fontSize: 15, marginBottom: 8 }}>💡 Tips performance</p>
         <ul style={{ margin: 0, paddingLeft: 20, color: '#71717a', fontSize: 14, lineHeight: 2.2 }}>
           <li>Les 2 premières secondes = tout. Le hook doit choquer ou intriguer</li>
           <li>Montre ton vrai résultat — l&apos;authenticité performe mieux que le scripté</li>

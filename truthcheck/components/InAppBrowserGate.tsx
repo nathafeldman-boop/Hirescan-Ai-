@@ -109,7 +109,7 @@ export default function InAppBrowserGate() {
               width: 72,
               height: 72,
               borderRadius: 18,
-              background: 'linear-gradient(135deg,#4c1d95,#6d28d9)',
+              background: 'linear-gradient(135deg,#6f3318,#8a3e16)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

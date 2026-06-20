@@ -54,7 +54,7 @@ export default function UserMenu() {
       <button
         onClick={() => setOpen(o => !o)}
         className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white hover:ring-2 hover:ring-violet-500/60 transition-all"
-        style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+        style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
         aria-label="Menu compte"
       >
         {initials}

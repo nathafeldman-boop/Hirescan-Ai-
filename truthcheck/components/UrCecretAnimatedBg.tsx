@@ -1,7 +1,7 @@
 'use client';
 
 export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: string }) {
-  const accent = accentColor ?? '#8b5cf6';
+  const accent = accentColor ?? '#c2611f';
 
   return (
     <>
@@ -57,7 +57,7 @@ export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: stri
           <span style={{
             fontSize: 'clamp(72px, 22vw, 180px)',
             fontWeight: 900,
-            background: 'linear-gradient(135deg, #a78bfa, #f472b6)',
+            background: 'linear-gradient(135deg, #d17d52, #e0a380)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>Ur</span>
@@ -72,27 +72,27 @@ export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: stri
         <div className="absolute rounded-full" style={{
           top: '50%', left: '50%',
           width: 'min(60vw, 480px)', height: 'min(60vw, 480px)',
-          border: '1px solid rgba(167,139,250,0.12)',
+          border: '1px solid rgba(209,125,82,0.12)',
           animation: 'ur-ring-cw 22s linear infinite',
         }}>
           {/* Dot on ring */}
           <div style={{
             position: 'absolute', top: '-3px', left: '50%',
             width: '6px', height: '6px', borderRadius: '50%',
-            background: '#a78bfa', boxShadow: '0 0 10px #a78bfa',
+            background: '#d17d52', boxShadow: '0 0 10px #d17d52',
             transform: 'translateX(-50%)',
           }} />
         </div>
         <div className="absolute rounded-full" style={{
           top: '50%', left: '50%',
           width: 'min(80vw, 680px)', height: 'min(80vw, 680px)',
-          border: '1px solid rgba(244,114,182,0.08)',
+          border: '1px solid rgba(224,163,128,0.08)',
           animation: 'ur-ring-ccw 32s linear infinite',
         }}>
           <div style={{
             position: 'absolute', bottom: '-3px', left: '50%',
             width: '5px', height: '5px', borderRadius: '50%',
-            background: '#f472b6', boxShadow: '0 0 8px #f472b6',
+            background: '#e0a380', boxShadow: '0 0 8px #e0a380',
             transform: 'translateX(-50%)',
           }} />
         </div>
@@ -101,14 +101,14 @@ export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: stri
         <div className="absolute rounded-full" style={{
           top: '18%', left: '8%',
           width: '320px', height: '320px',
-          background: 'radial-gradient(circle, rgba(167,139,250,0.13) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(209,125,82,0.13) 0%, transparent 70%)',
           filter: 'blur(2px)',
           animation: 'ur-blob-1 14s ease-in-out infinite',
         }} />
         <div className="absolute rounded-full" style={{
           bottom: '12%', right: '8%',
           width: '380px', height: '380px',
-          background: 'radial-gradient(circle, rgba(244,114,182,0.11) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(224,163,128,0.11) 0%, transparent 70%)',
           filter: 'blur(2px)',
           animation: 'ur-blob-2 17s ease-in-out infinite',
         }} />
@@ -122,13 +122,13 @@ export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: stri
 
         {/* Sparkle dots */}
         {([
-          { top: '14%',  left:  '22%', delay: '0s',    size: 4, color: '#a78bfa' },
-          { top: '78%',  left:  '13%', delay: '1.2s',  size: 3, color: '#f472b6' },
-          { top: '32%',  right: '18%', delay: '2.1s',  size: 4, color: '#a78bfa' },
-          { top: '88%',  right: '28%', delay: '0.6s',  size: 3, color: '#f472b6' },
-          { top: '52%',  left:  '72%', delay: '1.8s',  size: 3, color: '#a78bfa' },
-          { top: '22%',  right: '8%',  delay: '3.3s',  size: 4, color: '#f472b6' },
-          { top: '65%',  left:  '5%',  delay: '2.7s',  size: 3, color: '#a78bfa' },
+          { top: '14%',  left:  '22%', delay: '0s',    size: 4, color: '#d17d52' },
+          { top: '78%',  left:  '13%', delay: '1.2s',  size: 3, color: '#e0a380' },
+          { top: '32%',  right: '18%', delay: '2.1s',  size: 4, color: '#d17d52' },
+          { top: '88%',  right: '28%', delay: '0.6s',  size: 3, color: '#e0a380' },
+          { top: '52%',  left:  '72%', delay: '1.8s',  size: 3, color: '#d17d52' },
+          { top: '22%',  right: '8%',  delay: '3.3s',  size: 4, color: '#e0a380' },
+          { top: '65%',  left:  '5%',  delay: '2.7s',  size: 3, color: '#d17d52' },
           { top: '45%',  right: '5%',  delay: '0.9s',  size: 4, color: accent    },
         ] as Array<{ top?: string; left?: string; right?: string; bottom?: string; delay: string; size: number; color: string }>).map((dot, i) => (
           <div
@@ -147,8 +147,8 @@ export default function UrCecretAnimatedBg({ accentColor }: { accentColor?: stri
 
         {/* Drifting horizontal lines (very subtle) */}
         {[
-          { top: '30%', delay: '0s',   dur: '18s', color: 'rgba(167,139,250,0.06)' },
-          { top: '65%', delay: '6s',   dur: '22s', color: 'rgba(244,114,182,0.05)' },
+          { top: '30%', delay: '0s',   dur: '18s', color: 'rgba(209,125,82,0.06)' },
+          { top: '65%', delay: '6s',   dur: '22s', color: 'rgba(224,163,128,0.05)' },
           { top: '50%', delay: '12s',  dur: '20s', color: `${accent}0a`            },
         ].map((l, i) => (
           <div key={i} style={{

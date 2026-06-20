@@ -145,8 +145,8 @@ export default function QuizIndexPage() {
           </p>
           <Link href="/quiz/personnalite" style={{ textDecoration: 'none', color: '#fff', display: 'block' }}>
             <div style={{
-              background: 'linear-gradient(135deg, rgba(139,92,246,0.14) 0%, rgba(139,92,246,0.04) 100%)',
-              border: '1px solid rgba(139,92,246,0.28)',
+              background: 'linear-gradient(135deg, rgba(194,97,31,0.14) 0%, rgba(194,97,31,0.04) 100%)',
+              border: '1px solid rgba(194,97,31,0.28)',
               borderRadius: 20, padding: '28px 32px',
               display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap',
               position: 'relative', overflow: 'hidden',
@@ -154,21 +154,21 @@ export default function QuizIndexPage() {
               <div style={{
                 position: 'absolute', bottom: -60, right: -60,
                 width: 260, height: 260,
-                background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(194,97,31,0.12) 0%, transparent 70%)',
                 borderRadius: '50%', pointerEvents: 'none',
               }} />
 
               <div style={{
                 width: 64, height: 64, borderRadius: 18,
-                background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.28)',
+                background: 'rgba(194,97,31,0.15)', border: '1px solid rgba(194,97,31,0.28)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                boxShadow: '0 0 32px rgba(139,92,246,0.2)',
+                boxShadow: '0 0 32px rgba(194,97,31,0.2)',
               }}>
-                <div style={{ width: 38, height: 38 }}><BrainIcon color="#a78bfa" /></div>
+                <div style={{ width: 38, height: 38 }}><BrainIcon color="#d17d52" /></div>
               </div>
 
               <div style={{ flex: 1, position: 'relative', minWidth: 200 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#a78bfa', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#d17d52', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>
                   Test de personnalité · MBTI
                 </div>
                 <div style={{ fontWeight: 800, fontSize: 22, marginBottom: 6, letterSpacing: '-0.5px' }}>
@@ -180,9 +180,9 @@ export default function QuizIndexPage() {
               </div>
 
               <div style={{
-                background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)',
+                background: 'linear-gradient(135deg, #a94e18, #c2611f)',
                 borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700,
-                boxShadow: '0 0 28px rgba(139,92,246,0.35)',
+                boxShadow: '0 0 28px rgba(194,97,31,0.35)',
                 flexShrink: 0, position: 'relative',
               }}>
                 Commencer →

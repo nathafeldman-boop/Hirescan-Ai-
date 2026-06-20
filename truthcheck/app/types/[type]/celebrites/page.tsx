@@ -154,7 +154,7 @@ export default function CelebritesPage({ params }: Props) {
         >
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Ur
               </span>
               <span className="text-white">Cecret</span>
@@ -360,8 +360,8 @@ export default function CelebritesPage({ params }: Props) {
             aria-label="Découvrir mon type de personnalité"
             className="mb-10 rounded-2xl p-7 text-center"
             style={{
-              background: 'linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(236,72,153,0.12) 100%)',
-              border: '1px solid rgba(139,92,246,0.3)',
+              background: 'linear-gradient(135deg, rgba(169,78,24,0.15) 0%, rgba(209,125,82,0.12) 100%)',
+              border: '1px solid rgba(194,97,31,0.3)',
             }}
           >
             <div className="text-3xl mb-3" aria-hidden="true">{type.emoji}</div>
@@ -376,8 +376,8 @@ export default function CelebritesPage({ params }: Props) {
               href="/quiz/personnalite"
               className="inline-block px-8 py-4 rounded-xl font-black text-white text-base transition-all hover:scale-[1.03] hover:shadow-2xl active:scale-[0.98]"
               style={{
-                background: 'linear-gradient(135deg,#7c3aed,#ec4899)',
-                boxShadow: '0 6px 28px rgba(124,58,237,0.4)',
+                background: 'linear-gradient(135deg,#a94e18,#d17d52)',
+                boxShadow: '0 6px 28px rgba(169,78,24,0.4)',
               }}
             >
               Découvrir mon type MBTI — Gratuit

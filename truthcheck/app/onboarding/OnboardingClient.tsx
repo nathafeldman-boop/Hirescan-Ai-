@@ -7,8 +7,8 @@ import QuizIcon from '@/components/QuizIcon';
 
 const QUIZ_COLORS: Record<string, string> = {
   infidelite: '#f43f5e',
-  adopte: '#8b5cf6',
-  amoureux: '#ec4899',
+  adopte: '#c2611f',
+  amoureux: '#d17d52',
   'vrais-amis': '#06b6d4',
   orientation: '#10b981',
 };
@@ -100,7 +100,7 @@ export default function OnboardingClient() {
         <div className="h-1 bg-white/5 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #8b5cf6, #ec4899)' }}
+            style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #c2611f, #d17d52)' }}
           />
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function OnboardingClient() {
                     <div className="ob-pill-outer">
                       <div className="ob-pill-inner">
                         <span className="ob-pill-text">
-                          <QuizIcon slug={choice.slug} size={28} color={QUIZ_COLORS[choice.slug] ?? '#8b5cf6'} />
+                          <QuizIcon slug={choice.slug} size={28} color={QUIZ_COLORS[choice.slug] ?? '#c2611f'} />
                           <span>{choice.label}</span>
                           <svg className="w-4 h-4 ml-auto flex-shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

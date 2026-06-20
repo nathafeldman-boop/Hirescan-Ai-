@@ -20,12 +20,12 @@ export const metadata: Metadata = {
 };
 
 const testList = [
-  { slug: 'style-attachement', emoji: '🫀', title: 'Test Style d\'Attachement', desc: 'Sécure, anxieux, évitant ou désorganisé ? Comprends tes schémas relationnels profonds.', color: '#6366f1' },
-  { slug: 'langages-amour', emoji: '💌', title: 'Test des 5 Langages de l\'Amour', desc: 'Découvre comment tu exprimes et reçois l\'amour selon Gary Chapman.', color: '#ec4899' },
-  { slug: 'gaslight', emoji: '🫧', title: 'Test Gaslighting', desc: 'Suis-je victime de manipulation psychologique ? Évalue les signes en 12 questions.', color: '#7c3aed' },
+  { slug: 'style-attachement', emoji: '🫀', title: 'Test Style d\'Attachement', desc: 'Sécure, anxieux, évitant ou désorganisé ? Comprends tes schémas relationnels profonds.', color: '#b07d2b' },
+  { slug: 'langages-amour', emoji: '💌', title: 'Test des 5 Langages de l\'Amour', desc: 'Découvre comment tu exprimes et reçois l\'amour selon Gary Chapman.', color: '#d17d52' },
+  { slug: 'gaslight', emoji: '🫧', title: 'Test Gaslighting', desc: 'Suis-je victime de manipulation psychologique ? Évalue les signes en 12 questions.', color: '#a94e18' },
   { slug: 'burnout', emoji: '💤', title: 'Test Burnout', desc: 'Épuisement professionnel : où en es-tu ? Basé sur le Maslach Burnout Inventory.', color: '#f59e0b' },
   { slug: 'depression', emoji: '🌧️', title: 'Test Dépression', desc: 'Ai-je des signes de dépression ? Évaluation basée sur les critères DSM-5.', color: '#64748b' },
-  { slug: 'narcissique', emoji: '🪞', title: 'Test Narcissisme', desc: 'Traits narcissiques vs trouble de personnalité : où se situe ton profil ?', color: '#a855f7' },
+  { slug: 'narcissique', emoji: '🪞', title: 'Test Narcissisme', desc: 'Traits narcissiques vs trouble de personnalité : où se situe ton profil ?', color: '#c2611f' },
   { slug: 'infidelite', emoji: '💔', title: 'Test Infidélité', desc: 'Mon partenaire me trompe-t-il ? Analyse 30 signaux comportementaux.', color: '#ef4444' },
   { slug: 'manipule', emoji: '🎭', title: 'Test Manipulation', desc: 'Suis-je dans une relation manipulatrice ? Gaslighting, chantage émotionnel, emprise.', color: '#f97316' },
   { slug: 'relation-toxique', emoji: '⚠️', title: 'Test Relation Toxique', desc: 'Ma relation est-elle saine ou toxique ? Évalue les signes objectivement.', color: '#dc2626' },
@@ -63,7 +63,7 @@ export default function TestsPage() {
         <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
               <span className="text-white">Cecret</span>
             </Link>
             <Link href="/quizzes" className="text-xs text-zinc-500 hover:text-white transition-colors">Tous les quiz →</Link>
@@ -75,7 +75,7 @@ export default function TestsPage() {
             <p className="text-xs text-zinc-500 uppercase tracking-[0.2em] font-semibold mb-3">Tests gratuits & anonymes</p>
             <h1 className="text-3xl font-black text-white leading-tight mb-4">
               Tests Psychologiques{' '}
-              <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Gratuits
               </span>
             </h1>

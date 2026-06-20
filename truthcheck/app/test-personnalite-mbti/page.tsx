@@ -35,14 +35,14 @@ export const metadata: Metadata = {
 const GROUPS = [
   {
     name: 'Analystes',
-    color: '#7c3aed',
+    color: '#a94e18',
     emoji: '🔬',
     types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'],
     desc: 'Penseurs rationnels, stratèges et innovateurs.',
   },
   {
     name: 'Diplomates',
-    color: '#ec4899',
+    color: '#d17d52',
     emoji: '🌸',
     types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'],
     desc: 'Idéalistes empathiques, portés par leurs valeurs.',
@@ -132,10 +132,10 @@ export default function TestPersonnaliteMbtiPage() {
         <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
           <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
               <span className="text-gray-900">Cecret</span>
             </Link>
-            <Link href="/quiz/personnalite" className="px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+            <Link href="/quiz/personnalite" className="px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
               Passer le test →
             </Link>
           </div>
@@ -160,7 +160,7 @@ export default function TestPersonnaliteMbtiPage() {
             <Link
               href="/quiz/personnalite"
               className="inline-block px-8 py-4 rounded-2xl text-lg font-black text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.3)' }}
             >
               Passer le test MBTI gratuit →
             </Link>
@@ -209,7 +209,7 @@ export default function TestPersonnaliteMbtiPage() {
             <Link
               href="/quiz/personnalite"
               className="inline-block px-6 py-3 rounded-xl font-bold text-white transition-all hover:scale-[1.02]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
             >
               Commencer le test MBTI →
             </Link>
@@ -290,7 +290,7 @@ export default function TestPersonnaliteMbtiPage() {
             <Link
               href="/quiz/personnalite"
               className="inline-block px-8 py-4 rounded-2xl text-lg font-black text-white transition-all hover:scale-[1.02]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.3)' }}
             >
               Passer le test MBTI gratuit →
             </Link>

@@ -111,7 +111,7 @@ function calcCommission(conversions: Array<{ amountCents: number; commissionCent
 }
 
 // ── KPI Card ─────────────────────────────────────────────────────────────────
-function KpiCard({ label, value, sub, color = '#a78bfa' }: {
+function KpiCard({ label, value, sub, color = '#d17d52' }: {
   label: string; value: string | number; sub?: string; color?: string;
 }) {
   return (
@@ -130,7 +130,7 @@ function KpiCard({ label, value, sub, color = '#a78bfa' }: {
 
 function TierBadge({ tier }: { tier: string }) {
   return tier === 'premium'
-    ? <span style={{ background: 'rgba(139,92,246,0.18)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>Premium</span>
+    ? <span style={{ background: 'rgba(194,97,31,0.18)', color: '#d17d52', border: '1px solid rgba(194,97,31,0.3)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>Premium</span>
     : <span style={{ background: 'rgba(255,255,255,0.05)', color: '#52525b', border: '1px solid rgba(255,255,255,0.07)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>Gratuit</span>;
 }
 
@@ -456,7 +456,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
       <header style={{ position: 'sticky', top: 0, zIndex: 20, background: 'rgba(10,10,15,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link href="/" style={{ fontSize: 18, fontWeight: 900, textDecoration: 'none' }}>
-            <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span style={{ color: '#fff' }}>Cecret</span>
             <span style={{ fontSize: 11, color: '#3f3f46', fontWeight: 400, marginLeft: 8 }}>Admin</span>
           </Link>
@@ -474,8 +474,8 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             <button key={t.id} onClick={() => setTab(t.id)} style={{
               padding: '10px 16px', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
               background: 'none', border: 'none', cursor: 'pointer',
-              color: tab === t.id ? '#a78bfa' : '#52525b',
-              borderBottom: tab === t.id ? '2px solid #a78bfa' : '2px solid transparent',
+              color: tab === t.id ? '#d17d52' : '#52525b',
+              borderBottom: tab === t.id ? '2px solid #d17d52' : '2px solid transparent',
               transition: 'all .15s',
             }}>{t.label}</button>
           ))}
@@ -507,8 +507,8 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-              <KpiCard label="Total inscrits" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} color="#a78bfa" />
-              <KpiCard label="Premium (DB)" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#f472b6" />
+              <KpiCard label="Total inscrits" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} color="#d17d52" />
+              <KpiCard label="Premium (DB)" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#e0a380" />
               <KpiCard label="Tests MBTI" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} color="#0ea5e9" />
               <KpiCard label="Vues de page" value={stats.totalPageViews.toLocaleString('fr-FR')} sub="total cumulé" color="#0ea5e9" />
             </div>
@@ -518,8 +518,8 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               <>
                 <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Entonnoir d&apos;acquisition</p>
                 <FunnelStep label="Visiteurs uniques (vues de page)" value={stats.totalPageViews} color="#71717a" />
-                <FunnelStep label="Inscrits (comptes créés)" value={stats.totalUsers} pct={stats.totalPageViews > 0 ? (stats.totalUsers / stats.totalPageViews) * 100 : 0} color="#a78bfa" />
-                <FunnelStep label="Payants (premium)" value={stats.premiumUsers} pct={stats.totalUsers > 0 ? (stats.premiumUsers / stats.totalUsers) * 100 : 0} color="#f472b6" />
+                <FunnelStep label="Inscrits (comptes créés)" value={stats.totalUsers} pct={stats.totalPageViews > 0 ? (stats.totalUsers / stats.totalPageViews) * 100 : 0} color="#d17d52" />
+                <FunnelStep label="Payants (premium)" value={stats.premiumUsers} pct={stats.totalUsers > 0 ? (stats.premiumUsers / stats.totalUsers) * 100 : 0} color="#e0a380" />
                 {stripeStats && (
                   <FunnelStep label="Abonnés actifs Stripe" value={stripeStats.monthlyCount + stripeStats.annualCount} pct={stats.premiumUsers > 0 ? ((stripeStats.monthlyCount + stripeStats.annualCount) / stats.premiumUsers) * 100 : 0} color="#34d399" />
                 )}
@@ -533,8 +533,8 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <LineChart
                   xLabels={monthLabels}
                   series={[
-                    { label: 'Inscrits', color: '#a78bfa', values: usersSeries },
-                    { label: 'Premium', color: '#f472b6', values: premiumSeries },
+                    { label: 'Inscrits', color: '#d17d52', values: usersSeries },
+                    { label: 'Premium', color: '#e0a380', values: premiumSeries },
                     { label: 'Quiz complétés', color: '#34d399', values: quizSeries },
                   ]}
                   fmtVal={v => v.toLocaleString('fr-FR')}
@@ -549,7 +549,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '4px 24px' }}>
                   {topMbti.map(([type, count]) => (
                     <HorizBar key={type} label={type.toUpperCase()} value={count} max={maxMbti}
-                      color="linear-gradient(90deg,#7c3aed,#a78bfa)"
+                      color="linear-gradient(90deg,#a94e18,#d17d52)"
                       valueLabel={`${count} (${((count / stats.totalUsers) * 100).toFixed(1)}%)`} />
                   ))}
                 </div>
@@ -643,7 +643,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                     <div>
                       {(stats.recentSignups ?? stats.recentUsers.slice(0, 20)).map(u => (
                         <div key={u.id} style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: u.tier === 'premium' ? '#f472b6' : '#3f3f46', flexShrink: 0 }} />
+                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: u.tier === 'premium' ? '#e0a380' : '#3f3f46', flexShrink: 0 }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ color: '#d4d4d8', fontSize: 13, fontWeight: 500, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {maskEmail(u.email)}
@@ -683,7 +683,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                             <p style={{ color: '#3f3f46', fontSize: 11, margin: 0 }}>/{c.affiliateSlug}</p>
                           </td>
                           <td style={{ ...tdStyle, color: '#fbbf24', fontWeight: 600 }}>{fmt(c.amountCents)}</td>
-                          <td style={{ ...tdStyle, color: '#f472b6' }}>{fmt(c.commissionCents)}</td>
+                          <td style={{ ...tdStyle, color: '#e0a380' }}>{fmt(c.commissionCents)}</td>
                           <td style={{ ...tdStyle, color: '#3f3f46', fontSize: 11 }}>{fmtDateTime(c.createdAt)}</td>
                         </tr>
                       ))}
@@ -704,9 +704,9 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 {(['all', 'premium', 'free'] as const).map(f => (
                   <button key={f} onClick={() => setTierFilter(f)} style={{
                     padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                    background: tierFilter === f ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.04)',
-                    color: tierFilter === f ? '#a78bfa' : '#52525b',
-                    border: tierFilter === f ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.07)',
+                    background: tierFilter === f ? 'rgba(194,97,31,0.18)' : 'rgba(255,255,255,0.04)',
+                    color: tierFilter === f ? '#d17d52' : '#52525b',
+                    border: tierFilter === f ? '1px solid rgba(194,97,31,0.3)' : '1px solid rgba(255,255,255,0.07)',
                   }}>{f === 'all' ? 'Tous' : f === 'premium' ? 'Premium' : 'Gratuit'}</button>
                 ))}
               </div>
@@ -718,8 +718,8 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <LineChart
                   xLabels={monthLabels}
                   series={[
-                    { label: 'Nouveaux inscrits', color: '#a78bfa', values: usersSeries },
-                    { label: 'Conversions premium', color: '#f472b6', values: premiumSeries },
+                    { label: 'Nouveaux inscrits', color: '#d17d52', values: usersSeries },
+                    { label: 'Conversions premium', color: '#e0a380', values: premiumSeries },
                   ]}
                   fmtVal={v => v.toLocaleString('fr-FR') + ' users'}
                 />
@@ -727,9 +727,9 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
-              <KpiCard label="Aujourd'hui" value={stats.newToday} color="#a78bfa" />
-              <KpiCard label="Cette semaine" value={stats.newThisWeek} color="#a78bfa" />
-              <KpiCard label="Ce mois" value={stats.newThisMonth} color="#a78bfa" />
+              <KpiCard label="Aujourd'hui" value={stats.newToday} color="#d17d52" />
+              <KpiCard label="Cette semaine" value={stats.newThisWeek} color="#d17d52" />
+              <KpiCard label="Ce mois" value={stats.newThisMonth} color="#d17d52" />
             </div>
 
             <input type="text" placeholder="Rechercher par email ou nom…" value={search}
@@ -789,7 +789,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
               <KpiCard label="Unlocks payants (total)" value={stats.paidResults}     sub="résultats débloqués"    color="#34d399" />
               <KpiCard label="Unlocks ce mois"         value={stats.paidThisMonth}   sub={`+${stats.paidToday} auj.`} color="#34d399" />
-              <KpiCard label="Taux de conversion"      value={`${conversionRate}%`} sub="inscrits → premium"  color="#a78bfa" />
+              <KpiCard label="Taux de conversion"      value={`${conversionRate}%`} sub="inscrits → premium"  color="#d17d52" />
             </div>
 
             {cardP(
@@ -799,7 +799,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                   xLabels={monthLabels}
                   series={[
                     { label: 'CA généré', color: '#fbbf24', values: revSeries },
-                    { label: 'Commissions', color: '#f472b6', values: commSeries },
+                    { label: 'Commissions', color: '#e0a380', values: commSeries },
                   ]}
                   fmtVal={v => fmt(v)}
                   h={180}
@@ -837,7 +837,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                             {new Date(month + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                           </td>
                           <td style={{ ...tdStyle, color: '#fbbf24', fontWeight: 600 }}>{fmt(data.revenue)}</td>
-                          <td style={{ ...tdStyle, color: '#f472b6' }}>{fmt(data.commission)}</td>
+                          <td style={{ ...tdStyle, color: '#e0a380' }}>{fmt(data.commission)}</td>
                           <td style={{ ...tdStyle, color: '#71717a' }}>{data.count}</td>
                         </tr>
                       ))}
@@ -860,7 +860,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <LineChart
                   xLabels={monthLabels}
                   series={[
-                    { label: 'Quiz complétés', color: '#a78bfa', values: quizSeries },
+                    { label: 'Quiz complétés', color: '#d17d52', values: quizSeries },
                     { label: 'Résultats payants', color: '#34d399', values: paidSeries },
                   ]}
                   fmtVal={v => v.toLocaleString('fr-FR')}
@@ -874,7 +874,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Classement par complétions</p>
                 {sortedQuizzes.map(q => (
                   <HorizBar key={q.slug} label={q.name} value={q.count} max={maxQuizCount}
-                    color="linear-gradient(90deg,#7c3aed,#ec4899)"
+                    color="linear-gradient(90deg,#a94e18,#d17d52)"
                     valueLabel={q.count.toLocaleString('fr-FR')} />
                 ))}
               </>
@@ -913,7 +913,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                           <td style={tdStyle}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               <div style={{ width: 48, height: 5, borderRadius: 999, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${q.paidRate}%`, background: '#7c3aed', borderRadius: 999 }} />
+                                <div style={{ height: '100%', width: `${q.paidRate}%`, background: '#a94e18', borderRadius: 999 }} />
                               </div>
                               <span style={{ color: '#71717a', fontSize: 12 }}>{q.paidRate}%</span>
                             </div>
@@ -934,16 +934,16 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               {sectionTitle('Affiliés', `${stats.affiliates.length} affiliés · règle 80% (30j) → 30%`)}
-              <Link href="/admin/affiliates" style={{ padding: '8px 16px', borderRadius: 12, fontSize: 13, fontWeight: 600, textDecoration: 'none', background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)', flexShrink: 0 }}>
+              <Link href="/admin/affiliates" style={{ padding: '8px 16px', borderRadius: 12, fontSize: 13, fontWeight: 600, textDecoration: 'none', background: 'rgba(194,97,31,0.15)', color: '#d17d52', border: '1px solid rgba(194,97,31,0.25)', flexShrink: 0 }}>
                 Gérer →
               </Link>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-              <KpiCard label="Total affiliés"       value={stats.affiliates.length}                                                   color="#a78bfa" />
-              <KpiCard label="Total conversions"    value={stats.affiliates.reduce((s, a) => s + a.conversions.length, 0)}            color="#a78bfa" />
+              <KpiCard label="Total affiliés"       value={stats.affiliates.length}                                                   color="#d17d52" />
+              <KpiCard label="Total conversions"    value={stats.affiliates.reduce((s, a) => s + a.conversions.length, 0)}            color="#d17d52" />
               <KpiCard label="CA total affiliés"    value={fmt(totalAffilCA)}    sub="toutes conversions"  color="#fbbf24" />
-              <KpiCard label="Commissions (80/30)"  value={fmt(totalAffilCommission)} sub="à payer"        color="#f472b6" />
+              <KpiCard label="Commissions (80/30)"  value={fmt(totalAffilCommission)} sub="à payer"        color="#e0a380" />
             </div>
 
             {cardP(
@@ -953,7 +953,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                   xLabels={monthLabels}
                   series={[
                     { label: 'CA généré', color: '#fbbf24', values: revSeries },
-                    { label: 'Commissions', color: '#f472b6', values: commSeries },
+                    { label: 'Commissions', color: '#e0a380', values: commSeries },
                   ]}
                   fmtVal={v => fmt(v)}
                   h={150}
@@ -973,9 +973,9 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               {(['ca', 'clicks', 'sales', 'commission'] as const).map(s => (
                 <button key={s} onClick={() => setAffiliateSort(s)} style={{
                   padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                  background: affiliateSort === s ? 'rgba(139,92,246,0.18)' : 'rgba(255,255,255,0.04)',
-                  color: affiliateSort === s ? '#a78bfa' : '#52525b',
-                  border: affiliateSort === s ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.07)',
+                  background: affiliateSort === s ? 'rgba(194,97,31,0.18)' : 'rgba(255,255,255,0.04)',
+                  color: affiliateSort === s ? '#d17d52' : '#52525b',
+                  border: affiliateSort === s ? '1px solid rgba(194,97,31,0.3)' : '1px solid rgba(255,255,255,0.07)',
                 }}>
                   {s === 'ca' ? 'CA ↓' : s === 'clicks' ? 'Clics ↓' : s === 'sales' ? 'Ventes ↓' : 'Commission ↓'}
                 </button>
@@ -1013,32 +1013,32 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                               <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>CA</p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                              <p style={{ color: '#f472b6', fontWeight: 700, fontSize: 14, margin: 0 }}>{fmt(a.commission)}</p>
+                              <p style={{ color: '#e0a380', fontWeight: 700, fontSize: 14, margin: 0 }}>{fmt(a.commission)}</p>
                               <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>Commission due</p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                              <p style={{ color: '#a78bfa', fontWeight: 700, fontSize: 14, margin: 0 }}>{a.clicks.toLocaleString('fr-FR')}</p>
+                              <p style={{ color: '#d17d52', fontWeight: 700, fontSize: 14, margin: 0 }}>{a.clicks.toLocaleString('fr-FR')}</p>
                               <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>Clics</p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
                               <p style={{ color: '#d4d4d8', fontWeight: 700, fontSize: 14, margin: 0 }}>{a.sales}</p>
                               <p style={{ color: '#3f3f46', fontSize: 10, margin: 0 }}>Ventes</p>
                             </div>
-                            <span style={{ color: expandedAffiliate === a.id ? '#a78bfa' : '#3f3f46', fontSize: 12, alignSelf: 'center' }}>
+                            <span style={{ color: expandedAffiliate === a.id ? '#d17d52' : '#3f3f46', fontSize: 12, alignSelf: 'center' }}>
                               {expandedAffiliate === a.id ? '▲' : '▼'}
                             </span>
                           </div>
                         </div>
                         {/* CA bar */}
                         <div style={{ marginTop: 8, marginLeft: 44, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${(a.ca / maxAffilCA) * 100}%`, background: 'linear-gradient(90deg,#7c3aed,#fbbf24)', borderRadius: 999 }} />
+                          <div style={{ height: '100%', width: `${(a.ca / maxAffilCA) * 100}%`, background: 'linear-gradient(90deg,#a94e18,#fbbf24)', borderRadius: 999 }} />
                         </div>
                       </div>
 
                       {/* Expanded: commission breakdown */}
                       {expandedAffiliate === a.id && (
-                        <div style={{ background: 'rgba(139,92,246,0.05)', borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '16px 20px 20px 64px' }}>
-                          <p style={{ fontSize: 12, color: '#a78bfa', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        <div style={{ background: 'rgba(194,97,31,0.05)', borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '16px 20px 20px 64px' }}>
+                          <p style={{ fontSize: 12, color: '#d17d52', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             Règle commission : 80% premiers 30j · 30% ensuite
                           </p>
                           {a.conversions.length === 0 ? (
@@ -1065,7 +1065,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                                           <td style={{ ...tdStyle, fontSize: 11, padding: '8px 12px', color: '#71717a' }}>{fmtDate(c.createdAt)}</td>
                                           <td style={{ ...tdStyle, fontSize: 12, padding: '8px 12px', color: '#fbbf24', fontWeight: 600 }}>{fmt(c.amountCents)}</td>
                                           <td style={{ ...tdStyle, fontSize: 12, padding: '8px 12px', color: isEarlyBird ? '#34d399' : '#71717a', fontWeight: 600 }}>{(rate * 100).toFixed(0)}%</td>
-                                          <td style={{ ...tdStyle, fontSize: 12, padding: '8px 12px', color: '#f472b6', fontWeight: 600 }}>{fmt(due)}</td>
+                                          <td style={{ ...tdStyle, fontSize: 12, padding: '8px 12px', color: '#e0a380', fontWeight: 600 }}>{fmt(due)}</td>
                                           <td style={{ ...tdStyle, fontSize: 11, padding: '8px 12px' }}>
                                             <span style={{
                                               background: isEarlyBird ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)',
@@ -1081,7 +1081,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                                     })}
                                     <tr style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                                       <td colSpan={3} style={{ padding: '10px 12px', fontSize: 12, color: '#71717a', fontWeight: 600 }}>Total commission due</td>
-                                      <td style={{ padding: '10px 12px', color: '#f472b6', fontWeight: 800, fontSize: 14 }}>{fmt(a.commission)}</td>
+                                      <td style={{ padding: '10px 12px', color: '#e0a380', fontWeight: 800, fontSize: 14 }}>{fmt(a.commission)}</td>
                                       <td />
                                     </tr>
                                   </tbody>
@@ -1108,7 +1108,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, padding: '20px 24px' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#a78bfa', marginBottom: 16 }}>Générer un nouveau code</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#d17d52', marginBottom: 16 }}>Générer un nouveau code</p>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                 <input
                   value={newCodeNote}
@@ -1116,13 +1116,13 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                   placeholder="Note (ex: NomAffiliéX)"
                   style={{ flex: 1, minWidth: 180, padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, outline: 'none' }}
                 />
-                <button onClick={generateCode} disabled={codesLoading} style={{ padding: '10px 20px', borderRadius: 10, background: 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer', opacity: codesLoading ? 0.6 : 1 }}>
+                <button onClick={generateCode} disabled={codesLoading} style={{ padding: '10px 20px', borderRadius: 10, background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: '#fff', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer', opacity: codesLoading ? 0.6 : 1 }}>
                   {codesLoading ? '...' : '+ Générer'}
                 </button>
               </div>
               {generatedCode && (
-                <div style={{ marginTop: 16, padding: '14px 18px', borderRadius: 12, background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.3)' }}>
-                  <p style={{ fontSize: 11, color: '#a78bfa', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Code généré — à copier !</p>
+                <div style={{ marginTop: 16, padding: '14px 18px', borderRadius: 12, background: 'rgba(194,97,31,0.12)', border: '1px solid rgba(194,97,31,0.3)' }}>
+                  <p style={{ fontSize: 11, color: '#d17d52', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Code généré — à copier !</p>
                   <p style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '0.2em', fontFamily: 'monospace' }}>{generatedCode}</p>
                 </div>
               )}

@@ -36,9 +36,9 @@ export const metadata: Metadata = {
 };
 
 const TYPE_PREVIEW = [
-  { code: 'INFJ', name: "L'Avocat", emoji: '🌙', color: '#7c3aed', rarity: '1.5%' },
-  { code: 'ENFP', name: 'Le Champion', emoji: '🦋', color: '#ec4899', rarity: '8%' },
-  { code: 'INTJ', name: "L'Architecte", emoji: '🏛️', color: '#6366f1', rarity: '2%' },
+  { code: 'INFJ', name: "L'Avocat", emoji: '🌙', color: '#a94e18', rarity: '1.5%' },
+  { code: 'ENFP', name: 'Le Champion', emoji: '🦋', color: '#d17d52', rarity: '8%' },
+  { code: 'INTJ', name: "L'Architecte", emoji: '🏛️', color: '#b07d2b', rarity: '2%' },
   { code: 'ISFJ', name: 'Le Défenseur', emoji: '🛡️', color: '#0ea5e9', rarity: '13%' },
   { code: 'ENTP', name: 'Le Débatteur', emoji: '⚡', color: '#f59e0b', rarity: '3%' },
   { code: 'INFP', name: 'Le Médiateur', emoji: '🌿', color: '#10b981', rarity: '4%' },
@@ -142,7 +142,7 @@ export default function PersonnalitePage() {
         <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
               <span className="text-gray-900">Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ export default function PersonnalitePage() {
 
           <h1 className="text-4xl sm:text-5xl font-black mb-5 leading-tight text-gray-900">
             Test{' '}
-            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               MBTI
             </span>
             {' '}Gratuit — Quel est ton type ?

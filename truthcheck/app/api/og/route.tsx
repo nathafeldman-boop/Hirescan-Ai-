@@ -6,27 +6,27 @@ export const runtime = 'edge';
 
 const quizMeta: Record<string, { emoji: string; title: string; accent: string }> = {
   infidelite:        { emoji: '💔', title: 'Mon/Ma partenaire me cache quelque chose ?', accent: '#ef4444' },
-  adopte:            { emoji: '🧬', title: 'Suis-je adopté(e) ?',                         accent: '#6366f1' },
-  amoureux:          { emoji: '💫', title: 'Suis-je vraiment amoureux/amoureuse ?',        accent: '#ec4899' },
+  adopte:            { emoji: '🧬', title: 'Suis-je adopté(e) ?',                         accent: '#b07d2b' },
+  amoureux:          { emoji: '💫', title: 'Suis-je vraiment amoureux/amoureuse ?',        accent: '#d17d52' },
   'vrais-amis':      { emoji: '🫂', title: 'Sont-ils mes vrais amis ?',                    accent: '#10b981' },
-  orientation:       { emoji: '🌈', title: 'Quelle est mon orientation ?',                 accent: '#8b5cf6' },
+  orientation:       { emoji: '🌈', title: 'Quelle est mon orientation ?',                 accent: '#c2611f' },
   narcissique:       { emoji: '🪞', title: 'Suis-je narcissique ?',                        accent: '#f59e0b' },
-  'mon-ex':          { emoji: '💭', title: 'Mon ex pense encore à moi ?',                  accent: '#ec4899' },
-  manipule:          { emoji: '🎭', title: 'Suis-je manipulé(e) ?',                        accent: '#8b5cf6' },
+  'mon-ex':          { emoji: '💭', title: 'Mon ex pense encore à moi ?',                  accent: '#d17d52' },
+  manipule:          { emoji: '🎭', title: 'Suis-je manipulé(e) ?',                        accent: '#c2611f' },
   rompre:            { emoji: '💔', title: 'Dois-je rompre ?',                             accent: '#ef4444' },
   jaloux:            { emoji: '👁️', title: 'Suis-je trop jaloux/jalouse ?',               accent: '#f97316' },
   'relation-toxique':{ emoji: '☠️', title: 'Ma relation est-elle toxique ?',               accent: '#ef4444' },
-  crush:             { emoji: '💘', title: 'Mon crush ressent quelque chose ?',             accent: '#ec4899' },
+  crush:             { emoji: '💘', title: 'Mon crush ressent quelque chose ?',             accent: '#d17d52' },
   burnout:           { emoji: '🔥', title: 'Suis-je en burnout ?',                         accent: '#f97316' },
-  depression:        { emoji: '🌧️', title: 'Ai-je des signes de dépression ?',            accent: '#6366f1' },
+  depression:        { emoji: '🌧️', title: 'Ai-je des signes de dépression ?',            accent: '#b07d2b' },
   'vrai-amour':      { emoji: '❤️‍🔥', title: 'C\'est de l\'amour ou de l\'attachement ?', accent: '#e11d48' },
-  'style-attachement':{ emoji: '🫀', title: 'Quel est ton style d\'attachement ?',         accent: '#6366f1' },
-  'langages-amour':  { emoji: '💌', title: 'Quel est ton langage de l\'amour ?',           accent: '#ec4899' },
-  gaslight:          { emoji: '🫧', title: 'Est-ce qu\'on te fait douter de toi ?',        accent: '#7c3aed' },
+  'style-attachement':{ emoji: '🫀', title: 'Quel est ton style d\'attachement ?',         accent: '#b07d2b' },
+  'langages-amour':  { emoji: '💌', title: 'Quel est ton langage de l\'amour ?',           accent: '#d17d52' },
+  gaslight:          { emoji: '🫧', title: 'Est-ce qu\'on te fait douter de toi ?',        accent: '#a94e18' },
   // Duo quizzes
-  'duo-communication': { emoji: '💬', title: 'Duo · Communication',    accent: '#6366f1' },
-  'duo-compatibilite': { emoji: '🔮', title: 'Duo · Compatibilité',    accent: '#8b5cf6' },
-  'duo-investissement':{ emoji: '⚖️', title: 'Duo · Investissement',   accent: '#ec4899' },
+  'duo-communication': { emoji: '💬', title: 'Duo · Communication',    accent: '#b07d2b' },
+  'duo-compatibilite': { emoji: '🔮', title: 'Duo · Compatibilité',    accent: '#c2611f' },
+  'duo-investissement':{ emoji: '⚖️', title: 'Duo · Investissement',   accent: '#d17d52' },
   'duo-resilience':    { emoji: '🛡️', title: 'Duo · Résilience',       accent: '#f97316' },
   'duo-amour':         { emoji: '❤️', title: 'Duo · Amour & Désir',     accent: '#e11d48' },
 };
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
 
             {/* Brand */}
             <div style={{ position: 'absolute', top: '32px', left: '48px', display: 'flex', alignItems: 'baseline' }}>
-              <span style={{ fontSize: '22px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
+              <span style={{ fontSize: '22px', fontWeight: '900', background: 'linear-gradient(to right, #d17d52, #e0a380)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
               <span style={{ fontSize: '22px', fontWeight: '900', color: '#09090b' }}>Cecret</span>
             </div>
             <div style={{ position: 'absolute', top: '36px', right: '48px', background: `${t.accentColor}15`, border: `1px solid ${t.accentColor}40`, borderRadius: '100px', padding: '6px 16px', display: 'flex' }}>
@@ -132,13 +132,13 @@ export async function GET(req: NextRequest) {
         >
           {/* Background glows */}
           <div style={{ position: 'absolute', top: '-100px', left: '-80px', width: '500px', height: '500px', borderRadius: '50%', background: `radial-gradient(circle, ${meta.accent}40 0%, transparent 70%)`, filter: 'blur(60px)' }} />
-          <div style={{ position: 'absolute', bottom: '-80px', right: '-60px', width: '420px', height: '420px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)', filter: 'blur(50px)' }} />
+          <div style={{ position: 'absolute', bottom: '-80px', right: '-60px', width: '420px', height: '420px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(194,97,31,0.25) 0%, transparent 70%)', filter: 'blur(50px)' }} />
 
           {/* Brand */}
           <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '24px', gap: '0px' }}>
-            <span style={{ fontSize: '28px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
+            <span style={{ fontSize: '28px', fontWeight: '900', background: 'linear-gradient(to right, #d17d52, #e0a380)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
             <span style={{ fontSize: '28px', fontWeight: '900', color: 'white' }}>Cecret</span>
-            {isDuo && <span style={{ fontSize: '14px', fontWeight: '700', color: '#a78bfa', marginLeft: '10px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>· Mode Duo</span>}
+            {isDuo && <span style={{ fontSize: '14px', fontWeight: '700', color: '#d17d52', marginLeft: '10px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>· Mode Duo</span>}
           </div>
 
           {/* Quiz title */}
@@ -211,10 +211,10 @@ export async function GET(req: NextRequest) {
           }}
         >
           <div style={{ position: 'absolute', top: '-80px', left: '-60px', width: '450px', height: '450px', borderRadius: '50%', background: `radial-gradient(circle, ${meta.accent}55 0%, transparent 70%)`, filter: 'blur(40px)' }} />
-          <div style={{ position: 'absolute', bottom: '-60px', right: '-40px', width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+          <div style={{ position: 'absolute', bottom: '-60px', right: '-40px', width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(194,97,31,0.3) 0%, transparent 70%)', filter: 'blur(40px)' }} />
 
           <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '32px' }}>
-            <span style={{ fontSize: '36px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
+            <span style={{ fontSize: '36px', fontWeight: '900', background: 'linear-gradient(to right, #d17d52, #e0a380)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Ur</span>
             <span style={{ fontSize: '36px', fontWeight: '900', color: 'white' }}>Cecret</span>
           </div>
 
@@ -224,7 +224,7 @@ export async function GET(req: NextRequest) {
             {meta.title}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', background: `linear-gradient(135deg, ${meta.accent}, #8b5cf6)`, borderRadius: '100px', padding: '12px 32px', marginTop: '8px', boxShadow: `0 8px 32px ${meta.accent}66` }}>
+          <div style={{ display: 'flex', alignItems: 'center', background: `linear-gradient(135deg, ${meta.accent}, #c2611f)`, borderRadius: '100px', padding: '12px 32px', marginTop: '8px', boxShadow: `0 8px 32px ${meta.accent}66` }}>
             <span style={{ fontSize: '20px', fontWeight: '700', color: 'white' }}>
               100% anonyme · Résultats instantanés
             </span>
@@ -256,17 +256,17 @@ export async function GET(req: NextRequest) {
           fontFamily: 'system-ui, -apple-system, sans-serif',
         }}
       >
-        <div style={{ position: 'absolute', top: '-100px', left: '-80px', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.35) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-        <div style={{ position: 'absolute', bottom: '-80px', right: '-60px', width: '420px', height: '420px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.3) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+        <div style={{ position: 'absolute', top: '-100px', left: '-80px', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(194,97,31,0.35) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+        <div style={{ position: 'absolute', bottom: '-80px', right: '-60px', width: '420px', height: '420px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(209,125,82,0.3) 0%, transparent 70%)', filter: 'blur(40px)' }} />
 
-        <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '28px', boxShadow: '0 0 40px rgba(139,92,246,0.5)' }}>
+        <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: 'linear-gradient(135deg, #c2611f, #d17d52)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '28px', boxShadow: '0 0 40px rgba(194,97,31,0.5)' }}>
           <svg width="38" height="38" viewBox="0 0 24 24" fill="white">
             <path d="M12 1C8.676 1 6 3.676 6 7v1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 0 1 1 3.732V17a1 1 0 0 1-2 0v-1.268A2 2 0 0 1 12 12z"/>
           </svg>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '16px' }}>
-          <span style={{ fontSize: '88px', fontWeight: '900', background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', color: 'transparent', lineHeight: 1 }}>Ur</span>
+          <span style={{ fontSize: '88px', fontWeight: '900', background: 'linear-gradient(to right, #d17d52, #e0a380)', WebkitBackgroundClip: 'text', color: 'transparent', lineHeight: 1 }}>Ur</span>
           <span style={{ fontSize: '88px', fontWeight: '900', color: 'white', lineHeight: 1 }}>Cecret</span>
         </div>
 
@@ -274,7 +274,7 @@ export async function GET(req: NextRequest) {
           Tes vraies réponses. Rien que la vérité.
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', borderRadius: '100px', padding: '14px 36px', boxShadow: '0 8px 32px rgba(139,92,246,0.4)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'linear-gradient(135deg, #c2611f, #d17d52)', borderRadius: '100px', padding: '14px 36px', boxShadow: '0 8px 32px rgba(194,97,31,0.4)' }}>
           <span style={{ fontSize: '22px', fontWeight: '700', color: 'white' }}>18 quizzes · 100% anonyme · gratuit</span>
         </div>
 

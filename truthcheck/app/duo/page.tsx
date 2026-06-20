@@ -24,7 +24,7 @@ export default function DuoPage() {
       <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-black">
-            <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-gray-900">Cecret</span>
           </Link>
           <div className="flex items-center gap-3">
@@ -45,7 +45,7 @@ export default function DuoPage() {
           </div>
           <h1 className="text-3xl font-black text-gray-900 leading-tight mb-3">
             Comparez vos{' '}
-            <span style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               personnalités
             </span>
           </h1>
@@ -65,7 +65,7 @@ export default function DuoPage() {
           ].map(({ n, icon, text }) => (
             <div key={n} className="text-center">
               <div className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-black text-white"
-                style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)' }}>{n}</div>
+                style={{ background: 'linear-gradient(135deg,#c2611f,#d17d52)' }}>{n}</div>
               <div className="text-xl mb-1">{icon}</div>
               <p className="text-xs text-gray-500">{text}</p>
             </div>

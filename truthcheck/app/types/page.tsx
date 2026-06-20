@@ -49,11 +49,11 @@ export default function TypesPage() {
         <header className="relative z-10 sticky top-0" style={{ background: 'rgba(9,9,11,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
               <span className="text-white">Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
-              <Link href="/quiz/personnalite" className="text-xs font-bold transition-colors" style={{ color: '#a78bfa' }}>
+              <Link href="/quiz/personnalite" className="text-xs font-bold transition-colors" style={{ color: '#d17d52' }}>
                 Passer le test →
               </Link>
               <LanguageSwitcher />
@@ -71,7 +71,7 @@ export default function TypesPage() {
             </p>
             <Link href="/quiz/personnalite"
               className="mt-6 inline-block px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 6px 24px rgba(124,58,237,0.3)' }}>
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 24px rgba(169,78,24,0.3)' }}>
               Découvrir mon type gratuitement →
             </Link>
           </div>

@@ -154,20 +154,20 @@ export default function DuoQuizClient({ quiz }: Props) {
           {/* Code d'entrée — hero element */}
           <div
             className="rounded-2xl p-5 mb-4 border text-center"
-            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.06))', borderColor: 'rgba(139,92,246,0.4)' }}
+            style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.12), rgba(209,125,82,0.06))', borderColor: 'rgba(194,97,31,0.4)' }}
           >
             <p className="text-xs text-zinc-500 mb-3 uppercase tracking-widest font-semibold">Code d&apos;entrée équipe</p>
             <div className="flex items-center justify-center gap-3 mb-3">
               <span
                 className="text-3xl font-black tracking-[0.25em] font-mono"
-                style={{ background: 'linear-gradient(135deg,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+                style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
               >
                 {teamCode}
               </span>
               <button
                 onClick={copyCode}
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border"
-                style={{ borderColor: 'rgba(139,92,246,0.4)', color: codeCopied ? '#a78bfa' : '#71717a', background: 'rgba(139,92,246,0.08)' }}
+                style={{ borderColor: 'rgba(194,97,31,0.4)', color: codeCopied ? '#d17d52' : '#71717a', background: 'rgba(194,97,31,0.08)' }}
               >
                 {codeCopied ? '✓ Copié' : 'Copier'}
               </button>

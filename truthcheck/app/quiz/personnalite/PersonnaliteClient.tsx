@@ -40,7 +40,7 @@ function getShortQuestions(all: MbtiQuestion[]): MbtiQuestion[] {
 // Path format: /__diag/<step> — queryable in the admin diagnostic section.
 function diagLog(step: string, meta: Record<string, unknown> = {}) {
   // eslint-disable-next-line no-console
-  console.log(`%c[FUNNEL] ${step}`, 'color:#a78bfa;font-weight:bold', meta);
+  console.log(`%c[FUNNEL] ${step}`, 'color:#d17d52;font-weight:bold', meta);
   fetch('/api/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -95,7 +95,7 @@ function ProgressBar({ current, total, label }: { current: number; total: number
       <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
+          style={{ width: `${pct}%`, background: 'linear-gradient(to right,#a94e18,#d17d52)' }}
         />
       </div>
     </div>
@@ -192,7 +192,7 @@ function QuizScreen({ onComplete, questions, t }: {
       {milestoneMsg && (
         <div
           className="fixed inset-x-4 top-4 z-50 rounded-2xl p-4 text-center shadow-2xl"
-          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', animation: 'fadeInDown 0.3s ease' }}
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', animation: 'fadeInDown 0.3s ease' }}
           onClick={() => setMilestoneMsg(null)}
         >
           <p className="text-2xl mb-1">{milestoneMsg.emoji}</p>
@@ -214,8 +214,8 @@ function QuizScreen({ onComplete, questions, t }: {
 
       <div className="flex flex-col gap-2.5">
         {([
-          { key: 'A' as const, label: "Totalement d'accord", color: '#7c3aed' },
-          { key: 'B' as const, label: "Plutôt d'accord",     color: '#a78bfa' },
+          { key: 'A' as const, label: "Totalement d'accord", color: '#a94e18' },
+          { key: 'B' as const, label: "Plutôt d'accord",     color: '#d17d52' },
           { key: 'C' as const, label: 'Neutre',              color: '#9ca3af' },
           { key: 'D' as const, label: "Plutôt pas d'accord", color: '#f97316' },
           { key: 'E' as const, label: "Pas du tout d'accord",color: '#ef4444' },
@@ -275,7 +275,7 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
         <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-100"
-            style={{ width: `${progress}%`, background: 'linear-gradient(to right,#7c3aed,#ec4899)' }}
+            style={{ width: `${progress}%`, background: 'linear-gradient(to right,#a94e18,#d17d52)' }}
           />
         </div>
         <p className="text-xs text-stone-400 mt-3">{progress}%</p>
@@ -334,7 +334,7 @@ function InAppBrowserOverlay() {
 
       <style>{`
         @keyframes iab-float { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-9px)} }
-        @keyframes iab-glow  { 0%,100%{box-shadow:0 0 28px rgba(124,58,237,.45)} 50%{box-shadow:0 0 48px rgba(236,72,153,.65)} }
+        @keyframes iab-glow  { 0%,100%{box-shadow:0 0 28px rgba(169,78,24,.45)} 50%{box-shadow:0 0 48px rgba(209,125,82,.65)} }
         @keyframes iab-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
         @keyframes iab-shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
       `}</style>
@@ -343,7 +343,7 @@ function InAppBrowserOverlay() {
       <div className="relative mb-7" style={{ animation: 'iab-float 2.6s ease-in-out infinite' }}>
         {/* Ambient glow */}
         <div className="absolute inset-0 rounded-3xl blur-2xl opacity-60"
-             style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', transform: 'scale(1.15)' }}/>
+             style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', transform: 'scale(1.15)' }}/>
 
         <div className="relative rounded-3xl px-7 py-5"
              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', animation: 'iab-glow 2.2s ease-in-out infinite' }}>
@@ -358,7 +358,7 @@ function InAppBrowserOverlay() {
               <div key={i}
                    className="w-12 h-14 rounded-xl flex items-center justify-center text-2xl font-black text-white/20"
                    style={{
-                     background: i%2===0 ? 'rgba(124,58,237,0.35)' : 'rgba(236,72,153,0.22)',
+                     background: i%2===0 ? 'rgba(169,78,24,0.35)' : 'rgba(209,125,82,0.22)',
                      border: '1px solid rgba(255,255,255,0.15)',
                      filter: 'blur(5px)',
                      animation: `iab-float ${2.2+i*0.18}s ease-in-out infinite`,
@@ -390,7 +390,7 @@ function InAppBrowserOverlay() {
         <div className="flex items-start gap-3 p-3.5 rounded-2xl"
              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
           <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
-                style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>1</span>
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>1</span>
           <p className="text-white/75 text-sm leading-snug pt-0.5">
             Appuie sur les <strong className="text-white">⋯</strong> en haut à droite
           </p>
@@ -398,7 +398,7 @@ function InAppBrowserOverlay() {
         <div className="flex items-start gap-3 p-3.5 rounded-2xl"
              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
           <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
-                style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>2</span>
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>2</span>
           <p className="text-white/75 text-sm leading-snug pt-0.5">
             Appuie sur <strong className="text-white">&quot;Ouvrir dans le navigateur&quot;</strong>
           </p>
@@ -411,10 +411,10 @@ function InAppBrowserOverlay() {
           onClick={openInChrome}
           className="w-full py-[1.05rem] rounded-2xl font-black text-white text-base transition-all active:scale-[0.97]"
           style={{
-            background: copied ? 'linear-gradient(135deg,#16a34a,#22c55e)' : 'linear-gradient(270deg,#7c3aed,#ec4899,#7c3aed)',
+            background: copied ? 'linear-gradient(135deg,#16a34a,#22c55e)' : 'linear-gradient(270deg,#a94e18,#d17d52,#a94e18)',
             backgroundSize: '300% 100%',
             animation: copied ? 'none' : 'iab-shimmer 3s linear infinite, iab-glow 2s ease-in-out infinite',
-            boxShadow: copied ? '0 10px 36px rgba(34,197,94,0.4)' : '0 10px 36px rgba(124,58,237,0.55)'
+            boxShadow: copied ? '0 10px 36px rgba(34,197,94,0.4)' : '0 10px 36px rgba(169,78,24,0.55)'
           }}>
           {copied ? '✅ Lien copié — colle dans Safari / Chrome !' : '🔓 Voir mon type MBTI'}
         </button>
@@ -539,7 +539,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           </div>
           <div style={{ background: '#1a1a1a', borderRadius: 24, padding: '32px 24px', width: '100%', maxWidth: 380, marginTop: 80 }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'linear-gradient(135deg,#4c1d95,#6d28d9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, marginBottom: 12 }}>🔮</div>
+              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'linear-gradient(135deg,#6f3318,#8a3e16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, marginBottom: 12 }}>🔮</div>
               <div style={{ color: 'white', fontWeight: 700, fontSize: 16 }}>Profil {typeCode} prêt !</div>
             </div>
             <h2 style={{ color: 'white', fontSize: 20, fontWeight: 800, textAlign: 'center', lineHeight: 1.3, marginBottom: 24 }}>
@@ -568,7 +568,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <div className="text-5xl mb-3">🔮</div>
           <div
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black mb-3 tracking-widest"
-            style={{ background: 'rgba(109,40,217,0.08)', border: '1px solid rgba(109,40,217,0.2)', color: '#7c3aed' }}
+            style={{ background: 'rgba(138,62,22,0.08)', border: '1px solid rgba(138,62,22,0.2)', color: '#a94e18' }}
           >
             {typeCode.slice(0, 2)}<span className="blur-[4px] select-none opacity-40">??</span>
           </div>
@@ -585,7 +585,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         {/* Locked type preview */}
         <div className="rounded-2xl p-4 mb-4 relative overflow-hidden" style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'rgba(109,40,217,0.08)' }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'rgba(138,62,22,0.08)' }}>
               {type?.emoji ?? typeCode.slice(0, 2)}
             </div>
             <div>
@@ -616,9 +616,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <div className="space-y-3 mt-4">
 
           {/* 1 — Résultat unique (hero) */}
-          <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.07),rgba(236,72,153,0.05))', border: '2px solid rgba(124,58,237,0.3)' }}>
+          <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.05))', border: '2px solid rgba(169,78,24,0.3)' }}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#7c3aed' }}>
+              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#a94e18' }}>
                 {isFr ? '⚡ Résultat unique' : '⚡ One-time result'}
               </span>
               <span className="text-lg font-black text-stone-900">1,99 €</span>
@@ -642,7 +642,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               onClick={() => doCheckout('onetime')}
               disabled={loading}
               className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.35)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
             >
               {loading ? '…' : isFr ? `🔓 Révéler mon profil ${typeCode} →` : `🔓 Reveal my ${typeCode} profile →`}
             </button>
@@ -650,7 +650,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
           {/* 2 — Annuel (best value) */}
           <div className="rounded-2xl p-4 relative" style={{ background: 'white', border: '1.5px solid #d6d3d1' }}>
-            <span className="absolute top-0 right-0 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+            <span className="absolute top-0 right-0 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
               −75%
             </span>
             <div className="flex items-center justify-between mb-3 pr-12">
@@ -673,7 +673,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 'Only €2.50/month',
               ]).map(b => (
                 <li key={b} className="flex items-center gap-2 text-xs text-stone-700">
-                  <span style={{ color: '#7c3aed' }} className="font-bold flex-shrink-0">✓</span>{b}
+                  <span style={{ color: '#a94e18' }} className="font-bold flex-shrink-0">✓</span>{b}
                 </li>
               ))}
             </ul>
@@ -681,7 +681,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               onClick={() => doCheckout('annual')}
               disabled={loading}
               className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-              style={{ border: '1.5px solid rgba(124,58,237,0.4)', color: '#7c3aed', background: 'rgba(124,58,237,0.05)' }}
+              style={{ border: '1.5px solid rgba(169,78,24,0.4)', color: '#a94e18', background: 'rgba(169,78,24,0.05)' }}
             >
               {loading ? '…' : isFr ? 'Souscrire maintenant →' : 'Subscribe now →'}
             </button>

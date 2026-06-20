@@ -236,7 +236,7 @@ const ICON_MAP: Record<string, React.FC<{ color: string }>> = {
   'vrai-amour': IconVraiAmour,
 };
 
-export default function QuizIcon({ slug, size = 32, color = '#8b5cf6', className = '' }: Props) {
+export default function QuizIcon({ slug, size = 32, color = '#c2611f', className = '' }: Props) {
   const IconComponent = ICON_MAP[slug] ?? IconDefault;
   const padding = Math.round(size * 0.22);
   const iconSize = size - padding * 2;

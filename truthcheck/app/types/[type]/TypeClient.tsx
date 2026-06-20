@@ -178,7 +178,7 @@ export default function TypeClient({ type }: Props) {
           <p className="text-sm text-zinc-400 mb-4 max-w-sm mx-auto">{t.quizzesDesc}</p>
           <a href="/duo"
             className="inline-block px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.3)' }}>
+            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.3)' }}>
             Test de compatibilité →
           </a>
         </div>
@@ -236,7 +236,7 @@ export default function TypeClient({ type }: Props) {
           onClick={handleOneTime}
           disabled={loading}
           className="w-full max-w-xs px-7 py-4 rounded-xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-          style={{ background: `linear-gradient(135deg,${type.accentColor},#ec4899)`, boxShadow: `0 6px 24px ${type.accentColor}40` }}
+          style={{ background: `linear-gradient(135deg,${type.accentColor},#d17d52)`, boxShadow: `0 6px 24px ${type.accentColor}40` }}
         >
           {loading ? t.loading : t.unlockOneTime(ONE_TIME_PRICE)}
         </button>
@@ -257,7 +257,7 @@ export default function TypeClient({ type }: Props) {
           onClick={() => handleUnlock(false)}
           disabled={loading}
           className="w-full max-w-xs px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02] disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.3)' }}
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.3)' }}
         >
           {loading ? t.loading : t.unlockMonthly(MONTHLY_PRICE)}
         </button>
@@ -273,7 +273,7 @@ export default function TypeClient({ type }: Props) {
           onClick={() => handleUnlock(true)}
           disabled={loading}
           className="w-full max-w-xs mt-1 px-7 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-60 text-white"
-          style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.35)' }}
+          style={{ background: 'rgba(194,97,31,0.15)', border: '1px solid rgba(194,97,31,0.35)' }}
         >
           {t.unlockAnnual(ANNUAL_PRICE)}
         </button>

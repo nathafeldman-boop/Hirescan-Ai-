@@ -19,7 +19,7 @@ interface AnalysisResult {
 
 const STYLE_COLORS: Record<string, string> = {
   'Witty': '#f59e0b',
-  'Séducteur': '#ec4899',
+  'Séducteur': '#d17d52',
   'Neutre': '#6b7280',
   'Audacieux': '#ef4444',
   'Empathique': '#10b981',
@@ -170,7 +170,7 @@ export default function AnalyzeClient({ userId, tier }: { userId: string; tier: 
               className="w-full py-4 rounded-xl font-bold text-base transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               style={
                 file && !loading
-                  ? { background: 'linear-gradient(135deg, #8b5cf6cc, #8b5cf6)', boxShadow: '0 4px 24px #8b5cf640' }
+                  ? { background: 'linear-gradient(135deg, #c2611fcc, #c2611f)', boxShadow: '0 4px 24px #c2611f40' }
                   : { background: 'rgba(255,255,255,0.05)', color: '#71717a' }
               }
             >
@@ -212,7 +212,7 @@ export default function AnalyzeClient({ userId, tier }: { userId: string; tier: 
                       <span>{r.emoji}</span>
                       <span
                         className="text-xs font-bold px-2 py-0.5 rounded-full"
-                        style={{ color: STYLE_COLORS[r.style] ?? '#8b5cf6', backgroundColor: (STYLE_COLORS[r.style] ?? '#8b5cf6') + '20' }}
+                        style={{ color: STYLE_COLORS[r.style] ?? '#c2611f', backgroundColor: (STYLE_COLORS[r.style] ?? '#c2611f') + '20' }}
                       >
                         {r.style}
                       </span>

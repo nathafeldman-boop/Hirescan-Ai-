@@ -107,7 +107,7 @@ export default function DuoCompareClient({ quiz }: Props) {
           <Link
             href="/duo"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
+            style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)' }}
           >
             ← Aller au Mode Duo
           </Link>
@@ -299,14 +299,14 @@ export default function DuoCompareClient({ quiz }: Props) {
             {/* CTA */}
             <div
               className="rounded-2xl p-5 mb-6 text-center"
-              style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(236,72,153,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}
+              style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.1), rgba(209,125,82,0.1))', border: '1px solid rgba(194,97,31,0.3)' }}
             >
               <p className="text-white font-bold text-sm mb-1">Découvrez d&apos;autres vérités sur votre couple</p>
               <p className="text-zinc-500 text-xs mb-4">5 quiz duo disponibles · 100% anonyme</p>
               <Link
                 href="/duo"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98]"
-                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.35)' }}
+                style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 20px rgba(194,97,31,0.35)' }}
               >
                 Voir tous les quiz duo →
               </Link>

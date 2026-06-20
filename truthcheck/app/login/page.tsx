@@ -79,7 +79,7 @@ function LoginContent() {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🔮</div>
           <h1 className="text-3xl font-black mb-1">
-            <span style={{ background: 'linear-gradient(to right,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <span style={{ background: 'linear-gradient(to right,#a94e18,#d17d52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span className="text-stone-900">Cecret</span>
           </h1>
           <p className="text-stone-500 text-sm">Tes résultats t&apos;attendent 🔓</p>
@@ -92,7 +92,7 @@ function LoginContent() {
               <h2 className="text-stone-900 font-black text-xl mb-2">Vérifie tes emails !</h2>
               <p className="text-stone-500 text-sm leading-relaxed">
                 Un lien de connexion a été envoyé à{' '}
-                <span style={{ color: '#7c3aed' }} className="font-semibold">{email}</span>
+                <span style={{ color: '#a94e18' }} className="font-semibold">{email}</span>
               </p>
               <p className="text-stone-400 text-xs mt-3">Clique dessus — tes résultats seront là 🎯</p>
             </div>
@@ -126,7 +126,7 @@ function LoginContent() {
                   onClick={() => { setMode('email'); setCodeError(''); }}
                   className="flex-1 py-2.5 text-sm font-semibold transition-all"
                   style={{
-                    background: mode === 'email' ? 'linear-gradient(135deg,#7c3aed,#ec4899)' : 'transparent',
+                    background: mode === 'email' ? 'linear-gradient(135deg,#a94e18,#d17d52)' : 'transparent',
                     color: mode === 'email' ? '#fff' : '#78716c',
                   }}
                 >
@@ -137,7 +137,7 @@ function LoginContent() {
                   onClick={() => { setMode('code'); setSent(false); }}
                   className="flex-1 py-2.5 text-sm font-semibold transition-all"
                   style={{
-                    background: mode === 'code' ? 'linear-gradient(135deg,#7c3aed,#ec4899)' : 'transparent',
+                    background: mode === 'code' ? 'linear-gradient(135deg,#a94e18,#d17d52)' : 'transparent',
                     color: mode === 'code' ? '#fff' : '#78716c',
                   }}
                 >
@@ -156,14 +156,14 @@ function LoginContent() {
                     required
                     className="w-full rounded-xl px-4 py-3.5 text-stone-900 text-sm placeholder-stone-400 outline-none transition-all"
                     style={{ background: '#f5f4f2', border: '2px solid #e7e5e0' }}
-                    onFocus={e => { e.currentTarget.style.borderColor = '#7c3aed'; }}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#a94e18'; }}
                     onBlur={e => { e.currentTarget.style.borderColor = '#e7e5e0'; }}
                   />
                   <button
                     type="submit"
                     disabled={loading}
                     className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50 hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+                    style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 16px rgba(169,78,24,0.3)' }}
                   >
                     {loading ? '⏳ Envoi...' : '✉️ Recevoir mon lien de connexion →'}
                   </button>
@@ -181,7 +181,7 @@ function LoginContent() {
                     autoFocus
                     className="w-full rounded-xl px-4 py-3.5 text-stone-900 text-sm placeholder-stone-400 outline-none transition-all tracking-widest font-mono text-center uppercase"
                     style={{ background: '#f5f4f2', border: `2px solid ${codeError ? '#ef4444' : '#e7e5e0'}` }}
-                    onFocus={e => { e.currentTarget.style.borderColor = codeError ? '#ef4444' : '#7c3aed'; }}
+                    onFocus={e => { e.currentTarget.style.borderColor = codeError ? '#ef4444' : '#a94e18'; }}
                     onBlur={e => { e.currentTarget.style.borderColor = codeError ? '#ef4444' : '#e7e5e0'; }}
                   />
                   {codeError && (
@@ -191,7 +191,7 @@ function LoginContent() {
                     type="submit"
                     disabled={codeLoading}
                     className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50 hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+                    style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 16px rgba(169,78,24,0.3)' }}
                   >
                     {codeLoading ? '⏳ Vérification...' : '🎟️ Accéder avec mon code →'}
                   </button>

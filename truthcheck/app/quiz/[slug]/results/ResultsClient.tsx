@@ -535,7 +535,7 @@ export default function ResultsClient({ quiz }: Props) {
                 onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
                 disabled={isCheckingOut}
                 className="w-full py-4 rounded-xl font-black text-white text-base transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
+                style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 20px rgba(194,97,31,0.4)' }}
               >
                 {ctaText} ✦
               </button>
@@ -649,7 +649,7 @@ export default function ResultsClient({ quiz }: Props) {
                     type="submit"
                     disabled={authLoading}
                     className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}
+                    style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)' }}
                   >
                     {authLoading ? 'Envoi...' : 'Recevoir mon lien de connexion →'}
                   </button>
@@ -750,7 +750,7 @@ export default function ResultsClient({ quiz }: Props) {
               <Link
                 href="/dashboard"
                 className="flex items-center justify-between w-full px-5 py-4 rounded-2xl mb-6 transition-all hover:opacity-90 active:scale-[0.98]"
-                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(236,72,153,0.14))', border: '1px solid rgba(139,92,246,0.3)' }}
+                style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.18), rgba(209,125,82,0.14))', border: '1px solid rgba(194,97,31,0.3)' }}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-xl">👤</span>
@@ -793,7 +793,7 @@ export default function ResultsClient({ quiz }: Props) {
                   <div className="flex flex-col items-center gap-2">
                     <div
                       className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl"
-                      style={{ background: 'linear-gradient(135deg, #8b5cf6dd, #ec4899dd)', backdropFilter: 'blur(4px)' }}
+                      style={{ background: 'linear-gradient(135deg, #c2611fdd, #d17d52dd)', backdropFilter: 'blur(4px)' }}
                     >
                       <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -840,7 +840,7 @@ export default function ResultsClient({ quiz }: Props) {
               {/* Main paywall card */}
               <div
                 className="rounded-2xl p-7 mb-6 border border-white/10"
-                style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(236,72,153,0.10))' }}
+                style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.14), rgba(209,125,82,0.10))' }}
               >
                 <div className="text-center mb-6">
                   <h2 className="text-xl font-black text-white mb-3 leading-snug">{pw.headline}</h2>
@@ -865,7 +865,7 @@ export default function ResultsClient({ quiz }: Props) {
                   onClick={handleOneTimeClick}
                   disabled={isCheckingOut}
                   className="w-full py-5 rounded-2xl font-black text-white text-lg mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
-                  style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 6px 32px rgba(139,92,246,0.55)' }}
+                  style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 6px 32px rgba(194,97,31,0.55)' }}
                 >
                   {isCheckingOut ? (
                     <span className="flex items-center justify-center gap-2">
@@ -1058,7 +1058,7 @@ export default function ResultsClient({ quiz }: Props) {
                     }
                   }}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
-                  style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa' }}
+                  style={{ background: 'rgba(194,97,31,0.15)', border: '1px solid rgba(194,97,31,0.3)', color: '#d17d52' }}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                   <span id="copy-btn">Partager</span>
@@ -1070,7 +1070,7 @@ export default function ResultsClient({ quiz }: Props) {
           {/* Mode Duo CTA */}
           <div
             className="mt-4 rounded-2xl overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(236,72,153,0.10))', border: '1px solid rgba(139,92,246,0.28)' }}
+            style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.12), rgba(209,125,82,0.10))', border: '1px solid rgba(194,97,31,0.28)' }}
           >
             <div className="p-5">
               <div className="flex items-center gap-2 mb-3">
@@ -1085,7 +1085,7 @@ export default function ResultsClient({ quiz }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98] mb-2"
-                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.35)' }}
+                style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 20px rgba(194,97,31,0.35)' }}
               >
                 📲 Envoie ce défi à ton/ta partenaire
               </a>
@@ -1101,7 +1101,7 @@ export default function ResultsClient({ quiz }: Props) {
           {/* MBTI cross-sell */}
           <div
             className="mt-4 rounded-2xl overflow-hidden border"
-            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.10), rgba(168,85,247,0.08))', borderColor: 'rgba(99,102,241,0.25)' }}
+            style={{ background: 'linear-gradient(135deg, rgba(176,125,43,0.10), rgba(194,97,31,0.08))', borderColor: 'rgba(176,125,43,0.25)' }}
           >
             <div className="p-5">
               <div className="flex items-center gap-2 mb-1">
@@ -1114,7 +1114,7 @@ export default function ResultsClient({ quiz }: Props) {
               <Link
                 href="/quiz/personnalite"
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98]"
-                style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', boxShadow: '0 4px 16px rgba(99,102,241,0.35)' }}
+                style={{ background: 'linear-gradient(135deg, #b07d2b, #c2611f)', boxShadow: '0 4px 16px rgba(176,125,43,0.35)' }}
               >
                 🧠 Faire le test MBTI →
               </Link>

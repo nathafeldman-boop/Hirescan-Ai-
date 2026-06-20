@@ -120,7 +120,7 @@ export default async function SuccessPage({
           <div className="mb-8">
             <p className="text-stone-500 leading-relaxed mb-2">
               Un lien d&apos;accès a été envoyé à{' '}
-              <span style={{ color: '#7c3aed' }} className="font-semibold">{email}</span>.
+              <span style={{ color: '#a94e18' }} className="font-semibold">{email}</span>.
             </p>
             <p className="text-stone-400 text-sm">Ouvre ton appli mail et clique le lien — ça prend 10 secondes.</p>
           </div>
@@ -136,7 +136,7 @@ export default async function SuccessPage({
           {/* Email CTA */}
           {magicLinkSent && email && (
             <p className="text-sm text-stone-500">
-              Un lien a été envoyé à <strong style={{ color: '#7c3aed' }}>{email}</strong> pour accéder à nouveau plus tard.
+              Un lien a été envoyé à <strong style={{ color: '#a94e18' }}>{email}</strong> pour accéder à nouveau plus tard.
             </p>
           )}
 
@@ -145,7 +145,7 @@ export default async function SuccessPage({
             <Link
               href={`/share/${resultId}`}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.3)' }}
             >
               Voir mon analyse complète →
             </Link>
@@ -235,7 +235,7 @@ export default async function SuccessPage({
               <p className="text-xs font-bold tracking-widest uppercase text-pink-500 mb-3">Compatibles avec 💞</p>
               <div className="flex flex-wrap gap-2">
                 {t.compatibleWith.map(c => (
-                  <span key={c} className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(244,114,182,0.1)', border: '1px solid rgba(244,114,182,0.3)', color: '#ec4899' }}>{c}</span>
+                  <span key={c} className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(224,163,128,0.1)', border: '1px solid rgba(224,163,128,0.3)', color: '#d17d52' }}>{c}</span>
                 ))}
               </div>
             </div>
@@ -252,7 +252,7 @@ export default async function SuccessPage({
             {email && (
               <div className="rounded-2xl p-5 text-center" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
                 <p className="text-stone-500 text-sm mb-3">Connecte-toi pour retrouver ton profil à tout moment</p>
-                <Link href="/auth/signin" className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+                <Link href="/auth/signin" className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
                   Se connecter avec {email} →
                 </Link>
               </div>

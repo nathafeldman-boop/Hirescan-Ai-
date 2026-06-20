@@ -42,7 +42,7 @@ const guides: Record<string, GuideData> = {
     s2Title: 'Peut-on vraiment changer son style d\'attachement ?',
     s2: 'Oui — et c\'est la meilleure nouvelle. Le style d\'attachement n\'est pas une fatalité génétique. Des années de recherche en neurosciences et en psychologie montrent que des relations sécurisantes, une psychothérapie (notamment l\'EMDR, la thérapie des schémas ou la thérapie psychodynamique), et une meilleure conscience de soi permettent d\'évoluer vers un attachement plus sécure. Le premier pas incontournable est de savoir exactement où tu en es. C\'est ce que ce test te permet de faire en 5 minutes.',
     ctaText: 'Découvrir mon style d\'attachement →',
-    accentColor: '#6366f1',
+    accentColor: '#b07d2b',
     faqs: [
       { q: 'Quel est le "meilleur" style d\'attachement ?', a: 'L\'attachement sécure est associé aux relations les plus épanouissantes et à la plus grande satisfaction amoureuse à long terme. Mais aucun style n\'est une condamnation — tous peuvent évoluer avec un travail sur soi.' },
       { q: 'Comment se forme le style d\'attachement dans l\'enfance ?', a: 'Le style d\'attachement se forme principalement entre 0 et 3 ans selon la qualité des réponses des figures parentales aux besoins émotionnels de l\'enfant. Un parent "suffisamment bon" et prévisible favorise l\'attachement sécure.' },
@@ -72,7 +72,7 @@ const guides: Record<string, GuideData> = {
     s2Title: 'Pourquoi c\'est crucial pour ta relation ?',
     s2: 'La majorité des conflits de couple viennent d\'un "mal-amour" plutôt qu\'un "non-amour". Chaque partenaire aime sincèrement mais dans son propre langage. Si ton langage principal est le temps de qualité et que ton/ta partenaire exprime surtout son amour par des actes de service, vous pouvez vous sentir tous les deux non-aimés malgré vos efforts immenses. Connaître vos deux langages vous permet de vous aimer dans la langue de l\'autre — et de transformer une relation frustrante en relation épanouissante.',
     ctaText: 'Découvrir mon langage de l\'amour →',
-    accentColor: '#ec4899',
+    accentColor: '#d17d52',
     faqs: [
       { q: 'Peut-on avoir plusieurs langages de l\'amour principaux ?', a: 'Oui. Beaucoup de gens ont un langage dominant et un ou deux secondaires. Le test révèle ton profil exact avec la hiérarchie de tes langages pour que tu puisses l\'expliquer clairement à ton/ta partenaire.' },
       { q: 'Mon langage de l\'amour peut-il changer avec le temps ?', a: 'Oui, notamment selon les phases de vie. Pendant une période de stress intense, les mots d\'affirmation deviennent souvent plus importants. En tant que nouveau parent, les actes de service prennent beaucoup de poids.' },
@@ -102,7 +102,7 @@ const guides: Record<string, GuideData> = {
     s2Title: 'Que faire si tu es victime de gaslighting ?',
     s2: 'La première étape est la plus difficile : reconnaître que ce que tu vis n\'est pas normal. Si tu passes du temps à douter de ta santé mentale et que ces doutes ont commencé avec cette relation, c\'est un signal fort. Documente les événements par écrit pour garder une trace objective. Cherche le regard d\'un proche de confiance ou d\'un thérapeute qui peut te donner une perspective extérieure. Dans les cas sérieux, prendre de la distance de la personne — même temporairement — est souvent nécessaire pour retrouver son repère intérieur.',
     ctaText: 'Faire le test gaslighting →',
-    accentColor: '#7c3aed',
+    accentColor: '#a94e18',
     faqs: [
       { q: 'Tout le monde peut-il être victime de gaslighting ?', a: 'Oui. Le gaslighting ne touche pas que les personnes "faibles". Des personnes intelligentes et fortes en sont victimes car le processus est progressif et commence souvent dans une relation de confiance.' },
       { q: 'Le gaslighting est-il toujours intentionnel ?', a: 'Pas nécessairement. Certaines personnes gaslightent de façon inconsciente, souvent par mécanisme de défense narcissique ou par peur du conflit. Intentionnel ou non, les effets sur la victime sont identiques.' },
@@ -189,7 +189,7 @@ const guides: Record<string, GuideData> = {
     s2Title: 'Le paradoxe du narcissisme : une faible estime de soi ?',
     s2: 'Contrairement à ce qu\'on pense, le narcissisme pathologique est souvent enraciné dans une faible estime de soi profonde et une honte intense. La grandiosité est une défense contre ce sentiment insupportable de ne pas valoir grand-chose. C\'est pourquoi les personnes narcissiques réagissent si violemment à la moindre critique : elle touche exactement la blessure qu\'elles essaient de cacher. Cette compréhension ne justifie pas les comportements nocifs, mais aide à les expliquer.',
     ctaText: 'Faire le test narcissisme →',
-    accentColor: '#a855f7',
+    accentColor: '#c2611f',
     faqs: [
       { q: 'Peut-on avoir quelques traits narcissiques sans être narcissique ?', a: 'Oui, absolument. Le narcissisme est un spectre. Avoir certains traits ne signifie pas avoir un trouble de personnalité. Ce test évalue la présence ET l\'intensité des traits.' },
       { q: 'Le narcissisme se soigne-t-il ?', a: 'La thérapie peut aider, notamment la thérapie des schémas et la TCC. Le défi principal est que les personnes avec TPN cherchent rarement de l\'aide spontanément car elles ne voient généralement pas le problème en elles.' },
@@ -370,7 +370,7 @@ export default function TestGuidePage({ params }: PageProps) {
         <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a78bfa,#f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
               <span className="text-white">Cecret</span>
             </Link>
             <Link href="/quizzes" className="text-xs text-zinc-500 hover:text-white transition-colors">

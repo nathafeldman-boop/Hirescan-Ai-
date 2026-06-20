@@ -72,7 +72,7 @@ export default function FusionLanding() {
             <button
               onClick={() => setMode('create')}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.25)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.25)' }}
             >
               ✨ Créer une session
             </button>
@@ -105,7 +105,7 @@ export default function FusionLanding() {
               onClick={handleCreate}
               disabled={loading}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
             >
               {loading ? 'Création...' : 'Créer la session →'}
             </button>
@@ -142,7 +142,7 @@ export default function FusionLanding() {
               onClick={handleJoin}
               disabled={loading}
               className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
             >
               {loading ? 'Connexion...' : 'Rejoindre →'}
             </button>

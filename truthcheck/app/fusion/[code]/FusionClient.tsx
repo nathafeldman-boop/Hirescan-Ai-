@@ -210,7 +210,7 @@ function WaitingRoom({ code, participants, isHost, onStart }: {
       <button
         onClick={copyCode}
         className="mx-auto mb-6 flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-2xl tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
-        style={{ background: 'white', border: '2px solid #e7e5e0', color: '#7c3aed' }}
+        style={{ background: 'white', border: '2px solid #e7e5e0', color: '#a94e18' }}
       >
         {code}
         <span className="text-sm font-semibold text-stone-400">{copied ? '✓' : '📋'}</span>
@@ -236,7 +236,7 @@ function WaitingRoom({ code, participants, isHost, onStart }: {
           onClick={onStart}
           disabled={participants.length < 2}
           className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40"
-          style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
         >
           {participants.length < 2 ? 'En attente d\'un autre joueur...' : `🚀 Lancer le quiz (${participants.length} joueurs)`}
         </button>
@@ -260,7 +260,7 @@ function QuizView({ question, current, total, onAnswer }: {
         <span className="text-xs text-stone-400">{Math.round(progress)}%</span>
       </div>
       <div className="w-full h-1.5 rounded-full mb-6" style={{ background: '#e7e5e0' }}>
-        <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: 'linear-gradient(90deg,#7c3aed,#ec4899)' }} />
+        <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: 'linear-gradient(90deg,#a94e18,#d17d52)' }} />
       </div>
 
       <div className="rounded-2xl p-5 mb-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
@@ -338,7 +338,7 @@ function PaywallView({ onPay, loading, participants }: {
 
       <div
         className="rounded-2xl p-4 mb-6 text-center"
-        style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.06),rgba(236,72,153,0.06))', border: '1px solid rgba(124,58,237,0.15)' }}
+        style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.06),rgba(209,125,82,0.06))', border: '1px solid rgba(169,78,24,0.15)' }}
       >
         <p className="text-stone-500 text-xs mb-1">Accès unique pour tout le groupe</p>
         <p className="text-3xl font-black text-stone-900">1,99 €</p>
@@ -348,7 +348,7 @@ function PaywallView({ onPay, loading, participants }: {
         onClick={onPay}
         disabled={loading}
         className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-        style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
+        style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.3)' }}
       >
         {loading ? 'Redirection...' : '🔓 Révéler le profil du groupe — 1,99 €'}
       </button>
@@ -421,7 +421,7 @@ function ResultView({ result, code, participants }: {
       <button
         onClick={share}
         className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] mb-3"
-        style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}
+        style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
       >
         {copied ? '✓ Lien copié !' : '🔗 Partager le résultat'}
       </button>

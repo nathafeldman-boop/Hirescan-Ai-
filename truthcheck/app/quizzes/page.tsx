@@ -85,7 +85,7 @@ export default function QuizzesPage() {
         <header className="relative z-10 border-b border-stone-200 sticky top-0 backdrop-blur-md" style={{ background: 'rgba(250,249,247,0.9)' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(to right,#a94e18,#d17d52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Ur
               </span>
               <span className="text-stone-900">Cecret</span>
@@ -107,7 +107,7 @@ export default function QuizzesPage() {
               </p>
               <h1 className="text-3xl font-black text-stone-900 leading-tight">
                 Quelle vérité veux-tu{' '}
-                <span style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <span style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   découvrir ?
                 </span>
               </h1>
@@ -117,18 +117,18 @@ export default function QuizzesPage() {
             <Link
               href="/duo"
               className="group relative rounded-2xl overflow-hidden mb-4 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
-              style={{ background: 'white', border: '1px solid rgba(124,58,237,0.2)', boxShadow: '0 2px 12px rgba(124,58,237,0.08)' }}
+              style={{ background: 'white', border: '1px solid rgba(169,78,24,0.2)', boxShadow: '0 2px 12px rgba(169,78,24,0.08)' }}
             >
               <div className="relative p-5 flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
-                  style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)' }}>
+                  style={{ background: 'rgba(169,78,24,0.08)', border: '1px solid rgba(169,78,24,0.15)' }}>
                   🧩
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-stone-900 font-black text-base">Mode Équipe</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(236,72,153,0.1)', color: '#ec4899', border: '1px solid rgba(236,72,153,0.2)' }}>
+                      style={{ background: 'rgba(209,125,82,0.1)', color: '#d17d52', border: '1px solid rgba(209,125,82,0.2)' }}>
                       Nouveau
                     </span>
                   </div>
@@ -137,7 +137,7 @@ export default function QuizzesPage() {
                   </p>
                 </div>
                 <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                  style={{ color: '#7c3aed' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  style={{ color: '#a94e18' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -147,18 +147,18 @@ export default function QuizzesPage() {
             <Link
               href="/quiz/personnalite"
               className="group relative rounded-2xl overflow-hidden mb-6 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
-              style={{ background: 'white', border: '1px solid rgba(124,58,237,0.2)', boxShadow: '0 2px 12px rgba(124,58,237,0.08)' }}
+              style={{ background: 'white', border: '1px solid rgba(169,78,24,0.2)', boxShadow: '0 2px 12px rgba(169,78,24,0.08)' }}
             >
               <div className="relative p-5 flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
-                  style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)' }}>
+                  style={{ background: 'rgba(169,78,24,0.08)', border: '1px solid rgba(169,78,24,0.15)' }}>
                   🧠
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-stone-900 font-black text-base">Test de Personnalité 16 Types</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(124,58,237,0.1)', color: '#7c3aed', border: '1px solid rgba(124,58,237,0.2)' }}>
+                      style={{ background: 'rgba(169,78,24,0.1)', color: '#a94e18', border: '1px solid rgba(169,78,24,0.2)' }}>
                       Gratuit
                     </span>
                   </div>
@@ -167,7 +167,7 @@ export default function QuizzesPage() {
                   </p>
                 </div>
                 <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                  style={{ color: '#7c3aed' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  style={{ color: '#a94e18' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>

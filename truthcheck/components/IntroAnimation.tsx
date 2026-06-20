@@ -100,7 +100,7 @@ export default function IntroAnimation({ onComplete }: Props) {
           <span
             className="text-2xl font-black tracking-tight"
             style={{
-              background: 'linear-gradient(135deg, #a78bfa, #f472b6)',
+              background: 'linear-gradient(135deg, #d17d52, #e0a380)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -121,7 +121,7 @@ export default function IntroAnimation({ onComplete }: Props) {
             className="block font-black leading-none"
             style={{
               fontSize: 'clamp(64px, 18vw, 96px)',
-              background: 'linear-gradient(135deg, #a78bfa 0%, #f472b6 60%, #fb7185 100%)',
+              background: 'linear-gradient(135deg, #d17d52 0%, #e0a380 60%, #fb7185 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               letterSpacing: '-0.03em',
@@ -248,7 +248,7 @@ export default function IntroAnimation({ onComplete }: Props) {
           >
             Obtiens ta<br />
             <span style={{
-              background: 'linear-gradient(135deg, #a78bfa, #f472b6)',
+              background: 'linear-gradient(135deg, #d17d52, #e0a380)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
@@ -281,10 +281,10 @@ export default function IntroAnimation({ onComplete }: Props) {
                 className="px-4 py-3 rounded-xl text-sm font-medium transition-colors"
                 style={{
                   background: i === 2
-                    ? 'linear-gradient(135deg, rgba(139,92,246,0.3), rgba(236,72,153,0.2))'
+                    ? 'linear-gradient(135deg, rgba(194,97,31,0.3), rgba(209,125,82,0.2))'
                     : 'rgba(255,255,255,0.05)',
                   color: i === 2 ? '#e2e8f0' : 'rgba(255,255,255,0.45)',
-                  border: i === 2 ? '1px solid rgba(139,92,246,0.4)' : '1px solid transparent',
+                  border: i === 2 ? '1px solid rgba(194,97,31,0.4)' : '1px solid transparent',
                 }}
               >
                 {opt}
@@ -308,7 +308,7 @@ export default function IntroAnimation({ onComplete }: Props) {
           opacity: scene === 5 ? 1 : 0,
           transition: 'opacity 0.6s ease',
           pointerEvents: scene === 5 ? 'auto' : 'none',
-          background: 'radial-gradient(ellipse at 50% 40%, rgba(139,92,246,0.2) 0%, transparent 60%)',
+          background: 'radial-gradient(ellipse at 50% 40%, rgba(194,97,31,0.2) 0%, transparent 60%)',
         }}
       >
         <p
@@ -317,7 +317,7 @@ export default function IntroAnimation({ onComplete }: Props) {
         >
           Prêt(e) pour<br />
           <span style={{
-            background: 'linear-gradient(135deg, #a78bfa, #f472b6)',
+            background: 'linear-gradient(135deg, #d17d52, #e0a380)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>
@@ -332,7 +332,7 @@ export default function IntroAnimation({ onComplete }: Props) {
           <Link
             href="/quiz/personnalite"
             className="w-full py-4 rounded-2xl font-black text-white text-center text-base transition-all active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 8px 40px rgba(139,92,246,0.5)' }}
+            style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 8px 40px rgba(194,97,31,0.5)' }}
             onClick={onComplete}
           >
             🧠 Test de personnalité MBTI

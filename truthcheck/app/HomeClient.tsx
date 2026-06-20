@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 const GROUPS = [
   {
     name: 'Analystes',
-    color: '#8b5cf6',
-    bg: 'rgba(139,92,246,0.12)',
-    border: 'rgba(139,92,246,0.3)',
+    color: '#c2611f',
+    bg: 'rgba(194,97,31,0.12)',
+    border: 'rgba(194,97,31,0.3)',
     role: 'Intuitifs / Penseurs',
     types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'],
     labels: {
@@ -107,8 +107,8 @@ export default function HomeClient() {
       {/* Hero */}
       <section style={{ textAlign: 'center', padding: '100px 24px 80px', maxWidth: 800, margin: '0 auto' }}>
         <div style={{
-          display: 'inline-block', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.35)',
-          borderRadius: 100, padding: '4px 16px', fontSize: 13, color: '#a78bfa', marginBottom: 32,
+          display: 'inline-block', background: 'rgba(194,97,31,0.15)', border: '1px solid rgba(194,97,31,0.35)',
+          borderRadius: 100, padding: '4px 16px', fontSize: 13, color: '#d17d52', marginBottom: 32,
         }}>
           Test gratuit · 16 types de personnalité · Résultat instantané
         </div>
@@ -116,7 +116,7 @@ export default function HomeClient() {
         <h1 style={{
           fontSize: 'clamp(36px, 7vw, 72px)', fontWeight: 800, lineHeight: 1.1,
           letterSpacing: '-2px', marginBottom: 24,
-          background: 'linear-gradient(135deg, #fff 40%, #8b5cf6 100%)',
+          background: 'linear-gradient(135deg, #fff 40%, #c2611f 100%)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
         }}>
           Quel est ton type<br />de personnalité ?
@@ -131,10 +131,10 @@ export default function HomeClient() {
           <button
             onClick={() => router.push('/quiz/personnalite')}
             style={{
-              background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)',
+              background: 'linear-gradient(135deg, #a94e18, #c2611f)',
               color: '#fff', border: 'none', borderRadius: 12,
               padding: '14px 32px', fontSize: 16, fontWeight: 600, cursor: 'pointer',
-              boxShadow: '0 0 32px rgba(139,92,246,0.4)',
+              boxShadow: '0 0 32px rgba(194,97,31,0.4)',
             }}
           >
             Faire le test gratuit →
@@ -204,7 +204,7 @@ export default function HomeClient() {
               <div key={step.n} style={{ textAlign: 'center' }}>
                 <div style={{
                   width: 48, height: 48, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)',
+                  background: 'linear-gradient(135deg, #a94e18, #c2611f)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 16px', fontWeight: 800, fontSize: 20,
                 }}>
@@ -249,8 +249,8 @@ export default function HomeClient() {
       {/* Final CTA */}
       <section style={{
         padding: '80px 24px', textAlign: 'center',
-        background: 'radial-gradient(ellipse at center, rgba(139,92,246,0.15) 0%, transparent 70%)',
-        borderTop: '1px solid rgba(139,92,246,0.15)',
+        background: 'radial-gradient(ellipse at center, rgba(194,97,31,0.15) 0%, transparent 70%)',
+        borderTop: '1px solid rgba(194,97,31,0.15)',
       }}>
         <h2 style={{ fontSize: 'clamp(26px, 5vw, 48px)', fontWeight: 800, letterSpacing: '-1.5px', marginBottom: 16 }}>
           Prêt à te découvrir ?
@@ -261,10 +261,10 @@ export default function HomeClient() {
         <button
           onClick={() => router.push('/quiz/personnalite')}
           style={{
-            background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)',
+            background: 'linear-gradient(135deg, #a94e18, #c2611f)',
             color: '#fff', border: 'none', borderRadius: 12,
             padding: '16px 40px', fontSize: 17, fontWeight: 700, cursor: 'pointer',
-            boxShadow: '0 0 48px rgba(139,92,246,0.4)',
+            boxShadow: '0 0 48px rgba(194,97,31,0.4)',
           }}
         >
           Commencer le test gratuit →
