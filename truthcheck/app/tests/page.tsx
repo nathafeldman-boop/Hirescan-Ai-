@@ -59,27 +59,23 @@ export default function TestsPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="min-h-screen bg-[#09090b] text-white">
-        <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
+      <main className="min-h-screen" style={{ background: '#f7f3ec', color: '#2b2622' }}>
+        <header className="sticky top-0 z-20 backdrop-blur-md" style={{ background: 'rgba(247,243,236,0.9)', borderBottom: '1px solid #e8e0d4' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-              <span className="text-white">Cecret</span>
+            <Link href="/" className="font-display text-xl font-black text-stone-900">
+              Ur<span style={{ color: '#c2611f' }}>Cecret</span>
             </Link>
-            <Link href="/quizzes" className="text-xs text-zinc-500 hover:text-white transition-colors">Tous les quiz →</Link>
+            <Link href="/quizzes" className="text-xs text-stone-400 hover:text-stone-900 transition-colors">Tous les quiz →</Link>
           </div>
         </header>
 
         <div className="max-w-2xl mx-auto px-4 py-10">
           <div className="text-center mb-10">
-            <p className="text-xs text-zinc-500 uppercase tracking-[0.2em] font-semibold mb-3">Tests gratuits & anonymes</p>
-            <h1 className="text-3xl font-black text-white leading-tight mb-4">
-              Tests Psychologiques{' '}
-              <span style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Gratuits
-              </span>
+            <p className="text-xs text-stone-400 uppercase tracking-[0.2em] font-semibold mb-3">Tests gratuits &amp; anonymes</p>
+            <h1 className="font-display text-3xl font-black text-stone-900 leading-tight mb-4">
+              Tests Psychologiques <span style={{ color: '#c2611f', fontStyle: 'italic' }}>Gratuits</span>
             </h1>
-            <p className="text-zinc-400 text-base leading-relaxed">
+            <p className="text-stone-500 text-base leading-relaxed">
               Des guides complets et des tests basés sur des critères psychologiques établis.
               Résultats instantanés. Zéro compte requis.
             </p>
@@ -90,17 +86,17 @@ export default function TestsPage() {
               <Link
                 key={test.slug}
                 href={`/tests/${test.slug}`}
-                className="group rounded-2xl border border-white/8 p-5 transition-all hover:border-white/20 hover:scale-[1.01]"
-                style={{ background: 'rgba(255,255,255,0.02)' }}
+                className="group rounded-2xl p-5 transition-all hover:scale-[1.01]"
+                style={{ background: '#ffffff', border: '1px solid #e8e0d4', boxShadow: '0 1px 4px rgba(43,38,34,0.06)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                    style={{ background: `${test.color}20`, border: `1px solid ${test.color}30` }}>
+                    style={{ background: `${test.color}15`, border: `1px solid ${test.color}25` }}>
                     {test.emoji}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-white font-bold text-base leading-snug mb-1">{test.title}</h2>
-                    <p className="text-zinc-500 text-xs leading-relaxed">{test.desc}</p>
+                    <h2 className="text-stone-900 font-bold text-base leading-snug mb-1">{test.title}</h2>
+                    <p className="text-stone-400 text-xs leading-relaxed">{test.desc}</p>
                   </div>
                   <svg className="w-5 h-5 flex-shrink-0 transition-transform group-hover:translate-x-1"
                     style={{ color: test.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -111,8 +107,8 @@ export default function TestsPage() {
             ))}
           </div>
 
-          <p className="text-center text-zinc-600 text-xs mt-10">
-            🔒 100% anonyme · Zéro compte requis · Basé sur des critères cliniques
+          <p className="text-center text-stone-400 text-xs mt-10">
+            100% anonyme · Zéro compte requis · Basé sur des critères cliniques
           </p>
         </div>
       </main>

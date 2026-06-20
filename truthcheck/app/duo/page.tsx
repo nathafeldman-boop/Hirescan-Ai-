@@ -20,15 +20,14 @@ export const metadata: Metadata = {
 
 export default function DuoPage() {
   return (
-    <main className="min-h-screen bg-white">
-      <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+    <main className="min-h-screen" style={{ background: '#f7f3ec' }}>
+      <header className="sticky top-0 z-20 backdrop-blur-md" style={{ background: 'rgba(247,243,236,0.9)', borderBottom: '1px solid #e8e0d4' }}>
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-black">
-            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-gray-900">Cecret</span>
+          <Link href="/" className="font-display text-xl font-black text-stone-900">
+            Ur<span style={{ color: '#c2611f' }}>Cecret</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/quiz/personnalite" className="text-xs text-violet-600 font-medium hover:text-violet-700 transition-colors">
+            <Link href="/quiz/personnalite" className="text-xs font-medium transition-colors transition-colors">
               Faire le test →
             </Link>
             <UserMenu />
@@ -39,11 +38,11 @@ export default function DuoPage() {
       <div className="max-w-2xl mx-auto px-4 py-10">
         {/* Hero */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-200 bg-violet-50 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-            <span className="text-violet-600 text-xs font-semibold uppercase tracking-widest">Compatibilité MBTI</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-5" style={{ background: 'rgba(194,97,31,0.08)', border: '1px solid rgba(194,97,31,0.2)' }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#c2611f' }} />
+            <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#c2611f' }}>Compatibilité MBTI</span>
           </div>
-          <h1 className="text-3xl font-black text-gray-900 leading-tight mb-3">
+          <h1 className="font-display text-3xl font-black text-gray-900 leading-tight mb-3">
             Comparez vos{' '}
             <span style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               personnalités

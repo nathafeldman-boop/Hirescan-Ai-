@@ -148,7 +148,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
   ];
 
   return (
-    <main className="min-h-screen bg-[#09090b] text-white">
+    <main className="min-h-screen">
       {/* Sticky header */}
       <header className="border-b border-white/5 bg-[#09090b]/90 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-2xl mx-auto px-4 py-3.5 flex items-center justify-between">
@@ -217,7 +217,7 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
               <div className="px-5 py-4 flex items-center justify-between border-b border-white/5">
                 <h2 className="text-sm font-bold">Dernières ventes</h2>
                 {affiliate.conversions.length > 5 && (
-                  <button onClick={() => setTab('ventes')} className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Tout voir →</button>
+                  <button onClick={() => setTab('ventes')} className="text-xs font-medium transition-colors transition-colors">Tout voir →</button>
                 )}
               </div>
               {affiliate.conversions.length > 0 ? (
@@ -374,9 +374,9 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
           <div className="space-y-4">
             {/* Link box */}
             <div className="rounded-2xl p-6" style={{ border: '1px solid rgba(209,125,82,.3)', background: 'rgba(209,125,82,.05)' }}>
-              <p className="text-xs text-violet-400 font-bold uppercase tracking-widest mb-3">Ton lien affilié</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3">Ton lien affilié</p>
               <div className="bg-black/40 rounded-xl px-4 py-3 mb-4">
-                <code className="text-violet-300 text-sm font-mono break-all">{link}</code>
+                <code className="text-sm font-mono break-all">{link}</code>
               </div>
               <div className="flex flex-wrap gap-2">
                 <CopyBtn text={link} label="📋 Copier le lien"/>

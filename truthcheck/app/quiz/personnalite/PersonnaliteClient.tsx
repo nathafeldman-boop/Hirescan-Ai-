@@ -269,7 +269,7 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
       <div className="text-center max-w-sm">
         <div className="text-5xl mb-4 animate-pulse">🔮</div>
-        <div className="mb-6 text-violet-500"><BrainIcon /></div>
+        <div className="mb-6" style={{ color: '#c2611f' }}><BrainIcon /></div>
         <h2 className="text-xl font-bold text-stone-900 mb-2">{t.analysisStages[stage]}</h2>
         <p className="text-stone-500 text-sm mb-8">{t.doNotClose}</p>
         <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
