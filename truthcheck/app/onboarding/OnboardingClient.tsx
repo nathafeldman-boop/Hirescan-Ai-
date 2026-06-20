@@ -89,10 +89,10 @@ export default function OnboardingClient() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 pt-6">
         <span className="text-xl font-black">
-          <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>
+          <span className="font-display" style={{ color: '#e8a94d' }}>Ur</span>
           <span className="text-white">Cecret</span>
         </span>
-        <span className="text-xs text-zinc-600">{step + 1} / {STEPS.length}</span>
+        <span className="text-xs text-stone-600">{step + 1} / {STEPS.length}</span>
       </header>
 
       {/* Progress bar */}
@@ -117,10 +117,10 @@ export default function OnboardingClient() {
         <div className="w-full max-w-md">
           {currentStep === 'quizSlug' && (
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-3 leading-snug">
+              <h2 className="font-display text-2xl sm:text-3xl font-black text-white text-center mb-3 leading-snug">
                 Qu&apos;est-ce qui te préoccupe en ce moment ?
               </h2>
-              <p className="text-zinc-500 text-sm text-center mb-8">
+              <p className="text-stone-500 text-sm text-center mb-8">
                 L&apos;IA va analyser ta situation — sans filtre, sans jugement.
               </p>
               <div className="flex flex-col gap-3">
@@ -170,7 +170,7 @@ export default function OnboardingClient() {
           )}
           {currentStep === 'situation' && (
             <div>
-              <p className="text-xs text-zinc-500 uppercase tracking-widest font-semibold mb-3 text-center">
+              <p className="text-xs text-stone-500 uppercase tracking-widest font-semibold mb-3 text-center">
                 Dernière étape
               </p>
               <ChoiceStep
@@ -201,7 +201,7 @@ function TextStep({
 
   return (
     <div>
-      <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
+      <h2 className="font-display text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
         {question}
       </h2>
       <input
@@ -238,7 +238,7 @@ function ChoiceStep({
 }) {
   return (
     <div>
-      <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
+      <h2 className="font-display text-2xl sm:text-3xl font-black text-white text-center mb-8 leading-snug">
         {question}
       </h2>
       <div className="flex flex-col gap-3">

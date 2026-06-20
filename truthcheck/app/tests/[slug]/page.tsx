@@ -367,13 +367,13 @@ export default function TestGuidePage({ params }: PageProps) {
       <main className="min-h-screen bg-[#09090b] text-white">
 
         {/* Header */}
-        <header className="border-b border-white/5 bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-20">
+        <header className="border-b border-white/5 sticky top-0 z-20" style={{ background: 'rgba(10,7,5,0.88)', backdropFilter: 'blur(16px)' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+            <Link href="/" className="font-display text-xl font-black">
+              <span style={{ color: '#e8a94d' }}>Ur</span>
               <span className="text-white">Cecret</span>
             </Link>
-            <Link href="/quizzes" className="text-xs text-zinc-500 hover:text-white transition-colors">
+            <Link href="/quizzes" className="text-xs text-stone-500 hover:text-white transition-colors">
               Tous les quiz →
             </Link>
           </div>
@@ -384,8 +384,8 @@ export default function TestGuidePage({ params }: PageProps) {
           {/* Hero */}
           <div className="text-center mb-10">
             <div className="text-5xl mb-4">{guide.emoji}</div>
-            <h1 className="text-3xl font-black text-white leading-tight mb-4">{guide.h1}</h1>
-            <p className="text-zinc-400 text-base leading-relaxed mb-8">{guide.intro}</p>
+            <h1 className="font-display text-3xl font-black text-white leading-tight mb-4">{guide.h1}</h1>
+            <p className="text-stone-400 text-base leading-relaxed mb-8">{guide.intro}</p>
 
             {/* Primary CTA */}
             <Link
@@ -395,12 +395,12 @@ export default function TestGuidePage({ params }: PageProps) {
             >
               {guide.ctaText}
             </Link>
-            <p className="text-zinc-600 text-xs mt-3">Gratuit · Anonyme · Résultats instantanés</p>
+            <p className="text-stone-600 text-xs mt-3">Gratuit · Anonyme · Résultats instantanés</p>
           </div>
 
           {/* Section 1 */}
           <section className="mb-10">
-            <h2 className="text-xl font-black text-white mb-5">{guide.s1Title}</h2>
+            <h2 className="font-display text-xl font-black text-white mb-5">{guide.s1Title}</h2>
             <div className="space-y-3">
               {guide.s1.map((item, i) => (
                 <div

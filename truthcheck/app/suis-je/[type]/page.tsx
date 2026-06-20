@@ -115,7 +115,7 @@ function buildFaqs(t: MbtiType): { q: string; a: string }[] {
 function SignsSection({ type }: { type: MbtiType }) {
   return (
     <section className="mb-10">
-      <h2 className="text-xl font-black text-white mb-5">
+      <h2 className="font-display text-xl font-black text-white mb-5">
         8 signes que tu es {type.name} ({type.code})
       </h2>
       <div className="space-y-3">
@@ -140,7 +140,7 @@ function SignsSection({ type }: { type: MbtiType }) {
             </span>
             <div>
               <p className="text-sm font-semibold text-white mb-0.5">{trait}</p>
-              <p className="text-sm text-zinc-400 leading-relaxed">{traitToSign(trait, i)}</p>
+              <p className="text-sm text-stone-400 leading-relaxed">{traitToSign(trait, i)}</p>
             </div>
           </div>
         ))}
@@ -169,7 +169,7 @@ function SignsSection({ type }: { type: MbtiType }) {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-white mb-0.5">{strength}</p>
-                  <p className="text-sm text-zinc-400 leading-relaxed">
+                  <p className="text-sm text-stone-400 leading-relaxed">
                     Tu excelles naturellement dans : {strength.toLowerCase()}.
                   </p>
                 </div>
@@ -190,10 +190,10 @@ function DefinitionSection({ type }: { type: MbtiType }) {
         border: '1px solid rgba(255,255,255,0.07)',
       }}
     >
-      <h2 className="text-lg font-black text-white mb-3">
+      <h2 className="font-display text-lg font-black text-white mb-3">
         Ce qui te définit en tant que {type.code}
       </h2>
-      <p className="text-sm text-zinc-300 leading-relaxed">{type.shortDesc}</p>
+      <p className="text-sm text-stone-300 leading-relaxed">{type.shortDesc}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {type.traits.map(trait => (
           <span
@@ -225,11 +225,11 @@ function InLoveSection({ type }: { type: MbtiType }) {
       >
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">💕</span>
-          <h2 className="text-lg font-black text-white">
+          <h2 className="font-display text-lg font-black text-white">
             Le {type.code} en amour
           </h2>
         </div>
-        <p className="text-sm text-zinc-300 leading-relaxed">{type.inLove}</p>
+        <p className="text-sm text-stone-300 leading-relaxed">{type.inLove}</p>
       </div>
     </section>
   );
@@ -247,11 +247,11 @@ function AtWorkSection({ type }: { type: MbtiType }) {
       >
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg">💼</span>
-          <h2 className="text-lg font-black text-white">
+          <h2 className="font-display text-lg font-black text-white">
             Le {type.code} au travail
           </h2>
         </div>
-        <p className="text-sm text-zinc-300 leading-relaxed">{type.atWork}</p>
+        <p className="text-sm text-stone-300 leading-relaxed">{type.atWork}</p>
       </div>
     </section>
   );
@@ -260,7 +260,7 @@ function AtWorkSection({ type }: { type: MbtiType }) {
 function CelebSection({ type }: { type: MbtiType }) {
   return (
     <section className="mb-10">
-      <h2 className="text-lg font-black text-white mb-4">
+      <h2 className="font-display text-lg font-black text-white mb-4">
         Célébrités {type.code} — tu es en bonne compagnie
       </h2>
       <div className="flex flex-wrap gap-2">
@@ -293,10 +293,10 @@ function CtaCard({ type }: { type: MbtiType }) {
         }}
       >
         <div className="text-4xl mb-3">{type.emoji}</div>
-        <h2 className="text-xl font-black text-white mb-2">
+        <h2 className="font-display text-xl font-black text-white mb-2">
           Découvre ton type exact
         </h2>
-        <p className="text-sm text-zinc-400 mb-6 max-w-xs mx-auto">
+        <p className="text-sm text-stone-400 mb-6 max-w-xs mx-auto">
           Tu penses être {type.code} ? Confirme-le avec notre test MBTI complet — 100 questions, résultat instantané, gratuit.
         </p>
         <Link
@@ -309,7 +309,7 @@ function CtaCard({ type }: { type: MbtiType }) {
         >
           Passer le test MBTI gratuit →
         </Link>
-        <p className="mt-3 text-xs text-zinc-600">100 questions · Gratuit · Sans inscription</p>
+        <p className="mt-3 text-xs text-stone-600">100 questions · Gratuit · Sans inscription</p>
       </div>
     </section>
   );
@@ -319,7 +319,7 @@ function FaqSection({ type }: { type: MbtiType }) {
   const faqs = buildFaqs(type);
   return (
     <section className="mb-10">
-      <h2 className="text-lg font-black text-white mb-4">
+      <h2 className="font-display text-lg font-black text-white mb-4">
         Questions fréquentes — Suis-je {type.code} ?
       </h2>
       <div className="space-y-3">
@@ -332,13 +332,13 @@ function FaqSection({ type }: { type: MbtiType }) {
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <summary className="px-5 py-4 cursor-pointer text-sm font-semibold text-zinc-300 list-none flex justify-between items-center hover:text-white transition-colors">
+            <summary className="px-5 py-4 cursor-pointer text-sm font-semibold text-stone-300 list-none flex justify-between items-center hover:text-white transition-colors">
               <span>{q}</span>
-              <span className="text-zinc-600 ml-4 flex-shrink-0 group-open:rotate-180 transition-transform duration-200">
+              <span className="text-stone-600 ml-4 flex-shrink-0 group-open:rotate-180 transition-transform duration-200">
                 ▾
               </span>
             </summary>
-            <p className="px-5 pb-4 text-sm text-zinc-400 leading-relaxed">{a}</p>
+            <p className="px-5 pb-4 text-sm text-stone-400 leading-relaxed">{a}</p>
           </details>
         ))}
       </div>
@@ -349,7 +349,7 @@ function FaqSection({ type }: { type: MbtiType }) {
 function RelatedTypesSection({ type }: { type: MbtiType }) {
   return (
     <section className="mb-10 pt-8 border-t border-white/[0.06]">
-      <h2 className="text-sm font-bold text-zinc-500 mb-4">Explore aussi</h2>
+      <h2 className="text-sm font-bold text-stone-500 mb-4">Explore aussi</h2>
       <div className="flex flex-wrap gap-2 mb-6">
         {ALL_MBTI_TYPES.map(c => (
           <Link
@@ -358,7 +358,7 @@ function RelatedTypesSection({ type }: { type: MbtiType }) {
             className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
               c === type.code
                 ? 'text-white'
-                : 'text-zinc-500 hover:text-white hover:border-white/30'
+                : 'text-stone-500 hover:text-white hover:border-white/30'
             }`}
             style={
               c === type.code
@@ -376,19 +376,19 @@ function RelatedTypesSection({ type }: { type: MbtiType }) {
       <div className="flex gap-3 flex-wrap">
         <Link
           href={`/types/${type.code.toLowerCase()}`}
-          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
+          className="text-xs text-stone-500 hover:text-stone-300 transition-colors underline underline-offset-2"
         >
           Profil complet {type.code} →
         </Link>
         <Link
           href="/types"
-          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
+          className="text-xs text-stone-500 hover:text-stone-300 transition-colors underline underline-offset-2"
         >
           Tous les 16 types →
         </Link>
         <Link
           href="/quiz/personnalite"
-          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
+          className="text-xs text-stone-500 hover:text-stone-300 transition-colors underline underline-offset-2"
         >
           Passer le test MBTI →
         </Link>
@@ -415,20 +415,20 @@ function Footer() {
         </span>
         <span className="text-white">Cecret</span>
       </Link>
-      <p className="mt-2 text-xs text-zinc-600">
+      <p className="mt-2 text-xs text-stone-600">
         Test de personnalité MBTI gratuit · 16 types · En français
       </p>
-      <div className="mt-4 flex justify-center gap-4 text-xs text-zinc-700">
-        <Link href="/types" className="hover:text-zinc-400 transition-colors">
+      <div className="mt-4 flex justify-center gap-4 text-xs text-stone-700">
+        <Link href="/types" className="hover:text-stone-400 transition-colors">
           Types MBTI
         </Link>
-        <Link href="/quiz/personnalite" className="hover:text-zinc-400 transition-colors">
+        <Link href="/quiz/personnalite" className="hover:text-stone-400 transition-colors">
           Test MBTI
         </Link>
-        <Link href="/cgu" className="hover:text-zinc-400 transition-colors">
+        <Link href="/cgu" className="hover:text-stone-400 transition-colors">
           CGU
         </Link>
-        <Link href="/politique-confidentialite" className="hover:text-zinc-400 transition-colors">
+        <Link href="/politique-confidentialite" className="hover:text-stone-400 transition-colors">
           Confidentialité
         </Link>
       </div>
@@ -527,8 +527,6 @@ export default function SuisJePage({ params }: Props) {
             className="absolute top-0 right-1/3 w-96 h-96 rounded-full blur-3xl opacity-[0.07]"
             style={{ background: type.accentColor }}
           />
-          <div className="absolute bottom-1/4 left-0 w-72 h-72 rounded-full blur-3xl opacity-[0.05] bg-pink-600" />
-          <div className="absolute top-1/2 right-0 w-64 h-64 rounded-full blur-3xl opacity-[0.04] bg-violet-700" />
         </div>
 
         {/* Nav sticky */}
@@ -542,16 +540,8 @@ export default function SuisJePage({ params }: Props) {
           }}
         >
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black">
-              <span
-                style={{
-                  background: 'linear-gradient(to right,#d17d52,#e0a380)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                Ur
-              </span>
+            <Link href="/" className="font-display text-xl font-black">
+              <span style={{ color: '#e8a94d' }}>Ur</span>
               <span className="text-white">Cecret</span>
             </Link>
             <Link
@@ -569,14 +559,14 @@ export default function SuisJePage({ params }: Props) {
         <div className="relative z-10 max-w-2xl mx-auto px-4 py-10">
 
           {/* Breadcrumb */}
-          <nav className="text-xs text-zinc-600 mb-8 flex gap-2 items-center flex-wrap">
-            <Link href="/" className="hover:text-zinc-300 transition-colors">
+          <nav className="text-xs text-stone-600 mb-8 flex gap-2 items-center flex-wrap">
+            <Link href="/" className="hover:text-stone-300 transition-colors">
               Accueil
             </Link>
             <span>/</span>
-            <span className="text-zinc-500">Suis-je ?</span>
+            <span className="text-stone-500">Suis-je ?</span>
             <span>/</span>
-            <span className="text-zinc-400">{code}</span>
+            <span className="text-stone-400">{code}</span>
           </nav>
 
           {/* Hero header */}
@@ -592,7 +582,7 @@ export default function SuisJePage({ params }: Props) {
             >
               {type.rarity} de la population
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
+            <h1 className="font-display text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
               Suis-je{' '}
               <span
                 style={{
@@ -605,10 +595,10 @@ export default function SuisJePage({ params }: Props) {
               </span>{' '}
               ?
             </h1>
-            <p className="text-lg font-semibold text-zinc-300 mb-2">
+            <p className="text-lg font-semibold text-stone-300 mb-2">
               {type.name}
             </p>
-            <p className="text-sm text-zinc-500 italic">{type.tagline}</p>
+            <p className="text-sm text-stone-500 italic">{type.tagline}</p>
           </div>
 
           {/* Intro rapide */}
@@ -619,7 +609,7 @@ export default function SuisJePage({ params }: Props) {
               border: `1px solid ${type.accentColor}25`,
             }}
           >
-            <p className="text-sm text-zinc-300 leading-relaxed">
+            <p className="text-sm text-stone-300 leading-relaxed">
               {type.shortDesc}
             </p>
           </div>
@@ -644,7 +634,7 @@ export default function SuisJePage({ params }: Props) {
 
           {/* Types compatibles */}
           <section className="mb-10">
-            <h2 className="text-lg font-black text-white mb-4">
+            <h2 className="font-display text-lg font-black text-white mb-4">
               Types compatibles avec {type.code}
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -675,13 +665,13 @@ export default function SuisJePage({ params }: Props) {
           >
             <div>
               <p className="text-sm font-semibold text-white">Profil {code} complet</p>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-xs text-stone-500 mt-0.5">
                 Forces, faiblesses, croissance, analyse approfondie
               </p>
             </div>
             <Link
               href={`/types/${slug}`}
-              className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-colors"
+              className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold text-stone-300 hover:text-white transition-colors"
               style={{
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.1)',

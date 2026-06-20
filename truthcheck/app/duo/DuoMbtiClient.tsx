@@ -46,9 +46,9 @@ function TypePicker({ value, onChange, label }: { value: string; onChange: (t: s
 
 function PremiumGate({ onUpgrade, loading }: { onUpgrade: (annual: boolean) => void; loading: boolean }) {
   return (
-    <div className="rounded-2xl border-2 border-violet-200 bg-violet-50 p-6 text-center">
-      <div className="text-4xl mb-4">👑</div>
-      <h2 className="text-lg font-black text-gray-900 mb-2">Fonctionnalité Pro</h2>
+    <div className="rounded-2xl p-6 text-center" style={{ border: '2px solid rgba(194,97,31,0.25)', background: 'rgba(194,97,31,0.05)' }}>
+      <div className="text-4xl mb-4">🌑</div>
+      <h2 className="font-display text-lg font-black text-gray-900 mb-2">Fonctionnalité Pro</h2>
       <p className="text-sm text-gray-600 mb-2 leading-relaxed">
         Le mode compatibilité MBTI est réservé aux membres Pro.
       </p>

@@ -54,15 +54,15 @@ export default function SharedDisplay({ quiz, score, date, shareId }: Props) {
 
       <header className="relative z-10 border-b border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/onboarding" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
+          <Link href="/onboarding" className="text-stone-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             <span className="font-semibold">
-              <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">Ur</span>Secret
+              <span style={{ color: '#e8a94d' }}>Ur</span>Cecret
             </span>
           </Link>
-          <span className="text-xs text-zinc-600">Résultat partagé · {date}</span>
+          <span className="text-xs text-stone-600">Résultat partagé · {date}</span>
         </div>
       </header>
 
@@ -70,7 +70,7 @@ export default function SharedDisplay({ quiz, score, date, shareId }: Props) {
         <div className="w-full max-w-md animate-fade-in">
           {/* Shared badge */}
           <div className="flex justify-center mb-6">
-            <span className="inline-flex items-center gap-2 text-xs text-zinc-500 bg-white/5 px-3 py-1.5 rounded-full border border-white/8">
+            <span className="inline-flex items-center gap-2 text-xs text-stone-500 bg-white/5 px-3 py-1.5 rounded-full border border-white/8">
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
@@ -78,7 +78,7 @@ export default function SharedDisplay({ quiz, score, date, shareId }: Props) {
             </span>
           </div>
 
-          <p className="text-center text-zinc-500 text-sm mb-8">{quiz.emoji} {quiz.title}</p>
+          <p className="text-center text-stone-500 text-sm mb-8">{quiz.emoji} {quiz.title}</p>
 
           {/* Circle */}
           <div className="flex justify-center mb-8">
@@ -119,14 +119,14 @@ export default function SharedDisplay({ quiz, score, date, shareId }: Props) {
 
           {/* Message */}
           <div className="glass rounded-2xl p-6 mb-8 text-center">
-            <p className="text-zinc-300 leading-relaxed">{tier.message}</p>
+            <p className="text-stone-300 leading-relaxed">{tier.message}</p>
           </div>
 
           {/* Score bar */}
           <div className="glass rounded-xl p-4 mb-8">
-            <div className="flex justify-between text-xs text-zinc-500 mb-2">
+            <div className="flex justify-between text-xs text-stone-500 mb-2">
               <span>0%</span>
-              <span className="text-zinc-400 font-medium">Score : {score}%</span>
+              <span className="text-stone-400 font-medium">Score : {score}%</span>
               <span>100%</span>
             </div>
             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
@@ -141,7 +141,7 @@ export default function SharedDisplay({ quiz, score, date, shareId }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <Link
               href={`/quiz/${quiz.slug}`}
-              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/15 transition-all text-zinc-400 hover:text-white text-sm font-medium"
+              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/15 transition-all text-stone-400 hover:text-white text-sm font-medium"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />

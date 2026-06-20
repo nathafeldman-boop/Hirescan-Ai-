@@ -55,14 +55,10 @@ export default function FusionLanding() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.08] bg-violet-500" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-sm text-center">
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#f7f3ec' }}>
+      <div className="w-full max-w-sm text-center">
         <div className="text-5xl mb-4">⚗️</div>
-        <h1 className="text-3xl font-black text-stone-900 mb-2">Fusion</h1>
+        <h1 className="font-display text-3xl font-black text-stone-900 mb-2">Fusion</h1>
         <p className="text-stone-500 mb-8 leading-relaxed text-sm">
           Le quiz collectif. 2 à 10 personnes répondent ensemble et découvrent le profil de leur groupe.
         </p>
