@@ -102,7 +102,6 @@ export default async function SuccessPage({
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#f7f3ec' }}>
-      <div>
 
       <SuccessTracker />
       <div className="relative z-10 text-center max-w-md w-full">
