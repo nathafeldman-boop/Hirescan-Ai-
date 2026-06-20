@@ -120,7 +120,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <UserMenu />
             <Link
-              href="/quiz/personnalite"
+              href="/commencer"
               className="text-sm font-bold px-5 py-2.5 rounded-xl text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.3)' }}
             >
@@ -159,7 +159,7 @@ export default function LandingPage() {
           </p>
 
           <Link
-            href="/quiz/personnalite"
+            href="/commencer"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
             style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.35)' }}
           >
