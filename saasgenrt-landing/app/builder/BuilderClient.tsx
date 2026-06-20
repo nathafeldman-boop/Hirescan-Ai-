@@ -55,38 +55,38 @@ const EMPTY_DATA: UserData = {
 // ─── Static data ──────────────────────────────────────────────────────────────
 
 const DOMAIN_CHIPS = [
-  'B2B SaaS', 'Developer Tools', 'E-commerce', 'Healthcare',
-  'Marketing', 'Finance', 'HR & Hiring', 'Education',
-  'Legal Tech', 'Real Estate', 'Customer Support', 'Analytics',
+  'B2B SaaS', 'Outils Dev', 'E-commerce', 'Santé',
+  'Marketing', 'Finance', 'RH & Recrutement', 'Formation',
+  'LegalTech', 'Immobilier', 'Support Client', 'Analytics',
 ]
 
 const WHO_OPTIONS = [
-  { value: 'myself', icon: '👤', label: 'Me', desc: 'A problem you personally experience.' },
-  { value: 'company', icon: '🏢', label: 'My company', desc: 'A recurring issue inside your business.' },
-  { value: 'clients', icon: '🤝', label: 'My clients', desc: 'A problem your clients regularly face.' },
-  { value: 'family', icon: '👨‍👩‍👧', label: 'Friends & Family', desc: 'Someone close to you experiences this.' },
-  { value: 'community', icon: '🌍', label: 'A community', desc: 'A niche or audience you know well.' },
-  { value: 'unsure', icon: '❓', label: "I'm not sure", desc: "We'll help identify the best opportunity." },
+  { value: 'myself', icon: '👤', label: 'Moi-même', desc: 'Un problème que tu vis au quotidien.' },
+  { value: 'company', icon: '🏢', label: 'Mon entreprise', desc: 'Un problème récurrent dans ton activité.' },
+  { value: 'clients', icon: '🤝', label: 'Mes clients', desc: 'Un problème que rencontrent souvent tes clients.' },
+  { value: 'family', icon: '👨‍👩‍👧', label: 'Amis & Famille', desc: 'Quelqu\'un de proche vit ça.' },
+  { value: 'community', icon: '🌍', label: 'Une communauté', desc: 'Un secteur ou niche que tu connais bien.' },
+  { value: 'unsure', icon: '❓', label: "Je ne sais pas encore", desc: "On va t'aider à trouver la meilleure opportunité." },
 ]
 
 const LAUNCH_BUDGET_OPTIONS = [
-  { value: '<€500', icon: '🌱', label: 'Under €500', desc: 'Bootstrapped & scrappy' },
-  { value: '€500–€2K', icon: '🚀', label: '€500 – €2K', desc: 'Lean launch' },
-  { value: '€2K–€10K', icon: '💼', label: '€2K – €10K', desc: 'Funded start' },
-  { value: '€10K+', icon: '🏦', label: '€10K+', desc: 'Well-capitalized' },
+  { value: '<€500', icon: '🌱', label: 'Moins de 500 €', desc: 'Bootstrappé & débrouillard' },
+  { value: '€500–€2K', icon: '🚀', label: '500 € – 2 000 €', desc: 'Lancement lean' },
+  { value: '€2K–€10K', icon: '💼', label: '2 000 € – 10 000 €', desc: 'Démarrage financé' },
+  { value: '€10K+', icon: '🏦', label: '10 000 € et plus', desc: 'Bien capitalisé' },
 ]
 
 const BUILD_APPROACH_OPTIONS = [
-  { value: 'code', icon: '⌨️', label: 'I code myself', desc: 'Full control, build it by hand.' },
-  { value: 'vibe', icon: '🤖', label: 'Vibe coding (AI)', desc: 'Build fast with AI assistants.' },
-  { value: 'nocode', icon: '🧩', label: 'No-code tools', desc: 'Bubble, Webflow, Airtable & co.' },
+  { value: 'code', icon: '⌨️', label: 'Je code moi-même', desc: 'Contrôle total, tu construis de A à Z.' },
+  { value: 'vibe', icon: '🤖', label: 'IA (vibe coding)', desc: 'Construire vite avec des assistants IA.' },
+  { value: 'nocode', icon: '🧩', label: 'Outils no-code', desc: 'Bubble, Webflow, Airtable & co.' },
 ]
 
 const ADS_BUDGET_OPTIONS = [
-  { value: '€0 (organic)', icon: '🌿', label: '€0 / organic', desc: 'Content & community only' },
-  { value: '<€500/mo', icon: '📈', label: 'Under €500/mo', desc: 'Small paid tests' },
-  { value: '€500–€2K/mo', icon: '🎯', label: '€500 – €2K/mo', desc: 'Scaling acquisition' },
-  { value: '€2K+/mo', icon: '🔥', label: '€2K+ / mo', desc: 'Aggressive growth' },
+  { value: '€0 (organic)', icon: '🌿', label: '0 € / organique', desc: 'Contenu & communauté seulement' },
+  { value: '<€500/mo', icon: '📈', label: 'Moins de 500 €/mois', desc: 'Petits tests payants' },
+  { value: '€500–€2K/mo', icon: '🎯', label: '500 – 2 000 €/mois', desc: 'Acquisition en croissance' },
+  { value: '€2K+/mo', icon: '🔥', label: '2 000 €+ / mois', desc: 'Croissance agressive' },
 ]
 
 const ACQUISITION_CHANNELS = [
@@ -94,53 +94,53 @@ const ACQUISITION_CHANNELS = [
   { value: 'Instagram', icon: '📸' },
   { value: 'LinkedIn', icon: '💼' },
   { value: 'X / Twitter', icon: '🐦' },
-  { value: 'SEO / Content', icon: '🔍' },
+  { value: 'SEO / Contenu', icon: '🔍' },
   { value: 'YouTube', icon: '▶️' },
-  { value: 'Cold email', icon: '✉️' },
-  { value: 'Communities', icon: '💬' },
+  { value: 'Email froid', icon: '✉️' },
+  { value: 'Communautés', icon: '💬' },
 ]
 
 const MARKET_TYPE_OPTIONS = [
-  { value: 'b2c', icon: '🛍️', label: 'B2C', sub: 'Selling to consumers', examples: ['Individuals & creators', 'Impulse-friendly pricing', 'Viral, visual marketing'] },
-  { value: 'b2b', icon: '🏢', label: 'B2B', sub: 'Selling to businesses', examples: ['Companies & teams', 'Higher price points', 'Relationship-driven sales'] },
+  { value: 'b2c', icon: '🛍️', label: 'B2C', sub: 'Vente aux particuliers', examples: ['Particuliers & créateurs', 'Prix impulse-friendly', 'Marketing viral et visuel'] },
+  { value: 'b2b', icon: '🏢', label: 'B2B', sub: 'Vente aux entreprises', examples: ['Entreprises & équipes', 'Tickets plus élevés', 'Vente basée sur la relation'] },
 ]
 
 const AGE_OPTIONS = [
-  { value: '18–24', icon: '🎓', label: '18 – 24', desc: 'Student / early career' },
-  { value: '25–34', icon: '⚡', label: '25 – 34', desc: 'Building momentum' },
-  { value: '35–44', icon: '🎯', label: '35 – 44', desc: 'Peak expertise' },
-  { value: '45–54', icon: '🧠', label: '45 – 54', desc: 'Deep experience' },
-  { value: '55+', icon: '🌟', label: '55+', desc: 'Wisdom & network' },
+  { value: '18–24', icon: '🎓', label: '18 – 24 ans', desc: 'Étudiant / début de carrière' },
+  { value: '25–34', icon: '⚡', label: '25 – 34 ans', desc: 'En train de prendre de l\'élan' },
+  { value: '35–44', icon: '🎯', label: '35 – 44 ans', desc: 'Expertise au sommet' },
+  { value: '45–54', icon: '🧠', label: '45 – 54 ans', desc: 'Expérience profonde' },
+  { value: '55+', icon: '🌟', label: '55 ans et plus', desc: 'Sagesse & réseau' },
 ]
 
 const TIME_PER_DAY_OPTIONS = [
-  { value: '<1h/day', icon: '🌙', label: 'Under 1h / day', desc: 'Tiny pockets of time' },
-  { value: '1–3h/day', icon: '🌗', label: '1 – 3h / day', desc: 'Evenings & weekends' },
-  { value: '3–6h/day', icon: '🌤️', label: '3 – 6h / day', desc: 'Serious side hustle' },
-  { value: 'Full-time', icon: '☀️', label: 'Full-time', desc: 'All in' },
+  { value: '<1h/day', icon: '🌙', label: 'Moins d\'1h / jour', desc: 'Petites fenêtres de temps' },
+  { value: '1–3h/day', icon: '🌗', label: '1 – 3h / jour', desc: 'Soirs & week-ends' },
+  { value: '3–6h/day', icon: '🌤️', label: '3 – 6h / jour', desc: 'Side hustle sérieux' },
+  { value: 'Full-time', icon: '☀️', label: 'Temps plein', desc: 'À fond' },
 ]
 
 const AI_EXAMPLES = [
-  'I spend too much time creating invoices.',
-  'I struggle to organize client feedback.',
-  'I never know what content to post.',
+  'Je passe trop de temps à créer mes factures.',
+  'J\'ai du mal à organiser les retours de mes clients.',
+  'Je ne sais jamais quoi poster sur les réseaux.',
 ]
 
 const LOADING_STEPS_PROBLEMS = [
-  'Reading your profile & frustrations...',
-  'Cross-referencing 12K market gaps...',
-  'Scoring problems by opportunity size...',
-  'Shortlisting your 5 best problems...',
+  'Lecture de ton profil & frustrations...',
+  'Analyse de 12 000 opportunités de marché...',
+  'Classement par taille d\'opportunité...',
+  'Sélection de tes 5 meilleurs problèmes...',
 ]
 
 const LOADING_STEPS_IDEAS = [
-  'Analyzing your selected problem...',
-  'Scanning 50,000+ forum discussions...',
-  'Matching ideas to your budget & skills...',
-  'Scoring 200+ opportunities by MRR...',
-  'Filtering low-competition niches...',
-  'Tailoring marketing to your channels...',
-  'Generating your 10 best SaaS ideas...',
+  'Analyse du problème sélectionné...',
+  'Scan de 50 000+ discussions en ligne...',
+  'Correspondance avec ton budget & compétences...',
+  'Notation de 200+ opportunités par MRR...',
+  'Filtrage des niches à faible concurrence...',
+  'Adaptation du marketing à tes canaux...',
+  'Génération de tes 10 meilleures idées SaaS...',
 ]
 
 const IDEA_ACCENT = ['#8B5CF6', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7', '#22d3ee']
@@ -148,37 +148,37 @@ const IDEA_GLOW = IDEA_ACCENT.map(c => c + '14')
 const IDEA_BORDER = IDEA_ACCENT.map(c => c + '47')
 
 const FALLBACK_PROBLEMS: ProblemSuggestion[] = [
-  { title: 'Freelance invoice tracking nightmare', description: 'Freelancers chase late payments and reconcile invoices by hand.', frequency: 'Daily', marketSize: '59M freelancers worldwide' },
-  { title: 'Content calendar chaos for creators', description: 'Creators struggle to plan and repurpose content across platforms.', frequency: 'Weekly', marketSize: '$400B creator economy' },
-  { title: 'Client feedback scattered across tools', description: 'Agencies waste hours consolidating feedback from many channels.', frequency: 'Daily', marketSize: '400K+ agencies globally' },
-  { title: 'No-show appointments hurt revenue', description: 'Service businesses lose money from no-shows and late cancels.', frequency: 'Weekly', marketSize: '$1.2B lost annually' },
-  { title: 'Onboarding still lives in spreadsheets', description: 'Small teams onboard new hires with manual scattered checklists.', frequency: 'Monthly', marketSize: '33M SMBs in the US' },
+  { title: 'La galère des factures freelance', description: 'Les freelances courent après les paiements en retard et réconcilent les factures à la main.', frequency: 'Quotidien', marketSize: '59M freelances dans le monde' },
+  { title: 'Chaos dans le calendrier de contenu', description: 'Les créateurs peinent à planifier et réutiliser leur contenu sur plusieurs plateformes.', frequency: 'Hebdomadaire', marketSize: '400 Mds $ — économie créateur' },
+  { title: 'Retours clients éparpillés partout', description: 'Les agences perdent des heures à consolider les retours de tous leurs canaux.', frequency: 'Quotidien', marketSize: '400K+ agences dans le monde' },
+  { title: 'Les no-shows font perdre de l\'argent', description: 'Les pros des services perdent du chiffre à cause des annulations de dernière minute.', frequency: 'Hebdomadaire', marketSize: '1,2 Mds $ perdus par an' },
+  { title: 'L\'onboarding encore dans des tableurs', description: 'Les petites équipes intègrent les nouveaux avec des checklists manuelles éparpillées.', frequency: 'Mensuel', marketSize: '33M PME aux États-Unis' },
 ]
 
 const FALLBACK_IDEAS: SaaSIdea[] = [
-  { name: 'ContractPilot AI', tagline: 'Auto-review B2B contracts in seconds', mrrPotential: '$2.4K–$9K', competitionScore: 3, techComplexity: 'Medium', timeToMvp: '4–6 weeks', why: 'Matches your domain and budget', targetCustomer: 'SMBs with vendor contracts', competitors: ['DocuSign', 'PandaDoc', 'Ironclad'], marketingStrategy: 'LinkedIn thought leadership + cold email to legal ops' },
-  { name: 'StatusBoard Pro', tagline: 'Real-time API monitoring for dev teams', mrrPotential: '$1.8K–$6K', competitionScore: 4, techComplexity: 'Low', timeToMvp: '2–4 weeks', why: 'Low competition niche for your tech level', targetCustomer: 'Dev teams at 5–50 person SaaS', competitors: ['Datadog', 'Better Uptime', 'Freshping'], marketingStrategy: 'Dev communities + Product Hunt launch' },
-  { name: 'ChurnGuard', tagline: 'Predict and prevent SaaS churn', mrrPotential: '$3.2K–$14K', competitionScore: 5, techComplexity: 'Medium', timeToMvp: '5–8 weeks', why: 'High MRR ceiling, clear ROI for buyers', targetCustomer: 'B2B SaaS with 50–500 customers', competitors: ['Gainsight', 'ChurnZero', 'Intercom'], marketingStrategy: 'SaaS newsletters + onboarding tool partnerships' },
-  { name: 'InboxZen', tagline: 'AI triage for support inboxes', mrrPotential: '$1.5K–$5K', competitionScore: 4, techComplexity: 'Low', timeToMvp: '3–5 weeks', why: 'Simple integration into existing helpdesks', targetCustomer: 'E-commerce brands under 50 employees', competitors: ['Zendesk', 'Freshdesk', 'Help Scout'], marketingStrategy: 'Shopify app store + ecom communities' },
-  { name: 'ProposalFlow', tagline: 'Win more clients with AI proposals', mrrPotential: '$2K–$8K', competitionScore: 3, techComplexity: 'Low', timeToMvp: '3–4 weeks', why: 'High-value pain for agencies', targetCustomer: 'Freelance agencies under 10 people', competitors: ['Proposify', 'Better Proposals', 'Qwilr'], marketingStrategy: 'LinkedIn ads + freelancer communities' },
-  { name: 'MeetingMind', tagline: 'Auto action items from any call', mrrPotential: '$1.2K–$4K', competitionScore: 6, techComplexity: 'Medium', timeToMvp: '4–6 weeks', why: 'Universal pain, easy trial conversion', targetCustomer: 'Remote-first teams of 5–25', competitors: ['Otter.ai', 'Fireflies', 'Notion AI'], marketingStrategy: 'Slack/Teams integrations + G2 SEO' },
-  { name: 'BudgetSentinel', tagline: 'Alert before ad spend overruns', mrrPotential: '$1.8K–$7K', competitionScore: 3, techComplexity: 'Low', timeToMvp: '2–3 weeks', why: 'Direct ROI, quick payback', targetCustomer: 'Media buyers with multiple accounts', competitors: ['Optmyzr', 'Adalysis', 'WordStream'], marketingStrategy: 'Performance marketing groups + influencers' },
-  { name: 'ReferralMachine', tagline: 'Referral programs in one click', mrrPotential: '$2K–$9K', competitionScore: 4, techComplexity: 'Low', timeToMvp: '3–5 weeks', why: 'Grows with customers, strong LTV', targetCustomer: 'Early-stage SaaS with 100–1K users', competitors: ['ReferralHero', 'Viral Loops', 'Rewardful'], marketingStrategy: 'Indie hackers + newsletter sponsorships' },
-  { name: 'HireSignal', tagline: 'Find warm candidates early', mrrPotential: '$3K–$12K', competitionScore: 4, techComplexity: 'High', timeToMvp: '6–8 weeks', why: 'HR tech is evergreen, strong pricing', targetCustomer: 'HR managers at 50–200 person cos', competitors: ['LinkedIn Recruiter', 'Greenhouse', 'Lever'], marketingStrategy: 'HR communities + ATS partnerships' },
-  { name: 'OnboardKit', tagline: 'No-code user onboarding flows', mrrPotential: '$1.5K–$6K', competitionScore: 5, techComplexity: 'Medium', timeToMvp: '4–6 weeks', why: 'Every SaaS needs this, expansion revenue', targetCustomer: 'Product teams at 10–100 person SaaS', competitors: ['Appcues', 'Intercom', 'UserGuiding'], marketingStrategy: 'Product Hunt + founder content on X' },
+  { name: 'ContractPilot AI', tagline: 'Révision auto de contrats B2B en quelques secondes', mrrPotential: '2 400 €–9 000 €', competitionScore: 3, techComplexity: 'Moyen', timeToMvp: '4–6 semaines', why: 'Correspond à ton domaine et ton budget', targetCustomer: 'PME avec des contrats fournisseurs', competitors: ['DocuSign', 'PandaDoc', 'Ironclad'], marketingStrategy: 'Thought leadership LinkedIn + cold email équipes juridiques' },
+  { name: 'StatusBoard Pro', tagline: 'Monitoring API en temps réel pour devs', mrrPotential: '1 800 €–6 000 €', competitionScore: 4, techComplexity: 'Faible', timeToMvp: '2–4 semaines', why: 'Niche peu concurrentielle pour ton niveau technique', targetCustomer: 'Équipes dev dans des SaaS de 5–50 personnes', competitors: ['Datadog', 'Better Uptime', 'Freshping'], marketingStrategy: 'Communautés dev + lancement Product Hunt' },
+  { name: 'ChurnGuard', tagline: 'Prédit et prévient le churn SaaS', mrrPotential: '3 200 €–14 000 €', competitionScore: 5, techComplexity: 'Moyen', timeToMvp: '5–8 semaines', why: 'Plafond MRR élevé, ROI clair pour les acheteurs', targetCustomer: 'SaaS B2B avec 50–500 clients', competitors: ['Gainsight', 'ChurnZero', 'Intercom'], marketingStrategy: 'Newsletters SaaS + partenariats outils onboarding' },
+  { name: 'InboxZen', tagline: 'Triage IA pour les boîtes de support', mrrPotential: '1 500 €–5 000 €', competitionScore: 4, techComplexity: 'Faible', timeToMvp: '3–5 semaines', why: 'Intégration simple dans les helpdesks existants', targetCustomer: 'E-commerces de moins de 50 employés', competitors: ['Zendesk', 'Freshdesk', 'Help Scout'], marketingStrategy: 'App store Shopify + communautés e-com' },
+  { name: 'ProposalFlow', tagline: 'Gagne plus de clients avec des devis IA', mrrPotential: '2 000 €–8 000 €', competitionScore: 3, techComplexity: 'Faible', timeToMvp: '3–4 semaines', why: 'Douleur forte pour les agences, prix justifié', targetCustomer: 'Agences freelance de moins de 10 personnes', competitors: ['Proposify', 'Better Proposals', 'Qwilr'], marketingStrategy: 'Pubs LinkedIn + communautés freelances' },
+  { name: 'MeetingMind', tagline: 'Actions auto depuis n\'importe quel appel', mrrPotential: '1 200 €–4 000 €', competitionScore: 6, techComplexity: 'Moyen', timeToMvp: '4–6 semaines', why: 'Douleur universelle, conversion facile en essai', targetCustomer: 'Équipes remote de 5–25 personnes', competitors: ['Otter.ai', 'Fireflies', 'Notion AI'], marketingStrategy: 'Intégrations Slack/Teams + SEO G2' },
+  { name: 'BudgetSentinel', tagline: 'Alerte avant le dépassement de budget pub', mrrPotential: '1 800 €–7 000 €', competitionScore: 3, techComplexity: 'Faible', timeToMvp: '2–3 semaines', why: 'ROI direct, retour rapide sur investissement', targetCustomer: 'Media buyers avec plusieurs comptes', competitors: ['Optmyzr', 'Adalysis', 'WordStream'], marketingStrategy: 'Groupes marketing à la performance + influenceurs' },
+  { name: 'ReferralMachine', tagline: 'Programmes de parrainage en un clic', mrrPotential: '2 000 €–9 000 €', competitionScore: 4, techComplexity: 'Faible', timeToMvp: '3–5 semaines', why: 'Grandit avec les clients, LTV élevée', targetCustomer: 'SaaS early-stage avec 100–1K utilisateurs', competitors: ['ReferralHero', 'Viral Loops', 'Rewardful'], marketingStrategy: 'Indie hackers + sponsoring newsletters' },
+  { name: 'HireSignal', tagline: 'Trouve les candidats chauds avant les autres', mrrPotential: '3 000 €–12 000 €', competitionScore: 4, techComplexity: 'Élevé', timeToMvp: '6–8 semaines', why: 'La tech RH est pérenne, pricing solide', targetCustomer: 'Responsables RH dans des boîtes de 50–200 personnes', competitors: ['LinkedIn Recruiter', 'Greenhouse', 'Lever'], marketingStrategy: 'Communautés RH + partenariats ATS' },
+  { name: 'OnboardKit', tagline: 'Onboarding utilisateur no-code', mrrPotential: '1 500 €–6 000 €', competitionScore: 5, techComplexity: 'Moyen', timeToMvp: '4–6 semaines', why: 'Tous les SaaS en ont besoin, revenu d\'expansion', targetCustomer: 'Équipes produit dans des SaaS de 10–100 personnes', competitors: ['Appcues', 'Intercom', 'UserGuiding'], marketingStrategy: 'Product Hunt + contenu fondateur sur X' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function competitionLabel(score: number) {
-  if (score <= 3) return { label: 'Low', color: '#39FF88' }
-  if (score <= 6) return { label: 'Medium', color: '#fbbf24' }
-  return { label: 'High', color: '#f87171' }
+  if (score <= 3) return { label: 'Faible', color: '#39FF88' }
+  if (score <= 6) return { label: 'Moyen', color: '#fbbf24' }
+  return { label: 'Élevé', color: '#f87171' }
 }
 
 function complexityStyle(c: string) {
-  if (c === 'Low') return { color: '#39FF88', bg: 'rgba(57,255,136,0.1)', border: 'rgba(57,255,136,0.22)' }
-  if (c === 'Medium') return { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.22)' }
+  if (c === 'Faible') return { color: '#39FF88', bg: 'rgba(57,255,136,0.1)', border: 'rgba(57,255,136,0.22)' }
+  if (c === 'Moyen') return { color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.22)' }
   return { color: '#f87171', bg: 'rgba(248,113,113,0.1)', border: 'rgba(248,113,113,0.22)' }
 }
 
@@ -240,12 +240,12 @@ function BackButton({ onClick }: { onClick: () => void }) {
       }}
     >
       <ArrowLeft style={{ width: 14, height: 14 }} />
-      Back
+      Retour
     </button>
   )
 }
 
-function StepNav({ onBack, onNext, disabled, label = 'Continue', isAnalyze }: {
+function StepNav({ onBack, onNext, disabled, label = 'Continuer', isAnalyze }: {
   onBack?: () => void; onNext: () => void; disabled: boolean; label?: string; isAnalyze?: boolean
 }) {
   return (
@@ -279,7 +279,7 @@ function StepBadge({ n, tone = 'purple' }: { n: number | string; tone?: 'purple'
         style={{ width: 7, height: 7, borderRadius: '50%', background: c.dot }}
       />
       <span style={{ fontSize: '11px', color: c.text, fontWeight: 700, letterSpacing: '0.06em' }}>
-        {typeof n === 'number' ? `STEP ${n}` : n}
+        {typeof n === 'number' ? `ÉTAPE ${n}` : n}
       </span>
     </motion.div>
   )
@@ -322,7 +322,7 @@ function ProgressBar({ current, total = 12 }: { current: number; total?: number 
     <div style={{ marginBottom: 28 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
         <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.07em' }}>
-          STEP {current} OF {total}
+          ÉTAPE {current} / {total}
         </span>
         <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>{pct}%</span>
       </div>
@@ -423,11 +423,11 @@ function StickyWallIllustration() {
         <line x1="180" y1="82" x2="180" y2="116" stroke="rgba(139,92,246,0.32)" strokeWidth="1.2" strokeDasharray="4,3" />
         <line x1="202" y1="66" x2="210" y2="116" stroke="rgba(57,255,136,0.2)" strokeWidth="1.2" strokeDasharray="4,3" />
         <circle cx="180" cy="99" r="2.5" fill="rgba(139,92,246,0.55)" />
-        <g transform="rotate(-3,64,62)"><rect x="32" y="38" width="64" height="48" rx="5" fill="rgba(251,191,36,0.14)" stroke="rgba(251,191,36,0.30)" strokeWidth="1" /><circle cx="64" cy="41" r="3" fill="rgba(251,191,36,0.48)" /><text x="64" y="66" textAnchor="middle" fill="rgba(251,191,36,0.78)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Customer</text><text x="64" y="78" textAnchor="middle" fill="rgba(251,191,36,0.78)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Pain Point</text></g>
-        <g transform="rotate(2,148,57)"><rect x="116" y="32" width="64" height="50" rx="5" fill="rgba(139,92,246,0.18)" stroke="rgba(139,92,246,0.38)" strokeWidth="1" /><circle cx="148" cy="35" r="3" fill="rgba(139,92,246,0.62)" /><text x="148" y="60" textAnchor="middle" fill="rgba(167,139,250,0.88)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Market</text><text x="148" y="73" textAnchor="middle" fill="rgba(167,139,250,0.88)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Opportunity</text></g>
-        <g transform="rotate(-2,228,62)"><rect x="198" y="40" width="60" height="44" rx="5" fill="rgba(57,255,136,0.12)" stroke="rgba(57,255,136,0.26)" strokeWidth="1" /><circle cx="228" cy="43" r="3" fill="rgba(57,255,136,0.48)" /><text x="228" y="65" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">MRR</text><text x="228" y="77" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Potential</text></g>
+        <g transform="rotate(-3,64,62)"><rect x="32" y="38" width="64" height="48" rx="5" fill="rgba(251,191,36,0.14)" stroke="rgba(251,191,36,0.30)" strokeWidth="1" /><circle cx="64" cy="41" r="3" fill="rgba(251,191,36,0.48)" /><text x="64" y="66" textAnchor="middle" fill="rgba(251,191,36,0.78)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Douleur</text><text x="64" y="78" textAnchor="middle" fill="rgba(251,191,36,0.78)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Client</text></g>
+        <g transform="rotate(2,148,57)"><rect x="116" y="32" width="64" height="50" rx="5" fill="rgba(139,92,246,0.18)" stroke="rgba(139,92,246,0.38)" strokeWidth="1" /><circle cx="148" cy="35" r="3" fill="rgba(139,92,246,0.62)" /><text x="148" y="60" textAnchor="middle" fill="rgba(167,139,250,0.88)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Opportunité</text><text x="148" y="73" textAnchor="middle" fill="rgba(167,139,250,0.88)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Marché</text></g>
+        <g transform="rotate(-2,228,62)"><rect x="198" y="40" width="60" height="44" rx="5" fill="rgba(57,255,136,0.12)" stroke="rgba(57,255,136,0.26)" strokeWidth="1" /><circle cx="228" cy="43" r="3" fill="rgba(57,255,136,0.48)" /><text x="228" y="65" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">MRR</text><text x="228" y="77" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Potentiel</text></g>
         <g transform="rotate(3,66,143)"><rect x="36" y="120" width="60" height="46" rx="5" fill="rgba(14,165,233,0.14)" stroke="rgba(14,165,233,0.28)" strokeWidth="1" /><circle cx="66" cy="123" r="3" fill="rgba(14,165,233,0.48)" /><text x="66" y="145" textAnchor="middle" fill="rgba(56,189,248,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Solution</text><text x="66" y="157" textAnchor="middle" fill="rgba(56,189,248,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Concept</text></g>
-        <g transform="rotate(-2,180,139)"><rect x="148" y="116" width="64" height="48" rx="5" fill="rgba(244,114,182,0.13)" stroke="rgba(244,114,182,0.28)" strokeWidth="1" /><circle cx="180" cy="119" r="3" fill="rgba(244,114,182,0.48)" /><text x="180" y="140" textAnchor="middle" fill="rgba(249,168,212,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Target</text><text x="180" y="153" textAnchor="middle" fill="rgba(249,168,212,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Audience</text></g>
+        <g transform="rotate(-2,180,139)"><rect x="148" y="116" width="64" height="48" rx="5" fill="rgba(244,114,182,0.13)" stroke="rgba(244,114,182,0.28)" strokeWidth="1" /><circle cx="180" cy="119" r="3" fill="rgba(244,114,182,0.48)" /><text x="180" y="140" textAnchor="middle" fill="rgba(249,168,212,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Audience</text><text x="180" y="153" textAnchor="middle" fill="rgba(249,168,212,0.80)" fontSize="8.5" fontWeight="600" fontFamily="Inter, sans-serif">Cible</text></g>
         <line x1="16" y1="230" x2="264" y2="230" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
         <rect x="18" y="246" width="78" height="74" rx="7" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.09)" strokeWidth="1" /><rect x="18" y="246" width="9" height="74" rx="3" fill="rgba(139,92,246,0.22)" /><line x1="35" y1="264" x2="88" y2="264" stroke="rgba(255,255,255,0.08)" strokeWidth="1" /><line x1="35" y1="275" x2="88" y2="275" stroke="rgba(255,255,255,0.07)" strokeWidth="1" /><line x1="35" y1="286" x2="88" y2="286" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
         <rect x="114" y="258" width="36" height="44" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" strokeWidth="1" /><rect x="118" y="262" width="28" height="12" rx="3" fill="rgba(109,40,217,0.20)" /><path d="M150 272 Q164 272 164 282 Q164 292 150 292" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
@@ -471,10 +471,10 @@ function PeopleTableIllustration() {
         <circle cx="40" cy="162" r="16" fill="rgba(14,165,233,0.14)" stroke="rgba(14,165,233,0.32)" strokeWidth="1" /><circle cx="40" cy="158" r="7" fill="rgba(56,189,248,0.40)" />
         <circle cx="220" cy="162" r="16" fill="rgba(57,255,136,0.10)" stroke="rgba(57,255,136,0.26)" strokeWidth="1" /><circle cx="220" cy="158" r="7" fill="rgba(57,255,136,0.34)" />
         <circle cx="130" cy="246" r="16" fill="rgba(244,114,182,0.12)" stroke="rgba(244,114,182,0.28)" strokeWidth="1" /><circle cx="130" cy="242" r="7" fill="rgba(249,168,212,0.36)" />
-        <rect x="150" y="54" width="62" height="24" rx="8" fill="rgba(139,92,246,0.16)" stroke="rgba(139,92,246,0.30)" strokeWidth="1" /><text x="181" y="70" textAnchor="middle" fill="rgba(167,139,250,0.85)" fontSize="7.5" fontWeight="600" fontFamily="Inter, sans-serif">Pain point?</text>
-        <rect x="14" y="138" width="60" height="22" rx="7" fill="rgba(14,165,233,0.14)" stroke="rgba(14,165,233,0.26)" strokeWidth="1" /><text x="44" y="153" textAnchor="middle" fill="rgba(56,189,248,0.82)" fontSize="7.5" fontWeight="600" fontFamily="Inter, sans-serif">Every week!</text>
-        <rect x="186" y="138" width="60" height="22" rx="7" fill="rgba(57,255,136,0.10)" stroke="rgba(57,255,136,0.22)" strokeWidth="1" /><text x="216" y="153" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="7.5" fontWeight="600" fontFamily="Inter, sans-serif">Big market!</text>
-        <rect x="16" y="288" width="228" height="22" rx="7" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" strokeWidth="1" /><circle cx="32" cy="299" r="4" fill="rgba(57,255,136,0.45)" /><text x="42" y="303" fontSize="7.5" fill="rgba(255,255,255,0.35)" fontWeight="500" fontFamily="Inter, sans-serif">4 personas identified</text>
+        <rect x="150" y="54" width="62" height="24" rx="8" fill="rgba(139,92,246,0.16)" stroke="rgba(139,92,246,0.30)" strokeWidth="1" /><text x="181" y="70" textAnchor="middle" fill="rgba(167,139,250,0.85)" fontSize="7.5" fontWeight="600" fontFamily="Inter, sans-serif">Problème ?</text>
+        <rect x="14" y="138" width="60" height="22" rx="7" fill="rgba(14,165,233,0.14)" stroke="rgba(14,165,233,0.26)" strokeWidth="1" /><text x="44" y="153" textAnchor="middle" fill="rgba(56,189,248,0.82)" fontSize="7.5" fontWeight="600" fontFamily="Inter, sans-serif">Chaque sem. !</text>
+        <rect x="186" y="138" width="60" height="22" rx="7" fill="rgba(57,255,136,0.10)" stroke="rgba(57,255,136,0.22)" strokeWidth="1" /><text x="216" y="153" textAnchor="middle" fill="rgba(57,255,136,0.75)" fontSize="7.5" fontWeight="600" fontFamily="Inter, sans-serif">Grand marché !</text>
+        <rect x="16" y="288" width="228" height="22" rx="7" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" strokeWidth="1" /><circle cx="32" cy="299" r="4" fill="rgba(57,255,136,0.45)" /><text x="42" y="303" fontSize="7.5" fill="rgba(255,255,255,0.35)" fontWeight="500" fontFamily="Inter, sans-serif">4 personas identifiés</text>
       </svg>
     </motion.div>
   )
@@ -492,12 +492,12 @@ function BifurcationIllustration() {
         <path d="M130 250 C 145 200, 190 160, 200 96" stroke="rgba(56,189,248,0.4)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="5,5" />
         <circle cx="64" cy="74" r="22" fill="rgba(139,92,246,0.16)" stroke="rgba(139,92,246,0.45)" strokeWidth="1.5" />
         <path d="M64 62 L67 71 L76 71 L69 77 L72 86 L64 80 L56 86 L59 77 L52 71 L61 71 Z" fill="rgba(167,139,250,0.9)" />
-        <text x="64" y="116" textAnchor="middle" fill="rgba(167,139,250,0.85)" fontSize="9" fontWeight="700" fontFamily="Inter, sans-serif">CLEAR GOAL</text>
+        <text x="64" y="116" textAnchor="middle" fill="rgba(167,139,250,0.85)" fontSize="9" fontWeight="700" fontFamily="Inter, sans-serif">OBJECTIF CLAIR</text>
         <circle cx="200" cy="74" r="22" fill="rgba(56,189,248,0.10)" stroke="rgba(56,189,248,0.3)" strokeWidth="1.5" strokeDasharray="4,4" />
         <text x="200" y="80" textAnchor="middle" fill="rgba(56,189,248,0.75)" fontSize="18" fontWeight="700" fontFamily="Inter, sans-serif">?</text>
-        <text x="200" y="116" textAnchor="middle" fill="rgba(56,189,248,0.6)" fontSize="9" fontWeight="700" fontFamily="Inter, sans-serif">WE EXPLORE</text>
+        <text x="200" y="116" textAnchor="middle" fill="rgba(56,189,248,0.6)" fontSize="9" fontWeight="700" fontFamily="Inter, sans-serif">ON EXPLORE</text>
         <circle cx="100" cy="180" r="2.5" fill="rgba(255,255,255,0.2)" /><circle cx="160" cy="190" r="2.5" fill="rgba(255,255,255,0.15)" /><circle cx="130" cy="160" r="2" fill="rgba(139,92,246,0.4)" />
-        <rect x="40" y="280" width="180" height="22" rx="7" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" strokeWidth="1" /><text x="130" y="294" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.4)" fontWeight="600" fontFamily="Inter, sans-serif">Choose your path</text>
+        <rect x="40" y="280" width="180" height="22" rx="7" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.05)" strokeWidth="1" /><text x="130" y="294" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.4)" fontWeight="600" fontFamily="Inter, sans-serif">Choisis ton chemin</text>
       </svg>
     </motion.div>
   )
@@ -545,17 +545,17 @@ function PaymentIllustration() {
 // ─── Step 0: Intro ────────────────────────────────────────────────────────────
 
 const JOURNEY = [
-  { Icon: Lightbulb, title: 'Find a problem worth solving', desc: 'Start from a real frustration, or pick a domain you know.' },
-  { Icon: UserRound, title: 'Map your founder profile', desc: 'Budget, skills and time shape every recommendation.' },
-  { Icon: Target, title: 'Validate the opportunity', desc: 'Each idea is scored against its real competitors.' },
-  { Icon: Map, title: 'Get your launch roadmap', desc: 'A marketing plan and a 30-day path, ready to run.' },
-  { Icon: Rocket, title: 'Launch your SaaS', desc: 'Leave with a complete, actionable blueprint.', payoff: true },
+  { Icon: Lightbulb, title: 'Trouver un problème qui en vaut la peine', desc: 'Pars d\'une vraie frustration ou d\'un domaine que tu maîtrises.' },
+  { Icon: UserRound, title: 'Définir ton profil de fondateur', desc: 'Budget, compétences et temps façonnent chaque recommandation.' },
+  { Icon: Target, title: 'Valider l\'opportunité', desc: 'Chaque idée est scorée face à ses vrais concurrents.' },
+  { Icon: Map, title: 'Obtenir ta feuille de route de lancement', desc: 'Un plan marketing et un chemin de 30 jours, prêt à exécuter.' },
+  { Icon: Rocket, title: 'Lancer ton SaaS', desc: 'Repars avec un blueprint complet et actionnable.', payoff: true },
 ]
 
 const INTRO_TRUST = [
-  { Icon: ShieldCheck, label: 'No credit card to start' },
-  { Icon: Sparkles, label: 'AI-powered analysis' },
-  { Icon: Clock, label: 'About 2 minutes' },
+  { Icon: ShieldCheck, label: 'Sans carte bancaire' },
+  { Icon: Sparkles, label: 'Analyse IA' },
+  { Icon: Clock, label: 'Environ 2 minutes' },
 ]
 
 function IntroStep({ onStart }: { onStart: () => void }) {
@@ -573,18 +573,18 @@ function IntroStep({ onStart }: { onStart: () => void }) {
           <motion.span aria-hidden
             animate={reduce ? undefined : { opacity: [1, 0.35, 1] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
             style={{ width: 6, height: 6, borderRadius: '50%', background: '#a78bfa', boxShadow: '0 0 8px rgba(167,139,250,0.8)' }} />
-          <span style={{ fontSize: '12px', color: '#c4b5fd', fontWeight: 500, letterSpacing: '0.01em' }}>AI Product Builder</span>
+          <span style={{ fontSize: '12px', color: '#c4b5fd', fontWeight: 500, letterSpacing: '0.01em' }}>IA Product Builder</span>
         </motion.div>
 
         <motion.h1 {...rise(0.08)}
           style={{ fontSize: 'clamp(32px, 4.6vw, 46px)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.04, color: 'white', marginBottom: 16, textWrap: 'balance' }}>
-          {`Let's build your next `}
+          {`Construisons ton prochain `}
           <span style={{ background: 'linear-gradient(135deg, #c4b5fd 20%, #8B5CF6 80%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>SaaS.</span>
         </motion.h1>
 
         <motion.p {...rise(0.16)}
           style={{ fontSize: '15px', lineHeight: 1.6, color: 'rgba(255,255,255,0.5)', maxWidth: 392, margin: '0 auto' }}>
-          Answer 12 quick questions. We turn your experience, budget and time into SaaS ideas actually worth building.
+          Réponds à 12 questions. On transforme ton expérience, ton budget et ton temps en idées SaaS qui valent vraiment la peine.
         </motion.p>
       </div>
 
@@ -628,7 +628,7 @@ function IntroStep({ onStart }: { onStart: () => void }) {
         variants={{ rest: { scale: 1, boxShadow: '0 0 0 1px rgba(139,92,246,0.5), 0 8px 32px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.14)' }, hover: { scale: 1.02, boxShadow: '0 0 0 1px rgba(139,92,246,0.6), 0 12px 40px rgba(139,92,246,0.48), inset 0 1px 0 rgba(255,255,255,0.14)' } }}
         animate="rest"
         style={{ width: '100%', padding: '13px 14px 13px 24px', borderRadius: 16, background: 'linear-gradient(135deg, #8B5CF6 0%, #6d28d9 100%)', color: 'white', fontWeight: 600, fontSize: '15px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 18, fontFamily: 'inherit' }}>
-        <span style={{ paddingLeft: 2 }}>Start building</span>
+        <span style={{ paddingLeft: 2 }}>Commencer</span>
         <motion.span variants={{ rest: { x: 0 }, hover: { x: 3 } }} transition={{ duration: 0.3, ease: EASE }}
           style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <ArrowRight style={{ width: 15, height: 15 }} strokeWidth={2.5} />
@@ -678,9 +678,9 @@ function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
         <div style={{ flex: 1, minWidth: 300 }}>
           <StepBadge n={1} />
           <StepHeading
-            pre="What recurring problem"
-            accent="do you want to solve?"
-            subtitle="Describe something frustrating that repeats in your work or daily life — the more specific, the better."
+            pre="Quel problème récurrent"
+            accent="veux-tu résoudre ?"
+            subtitle="Décris quelque chose de frustrant qui se répète dans ton travail ou ta vie — plus c'est précis, mieux c'est."
           />
 
           {/* Double-bezel textarea */}
@@ -706,7 +706,7 @@ function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
                 onChange={handleTextChange}
                 onFocus={() => { setFocused(true); if (userData.domainChip) { setDomain(''); setDomainChip('') } }}
                 onBlur={() => setFocused(false)}
-                placeholder="e.g. I waste hours every week reconciling invoices manually..."
+                placeholder="ex. Je perds des heures chaque semaine à réconcilier mes factures manuellement..."
                 maxLength={500}
                 style={{
                   width: '100%', minHeight: '148px', border: 'none', outline: 'none',
@@ -736,7 +736,7 @@ function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
                       </motion.span>
                     )}
                   </AnimatePresence>
-                  {charCount >= 30 ? 'Ready to continue' : charCount > 0 ? `${30 - charCount} more characters` : 'Write at least 30 characters'}
+                  {charCount >= 30 ? 'Prêt à continuer' : charCount > 0 ? `encore ${30 - charCount} caractères` : 'Écris au moins 30 caractères'}
                 </motion.span>
                 <span style={{ fontSize: '11px', color: charCount > 450 ? '#fbbf24' : 'rgba(255,255,255,0.2)' }}>
                   {charCount} / 500
@@ -750,7 +750,7 @@ function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
               <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.26)', fontWeight: 600, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
-                or pick a domain
+                ou choisis un domaine
               </span>
               <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
             </div>
@@ -810,7 +810,7 @@ function ProblemStep({ userData, setDomain, setDomainChip, onNext, onBack }: {
                 }}>
                   <Sparkles style={{ width: 13, height: 13, color: '#a78bfa' }} strokeWidth={2} />
                 </div>
-                <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>Need inspiration?</span>
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(255,255,255,0.78)' }}>Besoin d'inspiration ?</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {AI_EXAMPLES.map((ex, i) => (
@@ -866,9 +866,9 @@ function WhoStep({ value, onSelect, onNext, onBack }: { value: string; onSelect:
         <div style={{ flex: 1, minWidth: 300 }}>
           <StepBadge n={2} />
           <StepHeading
-            pre="Who experiences"
-            accent="this problem?"
-            subtitle="The audience shapes the whole product. Pick who feels this frustration most."
+            pre="Qui vit"
+            accent="ce problème ?"
+            subtitle="L'audience façonne tout le produit. Choisis qui ressent cette frustration le plus."
           />
           <motion.div
             {...rise(0.18)}
@@ -917,16 +917,16 @@ function WhoStep({ value, onSelect, onNext, onBack }: { value: string; onSelect:
 const KNOWS_CHOICES = [
   {
     value: 'yes', emoji: '🎯',
-    label: 'Yes, I know it',
-    desc: 'I have a clear problem in mind that I want to validate and build around.',
-    tag: 'Skip exploration',
+    label: 'Oui, j\'ai mon idée',
+    desc: 'J\'ai un problème précis en tête que je veux valider et construire.',
+    tag: 'Aller directement',
     accent: '#8B5CF6', accentFill: 'rgba(139,92,246,0.14)', accentBorder: 'rgba(139,92,246,0.36)',
   },
   {
     value: 'no', emoji: '🧭',
-    label: 'Help me find one',
-    desc: "I'm not sure yet — guide me to a great opportunity based on my background.",
-    tag: 'AI-guided discovery',
+    label: 'Aide-moi à en trouver un',
+    desc: "Je ne suis pas sûr encore — guide-moi vers la meilleure opportunité selon mon profil.",
+    tag: 'Découverte guidée par IA',
     accent: '#0ea5e9', accentFill: 'rgba(14,165,233,0.12)', accentBorder: 'rgba(14,165,233,0.30)',
   },
 ]
@@ -940,9 +940,9 @@ function KnowsProblemStep({ value, onSelect, onNext, onBack }: { value: string; 
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
         <StepBadge n={3} />
         <StepHeading
-          pre="Do you already"
-          accent="know your problem?"
-          subtitle="If you have a clear idea, we'll dive straight in. If not, our AI surfaces the best opportunity for you."
+          pre="Tu as déjà"
+          accent="ton idée ?"
+          subtitle="Si tu sais où tu vas, on plonge directement. Sinon, notre IA trouve la meilleure opportunité pour toi."
         />
 
         {/* Side-by-side hero choice cards */}
@@ -1079,36 +1079,36 @@ function DiscoveryStep({ userData, setField, onNext, onBack }: {
         <div style={{ flex: 1, minWidth: 300 }}>
           <StepBadge n={4} tone="green" />
           <StepHeading
-            pre="Let's find your"
-            accent="perfect problem"
-            subtitle="A few quick questions and our AI surfaces 5 real problems worth solving — tailored to your life."
+            pre="Trouvons ton"
+            accent="problème parfait"
+            subtitle="Quelques questions rapides et notre IA fait remonter 5 vrais problèmes à résoudre — adaptés à ta vie."
           />
           <motion.div {...rise(0.18)}>
             <DiscoveryField
-              label="What frustrates you daily?" hint="you or someone close"
+              label="Qu'est-ce qui te frustre au quotidien ?" hint="toi ou quelqu'un de proche"
               value={userData.dailyFrustrations} onChange={(v) => setField('dailyFrustrations', v)}
-              placeholder="Things that waste your time, annoy you, or feel broken..."
+              placeholder="Ce qui te fait perdre du temps, t'énerve ou te semble cassé..."
               rows={3}
             />
           </motion.div>
           <motion.div {...rise(0.26)}>
             <DiscoveryField
-              label="What are your passions?" hint="optional"
+              label="Quelles sont tes passions ?" hint="optionnel"
               value={userData.passions} onChange={(v) => setField('passions', v)}
-              placeholder="Hobbies, topics you love, communities you're part of..."
+              placeholder="Hobbies, sujets que tu adores, communautés dont tu fais partie..."
               rows={2}
             />
           </motion.div>
           <motion.div {...rise(0.34)}>
             <DiscoveryField
-              label="Your profession or field of study?" hint="optional"
+              label="Ton métier ou domaine d'études ?" hint="optionnel"
               value={userData.profession} onChange={(v) => setField('profession', v)}
-              placeholder="e.g. Marketing student, freelance designer, nurse..."
+              placeholder="ex. Étudiant en marketing, designer freelance, infirmier..."
               rows={1}
             />
           </motion.div>
           <motion.div {...rise(0.42)} style={{ marginTop: 22 }}>
-            <StepNav onBack={onBack} onNext={onNext} disabled={!canContinue} label="Find my problems" isAnalyze />
+            <StepNav onBack={onBack} onNext={onNext} disabled={!canContinue} label="Trouver mes problèmes" isAnalyze />
           </motion.div>
         </div>
         <div style={{ width: 260, flexShrink: 0 }}>
@@ -1142,7 +1142,7 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
     return () => timers.forEach(clearTimeout)
   }, [userData])
 
-  const freqColor = (f: string) => f === 'Daily' ? '#f87171' : f === 'Weekly' ? '#fbbf24' : '#39FF88'
+  const freqColor = (f: string) => f === 'Quotidien' ? '#f87171' : f === 'Hebdomadaire' ? '#fbbf24' : '#39FF88'
 
   if (loading) {
     return (
@@ -1166,7 +1166,7 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
           />
         </div>
         <h2 style={{ fontSize: '21px', fontWeight: 700, color: 'white', letterSpacing: '-0.03em', marginBottom: 8 }}>
-          Finding your best problems
+          Recherche de tes meilleurs problèmes
         </h2>
         <AnimatePresence mode="wait">
           <motion.p
@@ -1187,9 +1187,9 @@ function ProblemListStep({ userData, onSelect, onNext, onBack }: {
       <ProgressBar current={5} />
       <StepBadge n={5} tone="green" />
       <StepHeading
-        pre="Pick the problem"
-        accent="worth solving"
-        subtitle="5 real opportunities scored for your profile. Choose the one that resonates most."
+        pre="Choisis le problème"
+        accent="qui en vaut la peine"
+        subtitle="5 vraies opportunités scorées pour ton profil. Choisis celle qui te parle le plus."
       />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 26 }}>
         {problems.map((p, i) => {
@@ -1276,9 +1276,9 @@ function AcquisitionStep({ value, onChange, onNext, onBack }: {
       <ProgressBar current={9} />
       <StepBadge n={9} />
       <StepHeading
-        pre="How will you"
-        accent="reach customers?"
-        subtitle="Pick up to 3 channels you're most excited to use. We'll tailor your marketing plan around them."
+        pre="Comment vas-tu"
+        accent="trouver tes clients ?"
+        subtitle="Choisis jusqu'à 3 canaux que tu veux utiliser. On construit ton plan marketing autour."
       />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 14 }}>
         {ACQUISITION_CHANNELS.map((c, i) => {
@@ -1329,7 +1329,7 @@ function AcquisitionStep({ value, onChange, onNext, onBack }: {
         fontSize: '11.5px', marginBottom: 22, textAlign: 'center',
         color: selected.length === 3 ? '#fbbf24' : 'rgba(255,255,255,0.32)',
       }}>
-        {selected.length} / 3 selected{selected.length === 3 ? ' — maximum reached' : ''}
+        {selected.length} / 3 sélectionné(s){selected.length === 3 ? ' — maximum atteint' : ''}
       </div>
       <StepNav onBack={onBack} onNext={onNext} disabled={selected.length === 0} />
     </div>
@@ -1346,9 +1346,9 @@ function MarketTypeStep({ value, onSelect, onNext, onBack }: { value: string; on
       <ProgressBar current={10} />
       <StepBadge n={10} />
       <StepHeading
-        pre="Who will you"
-        accent="sell to?"
-        subtitle="This shapes your pricing, your marketing tone, and how you'll find your first customers."
+        pre="À qui vas-tu"
+        accent="vendre ?"
+        subtitle="Ça façonne ta tarification, ton ton marketing et comment tu trouveras tes premiers clients."
       />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14, marginBottom: 28 }}>
         {MARKET_TYPE_OPTIONS.map((o, i) => {
@@ -1429,10 +1429,10 @@ function LoadingIdeasStep({ loadingStep }: { loadingStep: number }) {
         />
       </div>
       <h2 style={{ fontSize: '21px', fontWeight: 700, color: 'white', letterSpacing: '-0.03em', marginBottom: 8 }}>
-        Generating your 10 SaaS ideas
+        Génération de tes 10 idées SaaS
       </h2>
       <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.36)', marginBottom: 36 }}>
-        Our AI is scanning thousands of opportunities for you
+        Notre IA analyse des milliers d'opportunités pour toi
       </p>
       <div style={{ textAlign: 'left', maxWidth: 360, margin: '0 auto' }}>
         {LOADING_STEPS_IDEAS.map((msg, i) => {
@@ -1482,9 +1482,9 @@ function IdeaSelectionStep({ ideas, selectedIndex, onSelect, onNext, onBack }: {
   return (
     <div>
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        <StepBadge n="10 IDEAS → PICK 1" tone="green" />
-        <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'white', marginBottom: 6 }}>Your SaaS opportunities</h2>
-        <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.4)' }}>Select the one idea you want a full blueprint for.</p>
+        <StepBadge n="10 IDÉES → CHOISIS 1" tone="green" />
+        <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'white', marginBottom: 6 }}>Tes opportunités SaaS</h2>
+        <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.4)' }}>Choisis l'idée pour laquelle tu veux un blueprint complet.</p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 11, marginBottom: 24 }}>
         {list.map((idea, i) => {
@@ -1535,7 +1535,7 @@ function IdeaSelectionStep({ ideas, selectedIndex, onSelect, onNext, onBack }: {
                 <span style={{ fontSize: '9.5px', color: 'rgba(57,255,136,0.55)' }}>MRR</span>
               </div>
               <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 7px', borderRadius: 6, background: `${comp.color}1a`, color: comp.color }}>{comp.label} comp.</span>
+                <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 7px', borderRadius: 6, background: `${comp.color}1a`, color: comp.color }}>{comp.label} conc.</span>
                 <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 7px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>{idea.techComplexity}</span>
                 <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 7px', borderRadius: 6, background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>{idea.timeToMvp}</span>
               </div>
@@ -1543,7 +1543,7 @@ function IdeaSelectionStep({ ideas, selectedIndex, onSelect, onNext, onBack }: {
           )
         })}
       </div>
-      <StepNav onBack={onBack} onNext={onNext} disabled={!selectedIndex} label="Unlock this blueprint" isAnalyze />
+      <StepNav onBack={onBack} onNext={onNext} disabled={!selectedIndex} label="Voir mon blueprint" isAnalyze />
     </div>
   )
 }
@@ -1659,11 +1659,11 @@ function PaymentStep({ ideaName, onPaid, onBack }: { ideaName: string; onPaid: (
 // ─── Step 16: Full results ────────────────────────────────────────────────────
 
 const LAUNCH_PLAN = [
-  { day: 'Days 1–5', title: 'Validate the problem', desc: 'Interview 10 potential customers, confirm the pain is real.' },
-  { day: 'Days 6–12', title: 'Build your MVP', desc: 'Ship the smallest version that solves the core problem.' },
-  { day: 'Days 13–18', title: 'Landing page + waitlist', desc: 'Launch a page, collect emails, set up analytics.' },
-  { day: 'Days 19–25', title: 'First 10 users', desc: 'Onboard manually, gather feedback, iterate fast.' },
-  { day: 'Days 26–30', title: 'Open paid plans', desc: 'Turn on pricing, drive your acquisition channels.' },
+  { day: 'Jours 1–5', title: 'Valider le problème', desc: 'Interviewe 10 clients potentiels, confirme que la douleur est réelle.' },
+  { day: 'Jours 6–12', title: 'Construire ton MVP', desc: 'Lance la version minimale qui résout le problème central.' },
+  { day: 'Jours 13–18', title: 'Landing page + liste d\'attente', desc: 'Mets en ligne une page, collecte des emails, installe l\'analytics.' },
+  { day: 'Jours 19–25', title: 'Tes 10 premiers utilisateurs', desc: 'Onboarde manuellement, collecte les retours, itère vite.' },
+  { day: 'Jours 26–30', title: 'Ouvrir les plans payants', desc: 'Active la tarification, lance tes canaux d\'acquisition.' },
 ]
 
 function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; userData: UserData; onDashboard: () => void }) {
@@ -1672,8 +1672,8 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
   const list = ideas.length ? ideas : FALLBACK_IDEAS
   const idea = list[Number(userData.selectedIdeaIndex) || 0] || list[0]
   const accent = IDEA_ACCENT[(Number(userData.selectedIdeaIndex) || 0) % IDEA_ACCENT.length]
-  const channels = userData.acquisitionChannels ? userData.acquisitionChannels.split(',').filter(Boolean) : ['SEO / Content']
-  const competitors = idea.competitors && idea.competitors.length ? idea.competitors : ['Established player A', 'Incumbent B', 'Startup C']
+  const channels = userData.acquisitionChannels ? userData.acquisitionChannels.split(',').filter(Boolean) : ['SEO / Contenu']
+  const competitors = idea.competitors && idea.competitors.length ? idea.competitors : ['Acteur établi A', 'Concurrent B', 'Startup C']
   const bars = [22, 38, 55, 71, 88, 100]
 
   return (
@@ -1682,9 +1682,9 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
         <motion.div initial={reduce ? false : { scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={reduce ? {} : { duration: 0.4 }}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 14px', borderRadius: 99, marginBottom: 14, background: 'rgba(57,255,136,0.1)', border: '1px solid rgba(57,255,136,0.28)' }}>
           <Sparkles style={{ width: 12, height: 12, color: '#39FF88' }} />
-          <span style={{ fontSize: '11px', color: '#39FF88', fontWeight: 600, letterSpacing: '0.06em' }}>BLUEPRINT READY</span>
+          <span style={{ fontSize: '11px', color: '#39FF88', fontWeight: 600, letterSpacing: '0.06em' }}>BLUEPRINT PRÊT</span>
         </motion.div>
-        <h2 style={{ fontSize: 'clamp(24px, 3.2vw, 32px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'white' }}>Your SaaS blueprint is ready</h2>
+        <h2 style={{ fontSize: 'clamp(24px, 3.2vw, 32px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'white' }}>Ton blueprint SaaS est prêt</h2>
       </div>
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 18 }}>
         {/* LEFT */}
@@ -1696,7 +1696,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: 14 }}>{idea.tagline}</div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 99, background: 'rgba(57,255,136,0.12)', border: '1px solid rgba(57,255,136,0.25)', marginBottom: 14 }}>
               <span style={{ fontSize: '14px', fontWeight: 800, color: '#39FF88' }}>{idea.mrrPotential}</span>
-              <span style={{ fontSize: '11px', color: 'rgba(57,255,136,0.6)' }}>MRR potential</span>
+              <span style={{ fontSize: '11px', color: 'rgba(57,255,136,0.6)' }}>Potentiel MRR</span>
             </div>
             <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', fontSize: '12.5px', color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>💡 {idea.why}</div>
           </motion.div>
@@ -1704,10 +1704,10 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
           <div style={{ borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <Megaphone style={{ width: 16, height: 16, color: '#8B5CF6' }} />
-              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Marketing strategy</span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Stratégie marketing</span>
             </div>
             <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 14 }}>
-              {idea.marketingStrategy || `Target ${userData.marketType === 'b2b' ? 'businesses' : 'consumers'} through your chosen channels with a budget of ${userData.adsBudget || 'organic reach'}.`}
+              {idea.marketingStrategy || `Cible les ${userData.marketType === 'b2b' ? 'entreprises' : 'particuliers'} via tes canaux choisis avec un budget de ${userData.adsBudget || 'portée organique'}.`}
             </p>
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 8 }}>
               {channels.map(c => (
@@ -1721,7 +1721,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
           <div style={{ borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <Calendar style={{ width: 16, height: 16, color: '#39FF88' }} />
-              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>30-day launch plan</span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Plan de lancement 30 jours</span>
             </div>
             <div style={{ position: 'relative', paddingLeft: 22 }}>
               <div style={{ position: 'absolute', left: 6, top: 4, bottom: 4, width: 2, background: 'linear-gradient(180deg, #8B5CF6, rgba(57,255,136,0.6))' }} />
@@ -1743,7 +1743,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
           <div style={{ borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
               <Target style={{ width: 16, height: 16, color: '#f87171' }} />
-              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Top competitors</span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Concurrents principaux</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
               {competitors.slice(0, 3).map((c, i) => (
@@ -1751,7 +1751,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
                   <div style={{ width: 28, height: 28, borderRadius: 8, background: `${IDEA_ACCENT[i]}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 800, color: IDEA_ACCENT[i] }}>{c.charAt(0)}</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{c}</div>
-                    <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.35)' }}>Established competitor</div>
+                    <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.35)' }}>Concurrent établi</div>
                   </div>
                 </div>
               ))}
@@ -1761,7 +1761,7 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
           <div style={{ borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <TrendingUp style={{ width: 16, height: 16, color: '#39FF88' }} />
-              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Revenue projection</span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: 'white' }}>Projection revenus</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 90, marginBottom: 8 }}>
               {bars.map((h, i) => (
@@ -1775,8 +1775,8 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
           </div>
 
           <div style={{ borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'white', marginBottom: 12 }}>Resources</div>
-            {['Product Hunt launch guide', 'Cold email templates', 'MVP tech stack checklist'].map((r) => (
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'white', marginBottom: 12 }}>Ressources</div>
+            {['Guide de lancement Product Hunt', 'Modèles de cold email', 'Checklist tech stack MVP'].map((r) => (
               <a key={r} href="#" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0', fontSize: '12.5px', color: '#a78bfa', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                 <ArrowRight style={{ width: 12, height: 12 }} />{r}
               </a>
@@ -1786,29 +1786,30 @@ function FullResultsStep({ ideas, userData, onDashboard }: { ideas: SaaSIdea[]; 
       </div>
       <motion.button whileHover={reduce ? undefined : { scale: 1.01 }} whileTap={reduce ? undefined : { scale: 0.99 }} onClick={onDashboard}
         style={{ width: '100%', padding: '15px', borderRadius: 14, background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', boxShadow: '0 8px 32px rgba(139,92,246,0.42)', color: 'white', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'inherit' }}>
-        Open my dashboard <ArrowRight style={{ width: 17, height: 17 }} strokeWidth={2.5} />
+        Accéder à mon espace <ArrowRight style={{ width: 17, height: 17 }} strokeWidth={2.5} />
       </motion.button>
     </div>
   )
 }
 
-// ─── Step 17: Dashboard ───────────────────────────────────────────────────────
+// ─── Step 16: Dashboard ───────────────────────────────────────────────────────
 
 const SOCIALS = [
-  { id: 'tiktok', name: 'TikTok', color: '#000', accent: '#25F4EE', icon: '🎵' },
-  { id: 'instagram', name: 'Instagram', color: '#E1306C', accent: '#E1306C', icon: '📸' },
-  { id: 'facebook', name: 'Facebook', color: '#1877F2', accent: '#1877F2', icon: '👍' },
-  { id: 'youtube', name: 'YouTube', color: '#FF0000', accent: '#FF0000', icon: '▶️' },
+  { id: 'tiktok', name: 'TikTok', icon: '🎵', accent: '#25F4EE', desc: 'Stratégie contenu court-format viral' },
+  { id: 'instagram', name: 'Instagram', icon: '📸', accent: '#E1306C', desc: 'Reels & stories adaptés à ta niche' },
+  { id: 'twitter', name: 'X / Twitter', icon: '🐦', accent: '#1DA1F2', desc: 'Threads & croissance organique' },
+  { id: 'linkedin', name: 'LinkedIn', icon: '💼', accent: '#0077B5', desc: 'Thought leadership & B2B outreach' },
+  { id: 'youtube', name: 'YouTube', icon: '▶️', accent: '#FF0000', desc: 'Long-form & tutoriels' },
 ]
 
 const WEEK_TASKS = [
-  'Define your ideal customer profile (ICP)',
-  'Set up your landing page & waitlist',
-  'Join 3 relevant communities',
-  'Write 5 pieces of content for your channels',
-  'Reach out to 10 potential users',
-  'Set up analytics & tracking',
-  'Draft your first ad campaign',
+  "Définir ton profil client idéal (ICP)",
+  "Créer ta landing page & liste d'attente",
+  'Rejoindre 3 communautés pertinentes',
+  'Écrire 5 contenus pour tes canaux',
+  'Contacter 10 utilisateurs potentiels',
+  'Mettre en place l\'analytics & tracking',
+  'Rédiger ta première campagne pub',
 ]
 
 function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; userData: UserData; onRestart: () => void }) {
@@ -1817,16 +1818,28 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
   const idea = list[Number(userData.selectedIdeaIndex) || 0] || list[0]
   const [connected, setConnected] = useState<Record<string, boolean>>({})
   const [tasks, setTasks] = useState<boolean[]>(new Array(WEEK_TASKS.length).fill(false))
-  const [campaign, setCampaign] = useState('')
-  const channels = userData.acquisitionChannels ? userData.acquisitionChannels.split(',').filter(Boolean) : []
-  const adFormat = userData.marketType === 'b2b' ? 'LinkedIn carousel + cold email sequences' : 'Short-form video ads (TikTok / Reels)'
   const doneCount = tasks.filter(Boolean).length
+  const connectedCount = Object.values(connected).filter(Boolean).length
 
   const stats = [
-    { label: 'MRR goal', value: idea.mrrPotential, icon: '💰', color: '#39FF88' },
-    { label: 'Est. launch', value: idea.timeToMvp, icon: '🚀', color: '#8B5CF6' },
-    { label: 'Market', value: userData.marketType === 'b2b' ? 'B2B' : 'B2C', icon: '🎯', color: '#0ea5e9' },
-    { label: 'Ads budget', value: userData.adsBudget || '€0', icon: '📊', color: '#fbbf24' },
+    { label: 'Objectif MRR', value: idea.mrrPotential, icon: '💰', color: '#39FF88' },
+    { label: 'Lancement estimé', value: idea.timeToMvp, icon: '🚀', color: '#8B5CF6' },
+    { label: 'Marché', value: userData.marketType === 'b2b' ? 'B2B' : 'B2C', icon: '🎯', color: '#0ea5e9' },
+    { label: 'Budget pub', value: userData.adsBudget || '0 €', icon: '📊', color: '#fbbf24' },
+  ]
+
+  const PLANS = [
+    { id: 'week', name: 'Hebdo', price: '7,90€', period: '/ sem', accent: '#0ea5e9', ctaBg: 'rgba(14,165,233,0.15)', ctaBorder: 'rgba(14,165,233,0.3)', ctaColor: '#7dd3fc', border: 'rgba(14,165,233,0.25)', bg: 'rgba(14,165,233,0.05)', featured: false, save: '' },
+    { id: 'month', name: 'Mensuel', price: '23€', period: '/ mois', save: 'Économisez 19 %', accent: '#8B5CF6', ctaBg: 'linear-gradient(135deg, #8B5CF6, #6d28d9)', ctaBorder: 'transparent', ctaColor: 'white', border: 'rgba(139,92,246,0.5)', bg: 'rgba(139,92,246,0.1)', featured: true },
+    { id: 'year', name: 'Annuel', price: '75€', period: '/ an', save: 'Économisez 73 %', accent: '#39FF88', ctaBg: 'rgba(57,255,136,0.12)', ctaBorder: 'rgba(57,255,136,0.3)', ctaColor: '#39FF88', border: 'rgba(57,255,136,0.25)', bg: 'rgba(57,255,136,0.04)', featured: false },
+  ]
+
+  const strategyLines = [
+    'Hook rate cible : 8–12 %',
+    'Cadence : 3–5 posts / sem',
+    'Format priorité : Reels 15 s',
+    'Hashtags : 8 sélectionnés',
+    'Meilleur créneau : 19h–21h',
   ]
 
   return (
@@ -1835,7 +1848,7 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
       <motion.div initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.4 }}
         style={{ borderRadius: 20, padding: '26px 24px', marginBottom: 18, position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(139,92,246,0.25), rgba(109,40,217,0.12))', border: '1px solid rgba(139,92,246,0.3)' }}>
         <div style={{ position: 'absolute', top: -40, right: -20, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.3), transparent 70%)' }} />
-        <div style={{ fontSize: '11px', fontWeight: 700, color: '#c4b5fd', letterSpacing: '0.07em', marginBottom: 8 }}>YOUR WORKSPACE</div>
+        <div style={{ fontSize: '11px', fontWeight: 700, color: '#c4b5fd', letterSpacing: '0.07em', marginBottom: 8 }}>TON ESPACE DE TRAVAIL</div>
         <div style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 800, color: 'white', letterSpacing: '-0.02em', marginBottom: 4 }}>{idea.name}</div>
         <div style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.55)' }}>{idea.tagline}</div>
       </motion.div>
@@ -1852,22 +1865,26 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
         ))}
       </div>
 
+      {/* Socials + locked strategy */}
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 18 }}>
         {/* Connect accounts */}
-        <div style={{ flex: '1 1 320px', borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Connect your accounts</div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>Link your channels to publish & track from one place.</div>
+        <div style={{ flex: '1 1 300px', borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Connecte tes réseaux</div>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>Chaque réseau connecté débloque ta stratégie de contenu sur mesure.</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {SOCIALS.map((s) => {
               const on = connected[s.id]
               return (
-                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: `1px solid ${on ? s.accent + '55' : 'rgba(255,255,255,0.07)'}` }}>
+                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: `1px solid ${on ? s.accent + '55' : 'rgba(255,255,255,0.07)'}`, transition: 'border-color 0.2s' }}>
                   <div style={{ width: 34, height: 34, borderRadius: 9, background: `${s.accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', flexShrink: 0 }}>{s.icon}</div>
-                  <span style={{ flex: 1, fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{s.name}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{s.name}</div>
+                    {on && <div style={{ fontSize: '10.5px', color: s.accent, marginTop: 2 }}>{s.desc}</div>}
+                  </div>
                   <motion.button whileTap={reduce ? undefined : { scale: 0.95 }} onClick={() => setConnected(p => ({ ...p, [s.id]: !p[s.id] }))}
                     style={{ padding: '7px 14px', borderRadius: 9, fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: 'inherit',
-                      background: on ? 'rgba(57,255,136,0.15)' : s.accent, color: on ? '#39FF88' : '#fff', display: 'flex', alignItems: 'center', gap: 5 }}>
-                    {on ? <><Check style={{ width: 12, height: 12 }} strokeWidth={3} /> Connected</> : 'Connect'}
+                      background: on ? 'rgba(57,255,136,0.15)' : `${s.accent}33`, color: on ? '#39FF88' : s.accent, display: 'flex', alignItems: 'center', gap: 5 }}>
+                    {on ? <><Check style={{ width: 12, height: 12 }} strokeWidth={3} />Connecté</> : 'Connecter'}
                   </motion.button>
                 </div>
               )
@@ -1875,38 +1892,63 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
           </div>
         </div>
 
-        {/* Configure ads */}
-        <div style={{ flex: '1 1 280px', borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 16 }}>Configure your ads</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ padding: '12px 14px', borderRadius: 11, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Monthly budget</div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#fbbf24' }}>{userData.adsBudget || '€0 (organic)'}</div>
-            </div>
-            <div style={{ padding: '12px 14px', borderRadius: 11, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.4)', marginBottom: 5 }}>Suggested format</div>
-              <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', lineHeight: 1.4 }}>{adFormat}</div>
-            </div>
-            {channels.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {channels.map(c => <span key={c} style={{ fontSize: '10.5px', fontWeight: 600, padding: '4px 9px', borderRadius: 99, background: 'rgba(139,92,246,0.12)', color: '#c4b5fd' }}>{c}</span>)}
+        {/* Locked strategy preview */}
+        <div style={{ flex: '1 1 260px', borderRadius: 18, overflow: 'hidden', position: 'relative', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ padding: '20px' }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Stratégie de croissance</div>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>Basée sur tes réseaux connectés & ton profil</div>
+            <div style={{ position: 'relative' }}>
+              <div style={{ filter: connectedCount === 0 ? 'blur(5px)' : 'none', transition: 'filter 0.4s', userSelect: connectedCount === 0 ? 'none' : 'auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {strategyLines.map((line) => (
+                    <div key={line} style={{ padding: '10px 12px', borderRadius: 10, background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', fontSize: '12.5px', color: 'rgba(255,255,255,0.75)' }}>{line}</div>
+                  ))}
+                </div>
               </div>
-            )}
-            <div>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>Campaign name</div>
-              <input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder="e.g. Launch — Week 1"
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 10, background: 'rgba(9,11,17,0.6)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              {connectedCount === 0 && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, pointerEvents: 'none' }}>
+                  <div style={{ fontSize: '28px' }}>🔒</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', textAlign: 'center' }}>Stratégie prête</div>
+                  <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>Connecte un réseau pour voir</div>
+                </div>
+              )}
             </div>
-            <button style={{ padding: '10px', borderRadius: 10, fontSize: '12.5px', fontWeight: 600, cursor: 'pointer', border: 'none', background: 'rgba(139,92,246,0.16)', color: '#c4b5fd', fontFamily: 'inherit' }}>Launch campaign (demo)</button>
           </div>
         </div>
       </div>
 
+      {/* Payment section */}
+      <motion.div initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? {} : { duration: 0.45, delay: 0.1 }}
+        style={{ borderRadius: 18, padding: '22px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(139,92,246,0.22)', marginBottom: 18 }}>
+        <div style={{ textAlign: 'center', marginBottom: 18 }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'white', marginBottom: 4 }}>Débloque ton blueprint complet ✦</div>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Accès instantané · Annulation libre · Sans frais cachés</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          {PLANS.map((p) => (
+            <div key={p.id} style={{ borderRadius: 14, padding: '16px 14px', background: p.bg, border: `1.5px solid ${p.border}`, position: 'relative', transform: p.featured ? 'scale(1.04)' : 'scale(1)', transition: 'transform 0.15s' }}>
+              {p.featured && (
+                <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #8B5CF6, #6d28d9)', color: 'white', fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: 99, whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(139,92,246,0.4)' }}>✦ Populaire</div>
+              )}
+              <div style={{ fontSize: '10.5px', fontWeight: 700, color: p.accent, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 6, marginTop: p.featured ? 6 : 0 }}>{p.name}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: p.save ? 2 : 12 }}>
+                <span style={{ fontSize: '26px', fontWeight: 800, color: 'white', letterSpacing: '-0.04em', lineHeight: 1 }}>{p.price}</span>
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>{p.period}</span>
+              </div>
+              {p.save && <div style={{ fontSize: '10px', color: '#39FF88', fontWeight: 600, marginBottom: 10 }}>{p.save}</div>}
+              <button style={{ width: '100%', padding: '9px', borderRadius: 10, fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${p.ctaBorder}`, background: p.ctaBg, color: p.ctaColor, fontFamily: 'inherit', boxShadow: p.featured ? '0 6px 18px rgba(139,92,246,0.35)' : 'none' }}>
+                Choisir →
+              </button>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
       {/* Action plan */}
       <div style={{ borderRadius: 18, padding: '20px', background: 'rgba(17,24,39,0.7)', border: '1px solid rgba(255,255,255,0.08)', marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <span style={{ fontSize: '15px', fontWeight: 700, color: 'white' }}>First week action plan</span>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: doneCount === WEEK_TASKS.length ? '#39FF88' : 'rgba(255,255,255,0.4)' }}>{doneCount} / {WEEK_TASKS.length} done</span>
+          <span style={{ fontSize: '15px', fontWeight: 700, color: 'white' }}>Plan d&apos;action — semaine 1</span>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: doneCount === WEEK_TASKS.length ? '#39FF88' : 'rgba(255,255,255,0.4)' }}>{doneCount} / {WEEK_TASKS.length}</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {WEEK_TASKS.map((t, i) => {
@@ -1926,11 +1968,11 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
       </div>
 
       <div style={{ display: 'flex', gap: 10 }}>
-        <button style={{ flex: 1, padding: '13px', borderRadius: 14, fontSize: '13.5px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: 'inherit', background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', color: '#fff', boxShadow: '0 6px 22px rgba(139,92,246,0.35)' }}>Share my blueprint</button>
-        <button style={{ flex: 1, padding: '13px', borderRadius: 14, fontSize: '13.5px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.1)' }}>Download (PDF)</button>
+        <button style={{ flex: 1, padding: '13px', borderRadius: 14, fontSize: '13.5px', fontWeight: 600, cursor: 'pointer', border: 'none', fontFamily: 'inherit', background: 'linear-gradient(135deg,#8B5CF6,#6d28d9)', color: '#fff', boxShadow: '0 6px 22px rgba(139,92,246,0.35)' }}>Partager mon blueprint</button>
+        <button style={{ flex: 1, padding: '13px', borderRadius: 14, fontSize: '13.5px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.1)' }}>Télécharger (PDF)</button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14 }}>
-        <button onClick={onRestart} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}>Start a new project</button>
+        <button onClick={onRestart} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}>Démarrer un nouveau projet</button>
       </div>
     </div>
   )
@@ -1940,7 +1982,7 @@ function DashboardStep({ ideas, userData, onRestart }: { ideas: SaaSIdea[]; user
 
 const WIDTHS: Record<number, number> = {
   0: 520, 1: 900, 2: 900, 3: 900, 4: 900, 5: 620, 6: 560, 7: 560, 8: 560,
-  9: 560, 10: 620, 11: 560, 12: 560, 13: 520, 14: 760, 15: 880, 16: 1000, 17: 1120,
+  9: 560, 10: 620, 11: 560, 12: 560, 13: 520, 14: 760, 15: 1000, 16: 1120,
 }
 
 export function BuilderClient() {
@@ -2012,18 +2054,17 @@ export function BuilderClient() {
             {step === 3 && <KnowsProblemStep value={userData.knowsProblem} onSelect={(v) => set('knowsProblem', v)} onNext={() => goTo(userData.knowsProblem === 'yes' ? 5 : 4)} onBack={() => goTo(2)} />}
             {step === 4 && <DiscoveryStep userData={userData} setField={set} onNext={() => goTo(5)} onBack={() => goTo(3)} />}
             {step === 5 && <ProblemListStep userData={userData} onSelect={(t) => set('selectedProblem', t)} onNext={() => goTo(6)} onBack={() => goTo(userData.knowsProblem === 'yes' ? 3 : 4)} />}
-            {step === 6 && <ChoiceStep progressN={6} badgeN={6} pre="What's your" accent="launch budget?" subtitle="How much can you invest to get your SaaS off the ground?" options={LAUNCH_BUDGET_OPTIONS} value={userData.launchBudget} onSelect={(v) => set('launchBudget', v)} onNext={() => goTo(7)} onBack={() => goTo(5)} />}
-            {step === 7 && <ChoiceStep progressN={7} badgeN={7} pre="How will you" accent="build it?" subtitle="This determines your timeline, costs, and the ideas we recommend." options={BUILD_APPROACH_OPTIONS} value={userData.buildApproach} onSelect={(v) => set('buildApproach', v)} onNext={() => goTo(8)} onBack={() => goTo(6)} columns={1} />}
-            {step === 8 && <ChoiceStep progressN={8} badgeN={8} pre="Monthly budget" accent="for ads?" subtitle="We'll adapt your acquisition strategy to match your spend." options={ADS_BUDGET_OPTIONS} value={userData.adsBudget} onSelect={(v) => set('adsBudget', v)} onNext={() => goTo(9)} onBack={() => goTo(7)} />}
+            {step === 6 && <ChoiceStep progressN={6} badgeN={6} pre="Quel est ton" accent="budget de lancement ?" subtitle="Combien peux-tu investir pour démarrer ton SaaS ?" options={LAUNCH_BUDGET_OPTIONS} value={userData.launchBudget} onSelect={(v) => set('launchBudget', v)} onNext={() => goTo(7)} onBack={() => goTo(5)} />}
+            {step === 7 && <ChoiceStep progressN={7} badgeN={7} pre="Comment vas-tu" accent="le construire ?" subtitle="Ça détermine le calendrier, les coûts et les idées recommandées." options={BUILD_APPROACH_OPTIONS} value={userData.buildApproach} onSelect={(v) => set('buildApproach', v)} onNext={() => goTo(8)} onBack={() => goTo(6)} columns={1} />}
+            {step === 8 && <ChoiceStep progressN={8} badgeN={8} pre="Budget mensuel" accent="pour la pub ?" subtitle="On adapte ta stratégie d'acquisition à ton budget." options={ADS_BUDGET_OPTIONS} value={userData.adsBudget} onSelect={(v) => set('adsBudget', v)} onNext={() => goTo(9)} onBack={() => goTo(7)} />}
             {step === 9 && <AcquisitionStep value={userData.acquisitionChannels} onChange={(v) => set('acquisitionChannels', v)} onNext={() => goTo(10)} onBack={() => goTo(8)} />}
             {step === 10 && <MarketTypeStep value={userData.marketType} onSelect={(v) => set('marketType', v)} onNext={() => goTo(11)} onBack={() => goTo(9)} />}
-            {step === 11 && <ChoiceStep progressN={11} badgeN={11} pre="What's your" accent="age range?" subtitle="This helps us understand your audience and time horizon." options={AGE_OPTIONS} value={userData.age} onSelect={(v) => set('age', v)} onNext={() => goTo(12)} onBack={() => goTo(10)} />}
-            {step === 12 && <ChoiceStep progressN={12} badgeN={12} pre="Time you can" accent="commit per day?" subtitle="We'll size your roadmap to fit your real availability." options={TIME_PER_DAY_OPTIONS} value={userData.timePerDay} onSelect={(v) => set('timePerDay', v)} onNext={() => goTo(13)} onBack={() => goTo(11)} />}
+            {step === 11 && <ChoiceStep progressN={11} badgeN={11} pre="Quelle est ta" accent="tranche d'âge ?" subtitle="Ça nous aide à comprendre ton profil et ton horizon." options={AGE_OPTIONS} value={userData.age} onSelect={(v) => set('age', v)} onNext={() => goTo(12)} onBack={() => goTo(10)} />}
+            {step === 12 && <ChoiceStep progressN={12} badgeN={12} pre="Combien de temps" accent="peux-tu y consacrer ?" subtitle="On dimensionne ta roadmap selon ta vraie disponibilité." options={TIME_PER_DAY_OPTIONS} value={userData.timePerDay} onSelect={(v) => set('timePerDay', v)} onNext={() => goTo(13)} onBack={() => goTo(11)} />}
             {step === 13 && <LoadingIdeasStep loadingStep={loadingStep} />}
             {step === 14 && <IdeaSelectionStep ideas={ideas} selectedIndex={userData.selectedIdeaIndex} onSelect={(i) => set('selectedIdeaIndex', i)} onNext={() => goTo(15)} onBack={() => goTo(12)} />}
-            {step === 15 && <PaymentStep ideaName={(ideas.length ? ideas : FALLBACK_IDEAS)[Number(userData.selectedIdeaIndex) || 0]?.name || ''} onPaid={() => goTo(16)} onBack={() => goTo(14)} />}
-            {step === 16 && <FullResultsStep ideas={ideas} userData={userData} onDashboard={() => goTo(17)} />}
-            {step === 17 && <DashboardStep ideas={ideas} userData={userData} onRestart={restart} />}
+            {step === 15 && <FullResultsStep ideas={ideas} userData={userData} onDashboard={() => goTo(16)} />}
+            {step === 16 && <DashboardStep ideas={ideas} userData={userData} onRestart={restart} />}
           </motion.div>
         </AnimatePresence>
       </div>
