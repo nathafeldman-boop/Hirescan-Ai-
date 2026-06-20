@@ -540,11 +540,21 @@ export default function ResultsClient({ quiz }: Props) {
                 {ctaText} ✦
               </button>
               <button
-                onClick={() => { setShowExitModal(false); void doCheckout(); }}
+                onClick={() => {
+                  setShowExitModal(false);
+                  void (async () => {
+                    setIsCheckingOut(true);
+                    trackEvent('checkout_click');
+                    const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quizSlug: quiz.slug, score, origin: window.location.origin, userEmail: session?.user?.email ?? undefined, annual: true }) });
+                    const data = await res.json() as { url?: string; error?: string };
+                    if (data.url) window.location.href = data.url; else { alert(data.error ?? 'Erreur de paiement'); setIsCheckingOut(false); }
+                  })();
+                }}
                 disabled={isCheckingOut}
-                className="w-full py-2.5 rounded-xl font-medium text-zinc-500 text-xs border border-white/6 bg-white/[0.03] hover:bg-white/5 hover:text-zinc-400 transition-all disabled:opacity-60"
+                className="w-full py-2.5 rounded-xl font-medium text-xs border transition-all disabled:opacity-60"
+                style={{ borderColor: 'rgba(224,163,128,0.4)', background: 'rgba(194,97,31,0.12)', color: '#e0a380' }}
               >
-                Accès illimité — 9,99€/mois (pour les passionnés MBTI)
+                Ou tout débloquer 1 an — 29,99€ (0,08€/jour)
               </button>
               <button
                 onClick={() => setShowExitModal(false)}
@@ -896,34 +906,73 @@ export default function ResultsClient({ quiz }: Props) {
                 {/* Divider */}
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex-1 h-px bg-white/8" />
-                  <span className="text-[10px] text-zinc-500 font-semibold tracking-wider uppercase whitespace-nowrap">Accès illimité</span>
+                  <span className="text-[10px] text-zinc-500 font-semibold tracking-wider uppercase whitespace-nowrap">Ou débloque tout</span>
                   <div className="flex-1 h-px bg-white/8" />
                 </div>
 
-                {/* Annual option — best value, highlighted */}
-                <button
-                  onClick={() => {
-                    void (async () => {
-                      setIsCheckingOut(true);
-                      const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quizSlug: quiz.slug, score, origin: window.location.origin, userEmail: session?.user?.email ?? undefined, annual: true }) });
-                      const data = await res.json() as { url?: string; error?: string };
-                      if (data.url) window.location.href = data.url; else { alert(data.error ?? 'Erreur de paiement'); setIsCheckingOut(false); }
-                    })();
-                  }}
-                  disabled={isCheckingOut}
-                  className="w-full py-4 rounded-xl font-semibold text-white text-sm border border-white/15 bg-white/[0.07] hover:bg-white/10 transition-all active:scale-[0.98] mb-2.5 disabled:opacity-60 px-5"
+                {/* Annual option — featured, most popular, value-stacked */}
+                <div
+                  className="relative rounded-2xl p-5 mb-2.5"
+                  style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.18), rgba(176,125,43,0.10))', border: '1.5px solid rgba(224,163,128,0.55)' }}
                 >
-                  <span className="flex items-center justify-between">
-                    <span className="flex flex-col items-start gap-0.5">
-                      <span className="text-white font-bold">🗓 Annuel · 15 quiz · profil complet</span>
-                      <span className="text-zinc-400 text-xs font-normal">Meilleur rapport qualité/prix — 2,50€/mois</span>
+                  {/* Badge */}
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                    <span className="text-[10px] font-black px-3 py-1 rounded-full tracking-wide whitespace-nowrap" style={{ background: '#c2611f', color: '#fff', boxShadow: '0 2px 10px rgba(194,97,31,0.5)' }}>
+                      ⭐ LA PLUS POPULAIRE
                     </span>
-                    <span className="flex flex-col items-end ml-3 flex-shrink-0">
-                      <span className="font-black text-white">29,99€</span>
-                      <span className="text-zinc-400 text-xs font-normal">-75%</span>
-                    </span>
-                  </span>
-                </button>
+                  </div>
+
+                  <div className="flex items-end justify-between mt-2 mb-3">
+                    <div className="flex flex-col">
+                      <span className="text-white font-black text-base leading-tight">Accès illimité — 1 an</span>
+                      <span className="text-[11px] mt-0.5 font-semibold" style={{ color: '#e0a380' }}>
+                        soit 0,08€/jour — moins qu&apos;un chewing-gum
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end flex-shrink-0 ml-3">
+                      <span className="flex items-baseline gap-1.5">
+                        <span className="text-zinc-500 text-xs line-through">119,88€</span>
+                        <span className="font-black text-white text-2xl">29,99€</span>
+                      </span>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded mt-0.5" style={{ background: 'rgba(125,148,102,0.25)', color: '#aebf9c' }}>
+                        −75%
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Value stack */}
+                  <ul className="space-y-1.5 mb-4">
+                    {[
+                      'Ton profil MBTI complet + les 16 types en détail',
+                      'Les 15 quiz secrets débloqués (couple, amitié, manipulation…)',
+                      'Test de compatibilité duo en illimité',
+                      'Suivi personnalisé sur 15 jours',
+                      'Tous les futurs quiz inclus, à vie',
+                    ].map((b) => (
+                      <li key={b} className="flex items-start gap-2 text-[13px] text-zinc-200 leading-snug">
+                        <span className="flex-shrink-0 mt-px" style={{ color: '#aebf9c' }}>✓</span>
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => {
+                      void (async () => {
+                        setIsCheckingOut(true);
+                        trackEvent('checkout_click');
+                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quizSlug: quiz.slug, score, origin: window.location.origin, userEmail: session?.user?.email ?? undefined, annual: true }) });
+                        const data = await res.json() as { url?: string; error?: string };
+                        if (data.url) window.location.href = data.url; else { alert(data.error ?? 'Erreur de paiement'); setIsCheckingOut(false); }
+                      })();
+                    }}
+                    disabled={isCheckingOut}
+                    className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+                    style={{ background: '#c2611f', boxShadow: '0 4px 18px rgba(194,97,31,0.45)' }}
+                  >
+                    Tout débloquer pour 29,99€/an
+                  </button>
+                </div>
 
                 {/* Monthly sub */}
                 <button
@@ -934,14 +983,14 @@ export default function ResultsClient({ quiz }: Props) {
                   <span className="flex items-center justify-between">
                     <span className="flex flex-col items-start gap-0.5">
                       <span className="text-zinc-200 font-semibold">🔄 Mensuel · sans engagement</span>
-                      <span className="text-zinc-500 text-xs font-normal">Accès illimité · annule quand tu veux</span>
+                      <span className="text-zinc-500 text-xs font-normal">Même accès · annule quand tu veux</span>
                     </span>
                     <span className="font-black text-zinc-200 ml-3 flex-shrink-0">9,99€<span className="font-normal text-zinc-500 text-xs">/mois</span></span>
                   </span>
                 </button>
 
                 <p className="text-center text-[11px] text-zinc-600">
-                  🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay
+                  🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay · Annulable à tout moment
                 </p>
               </div>
 

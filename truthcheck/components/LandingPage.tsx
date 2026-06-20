@@ -11,8 +11,8 @@ const GROUPS = [
     title: 'Analystes',
     desc: 'Rationnels, stratèges, orientés systèmes',
     codes: ['INTJ', 'INTP', 'ENTJ', 'ENTP'],
-    color: '#7c3aed',
-    glow: 'rgba(124,58,237,0.12)',
+    color: '#a94e18',
+    glow: 'rgba(169,78,24,0.10)',
     emoji: '📊',
   },
   {
@@ -20,8 +20,8 @@ const GROUPS = [
     title: 'Diplomates',
     desc: 'Empathiques, idéalistes, axés relations',
     codes: ['INFJ', 'INFP', 'ENFJ', 'ENFP'],
-    color: '#10b981',
-    glow: 'rgba(16,185,129,0.12)',
+    color: '#566b45',
+    glow: 'rgba(86,107,69,0.10)',
     emoji: '🌱',
   },
   {
@@ -29,8 +29,8 @@ const GROUPS = [
     title: 'Sentinelles',
     desc: 'Organisés, fiables, attachés aux structures',
     codes: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'],
-    color: '#0ea5e9',
-    glow: 'rgba(14,165,233,0.12)',
+    color: '#3f6b6b',
+    glow: 'rgba(63,107,107,0.10)',
     emoji: '🏛️',
   },
   {
@@ -38,18 +38,20 @@ const GROUPS = [
     title: 'Explorateurs',
     desc: 'Adaptables, pragmatiques, orientés action',
     codes: ['ISTP', 'ISFP', 'ESTP', 'ESFP'],
-    color: '#f97316',
-    glow: 'rgba(249,115,22,0.12)',
+    color: '#b07d2b',
+    glow: 'rgba(176,125,43,0.10)',
     emoji: '🎯',
   },
 ];
 
 const MBTI_LETTERS = [
-  { letter: 'E/I', emoji: '🧭', label: 'Extraversion · Introversion', color: '#7c3aed', desc: 'Comment vous rechargez votre énergie : dans l\'action collective ou dans la solitude réflexive.' },
-  { letter: 'N/S', emoji: '🌟', label: 'Intuition · Sensation', color: '#10b981', desc: 'Comment vous traitez l\'information : abstraitement vers l\'avenir ou concrètement dans le présent.' },
-  { letter: 'T/F', emoji: '🧠', label: 'Pensée · Sentiment', color: '#f97316', desc: 'Comment vous prenez vos décisions : par analyse logique ou par système de valeurs.' },
-  { letter: 'J/P', emoji: '📅', label: 'Jugement · Perception', color: '#0ea5e9', desc: 'Comment vous organisez votre vie : avec structure et planification ou avec flexibilité et spontanéité.' },
+  { letter: 'E/I', emoji: '🧭', label: 'Extraversion · Introversion', color: '#a94e18', desc: 'Comment vous rechargez votre énergie : dans l\'action collective ou dans la solitude réflexive.' },
+  { letter: 'N/S', emoji: '🌟', label: 'Intuition · Sensation', color: '#566b45', desc: 'Comment vous traitez l\'information : abstraitement vers l\'avenir ou concrètement dans le présent.' },
+  { letter: 'T/F', emoji: '🧠', label: 'Pensée · Sentiment', color: '#b07d2b', desc: 'Comment vous prenez vos décisions : par analyse logique ou par système de valeurs.' },
+  { letter: 'J/P', emoji: '📅', label: 'Jugement · Perception', color: '#3f6b6b', desc: 'Comment vous organisez votre vie : avec structure et planification ou avec flexibilité et spontanéité.' },
 ];
+
+const CLAY = '#a94e18';
 
 function InAppBanner({ onClose }: { onClose: () => void }) {
   const copyLink = async () => {
@@ -57,15 +59,15 @@ function InAppBanner({ onClose }: { onClose: () => void }) {
   };
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 rounded-2xl px-4 py-3 flex items-center gap-3"
-      style={{ background: '#1c1917', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}>
-      <span className="text-xl flex-shrink-0">🔮</span>
-      <p className="flex-1 text-white text-xs leading-snug">
+      style={{ background: '#2b2622', border: '1px solid rgba(255,255,255,0.10)', boxShadow: '0 8px 32px rgba(0,0,0,0.28)' }}>
+      <span className="text-xl flex-shrink-0">📖</span>
+      <p className="flex-1 text-white text-xs leading-snug" style={{ fontFamily: 'var(--font-sans)' }}>
         Pour voir tes résultats, <strong>ouvre dans ton navigateur</strong> (⋯ → Ouvrir dans le navigateur)
       </p>
-      <button onClick={copyLink} className="flex-shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(124,58,237,0.25)', color: '#a78bfa' }}>
+      <button onClick={copyLink} className="flex-shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(224,163,128,0.22)', color: '#e0a380' }}>
         Copier
       </button>
-      <button onClick={onClose} className="flex-shrink-0 text-zinc-500 text-sm leading-none">✕</button>
+      <button onClick={onClose} className="flex-shrink-0 text-stone-400 text-sm leading-none">✕</button>
     </div>
   );
 }
@@ -93,36 +95,31 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <main className="min-h-screen overflow-x-hidden" style={{ background: '#faf9f7' }}>
+    <main className="min-h-screen overflow-x-hidden relative" style={{ background: '#f7f3ec', color: '#2b2622' }}>
       {inApp && !bannerDismissed && <InAppBanner onClose={() => setBannerDismissed(true)} />}
 
-      {/* Subtle cream orbs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-3xl opacity-[0.15] bg-violet-300" />
-        <div className="absolute top-1/3 right-0 w-80 h-80 rounded-full blur-3xl opacity-[0.1] bg-pink-300" />
-        <div className="absolute bottom-1/4 left-0 w-64 h-64 rounded-full blur-3xl opacity-[0.08] bg-violet-200" />
-      </div>
+      {/* Paper grain — handcrafted texture */}
+      <div className="grain-overlay" />
 
       {/* Nav */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
-          background: scrolled ? 'rgba(250,249,247,0.9)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(16px)' : 'none',
-          borderBottom: scrolled ? '1px solid #e7e5e0' : '1px solid transparent',
+          background: scrolled ? 'rgba(247,243,236,0.92)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(12px)' : 'none',
+          borderBottom: scrolled ? '1px solid #e4d9c8' : '1px solid transparent',
         }}
       >
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-xl font-black tracking-tight">
-            <span style={{ background: 'linear-gradient(to right,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-stone-900">Cecret</span>
+          <span className="text-xl font-black tracking-tight font-display" style={{ color: '#2b2622' }}>
+            Ur<span style={{ color: CLAY }}>Cecret</span>
           </span>
           <div className="flex items-center gap-3">
             <UserMenu />
             <Link
               href="/commencer"
-              className="text-sm font-bold px-5 py-2.5 rounded-xl text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 20px rgba(124,58,237,0.3)' }}
+              className="text-sm font-bold px-5 py-2.5 rounded-full text-white transition-all hover:opacity-90 active:scale-[0.98]"
+              style={{ background: CLAY, boxShadow: '0 2px 10px rgba(169,78,24,0.25)' }}
             >
               Faire le test
             </Link>
@@ -131,37 +128,28 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative z-10 pt-32 pb-16 px-6 text-center">
+      <section className="relative z-10 pt-36 pb-16 px-6 text-center">
         <div className="max-w-xl mx-auto">
-          {/* Floating crystal balls */}
-          <div className="flex justify-center gap-3 mb-6 text-4xl">
-            <span className="animate-bounce" style={{ animationDelay: '0ms', animationDuration: '2s' }}>🔮</span>
-            <span className="animate-bounce" style={{ animationDelay: '200ms', animationDuration: '2s' }}>✨</span>
-            <span className="animate-bounce" style={{ animationDelay: '400ms', animationDuration: '2s' }}>🧠</span>
-          </div>
-
           <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 tracking-wide"
-            style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)', color: '#7c3aed' }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-7 tracking-wide"
+            style={{ background: 'rgba(169,78,24,0.07)', border: '1px solid rgba(169,78,24,0.18)', color: CLAY }}
           >
-            ✦ Test de personnalité — 100 questions
+            Test de personnalité · 100 questions
           </div>
 
-          <h1 className="text-5xl sm:text-[56px] font-black leading-[1.05] mb-5 tracking-tight text-stone-900">
-            Test MBTI — quel est<br />
-            <span style={{ background: 'linear-gradient(135deg,#7c3aed 0%,#ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              ton type ?
-            </span>
+          <h1 className="font-display text-5xl sm:text-[58px] font-black leading-[1.04] mb-5 tracking-tight" style={{ color: '#2b2622' }}>
+            Quel est<br />
+            <span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type ?
           </h1>
 
           <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-9">
-            Parmi 16 profils psychologiques. Basé sur la théorie des types cognitifs de Myers-Briggs. Résultat complet en 12 minutes.
+            Parmi 16 profils psychologiques. Basé sur la théorie des types cognitifs de Myers-Briggs. Ton résultat complet en 12 minutes.
           </p>
 
           <Link
             href="/commencer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.35)' }}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-white text-sm transition-all hover:opacity-90 active:scale-[0.98]"
+            style={{ background: CLAY, boxShadow: '0 6px 24px rgba(169,78,24,0.28)' }}
           >
             Découvrir mon type →
           </Link>
@@ -172,28 +160,27 @@ export default function LandingPage() {
           {/* Features strip */}
           <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
             <span className="text-stone-400 text-xs font-medium">Et aussi :</span>
-            <a href="/duo" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#7c3aed' }}>
+            <a href="/duo" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: '#fff', border: '1px solid #e4d9c8', color: '#566b45' }}>
               💑 Test duo
             </a>
-            <a href="/fusion" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#ec4899' }}>
+            <a href="/fusion" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: '#fff', border: '1px solid #e4d9c8', color: CLAY }}>
               ⚗️ Quiz de groupe
             </a>
-            <a href="/quizzes" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: 'white', border: '1px solid #e7e5e0', color: '#6b7280' }}>
+            <a href="/quizzes" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: '#fff', border: '1px solid #e4d9c8', color: '#78716c' }}>
               🎯 15 quiz secrets
             </a>
           </div>
 
           {/* Stats */}
-          <div className="flex items-center justify-center gap-12 mt-14 pt-10 border-t border-stone-200">
+          <div className="flex items-center justify-center gap-12 mt-14 pt-10" style={{ borderTop: '1px solid #e4d9c8' }}>
             {[
-              { value: '16', label: 'Profils distincts', emoji: '🌈' },
-              { value: '100', label: 'Questions calibrées', emoji: '🎯' },
-              { value: '0 €', label: 'Pour commencer', emoji: '🎁' },
+              { value: '16', label: 'Profils distincts' },
+              { value: '100', label: 'Questions calibrées' },
+              { value: '0 €', label: 'Pour commencer' },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <div className="text-lg mb-1">{s.emoji}</div>
-                <div className="text-2xl font-black text-stone-900">{s.value}</div>
-                <div className="text-xs text-stone-400 mt-0.5">{s.label}</div>
+                <div className="font-display text-3xl font-black" style={{ color: '#2b2622' }}>{s.value}</div>
+                <div className="text-xs text-stone-400 mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -211,9 +198,9 @@ export default function LandingPage() {
             <div
               key={who}
               className="flex items-start gap-3 rounded-2xl px-4 py-3"
-              style={{ background: 'rgba(124,58,237,0.05)', border: '1px solid rgba(124,58,237,0.10)' }}
+              style={{ background: '#fff', border: '1px solid #ece2d4' }}
             >
-              <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-black text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+              <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-black text-white" style={{ background: CLAY }}>
                 {who[0]}
               </div>
               <div>
@@ -230,11 +217,11 @@ export default function LandingPage() {
         <div className="max-w-lg mx-auto">
           <div
             className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.06),rgba(236,72,153,0.04))', border: '1px solid rgba(124,58,237,0.15)' }}
+            style={{ background: '#fff', border: '1px solid #ece2d4' }}
           >
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#7c3aed' }}>💑 Mode duo</p>
-              <h2 className="text-base font-black text-stone-900 mb-1">
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#566b45' }}>💑 Mode duo</p>
+              <h2 className="font-display text-lg font-black text-stone-900 mb-1">
                 Test de compatibilité MBTI
               </h2>
               <p className="text-stone-500 text-xs leading-relaxed max-w-xs">
@@ -243,8 +230,8 @@ export default function LandingPage() {
             </div>
             <Link
               href="/duo"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 whitespace-nowrap"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 4px 16px rgba(124,58,237,0.25)' }}
+              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm text-white transition-all hover:opacity-90 whitespace-nowrap"
+              style={{ background: '#566b45', boxShadow: '0 2px 10px rgba(86,107,69,0.22)' }}
             >
               Tester la compatibilité →
             </Link>
@@ -253,11 +240,11 @@ export default function LandingPage() {
           {/* Fusion card */}
           <div
             className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-3"
-            style={{ background: 'linear-gradient(135deg,rgba(236,72,153,0.06),rgba(124,58,237,0.04))', border: '1px solid rgba(236,72,153,0.15)' }}
+            style={{ background: '#fff', border: '1px solid #ece2d4' }}
           >
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#ec4899' }}>⚗️ Mode groupe</p>
-              <h2 className="text-base font-black text-stone-900 mb-1">
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: CLAY }}>⚗️ Mode groupe</p>
+              <h2 className="font-display text-lg font-black text-stone-900 mb-1">
                 Fusion — Quiz de groupe
               </h2>
               <p className="text-stone-500 text-xs leading-relaxed max-w-xs">
@@ -266,8 +253,8 @@ export default function LandingPage() {
             </div>
             <Link
               href="/fusion"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 whitespace-nowrap"
-              style={{ background: 'linear-gradient(135deg,#ec4899,#7c3aed)', boxShadow: '0 4px 16px rgba(236,72,153,0.25)' }}
+              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm text-white transition-all hover:opacity-90 whitespace-nowrap"
+              style={{ background: CLAY, boxShadow: '0 2px 10px rgba(169,78,24,0.22)' }}
             >
               Lancer un Fusion →
             </Link>
@@ -283,7 +270,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-2xl">{group.emoji}</span>
                 <div>
-                  <p className="font-black text-stone-900 text-sm">{group.title}</p>
+                  <p className="font-display font-black text-stone-900 text-base">{group.title}</p>
                   <p className="text-stone-400 text-xs">{group.desc}</p>
                 </div>
               </div>
@@ -294,8 +281,8 @@ export default function LandingPage() {
                     <Link
                       key={code}
                       href={`/types/${code.toLowerCase()}`}
-                      className="block p-5 rounded-xl transition-all hover:scale-[1.02] group"
-                      style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                      className="block p-5 rounded-xl transition-all hover:-translate-y-0.5 group"
+                      style={{ background: '#fff', border: '1px solid #ece2d4' }}
                     >
                       <div
                         className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-black mb-3 tracking-widest"
@@ -322,7 +309,7 @@ export default function LandingPage() {
       <section className="relative z-10 py-16 px-6">
         <div className="max-w-2xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 text-center mb-3">Fonctionnement</p>
-          <h2 className="text-2xl font-black text-stone-900 text-center mb-10">
+          <h2 className="font-display text-3xl font-black text-stone-900 text-center mb-10">
             Les 4 dimensions du modèle MBTI
           </h2>
           <div className="space-y-3">
@@ -330,7 +317,7 @@ export default function LandingPage() {
               <div
                 key={item.letter}
                 className="flex items-start gap-5 p-4 rounded-xl"
-                style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}
+                style={{ background: '#fff', border: '1px solid #ece2d4' }}
               >
                 <div
                   className="flex-shrink-0 w-14 h-12 rounded-lg flex items-center justify-center text-xl"
@@ -351,10 +338,10 @@ export default function LandingPage() {
       {/* Truth quizzes */}
       <section className="relative z-10 py-16 px-6">
         <div className="max-w-lg mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: '#7c3aed' }}>
+          <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
             🔍 Questions secrètes
           </p>
-          <h2 className="text-2xl font-black text-stone-900 text-center mb-2">
+          <h2 className="font-display text-3xl font-black text-stone-900 text-center mb-2">
             Des révélations que tu n&apos;attendais pas
           </h2>
           <p className="text-stone-500 text-center text-sm mb-8 max-w-xs mx-auto">
@@ -370,32 +357,31 @@ export default function LandingPage() {
               <Link
                 key={q.href}
                 href={q.href}
-                className="flex items-center gap-4 p-4 rounded-xl transition-all hover:scale-[1.01] group"
-                style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}
+                className="flex items-center gap-4 p-4 rounded-xl transition-all hover:-translate-y-0.5 group"
+                style={{ background: '#fff', border: '1px solid #ece2d4' }}
               >
                 <span className="text-2xl flex-shrink-0">{q.emoji}</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
                   <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
                 </div>
-                <svg className="w-4 h-4 text-stone-300 group-hover:text-violet-500 flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 text-stone-300 flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
             ))}
           </div>
-          <Link href="/quizzes" className="block text-center mt-6 text-sm font-semibold transition-colors" style={{ color: '#7c3aed' }}>
+          <Link href="/quizzes" className="block text-center mt-6 text-sm font-semibold transition-colors" style={{ color: CLAY }}>
             Voir tous les quiz →
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-8 px-6 border-t border-stone-200">
+      <footer className="relative z-10 py-8 px-6" style={{ borderTop: '1px solid #e4d9c8' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-base font-black">
-            <span style={{ background: 'linear-gradient(to right,#7c3aed,#ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-stone-900">Cecret</span>
+          <span className="font-display text-base font-black">
+            Ur<span style={{ color: CLAY }}>Cecret</span>
           </span>
           <div className="flex items-center gap-6 text-stone-400 text-xs">
             <Link href="/types" className="hover:text-stone-700 transition-colors">16 types</Link>

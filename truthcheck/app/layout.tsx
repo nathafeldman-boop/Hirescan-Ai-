@@ -1,6 +1,23 @@
 import type { Metadata } from 'next';
+import { Fraunces, Nunito_Sans } from 'next/font/google';
 import './globals.css';
 import Providers from './Providers';
+
+// Warm, handcrafted type pairing — characterful soft serif for display,
+// rounded humanist sans for body. Replaces the default system stack that
+// reads as generic / AI-generated.
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-display',
+  style: ['normal', 'italic'],
+});
+
+const nunitoSans = Nunito_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
 import Tracker from './Tracker';
 import { Suspense } from 'react';
 import AffiliateTracker from '@/components/AffiliateTracker';
@@ -101,7 +118,7 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" className={`${fraunces.variable} ${nunitoSans.variable}`}>
       <head>
         <script
           type="application/ld+json"
