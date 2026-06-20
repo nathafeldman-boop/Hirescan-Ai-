@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Stripe from 'stripe';
 import crypto from 'crypto';
 import { prisma } from '@/lib/db';
+import { mbtiTypes } from '@/lib/mbti';
 import SuccessTracker from './SuccessTracker';
 
 async function verifyAndUnlock(sessionId: string | undefined, resultId: string | undefined) {
@@ -132,29 +133,11 @@ export default async function SuccessPage({
         )}
 
         <div className="space-y-3 max-w-sm mx-auto">
-          {/* Direct link to result — always shown when typeCode is available */}
-          {typeCode && (
-            <Link
-              href={`/types/${typeCode.toLowerCase()}`}
-              className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
-            >
-              🔓 Voir mon profil {typeCode} →
-            </Link>
-          )}
-
-          {/* Email CTA — secondary when magic link was sent */}
+          {/* Email CTA */}
           {magicLinkSent && email && (
-            <a
-              href={`mailto:${email}`}
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-stone-600 text-sm text-center transition-all hover:bg-stone-100"
-              style={{ background: 'white', border: '1px solid #e7e5e0' }}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              📬 Recevoir par email aussi →
-            </a>
+            <p className="text-sm text-stone-500">
+              Un lien a été envoyé à <strong style={{ color: '#7c3aed' }}>{email}</strong> pour accéder à nouveau plus tard.
+            </p>
           )}
 
           {/* Direct link if no typeCode but resultId exists */}
@@ -183,6 +166,100 @@ export default async function SuccessPage({
           </p>
         )}
       </div>
+
+      {/* MBTI profile displayed inline — no redirect, no login required */}
+      {paid && typeCode && (() => {
+        const t = mbtiTypes[typeCode];
+        if (!t) return null;
+        return (
+          <div className="relative z-10 max-w-xl mx-auto mt-8 px-4 pb-16 space-y-4">
+            {/* Type header */}
+            <div className="rounded-2xl p-6 text-center" style={{ background: 'white', border: '1px solid #e7e5e0', borderTop: `3px solid ${t.accentColor}` }}>
+              <div className="text-5xl mb-3">{t.emoji}</div>
+              <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: t.accentColor }}>{t.code}</p>
+              <h2 className="text-2xl font-black text-stone-900 mb-2">{t.name}</h2>
+              <p className="text-stone-500 text-sm leading-relaxed mb-3">{t.tagline}</p>
+              <span className="inline-block bg-stone-100 text-stone-500 text-xs px-3 py-1 rounded-full">{t.rarity} de la population</span>
+            </div>
+
+            {/* Full desc */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+              <p className="text-xs font-bold tracking-widest uppercase text-violet-500 mb-3">Profil complet</p>
+              <p className="text-stone-700 text-sm leading-relaxed">{t.fullDesc}</p>
+            </div>
+
+            {/* Traits */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+              <p className="text-xs font-bold tracking-widest uppercase text-violet-500 mb-3">Traits principaux</p>
+              <div className="flex flex-wrap gap-2">
+                {t.traits.map(tr => (
+                  <span key={tr} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: `${t.accentColor}18`, border: `1px solid ${t.accentColor}40`, color: t.accentColor }}>{tr}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* In love & at work */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+              <p className="text-xs font-bold tracking-widest uppercase text-pink-500 mb-3">En amour ❤️</p>
+              <p className="text-stone-700 text-sm leading-relaxed">{t.inLove}</p>
+            </div>
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+              <p className="text-xs font-bold tracking-widest uppercase text-sky-500 mb-3">Au travail 💼</p>
+              <p className="text-stone-700 text-sm leading-relaxed">{t.atWork}</p>
+            </div>
+
+            {/* Strengths & Weaknesses */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+                <p className="text-xs font-bold tracking-widest uppercase text-green-500 mb-3">Forces ✨</p>
+                <ul className="space-y-1.5">
+                  {t.strengths.map(s => <li key={s} className="text-xs text-stone-700 flex gap-1.5"><span className="text-green-500 flex-shrink-0">+</span>{s}</li>)}
+                </ul>
+              </div>
+              <div className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+                <p className="text-xs font-bold tracking-widest uppercase text-orange-400 mb-3">Points fragiles ⚡</p>
+                <ul className="space-y-1.5">
+                  {t.weaknesses.map(w => <li key={w} className="text-xs text-stone-700 flex gap-1.5"><span className="text-orange-400 flex-shrink-0">−</span>{w}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            {/* Growth */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+              <p className="text-xs font-bold tracking-widest uppercase text-yellow-500 mb-3">Croissance personnelle 🌱</p>
+              <p className="text-stone-700 text-sm leading-relaxed">{t.growth}</p>
+            </div>
+
+            {/* Compatible with */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+              <p className="text-xs font-bold tracking-widest uppercase text-pink-500 mb-3">Compatibles avec 💞</p>
+              <div className="flex flex-wrap gap-2">
+                {t.compatibleWith.map(c => (
+                  <span key={c} className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(244,114,182,0.1)', border: '1px solid rgba(244,114,182,0.3)', color: '#ec4899' }}>{c}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Famous */}
+            {t.famousExamples.length > 0 && (
+              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Célébrités {t.code}</p>
+                <p className="text-stone-600 text-sm">{t.famousExamples.join(' · ')}</p>
+              </div>
+            )}
+
+            {/* Sign in CTA */}
+            {email && (
+              <div className="rounded-2xl p-5 text-center" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+                <p className="text-stone-500 text-sm mb-3">Connecte-toi pour retrouver ton profil à tout moment</p>
+                <Link href="/auth/signin" className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm" style={{ background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+                  Se connecter avec {email} →
+                </Link>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </main>
   );
 }

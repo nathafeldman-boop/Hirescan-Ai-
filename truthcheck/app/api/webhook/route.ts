@@ -48,6 +48,15 @@ export async function POST(req: NextRequest) {
         }).catch(() => {});
       }
 
+      // ── One-time MBTI purchase → upgrade user tier ──
+      if (email && meta.oneTime === 'true' && meta.typeCode) {
+        await prisma.user.upsert({
+          where: { email },
+          create: { email, tier: 'premium' },
+          update: { tier: 'premium' },
+        }).catch(() => {});
+      }
+
       // ── Subscription or rapport → upgrade user tier ──
       if (email && (meta.annual === 'true' || session.mode === 'subscription' || meta.rapport === 'true')) {
         await prisma.user.upsert({

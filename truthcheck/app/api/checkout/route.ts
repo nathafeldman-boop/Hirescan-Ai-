@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
         }],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', oneTime: 'true', affiliateSlug },
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', oneTime: 'true', affiliateSlug, ...(typeCode ? { typeCode } : {}) },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
