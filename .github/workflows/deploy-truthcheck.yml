@@ -22,7 +22,6 @@ jobs:
           K=$(echo "${V1}${V2}${V3}" | base64 -d)
           T="team_UkkHlHN78WCM48v67UQ6bnjC"
 
-          cd truthcheck
           URL=$(npx vercel deploy --prod --yes --token "$K" --scope "$T" 2>&1 | tail -1)
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed to: $URL"
