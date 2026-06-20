@@ -101,18 +101,14 @@ export default async function SuccessPage({
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.1] bg-violet-500" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-400/10 rounded-full blur-3xl" />
-      </div>
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#f7f3ec' }}>
+      <div>
 
       <SuccessTracker />
       <div className="relative z-10 text-center max-w-md w-full">
-        {/* Success illustration */}
-        <div className="text-6xl mb-4 animate-bounce" style={{ animationDuration: '2s' }}>🎉</div>
+        <div className="text-6xl mb-4">🎉</div>
 
-        <h1 className="text-3xl font-black text-stone-900 mb-3">
+        <h1 className="font-display text-3xl font-black text-stone-900 mb-3">
           {typeCode ? `Profil ${typeCode} débloqué !` : 'Bienvenue dans UrCecret ✨'}
         </h1>
 
@@ -184,13 +180,13 @@ export default async function SuccessPage({
 
             {/* Full desc */}
             <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-              <p className="text-xs font-bold tracking-widest uppercase text-violet-500 mb-3">Profil complet</p>
+              <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Profil complet</p>
               <p className="text-stone-700 text-sm leading-relaxed">{t.fullDesc}</p>
             </div>
 
             {/* Traits */}
             <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-              <p className="text-xs font-bold tracking-widest uppercase text-violet-500 mb-3">Traits principaux</p>
+              <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Traits principaux</p>
               <div className="flex flex-wrap gap-2">
                 {t.traits.map(tr => (
                   <span key={tr} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: `${t.accentColor}18`, border: `1px solid ${t.accentColor}40`, color: t.accentColor }}>{tr}</span>
@@ -200,39 +196,39 @@ export default async function SuccessPage({
 
             {/* In love & at work */}
             <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-              <p className="text-xs font-bold tracking-widest uppercase text-pink-500 mb-3">En amour ❤️</p>
+              <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">En amour ❤️</p>
               <p className="text-stone-700 text-sm leading-relaxed">{t.inLove}</p>
             </div>
             <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-              <p className="text-xs font-bold tracking-widest uppercase text-sky-500 mb-3">Au travail 💼</p>
+              <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Au travail 💼</p>
               <p className="text-stone-700 text-sm leading-relaxed">{t.atWork}</p>
             </div>
 
             {/* Strengths & Weaknesses */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-green-500 mb-3">Forces ✨</p>
+                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Forces ✨</p>
                 <ul className="space-y-1.5">
-                  {t.strengths.map(s => <li key={s} className="text-xs text-stone-700 flex gap-1.5"><span className="text-green-500 flex-shrink-0">+</span>{s}</li>)}
+                  {t.strengths.map(s => <li key={s} className="text-xs text-stone-700 flex gap-1.5"><span className="text-stone-400 flex-shrink-0">+</span>{s}</li>)}
                 </ul>
               </div>
               <div className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-orange-400 mb-3">Points fragiles ⚡</p>
+                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Points fragiles ⚡</p>
                 <ul className="space-y-1.5">
-                  {t.weaknesses.map(w => <li key={w} className="text-xs text-stone-700 flex gap-1.5"><span className="text-orange-400 flex-shrink-0">−</span>{w}</li>)}
+                  {t.weaknesses.map(w => <li key={w} className="text-xs text-stone-700 flex gap-1.5"><span className="text-stone-500 flex-shrink-0">−</span>{w}</li>)}
                 </ul>
               </div>
             </div>
 
             {/* Growth */}
             <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-              <p className="text-xs font-bold tracking-widest uppercase text-yellow-500 mb-3">Croissance personnelle 🌱</p>
+              <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Croissance personnelle 🌱</p>
               <p className="text-stone-700 text-sm leading-relaxed">{t.growth}</p>
             </div>
 
             {/* Compatible with */}
             <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-              <p className="text-xs font-bold tracking-widest uppercase text-pink-500 mb-3">Compatibles avec 💞</p>
+              <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Compatibles avec 💞</p>
               <div className="flex flex-wrap gap-2">
                 {t.compatibleWith.map(c => (
                   <span key={c} className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(224,163,128,0.1)', border: '1px solid rgba(224,163,128,0.3)', color: '#d17d52' }}>{c}</span>

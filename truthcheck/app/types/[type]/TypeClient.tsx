@@ -120,42 +120,42 @@ export default function TypeClient({ type }: Props) {
         </Section>
 
         <Section title={t.sectionWhoAreYou} accent={type.accentColor}>
-          <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-line">{localType.fullDesc}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.fullDesc}</p>
         </Section>
 
         <Section title={t.sectionInLove} accent={type.accentColor}>
-          <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-line">{localType.inLove}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.inLove}</p>
         </Section>
 
         <Section title={t.sectionAtWork} accent={type.accentColor}>
-          <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-line">{localType.atWork}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.atWork}</p>
         </Section>
 
         <div className="grid sm:grid-cols-2 gap-6">
           <Section title={t.sectionStrengths} accent={type.accentColor}>
             <ul className="space-y-2">
               {localType.strengths.map(s => (
-                <li key={s} className="flex gap-2 text-sm text-zinc-300"><span className="text-emerald-400 mt-0.5">✓</span>{s}</li>
+                <li key={s} className="flex gap-2 text-sm text-stone-300"><span className="text-emerald-400 mt-0.5">✓</span>{s}</li>
               ))}
             </ul>
           </Section>
           <Section title={t.sectionWeaknesses} accent={type.accentColor}>
             <ul className="space-y-2">
               {localType.weaknesses.map(s => (
-                <li key={s} className="flex gap-2 text-sm text-zinc-300"><span className="text-amber-400 mt-0.5">!</span>{s}</li>
+                <li key={s} className="flex gap-2 text-sm text-stone-300"><span className="text-amber-400 mt-0.5">!</span>{s}</li>
               ))}
             </ul>
           </Section>
         </div>
 
         <Section title={t.sectionGrowth} accent={type.accentColor}>
-          <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-line">{localType.growth}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.growth}</p>
         </Section>
 
         <Section title={t.sectionFamous} accent={type.accentColor}>
           <div className="flex flex-wrap gap-2">
             {type.famousExamples.map(f => (
-              <span key={f} className="px-3 py-1.5 rounded-full text-xs font-medium text-zinc-300" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>{f}</span>
+              <span key={f} className="px-3 py-1.5 rounded-full text-xs font-medium text-stone-300" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>{f}</span>
             ))}
           </div>
         </Section>
@@ -164,7 +164,7 @@ export default function TypeClient({ type }: Props) {
           <div className="flex flex-wrap gap-3">
             {type.compatibleWith.map(c => (
               <a key={c} href={`/types/${c.toLowerCase()}`}
-                className="px-4 py-2 rounded-lg text-sm font-bold text-zinc-300 hover:text-white transition-all"
+                className="px-4 py-2 rounded-lg text-sm font-bold text-stone-300 hover:text-white transition-all"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 {c}
               </a>
@@ -175,7 +175,7 @@ export default function TypeClient({ type }: Props) {
         <div className="rounded-2xl p-6 border text-center"
           style={{ borderColor: `${type.accentColor}30`, background: `${type.accentColor}10` }}>
           <h3 className="text-lg font-black text-white mb-2">Ton accès UrCecret est ouvert 🔓</h3>
-          <p className="text-sm text-zinc-400 mb-4 max-w-sm mx-auto">{t.quizzesDesc}</p>
+          <p className="text-sm text-stone-400 mb-4 max-w-sm mx-auto">{t.quizzesDesc}</p>
           <a href="/duo"
             className="inline-block px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
             style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.3)' }}>
@@ -204,22 +204,22 @@ export default function TypeClient({ type }: Props) {
             </span>
           ))}
         </div>
-        <p className="text-zinc-200 text-sm leading-relaxed">
+        <p className="text-stone-200 text-sm leading-relaxed">
           {localType.fullDesc.split(/(?<=[.!?])\s/)[0]}
         </p>
         <div className="relative mt-3 overflow-hidden" style={{ maxHeight: 54 }}>
           <div style={{ filter: 'blur(5px)', userSelect: 'none', pointerEvents: 'none' }}>
-            <p className="text-zinc-400 text-sm leading-relaxed">
+            <p className="text-stone-400 text-sm leading-relaxed">
               {localType.fullDesc.split(/(?<=[.!?])\s/).slice(1, 4).join(' ')}
             </p>
           </div>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.97) 65%)' }} />
         </div>
         <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-white/8">
-          <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-3.5 h-3.5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          <span className="text-[11px] text-zinc-500">Rapport complet verrouillé — traits, amour, travail, forces…</span>
+          <span className="text-[11px] text-stone-500">Rapport complet verrouillé — traits, amour, travail, forces…</span>
         </div>
       </div>
 
@@ -231,7 +231,7 @@ export default function TypeClient({ type }: Props) {
           RÉSULTAT {type.code}
         </div>
         <div className="text-4xl font-black text-white mb-1">{ONE_TIME_PRICE}</div>
-        <p className="text-zinc-400 text-xs mb-5">{t.oneTimeDesc}</p>
+        <p className="text-stone-400 text-xs mb-5">{t.oneTimeDesc}</p>
         <button
           onClick={handleOneTime}
           disabled={loading}
@@ -245,14 +245,14 @@ export default function TypeClient({ type }: Props) {
       {/* ── Séparateur ── */}
       <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-white/8" />
-        <span className="text-zinc-600 text-xs font-medium">{t.orPremium}</span>
+        <span className="text-stone-600 text-xs font-medium">{t.orPremium}</span>
         <div className="flex-1 h-px bg-white/8" />
       </div>
 
       {/* ── Abonnement ── */}
       <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <p className="text-xs text-zinc-400 mb-1">{t.paywallTagline}</p>
-        <p className="text-xs text-zinc-500 mb-4">{t.paywallPlus}</p>
+        <p className="text-xs text-stone-400 mb-1">{t.paywallTagline}</p>
+        <p className="text-xs text-stone-500 mb-4">{t.paywallPlus}</p>
         <button
           onClick={() => handleUnlock(false)}
           disabled={loading}
@@ -263,7 +263,7 @@ export default function TypeClient({ type }: Props) {
         </button>
         <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3 mb-3 text-left max-w-xs mx-auto">
           {['Rapport MBTI complet', 'Amour & compatibilité', 'Forces & faiblesses', 'Tous les 16 types', 'Accès aux quiz UrCecret', 'Annulable à tout moment'].map(b => (
-            <li key={b} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+            <li key={b} className="flex items-center gap-1.5 text-[11px] text-stone-400">
               <span className="text-emerald-400 text-[10px]">✓</span>
               {b}
             </li>
@@ -277,13 +277,13 @@ export default function TypeClient({ type }: Props) {
         >
           {t.unlockAnnual(ANNUAL_PRICE)}
         </button>
-        <p className="text-xs text-zinc-600 mt-3">{t.guarantee}</p>
+        <p className="text-xs text-stone-600 mt-3">{t.guarantee}</p>
       </div>
 
       <div className="text-center mt-5">
         <a
           href="/types"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-zinc-400 hover:text-white transition-all"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-stone-400 hover:text-white transition-all"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
           🔍 Voir les 16 types
@@ -296,7 +296,7 @@ export default function TypeClient({ type }: Props) {
 function Section({ title, accent, children }: { title: string; accent: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-      <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2">
+      <h2 className="font-display text-base font-bold text-white mb-4 flex items-center gap-2">
         <span className="inline-block w-1.5 h-4 rounded-full" style={{ background: accent }} />
         {title}
       </h2>

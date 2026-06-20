@@ -73,22 +73,13 @@ export default function QuizzesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <main className="min-h-screen flex flex-col" style={{ background: '#faf9f7' }}>
-
-        {/* Subtle animated orbs */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.12] bg-violet-300" style={{ animation: 'pulse 7s ease-in-out infinite' }} />
-          <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-300/10 rounded-full blur-3xl" />
-        </div>
+      <main className="min-h-screen flex flex-col" style={{ background: '#f7f3ec' }}>
 
         {/* Header */}
-        <header className="relative z-10 border-b border-stone-200 sticky top-0 backdrop-blur-md" style={{ background: 'rgba(250,249,247,0.9)' }}>
+        <header className="border-b sticky top-0 backdrop-blur-md z-20" style={{ background: 'rgba(247,243,236,0.9)', borderColor: '#e8e0d4' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#a94e18,#d17d52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Ur
-              </span>
-              <span className="text-stone-900">Cecret</span>
+            <Link href="/" className="font-display text-xl font-black text-stone-900">
+              Ur<span style={{ color: '#c2611f' }}>Cecret</span>
             </Link>
             <span className="text-xs text-stone-400 uppercase tracking-widest font-semibold">Choisis ton quiz</span>
           </div>
@@ -99,15 +90,12 @@ export default function QuizzesPage() {
           <div className="w-full max-w-md">
 
             <div className="text-center mb-10">
-              <div className="flex justify-center gap-2 text-3xl mb-4">
-                <span>🔍</span><span>✨</span><span>💫</span>
-              </div>
               <p className="text-xs text-stone-400 uppercase tracking-[0.2em] font-semibold mb-3">
                 30 questions · Résultats instantanés
               </p>
-              <h1 className="text-3xl font-black text-stone-900 leading-tight">
+              <h1 className="font-display text-3xl font-black text-stone-900 leading-tight">
                 Quelle vérité veux-tu{' '}
-                <span style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <span style={{ color: '#c2611f', fontStyle: 'italic' }}>
                   découvrir ?
                 </span>
               </h1>

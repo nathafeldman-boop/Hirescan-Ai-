@@ -16,33 +16,61 @@ interface Props {
   };
 }
 
+// Dark side theme — only activated for premium users
+const DARK = {
+  bg: '#0a0705',
+  card: 'rgba(255,255,255,0.03)',
+  cardBorder: 'rgba(255,255,255,0.06)',
+  headerBg: 'rgba(10,7,5,0.88)',
+  text: '#f5f0e8',
+  muted: '#8a7d6e',
+  accent: '#e8a94d', // ember gold
+  accentBg: 'rgba(232,169,77,0.1)',
+  accentBorder: 'rgba(232,169,77,0.2)',
+};
+
+// Light side — free users get the warm/cream world
+const LIGHT = {
+  bg: '#f7f3ec',
+  card: '#ffffff',
+  cardBorder: '#e8e0d4',
+  headerBg: 'rgba(247,243,236,0.9)',
+  text: '#2b2622',
+  muted: '#8c7b6b',
+  accent: '#c2611f', // clay
+  accentBg: 'rgba(194,97,31,0.08)',
+  accentBorder: 'rgba(194,97,31,0.2)',
+};
+
 export default function DashboardClient({ user }: Props) {
   const isPremium = user.tier === 'premium' || user.tier === 'pro';
+  const theme = isPremium ? DARK : LIGHT;
   const type = user.mbtiType ? mbtiTypes[user.mbtiType] : null;
   const firstName = user.name?.split(' ')[0] ?? 'toi';
 
   return (
-    <main className="min-h-screen bg-[#09090b]">
+    <main className="min-h-screen" style={{ background: theme.bg }}>
 
-      {/* Background atmosphere */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-[0.08] bg-violet-600" />
-        <div className="absolute bottom-1/3 left-0 w-72 h-72 rounded-full blur-3xl opacity-[0.06] bg-pink-600" />
-      </div>
+      {/* Premium atmosphere — ember glow particles */}
+      {isPremium && (
+        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+          <div className="absolute top-0 right-1/3 w-80 h-80 rounded-full blur-3xl opacity-[0.06]" style={{ background: '#e8a94d' }} />
+          <div className="absolute bottom-1/4 left-0 w-64 h-64 rounded-full blur-3xl opacity-[0.04]" style={{ background: '#c2611f' }} />
+        </div>
+      )}
 
       {/* Top nav */}
-      <header className="relative z-10 sticky top-0" style={{ background: 'rgba(9,9,11,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <header className="relative z-10 sticky top-0" style={{ background: theme.headerBg, backdropFilter: 'blur(16px)', borderBottom: `1px solid ${theme.cardBorder}` }}>
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="text-lg font-black">
-            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-white">Cecret</span>
+          <Link href="/" className="font-display text-lg font-black" style={{ color: theme.text }}>
+            Ur<span style={{ color: theme.accent }}>Cecret</span>
           </Link>
           <div className="flex items-center gap-3">
             {user.image
-              ? <img src={user.image} alt="" className="w-8 h-8 rounded-full border border-white/10" /> // eslint-disable-line @next/next/no-img-element
-              : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: '#fff' }}>{firstName[0]?.toUpperCase()}</div>
+              ? <img src={user.image} alt="" className="w-8 h-8 rounded-full" style={{ border: `1px solid ${theme.cardBorder}` }} /> // eslint-disable-line @next/next/no-img-element
+              : <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: theme.accent, color: isPremium ? '#0a0705' : '#fff' }}>{firstName[0]?.toUpperCase()}</div>
             }
-            <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
+            <button onClick={() => signOut({ callbackUrl: '/' })} className="text-xs transition-colors" style={{ color: theme.muted }}>
               Déconnexion
             </button>
           </div>
@@ -51,48 +79,63 @@ export default function DashboardClient({ user }: Props) {
 
       <div className="relative z-10 max-w-lg mx-auto px-4 py-6 space-y-4">
 
-        {/* Greeting + tier */}
+        {/* Greeting */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-black text-white">Bonjour {firstName} 👋</h1>
-            <p className="text-sm text-zinc-500">{user.email}</p>
+            {isPremium ? (
+              <>
+                <h1 className="font-display text-xl font-black" style={{ color: theme.text }}>
+                  Bienvenue dans les profondeurs, <span style={{ color: theme.accent }}>{firstName}</span>
+                </h1>
+                <p className="text-sm mt-0.5" style={{ color: theme.muted }}>Ton côté obscur t&apos;attend</p>
+              </>
+            ) : (
+              <>
+                <h1 className="font-display text-xl font-black" style={{ color: theme.text }}>Bonjour {firstName}</h1>
+                <p className="text-sm mt-0.5" style={{ color: theme.muted }}>{user.email}</p>
+              </>
+            )}
           </div>
           {isPremium
-            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: '#d17d52', background: 'rgba(209,125,82,0.12)', border: '1px solid rgba(209,125,82,0.25)' }}>👑 Pro</span>
-            : <span className="text-xs font-semibold px-3 py-1.5 rounded-full text-zinc-400" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>Gratuit</span>
+            ? <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{ color: DARK.accent, background: DARK.accentBg, border: `1px solid ${DARK.accentBorder}` }}>🌑 Sombre</span>
+            : <span className="text-xs font-semibold px-3 py-1.5 rounded-full" style={{ color: theme.muted, background: isPremium ? 'transparent' : '#ece2d4', border: `1px solid ${theme.cardBorder}` }}>Gratuit</span>
           }
         </div>
 
-        {/* MBTI type — main card */}
+        {/* MBTI type card */}
         {type ? (
           <div
             className="rounded-2xl overflow-hidden"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ background: theme.card, border: `1px solid ${theme.cardBorder}` }}
           >
-            {/* Color band */}
-            <div className="h-1 w-full" style={{ background: `linear-gradient(to right,${type.accentColor},#d17d52)` }} />
+            <div className="h-1 w-full" style={{ background: isPremium ? `linear-gradient(to right,${DARK.accent},#c2611f)` : `linear-gradient(to right,${type.accentColor},#d17d52)` }} />
             <div className="p-5">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Ton type de personnalité</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: theme.muted }}>Ton type de personnalité</p>
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-5xl leading-none">{type.emoji}</div>
                 <div>
-                  <p className="text-2xl font-black text-white leading-tight">{user.mbtiType}</p>
-                  <p className="text-sm font-bold text-zinc-400">{type.name}</p>
+                  <p className="font-display text-2xl font-black leading-tight" style={{ color: theme.text }}>{user.mbtiType}</p>
+                  <p className="text-sm font-bold" style={{ color: theme.muted }}>{type.name}</p>
                   <p className="text-xs mt-0.5" style={{ color: type.accentColor }}>{type.rarity} de la population</p>
                 </div>
               </div>
-              <p className="text-sm text-zinc-400 italic mb-5 leading-relaxed">&ldquo;{type.tagline}&rdquo;</p>
+              <p className="text-sm italic mb-5 leading-relaxed" style={{ color: theme.muted }}>&ldquo;{type.tagline}&rdquo;</p>
               <Link
                 href={`/types/${user.mbtiType!.toLowerCase()}`}
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.01]"
-                style={{ background: `linear-gradient(135deg,${type.accentColor},#d17d52)`, boxShadow: `0 4px 20px ${type.accentColor}30` }}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.01]"
+                style={{
+                  background: isPremium ? `linear-gradient(135deg,#2a1f0a,#3d2c0d)` : `linear-gradient(135deg,${type.accentColor},#d17d52)`,
+                  color: isPremium ? DARK.accent : '#fff',
+                  border: isPremium ? `1px solid ${DARK.accentBorder}` : 'none',
+                  boxShadow: isPremium ? `0 4px 20px rgba(232,169,77,0.15)` : `0 4px 20px ${type.accentColor}30`,
+                }}
               >
-                Voir mon profil complet →
+                {isPremium ? 'Explorer les profondeurs →' : 'Voir mon profil complet →'}
               </Link>
               {user.mbtiTestCount > 0 && (
                 <div className="flex items-center justify-between mt-3">
-                  <p className="text-xs text-zinc-600">Test passé {user.mbtiTestCount} fois</p>
-                  <Link href="/quiz/personnalite" className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
+                  <p className="text-xs" style={{ color: theme.muted }}>Test passé {user.mbtiTestCount} fois</p>
+                  <Link href="/quiz/personnalite" className="text-xs transition-colors hover:opacity-80" style={{ color: theme.muted }}>
                     Repasser le test →
                   </Link>
                 </div>
@@ -102,11 +145,11 @@ export default function DashboardClient({ user }: Props) {
         ) : (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: 'rgba(194,97,31,0.06)', border: '2px dashed rgba(194,97,31,0.25)' }}
+            style={{ background: theme.accentBg, border: `2px dashed ${theme.accentBorder}` }}
           >
             <div className="text-4xl mb-3">🧠</div>
-            <p className="text-base font-black text-white mb-1">Découvre ton type MBTI</p>
-            <p className="text-sm text-zinc-500 mb-5">100 questions · environ 12 minutes</p>
+            <p className="font-display text-base font-black mb-1" style={{ color: theme.text }}>Découvre ton type MBTI</p>
+            <p className="text-sm mb-5" style={{ color: theme.muted }}>100 questions · environ 12 minutes</p>
             <Link
               href="/quiz/personnalite"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
@@ -122,28 +165,28 @@ export default function DashboardClient({ user }: Props) {
           <Link
             href={isPremium ? '/duo' : '/pricing'}
             className="rounded-2xl p-4 transition-all hover:scale-[1.02] group"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ background: theme.card, border: `1px solid ${theme.cardBorder}` }}
           >
             <div className="flex items-start justify-between mb-3">
               <span className="text-2xl">💑</span>
               {!isPremium && (
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(209,125,82,0.15)', color: '#d17d52' }}>Pro</span>
+                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: theme.accentBg, color: theme.accent }}>Pro</span>
               )}
             </div>
-            <p className="text-sm font-bold text-white">Compatibilité</p>
-            <p className="text-xs text-zinc-500 mt-0.5 leading-snug">Compare avec quelqu&apos;un</p>
+            <p className="text-sm font-bold" style={{ color: theme.text }}>Compatibilité</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: theme.muted }}>Compare avec quelqu&apos;un</p>
           </Link>
 
           <Link
             href="/types"
             className="rounded-2xl p-4 transition-all hover:scale-[1.02]"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ background: theme.card, border: `1px solid ${theme.cardBorder}` }}
           >
             <div className="mb-3">
               <span className="text-2xl">🔍</span>
             </div>
-            <p className="text-sm font-bold text-white">Les 16 types</p>
-            <p className="text-xs text-zinc-500 mt-0.5 leading-snug">Explorer tous les profils</p>
+            <p className="text-sm font-bold" style={{ color: theme.text }}>Les 16 types</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: theme.muted }}>Explorer tous les profils</p>
           </Link>
         </div>
 
@@ -151,12 +194,12 @@ export default function DashboardClient({ user }: Props) {
         {!isPremium && (
           <div
             className="rounded-2xl p-5 flex items-center gap-4"
-            style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.12),rgba(209,125,82,0.08))', border: '1px solid rgba(194,97,31,0.2)' }}
+            style={{ background: `linear-gradient(135deg,rgba(169,78,24,0.08),rgba(209,125,82,0.05))`, border: `1px solid rgba(194,97,31,0.2)` }}
           >
-            <div className="text-2xl flex-shrink-0">💎</div>
+            <div className="text-2xl flex-shrink-0">🌑</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-black text-white">Passer Pro</p>
-              <p className="text-xs text-zinc-400 mt-0.5">Type révélé · Compatibilité duo · Profils complets</p>
+              <p className="text-sm font-black" style={{ color: theme.text }}>Découvre ton côté sombre</p>
+              <p className="text-xs mt-0.5" style={{ color: theme.muted }}>Profil complet · Compatibilité · 15 tests</p>
             </div>
             <Link
               href="/pricing"
@@ -166,6 +209,22 @@ export default function DashboardClient({ user }: Props) {
               Voir →
             </Link>
           </div>
+        )}
+
+        {/* Premium dark mode extra card — quizzes */}
+        {isPremium && (
+          <Link
+            href="/quizzes"
+            className="rounded-2xl p-5 flex items-center gap-4 transition-all hover:scale-[1.01]"
+            style={{ background: 'linear-gradient(135deg,rgba(232,169,77,0.06),rgba(194,97,31,0.04))', border: `1px solid ${DARK.accentBorder}` }}
+          >
+            <div className="text-2xl flex-shrink-0">🃏</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black" style={{ color: DARK.text }}>15 tests secrets débloqués</p>
+              <p className="text-xs mt-0.5" style={{ color: DARK.muted }}>Manipulation · Couple · Amitié · et plus</p>
+            </div>
+            <span style={{ color: DARK.accent }} className="text-sm">→</span>
+          </Link>
         )}
 
       </div>

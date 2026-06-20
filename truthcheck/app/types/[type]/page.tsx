@@ -49,14 +49,14 @@ function FAQ({ type }: { type: MbtiType }) {
   ];
   return (
     <div className="mt-12 space-y-3">
-      <h2 className="text-lg font-black text-white">Questions fréquentes — {type.code}</h2>
+      <h2 className="font-display text-lg font-black text-white">Questions fréquentes — {type.code}</h2>
       {faqs.map(({ q, a }) => (
         <details key={q} className="group rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <summary className="px-5 py-4 cursor-pointer text-sm font-medium text-zinc-300 list-none flex justify-between items-center hover:text-white transition-colors">
+          <summary className="px-5 py-4 cursor-pointer text-sm font-medium text-stone-300 list-none flex justify-between items-center hover:text-white transition-colors">
             {q}
-            <span className="text-zinc-600 group-open:rotate-180 transition-transform">▾</span>
+            <span className="text-stone-600 group-open:rotate-180 transition-transform">▾</span>
           </summary>
-          <p className="px-5 pb-4 text-sm text-zinc-400 leading-relaxed">{a}</p>
+          <p className="px-5 pb-4 text-sm text-stone-400 leading-relaxed">{a}</p>
         </details>
       ))}
     </div>
@@ -92,18 +92,12 @@ export default function TypePage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
-      <main className="min-h-screen bg-[#09090b] text-white">
-        {/* Background atmosphere */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute top-0 right-1/3 w-96 h-96 rounded-full blur-3xl opacity-[0.08]" style={{ background: type.accentColor }} />
-          <div className="absolute bottom-1/3 left-0 w-64 h-64 rounded-full blur-3xl opacity-[0.06] bg-pink-600" />
-        </div>
+      <main className="min-h-screen bg-[#0a0705] text-white">
 
-        <header className="relative z-10 sticky top-0" style={{ background: 'rgba(9,9,11,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <header className="relative z-10 sticky top-0" style={{ background: 'rgba(10,7,5,0.88)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-              <span className="text-white">Cecret</span>
+            <Link href="/" className="font-display text-xl font-black">
+              Ur<span style={{ color: '#e8a94d' }}>Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
               <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">← Tous les types</Link>
@@ -121,10 +115,10 @@ export default function TypePage({ params }: Props) {
               style={{ background: `${type.accentColor}20`, color: type.accentColor, border: `1px solid ${type.accentColor}40` }}>
               {type.rarity} de la population
             </div>
-            <h1 className="text-3xl font-black text-white mb-2">
+            <h1 className="font-display text-3xl font-black text-white mb-2">
               {code} — {type.name}
             </h1>
-            <p className="text-zinc-400 text-base italic">{type.tagline}</p>
+            <p className="text-stone-400 text-base italic">{type.tagline}</p>
           </div>
 
           {/* Breadcrumb */}
@@ -143,17 +137,16 @@ export default function TypePage({ params }: Props) {
           <FAQ type={type} />
 
           {/* All types nav */}
-          <div className="mt-12 pt-8 border-t border-white/6">
-            <h2 className="text-sm font-bold text-zinc-500 mb-4">Explore les 16 types</h2>
+          <div className="mt-12 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <h2 className="text-sm font-bold text-stone-500 mb-4">Explore les 16 types</h2>
             <div className="flex flex-wrap gap-2">
               {ALL_MBTI_TYPES.map(c => (
                 <Link key={c} href={`/types/${c.toLowerCase()}`}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-                    c === code
-                      ? 'text-white border-violet-500 bg-violet-500'
-                      : 'text-zinc-500 hover:text-white hover:border-white/30'
-                  }`}
-                  style={c !== code ? { borderColor: 'rgba(255,255,255,0.1)' } : {}}>
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all"
+                  style={c === code
+                    ? { color: '#fff', borderColor: '#e8a94d', background: 'rgba(232,169,77,0.15)' }
+                    : { color: '#6b6060', borderColor: 'rgba(255,255,255,0.1)' }
+                  }>
                   {c}
                 </Link>
               ))}

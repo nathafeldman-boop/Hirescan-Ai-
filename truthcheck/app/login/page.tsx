@@ -67,20 +67,12 @@ function LoginContent() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
-      {/* Subtle cream orbs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.12] bg-violet-400" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-pink-400/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-sm">
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#f7f3ec' }}>
+      <div className="w-full max-w-sm">
         {/* Logo + header */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🔮</div>
-          <h1 className="text-3xl font-black mb-1">
-            <span style={{ background: 'linear-gradient(to right,#a94e18,#d17d52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span className="text-stone-900">Cecret</span>
+          <h1 className="font-display text-3xl font-black mb-1">
+            <span className="text-stone-900">Ur</span><span style={{ color: '#c2611f' }}>Cecret</span>
           </h1>
           <p className="text-stone-500 text-sm">Tes résultats t&apos;attendent 🔓</p>
         </div>
