@@ -45,10 +45,10 @@ const GROUPS = [
 ];
 
 const MBTI_LETTERS = [
-  { letter: 'E/I', emoji: '🧭', label: 'Extraversion · Introversion', color: '#a94e18', desc: 'Comment vous rechargez votre énergie : dans l\'action collective ou dans la solitude réflexive.' },
-  { letter: 'N/S', emoji: '🌟', label: 'Intuition · Sensation', color: '#566b45', desc: 'Comment vous traitez l\'information : abstraitement vers l\'avenir ou concrètement dans le présent.' },
-  { letter: 'T/F', emoji: '🧠', label: 'Pensée · Sentiment', color: '#b07d2b', desc: 'Comment vous prenez vos décisions : par analyse logique ou par système de valeurs.' },
-  { letter: 'J/P', emoji: '📅', label: 'Jugement · Perception', color: '#3f6b6b', desc: 'Comment vous organisez votre vie : avec structure et planification ou avec flexibilité et spontanéité.' },
+  { letter: 'E/I', emoji: '🧭', label: 'Extraversion · Introversion', color: '#a94e18', desc: 'Indique si ta fonction cognitive dominante est dirigée vers l\'extérieur (action, personnes) ou vers l\'intérieur (réflexion, solitude). Ce n\'est pas la timidité — c\'est la direction de ton énergie.' },
+  { letter: 'N/S', emoji: '🌟', label: 'Intuition · Sensation', color: '#566b45', desc: 'Tes deux fonctions de perception. Jung distingue la Sensation (concret, présent, détails) de l\'iNtuition (abstrait, futur, patterns). L\'une est dominante, l\'autre auxiliaire dans ton stack.' },
+  { letter: 'T/F', emoji: '🧠', label: 'Pensée · Sentiment', color: '#b07d2b', desc: 'Tes deux fonctions de jugement. La Pensée (logique, systèmes, objectivité) et le Sentiment (valeurs, harmonie, impact humain). Ces fonctions déterminent comment tu décides — pas ce que tu ressens.' },
+  { letter: 'J/P', emoji: '📅', label: 'Jugement · Perception', color: '#3f6b6b', desc: 'Révèle quelle fonction est en surface : une fonction de Jugement (T ou F) te donne une structure visible ; une fonction de Perception (N ou S) te rend plus adaptable. Mais ton intérieur est souvent l\'inverse.' },
 ];
 
 const CLAY = '#a94e18';
@@ -143,7 +143,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-9">
-            Parmi 16 profils psychologiques. Basé sur la théorie des types cognitifs de Myers-Briggs. Ton résultat complet en 12 minutes.
+            Basé sur les 8 fonctions cognitives de Carl Jung — repris par Myers-Briggs. 16 profils distincts. Ton analyse complète en 12 minutes.
           </p>
 
           <Link
@@ -176,7 +176,7 @@ export default function LandingPage() {
             {[
               { value: '16', label: 'Profils distincts' },
               { value: '100', label: 'Questions calibrées' },
-              { value: '0 €', label: 'Pour commencer' },
+              { value: 'Gratuit', label: 'Pour commencer' },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="font-display text-3xl font-black" style={{ color: '#2b2622' }}>{s.value}</div>
@@ -191,9 +191,9 @@ export default function LandingPage() {
       <section className="relative z-10 py-4 px-4">
         <div className="max-w-lg mx-auto space-y-3">
           {[
-            { msg: "j'ai peur c'est vraiment moi 😰 c'est hyper précis je comprends enfin pourquoi je réagis comme ça", who: "Camille, 24 ans" },
-            { msg: "j'ai pris l'abonnement à 10€ j'utilise vraiment tous les jours maintenant, ça vaut largement le coup", who: "Lucas, 22 ans" },
-            { msg: "le suivi sur 15 jours est vraiment incroyable 🙏 je me sens tellement mieux dans ma peau", who: "Jade, 27 ans" },
+            { msg: "j'ai fait le quiz infidélité à 2h du matin… j'avais 78%. Deux semaines après j'avais ma réponse. L'analyse était précise à un niveau qui m'a mis mal à l'aise 😰", who: "Camille, 24 ans" },
+            { msg: "INTJ depuis 3 ans sur 16personalities — ici l'analyse des fonctions cognitives m'a appris des trucs que je ne savais pas sur moi-même. C'est pas le même niveau.", who: "Lucas, 22 ans" },
+            { msg: "j'ai envoyé le lien du quiz amoureux à mon meilleur ami sans lui dire pourquoi. Il a eu 82%. On s'est parlé pour la première fois en vrai après ça 🙏", who: "Jade, 27 ans" },
           ].map(({ msg, who }) => (
             <div
               key={who}
@@ -308,9 +308,9 @@ export default function LandingPage() {
       {/* MBTI letters explanation */}
       <section className="relative z-10 py-16 px-6">
         <div className="max-w-2xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 text-center mb-3">Fonctionnement</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 text-center mb-3">Fonctionnement · Théorie de Carl Jung</p>
           <h2 className="font-display text-3xl font-black text-stone-900 text-center mb-10">
-            Les 4 dimensions du modèle MBTI
+            Les 4 dimensions — 8 fonctions cognitives
           </h2>
           <div className="space-y-3">
             {MBTI_LETTERS.map((item) => (

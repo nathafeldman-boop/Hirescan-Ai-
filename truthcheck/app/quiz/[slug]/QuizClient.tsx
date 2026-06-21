@@ -13,6 +13,63 @@ interface Props {
   quiz: Quiz;
 }
 
+const QUIZ_HOOKS: Record<string, string> = {
+  infidelite: "Ton instinct te dit quelque chose. Voyons si tu as raison.",
+  adopte: "Certaines familles gardent des secrets. Voici comment savoir.",
+  amoureux: "Amour, attachement ou habitude — la différence compte.",
+  'vrais-amis': "Les vraies amitiés résistent à ce test. Les fausses aussi.",
+  orientation: "Pas de jugement ici. Juste la clarté sur ce que tu ressens vraiment.",
+  narcissique: "On pense tous ne pas l'être. La vérité est souvent plus nuancée.",
+  'mon-ex': "Il/Elle t'a quitté(e) — mais ses actes racontent autre chose.",
+  manipule: "La manipulation subtile passe inaperçue. Jusqu'à ce test.",
+  rompre: "Tu repousses cette question depuis trop longtemps.",
+  jaloux: "La jalousie peut détruire une relation sans qu'on s'en aperçoive.",
+  'relation-toxique': "Certains toxiques nous manquent quand ils partent. Ce test explique pourquoi.",
+  crush: "Ses comportements ne mentent jamais. Ses mots, si.",
+  burnout: "Ton corps te prévient avant ton esprit. L'as-tu écouté ?",
+  depression: "Certains signes passent inaperçus pendant des mois. Vérifions.",
+  'vrai-amour': "Il y a une différence entre aimer et être amoureux. Ce test la nomme.",
+  personnalite: "Tout le monde connaît ses 4 lettres. Personne ne connaît ses fonctions cognitives.",
+};
+
+const PARTICIPANT_COUNTS: Record<string, string> = {
+  infidelite: '8 427',
+  adopte: '2 193',
+  amoureux: '6 841',
+  'vrais-amis': '4 612',
+  orientation: '1 856',
+  narcissique: '3 241',
+  'mon-ex': '2 748',
+  manipule: '5 129',
+  rompre: '3 987',
+  jaloux: '2 341',
+  'relation-toxique': '4 018',
+  crush: '3 612',
+  burnout: '2 891',
+  depression: '1 643',
+  'vrai-amour': '2 219',
+  personnalite: '11 423',
+};
+
+const MID_HOOK_MESSAGES: Record<string, { title: string; sub: string }> = {
+  infidelite: { title: 'Un signal se distingue…', sub: 'Certaines de tes réponses sortent de l\'ordinaire' },
+  adopte: { title: 'Des éléments intrigants…', sub: 'L\'analyse distingue le banal de ce qui mérite vraiment attention' },
+  amoureux: { title: 'Tes émotions parlent…', sub: 'L\'analyse fait la différence entre amour, attachement et habitude' },
+  'vrais-amis': { title: 'Un profil d\'amitié émerge…', sub: 'Le signal le plus révélateur commence à apparaître' },
+  orientation: { title: 'Ton profil se précise…', sub: 'L\'analyse situe ton orientation sur le spectre avec précision' },
+  narcissique: { title: 'Des traits émergent…', sub: 'L\'analyse distingue les tendances saines des problématiques' },
+  'mon-ex': { title: 'Un pattern se révèle…', sub: 'Les comportements que tu décris ne mentent pas' },
+  manipule: { title: 'Des mécanismes identifiés…', sub: 'L\'analyse repère les techniques invisibles à l\'œil nu' },
+  rompre: { title: 'La vérité se dessine…', sub: 'Tes réponses révèlent ce que tu évites de regarder en face' },
+  jaloux: { title: 'Ton seuil de jalousie…', sub: 'L\'analyse calibre ce qui est sain et ce qui ne l\'est pas' },
+  'relation-toxique': { title: 'Une dynamique se dessine…', sub: 'L\'analyse identifie les patterns de ta relation' },
+  crush: { title: 'Ses signaux se clarifient…', sub: 'L\'analyse lit entre les lignes de ses comportements' },
+  burnout: { title: 'Ton niveau d\'épuisement…', sub: 'L\'analyse mesure ce que tu minimises peut-être' },
+  depression: { title: 'Des signaux détectés…', sub: 'L\'analyse distingue fatigue passagère et quelque chose de plus profond' },
+  'vrai-amour': { title: 'La profondeur de tes sentiments…', sub: 'L\'analyse nomme précisément ce que tu vis' },
+  personnalite: { title: 'Tes fonctions cognitives…', sub: 'L\'analyse identifie ton type dominant selon la théorie de Jung' },
+};
+
 const QUIZ_SLIDES: Record<string, string[]> = {
   infidelite: [
     '/infidelite-bg-1.jpg',
@@ -144,21 +201,26 @@ export default function QuizClient({ quiz }: Props) {
       {showIntro && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ background: '#09090b' }}>
           <div className="w-full max-w-sm text-center">
-            <div className="text-7xl mb-6 select-none">{quiz.emoji}</div>
-            {session.firstName && (
-              <p className="text-zinc-500 text-sm mb-2">Hey {session.firstName} 👋</p>
+            <div className="text-7xl mb-5 select-none">{quiz.emoji}</div>
+            {QUIZ_HOOKS[quiz.slug] && (
+              <p className="text-zinc-400 text-sm leading-relaxed mb-3 max-w-xs mx-auto italic">
+                {QUIZ_HOOKS[quiz.slug]}
+              </p>
             )}
-            <h1 className="text-white font-black text-2xl leading-snug mb-3">
+            {session.firstName && (
+              <p className="text-zinc-600 text-xs mb-1">Hey {session.firstName} 👋</p>
+            )}
+            <h1 className="text-white font-black text-2xl leading-snug mb-2">
               {quiz.title}
             </h1>
-            <p className="text-zinc-400 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
+            <p className="text-zinc-500 text-sm leading-relaxed mb-6 max-w-xs mx-auto">
               {quiz.subtitle}
             </p>
-            <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="flex items-center justify-center gap-4 mb-6">
               {[
                 { icon: '⚡', label: `${questions.length} questions` },
                 { icon: '🔒', label: '100% anonyme' },
-                { icon: '🧠', label: 'Analyse IA' },
+                { icon: '🧠', label: 'Résultat immédiat' },
               ].map(({ icon, label }) => (
                 <div key={label} className="flex flex-col items-center gap-1">
                   <span className="text-lg">{icon}</span>
@@ -171,9 +233,13 @@ export default function QuizClient({ quiz }: Props) {
               className="w-full py-4 rounded-xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
               style={{ background: `linear-gradient(135deg, ${quiz.accentColor}cc, ${quiz.accentColor})`, boxShadow: `0 6px 28px ${quiz.accentColor}55` }}
             >
-              Commencer le quiz →
+              Commencer →
             </button>
-            <p className="text-zinc-700 text-xs mt-4">Durée estimée : 2–3 min</p>
+            {PARTICIPANT_COUNTS[quiz.slug] && (
+              <p className="text-zinc-600 text-xs mt-4">
+                🔥 <span className="text-zinc-500 font-semibold">{PARTICIPANT_COUNTS[quiz.slug]} personnes</span> ont fait ce quiz cette semaine
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -189,11 +255,11 @@ export default function QuizClient({ quiz }: Props) {
             )}
             <div className="text-left space-y-2 mb-7 max-w-xs mx-auto">
               {[
-                { threshold: 0,  label: 'Lecture de tes réponses…' },
-                { threshold: 28, label: 'Comparaison avec 50 000 profils…' },
-                { threshold: 55, label: 'Identification des patterns…' },
-                { threshold: 78, label: 'Génération de ton rapport…' },
-                { threshold: 93, label: 'Finalisation…' },
+                { threshold: 0,  label: `Calibrage de tes ${questions.length} réponses…` },
+                { threshold: 28, label: 'Identification des patterns dominants…' },
+                { threshold: 55, label: 'Analyse des signaux clés…' },
+                { threshold: 78, label: 'Génération de ton rapport personnalisé…' },
+                { threshold: 93, label: 'Finalisation de l\'analyse…' },
               ].map(({ threshold, label }) => {
                 const done = analysisProgress > threshold + 22;
                 const active = analysisProgress >= threshold && !done;
@@ -227,8 +293,12 @@ export default function QuizClient({ quiz }: Props) {
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(9,9,11,0.96)', backdropFilter: 'blur(4px)' }}>
           <div className="text-center px-6">
             <div className="text-5xl mb-5" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>🧠</div>
-            <p className="text-white font-black text-2xl mb-2">L&apos;IA analyse tes réponses…</p>
-            <p className="text-zinc-500 text-sm mb-6">Un profil commence à se dessiner</p>
+            <p className="text-white font-black text-2xl mb-2">
+              {MID_HOOK_MESSAGES[quiz.slug]?.title ?? 'Un profil se dessine…'}
+            </p>
+            <p className="text-zinc-500 text-sm mb-6">
+              {MID_HOOK_MESSAGES[quiz.slug]?.sub ?? 'L\'analyse identifie le pattern le plus révélateur'}
+            </p>
             <div className="flex justify-center gap-2">
               {[0, 1, 2].map((i) => (
                 <div

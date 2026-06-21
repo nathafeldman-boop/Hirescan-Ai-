@@ -108,7 +108,6 @@ export default function ResultsClient({ quiz }: Props) {
 
   const tier = getResultTier(quiz, score);
 
-  const [contractAccepted] = useState(true);
   const [strokeOffset, setStrokeOffset] = useState(CIRCUMFERENCE);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [shareId, setShareId] = useState<string | null>(null);
@@ -199,27 +198,6 @@ export default function ResultsClient({ quiz }: Props) {
     subline: "Ce que tu as répondu pointe vers quelque chose de spécifique. L'analyse le formule clairement.",
     social: "Des milliers de personnes ont découvert leur profil cette semaine",
   };
-
-  const SCARY_STATS: Record<string, (s: number) => string> = {
-    infidelite: (s) => s >= 60
-      ? `63 % des personnes avec exactement ce niveau de signaux ont eu raison de ne pas ignorer leurs doutes.`
-      : `41 % des personnes avec ce profil disent que connaître leur score les a aidées à sortir du doute.`,
-    adopte: (s) => s >= 50
-      ? `71 % des personnes avec ce score ont appris quelque chose d'inattendu sur leur histoire familiale.`
-      : `58 % des personnes avec ce profil ont trouvé dans l'analyse la clarté qu'une conversation n'avait pas donnée.`,
-    amoureux: (s) => s >= 60
-      ? `78 % des personnes avec ce résultat qui ont agi sur leurs sentiments disent ne pas le regretter.`
-      : `65 % des personnes avec ce profil disent que mettre un mot précis sur leurs émotions a tout changé.`,
-    'vrais-amis': (s) => s >= 60
-      ? `69 % des personnes avec ce score ont pris une décision sur cette relation après avoir lu l'analyse.`
-      : `54 % des personnes avec ce profil ont dit que l'analyse avait renforcé la confiance dans leurs vraies amitiés.`,
-    orientation: (s) => s >= 50
-      ? `74 % des personnes avec ce profil décrivent la lecture de l'analyse comme un moment de soulagement.`
-      : '67 % des personnes avec ce score disent que l\'analyse les a aidées à mieux se comprendre.',
-    personnalite: () => `91 % des personnes qui lisent leur analyse complète disent avoir découvert quelque chose d'inattendu — même celles qui connaissaient déjà leur type depuis des années.`,
-  };
-  const scaryStat = SCARY_STATS[quiz.slug]?.(score)
-    ?? `${Math.min(97, Math.round(55 + score * 0.35))} % des personnes avec ce profil considèrent cette analyse comme un tournant.`;
 
   // ── Teaser hooks: one real insight cut before the key conclusion ──
   const TEASER_HOOKS: Record<string, (s: number) => { intro: string; cut: string; locked: string[] }> = {
@@ -323,16 +301,6 @@ export default function ResultsClient({ quiz }: Props) {
     ],
   };
 
-  // ── CTA button label — specific to quiz context ──
-  const ctaLabel: Record<string, string> = {
-    infidelite: score >= 60 ? `Sortir du doute maintenant — 1,99€` : `Comprendre la source de mon instinct — 1,99€`,
-    adopte: `Trouver la clarté que je cherche — 1,99€`,
-    amoureux: score >= 60 ? `Savoir si c'est vraiment de l'amour — 1,99€` : `Mettre un mot sur ce que je ressens — 1,99€`,
-    'vrais-amis': score >= 60 ? `Voir qui mérite vraiment ma confiance — 1,99€` : `Arrêter de douter de cette amitié — 1,99€`,
-    orientation: `Me comprendre vraiment — 1,99€`,
-    personnalite: `Me connaître vraiment, pas juste 4 lettres — 1,99€`,
-  };
-  const ctaText = ctaLabel[quiz.slug] ?? `Comprendre ce que ça dit vraiment de moi — 1,99€`;
 
   useEffect(() => {
     if (hasSaved.current) return;
