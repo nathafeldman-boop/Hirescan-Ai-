@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { prisma } from '@/lib/db';
 import Link from 'next/link';
+import Stripe from 'stripe';
 
 /* ════════════════════════════════════════════════════════════════════════════
    UrCecret — Dashboard exécutif v2
@@ -200,6 +201,56 @@ export default async function DashboardPage({
     .sort((a, b) => b.count - a.count);
   const maxQuiz = Math.max(...quizRows.map(q => q.count), 1);
 
+  // STRIPE — paiements directs depuis le début de la semaine
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)); // lundi
+  startOfWeek.setHours(0, 0, 0, 0);
+  const startOfWeekTs = Math.floor(startOfWeek.getTime() / 1000);
+
+  type StripeCharge = { id: string; amount: number; currency: string; created: number; email: string | null; description: string | null; status: string };
+  let weekCharges: StripeCharge[] = [];
+  let stripeMrr = 0;
+  let stripeMonthlyCount = 0;
+  let stripeAnnualCount = 0;
+
+  if (tab === 'revenue') {
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (stripeKey) {
+      try {
+        const stripe = new Stripe(stripeKey, { apiVersion: '2024-06-20' });
+        const [chargesRes, subsRes] = await Promise.all([
+          stripe.charges.list({ limit: 100, created: { gte: startOfWeekTs } }),
+          stripe.subscriptions.list({ status: 'active', limit: 100, expand: ['data.items.data.price'] }),
+        ]);
+        weekCharges = chargesRes.data
+          .filter(c => c.status === 'succeeded')
+          .map(c => ({ id: c.id, amount: c.amount, currency: c.currency, created: c.created, email: c.receipt_email, description: c.description, status: c.status }));
+        for (const sub of subsRes.data) {
+          for (const item of sub.items.data) {
+            const price = item.price;
+            const amount = price.unit_amount ?? 0;
+            if (price.recurring?.interval === 'month') { stripeMrr += amount; stripeMonthlyCount++; }
+            else if (price.recurring?.interval === 'year') { stripeMrr += Math.round(amount / 12); stripeAnnualCount++; }
+          }
+        }
+      } catch { /* Stripe non dispo */ }
+    }
+  }
+
+  // Grouper par prix
+  const PRICE_LABELS: Record<number, { label: string; color: string; type: string }> = {
+    199:  { label: '1,99 €',  color: C.dim,    type: 'Résultat unique' },
+    999:  { label: '9,99 €',  color: C.accent, type: 'Abonnement mensuel' },
+    1999: { label: '19,99 €', color: C.accent2, type: 'Rapport MBTI' },
+    2999: { label: '29,99 €', color: C.gold,   type: 'Abonnement annuel' },
+  };
+  const byPrice: Record<number, { count: number; total: number; charges: StripeCharge[] }> = {};
+  weekCharges.forEach(c => {
+    if (!byPrice[c.amount]) byPrice[c.amount] = { count: 0, total: 0, charges: [] };
+    byPrice[c.amount].count++; byPrice[c.amount].total += c.amount; byPrice[c.amount].charges.push(c);
+  });
+  const weekTotal = weekCharges.reduce((s, c) => s + c.amount, 0);
+
   // SOURCES
   type ConvRow = { id: string; email: string | null; amountCents: number; quizSlug: string | null; productType: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; affiliateSlug: string | null; landingPath: string | null; createdAt: Date };
   let attribution: ConvRow[] = [];
@@ -361,47 +412,83 @@ export default async function DashboardPage({
         {/* ════ REVENUE ════ */}
         {tab === 'revenue' && (
           <>
+            {/* KPIs Stripe live */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+              <Kpi label="MRR (Stripe live)"      value={eur(stripeMrr)}        color={C.gold} />
+              <Kpi label="Abos mensuels actifs"   value={stripeMonthlyCount}    color={C.green} />
+              <Kpi label="Abos annuels actifs"    value={stripeAnnualCount}      color={C.accent} />
+              <Kpi label="CA cette semaine"        value={eur(weekTotal)}        color={C.accent2} sub={`${weekCharges.length} paiements`} />
+            </div>
+
+            {/* Breakdown cette semaine par prix */}
+            <Card title={`Paiements Stripe · depuis lundi ${startOfWeek.toLocaleDateString('fr-FR')}`}
+              sub={weekCharges.length === 0 ? 'Aucun paiement cette semaine' : `${weekCharges.length} paiements · ${eur(weekTotal)} total`}>
+              {weekCharges.length === 0 ? (
+                <p style={{ color: C.faint, fontSize: 13, textAlign: 'center', padding: '16px 0' }}>
+                  Aucun paiement réussi depuis lundi — ou clé Stripe non configurée.
+                </p>
+              ) : (
+                <>
+                  {/* Résumé par prix */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
+                    {Object.entries(byPrice).sort(([a], [b]) => Number(a) - Number(b)).map(([amt, data]) => {
+                      const info = PRICE_LABELS[Number(amt)] ?? { label: eur(Number(amt)), color: C.dim, type: 'Autre' };
+                      return (
+                        <div key={amt} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, borderTop: `2px solid ${info.color}`, borderRadius: 14, padding: '16px 18px' }}>
+                          <p style={{ fontSize: 10, color: C.dim, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{info.type}</p>
+                          <p style={{ fontSize: 28, fontWeight: 900, color: info.color, margin: '8px 0 2px', lineHeight: 1 }}>{data.count}×</p>
+                          <p style={{ fontSize: 13, color: C.text, margin: 0 }}>{info.label} · <span style={{ color: C.gold, fontWeight: 700 }}>{eur(data.total)}</span></p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Liste détaillée */}
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead><tr>
+                        {['Date / heure', 'Email client', 'Montant', 'Type produit', 'Description'].map(h => <th key={h} style={th}>{h}</th>)}
+                      </tr></thead>
+                      <tbody>
+                        {weekCharges.sort((a, b) => b.created - a.created).map(c => {
+                          const info = PRICE_LABELS[c.amount] ?? { label: eur(c.amount), color: C.dim, type: '—' };
+                          const d = new Date(c.created * 1000);
+                          return (
+                            <tr key={c.id}>
+                              <td style={{ ...td, fontSize: 12, color: C.faint, whiteSpace: 'nowrap' }}>
+                                {d.toLocaleDateString('fr-FR')} {d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                              </td>
+                              <td style={{ ...td, fontFamily: 'monospace', fontSize: 12, color: C.accent, fontWeight: 600 }}>{c.email ?? '—'}</td>
+                              <td style={{ ...td, whiteSpace: 'nowrap' }}>
+                                <span style={{ color: C.gold, fontWeight: 800, fontSize: 15 }}>{eur(c.amount)}</span>
+                              </td>
+                              <td style={{ ...td }}>
+                                <span style={{ padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,255,255,0.06)', color: info.color, border: `1px solid ${info.color}33` }}>
+                                  {info.type}
+                                </span>
+                              </td>
+                              <td style={{ ...td, fontSize: 12, color: C.dim }}>{c.description ?? '—'}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </Card>
+
+            {/* KPIs historiques */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
-              <Kpi label="Total"        value={eur(totalRev)}   color={C.gold} />
-              <Kpi label="Aujourd'hui"  value={eur(revToday)}   color={C.green} />
-              <Kpi label="7 jours"      value={eur(revWeek)}    color={C.green} />
-              <Kpi label="Ce mois"      value={eur(revMonth)}   color={C.accent} />
-              <Kpi label="Cette année"  value={eur(revYear)}    color={C.accent} />
+              <Kpi label="Total historique" value={eur(totalRev)}   color={C.gold} />
+              <Kpi label="Aujourd'hui"      value={eur(revToday)}   color={C.green} />
+              <Kpi label="7 jours"          value={eur(revWeek)}    color={C.green} />
+              <Kpi label="Ce mois"          value={eur(revMonth)}   color={C.accent} />
+              <Kpi label="Cette année"      value={eur(revYear)}    color={C.accent} />
             </div>
 
             <Card title="Revenu mensuel · 12 mois">
               <BarChart labels={labels} values={revSeries} color={C.gold} fmtTip={v => eur(v)} />
-            </Card>
-
-            <Card title="Détail mensuel" noPad>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead><tr>
-                  <th style={th}>Mois</th>
-                  <th style={th}>Revenu</th>
-                  <th style={th}>Nb conversions</th>
-                  <th style={th}>Panier moyen</th>
-                </tr></thead>
-                <tbody>
-                  {keys.slice().reverse().map(k => {
-                    const monthConv = allConversions.filter(c => mk(c.createdAt) === k);
-                    const rev = monthConv.reduce((s, c) => s + c.amountCents, 0);
-                    const cnt = monthConv.length;
-                    const avg = cnt ? Math.round(rev / cnt) : 0;
-                    if (cnt === 0) return null;
-                    return (
-                      <tr key={k}>
-                        <td style={{ ...td, fontWeight: 600 }}>{ml(k)}</td>
-                        <td style={{ ...td, color: C.gold, fontWeight: 700 }}>{eur(rev)}</td>
-                        <td style={{ ...td, color: C.dim }}>{cnt}</td>
-                        <td style={{ ...td, color: C.dim }}>{eur(avg)}</td>
-                      </tr>
-                    );
-                  }).filter(Boolean)}
-                  {allConversions.length === 0 && (
-                    <tr><td colSpan={4} style={{ ...td, textAlign: 'center', color: C.faint }}>Aucune conversion enregistrée</td></tr>
-                  )}
-                </tbody>
-              </table>
             </Card>
           </>
         )}
