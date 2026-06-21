@@ -150,7 +150,7 @@ export default function LandingPage() {
 
           <h1 className="font-display text-5xl sm:text-[58px] font-black leading-[1.04] mb-5 tracking-tight" style={{ color: '#2b2622' }}>
             {fromTiktok ? (
-              <>Ce test révèle<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>ce que tu caches</span> vraiment</>
+              <>Tu réagis différemment<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>des autres</span> — voilà pourquoi</>
             ) : (
               <>Quel est<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type ?</>
             )}
@@ -158,16 +158,16 @@ export default function LandingPage() {
 
           <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-8">
             {fromTiktok
-              ? 'Infidélité, manipulation, amour véritable — 15 quiz qui posent les questions que personne n\'ose poser. Résultat en 2 minutes.'
+              ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en 12 minutes.'
               : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en 12 minutes.'}
           </p>
 
           <Link
-            href={fromTiktok ? '/quiz/infidelite' : '/commencer'}
+            href={fromTiktok ? '/quiz/personnalite' : '/commencer'}
             className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-black text-white text-base transition-all hover:opacity-90 active:scale-[0.98]"
             style={{ background: CLAY, boxShadow: '0 8px 28px rgba(169,78,24,0.38)' }}
           >
-            {fromTiktok ? 'Faire le test — Gratuit →' : 'Découvrir mon type →'}
+            {fromTiktok ? 'Découvrir mon type — Gratuit →' : 'Découvrir mon type →'}
           </Link>
           <p className="text-stone-400 text-xs mt-3.5">
             Gratuit · Résultat immédiat · Sans inscription
@@ -406,7 +406,7 @@ export default function LandingPage() {
           style={{ padding: '12px 16px 28px', background: 'linear-gradient(to top, rgba(247,243,236,1) 65%, transparent)' }}
         >
           <Link
-            href={fromTiktok ? '/quiz/infidelite' : '/commencer'}
+            href={fromTiktok ? '/quiz/personnalite' : '/commencer'}
             className="block w-full text-center py-4 rounded-full font-black text-white text-base transition-all active:scale-[0.98]"
             style={{ background: CLAY, boxShadow: '0 6px 24px rgba(169,78,24,0.40)' }}
           >
