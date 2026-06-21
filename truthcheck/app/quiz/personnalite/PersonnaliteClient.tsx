@@ -486,12 +486,20 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
   const [showPayOverlay, setShowPayOverlay] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const copyPayLink = async () => {
+    const url = `${window.location.origin}/quiz/personnalite?pending=${typeCode}`;
+    try { await navigator.clipboard.writeText(url); } catch {}
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 3000);
+  };
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
     diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail, isInApp });
@@ -555,6 +563,16 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 <span style={{ color: '#e5e7eb', fontSize: 15, lineHeight: 1.4 }}>Puis appuie sur <strong style={{ color: '#0ea5e9' }}>« Ouvrir dans le navigateur »</strong></span>
               </div>
             </div>
+            <button
+              onClick={copyPayLink}
+              style={{ width: '100%', padding: '13px', borderRadius: 12, background: linkCopied ? 'rgba(34,197,94,0.15)' : 'rgba(14,165,233,0.15)', border: `1px solid ${linkCopied ? 'rgba(34,197,94,0.4)' : 'rgba(14,165,233,0.4)'}`, color: linkCopied ? '#4ade80' : '#38bdf8', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8 }}>
+              {linkCopied ? '✅ Lien copié ! Colle-le dans Safari ou Chrome' : '📋 Copier mon lien de résultat'}
+            </button>
+            {linkCopied && (
+              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, textAlign: 'center', marginBottom: 8, lineHeight: 1.5 }}>
+                Ouvre Safari ou Chrome, colle le lien → tu retrouveras ton profil {typeCode} directement
+              </p>
+            )}
             <button onClick={() => setShowPayOverlay(false)} style={{ width: '100%', padding: '11px', borderRadius: 12, background: 'transparent', border: '1px solid #3f3f46', color: '#71717a', fontSize: 13, cursor: 'pointer' }}>
               ← Retour
             </button>

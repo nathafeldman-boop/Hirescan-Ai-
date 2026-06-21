@@ -189,48 +189,93 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Quiz viraux — montés ici pour le traffic TikTok (section 2 au lieu de 7) ── */}
+      {/* ── Section 2 : MBTI pour traffic TikTok, quiz thématiques pour trafic organique ── */}
       <section className="relative z-10 pb-10 px-5">
         <div className="max-w-lg mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
-            🔍 Questions secrètes
-          </p>
-          <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-1">
-            Des révélations que tu n&apos;attendais pas
-          </h2>
-          <p className="text-stone-400 text-center text-xs mb-5">
-            Anonyme · Résultat immédiat · Sans inscription
-          </p>
-          <div className="space-y-2">
-            {[
-              { href: '/quiz/infidelite',       q: 'Mon/ma partenaire me trompe ?',      sub: '8 comportements analysés · 2 minutes',                           emoji: '💔' },
-              { href: '/quiz/amoureux',         q: 'Suis-je vraiment amoureux(se) ?',    sub: 'Amour, attachement ou habitude — analyse différenciée',           emoji: '❤️' },
-              { href: '/quiz/manipule',         q: 'Suis-je manipulé(e) ?',              sub: 'Gaslighting, contrôle émotionnel, emprise — détection',           emoji: '🎭' },
-              { href: '/quiz/vrais-amis',       q: 'Sont-ils de vrais amis ?',           sub: 'Dynamiques de réciprocité dans tes amitiés proches',              emoji: '🤝' },
-              { href: '/quiz/personnalite',     q: 'Quel est mon type de personnalité ?', sub: 'Test MBTI · 16 profils · fonctions cognitives de Jung',          emoji: '🧠' },
-            ].map((q) => (
-              <Link
-                key={q.href}
-                href={q.href}
-                className="flex items-center gap-4 p-4 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
-                style={{ background: '#fff', border: '1px solid #ece2d4', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
-              >
-                <span className="text-2xl flex-shrink-0">{q.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
-                  <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
-                </div>
-                <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(169,78,24,0.08)' }}>
-                  <svg className="w-3.5 h-3.5" style={{ color: CLAY }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
+          {fromTiktok ? (
+            <>
+              <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
+                🧠 Les 4 familles MBTI
+              </p>
+              <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-1">
+                Quel type es-tu vraiment ?
+              </h2>
+              <p className="text-stone-400 text-center text-xs mb-5">
+                16 profils · Fonctions cognitives de Jung · Résultat en 5 min
+              </p>
+              <div className="space-y-2">
+                {[
+                  { href: '/quiz/personnalite', emoji: '📊', q: 'Analytique (INTJ · INTP · ENTJ · ENTP)', sub: 'Stratèges, rationnels, orientés systèmes' },
+                  { href: '/quiz/personnalite', emoji: '🌱', q: 'Diplomate (INFJ · INFP · ENFJ · ENFP)',  sub: 'Empathiques, idéalistes, axés relations' },
+                  { href: '/quiz/personnalite', emoji: '🏛️', q: 'Sentinelle (ISTJ · ISFJ · ESTJ · ESFJ)', sub: 'Organisés, fiables, attachés aux structures' },
+                  { href: '/quiz/personnalite', emoji: '🎯', q: 'Explorateur (ISTP · ISFP · ESTP · ESFP)', sub: 'Adaptables, pragmatiques, orientés action' },
+                ].map((q) => (
+                  <Link
+                    key={q.q}
+                    href={q.href}
+                    className="flex items-center gap-4 p-4 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    style={{ background: '#fff', border: '1px solid #ece2d4', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+                  >
+                    <span className="text-2xl flex-shrink-0">{q.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
+                      <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
+                    </div>
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(169,78,24,0.08)' }}>
+                      <svg className="w-3.5 h-3.5" style={{ color: CLAY }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <Link href="/quiz/personnalite" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
+                Faire le test complet →
               </Link>
-            ))}
-          </div>
-          <Link href="/quizzes" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
-            Voir tous les quiz →
-          </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
+                🔍 Questions secrètes
+              </p>
+              <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-1">
+                Des révélations que tu n&apos;attendais pas
+              </h2>
+              <p className="text-stone-400 text-center text-xs mb-5">
+                Anonyme · Résultat immédiat · Sans inscription
+              </p>
+              <div className="space-y-2">
+                {[
+                  { href: '/quiz/infidelite',   q: 'Mon/ma partenaire me trompe ?',       sub: '8 comportements analysés · 2 minutes',                  emoji: '💔' },
+                  { href: '/quiz/amoureux',     q: 'Suis-je vraiment amoureux(se) ?',     sub: 'Amour, attachement ou habitude — analyse différenciée', emoji: '❤️' },
+                  { href: '/quiz/manipule',     q: 'Suis-je manipulé(e) ?',               sub: 'Gaslighting, contrôle émotionnel, emprise — détection', emoji: '🎭' },
+                  { href: '/quiz/vrais-amis',   q: 'Sont-ils de vrais amis ?',            sub: 'Dynamiques de réciprocité dans tes amitiés proches',    emoji: '🤝' },
+                  { href: '/quiz/personnalite', q: 'Quel est mon type de personnalité ?', sub: 'Test MBTI · 16 profils · fonctions cognitives de Jung', emoji: '🧠' },
+                ].map((q) => (
+                  <Link
+                    key={q.href}
+                    href={q.href}
+                    className="flex items-center gap-4 p-4 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    style={{ background: '#fff', border: '1px solid #ece2d4', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+                  >
+                    <span className="text-2xl flex-shrink-0">{q.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
+                      <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
+                    </div>
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(169,78,24,0.08)' }}>
+                      <svg className="w-3.5 h-3.5" style={{ color: CLAY }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <Link href="/quizzes" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
+                Voir tous les quiz →
+              </Link>
+            </>
+          )}
         </div>
       </section>
 
