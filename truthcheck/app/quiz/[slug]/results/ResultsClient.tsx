@@ -737,6 +737,24 @@ export default function ResultsClient({ quiz }: Props) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
+
+              {/* Portrait viral CTA — concours 1 000 € */}
+              <Link
+                href={`/portrait?quiz=${quiz.slug}&score=${score}${quiz.slug === 'personnalite' ? '' : ''}`}
+                className="flex items-center justify-between w-full px-5 py-4 rounded-2xl mb-3 transition-all hover:opacity-90 active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(194,97,31,0.12))', border: '1px solid rgba(251,191,36,0.35)' }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">🏆</span>
+                  <div>
+                    <p className="text-white font-black text-sm leading-tight">Génère ton portrait viral</p>
+                    <p style={{ color: '#fbbf24' }} className="text-xs font-semibold mt-0.5">Concours 1 000 € · le plus de vues gagne</p>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </>
           ) : (
             /* ── FREE: paywall ── */
@@ -857,6 +875,7 @@ export default function ResultsClient({ quiz }: Props) {
                       'Profil MBTI + compatibilités duo illimitées',
                       'Suivi personnalisé sur 15 jours',
                       'Tous les futurs quiz inclus, à vie',
+                      '🏆 Portrait viral IA + concours 1 000 €',
                     ].map((b) => (
                       <li key={b} className="flex items-start gap-2 text-[13px] text-zinc-200 leading-snug">
                         <span className="flex-shrink-0 mt-px" style={{ color: '#aebf9c' }}>✓</span>
