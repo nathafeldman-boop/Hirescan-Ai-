@@ -96,9 +96,11 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    if (isInAppBrowser(navigator.userAgent || '')) setInApp(true);
+    const ua = navigator.userAgent || '';
+    if (isInAppBrowser(ua)) setInApp(true);
     const p = new URLSearchParams(window.location.search);
-    setFromTiktok(p.get('utm_source') === 'tiktok' || p.get('utm_medium') === 'paid');
+    const isTiktokUA = /TikTok|BytedanceWebview|musical_ly|trill/i.test(ua);
+    setFromTiktok(p.get('utm_source') === 'tiktok' || p.get('utm_medium') === 'paid' || isTiktokUA);
   }, []);
 
   return (
