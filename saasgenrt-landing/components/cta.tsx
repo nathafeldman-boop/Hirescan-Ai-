@@ -3,126 +3,110 @@
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
+const EASE = [0.22, 1, 0.36, 1] as const
+
 export function CTA() {
   return (
     <section
       id="cta"
       className="relative overflow-hidden"
-      style={{ background: '#08080f', paddingTop: '80px', paddingBottom: '96px' }}
+      style={{ background: 'var(--bg)', paddingTop: '80px', paddingBottom: '96px' }}
     >
-      {/* Section divider line */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ width: '640px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.32), transparent)' }}
-      />
+      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '480px', height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
 
       <div className="max-w-[1200px] mx-auto px-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative overflow-hidden text-center"
+          transition={{ duration: 0.55, ease: EASE }}
           style={{
-            borderRadius: '28px',
-            padding: '72px 48px',
-            background: 'linear-gradient(145deg, rgba(124,58,237,0.13) 0%, rgba(109,40,217,0.06) 60%, rgba(255,255,255,0.025) 100%)',
-            border: '1px solid rgba(124,58,237,0.2)',
+            borderRadius: '20px',
+            padding: 'clamp(48px, 6vw, 72px) clamp(28px, 5vw, 64px)',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            textAlign: 'center',
           }}
         >
-          {/* Top-right corner glow */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: 0,
-              right: 0,
-              width: '350px',
-              height: '350px',
-              background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)',
-              transform: 'translate(35%, -35%)',
-            }}
-          />
-          {/* Bottom-left corner glow */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              bottom: 0,
-              left: 0,
-              width: '250px',
-              height: '250px',
-              background: 'radial-gradient(circle, rgba(124,58,237,0.13) 0%, transparent 70%)',
-              transform: 'translate(-35%, 35%)',
-            }}
-          />
-
-          {/* Headline */}
           <h2
-            className="font-bold text-white relative z-10"
-            style={{ fontSize: 'clamp(32px, 4vw, 44px)', letterSpacing: '-0.028em', lineHeight: '1.12', marginBottom: '16px' }}
+            className="font-bold text-white"
+            style={{
+              fontSize: 'clamp(28px, 4vw, 44px)',
+              letterSpacing: '-0.03em',
+              lineHeight: '1.1',
+              marginBottom: '16px',
+              textWrap: 'balance',
+            }}
           >
-            Ready to build your
-            <br />
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #c4b5fd 20%, #8b5cf6 80%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              next SaaS?
-            </span>
+            Prêt à construire ton<br />
+            <span style={{ color: 'var(--primary)' }}>prochain SaaS ?</span>
           </h2>
 
-          {/* Sub */}
           <p
-            className="relative z-10 mx-auto"
+            className="mx-auto"
             style={{
               fontSize: '15.5px',
-              color: 'rgba(255,255,255,0.48)',
+              color: 'var(--muted)',
               lineHeight: '1.65',
-              maxWidth: '440px',
+              maxWidth: '44ch',
               marginBottom: '36px',
             }}
           >
-            Join thousands of indie builders who already found
-            their profitable SaaS idea with SaaSGenrt.
+            Rejoins des centaines de makers qui ont trouvé leur idée SaaS rentable avec SaaSGenrt.
           </p>
 
-          {/* Buttons */}
-          <div className="flex items-center justify-center gap-3 flex-wrap relative z-10">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
             <a
-              href="#pricing"
-              className="flex items-center gap-2 text-white font-semibold rounded-full transition-all"
+              href="/builder"
+              className="flex items-center gap-2 font-semibold transition-all"
               style={{
                 fontSize: '14px',
                 padding: '12px 28px',
-                background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                boxShadow: '0 8px 32px rgba(124,58,237,0.42), inset 0 1px 0 rgba(255,255,255,0.13)',
+                borderRadius: '12px',
+                background: 'var(--primary)',
+                color: 'white',
+                boxShadow: '0 6px 24px oklch(0.62 0.14 205 / 0.35)',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)'
+                ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.filter = 'brightness(1)'
+                ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
               }}
             >
-              Start Building Free
+              Commencer gratuitement
               <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
             </a>
             <a
               href="#how-it-works"
-              className="flex items-center font-medium rounded-full transition-all"
+              className="flex items-center font-medium transition-all"
               style={{
                 fontSize: '14px',
                 padding: '11px 24px',
-                color: 'rgba(255,255,255,0.7)',
-                border: '1px solid rgba(255,255,255,0.11)',
-                background: 'rgba(255,255,255,0.04)',
+                borderRadius: '12px',
+                color: 'oklch(0.97 0 0 / 0.7)',
+                border: '1px solid var(--border)',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'oklch(0.35 0 0)'
+                ;(e.currentTarget as HTMLElement).style.color = 'var(--ink)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
+                ;(e.currentTarget as HTMLElement).style.color = 'oklch(0.97 0 0 / 0.7)'
               }}
             >
-              See how it works
+              Voir comment ça marche
             </a>
           </div>
 
-          {/* Trust strip */}
-          <div className="flex items-center justify-center gap-7 flex-wrap relative z-10" style={{ marginTop: '28px' }}>
-            {['No credit card required', 'First idea is free', 'Cancel anytime'].map((t) => (
-              <span key={t} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>✓ {t}</span>
+          <div className="flex items-center justify-center gap-7 flex-wrap" style={{ marginTop: '24px' }}>
+            {['Sans carte de crédit', 'Première idée gratuite', 'Annulation libre'].map((t) => (
+              <span key={t} style={{ fontSize: '12px', color: 'var(--muted)' }}>✓ {t}</span>
             ))}
           </div>
         </motion.div>

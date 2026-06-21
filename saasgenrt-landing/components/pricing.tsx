@@ -2,56 +2,65 @@
 
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
-import { ArrowRight } from 'lucide-react'
+
+const EASE = [0.22, 1, 0.36, 1] as const
 
 const plans = [
   {
-    id: 'starter',
-    name: 'Starter',
-    price: '$9',
-    period: 'one-time',
-    desc: 'Unlock all your SaaS ideas in one click.',
+    id: 'week',
+    name: 'Hebdo',
+    price: '7,90€',
+    period: '/ semaine',
+    tagline: 'Pour commencer maintenant',
     featured: false,
-    cta: 'Get started →',
+    cta: 'Commencer →',
+    save: '',
+    badge: '',
     features: [
-      '10 validated SaaS ideas',
-      'MRR potential per idea',
-      'Competition score',
-      'PDF export',
+      'Analyse complète de ton idée',
+      '10 idées SaaS validées',
+      'Score de concurrence',
+      'Potentiel MRR par idée',
+      'Stratégie marketing personnalisée',
     ],
-    bg: 'rgba(255,255,255,0.04)',
-    border: 'rgba(255,255,255,0.10)',
-    ctaBg: 'rgba(255,255,255,0.08)',
-    ctaBorder: 'rgba(255,255,255,0.12)',
-    ctaColor: 'rgba(255,255,255,0.85)',
-    checkBg: 'rgba(255,255,255,0.08)',
-    checkColor: 'rgba(255,255,255,0.5)',
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    price: '$200',
-    period: 'one-time',
-    desc: 'Full validation suite for serious builders.',
+    id: 'month',
+    name: 'Mensuel',
+    price: '23€',
+    period: '/ mois',
+    tagline: 'Pour les builders sérieux',
     featured: true,
-    cta: 'Start building →',
+    cta: 'Choisir Mensuel →',
+    save: 'Économise 19 % vs hebdo',
+    badge: 'Le plus populaire',
     features: [
-      'Everything in Starter',
-      'Unlimited regeneration',
-      'TAM / SAM / SOM analysis',
-      'Landing page copy',
-      'Pricing recommendations',
-      'Competitor breakdown',
-      'Integration blueprint',
-      'Priority support',
+      'Tout le plan Hebdo',
+      'Régénération illimitée',
+      'Analyse TAM / SAM / SOM',
+      'Fiche concurrents complète',
+      'Roadmap de lancement 30 jours',
+      'Accès dashboard workspace',
     ],
-    bg: 'rgba(124,58,237,0.09)',
-    border: 'rgba(124,58,237,0.42)',
-    ctaBg: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-    ctaBorder: 'transparent',
-    ctaColor: 'white',
-    checkBg: 'rgba(124,58,237,0.28)',
-    checkColor: '#a78bfa',
+  },
+  {
+    id: 'year',
+    name: 'Annuel',
+    price: '75€',
+    period: '/ an',
+    tagline: 'Meilleure valeur long terme',
+    featured: false,
+    cta: 'Choisir Annuel →',
+    save: 'Économise 73 % vs mensuel',
+    badge: '',
+    features: [
+      'Tout le plan Mensuel',
+      'Support prioritaire',
+      'Accès aux nouvelles fonctionnalités',
+      'Export PDF illimité',
+      'Blueprint intégration tech',
+      'Recommandations pricing personnalisées',
+    ],
   },
 ]
 
@@ -60,139 +69,148 @@ export function Pricing() {
     <section
       id="pricing"
       className="relative overflow-hidden"
-      style={{ background: '#08080f', paddingTop: '96px', paddingBottom: '96px' }}
+      style={{ background: 'var(--bg)', paddingTop: '96px', paddingBottom: '96px' }}
     >
-      {/* Divider glow */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ width: '640px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(124,58,237,0.32), transparent)' }}
-      />
-      {/* Center radial glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 55% 50% at 50% 50%, rgba(124,58,237,0.10) 0%, transparent 70%)' }}
-      />
+      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '480px', height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
 
       <div className="max-w-[1200px] mx-auto px-6 relative z-10">
 
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-14"
+          transition={{ duration: 0.5, ease: EASE }}
+          className="mb-14"
         >
           <h2
-            className="font-bold text-white mb-3"
-            style={{ fontSize: '40px', letterSpacing: '-0.025em' }}
+            className="font-bold text-white"
+            style={{ fontSize: 'clamp(28px, 3.5vw, 40px)', letterSpacing: '-0.028em', lineHeight: 1.1 }}
           >
-            Pricing preview
+            Tarification simple et honnête
           </h2>
-          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.48)' }}>
-            One-time payment. No subscription. No surprises.
+          <p style={{ fontSize: '15px', color: 'var(--muted)', marginTop: '10px' }}>
+            Sans engagement. Annule à tout moment.
           </p>
         </motion.div>
 
-        {/* Cards */}
-        <div className="flex flex-col md:flex-row gap-5 justify-center items-start max-w-[820px] mx-auto">
+        <div className="flex flex-col md:flex-row gap-4 justify-center items-stretch max-w-[900px] mx-auto">
           {plans.map((plan, i) => (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
+              transition={{ duration: 0.45, delay: i * 0.1, ease: EASE }}
               className="relative flex-1 w-full"
               style={{
-                borderRadius: '20px',
+                borderRadius: 16,
                 padding: '28px',
-                background: plan.bg,
-                border: `1px solid ${plan.border}`,
+                background: plan.featured ? 'oklch(0.62 0.14 205 / 0.07)' : 'var(--surface)',
+                border: `1.5px solid ${plan.featured ? 'var(--primary)' : 'var(--border)'}`,
+                transform: plan.featured ? 'scale(1.02)' : 'scale(1)',
+                zIndex: plan.featured ? 2 : 1,
+                transition: 'transform 0.2s ease, border-color 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (!plan.featured) (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'
+              }}
+              onMouseLeave={(e) => {
+                if (!plan.featured) (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
               }}
             >
-              {/* Featured badge */}
-              {plan.featured && (
-                <div
-                  className="absolute -top-[13px] left-1/2 -translate-x-1/2 text-white font-semibold"
-                  style={{
-                    fontSize: '11px',
-                    padding: '3px 14px',
-                    borderRadius: 99,
-                    background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                    whiteSpace: 'nowrap',
-                    boxShadow: '0 4px 14px rgba(124,58,237,0.4)',
-                  }}
-                >
-                  ✦ Most popular
+              {plan.badge && (
+                <div style={{
+                  position: 'absolute',
+                  top: -12,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  padding: '3px 14px',
+                  borderRadius: 99,
+                  background: 'var(--primary)',
+                  color: 'white',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 4px 12px oklch(0.62 0.14 205 / 0.35)',
+                }}>
+                  {plan.badge}
                 </div>
               )}
 
-              {/* Plan name + desc */}
-              <div className="mb-5">
-                <div className="text-white font-semibold mb-1" style={{ fontSize: '15px' }}>{plan.name}</div>
-                <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{plan.desc}</div>
-              </div>
-
-              {/* Price */}
-              <div className="flex items-end gap-2 mb-6">
-                <span
-                  className="font-bold text-white"
-                  style={{ fontSize: '48px', lineHeight: 1, letterSpacing: '-0.04em' }}
-                >
-                  {plan.price}
-                </span>
-                <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.38)', paddingBottom: '6px' }}>
-                  {plan.period}
+              <div style={{ marginBottom: 4, marginTop: plan.badge ? 8 : 0 }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: plan.featured ? 'var(--primary)' : 'var(--muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  {plan.name}
                 </span>
               </div>
+              <div style={{ fontSize: '12.5px', color: 'var(--muted)', marginBottom: 18, lineHeight: 1.4 }}>{plan.tagline}</div>
 
-              {/* CTA */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: plan.save ? 6 : 22 }}>
+                <span style={{ fontSize: '42px', fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.04em', lineHeight: 1 }}>{plan.price}</span>
+                <span style={{ fontSize: '13px', color: 'var(--muted)', paddingBottom: 4 }}>{plan.period}</span>
+              </div>
+              {plan.save && (
+                <div style={{ fontSize: '11.5px', color: 'var(--accent)', fontWeight: 600, marginBottom: 18 }}>{plan.save}</div>
+              )}
+
               <a
-                href="#"
-                className="flex items-center justify-center w-full font-semibold text-white mb-6 transition-all"
+                href="/builder"
+                className="flex items-center justify-center w-full font-semibold transition-all"
                 style={{
                   fontSize: '13.5px',
                   padding: '11px 20px',
-                  borderRadius: '99px',
-                  background: plan.ctaBg,
-                  border: `1px solid ${plan.ctaBorder}`,
-                  color: plan.ctaColor,
-                  boxShadow: plan.featured ? '0 8px 28px rgba(124,58,237,0.38), inset 0 1px 0 rgba(255,255,255,0.12)' : 'none',
+                  borderRadius: '12px',
+                  background: plan.featured ? 'var(--primary)' : 'transparent',
+                  border: plan.featured ? 'none' : '1.5px solid var(--border)',
+                  color: plan.featured ? 'white' : 'var(--ink)',
+                  marginBottom: 22,
+                  textDecoration: 'none',
+                  boxShadow: plan.featured ? '0 6px 20px oklch(0.62 0.14 205 / 0.3)' : 'none',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+                  if (plan.featured) (e.currentTarget as HTMLElement).style.filter = 'brightness(1.08)'
+                  else (e.currentTarget as HTMLElement).style.borderColor = 'oklch(0.35 0 0)'
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+                  if (plan.featured) (e.currentTarget as HTMLElement).style.filter = 'brightness(1)'
+                  else (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
                 }}
               >
                 {plan.cta}
               </a>
 
-              {/* Divider */}
-              <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '18px' }} />
+              <div style={{ height: 1, background: 'var(--border)', marginBottom: 18 }} />
 
-              {/* Features */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {plan.features.map((f) => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <div
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <Check
                       style={{
-                        width: 16,
-                        height: 16,
-                        borderRadius: '50%',
-                        background: plan.checkBg,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                        marginTop: '1px',
+                        width: 14, height: 14, marginTop: 1, flexShrink: 0,
+                        color: plan.featured ? 'var(--primary)' : 'var(--muted)',
                       }}
-                    >
-                      <Check style={{ width: '9px', height: '9px', color: plan.checkColor }} strokeWidth={3} />
-                    </div>
-                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.58)', lineHeight: '1.5' }}>{f}</span>
+                      strokeWidth={2.5}
+                    />
+                    <span style={{ fontSize: '13px', color: 'oklch(0.97 0 0 / 0.6)', lineHeight: 1.5 }}>{f}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="flex items-center justify-center gap-8 mt-12 flex-wrap"
+        >
+          {['Paiement sécurisé', 'Annulation libre', 'Accès instantané', 'Sans frais cachés'].map((t) => (
+            <span key={t} style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500 }}>✓ {t}</span>
+          ))}
+        </motion.div>
       </div>
     </section>
   )
