@@ -508,8 +508,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
       currency: 'EUR',
     });
-    // In-app browser (TikTok etc.) — Stripe doesn't redirect reliably; show overlay
-    if (isInApp) { setShowPayOverlay(true); return; }
     setLoading(true);
     try {
       let affiliateRef = '';
@@ -732,6 +730,18 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <p className="text-center text-[11px] text-stone-400 mt-4">
           {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe · Card, Apple Pay, Google Pay'}
         </p>
+
+        {isInApp && (
+          <div className="mt-4 text-center">
+            <button
+              onClick={copyPayLink}
+              className="text-xs font-semibold transition-colors"
+              style={{ color: linkCopied ? '#10b981' : '#a8a29e', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            >
+              {linkCopied ? '✓ Lien copié — colle dans Safari' : '↗ Ouvrir dans mon navigateur'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
