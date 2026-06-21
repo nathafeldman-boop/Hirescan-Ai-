@@ -66,9 +66,11 @@ export async function POST(req: NextRequest) {
       }),
     });
 
+    if (!res.ok) throw new Error(`Mistral ${res.status}`);
     const data = await res.json() as { choices?: { message?: { content?: string } }[] };
     const raw = data.choices?.[0]?.message?.content ?? '{}';
-    const parsed = JSON.parse(raw) as { hook?: string; archetype?: string; description?: string; caption?: string; hashtags?: string };
+    let parsed: { hook?: string; archetype?: string; description?: string; caption?: string; hashtags?: string } = {};
+    try { parsed = JSON.parse(raw); } catch { /* utilise les fallbacks ci-dessous */ }
 
     return NextResponse.json({
       hook:        parsed.hook        ?? 'Mon profil psychologique vient d\'être révélé.',

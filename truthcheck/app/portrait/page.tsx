@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -24,17 +24,21 @@ const QUIZ_NAMES: Record<string, string> = {
 };
 
 export default function PortraitPage() {
-  const params = typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search)
-    : new URLSearchParams();
+  const [quizSlug, setQuizSlug] = useState('personnalite');
+  const [score, setScore]       = useState(75);
+  const [typeCode, setTypeCode] = useState('');
 
-  const quizSlug = params.get('quiz') ?? 'personnalite';
-  const score    = Number(params.get('score') ?? 75);
-  const typeCode = params.get('type') ?? '';
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    setQuizSlug(p.get('quiz') ?? 'personnalite');
+    setScore(Number(p.get('score') ?? 75));
+    setTypeCode(p.get('type') ?? '');
+  }, []);
 
   const [portrait, setPortrait]   = useState<PortraitData | null>(null);
   const [loading, setLoading]     = useState(false);
   const [copied, setCopied]       = useState(false);
+  const [error, setError]         = useState<string | null>(null);
   const [step, setStep]           = useState<'idle' | 'generating' | 'done'>('idle');
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -45,17 +49,20 @@ export default function PortraitPage() {
   async function generate() {
     setLoading(true);
     setStep('generating');
+    setError(null);
     try {
       const res = await fetch('/api/generate-portrait', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quizSlug, score, typeCode: typeCode || undefined }),
       });
+      if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json() as PortraitData;
       setPortrait(data);
       setStep('done');
     } catch {
       setStep('idle');
+      setError('Erreur lors de la génération — réessaie dans quelques secondes.');
     } finally {
       setLoading(false);
     }
@@ -64,9 +71,13 @@ export default function PortraitPage() {
   async function copyCaption() {
     if (!portrait) return;
     const text = `${portrait.caption}\n\n${portrait.hashtags}\n\nurcecret.site`;
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError('Impossible de copier — fais-le manuellement.');
+    }
   }
 
   const quizName = QUIZ_NAMES[quizSlug] ?? quizSlug;
@@ -119,6 +130,13 @@ export default function PortraitPage() {
             <p style={{ fontSize: 12, color: '#71717a', margin: '3px 0 0' }}>Score : {score}% · Portrait personnalisé par IA</p>
           </div>
         </div>
+
+        {/* Error message */}
+        {error && (
+          <div style={{ borderRadius: 12, padding: '12px 16px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', marginBottom: 16 }}>
+            <p style={{ fontSize: 13, color: '#f87171', margin: 0 }}>⚠️ {error}</p>
+          </div>
+        )}
 
         {/* Generate CTA */}
         {step === 'idle' && (
