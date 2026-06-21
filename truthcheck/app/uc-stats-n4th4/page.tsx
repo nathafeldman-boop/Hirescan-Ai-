@@ -48,30 +48,6 @@ export default async function StatsPage() {
     }),
   ]);
 
-  // Isolated try-catch: prisma.conversion may not exist if db push hasn't run yet
-  type ConvRow = { id: string; email: string | null; amountCents: number; quizSlug: string | null; productType: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; affiliateSlug: string | null; landingPath: string | null; createdAt: Date };
-  let allAttributionConversions: ConvRow[] = [];
-  try {
-    allAttributionConversions = await prisma.conversion.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 200,
-      select: {
-        id: true, email: true, amountCents: true, quizSlug: true,
-        productType: true, utmSource: true, utmMedium: true,
-        utmCampaign: true, affiliateSlug: true, landingPath: true, createdAt: true,
-      },
-    });
-  } catch { /* table not yet migrated */ }
-
-  // Agrégation par source
-  const sourceBreakdown: Record<string, { count: number; revenueCents: number }> = {};
-  allAttributionConversions.forEach(c => {
-    const src = c.utmSource ?? (c.affiliateSlug ? `aff:${c.affiliateSlug}` : 'organique');
-    if (!sourceBreakdown[src]) sourceBreakdown[src] = { count: 0, revenueCents: 0 };
-    sourceBreakdown[src].count++;
-    sourceBreakdown[src].revenueCents += c.amountCents;
-  });
-
   const usersByMonth: Record<string, number> = {};
   allUsersForMonth.forEach(u => {
     const key = u.createdAt.toISOString().slice(0, 7);
@@ -107,8 +83,6 @@ export default async function StatsPage() {
     totalResults, paidResults, paidToday, paidThisMonth, byQuiz,
     totalRevenueCents, todayRevenueCents, weekRevenueCents, monthRevenueCents, yearRevenueCents,
     revenueByMonth, affiliates,
-    recentAttributionConversions: allAttributionConversions.slice(0, 50),
-    sourceBreakdown,
   }));
 
   return <AdminDashboard stats={stats} />;
