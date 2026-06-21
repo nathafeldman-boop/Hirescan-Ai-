@@ -17,7 +17,7 @@ const RAPPORT_PRICE_CENTS  = 1999;  // €19.99 — rapport MBTI
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  if (!rateLimit(`checkout:${ip}`, 10, 60_000)) {
+  if (!rateLimit(`checkout:${ip}`, 20, 60_000)) {
     return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 });
   }
 

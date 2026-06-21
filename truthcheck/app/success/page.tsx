@@ -120,11 +120,14 @@ export default async function SuccessPage({
             <p className="text-stone-400 text-sm">Ouvre ton appli mail et clique le lien — ça prend 10 secondes.</p>
           </div>
         ) : (
-          <p className="text-stone-500 mb-8 leading-relaxed">
-            {typeCode
-              ? `Ton profil ${typeCode} et les 15 tests UrCecret sont maintenant débloqués.`
-              : `Ton rapport complet et les 15 tests UrCecret sont maintenant débloqués.`}
-          </p>
+          <div className="mb-8">
+            <p className="text-stone-500 leading-relaxed mb-2">
+              {typeCode
+                ? `Ton profil ${typeCode} est débloqué — fais défiler pour le lire intégralement.`
+                : `Ton accès UrCecret est actif. Fais défiler pour découvrir ton analyse.`}
+            </p>
+            <p className="text-stone-400 text-xs">💡 Ajoute cette page en favori pour y revenir.</p>
+          </div>
         )}
 
         <div className="space-y-3 max-w-sm mx-auto">
