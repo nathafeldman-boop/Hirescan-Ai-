@@ -1,16 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg: #090B11;
-  --bg-card: #111827;
-  --p: #8B5CF6;
-  --pl: #a78bfa;
-  --green: #39FF88;
-  --border: rgba(255,255,255,0.08);
+  --bg:      oklch(0.08 0 0);
+  --surface: oklch(0.13 0 0);
+  --ink:     oklch(0.97 0 0);
+  --muted:   oklch(0.52 0 0);
+  --primary: oklch(0.62 0.14 205);
+  --accent:  oklch(0.82 0.15 85);
+  --border:  oklch(0.20 0 0);
 }
 
 * {
@@ -21,9 +22,9 @@
 
 html,
 body {
-  background-color: #090B11;
-  color: white;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
@@ -33,31 +34,17 @@ body {
   width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #090B11;
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(139,92,246,0.4);
+  background: oklch(0.62 0.14 205 / 0.4);
   border-radius: 2px;
-}
-
-.glass {
-  background: rgba(17,24,39,0.7);
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #c4b5fd 20%, #8B5CF6 80%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .grid-bg {
   background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    linear-gradient(oklch(1 0 0 / 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 0.018) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
