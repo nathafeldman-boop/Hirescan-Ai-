@@ -42,6 +42,26 @@ export function middleware(request: NextRequest) {
     });
   }
 
+  // UTM attribution — capture toutes les sources publicitaires dans un cookie JSON
+  const utmSource   = request.nextUrl.searchParams.get('utm_source')   ?? '';
+  const utmMedium   = request.nextUrl.searchParams.get('utm_medium')   ?? '';
+  const utmCampaign = request.nextUrl.searchParams.get('utm_campaign') ?? '';
+  const utmContent  = request.nextUrl.searchParams.get('utm_content')  ?? '';
+  if (utmSource || utmMedium || utmCampaign) {
+    const payload: Record<string, string> = {};
+    if (utmSource)   payload.s  = utmSource;
+    if (utmMedium)   payload.m  = utmMedium;
+    if (utmCampaign) payload.c  = utmCampaign;
+    if (utmContent)  payload.co = utmContent;
+    payload.lp = request.nextUrl.pathname;
+    response.cookies.set('urs_utm', JSON.stringify(payload), {
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/',
+      sameSite: 'lax',
+      httpOnly: true,
+    });
+  }
+
   return response;
 }
 

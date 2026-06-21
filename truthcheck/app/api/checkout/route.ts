@@ -31,6 +31,20 @@ export async function POST(req: NextRequest) {
     const affiliateSlug = req.cookies.get('urs_ref')?.value || (typeof affiliateRef === 'string' ? affiliateRef : '') || '';
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
+    // Lire les UTM du cookie et les injecter dans la metadata Stripe
+    const utmRaw = req.cookies.get('urs_utm')?.value ?? '';
+    const utmMeta: Record<string, string> = {};
+    try {
+      if (utmRaw) {
+        const u = JSON.parse(utmRaw) as Record<string, string>;
+        if (u.s)  utmMeta.utmSource   = u.s;
+        if (u.m)  utmMeta.utmMedium   = u.m;
+        if (u.c)  utmMeta.utmCampaign = u.c;
+        if (u.co) utmMeta.utmContent  = u.co;
+        if (u.lp) utmMeta.landingPath = u.lp;
+      }
+    } catch { /* cookie malformé — on ignore */ }
+
     // ── Fusion group unlock ──
     if (fusionGroupId && fusionCode) {
       const fusionSession = await stripe.checkout.sessions.create({
@@ -45,7 +59,7 @@ export async function POST(req: NextRequest) {
         }],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { fusionGroupId, fusionCode, affiliateSlug },
+        metadata: { fusionGroupId, fusionCode, affiliateSlug, ...utmMeta },
         success_url: `${baseUrl}/fusion/${fusionCode}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/fusion/${fusionCode}`,
       });
@@ -84,7 +98,7 @@ export async function POST(req: NextRequest) {
         }],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { typeCode, rapport: 'true', affiliateSlug },
+        metadata: { typeCode, rapport: 'true', affiliateSlug, ...utmMeta },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
@@ -110,7 +124,7 @@ export async function POST(req: NextRequest) {
         line_items: [annualLineItem],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', annual: 'true', affiliateSlug },
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', annual: 'true', affiliateSlug, ...utmMeta },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
@@ -131,7 +145,7 @@ export async function POST(req: NextRequest) {
         }],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
-        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', oneTime: 'true', affiliateSlug, ...(typeCode ? { typeCode } : {}) },
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', oneTime: 'true', affiliateSlug, ...(typeCode ? { typeCode } : {}), ...utmMeta },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
@@ -154,7 +168,7 @@ export async function POST(req: NextRequest) {
       line_items: [lineItem],
       allow_promotion_codes: true,
       ...(userEmail ? { customer_email: userEmail } : {}),
-      metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', affiliateSlug },
+      metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', affiliateSlug, ...utmMeta },
       success_url: successUrl,
       cancel_url: cancelUrl,
     });

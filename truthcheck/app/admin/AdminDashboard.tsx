@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates' | 'codes' | 'activite';
+type Tab = 'overview' | 'users' | 'revenue' | 'quizzes' | 'affiliates' | 'codes' | 'activite' | 'sources';
 
 interface RecentConv {
   id: string;
@@ -47,6 +47,13 @@ interface Stats {
   totalPageViews: number;
   recentConversions?: RecentConv[];
   recentSignups?: RecentSignup[];
+  recentAttributionConversions?: Array<{
+    id: string; email: string | null; amountCents: number; quizSlug: string | null;
+    productType: string | null; utmSource: string | null; utmMedium: string | null;
+    utmCampaign: string | null; affiliateSlug: string | null; landingPath: string | null;
+    createdAt: string;
+  }>;
+  sourceBreakdown?: Record<string, { count: number; revenueCents: number }>;
 }
 
 interface StripeStats {
@@ -421,6 +428,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   const TABS: { id: Tab; label: string }[] = [
     { id: 'overview',   label: '📊 Vue d\'ensemble' },
     { id: 'activite',   label: '⚡ Activité' },
+    { id: 'sources',    label: '🎯 Sources' },
     { id: 'users',      label: '👥 Utilisateurs' },
     { id: 'revenue',    label: '💰 Revenus' },
     { id: 'quizzes',    label: '🧩 Quiz' },
@@ -691,6 +699,114 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                   </table>
                 </div>
               </>
+            )}
+          </div>
+        )}
+
+        {/* ── SOURCES ── */}
+        {tab === 'sources' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {sectionTitle('Sources d\'acquisition', 'Attribution complète · chaque paiement tracé avec sa source')}
+
+            {/* KPI cards — top sources */}
+            {stats.sourceBreakdown && Object.keys(stats.sourceBreakdown).length > 0 && (() => {
+              const sorted = Object.entries(stats.sourceBreakdown).sort((a, b) => b[1].revenueCents - a[1].revenueCents);
+              const totalRev = sorted.reduce((s, [, v]) => s + v.revenueCents, 0);
+              const totalCnt = sorted.reduce((s, [, v]) => s + v.count, 0);
+              return (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+                    <KpiCard label="Sources uniques"  value={sorted.length}             color="#d17d52" />
+                    <KpiCard label="Conversions trackées" value={totalCnt}              color="#d17d52" />
+                    <KpiCard label="CA tracké"         value={fmt(totalRev)} sub="toutes sources" color="#fbbf24" />
+                    <KpiCard label="Meilleure source"  value={sorted[0]?.[0] ?? '—'}   color="#e0a380" />
+                  </div>
+
+                  {card(
+                    <>
+                      <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600, fontSize: 14 }}>
+                        Répartition par source
+                      </div>
+                      <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {sorted.map(([src, data]) => {
+                          const pct = totalRev > 0 ? Math.round(data.revenueCents / totalRev * 100) : 0;
+                          return (
+                            <div key={src}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                <span style={{ color: '#d4d4d8', fontSize: 13, fontWeight: 500 }}>{src}</span>
+                                <div style={{ display: 'flex', gap: 16 }}>
+                                  <span style={{ color: '#71717a', fontSize: 12 }}>{data.count} vente{data.count > 1 ? 's' : ''}</span>
+                                  <span style={{ color: '#fbbf24', fontWeight: 600, fontSize: 13 }}>{fmt(data.revenueCents)}</span>
+                                  <span style={{ color: '#52525b', fontSize: 12, width: 32, textAlign: 'right' }}>{pct}%</span>
+                                </div>
+                              </div>
+                              <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#a94e18,#d17d52)', borderRadius: 999, transition: 'width 0.4s ease' }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </>
+              );
+            })()}
+
+            {/* Recent attribution conversions table */}
+            {stats.recentAttributionConversions && stats.recentAttributionConversions.length > 0 ? card(
+              <>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 600, fontSize: 14 }}>
+                  Dernières conversions trackées ({stats.recentAttributionConversions.length})
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead><tr>
+                      {['Date','Email','Montant','Type','Quiz','Source','Medium','Campagne','Affilié','Page entrée'].map(h => (
+                        <th key={h} style={{ ...thStyle, fontSize: 10 }}>{h}</th>
+                      ))}
+                    </tr></thead>
+                    <tbody>
+                      {stats.recentAttributionConversions.map(c => (
+                        <tr key={c.id}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                          <td style={{ ...tdStyle, fontSize: 10, whiteSpace: 'nowrap', color: '#52525b' }}>{fmtDateTime(c.createdAt)}</td>
+                          <td style={{ ...tdStyle, fontSize: 11, color: '#71717a', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.email ? maskEmail(c.email) : '—'}</td>
+                          <td style={{ ...tdStyle, color: '#fbbf24', fontWeight: 700, whiteSpace: 'nowrap' }}>{fmt(c.amountCents)}</td>
+                          <td style={{ ...tdStyle }}>
+                            {c.productType ? (
+                              <span style={{
+                                padding: '2px 7px', borderRadius: 999, fontSize: 10, fontWeight: 600,
+                                background: c.productType === 'annual' ? 'rgba(251,191,36,0.12)' : c.productType === 'monthly' ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.06)',
+                                color: c.productType === 'annual' ? '#fbbf24' : c.productType === 'monthly' ? '#34d399' : '#71717a',
+                                border: `1px solid ${c.productType === 'annual' ? 'rgba(251,191,36,0.25)' : c.productType === 'monthly' ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.08)'}`,
+                              }}>{c.productType}</span>
+                            ) : '—'}
+                          </td>
+                          <td style={{ ...tdStyle, color: '#52525b', fontSize: 11 }}>{c.quizSlug ?? '—'}</td>
+                          <td style={{ ...tdStyle }}>
+                            {c.utmSource ? (
+                              <span style={{ padding: '2px 7px', borderRadius: 999, fontSize: 10, fontWeight: 600, background: 'rgba(194,97,31,0.15)', color: '#d17d52', border: '1px solid rgba(194,97,31,0.25)' }}>
+                                {c.utmSource}
+                              </span>
+                            ) : <span style={{ color: '#3f3f46', fontSize: 11 }}>organique</span>}
+                          </td>
+                          <td style={{ ...tdStyle, color: '#52525b', fontSize: 11 }}>{c.utmMedium ?? '—'}</td>
+                          <td style={{ ...tdStyle, color: '#52525b', fontSize: 11 }}>{c.utmCampaign ?? '—'}</td>
+                          <td style={{ ...tdStyle, color: '#52525b', fontSize: 11 }}>{c.affiliateSlug ?? '—'}</td>
+                          <td style={{ ...tdStyle, color: '#3f3f46', fontSize: 10, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.landingPath ?? '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            ) : (
+              <div style={{ padding: '48px 24px', textAlign: 'center', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20 }}>
+                <p style={{ color: '#52525b', fontSize: 14 }}>Aucune conversion trackée pour l'instant</p>
+                <p style={{ color: '#3f3f46', fontSize: 12, marginTop: 8 }}>Les prochains paiements seront automatiquement enregistrés avec leur source UTM.</p>
+              </div>
             )}
           </div>
         )}

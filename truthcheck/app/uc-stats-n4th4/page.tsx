@@ -38,7 +38,7 @@ export default async function StatsPage() {
     }),
   ]);
 
-  const [allConversions, affiliates] = await Promise.all([
+  const [allConversions, affiliates, allAttributionConversions] = await Promise.all([
     prisma.affiliateConversion.findMany({
       select: { amountCents: true, commissionCents: true, createdAt: true, affiliateId: true },
     }),
@@ -46,7 +46,25 @@ export default async function StatsPage() {
       include: { conversions: { orderBy: { createdAt: 'desc' } } },
       orderBy: { createdAt: 'desc' },
     }),
+    prisma.conversion.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+      select: {
+        id: true, email: true, amountCents: true, quizSlug: true,
+        productType: true, utmSource: true, utmMedium: true,
+        utmCampaign: true, affiliateSlug: true, landingPath: true, createdAt: true,
+      },
+    }),
   ]);
+
+  // Agrégation par source
+  const sourceBreakdown: Record<string, { count: number; revenueCents: number }> = {};
+  allAttributionConversions.forEach(c => {
+    const src = c.utmSource ?? (c.affiliateSlug ? `aff:${c.affiliateSlug}` : 'organique');
+    if (!sourceBreakdown[src]) sourceBreakdown[src] = { count: 0, revenueCents: 0 };
+    sourceBreakdown[src].count++;
+    sourceBreakdown[src].revenueCents += c.amountCents;
+  });
 
   const usersByMonth: Record<string, number> = {};
   allUsersForMonth.forEach(u => {
@@ -83,6 +101,8 @@ export default async function StatsPage() {
     totalResults, paidResults, paidToday, paidThisMonth, byQuiz,
     totalRevenueCents, todayRevenueCents, weekRevenueCents, monthRevenueCents, yearRevenueCents,
     revenueByMonth, affiliates,
+    recentAttributionConversions: allAttributionConversions.slice(0, 50),
+    sourceBreakdown,
   }));
 
   return <AdminDashboard stats={stats} />;

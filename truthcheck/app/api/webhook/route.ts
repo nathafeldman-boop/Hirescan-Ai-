@@ -85,6 +85,30 @@ export async function POST(req: NextRequest) {
           }).catch(() => {});
         }
       }
+
+      // ── Attribution complète — chaque paiement tracé avec sa source ──
+      await prisma.conversion.upsert({
+        where: { stripeSessionId: session.id },
+        create: {
+          stripeSessionId: session.id,
+          email:           email ?? undefined,
+          amountCents:     session.amount_total ?? 0,
+          quizSlug:        meta.quizSlug     || undefined,
+          productType:     meta.annual === 'true'          ? 'annual'
+                         : meta.rapport === 'true'         ? 'rapport'
+                         : meta.fusionGroupId              ? 'fusion'
+                         : meta.oneTime === 'true'         ? 'onetime'
+                         : session.mode === 'subscription' ? 'monthly'
+                         : 'onetime',
+          utmSource:       meta.utmSource    || undefined,
+          utmMedium:       meta.utmMedium    || undefined,
+          utmCampaign:     meta.utmCampaign  || undefined,
+          utmContent:      meta.utmContent   || undefined,
+          affiliateSlug:   meta.affiliateSlug || undefined,
+          landingPath:     meta.landingPath  || undefined,
+        },
+        update: {},
+      }).catch(() => {});
     }
 
     // ── Subscription renewal → keep tier premium ──

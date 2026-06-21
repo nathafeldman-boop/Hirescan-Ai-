@@ -182,3 +182,23 @@ model AccessCode {
   createdAt   DateTime  @default(now())
 }
 
+model Conversion {
+  id              String   @id @default(cuid())
+  stripeSessionId String   @unique
+  email           String?
+  amountCents     Int
+  quizSlug        String?
+  productType     String?  // 'onetime' | 'monthly' | 'annual' | 'rapport' | 'fusion'
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  utmContent      String?
+  affiliateSlug   String?
+  landingPath     String?
+  createdAt       DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([utmSource])
+  @@index([quizSlug])
+}
+
