@@ -38,7 +38,7 @@ export default async function StatsPage() {
     }),
   ]);
 
-  const [allConversions, affiliates, allAttributionConversions] = await Promise.all([
+  const [allConversions, affiliates] = await Promise.all([
     prisma.affiliateConversion.findMany({
       select: { amountCents: true, commissionCents: true, createdAt: true, affiliateId: true },
     }),
@@ -46,8 +46,13 @@ export default async function StatsPage() {
       include: { conversions: { orderBy: { createdAt: 'desc' } } },
       orderBy: { createdAt: 'desc' },
     }),
-    // Resilient — table may not exist yet on first deploy after migration
-    prisma.conversion.findMany({
+  ]);
+
+  // Isolated try-catch: prisma.conversion may not exist if db push hasn't run yet
+  type ConvRow = { id: string; email: string | null; amountCents: number; quizSlug: string | null; productType: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; affiliateSlug: string | null; landingPath: string | null; createdAt: Date };
+  let allAttributionConversions: ConvRow[] = [];
+  try {
+    allAttributionConversions = await prisma.conversion.findMany({
       orderBy: { createdAt: 'desc' },
       take: 200,
       select: {
@@ -55,8 +60,8 @@ export default async function StatsPage() {
         productType: true, utmSource: true, utmMedium: true,
         utmCampaign: true, affiliateSlug: true, landingPath: true, createdAt: true,
       },
-    }).catch(() => [] as Array<{ id: string; email: string | null; amountCents: number; quizSlug: string | null; productType: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; affiliateSlug: string | null; landingPath: string | null; createdAt: Date }>),
-  ]);
+    });
+  } catch { /* table not yet migrated */ }
 
   // Agrégation par source
   const sourceBreakdown: Record<string, { count: number; revenueCents: number }> = {};
