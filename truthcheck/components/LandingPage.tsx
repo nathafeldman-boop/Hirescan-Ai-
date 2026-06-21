@@ -163,7 +163,7 @@ export default function LandingPage() {
           </p>
 
           <Link
-            href="/commencer"
+            href={fromTiktok ? '/quiz/infidelite' : '/commencer'}
             className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-black text-white text-base transition-all hover:opacity-90 active:scale-[0.98]"
             style={{ background: CLAY, boxShadow: '0 8px 28px rgba(169,78,24,0.38)' }}
           >
@@ -406,7 +406,7 @@ export default function LandingPage() {
           style={{ padding: '12px 16px 28px', background: 'linear-gradient(to top, rgba(247,243,236,1) 65%, transparent)' }}
         >
           <Link
-            href="/commencer"
+            href={fromTiktok ? '/quiz/infidelite' : '/commencer'}
             className="block w-full text-center py-4 rounded-full font-black text-white text-base transition-all active:scale-[0.98]"
             style={{ background: CLAY, boxShadow: '0 6px 24px rgba(169,78,24,0.40)' }}
           >
