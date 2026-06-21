@@ -538,14 +538,6 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
             <div className="space-y-3">
               <button
-                onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
-                disabled={isCheckingOut}
-                className="w-full py-4 rounded-xl font-black text-white text-base transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 20px rgba(194,97,31,0.4)' }}
-              >
-                {ctaText} ✦
-              </button>
-              <button
                 onClick={() => {
                   setShowExitModal(false);
                   void (async () => {
@@ -557,10 +549,18 @@ export default function ResultsClient({ quiz }: Props) {
                   })();
                 }}
                 disabled={isCheckingOut}
-                className="w-full py-2.5 rounded-xl font-medium text-xs border transition-all disabled:opacity-60"
-                style={{ borderColor: 'rgba(224,163,128,0.4)', background: 'rgba(194,97,31,0.12)', color: '#e0a380' }}
+                className="w-full py-4 rounded-xl font-black text-white text-base transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 20px rgba(194,97,31,0.4)' }}
               >
-                Ou tout débloquer 1 an — 29,99€ (0,08€/jour)
+                Tout débloquer — 29,99€/an ✦
+              </button>
+              <button
+                onClick={() => { setShowExitModal(false); handleOneTimeClick(); }}
+                disabled={isCheckingOut}
+                className="w-full py-2.5 rounded-xl font-medium text-xs border transition-all disabled:opacity-60"
+                style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', color: '#a1a1aa' }}
+              >
+                ou juste ce résultat pour 1,99€
               </button>
               <button
                 onClick={() => setShowExitModal(false)}
@@ -841,113 +841,52 @@ export default function ResultsClient({ quiz }: Props) {
               {/* Main paywall card */}
               <div
                 ref={paywallRef}
-                className="rounded-2xl p-7 mb-6 border border-white/10"
+                className="rounded-2xl p-6 mb-6 border border-white/10"
                 style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.14), rgba(209,125,82,0.10))' }}
               >
-                <div className="text-center mb-6">
-                  <h2 className="text-xl font-black text-white mb-3 leading-snug">{pw.headline}</h2>
-                  <p className="text-zinc-400 text-sm leading-relaxed">
-                    {pw.subline}
-                  </p>
+                <div className="text-center mb-5">
+                  <h2 className="text-xl font-black text-white mb-2 leading-snug">{pw.headline}</h2>
+                  <p className="text-zinc-400 text-sm leading-relaxed">{pw.subline}</p>
                 </div>
 
                 {/* Social proof */}
-                <div className="flex items-center justify-center gap-2 mb-6 py-2.5 rounded-xl border border-white/8 bg-white/[0.04]">
+                <div className="flex items-center justify-center gap-2 mb-5 py-2.5 rounded-xl border border-white/8 bg-white/[0.04]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-xs text-zinc-400">{pw.social}</span>
                 </div>
 
-                {/* CTA — 1,99€ one-time: primary hero */}
-                <div className="flex justify-center mb-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 tracking-wide">
-                    ⚡ Accès immédiat · Sans engagement
-                  </span>
-                </div>
-                <button
-                  onClick={handleOneTimeClick}
-                  disabled={isCheckingOut}
-                  className="w-full py-5 rounded-2xl font-black text-white text-lg mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
-                  style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 6px 32px rgba(194,97,31,0.55)' }}
-                >
-                  {isCheckingOut ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Redirection…
-                    </span>
-                  ) : (
-                    <>{ctaText} ✦</>
-                  )}
-                </button>
-
-                {/* Benefit bullets — quiz-specific, outcome focused */}
-                {(() => {
-                  const BENEFIT_BULLETS: Record<string, string[]> = {
-                    infidelite: ['Tu sors du doute aujourd\'hui', 'Tu reprends le contrôle', 'Paiement unique · 1,99€', 'Résultat immédiat'],
-                    adopte: ['Tu trouves la clarté que tu cherches', 'Tu avances l\'esprit libre', 'Paiement unique · 1,99€', 'Résultat immédiat'],
-                    amoureux: ['Tu mets un mot sur ce que tu ressens', 'Tu sais quoi faire maintenant', 'Paiement unique · 1,99€', 'Résultat immédiat'],
-                    'vrais-amis': ['Tu vois qui mérite ta confiance', 'Tu arrêtes de te remettre en question', 'Paiement unique · 1,99€', 'Résultat immédiat'],
-                    orientation: ['Tu te libères d\'une question qui traîne', 'Tu te comprends mieux, sans étiquette', 'Paiement unique · 1,99€', 'Résultat immédiat'],
-                    personnalite: ['Ton type exact — pas juste 4 lettres', 'Ton profil sous pression dévoilé', 'Paiement unique · 1,99€', 'Résultat immédiat'],
-                  };
-                  const bullets = BENEFIT_BULLETS[quiz.slug] ?? ['Tu comprends pourquoi tu réagis comme ça', 'Tu sors de l\'incertitude', 'Paiement unique · 1,99€', 'Résultat immédiat'];
-                  return (
-                    <ul className="grid grid-cols-2 gap-x-4 gap-y-2 mb-7 px-1">
-                      {bullets.map(b => (
-                        <li key={b} className="flex items-center gap-2 text-xs text-zinc-300">
-                          <span className="text-emerald-400 text-sm flex-shrink-0">✓</span>
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                })()}
-
-                {/* Divider */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 h-px bg-white/8" />
-                  <span className="text-[10px] text-zinc-500 font-semibold tracking-wider uppercase whitespace-nowrap">Ou débloque tout</span>
-                  <div className="flex-1 h-px bg-white/8" />
-                </div>
-
-                {/* Annual option — featured, most popular, value-stacked */}
+                {/* Annual — PRIMARY HERO */}
                 <div
-                  className="relative rounded-2xl p-5 mb-2.5"
-                  style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.18), rgba(176,125,43,0.10))', border: '1.5px solid rgba(224,163,128,0.55)' }}
+                  className="relative rounded-2xl p-5 mb-4"
+                  style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.22), rgba(176,125,43,0.14))', border: '2px solid rgba(224,163,128,0.65)' }}
                 >
-                  {/* Badge */}
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                    <span className="text-[10px] font-black px-3 py-1 rounded-full tracking-wide whitespace-nowrap" style={{ background: '#c2611f', color: '#fff', boxShadow: '0 2px 10px rgba(194,97,31,0.5)' }}>
-                      ⭐ LA PLUS POPULAIRE
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="text-[11px] font-black px-4 py-1.5 rounded-full tracking-wide whitespace-nowrap" style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', color: '#fff', boxShadow: '0 4px 18px rgba(194,97,31,0.6)' }}>
+                      ⭐ LE MEILLEUR CHOIX · LE PLUS POPULAIRE
                     </span>
                   </div>
 
-                  <div className="flex items-end justify-between mt-2 mb-3">
+                  <div className="flex items-start justify-between mt-3 mb-3">
                     <div className="flex flex-col">
                       <span className="text-white font-black text-base leading-tight">Accès illimité — 1 an</span>
-                      <span className="text-[11px] mt-0.5 font-semibold" style={{ color: '#e0a380' }}>
-                        soit 0,08€/jour — moins qu&apos;un chewing-gum
+                      <span className="text-[11px] mt-1 font-semibold" style={{ color: '#e0a380' }}>
+                        0,08€/jour · moins qu&apos;un chewing-gum
                       </span>
                     </div>
                     <div className="flex flex-col items-end flex-shrink-0 ml-3">
-                      <span className="flex items-baseline gap-1.5">
-                        <span className="text-zinc-500 text-xs line-through">119,88€</span>
-                        <span className="font-black text-white text-2xl">29,99€</span>
-                      </span>
-                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded mt-0.5" style={{ background: 'rgba(125,148,102,0.25)', color: '#aebf9c' }}>
+                      <span className="text-zinc-500 text-xs line-through mb-0.5">119,88€</span>
+                      <span className="font-black text-white text-3xl leading-none">29,99€</span>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded mt-1" style={{ background: 'rgba(125,148,102,0.25)', color: '#aebf9c' }}>
                         −75%
                       </span>
                     </div>
                   </div>
 
-                  {/* Value stack */}
-                  <ul className="space-y-1.5 mb-4">
+                  <ul className="space-y-1.5 mb-5">
                     {[
-                      'Ton profil MBTI complet + les 16 types en détail',
-                      'Les 15 quiz secrets débloqués (couple, amitié, manipulation…)',
-                      'Test de compatibilité duo en illimité',
+                      'Analyse complète de ce résultat — maintenant',
+                      'Les 15 quiz secrets débloqués (couple, amitié…)',
+                      'Profil MBTI + compatibilités duo illimitées',
                       'Suivi personnalisé sur 15 jours',
                       'Tous les futurs quiz inclus, à vie',
                     ].map((b) => (
@@ -969,18 +908,28 @@ export default function ResultsClient({ quiz }: Props) {
                       })();
                     }}
                     disabled={isCheckingOut}
-                    className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-                    style={{ background: '#c2611f', boxShadow: '0 4px 18px rgba(194,97,31,0.45)' }}
+                    className="w-full py-5 rounded-2xl font-black text-white text-lg transition-all active:scale-[0.98] disabled:opacity-60"
+                    style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 8px 36px rgba(194,97,31,0.65)' }}
                   >
-                    Tout débloquer pour 29,99€/an
+                    {isCheckingOut ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Redirection…
+                      </span>
+                    ) : (
+                      <>Tout débloquer — 29,99€/an ✦</>
+                    )}
                   </button>
                 </div>
 
-                {/* Monthly sub */}
+                {/* Secondary: monthly */}
                 <button
                   onClick={handlePayClick}
                   disabled={isCheckingOut}
-                  className="w-full py-4 rounded-xl font-semibold text-white text-sm border border-white/10 bg-white/[0.04] hover:bg-white/7 transition-all active:scale-[0.98] mb-5 disabled:opacity-60 px-5"
+                  className="w-full py-3.5 rounded-xl font-semibold text-white text-sm border border-white/10 bg-white/[0.04] hover:bg-white/7 transition-all active:scale-[0.98] mb-4 disabled:opacity-60 px-5"
                 >
                   <span className="flex items-center justify-between">
                     <span className="flex flex-col items-start gap-0.5">
@@ -990,6 +939,17 @@ export default function ResultsClient({ quiz }: Props) {
                     <span className="font-black text-zinc-200 ml-3 flex-shrink-0">9,99€<span className="font-normal text-zinc-500 text-xs">/mois</span></span>
                   </span>
                 </button>
+
+                {/* Downsell: 1,99€ one-time report only */}
+                <div className="text-center mb-5">
+                  <button
+                    onClick={handleOneTimeClick}
+                    disabled={isCheckingOut}
+                    className="text-zinc-500 hover:text-zinc-300 text-xs underline underline-offset-2 transition-colors disabled:opacity-60"
+                  >
+                    ou juste ce résultat pour 1,99€ →
+                  </button>
+                </div>
 
                 <p className="text-center text-[11px] text-zinc-600">
                   🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay · Annulable à tout moment
