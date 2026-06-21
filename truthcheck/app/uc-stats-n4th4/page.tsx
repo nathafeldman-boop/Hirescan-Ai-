@@ -46,6 +46,7 @@ export default async function StatsPage() {
       include: { conversions: { orderBy: { createdAt: 'desc' } } },
       orderBy: { createdAt: 'desc' },
     }),
+    // Resilient — table may not exist yet on first deploy after migration
     prisma.conversion.findMany({
       orderBy: { createdAt: 'desc' },
       take: 200,
@@ -54,7 +55,7 @@ export default async function StatsPage() {
         productType: true, utmSource: true, utmMedium: true,
         utmCampaign: true, affiliateSlug: true, landingPath: true, createdAt: true,
       },
-    }),
+    }).catch(() => [] as Array<{ id: string; email: string | null; amountCents: number; quizSlug: string | null; productType: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; affiliateSlug: string | null; landingPath: string | null; createdAt: Date }>),
   ]);
 
   // Agrégation par source
