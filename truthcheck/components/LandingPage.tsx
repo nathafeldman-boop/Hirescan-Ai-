@@ -83,20 +83,28 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [inApp, setInApp] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [fromTiktok, setFromTiktok] = useState(false);
+  const [stickyVisible, setStickyVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+      setStickyVisible(window.scrollY > 320);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
     if (isInAppBrowser(navigator.userAgent || '')) setInApp(true);
+    const p = new URLSearchParams(window.location.search);
+    setFromTiktok(p.get('utm_source') === 'tiktok' || p.get('utm_medium') === 'paid');
   }, []);
 
   return (
     <main className="min-h-screen overflow-x-hidden relative" style={{ background: '#f7f3ec', color: '#2b2622' }}>
-      {inApp && !bannerDismissed && <InAppBanner onClose={() => setBannerDismissed(true)} />}
+      {/* InAppBanner intentionnellement retiré de la landing — le banner est géré sur la page de résultats uniquement pour ne pas bloquer le traffic ads TikTok/Instagram */}
+      {false && inApp && !bannerDismissed && <InAppBanner onClose={() => setBannerDismissed(true)} />}
 
       {/* Paper grain — handcrafted texture */}
       <div className="grain-overlay" />
@@ -128,62 +136,99 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative z-10 pt-36 pb-16 px-6 text-center">
+      <section className="relative z-10 pt-36 pb-12 px-6 text-center">
         <div className="max-w-xl mx-auto">
-          <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-7 tracking-wide"
-            style={{ background: 'rgba(169,78,24,0.07)', border: '1px solid rgba(169,78,24,0.18)', color: CLAY }}
-          >
-            Test de personnalité · 100 questions
+
+          {/* Live social proof pill */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6"
+            style={{ background: 'rgba(169,78,24,0.07)', border: '1px solid rgba(169,78,24,0.18)', color: CLAY }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+            {fromTiktok ? '🔥 Ce test circule sur TikTok en ce moment' : 'Test de personnalité · Résultat immédiat'}
           </div>
 
           <h1 className="font-display text-5xl sm:text-[58px] font-black leading-[1.04] mb-5 tracking-tight" style={{ color: '#2b2622' }}>
-            Quel est<br />
-            <span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type ?
+            {fromTiktok ? (
+              <>Ce test révèle<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>ce que tu caches</span> vraiment</>
+            ) : (
+              <>Quel est<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type ?</>
+            )}
           </h1>
 
-          <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-9">
-            Basé sur les 8 fonctions cognitives de Carl Jung — repris par Myers-Briggs. 16 profils distincts. Ton analyse complète en 12 minutes.
+          <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-8">
+            {fromTiktok
+              ? 'Infidélité, manipulation, amour véritable — 15 quiz qui posent les questions que personne n\'ose poser. Résultat en 2 minutes.'
+              : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en 12 minutes.'}
           </p>
 
           <Link
             href="/commencer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-white text-sm transition-all hover:opacity-90 active:scale-[0.98]"
-            style={{ background: CLAY, boxShadow: '0 6px 24px rgba(169,78,24,0.28)' }}
+            className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-black text-white text-base transition-all hover:opacity-90 active:scale-[0.98]"
+            style={{ background: CLAY, boxShadow: '0 8px 28px rgba(169,78,24,0.38)' }}
           >
-            Découvrir mon type →
+            {fromTiktok ? 'Faire le test — Gratuit →' : 'Découvrir mon type →'}
           </Link>
-          <p className="text-stone-400 text-xs mt-4">
-            Gratuit · 12 minutes · Sans inscription
+          <p className="text-stone-400 text-xs mt-3.5">
+            Gratuit · Résultat immédiat · Sans inscription
           </p>
 
-          {/* Features strip */}
-          <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
-            <span className="text-stone-400 text-xs font-medium">Et aussi :</span>
-            <a href="/duo" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: '#fff', border: '1px solid #e4d9c8', color: '#566b45' }}>
-              💑 Test duo
-            </a>
-            <a href="/fusion" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: '#fff', border: '1px solid #e4d9c8', color: CLAY }}>
-              ⚗️ Quiz de groupe
-            </a>
-            <a href="/quizzes" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-[1.04]" style={{ background: '#fff', border: '1px solid #e4d9c8', color: '#78716c' }}>
-              🎯 15 quiz secrets
-            </a>
-          </div>
-
           {/* Stats */}
-          <div className="flex items-center justify-center gap-12 mt-14 pt-10" style={{ borderTop: '1px solid #e4d9c8' }}>
+          <div className="flex items-center justify-center gap-10 mt-12 pt-8" style={{ borderTop: '1px solid #e4d9c8' }}>
             {[
-              { value: '16', label: 'Profils distincts' },
-              { value: '100', label: 'Questions calibrées' },
+              { value: '15 quiz', label: 'Différents thèmes' },
+              { value: '+10 000', label: 'Résultats ce mois' },
               { value: 'Gratuit', label: 'Pour commencer' },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <div className="font-display text-3xl font-black" style={{ color: '#2b2622' }}>{s.value}</div>
+                <div className="font-display text-2xl font-black" style={{ color: '#2b2622' }}>{s.value}</div>
                 <div className="text-xs text-stone-400 mt-1">{s.label}</div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Quiz viraux — montés ici pour le traffic TikTok (section 2 au lieu de 7) ── */}
+      <section className="relative z-10 pb-10 px-5">
+        <div className="max-w-lg mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
+            🔍 Questions secrètes
+          </p>
+          <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-1">
+            Des révélations que tu n&apos;attendais pas
+          </h2>
+          <p className="text-stone-400 text-center text-xs mb-5">
+            Anonyme · Résultat immédiat · Sans inscription
+          </p>
+          <div className="space-y-2">
+            {[
+              { href: '/quiz/infidelite',       q: 'Mon/ma partenaire me trompe ?',      sub: '8 comportements analysés · 2 minutes',                           emoji: '💔' },
+              { href: '/quiz/amoureux',         q: 'Suis-je vraiment amoureux(se) ?',    sub: 'Amour, attachement ou habitude — analyse différenciée',           emoji: '❤️' },
+              { href: '/quiz/manipule',         q: 'Suis-je manipulé(e) ?',              sub: 'Gaslighting, contrôle émotionnel, emprise — détection',           emoji: '🎭' },
+              { href: '/quiz/vrais-amis',       q: 'Sont-ils de vrais amis ?',           sub: 'Dynamiques de réciprocité dans tes amitiés proches',              emoji: '🤝' },
+              { href: '/quiz/personnalite',     q: 'Quel est mon type de personnalité ?', sub: 'Test MBTI · 16 profils · fonctions cognitives de Jung',          emoji: '🧠' },
+            ].map((q) => (
+              <Link
+                key={q.href}
+                href={q.href}
+                className="flex items-center gap-4 p-4 rounded-xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                style={{ background: '#fff', border: '1px solid #ece2d4', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+              >
+                <span className="text-2xl flex-shrink-0">{q.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
+                  <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
+                </div>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(169,78,24,0.08)' }}>
+                  <svg className="w-3.5 h-3.5" style={{ color: CLAY }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <Link href="/quizzes" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
+            Voir tous les quiz →
+          </Link>
         </div>
       </section>
 
@@ -335,50 +380,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Truth quizzes */}
-      <section className="relative z-10 py-16 px-6">
-        <div className="max-w-lg mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
-            🔍 Questions secrètes
-          </p>
-          <h2 className="font-display text-3xl font-black text-stone-900 text-center mb-2">
-            Des révélations que tu n&apos;attendais pas
-          </h2>
-          <p className="text-stone-500 text-center text-sm mb-8 max-w-xs mx-auto">
-            Anonyme. Résultat immédiat. Sans inscription.
-          </p>
-          <div className="space-y-2">
-            {[
-              { href: '/quiz/infidelite', q: 'Mon/ma partenaire me trompe ?', sub: '8 comportements analysés · 2 minutes', emoji: '💔' },
-              { href: '/quiz/amoureux', q: 'Suis-je vraiment amoureux(se) ?', sub: 'Amour, attachement ou habitude — analyse différenciée', emoji: '❤️' },
-              { href: '/quiz/vrais-amis', q: 'Sont-ils de vrais amis ?', sub: 'Dynamiques de réciprocité dans tes amitiés proches', emoji: '🤝' },
-              { href: '/quiz/manipule', q: 'Suis-je manipulé(e) ?', sub: 'Gaslighting, contrôle émotionnel, emprise — détection', emoji: '🎭' },
-            ].map((q) => (
-              <Link
-                key={q.href}
-                href={q.href}
-                className="flex items-center gap-4 p-4 rounded-xl transition-all hover:-translate-y-0.5 group"
-                style={{ background: '#fff', border: '1px solid #ece2d4' }}
-              >
-                <span className="text-2xl flex-shrink-0">{q.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
-                  <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
-                </div>
-                <svg className="w-4 h-4 text-stone-300 flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            ))}
-          </div>
-          <Link href="/quizzes" className="block text-center mt-6 text-sm font-semibold transition-colors" style={{ color: CLAY }}>
-            Voir tous les quiz →
-          </Link>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="relative z-10 py-8 px-6" style={{ borderTop: '1px solid #e4d9c8' }}>
+      <footer className="relative z-10 py-8 px-6 pb-24 sm:pb-8" style={{ borderTop: '1px solid #e4d9c8' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="font-display text-base font-black">
             Ur<span style={{ color: CLAY }}>Cecret</span>
@@ -393,6 +396,22 @@ export default function LandingPage() {
           <p className="text-stone-400 text-xs">© 2025 UrCecret</p>
         </div>
       </footer>
+
+      {/* Sticky mobile CTA — visible after 320px scroll, hidden on desktop */}
+      {stickyVisible && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-40 sm:hidden"
+          style={{ padding: '12px 16px 28px', background: 'linear-gradient(to top, rgba(247,243,236,1) 65%, transparent)' }}
+        >
+          <Link
+            href="/commencer"
+            className="block w-full text-center py-4 rounded-full font-black text-white text-base transition-all active:scale-[0.98]"
+            style={{ background: CLAY, boxShadow: '0 6px 24px rgba(169,78,24,0.40)' }}
+          >
+            {fromTiktok ? 'Faire le test — Gratuit →' : 'Découvrir mon type →'}
+          </Link>
+        </div>
+      )}
     </main>
   );
 }
