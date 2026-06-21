@@ -110,6 +110,7 @@ export default function ResultsClient({ quiz }: Props) {
 
   const [contractAccepted] = useState(true);
   const [strokeOffset, setStrokeOffset] = useState(CIRCUMFERENCE);
+  const [animatedScore, setAnimatedScore] = useState(0);
   const [shareId, setShareId] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -126,9 +127,6 @@ export default function ResultsClient({ quiz }: Props) {
   const analysis = buildAnalysis(quiz, score, tier.title);
 
   const partialScore = score >= 100 ? '9?%' : score >= 10 ? `${Math.floor(score / 10)}?%` : '?%';
-  const partialType = quiz.slug === 'personnalite' && tier.title?.length >= 4
-    ? tier.title.slice(0, 2) + '??'
-    : null;
 
   function trackEvent(event: 'paywall_view' | 'checkout_click' | 'payment_success') {
     track(event, { quiz: quiz.slug, content_name: quiz.title });
@@ -354,14 +352,22 @@ export default function ResultsClient({ quiz }: Props) {
     return () => clearTimeout(t);
   }, [score]);
 
-  // Auto-scroll to paywall — delay so user sees their score/tier first
+  // Count-up the real score for the reveal moment — the dopamine they earned
   useEffect(() => {
-    if (isPremium || sessionLoading) return;
-    const t = setTimeout(() => {
-      paywallRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 2000);
-    return () => clearTimeout(t);
-  }, [isPremium, sessionLoading]);
+    if (sessionLoading) return;
+    let raf = 0;
+    let start: number | null = null;
+    const dur = 1400;
+    const step = (ts: number) => {
+      if (start === null) start = ts;
+      const p = Math.min((ts - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setAnimatedScore(Math.round(eased * score));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [score, sessionLoading]);
 
   // Track paywall impression once per session
   useEffect(() => {
@@ -766,79 +772,75 @@ export default function ResultsClient({ quiz }: Props) {
             </>
           ) : (
             /* ── FREE: paywall ── */
-            <div ref={paywallRef}>
-              {/* Blurred score circle */}
-              <div className="flex justify-center mb-6 relative">
-                <div style={{ filter: 'blur(12px)', opacity: 0.5, pointerEvents: 'none' }}>
-                  <svg width="180" height="180" viewBox="0 0 180 180">
-                    <defs>
-                      <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor={`${tier.glowColor}88`} />
-                        <stop offset="100%" stopColor={tier.glowColor} />
-                      </linearGradient>
-                    </defs>
-                    <circle cx="90" cy="90" r="72" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
-                    <circle
-                      cx="90" cy="90" r="72" fill="none"
-                      stroke="url(#circleGrad)" strokeWidth="10"
-                      strokeDasharray={CIRCUMFERENCE} strokeDashoffset={strokeOffset}
-                      strokeLinecap="round" transform="rotate(-90 90 90)"
-                      style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
-                    />
-                    <text x="90" y="98" textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize={partialType ? '26' : '36'} fontWeight="900">{partialType ?? partialScore}</text>
-                  </svg>
-                </div>
-                {/* Lock icon overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl"
-                      style={{ background: 'linear-gradient(135deg, #c2611fdd, #d17d52dd)', backdropFilter: 'blur(4px)' }}
-                    >
-                      <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
-                    <span className="text-[10px] font-bold text-white/60 tracking-widest uppercase">Score caché</span>
-                  </div>
-                </div>
+            <>
+              {/* ── Real score revealed — the reward they earned (dopamine + shareable) ── */}
+              <div className="flex justify-center mb-5">
+                <svg width="180" height="180" viewBox="0 0 180 180">
+                  <defs>
+                    <linearGradient id="circleGradFree" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor={`${tier.glowColor}88`} />
+                      <stop offset="100%" stopColor={tier.glowColor} />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="90" cy="90" r="72" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
+                  <circle
+                    cx="90" cy="90" r="72" fill="none"
+                    stroke="url(#circleGradFree)" strokeWidth="10"
+                    strokeDasharray={CIRCUMFERENCE} strokeDashoffset={strokeOffset}
+                    strokeLinecap="round" transform="rotate(-90 90 90)"
+                    style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
+                  />
+                  <text x="90" y="98" textAnchor="middle" fill={tier.glowColor} fontSize="42" fontWeight="900">{animatedScore}%</text>
+                </svg>
               </div>
 
-              {/* Badge — tier + partial score */}
-              <div className="flex justify-center mb-4">
+              {/* Tier badge — fully revealed */}
+              <div className="flex justify-center mb-5">
                 <span
                   className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold border"
-                  style={{ color: tier.glowColor, borderColor: `${tier.glowColor}40`, backgroundColor: `${tier.glowColor}12` }}
+                  style={{ color: tier.glowColor, borderColor: `${tier.glowColor}40`, backgroundColor: `${tier.glowColor}15` }}
                 >
                   <span>{tier.emoji}</span>
-                  {tier.title} · {partialType ?? partialScore}
+                  {tier.title}
                 </span>
               </div>
 
-              {/* Teaser — specific hook + locked list */}
-              <div className="mb-5 rounded-2xl border border-white/8 bg-white/[0.03] p-5">
-                {/* First real insight, visible */}
-                <p className="text-zinc-100 text-sm leading-relaxed mb-3">
-                  {teaser.intro}
-                </p>
-                {/* Cut-off — the crucial moment */}
-                <div className="relative overflow-hidden" style={{ maxHeight: 36 }}>
-                  <p className="text-zinc-400 text-sm leading-relaxed italic">
-                    {teaser.cut}
-                  </p>
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent 60%, rgba(9,9,11,0.98) 100%)' }} />
+              {/* Verdict + free analysis preview — proves the value is real BEFORE any ask */}
+              <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5 mb-4">
+                <p className="text-zinc-100 font-semibold text-sm mb-4 leading-relaxed">{tier.message}</p>
+                <div className="space-y-3">
+                  {analysis.slice(0, 3).map((line, i) => (
+                    <p key={i} className="text-zinc-400 text-sm leading-relaxed">{line}</p>
+                  ))}
                 </div>
 
-                {/* What's locked — specific list */}
-                <div className="mt-4 pt-4 border-t border-white/5 space-y-1.5">
-                  {teaser.locked.map((item) => (
-                    <p key={item} className="text-[11px] text-zinc-600 leading-snug">{item}</p>
+                {/* The analysis continues — blurred to prove there's real depth behind the unlock */}
+                <div className="relative mt-3" aria-hidden>
+                  <div className="space-y-3" style={{ filter: 'blur(5px)', opacity: 0.4, userSelect: 'none', pointerEvents: 'none' }}>
+                    {analysis.slice(3, 6).map((line, i) => (
+                      <p key={i} className="text-zinc-400 text-sm leading-relaxed">{line}</p>
+                    ))}
+                  </div>
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent, rgba(9,9,11,0.97))' }} />
+                </div>
+              </div>
+
+              {/* What the complete report unlocks */}
+              <div className="mb-5 rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+                <p className="text-[11px] text-zinc-500 uppercase tracking-widest font-semibold mb-3">Dans ton rapport complet</p>
+                <div className="space-y-2">
+                  {teaser.locked.filter((item) => !/score exact/i.test(item)).map((item) => (
+                    <p key={item} className="text-[13px] text-zinc-300 leading-snug flex items-start gap-2">
+                      <span className="flex-shrink-0 mt-px opacity-60">🔓</span>
+                      <span>{item.replace(/^🔒\s*/, '')}</span>
+                    </p>
                   ))}
                 </div>
               </div>
 
               {/* Main paywall card */}
               <div
+                ref={paywallRef}
                 className="rounded-2xl p-7 mb-6 border border-white/10"
                 style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.14), rgba(209,125,82,0.10))' }}
               >
@@ -994,7 +996,7 @@ export default function ResultsClient({ quiz }: Props) {
                 </p>
               </div>
 
-            </div>
+            </>
           )}
 
           {/* Viral share section */}
