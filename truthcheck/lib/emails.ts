@@ -67,8 +67,8 @@ export function emailResultReady(name: string | null, typeCode: string) {
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
         Ton profil complet t'attend : ta face cachée, ton schéma en amour, tes vraies forces et tes angles morts. La plupart des gens disent "c'est exactement moi" en le lisant.
       </p>
-      <div style="background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
-        <p style="margin:0;color:#f472b6;font-size:14px;font-style:italic;line-height:1.7">
+      <div style="background:rgba(209,125,82,0.08);border:1px solid rgba(209,125,82,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;color:#d17d52;font-size:14px;font-style:italic;line-height:1.7">
           "J'ai cru que ce serait bateau. En fait je me suis reconnu(e) dans chaque ligne."
         </p>
       </div>
@@ -91,8 +91,8 @@ export function emailDay1(name: string | null) {
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
         Hier tu as commencé. Ton résultat est sauvegardé — mais la plupart des gens qui n'y reviennent pas dans 24h ne reviennent jamais.
       </p>
-      <div style="background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
-        <p style="margin:0;color:#f472b6;font-size:14px;font-style:italic;line-height:1.7">
+      <div style="background:rgba(209,125,82,0.08);border:1px solid rgba(209,125,82,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;color:#d17d52;font-size:14px;font-style:italic;line-height:1.7">
           "Je pensais que ce serait un quiz bateau. En fait j'ai pleuré en lisant mon analyse. C'était exactement ça."
         </p>
         <p style="margin:8px 0 0;color:#52525b;font-size:12px">— Marie, 24 ans</p>
@@ -116,8 +116,8 @@ export function emailDay3(name: string | null) {
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
         73% des personnes qui lisent leur analyse complète disent que ça a changé leur façon de voir une situation dans leur vie.
       </p>
-      <div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
-        <p style="margin:0 0 12px;color:#a78bfa;font-size:13px;font-weight:700">Ce que les gens découvrent :</p>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
+        <p style="margin:0 0 12px;color:#c2611f;font-size:13px;font-weight:700">Ce que les gens découvrent :</p>
         <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.2">
           <li>🧠 "Je comprends enfin pourquoi je réagis comme ça"</li>
           <li>💔 "J'avais raison de me poser des questions"</li>
@@ -144,8 +144,8 @@ export function emailDay7(name: string | null) {
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
         C'est le dernier email que je t'envoie. Dans 24h, ton analyse est archivée et tu devras tout refaire.
       </p>
-      <div style="background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
-        <p style="margin:0 0 4px;color:#f472b6;font-size:15px;font-weight:700">Ce que ${firstName} n'a pas encore vu :</p>
+      <div style="background:rgba(209,125,82,0.08);border:1px solid rgba(209,125,82,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
+        <p style="margin:0 0 4px;color:#d17d52;font-size:15px;font-weight:700">Ce que ${firstName} n'a pas encore vu :</p>
         <ul style="margin:8px 0 0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.1">
           <li>Son score exact (pas juste une fourchette)</li>
           <li>10 points d'analyse personnalisée</li>
@@ -194,8 +194,8 @@ export function emailPurchaseConfirm(name: string | null, type: 'onetime' | 'mon
       <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${firstName}, ${headline}</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">${body}</p>
       ${isSubscription ? `
-      <div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
-        <p style="margin:0 0 8px;color:#a78bfa;font-size:13px;font-weight:700">Ce que tu peux faire maintenant :</p>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0 0 8px;color:#c2611f;font-size:13px;font-weight:700">Ce que tu peux faire maintenant :</p>
         <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.1">
           <li>Voir ton score exact sur tous tes quiz</li>
           <li>Accéder à l'analyse complète de chaque résultat</li>
