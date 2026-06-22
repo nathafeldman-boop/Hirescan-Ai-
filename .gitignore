@@ -1,3 +1,6 @@
+node_modules/
+package-lock.json
+package.json
 smartapp-website/node_modules/
 smartapp-website/out/
 smartapp-website/.next/
