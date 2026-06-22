@@ -16,6 +16,10 @@
   --signal-ink:    oklch(0.47 0.17 31);     /* small vermilion text/links on light */
   --signal-bright: oklch(0.70 0.175 35);    /* vermilion text/icons on dark panels */
   --signal-wash:   oklch(0.93 0.045 45);    /* soft peach highlight bg */
+  --ok:            oklch(0.52 0.135 152);   /* calm green — positive metrics / success */
+  --ok-bright:     oklch(0.72 0.15 152);    /* green on dark panels */
+  --ok-wash:       oklch(0.94 0.04 152);    /* light green highlight bg */
+  --error:         oklch(0.55 0.20 25);     /* clear red for errors */
   --border:        oklch(0.90 0.008 50);
   --border-strong: oklch(0.84 0.011 50);
 
