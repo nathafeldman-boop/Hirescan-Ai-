@@ -481,6 +481,64 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
   );
 }
 
+// ─── Paywall email capture (abandon recovery) ───────────────────────────────────
+// For users not ready to pay: capture the email so we can send their welcome +
+// follow-up. POSTs to /api/save-email which fires a welcome email per new lead.
+function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
+  const [email, setEmail] = useState('');
+  const [state, setState] = useState<'idle' | 'loading' | 'done'>('idle');
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes('@') || !email.includes('.')) return;
+    setState('loading');
+    try {
+      await fetch('/api/save-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), typeCode }),
+      });
+    } catch {}
+    setState('done');
+  };
+
+  if (state === 'done') {
+    return (
+      <div className="rounded-2xl p-4 mt-5 text-center" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+        <p className="text-2xl mb-1">📩</p>
+        <p className="text-sm font-bold text-stone-800">{isFr ? 'Email envoyé !' : 'Email sent!'}</p>
+        <p className="text-xs text-stone-500 mt-0.5">{isFr ? 'Vérifie ta boîte — ton profil t\'attend.' : 'Check your inbox — your profile awaits.'}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+      <p className="text-sm font-bold text-stone-800 mb-1">{isFr ? 'Pas prêt ? Reçois ton profil par email 📩' : 'Not ready? Get your profile by email 📩'}</p>
+      <p className="text-xs text-stone-500 mb-3">{isFr ? 'On te garde ton résultat et on t\'envoie le lien.' : 'We\'ll save your result and send you the link.'}</p>
+      <form onSubmit={submit} className="flex gap-2">
+        <input
+          type="email"
+          inputMode="email"
+          placeholder={isFr ? 'ton@email.com' : 'your@email.com'}
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="flex-1 min-w-0 px-3 py-2.5 rounded-lg text-sm outline-none"
+          style={{ background: '#faf9f7', border: '1px solid #e7e5e0', color: '#2b2622' }}
+        />
+        <button
+          type="submit"
+          disabled={state === 'loading'}
+          className="px-4 py-2.5 rounded-lg font-bold text-white text-sm flex-shrink-0 disabled:opacity-60"
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
+        >
+          {state === 'loading' ? '…' : isFr ? 'Recevoir' : 'Send'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 // ─── Result teaser (free users — logged in or not) ─────────────────────────────
 // Auth gate removed: user goes straight to Stripe which collects their email.
 // The success page creates the account automatically from the Stripe email.
@@ -800,6 +858,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             {isFr ? '✓ Satisfait ou remboursé sous 7 jours' : '✓ 7-day money-back guarantee'}
           </p>
         </div>
+
+        {/* Abandon recovery — capture email + send welcome (non in-app, they already
+            have the free-signup card above) */}
+        {!isInApp && <PaywallEmailCapture typeCode={typeCode} isFr={isFr} />}
 
         {/* ── Portrait viral + Concours 1 000€ ─────────────────────────────── */}
         <a
