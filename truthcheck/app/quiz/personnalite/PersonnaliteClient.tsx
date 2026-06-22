@@ -485,8 +485,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
-  const [showPayOverlay, setShowPayOverlay] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
+  // Pre-fetched Stripe URL for in-app browsers (TikTok etc.)
+  // Using an <a href> instead of window.location.href lets TikTok open Stripe in Safari
+  // where the post-payment redirect back to /success works correctly.
+  const [inAppPayUrl, setInAppPayUrl] = useState<string | null>(null);
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
@@ -494,15 +496,30 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const copyPayLink = async () => {
-    const url = `${window.location.origin}/quiz/personnalite?pending=${typeCode}`;
-    try { await navigator.clipboard.writeText(url); } catch {}
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 3000);
-  };
+  // Pre-fetch one-time checkout URL immediately when in-app browser is detected
+  useEffect(() => {
+    if (!isInApp || !typeCode) return;
+    let affiliateRef = '';
+    try { affiliateRef = localStorage.getItem('_urs_ref') ?? ''; } catch {}
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origin: window.location.origin,
+        quizSlug: 'personnalite',
+        typeCode,
+        ...(userEmail ? { userEmail } : {}),
+        oneTime: true,
+        ...(affiliateRef ? { affiliateRef } : {}),
+      }),
+    }).then(r => r.json()).then(d => {
+      if (d.url) setInAppPayUrl(d.url);
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInApp, typeCode]);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
-    diagLog('checkout_start', { intent: checkoutType, hasEmail: !!userEmail, isInApp });
+    diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
     track('checkout_click', {
       quiz: 'personnalite',
       value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
@@ -532,51 +549,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       alert('Erreur réseau. Réessaie.');
       setLoading(false);
     }
-  }, [typeCode, userEmail, isInApp]);
+  }, [typeCode, userEmail]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: '#faf9f7' }}>
-      {/* Pay overlay for TikTok/in-app browser users */}
-      {showPayOverlay && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: '#0d0d0d', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
-          <div style={{ position: 'absolute', top: 18, right: 18, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M6 30L30 6M30 6H14M30 6V22" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            <div style={{ background: '#0ea5e9', color: 'white', fontWeight: 700, fontSize: 14, padding: '8px 14px', borderRadius: 20, whiteSpace: 'nowrap' }}>Appuie sur ••• ici</div>
-          </div>
-          <div style={{ background: '#1a1a1a', borderRadius: 24, padding: '32px 24px', width: '100%', maxWidth: 380, marginTop: 80 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'linear-gradient(135deg,#6f3318,#8a3e16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, marginBottom: 12 }}>🔮</div>
-              <div style={{ color: 'white', fontWeight: 700, fontSize: 16 }}>Profil {typeCode} prêt !</div>
-            </div>
-            <h2 style={{ color: 'white', fontSize: 20, fontWeight: 800, textAlign: 'center', lineHeight: 1.3, marginBottom: 24 }}>
-              Pour payer, ouvre dans ton navigateur :
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
-              <div style={{ background: '#262626', borderRadius: 14, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#3f3f46', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>1</div>
-                <span style={{ color: '#e5e7eb', fontSize: 15, lineHeight: 1.4 }}>Appuie sur <strong style={{ color: 'white' }}>•••</strong> en haut à droite</span>
-              </div>
-              <div style={{ background: '#262626', borderRadius: 14, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#3f3f46', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>2</div>
-                <span style={{ color: '#e5e7eb', fontSize: 15, lineHeight: 1.4 }}>Puis appuie sur <strong style={{ color: '#0ea5e9' }}>« Ouvrir dans le navigateur »</strong></span>
-              </div>
-            </div>
-            <button
-              onClick={copyPayLink}
-              style={{ width: '100%', padding: '13px', borderRadius: 12, background: linkCopied ? 'rgba(34,197,94,0.15)' : 'rgba(14,165,233,0.15)', border: `1px solid ${linkCopied ? 'rgba(34,197,94,0.4)' : 'rgba(14,165,233,0.4)'}`, color: linkCopied ? '#4ade80' : '#38bdf8', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 8 }}>
-              {linkCopied ? '✅ Lien copié ! Colle-le dans Safari ou Chrome' : '📋 Copier mon lien de résultat'}
-            </button>
-            {linkCopied && (
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, textAlign: 'center', marginBottom: 8, lineHeight: 1.5 }}>
-                Ouvre Safari ou Chrome, colle le lien → tu retrouveras ton profil {typeCode} directement
-              </p>
-            )}
-            <button onClick={() => setShowPayOverlay(false)} style={{ width: '100%', padding: '11px', borderRadius: 12, background: 'transparent', border: '1px solid #3f3f46', color: '#71717a', fontSize: 13, cursor: 'pointer' }}>
-              ← Retour
-            </button>
-          </div>
-        </div>
-      )}
       <div className="w-full max-w-sm">
 
         {/* Header */}
@@ -654,14 +630,29 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => doCheckout('onetime')}
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
-            >
-              {loading ? '…' : isFr ? `🔓 Révéler mon profil ${typeCode} →` : `🔓 Reveal my ${typeCode} profile →`}
-            </button>
+            {isInApp && inAppPayUrl ? (
+              // In TikTok WebView: <a target="_blank"> is treated as a user-initiated
+              // tap and opens in Safari, where the Stripe post-payment redirect works.
+              <a
+                href={inAppPayUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
+                className="w-full py-3.5 rounded-xl font-black text-white text-sm active:scale-[0.98] text-center block"
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)', textDecoration: 'none' }}
+              >
+                {isFr ? `🔓 Révéler mon profil ${typeCode} →` : `🔓 Reveal my ${typeCode} profile →`}
+              </a>
+            ) : (
+              <button
+                onClick={() => doCheckout('onetime')}
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
+              >
+                {loading ? '…' : isFr ? `🔓 Révéler mon profil ${typeCode} →` : `🔓 Reveal my ${typeCode} profile →`}
+              </button>
+            )}
           </div>
 
           {/* 2 — Annuel (best value) */}
@@ -731,17 +722,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe · Card, Apple Pay, Google Pay'}
         </p>
 
-        {isInApp && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={copyPayLink}
-              className="text-xs font-semibold transition-colors"
-              style={{ color: linkCopied ? '#10b981' : '#a8a29e', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-            >
-              {linkCopied ? '✓ Lien copié — colle dans Safari' : '↗ Ouvrir dans mon navigateur'}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
