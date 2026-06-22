@@ -25,8 +25,12 @@ export async function GET(req: NextRequest) {
   let errors = 0;
 
   for (const seq of SEQUENCES) {
-    const windowStart = new Date(now.getTime() - (seq.days * 86400 + 3600) * 1000);
-    const windowEnd = new Date(now.getTime() - (seq.days * 86400 - 3600) * 1000);
+    // Full 24h window ending exactly N days ago. The cron runs daily, so each
+    // free user lands in the dayN window on exactly one run → everyone receives
+    // the whole sequence (the old ±1h band made most users miss their emails).
+    // The emailLog dedup is the safety net against any double-send.
+    const windowStart = new Date(now.getTime() - (seq.days + 1) * 86400 * 1000);
+    const windowEnd = new Date(now.getTime() - seq.days * 86400 * 1000);
 
     const users = await prisma.user.findMany({
       where: {
