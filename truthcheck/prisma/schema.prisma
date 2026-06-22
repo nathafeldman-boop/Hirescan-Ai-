@@ -202,3 +202,19 @@ model Conversion {
   @@index([quizSlug])
 }
 
+model ContestEntry {
+  id            String   @id @default(cuid())
+  month         String   // "2026-06"
+  affiliateSlug String
+  affiliateName String?
+  tiktokUrl     String?
+  viewsCount    Int      @default(0)
+  likesCount    Int      @default(0)
+  sharesCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([month, affiliateSlug])
+  @@index([month])
+}
+
