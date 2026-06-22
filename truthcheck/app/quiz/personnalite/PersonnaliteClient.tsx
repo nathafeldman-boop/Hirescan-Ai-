@@ -890,9 +890,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           </p>
         </div>
 
-        {/* Abandon recovery — capture email + send welcome (non in-app, they already
-            have the free-signup card above) */}
-        {!isInApp && <PaywallEmailCapture typeCode={typeCode} isFr={isFr} />}
+        {/* Abandon recovery — in-place email capture (works in TikTok webview too,
+            no Safari hop needed) → sends the targeted "profil prêt" email */}
+        <PaywallEmailCapture typeCode={typeCode} isFr={isFr} />
 
         {/* ── Portrait viral + Concours 1 000€ ─────────────────────────────── */}
         <a
