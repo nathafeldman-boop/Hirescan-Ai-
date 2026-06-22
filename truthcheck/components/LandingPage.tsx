@@ -175,6 +175,18 @@ export default function LandingPage() {
             Gratuit · Résultat immédiat · Sans inscription
           </p>
 
+          {/* Trust strip right under the CTA — where the click decision happens */}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <span style={{ color: '#e0a380', letterSpacing: 1, fontSize: 13 }}>★★★★★</span>
+            <span className="text-xs font-bold" style={{ color: '#2b2622' }}>4,9</span>
+            <span className="text-xs text-stone-400">· +12 000 tests ce mois</span>
+          </div>
+          <div className="flex justify-center -space-x-2 mt-3">
+            {['#a94e18', '#566b45', '#3f6b6b', '#b07d2b', '#8a3e16'].map((c, i) => (
+              <div key={i} className="w-7 h-7 rounded-full border-2 border-white" style={{ background: c }} />
+            ))}
+          </div>
+
           {/* Stats */}
           <div className="flex items-center justify-center gap-10 mt-12 pt-8" style={{ borderTop: '1px solid #e4d9c8' }}>
             {[
