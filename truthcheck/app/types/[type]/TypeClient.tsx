@@ -235,6 +235,7 @@ export default function TypeClient({ type }: Props) {
             <span className="text-xs text-stone-500 line-through mr-1">29,99 €</span>
             <span className="text-xl font-black text-white">9,99 €</span>
             <span className="text-stone-400 text-xs">/mois</span>
+            <p className="text-[10px] text-stone-500">soit 0,33 €/jour</p>
           </div>
         </div>
         <ul className="space-y-2 mb-4">

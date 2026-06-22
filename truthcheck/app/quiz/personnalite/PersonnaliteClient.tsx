@@ -120,8 +120,8 @@ function QuizScreen({ onComplete, questions, t }: {
 
   const MILESTONE_MSGS: Record<number, { emoji: string; title: string; sub: string }> = {
     25: { emoji: '🔥', title: 'Tu es dans le top 25 % !', sub: 'La plupart des gens s\'arrêtent avant toi. Continue — ton type se dessine.' },
-    50: { emoji: '⚡', title: 'Mi-chemin atteint !', sub: 'Ton profil commence à prendre forme. Plus que 50 questions pour le révéler.' },
-    75: { emoji: '🎯', title: 'Plus que 25 questions !', sub: 'Ton type se précise. Tu es à quelques secondes de découvrir qui tu es vraiment.' },
+    50: { emoji: '⚡', title: 'Ton profil prend forme...', sub: 'Le résultat révèle ta face cachée, ton schéma en amour et tes angles morts. Continue.' },
+    75: { emoji: '🔓', title: 'Ton type est presque déterminé !', sub: 'Profil complet + les quiz secrets (infidélité, amour, manipulation) à débloquer. Tu y es presque.' },
   };
 
   useEffect(() => {
@@ -667,6 +667,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               <div className="text-right">
                 <span className="text-xs text-stone-400 line-through mr-1">29,99 €</span>
                 <span className="text-lg font-black text-stone-900">9,99 €<span className="text-xs font-normal text-stone-400">{isFr ? '/mois' : '/mo'}</span></span>
+                <p className="text-[10px] text-stone-400">{isFr ? 'soit 0,33 €/jour' : 'just €0.33/day'}</p>
               </div>
             </div>
             <ul className="space-y-1.5 mb-4 mt-2">
