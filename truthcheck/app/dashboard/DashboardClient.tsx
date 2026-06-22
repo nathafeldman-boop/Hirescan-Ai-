@@ -149,7 +149,7 @@ export default function DashboardClient({ user }: Props) {
           >
             <div className="text-4xl mb-3">🧠</div>
             <p className="font-display text-base font-black mb-1" style={{ color: theme.text }}>Découvre ton type MBTI</p>
-            <p className="text-sm mb-5" style={{ color: theme.muted }}>100 questions · environ 12 minutes</p>
+            <p className="text-sm mb-5" style={{ color: theme.muted }}>24 questions · moins de 3 minutes</p>
             <Link
               href="/quiz/personnalite"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"

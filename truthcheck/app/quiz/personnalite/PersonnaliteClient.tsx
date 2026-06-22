@@ -262,7 +262,7 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   const [stage, setStage] = useState(0);
 
   useEffect(() => {
-    const duration = 3500;
+    const duration = 2200;
     const start = Date.now();
     const tick = setInterval(() => {
       const elapsed = Date.now() - start;

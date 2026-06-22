@@ -160,8 +160,8 @@ export default function LandingPage() {
 
           <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-8">
             {fromTiktok
-              ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en 12 minutes.'
-              : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en 12 minutes.'}
+              ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
+              : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
           </p>
 
           <Link
