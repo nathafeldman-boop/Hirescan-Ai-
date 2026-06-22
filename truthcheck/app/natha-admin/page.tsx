@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
+import AccessCodeWidget from './AccessCodeWidget';
 
 export const metadata: Metadata = {
   title: 'Mon tableau de bord',
@@ -99,6 +100,12 @@ export default async function NathaAdminPage() {
     diagSteps.map(step => prisma.pageView.count({ where: { path: `/__diag/${step}`, createdAt: { gte: sevenDaysAgo } } }))
   );
   const diagData = diagSteps.map((step, i) => ({ step, count: diagCounts[i] }));
+
+  const recentCodes = await prisma.accessCode.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+    select: { id: true, code: true, note: true, used: true, usedByEmail: true },
+  });
 
   const revenueToday = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
   const revenueWeek  = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
@@ -414,6 +421,12 @@ export default async function NathaAdminPage() {
           <p style={{ color: C.muted, fontSize: 11, marginTop: 12, marginBottom: 0 }}>
             Ces compteurs apparaissent dès qu'un utilisateur atteint l'étape correspondante. Zéro = l'étape n'a pas été atteinte.
           </p>
+        </div>
+
+        {/* ── SECTION 10 : Codes d'accès ── */}
+        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12, marginTop: 28 }}>Codes d&apos;accès</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
+          <AccessCodeWidget initial={recentCodes} />
         </div>
 
       </div>
