@@ -1,10 +1,10 @@
 'use client'
 
 const links = {
-  Produit: ['Comment ça marche', 'Fonctionnalités', 'Tarifs', 'Changelog'],
+  Produit: ['Comment ça marche', 'Tarifs', 'Témoignages', 'Changelog'],
   Ressources: ['Blog', 'Documentation', 'Support', 'Statut'],
-  Entreprise: ['À propos', 'Carrières', 'Presse', 'Contact'],
-  Légal: ['Confidentialité', 'Conditions d\'utilisation', 'Cookies', 'RGPD'],
+  Entreprise: ['À propos', 'Contact', 'Affiliation'],
+  Légal: ['Confidentialité', "Conditions d'utilisation", 'RGPD'],
 }
 
 function TwitterIcon() {
@@ -14,7 +14,6 @@ function TwitterIcon() {
     </svg>
   )
 }
-
 function GitHubIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -22,7 +21,6 @@ function GitHubIcon() {
     </svg>
   )
 }
-
 function LinkedInIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -33,54 +31,32 @@ function LinkedInIcon() {
 
 export function Footer() {
   return (
-    <footer style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)', paddingTop: '64px', paddingBottom: '48px' }}>
-      <div className="max-w-[1200px] mx-auto px-6">
+    <footer style={{ background: 'var(--bg-2)', borderTop: '1px solid var(--border)', paddingTop: 64, paddingBottom: 44 }}>
+      <div className="max-w-[1180px] mx-auto px-6">
         <div className="flex flex-col md:flex-row gap-12">
 
-          {/* Brand */}
-          <div className="flex-shrink-0" style={{ maxWidth: '220px' }}>
-            <div className="flex items-center gap-2 mb-4">
-              <div style={{
-                width: 28, height: 28, borderRadius: 8,
-                background: 'var(--primary)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1L12.5 4.25V10.75L7 14L1.5 10.75V4.25L7 1Z" fill="white" fillOpacity="0.95" />
-                  <circle cx="7" cy="7" r="2.5" fill="white" fillOpacity="0.45" />
-                </svg>
-              </div>
-              <span style={{ color: 'var(--ink)', fontWeight: 600, fontSize: '15px' }}>SaaSGenrt</span>
+          <div className="flex-shrink-0" style={{ maxWidth: 240 }}>
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src="/logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+              <span className="font-display" style={{ color: 'var(--ink)', fontWeight: 700, fontSize: 16, letterSpacing: '-0.02em' }}>SaaSGenrt</span>
             </div>
-            <p style={{ fontSize: '13px', lineHeight: '1.65', color: 'var(--muted)', marginBottom: '24px' }}>
-              La façon la plus rapide de trouver et lancer ton premier SaaS rentable.
+            <p style={{ fontSize: 13.5, lineHeight: 1.6, color: 'var(--muted)', marginBottom: 24 }}>
+              Trouve et lance un SaaS que les gens paient vraiment. Fait par des fondateurs, pour des fondateurs.
             </p>
             <div className="flex items-center gap-2">
               {[
-                { icon: <TwitterIcon />, href: '#', label: 'Twitter' },
-                { icon: <GitHubIcon />, href: '#', label: 'GitHub' },
-                { icon: <LinkedInIcon />, href: '#', label: 'LinkedIn' },
-              ].map(({ icon, href, label }) => (
+                { icon: <TwitterIcon />, label: 'Twitter' },
+                { icon: <GitHubIcon />, label: 'GitHub' },
+                { icon: <LinkedInIcon />, label: 'LinkedIn' },
+              ].map(({ icon, label }) => (
                 <a
                   key={label}
-                  href={href}
+                  href="#"
                   aria-label={label}
                   className="flex items-center justify-center transition-all"
-                  style={{
-                    width: 30, height: 30, borderRadius: 7,
-                    background: 'transparent',
-                    border: '1px solid var(--border)',
-                    color: 'var(--muted)',
-                    textDecoration: 'none',
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--primary)'
-                    ;(e.currentTarget as HTMLElement).style.color = 'var(--primary)'
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
-                    ;(e.currentTarget as HTMLElement).style.color = 'var(--muted)'
-                  }}
+                  style={{ width: 32, height: 32, borderRadius: 9, background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--muted)', textDecoration: 'none' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--signal)'; (e.currentTarget as HTMLElement).style.color = 'var(--signal)' }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--muted)' }}
                 >
                   {icon}
                 </a>
@@ -88,20 +64,17 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Links */}
           <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8">
             {Object.entries(links).map(([group, items]) => (
               <div key={group}>
-                <div style={{ color: 'var(--ink)', fontSize: '13px', fontWeight: 600, marginBottom: '14px' }}>
-                  {group}
-                </div>
+                <div style={{ color: 'var(--ink)', fontSize: 13.5, fontWeight: 700, marginBottom: 14 }}>{group}</div>
                 <ul className="space-y-2.5">
                   {items.map((item) => (
                     <li key={item}>
                       <a
                         href="#"
-                        style={{ fontSize: '13px', color: 'var(--muted)', textDecoration: 'none' }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink)')}
+                        style={{ fontSize: 13.5, color: 'var(--muted)', textDecoration: 'none' }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--signal-ink)')}
                         onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--muted)')}
                       >
                         {item}
@@ -114,16 +87,11 @@ export function Footer() {
           </div>
         </div>
 
-        <div
-          className="flex flex-col md:flex-row items-center justify-between gap-4 mt-12 pt-8"
-          style={{ borderTop: '1px solid var(--border)' }}
-        >
-          <p style={{ fontSize: '12px', color: 'var(--muted)' }}>
-            © 2025 SaaSGenrt. Tous droits réservés.
-          </p>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-14 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
+          <p style={{ fontSize: 12.5, color: 'var(--muted)' }}>© 2026 SaaSGenrt. Tous droits réservés.</p>
           <div className="flex items-center gap-1.5">
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', opacity: 0.9 }} className="animate-pulse" />
-            <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Tous les systèmes opérationnels</span>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'oklch(0.62 0.16 150)' }} />
+            <span style={{ fontSize: 12, color: 'var(--muted)' }}>Tous les systèmes opérationnels</span>
           </div>
         </div>
       </div>

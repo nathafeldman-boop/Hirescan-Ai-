@@ -1,17 +1,41 @@
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg:      oklch(0.08 0 0);
-  --surface: oklch(0.13 0 0);
-  --ink:     oklch(0.97 0 0);
-  --muted:   oklch(0.52 0 0);
-  --primary: oklch(0.62 0.14 205);
-  --accent:  oklch(0.82 0.15 85);
-  --border:  oklch(0.20 0 0);
+  /* Warm light canvas — "le playbook de l'opérateur" */
+  --bg:            oklch(0.985 0.004 50);   /* warm off-white, brand-hue tint (not cream) */
+  --bg-2:          oklch(0.965 0.008 50);   /* alternating section panel */
+  --surface:       oklch(0.996 0.001 50);   /* lifted card */
+  --ink:           oklch(0.205 0.012 45);   /* warm near-black */
+  --ink-soft:      oklch(0.33 0.012 45);    /* secondary heading ink */
+  --muted:         oklch(0.455 0.015 45);   /* body-muted, ≥4.5:1 on bg */
+  --signal:        oklch(0.505 0.19 30);    /* vermilion — fills + accents on light (AA both ways) */
+  --signal-ink:    oklch(0.47 0.17 31);     /* small vermilion text/links on light */
+  --signal-bright: oklch(0.70 0.175 35);    /* vermilion text/icons on dark panels */
+  --signal-wash:   oklch(0.93 0.045 45);    /* soft peach highlight bg */
+  --border:        oklch(0.90 0.008 50);
+  --border-strong: oklch(0.84 0.011 50);
+
+  /* Art-directed dark panel (pricing feature / closing band) */
+  --ink-panel:     oklch(0.205 0.015 45);
+  --on-ink:        oklch(0.972 0.006 60);
+  --on-ink-muted:  oklch(0.72 0.012 55);
+  --on-ink-border: oklch(0.32 0.012 50);
+
+  --shadow-sm: 0 1px 2px oklch(0.20 0.03 45 / 0.06), 0 2px 6px oklch(0.20 0.03 45 / 0.05);
+  --shadow-md: 0 4px 12px oklch(0.20 0.03 45 / 0.07), 0 14px 30px oklch(0.20 0.03 45 / 0.07);
+  --shadow-lg: 0 10px 26px oklch(0.20 0.03 45 / 0.09), 0 28px 60px oklch(0.20 0.03 45 / 0.10);
+
+  --font-display: 'Bricolage Grotesque', Georgia, serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+
+  /* semantic z-scale */
+  --z-sticky: 100;
+  --z-modal: 300;
+  --z-toast: 400;
 }
 
 * {
@@ -20,36 +44,63 @@
   margin: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   background-color: var(--bg);
   color: var(--ink);
-  font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+  font-feature-settings: 'ss01', 'cv01';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--signal);
+  color: white;
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.62 0.14 205 / 0.4);
-  border-radius: 2px;
+  background: var(--border-strong);
+  border: 3px solid var(--bg);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }
 
-.grid-bg {
-  background-image:
-    linear-gradient(oklch(1 0 0 / 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(1 0 0 / 0.018) 1px, transparent 1px);
-  background-size: 60px 60px;
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+}
+
+/* faint dotted field — warm, near-invisible, anchors the hero */
+.dot-field {
+  background-image: radial-gradient(oklch(0.205 0.012 45 / 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black, transparent 78%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black, transparent 78%);
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

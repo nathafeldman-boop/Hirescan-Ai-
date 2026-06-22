@@ -1,113 +1,61 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowRight, Check } from 'lucide-react'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
 export function CTA() {
-  return (
-    <section
-      id="cta"
-      className="relative overflow-hidden"
-      style={{ background: 'var(--bg)', paddingTop: '80px', paddingBottom: '96px' }}
-    >
-      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '480px', height: '1px', background: 'linear-gradient(90deg, transparent, var(--border), transparent)' }} />
+  const reduce = useReducedMotion()
 
-      <div className="max-w-[1200px] mx-auto px-6 relative z-10">
+  return (
+    <section id="cta" className="relative" style={{ background: 'var(--bg)', paddingTop: 'clamp(20px, 4vw, 48px)', paddingBottom: 'clamp(80px, 9vw, 112px)' }}>
+      <div className="max-w-[1180px] mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={reduce ? false : { opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55, ease: EASE }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="relative overflow-hidden"
           style={{
-            borderRadius: '20px',
-            padding: 'clamp(48px, 6vw, 72px) clamp(28px, 5vw, 64px)',
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            borderRadius: 28,
+            padding: 'clamp(48px, 7vw, 88px) clamp(28px, 6vw, 72px)',
+            background: 'var(--signal)',
             textAlign: 'center',
           }}
         >
-          <h2
-            className="font-bold text-white"
-            style={{
-              fontSize: 'clamp(28px, 4vw, 44px)',
-              letterSpacing: '-0.03em',
-              lineHeight: '1.1',
-              marginBottom: '16px',
-              textWrap: 'balance',
-            }}
-          >
-            Prêt à construire ton<br />
-            <span style={{ color: 'var(--primary)' }}>prochain SaaS ?</span>
-          </h2>
+          {/* subtle depth — warm darker wash from one corner, not a glow */}
+          <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 120% at 100% 0%, oklch(0.45 0.16 30 / 0.35), transparent 55%)', pointerEvents: 'none' }} />
 
-          <p
-            className="mx-auto"
-            style={{
-              fontSize: '15.5px',
-              color: 'var(--muted)',
-              lineHeight: '1.65',
-              maxWidth: '44ch',
-              marginBottom: '36px',
-            }}
-          >
-            Rejoins des centaines de makers qui ont trouvé leur idée SaaS rentable avec SaaSGenrt.
-          </p>
+          <div className="relative">
+            <h2 className="font-display text-balance" style={{ fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 0.98, color: 'white', marginBottom: 18 }}>
+              Ton idée t'attend.<br />Va la chercher.
+            </h2>
+            <p className="mx-auto text-pretty" style={{ fontSize: 'clamp(15px, 1.5vw, 18px)', color: 'oklch(1 0 0 / 0.9)', lineHeight: 1.6, maxWidth: '44ch', marginBottom: 36 }}>
+              Rejoins les fondateurs qui ont arrêté de deviner et commencé à construire. La première idée est gratuite.
+            </p>
 
-          <div className="flex items-center justify-center gap-3 flex-wrap">
-            <a
-              href="/builder"
-              className="flex items-center gap-2 font-semibold transition-all"
-              style={{
-                fontSize: '14px',
-                padding: '12px 28px',
-                borderRadius: '12px',
-                background: 'var(--primary)',
-                color: 'white',
-                boxShadow: '0 6px 24px oklch(0.62 0.14 205 / 0.35)',
-                textDecoration: 'none',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)'
-                ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.filter = 'brightness(1)'
-                ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
-              }}
-            >
-              Commencer gratuitement
-              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
-            </a>
-            <a
-              href="#how-it-works"
-              className="flex items-center font-medium transition-all"
-              style={{
-                fontSize: '14px',
-                padding: '11px 24px',
-                borderRadius: '12px',
-                color: 'oklch(0.97 0 0 / 0.7)',
-                border: '1px solid var(--border)',
-                textDecoration: 'none',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = 'oklch(0.35 0 0)'
-                ;(e.currentTarget as HTMLElement).style.color = 'var(--ink)'
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
-                ;(e.currentTarget as HTMLElement).style.color = 'oklch(0.97 0 0 / 0.7)'
-              }}
-            >
-              Voir comment ça marche
-            </a>
-          </div>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <a
+                href="/builder"
+                className="group flex items-center gap-2 transition-all"
+                style={{ fontSize: 15.5, fontWeight: 700, padding: '15px 28px', borderRadius: 13, background: 'white', color: 'var(--signal-ink)', textDecoration: 'none', boxShadow: 'var(--shadow-lg)' }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'}
+              >
+                Trouver mon idée gratuitement
+                <ArrowRight className="transition-transform group-hover:translate-x-0.5" style={{ width: 17, height: 17 }} strokeWidth={2.5} />
+              </a>
+            </div>
 
-          <div className="flex items-center justify-center gap-7 flex-wrap" style={{ marginTop: '24px' }}>
-            {['Sans carte de crédit', 'Première idée gratuite', 'Annulation libre'].map((t) => (
-              <span key={t} style={{ fontSize: '12px', color: 'var(--muted)' }}>✓ {t}</span>
-            ))}
+            <div className="flex items-center justify-center gap-x-7 gap-y-2 flex-wrap" style={{ marginTop: 26 }}>
+              {['Sans carte de crédit', 'Première idée gratuite', 'Annulation libre'].map((t) => (
+                <div key={t} className="flex items-center gap-1.5">
+                  <Check style={{ width: 14, height: 14, color: 'white' }} strokeWidth={3} />
+                  <span style={{ fontSize: 13, color: 'oklch(1 0 0 / 0.9)', fontWeight: 500 }}>{t}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
       </div>

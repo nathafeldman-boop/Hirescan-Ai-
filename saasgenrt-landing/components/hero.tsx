@@ -1,7 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { ArrowRight, Play, Check } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { ArrowRight, Check } from 'lucide-react'
 import { FloatingCards } from './floating-cards'
 
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -9,124 +9,95 @@ const EASE = [0.22, 1, 0.36, 1] as const
 const trustItems = [
   'Sans carte de crédit',
   'Première idée gratuite',
-  'Résultats en 10 minutes',
+  'Résultats en 10 min',
 ]
 
 export function Hero() {
+  const reduce = useReducedMotion()
+  const rise = (delay: number) => ({
+    initial: reduce ? false : { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6, delay, ease: EASE },
+  })
+
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden" style={{ background: 'var(--bg)' }}>
+    <section className="relative flex items-center overflow-hidden" style={{ background: 'var(--bg)', minHeight: '100svh' }}>
+      <div className="absolute inset-0 pointer-events-none dot-field" aria-hidden />
 
-      {/* Grid only — no glow */}
-      <div className="absolute inset-0 pointer-events-none grid-bg" style={{ opacity: 0.6 }} />
-
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 w-full pt-32 pb-20">
-        <div className="flex items-center gap-8 xl:gap-14">
+      <div className="relative z-10 max-w-[1180px] mx-auto px-6 w-full pt-32 pb-20 lg:pb-28">
+        <div className="flex items-center gap-10 xl:gap-16">
 
           {/* LEFT */}
-          <div className="flex-1 min-w-0 max-w-[580px]">
+          <div className="flex-1 min-w-0" style={{ maxWidth: 600 }}>
+
+            <motion.div {...rise(0.05)} className="inline-flex items-center gap-2 mb-7"
+              style={{ padding: '5px 12px 5px 8px', borderRadius: 99, background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+              <span style={{ display: 'inline-flex', width: 18, height: 18, borderRadius: '50%', background: 'var(--signal-wash)', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--signal)' }} />
+              </span>
+              <span style={{ fontSize: 12.5, color: 'var(--ink-soft)', fontWeight: 500 }}>
+                Déjà <strong style={{ color: 'var(--ink)', fontWeight: 700 }}>2 400+</strong> fondateurs ont trouvé leur idée
+              </span>
+            </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 22 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.1, ease: EASE }}
-              className="font-extrabold text-white mb-5"
+              {...rise(0.12)}
+              className="font-display"
               style={{
-                fontSize: 'clamp(44px, 5.5vw, 72px)',
-                lineHeight: 1.02,
-                letterSpacing: '-0.04em',
+                fontSize: 'clamp(40px, 5.6vw, 70px)',
+                lineHeight: 0.98,
+                letterSpacing: '-0.035em',
+                fontWeight: 800,
+                color: 'var(--ink)',
                 textWrap: 'balance',
+                marginBottom: 22,
               }}
             >
-              Build a{' '}
-              <span style={{ color: 'var(--primary)' }}>SaaS</span>{' '}
-              people<br />actually pay for.
+              Trouve un SaaS<br />
+              que les gens{' '}
+              <span style={{ color: 'var(--signal)' }}>paient</span> vraiment.
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.24, ease: EASE }}
-              style={{
-                fontSize: '16px',
-                lineHeight: '1.65',
-                color: 'var(--muted)',
-                marginBottom: '32px',
-                maxWidth: '46ch',
-              }}
+              {...rise(0.22)}
+              className="text-pretty"
+              style={{ fontSize: 'clamp(16px, 1.4vw, 18px)', lineHeight: 1.6, color: 'var(--muted)', marginBottom: 32, maxWidth: '48ch' }}
             >
-              Découvre des idées SaaS rentables, valide-les en quelques questions,
-              et reçois un blueprint complet pour lancer.
+              Pas une idée de plus dans ton carnet. Une idée <strong style={{ color: 'var(--ink-soft)', fontWeight: 600 }}>validée</strong>,
+              un pricing, et un plan de lancement clair — en 10 minutes, pas en 6 mois.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.34, ease: EASE }}
-              className="flex items-center gap-3 flex-wrap mb-8"
-            >
+            <motion.div {...rise(0.3)} className="flex items-center gap-3 flex-wrap mb-9">
               <a
                 href="/builder"
-                className="flex items-center gap-2 font-semibold transition-all"
+                className="group flex items-center gap-2 transition-all"
                 style={{
-                  fontSize: '14px',
-                  padding: '12px 26px',
-                  borderRadius: '12px',
-                  background: 'var(--primary)',
-                  color: 'white',
-                  boxShadow: '0 4px 20px oklch(0.62 0.14 205 / 0.35)',
+                  fontSize: 15, fontWeight: 600, padding: '14px 24px', borderRadius: 13,
+                  background: 'var(--signal)', color: 'white', boxShadow: 'var(--shadow-md)', textDecoration: 'none',
                 }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)'
-                  ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.filter = 'brightness(1)'
-                  ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
-                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.filter = 'brightness(1.06)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)' }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.filter = 'brightness(1)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
               >
-                Commencer gratuitement
-                <ArrowRight className="w-[15px] h-[15px]" strokeWidth={2.5} />
+                Trouver mon idée
+                <ArrowRight className="transition-transform group-hover:translate-x-0.5" style={{ width: 17, height: 17 }} strokeWidth={2.5} />
               </a>
 
-              <button
-                className="flex items-center gap-2.5 font-medium transition-all"
-                style={{
-                  fontSize: '14px',
-                  padding: '11px 20px',
-                  borderRadius: '12px',
-                  color: 'oklch(0.97 0 0 / 0.75)',
-                  border: '1px solid var(--border)',
-                  background: 'transparent',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = 'oklch(0.35 0 0)'
-                  ;(e.currentTarget as HTMLElement).style.color = 'var(--ink)'
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'
-                  ;(e.currentTarget as HTMLElement).style.color = 'oklch(0.97 0 0 / 0.75)'
-                }}
+              <a
+                href="#how-it-works"
+                className="flex items-center font-medium transition-colors"
+                style={{ fontSize: 15, padding: '14px 18px', borderRadius: 13, color: 'var(--ink-soft)', textDecoration: 'none' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--signal-ink)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--ink-soft)')}
               >
-                <div
-                  className="flex items-center justify-center rounded-full flex-shrink-0"
-                  style={{ width: '28px', height: '28px', background: 'oklch(1 0 0 / 0.07)', border: '1px solid var(--border)' }}
-                >
-                  <Play style={{ width: '10px', height: '10px', marginLeft: '1px' }} className="fill-white text-white" />
-                </div>
-                Voir la démo
-              </button>
+                Comment ça marche →
+              </a>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.48 }}
-              className="flex items-center gap-5 flex-wrap"
-            >
+            <motion.div {...rise(0.42)} className="flex items-center gap-x-5 gap-y-2 flex-wrap">
               {trustItems.map((item) => (
                 <div key={item} className="flex items-center gap-1.5">
-                  <Check style={{ width: '13px', height: '13px', color: 'var(--primary)', flexShrink: 0 }} strokeWidth={2.5} />
-                  <span style={{ fontSize: '12.5px', color: 'var(--muted)' }}>{item}</span>
+                  <Check style={{ width: 14, height: 14, color: 'var(--signal)', flexShrink: 0 }} strokeWidth={3} />
+                  <span style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 500 }}>{item}</span>
                 </div>
               ))}
             </motion.div>
@@ -135,9 +106,9 @@ export function Hero() {
           {/* RIGHT */}
           <motion.div
             className="hidden lg:block flex-shrink-0"
-            initial={{ opacity: 0, x: 30 }}
+            initial={reduce ? false : { opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.25, ease: EASE }}
+            transition={{ duration: 0.75, delay: 0.25, ease: EASE }}
           >
             <FloatingCards />
           </motion.div>

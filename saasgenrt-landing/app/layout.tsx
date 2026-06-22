@@ -2,13 +2,14 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'SaaSGenrt – Build a SaaS people actually pay for',
-  description: 'Discover profitable SaaS ideas, validate them and launch your first SaaS faster than ever with AI.',
-  keywords: 'saas, ideas, ai, startup, validation, launch',
+  title: 'SaaSGenrt — Trouve un SaaS que les gens paient vraiment',
+  description: "Pas une idée de plus dans ton carnet. Une idée validée, un pricing et un plan de lancement clair — en 10 minutes, pas en 6 mois.",
+  keywords: 'saas, idées, startup, validation, lancement, fondateur, MRR',
   openGraph: {
-    title: 'SaaSGenrt – Build a SaaS people actually pay for',
-    description: 'Discover profitable SaaS ideas, validate them and launch your first SaaS faster than ever with AI.',
+    title: 'SaaSGenrt — Trouve un SaaS que les gens paient vraiment',
+    description: "Une idée validée, un pricing et un plan de lancement clair — en 10 minutes, pas en 6 mois.",
     type: 'website',
+    locale: 'fr_FR',
   },
 }
 
@@ -18,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className="scroll-smooth">
-      <body className="bg-[#090B11] text-white antialiased">
+    <html lang="fr">
+      <body>
         {children}
       </body>
     </html>
