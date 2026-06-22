@@ -8,6 +8,7 @@ import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
+import SocialProofToast from '@/components/SocialProofToast';
 
 // ─── In-app browser detection ───────────────────────────────────────────────────
 function detectInAppBrowser(): boolean {
@@ -562,6 +563,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: '#faf9f7' }}>
+      <SocialProofToast />
       <div className="w-full max-w-sm">
 
         {/* Header */}
@@ -789,9 +791,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         </div>
 
-        <p className="text-center text-[11px] text-stone-400 mt-4">
-          {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe · Card, Apple Pay, Google Pay'}
-        </p>
+        <div className="flex flex-col items-center gap-1.5 mt-4">
+          <p className="text-center text-[11px] text-stone-400">
+            {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe · Card, Apple Pay, Google Pay'}
+          </p>
+          <p className="text-center text-[11px] font-semibold" style={{ color: '#1f7a4d' }}>
+            {isFr ? '✓ Satisfait ou remboursé sous 7 jours' : '✓ 7-day money-back guarantee'}
+          </p>
+        </div>
 
         {/* ── Portrait viral + Concours 1 000€ ─────────────────────────────── */}
         <a

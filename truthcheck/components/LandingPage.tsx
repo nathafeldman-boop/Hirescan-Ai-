@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import UserMenu from './UserMenu';
 import { mbtiTypes } from '@/lib/mbti';
+import SocialProofToast from './SocialProofToast';
 
 const GROUPS = [
   {
@@ -105,6 +106,7 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden relative" style={{ background: '#f7f3ec', color: '#2b2622' }}>
+      <SocialProofToast />
       {/* InAppBanner intentionnellement retiré de la landing — le banner est géré sur la page de résultats uniquement pour ne pas bloquer le traffic ads TikTok/Instagram */}
       {false && inApp && !bannerDismissed && <InAppBanner onClose={() => setBannerDismissed(true)} />}
 
