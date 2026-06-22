@@ -47,7 +47,8 @@ export default async function NathaAdminPage() {
     topPages, recentUsers, affiliates, quizResults, allConversions,
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.user.count({ where: { tier: 'premium' } }),
+    // Exclude synthetic access-code testers (@urcecret.app) from real client counts
+    prisma.user.count({ where: { tier: 'premium', NOT: { email: { endsWith: '@urcecret.app' } } } }),
     prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
     prisma.user.count({ where: { createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
@@ -111,7 +112,32 @@ export default async function NathaAdminPage() {
   const revenueWeek  = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
   const revenueMonth = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
   const revenueTotal = allConversions.reduce((s, c) => s + c.amountCents, 0);
-  const MRR = premiumUsers * 999;
+
+  // ── MRR réel ──────────────────────────────────────────────────────────────
+  // Seulement les abonnements récurrents (mensuel + annuel). On EXCLUT :
+  //  • les codes de test (jamais de Conversion)
+  //  • les achats uniques à 1,99 € (productType = 'onetime')
+  // Et on ne compte que les abonnés encore actifs (tier premium, pas résiliés).
+  const subConversions = await prisma.conversion.findMany({
+    where: { productType: { in: ['monthly', 'annual'] } },
+    select: { email: true, productType: true, createdAt: true },
+    orderBy: { createdAt: 'desc' },
+  });
+  const planByEmail = new Map<string, string>();
+  for (const c of subConversions) {
+    if (c.email && !planByEmail.has(c.email)) planByEmail.set(c.email, c.productType ?? 'monthly');
+  }
+  const subEmails = Array.from(planByEmail.keys());
+  const activeSubs = subEmails.length
+    ? await prisma.user.findMany({ where: { email: { in: subEmails }, tier: 'premium' }, select: { email: true } })
+    : [];
+  let monthlySubs = 0, annualSubs = 0;
+  for (const u of activeSubs) {
+    if (planByEmail.get(u.email ?? '') === 'annual') annualSubs++;
+    else monthlySubs++;
+  }
+  const subscriberCount = monthlySubs + annualSubs;
+  const MRR = monthlySubs * 999 + annualSubs * Math.round(2999 / 12);
 
   const byQuiz: Record<string, { total: number; paid: number }> = {};
   for (const r of quizResults) {
@@ -232,7 +258,10 @@ export default async function NathaAdminPage() {
           <div style={{ ...block('rgba(74,222,128,0.06)', 'rgba(74,222,128,0.2)'), gridColumn: '1 / -1' }}>
             <p style={label}>Revenus mensuels estimés (MRR)</p>
             <p style={{ ...bigNum, fontSize: 36, color: C.green }}>{euros(MRR)}</p>
-            <p style={sub}>{premiumUsers} abonné{premiumUsers > 1 ? 's' : ''} × 9,99 €/mois</p>
+            <p style={sub}>
+              {subscriberCount} abonné{subscriberCount > 1 ? 's' : ''} récurrent{subscriberCount > 1 ? 's' : ''}
+              {subscriberCount > 0 ? ` · ${monthlySubs} mensuel${monthlySubs > 1 ? 's' : ''} + ${annualSubs} annuel${annualSubs > 1 ? 's' : ''}` : ' (hors codes test & achats 1,99 €)'}
+            </p>
           </div>
 
           <div style={block(C.surface, C.border)}>
@@ -260,9 +289,9 @@ export default async function NathaAdminPage() {
             <p style={sub}>ont créé un compte</p>
           </div>
           <div style={block(C.surface, C.border)}>
-            <p style={label}>Abonnés premium</p>
+            <p style={label}>Clients premium</p>
             <p style={{ ...bigNum, color: C.pink }}>{premiumUsers}</p>
-            <p style={sub}>{pct(premiumUsers, totalUsers)} des inscrits</p>
+            <p style={sub}>{pct(premiumUsers, totalUsers)} des inscrits · hors codes test</p>
           </div>
           <div style={block(C.surface, C.border)}>
             <p style={label}>Quiz complétés</p>
