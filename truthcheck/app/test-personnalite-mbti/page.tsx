@@ -6,7 +6,7 @@ const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Test de Personnalité MBTI Gratuit — Les 16 Types en Français',
-  description: 'Passe le test de personnalité MBTI gratuit en français : 100 questions pour découvrir ton type parmi les 16 profils (INFJ, ENFP, INTJ, INTP…). Résultat instantané, sans inscription. Le test MBTI le plus complet en français.',
+  description: 'Passe le test de personnalité MBTI gratuit en français : 24 questions pour découvrir ton type parmi les 16 profils (INFJ, ENFP, INTJ, INTP…). Résultat instantané, sans inscription. Le test MBTI le plus complet en français.',
   keywords: [
     'test de personnalité MBTI', 'test MBTI gratuit', 'test MBTI en français',
     'les 16 personnalités', 'type MBTI', 'quel est mon type MBTI',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE}/test-personnalite-mbti` },
   openGraph: {
     title: 'Test de Personnalité MBTI Gratuit — 16 Types | UrCecret',
-    description: 'Découvre ton type MBTI parmi les 16 profils. 100 questions, résultat instantané, gratuit et en français.',
+    description: 'Découvre ton type MBTI parmi les 16 profils. 24 questions, résultat instantané, gratuit et en français.',
     type: 'article',
     url: `${BASE}/test-personnalite-mbti`,
     siteName: 'UrCecret',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Personnalité MBTI Gratuit',
-    description: '100 questions · 16 types · Résultat instantané · Gratuit',
+    description: '24 questions · 16 types · Résultat instantané · Gratuit',
     images: [`${BASE}/api/og`],
   },
 };
@@ -70,7 +70,7 @@ const FAQ = [
   },
   {
     q: "Combien de questions contient le test MBTI sur UrCecret ?",
-    a: "Le test MBTI d'UrCecret contient 100 questions soigneusement sélectionnées pour maximiser la précision du résultat. Chaque question évalue l'une des 4 dimensions MBTI. Le test dure en moyenne 8 à 12 minutes.",
+    a: "Le test MBTI d'UrCecret contient 24 questions soigneusement sélectionnées pour maximiser la précision du résultat. Chaque question évalue l'une des 4 dimensions MBTI. Le test dure en moyenne moins de 3 minutes.",
   },
   {
     q: "Le test MBTI d'UrCecret est-il vraiment gratuit ?",
@@ -155,7 +155,7 @@ export default function TestPersonnaliteMbtiPage() {
               Test de Personnalité MBTI Gratuit
             </h1>
             <p className="text-xl text-gray-500 mb-2">Découvre ton type parmi les 16 profils psychologiques</p>
-            <p className="text-sm text-gray-400 mb-8">100 questions · Résultat instantané · Gratuit · En français</p>
+            <p className="text-sm text-gray-400 mb-8">24 questions · Résultat instantané · Gratuit · En français</p>
 
             <Link
               href="/quiz/personnalite"
@@ -166,7 +166,7 @@ export default function TestPersonnaliteMbtiPage() {
             </Link>
 
             <div className="flex justify-center gap-8 mt-6 text-sm text-gray-500">
-              {[['🧪', '100 questions'], ['⚡', 'Résultat immédiat'], ['🔒', 'Sans inscription'], ['🇫🇷', 'En français']].map(([icon, label]) => (
+              {[['🧪', '24 questions'], ['⚡', 'Résultat immédiat'], ['🔒', 'Sans inscription'], ['🇫🇷', 'En français']].map(([icon, label]) => (
                 <div key={label as string} className="flex flex-col items-center gap-1">
                   <span className="text-lg">{icon}</span>
                   <span className="text-xs font-medium">{label}</span>
@@ -198,14 +198,14 @@ export default function TestPersonnaliteMbtiPage() {
               ))}
             </ul>
             <p className="text-gray-600 leading-relaxed">
-              Le test MBTI d'UrCecret compte <strong>100 questions</strong> pour maximiser la précision de ton résultat. Il est entièrement <strong>gratuit</strong>, disponible <strong>en français</strong>, et ne nécessite aucune inscription.
+              Le test MBTI d'UrCecret compte <strong>24 questions</strong> pour maximiser la précision de ton résultat. Il est entièrement <strong>gratuit</strong>, disponible <strong>en français</strong>, et ne nécessite aucune inscription.
             </p>
           </section>
 
           {/* CTA milieu */}
           <div className="my-10 p-8 rounded-3xl text-center" style={{ background: 'linear-gradient(135deg,#f5f3ff,#fdf2f8)' }}>
             <p className="text-lg font-bold text-gray-900 mb-2">Prêt à découvrir ton type ?</p>
-            <p className="text-sm text-gray-500 mb-5">100 questions · 8 à 12 minutes · Résultat parmi les 16 types MBTI</p>
+            <p className="text-sm text-gray-500 mb-5">24 questions · moins de 3 minutes · Résultat parmi les 16 types MBTI</p>
             <Link
               href="/quiz/personnalite"
               className="inline-block px-6 py-3 rounded-xl font-bold text-white transition-all hover:scale-[1.02]"
@@ -286,7 +286,7 @@ export default function TestPersonnaliteMbtiPage() {
           {/* CTA final */}
           <div className="text-center py-10 border-t border-gray-100">
             <h2 className="text-2xl font-black text-gray-900 mb-2">Quel est ton type MBTI ?</h2>
-            <p className="text-gray-500 mb-6">100 questions · Gratuit · Résultat immédiat</p>
+            <p className="text-gray-500 mb-6">24 questions · Gratuit · Résultat immédiat</p>
             <Link
               href="/quiz/personnalite"
               className="inline-block px-8 py-4 rounded-2xl text-lg font-black text-white transition-all hover:scale-[1.02]"

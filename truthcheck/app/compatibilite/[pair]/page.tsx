@@ -266,7 +266,7 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
           {/* CTA */}
           <div className="mb-10 rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.2),rgba(209,125,82,0.1))', border: '1px solid rgba(209,125,82,0.2)' }}>
             <p className="text-white font-bold mb-1">Découvre ton type MBTI</p>
-            <p className="text-zinc-400 text-xs mb-4">100 questions · résultat instantané · gratuit</p>
+            <p className="text-zinc-400 text-xs mb-4">24 questions · résultat instantané · gratuit</p>
             <Link
               href="/quiz/personnalite"
               className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02] hover:opacity-90"

@@ -370,7 +370,7 @@ export default function CelebritesPage({ params }: Props) {
             </h2>
             <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto leading-relaxed">
               Partages-tu les traits de {type.famousExamples[0]} ou {type.famousExamples[1]} ?
-              Fais le test gratuit pour découvrir ton vrai type MBTI — 100 questions, résultat instantané.
+              Fais le test gratuit pour découvrir ton vrai type MBTI — 24 questions, résultat instantané.
             </p>
             <Link
               href="/quiz/personnalite"
@@ -462,7 +462,7 @@ export default function CelebritesPage({ params }: Props) {
                     <Link href="/quiz/personnalite" className="underline decoration-dotted hover:text-white transition-colors" style={{ color: type.accentColor }}>
                       test de personnalité MBTI gratuit sur UrCecret
                     </Link>.
-                    En quelques minutes, répondez à nos 100 questions et découvrez si vous partagez
+                    En quelques minutes, répondez à nos 24 questions et découvrez si vous partagez
                     les traits de {type.famousExamples[0]} ou {type.famousExamples[1]}.
                   </p>
                   <p>

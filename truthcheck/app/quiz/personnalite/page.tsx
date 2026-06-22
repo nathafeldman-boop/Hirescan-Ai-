@@ -157,7 +157,7 @@ export default function PersonnalitePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold mb-8" style={{ background: 'rgba(194,97,31,0.08)', border: '1px solid rgba(194,97,31,0.2)', color: '#c2611f' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#c2611f' }} />
-            Gratuit · 12 minutes · Résultat instantané
+            Gratuit · 3 minutes · Résultat instantané
           </div>
 
           <h1 className="font-display text-4xl sm:text-5xl font-black mb-5 leading-tight text-gray-900">

@@ -297,7 +297,7 @@ function CtaCard({ type }: { type: MbtiType }) {
           Découvre ton type exact
         </h2>
         <p className="text-sm text-stone-400 mb-6 max-w-xs mx-auto">
-          Tu penses être {type.code} ? Confirme-le avec notre test MBTI complet — 100 questions, résultat instantané, gratuit.
+          Tu penses être {type.code} ? Confirme-le avec notre test MBTI complet — 24 questions, résultat instantané, gratuit.
         </p>
         <Link
           href="/quiz/personnalite"
@@ -309,7 +309,7 @@ function CtaCard({ type }: { type: MbtiType }) {
         >
           Passer le test MBTI gratuit →
         </Link>
-        <p className="mt-3 text-xs text-stone-600">100 questions · Gratuit · Sans inscription</p>
+        <p className="mt-3 text-xs text-stone-600">24 questions · Gratuit · Sans inscription</p>
       </div>
     </section>
   );
