@@ -489,6 +489,26 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
   );
 }
 
+// ─── Per-type emotional hook (curiosity gap — #1 conversion lever) ──────────────
+const HOOK_LINES: Record<string, string> = {
+  INTJ: 'Pourquoi tu sembles froid(e) alors que tu ressens tout en profondeur',
+  INTP: 'Pourquoi tu procrastines sur tes propres projets malgré ton intelligence',
+  ENTJ: 'Pourquoi on te voit comme autoritaire quand tu veux juste être efficace',
+  ENTP: 'Pourquoi tu t\'ennuies si vite — même avec les gens que tu aimes',
+  INFJ: 'Pourquoi tu t\'épuises à tout porter pour les autres',
+  INFP: 'Pourquoi tu te sens incompris(e) même par ceux qui t\'aiment',
+  ENFJ: 'Pourquoi tu mets les autres avant toi jusqu\'à t\'oublier',
+  ENFP: 'Pourquoi tu commences tout avec passion sans jamais finir',
+  ISTJ: 'Pourquoi tu portes tout le monde sans que personne le remarque',
+  ISFJ: 'Pourquoi tu dis oui quand tu veux dire non — encore et encore',
+  ESTJ: 'Pourquoi on te trouve trop dur(e) quand tu veux juste aider',
+  ESFJ: 'Pourquoi tu as besoin que tout le monde aille bien pour aller bien',
+  ISTP: 'Pourquoi tu fuis dès que quelqu\'un s\'attache vraiment à toi',
+  ISFP: 'Pourquoi tu n\'oses pas montrer ce que tu crées vraiment',
+  ESTP: 'Pourquoi tu t\'ennuies dès que la relation devient sécurisante',
+  ESFP: 'Pourquoi tu as besoin d\'attention pour te sentir vraiment aimé(e)',
+};
+
 // ─── Paywall email capture (abandon recovery) ───────────────────────────────────
 // For users not ready to pay: capture the email so we can send their welcome +
 // follow-up. POSTs to /api/save-email which fires a welcome email per new lead.
@@ -649,6 +669,12 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               ? `${type?.rarity ?? 'Rare'} de la population partagent ce profil.`
               : `${type?.rarity ?? 'Rare'} of people share this profile.`}
           </p>
+          {isFr && HOOK_LINES[typeCode] && (
+            <div className="mt-3 mx-auto max-w-[19rem] rounded-xl px-3 py-2.5" style={{ background: 'rgba(138,62,22,0.05)', border: '1px solid rgba(138,62,22,0.15)' }}>
+              <p className="text-[10px] font-black uppercase tracking-widest mb-0.5" style={{ color: '#a94e18' }}>Ton profil révèle</p>
+              <p className="text-sm font-bold text-stone-800 leading-snug">{HOOK_LINES[typeCode]}</p>
+            </div>
+          )}
         </div>
 
         {/* Locked type preview */}
