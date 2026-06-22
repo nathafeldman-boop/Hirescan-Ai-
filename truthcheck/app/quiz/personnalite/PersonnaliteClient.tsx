@@ -757,6 +757,19 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe · Card, Apple Pay, Google Pay'}
         </p>
 
+        {/* ── Portrait viral + Concours 1 000€ ─────────────────────────────── */}
+        <a
+          href={`/portrait?quiz=personnalite&type=${encodeURIComponent(typeCode)}&score=95`}
+          className="block w-full mt-5 rounded-2xl p-4 text-center"
+          style={{ background: 'linear-gradient(135deg,rgba(251,191,36,0.10),rgba(194,97,31,0.10))', border: '1px solid rgba(251,191,36,0.3)', textDecoration: 'none' }}
+        >
+          <p className="text-2xl mb-1">🏆</p>
+          <p className="font-black text-sm" style={{ color: '#fbbf24' }}>Concours · 1 000 €</p>
+          <p className="text-xs text-stone-400 mt-0.5">
+            {isFr ? 'Génère ton portrait viral et tente de gagner' : 'Generate your viral portrait and win'}
+          </p>
+        </a>
+
       </div>
     </div>
   );
