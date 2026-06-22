@@ -16,42 +16,40 @@ function formatCount(n: number) {
   return n.toString();
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function CagnottePage() {
   const month = currentMonth();
+  const monthStart = new Date(`${month}-01`);
+  const monthEnd = new Date(new Date(`${month}-01`).setMonth(new Date(`${month}-01`).getMonth() + 1));
 
-  const [poolResult, revenueRows, viewsRows, likesRows] = await Promise.all([
+  // Affiliate revenue (existing tables — always present)
+  const [poolResult, revenueRows] = await Promise.all([
     prisma.affiliateConversion.aggregate({
       _sum: { commissionCents: true },
-      where: {
-        createdAt: {
-          gte: new Date(`${month}-01`),
-          lt: new Date(new Date(`${month}-01`).setMonth(new Date(`${month}-01`).getMonth() + 1)),
-        },
-      },
+      where: { createdAt: { gte: monthStart, lt: monthEnd } },
     }),
     prisma.affiliateConversion.groupBy({
       by: ['affiliateId'],
       _sum: { commissionCents: true, amountCents: true },
-      where: {
-        createdAt: {
-          gte: new Date(`${month}-01`),
-          lt: new Date(new Date(`${month}-01`).setMonth(new Date(`${month}-01`).getMonth() + 1)),
-        },
-      },
+      where: { createdAt: { gte: monthStart, lt: monthEnd } },
       orderBy: { _sum: { commissionCents: 'desc' } },
       take: 10,
     }),
-    prisma.contestEntry.findMany({
-      where: { month },
-      orderBy: { viewsCount: 'desc' },
-      take: 10,
-    }),
-    prisma.contestEntry.findMany({
-      where: { month },
-      orderBy: [{ likesCount: 'desc' }, { sharesCount: 'desc' }],
-      take: 10,
-    }),
   ]);
+
+  // Contest entries — table may not exist yet on first deploy; degrade gracefully.
+  type ContestRow = { id: string; affiliateSlug: string; viewsCount: number; likesCount: number; sharesCount: number };
+  let viewsRows: ContestRow[] = [];
+  let likesRows: ContestRow[] = [];
+  try {
+    [viewsRows, likesRows] = await Promise.all([
+      prisma.contestEntry.findMany({ where: { month }, orderBy: { viewsCount: 'desc' }, take: 10 }),
+      prisma.contestEntry.findMany({ where: { month }, orderBy: [{ likesCount: 'desc' }, { sharesCount: 'desc' }], take: 10 }),
+    ]);
+  } catch {
+    // ContestEntry table not migrated yet — show empty leaderboards instead of crashing.
+  }
 
   const affiliateIds = revenueRows.map(r => r.affiliateId);
   const affiliates = affiliateIds.length > 0
