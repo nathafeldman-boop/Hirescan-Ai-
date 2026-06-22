@@ -8,7 +8,7 @@ const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Test MBTI Gratuit — 16 Types de Personnalité en Français',
-  description: 'Test de personnalité MBTI gratuit : 70 questions pour découvrir ton profil parmi les 16 types — INFJ, ENFP, INTJ, INTP, ESFP, ISFJ, ENTJ et plus. Résultat instantané, sans inscription. Le test MBTI le plus complet en français.',
+  description: 'Test de personnalité MBTI gratuit : 24 questions pour découvrir ton profil parmi les 16 types — INFJ, ENFP, INTJ, INTP, ESFP, ISFJ, ENTJ et plus. Résultat instantané, sans inscription. Le test MBTI le plus complet en français.',
   keywords: [
     'test MBTI', 'MBTI gratuit', 'test de personnalité MBTI', '16 types MBTI',
     'INFJ', 'ENFP', 'INTJ', 'INTP', 'ENFJ', 'ENTP', 'INFP', 'ISFJ',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE}/quiz/personnalite` },
   openGraph: {
     title: 'Test MBTI Gratuit — 16 Types de Personnalité | UrCecret',
-    description: 'Découvre ton type MBTI en 70 questions. INFJ, ENFP, INTJ, INTP et 12 autres profils. Gratuit, instantané, en français.',
+    description: 'Découvre ton type MBTI en 24 questions. INFJ, ENFP, INTJ, INTP et 12 autres profils. Gratuit, instantané, en français.',
     type: 'website',
     url: `${BASE}/quiz/personnalite`,
     siteName: 'UrCecret',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Test MBTI Gratuit — 16 Types de Personnalité',
-    description: 'Découvre ton profil MBTI en 70 questions. Gratuit, instantané.',
+    description: 'Découvre ton profil MBTI en 24 questions. Gratuit, instantané.',
     images: ['/api/og'],
   },
 };
@@ -169,8 +169,8 @@ export default function PersonnalitePage() {
           </h1>
 
           <p className="text-lg text-gray-500 mb-10 max-w-xl mx-auto leading-relaxed">
-            70 questions · 16 types de personnalité · INFJ, ENFP, INTJ et plus.
-            Le test MBTI le plus complet en français — résultat instantané.
+            24 questions · 16 types de personnalité · INFJ, ENFP, INTJ et plus.
+            Le test MBTI en français — résultat instantané en moins de 3 minutes.
           </p>
 
           {/* Stats */}
@@ -207,8 +207,8 @@ export default function PersonnalitePage() {
           {/* How it works */}
           <div className="mt-16 grid sm:grid-cols-3 gap-6 text-left">
             {[
-              { icon: '🎯', title: '70 questions ciblées', desc: '25 questions par dimension psychologique. Pas de bonnes ou mauvaises réponses.' },
-              { icon: '⚡', title: 'Résultat immédiat', desc: 'Ton type parmi les 16 profils en moins de 12 minutes. Gratuit, sans inscription.' },
+              { icon: '🎯', title: '24 questions ciblées', desc: '6 questions par dimension psychologique. Pas de bonnes ou mauvaises réponses.' },
+              { icon: '⚡', title: 'Résultat immédiat', desc: 'Ton type parmi les 16 profils en moins de 3 minutes. Gratuit, sans inscription.' },
               { icon: '🔓', title: 'Rapport complet en option', desc: 'Relations, carrière, forces, croissance personnelle. Accessible avec Premium.' },
             ].map(({ icon, title, desc }) => (
               <div key={title} className="bg-gray-50 rounded-xl p-5 border border-gray-100">

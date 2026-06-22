@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     default: 'UrCecret — Test MBTI Gratuit · 16 Types de Personnalité',
     template: '%s | UrCecret',
   },
-  description: 'Découvre ton type de personnalité MBTI parmi les 16 profils psychologiques : INFJ, ENFP, INTJ, INTP, ESFP et plus. Test gratuit, 70 questions, résultat instantané. Le test de personnalité le plus complet en français.',
+  description: 'Découvre ton type de personnalité MBTI parmi les 16 profils psychologiques : INFJ, ENFP, INTJ, INTP, ESFP et plus. Test gratuit, 24 questions, résultat instantané. Le test de personnalité le plus complet en français.',
   keywords: [
     'test MBTI', 'MBTI gratuit', 'test de personnalité', '16 types de personnalité',
     'type MBTI', 'MBTI français', 'test personnalité gratuit', '16 personnalités',
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'UrCecret — Test MBTI Gratuit · 16 Types de Personnalité',
-    description: 'Découvre ton type MBTI parmi les 16 profils psychologiques. Test gratuit, 70 questions, résultat instantané.',
+    description: 'Découvre ton type MBTI parmi les 16 profils psychologiques. Test gratuit, 24 questions, résultat instantané.',
     type: 'website',
     siteName: 'UrCecret',
     locale: 'fr_FR',
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     site: '@urcecret',
     creator: '@urcecret',
     title: 'UrCecret — Test MBTI Gratuit',
-    description: 'Découvre ton type de personnalité MBTI. 16 profils · 70 questions · Gratuit.',
+    description: 'Découvre ton type de personnalité MBTI. 16 profils · 24 questions · Gratuit.',
   },
   robots: {
     index: true,
