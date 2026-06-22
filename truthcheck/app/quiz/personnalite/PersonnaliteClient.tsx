@@ -604,8 +604,43 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         <CountdownTimer isFr={isFr} />
 
+        {/* ── TikTok : compte gratuit en premier ──────────────────────────────
+            Ouvre Safari via <a target="_blank"> → login possible → email capturé.
+            Payment reste disponible en dessous comme option secondaire.       */}
+        {isInApp && (
+          <div className="rounded-2xl p-4 mt-4" style={{ background: 'white', border: '2px solid rgba(169,78,24,0.35)', boxShadow: '0 4px 16px rgba(169,78,24,0.08)' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#a94e18' }}>
+              ✦ Gratuit — Sauvegarde ton résultat
+            </p>
+            <p className="text-sm font-bold text-stone-900 mb-1">
+              {isFr ? `Crée ton compte pour retrouver ton profil ${typeCode} à tout moment` : `Create an account to access your ${typeCode} profile anytime`}
+            </p>
+            <p className="text-xs text-stone-500 mb-3">
+              {isFr ? 'Gratuit · Pas de carte · 30 secondes' : 'Free · No card required · 30 seconds'}
+            </p>
+            <a
+              href={`/login?callbackUrl=${encodeURIComponent(`/quiz/personnalite?pending=${typeCode}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => diagLog('inapp_signup_click', { typeCode })}
+              className="block w-full py-3.5 rounded-xl font-black text-white text-sm text-center"
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 16px rgba(169,78,24,0.25)', textDecoration: 'none' }}
+            >
+              {isFr ? `Sauvegarder mon profil ${typeCode} →` : `Save my ${typeCode} profile →`}
+            </a>
+            <p className="text-center text-[11px] text-stone-400 mt-2">
+              {isFr ? "S'ouvre dans Safari · Google ou email 🔓" : 'Opens in Safari · Google or email 🔓'}
+            </p>
+          </div>
+        )}
+
         {/* 3 offers */}
         <div className="space-y-3 mt-4">
+          {isInApp && (
+            <p className="text-[11px] text-stone-400 text-center font-semibold pb-1">
+              {isFr ? '— ou déverrouiller directement —' : '— or unlock directly —'}
+            </p>
+          )}
 
           {/* 1 — Résultat unique (hero) */}
           <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.05))', border: '2px solid rgba(169,78,24,0.3)' }}>

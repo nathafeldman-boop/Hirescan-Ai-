@@ -91,6 +91,7 @@ export default async function NathaAdminPage() {
     'type_from_localstorage', 'type_from_localstorage_not_authed',
     'analysis_done',
     'paywall_mounted',
+    'inapp_signup_click',
     'checkout_no_email', 'checkout_with_email',
     'auto_checkout_check',
   ];
