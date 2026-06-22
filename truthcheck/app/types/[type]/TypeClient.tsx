@@ -285,19 +285,16 @@ export default function TypeClient({ type }: Props) {
         </button>
       </div>
 
-      {/* ── 1,99 € (downsell) ── */}
+      {/* ── 1,99 € (entrée petit prix) ── */}
       <div className="mt-3 rounded-xl px-4 py-3.5" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Accès partiel</span>
+          <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">⚡ Juste mon résultat</span>
           <div>
             <span className="text-xs text-stone-600 line-through mr-1">9,99 €</span>
-            <span className="text-sm font-black text-stone-400">1,99 €</span>
+            <span className="text-sm font-black text-stone-300">1,99 €</span>
           </div>
         </div>
-        <div className="flex items-start gap-1.5 mb-2 rounded-lg px-2.5 py-1.5" style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.15)' }}>
-          <span className="text-[10px] flex-shrink-0">⚠️</span>
-          <p className="text-[10px] leading-snug" style={{ color: '#e0a380' }}>Profil {type.code} uniquement — sans les autres types ni les quiz</p>
-        </div>
+        <p className="text-[11px] text-stone-500 mb-2.5">Ton profil {type.code} complet — paiement unique, accès immédiat</p>
         <button
           onClick={handleOneTime}
           disabled={loading}

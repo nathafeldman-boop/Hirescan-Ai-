@@ -820,19 +820,16 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </button>
           </div>
 
-          {/* 3 — Résultat unique (downsell) */}
+          {/* 3 — Résultat unique (entrée petit prix) */}
           <div className="rounded-xl px-4 py-3.5" style={{ background: '#fafafa', border: '1px solid #e7e5e0' }}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">{isFr ? 'Accès partiel' : 'Partial access'}</span>
+              <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">{isFr ? '⚡ Juste mon résultat' : '⚡ Just my result'}</span>
               <div className="text-right">
                 <span className="text-xs text-stone-300 line-through mr-1">9,99 €</span>
-                <span className="text-sm font-black text-stone-600">1,99 €</span>
+                <span className="text-sm font-black text-stone-700">1,99 €</span>
               </div>
             </div>
-            <div className="flex items-start gap-1.5 mb-2 rounded-lg px-2.5 py-2" style={{ background: 'rgba(169,78,24,0.05)', border: '1px solid rgba(169,78,24,0.15)' }}>
-              <span className="text-[10px] flex-shrink-0 mt-0.5">⚠️</span>
-              <p className="text-[10px] leading-snug" style={{ color: '#a94e18' }}>{isFr ? `Profil ${typeCode} uniquement — sans les autres types ni les quiz` : `${typeCode} profile only — no other types or quizzes`}</p>
-            </div>
+            <p className="text-[11px] text-stone-500 mb-2.5">{isFr ? `Ton profil ${typeCode} complet — paiement unique, accès immédiat` : `Your full ${typeCode} profile — one-time, instant access`}</p>
             {isInApp && inAppPayUrl ? (
               <a
                 href={inAppPayUrl}
