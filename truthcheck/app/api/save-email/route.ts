@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
-import { emailWelcome, sendEmail } from '@/lib/emails';
+import { emailWelcome, emailResultReady, sendEmail } from '@/lib/emails';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +33,11 @@ export async function POST(req: NextRequest) {
       .findUnique({ where: { userId_type: { userId: user.id, type: 'welcome' } } })
       .catch(() => null);
     if (!already) {
-      const { subject, html } = emailWelcome(user.name ?? name);
+      // If we know their type (paywall abandon), send the purchase-focused
+      // "your profile is ready" email; otherwise the generic welcome.
+      const { subject, html } = mbtiType
+        ? emailResultReady(user.name ?? name, mbtiType)
+        : emailWelcome(user.name ?? name);
       try {
         await sendEmail(email, subject, html);
         await prisma.emailLog.create({ data: { userId: user.id, type: 'welcome' } }).catch(() => {});

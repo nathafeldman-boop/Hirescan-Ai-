@@ -55,6 +55,32 @@ export function emailWelcome(name: string | null) {
   };
 }
 
+// Sent when a lead abandons the paywall (we know their type). Purchase-focused.
+export function emailResultReady(name: string | null, typeCode: string) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode.toUpperCase();
+  return {
+    subject: `${firstName}, ton profil ${code} est prêt 🔓`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Ton résultat est sauvegardé</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Tu es ${code} — mais tu n'as pas tout vu.</h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        Ton profil complet t'attend : ta face cachée, ton schéma en amour, tes vraies forces et tes angles morts. La plupart des gens disent "c'est exactement moi" en le lisant.
+      </p>
+      <div style="background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;color:#f472b6;font-size:14px;font-style:italic;line-height:1.7">
+          "J'ai cru que ce serait bateau. En fait je me suis reconnu(e) dans chaque ligne."
+        </p>
+      </div>
+      <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
+        Débloque ton profil ${code} complet — à partir de <strong style="color:#fff">1,99€</strong>, ou accès illimité à tout pour <strong style="color:#fff">9,99€/mois</strong>.
+      </p>
+      ${cta(`Voir mon profil ${code} →`, `${BASE}/quiz/personnalite?pending=${code}`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Paiement sécurisé · Accès immédiat · Satisfait ou remboursé 7 jours</p>
+    `),
+  };
+}
+
 export function emailDay1(name: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   return {
