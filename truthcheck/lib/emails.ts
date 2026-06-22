@@ -10,7 +10,7 @@ function wrap(content: string) {
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
         <tr><td align="center" style="padding-bottom:28px">
           <h1 style="margin:0;font-size:28px;font-weight:900;letter-spacing:-1px">
-            <span style="background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Ur</span><span style="color:#fff">Cecret</span>
+            <span style="background:linear-gradient(135deg,#d17d52,#a94e18);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Ur</span><span style="color:#fff">Cecret</span>
           </h1>
         </td></tr>
         <tr><td style="background:#18181b;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:36px 32px">
@@ -29,7 +29,7 @@ function wrap(content: string) {
 function cta(text: string, url: string) {
   return `<table width="100%" cellpadding="0" cellspacing="0">
     <tr><td align="center" style="padding:24px 0">
-      <a href="${url}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 36px;border-radius:12px">${text}</a>
+      <a href="${url}" style="display:inline-block;background:linear-gradient(135deg,#a94e18,#d17d52);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 36px;border-radius:12px">${text}</a>
     </td></tr>
   </table>`;
 }
