@@ -443,17 +443,20 @@ function InAppBrowserOverlay() {
 // ─── Countdown timer ─────────────────────────────────────────────────────────────
 
 function CountdownTimer({ isFr }: { isFr: boolean }) {
+  // 48-hour offer window from first visit — persists across sessions (stronger
+  // urgency than a 15-min timer that obviously resets on every reload).
+  const DURATION = 48 * 60 * 60;
   const [seconds, setSeconds] = useState(() => {
     try {
-      const end = sessionStorage.getItem('_pwt');
+      const end = localStorage.getItem('_urs_offer_end');
       if (end) {
         const rem = Math.round((parseInt(end) - Date.now()) / 1000);
-        if (rem > 0 && rem <= 15 * 60) return rem;
+        if (rem > 0 && rem <= DURATION) return rem;
       }
     } catch {}
-    const endTs = Date.now() + 15 * 60 * 1000;
-    try { sessionStorage.setItem('_pwt', endTs.toString()); } catch {}
-    return 15 * 60;
+    const endTs = Date.now() + DURATION * 1000;
+    try { localStorage.setItem('_urs_offer_end', endTs.toString()); } catch {}
+    return DURATION;
   });
 
   useEffect(() => {
@@ -463,13 +466,15 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
   }, []);
 
   if (seconds <= 0) return null;
-  const m = Math.floor(seconds / 60);
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
   const s = (seconds % 60).toString().padStart(2, '0');
+  const label = h > 0 ? `${h}h ${m.toString().padStart(2, '0')}min` : `${m}:${s}`;
 
   return (
     <div className="flex items-center justify-center gap-1.5 mb-3">
-      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-black bg-red-50 border border-red-200 text-red-600">
-        ⏱ {isFr ? `Prix réduit — encore ${m}:${s}` : `Reduced price — ${m}:${s} left`}
+      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-black bg-red-50 border border-red-200 text-red-600">
+        🔥 {isFr ? `Offre de lancement — expire dans ${label}` : `Launch offer — expires in ${label}`}
       </span>
     </div>
   );
@@ -485,10 +490,11 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
-  // Pre-fetched Stripe URL for in-app browsers (TikTok etc.)
+  // Pre-fetched Stripe URLs for in-app browsers (TikTok etc.)
   // Using an <a href> instead of window.location.href lets TikTok open Stripe in Safari
   // where the post-payment redirect back to /success works correctly.
   const [inAppPayUrl, setInAppPayUrl] = useState<string | null>(null);
+  const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
@@ -496,25 +502,28 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Pre-fetch one-time checkout URL immediately when in-app browser is detected
+  // Pre-fetch checkout URLs immediately when in-app browser is detected, so the
+  // TikTok <a target="_blank"> tap opens Stripe in Safari (where redirects work).
+  // We pre-fetch both the monthly (MRR hero) and the one-time downsell.
   useEffect(() => {
     if (!isInApp || !typeCode) return;
     let affiliateRef = '';
     try { affiliateRef = localStorage.getItem('_urs_ref') ?? ''; } catch {}
+    const base = {
+      origin: window.location.origin,
+      quizSlug: 'personnalite',
+      typeCode,
+      ...(userEmail ? { userEmail } : {}),
+      ...(affiliateRef ? { affiliateRef } : {}),
+    };
     fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        origin: window.location.origin,
-        quizSlug: 'personnalite',
-        typeCode,
-        ...(userEmail ? { userEmail } : {}),
-        oneTime: true,
-        ...(affiliateRef ? { affiliateRef } : {}),
-      }),
-    }).then(r => r.json()).then(d => {
-      if (d.url) setInAppPayUrl(d.url);
-    }).catch(() => {});
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...base, oneTime: true }),
+    }).then(r => r.json()).then(d => { if (d.url) setInAppPayUrl(d.url); }).catch(() => {});
+    fetch('/api/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...base }),
+    }).then(r => r.json()).then(d => { if (d.url) setInAppMonthlyUrl(d.url); }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInApp, typeCode]);
 
@@ -642,80 +651,93 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </p>
           )}
 
-          {/* 1 — Résultat unique (hero) */}
-          <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.05))', border: '2px solid rgba(169,78,24,0.3)' }}>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#a94e18' }}>
-                {isFr ? '⚡ Résultat unique' : '⚡ One-time result'}
+          {/* 1 — Mensuel (HERO · MRR) */}
+          <div className="rounded-2xl p-4 relative" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.08),rgba(209,125,82,0.06))', border: '2px solid rgba(169,78,24,0.35)' }}>
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
+              <span className="text-white text-[10px] font-black px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 10px rgba(169,78,24,0.4)' }}>
+                🔥 {isFr ? 'LE PLUS POPULAIRE' : 'MOST POPULAR'}
               </span>
-              <span className="text-lg font-black text-stone-900">1,99 €</span>
             </div>
-            <ul className="space-y-1.5 mb-4">
+            <div className="flex items-center justify-between mb-1 mt-2">
+              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#a94e18' }}>
+                {isFr ? '🔄 Mensuel · sans engagement' : '🔄 Monthly · no commitment'}
+              </span>
+              <div className="text-right">
+                <span className="text-xs text-stone-400 line-through mr-1">29,99 €</span>
+                <span className="text-lg font-black text-stone-900">9,99 €<span className="text-xs font-normal text-stone-400">{isFr ? '/mois' : '/mo'}</span></span>
+              </div>
+            </div>
+            <ul className="space-y-1.5 mb-4 mt-2">
               {(isFr ? [
-                `Ton profil ${typeCode} complet déverrouillé`,
-                'Tes forces, faiblesses, amour, travail',
-                'Accès immédiat · Paiement unique',
+                `Ton profil ${typeCode} complet : amour, carrière, face cachée`,
+                'Les 16 types MBTI débloqués (comprends les autres)',
+                'Tous les quiz + test de compatibilité duo illimité',
+                'Résilie en 1 clic — sans engagement',
               ] : [
-                `Your full ${typeCode} profile unlocked`,
-                'Strengths, weaknesses, love, career',
-                'Instant access · One-time payment',
+                `Your full ${typeCode} profile: love, career, shadow side`,
+                'All 16 MBTI types unlocked',
+                'All quizzes + unlimited duo compatibility',
+                'Cancel in 1 click — no commitment',
               ]).map(b => (
-                <li key={b} className="flex items-center gap-2 text-xs text-stone-700">
-                  <span className="text-emerald-500 font-bold flex-shrink-0">✓</span>{b}
+                <li key={b} className="flex items-start gap-2 text-xs text-stone-700">
+                  <span className="font-bold flex-shrink-0 mt-0.5" style={{ color: '#a94e18' }}>✓</span>{b}
                 </li>
               ))}
             </ul>
-            {isInApp && inAppPayUrl ? (
-              // In TikTok WebView: <a target="_blank"> is treated as a user-initiated
-              // tap and opens in Safari, where the Stripe post-payment redirect works.
+            {isInApp && inAppMonthlyUrl ? (
               <a
-                href={inAppPayUrl}
+                href={inAppMonthlyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
+                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'monthly', via: 'anchor' })}
                 className="w-full py-3.5 rounded-xl font-black text-white text-sm active:scale-[0.98] text-center block"
                 style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)', textDecoration: 'none' }}
               >
-                {isFr ? `🔓 Révéler mon profil ${typeCode} →` : `🔓 Reveal my ${typeCode} profile →`}
+                {isFr ? '🔓 Commencer pour 9,99 €/mois →' : '🔓 Start for €9.99/mo →'}
               </a>
             ) : (
               <button
-                onClick={() => doCheckout('onetime')}
+                onClick={() => doCheckout('monthly')}
                 disabled={loading}
                 className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
               >
-                {loading ? '…' : isFr ? `🔓 Révéler mon profil ${typeCode} →` : `🔓 Reveal my ${typeCode} profile →`}
+                {loading ? '…' : isFr ? '🔓 Commencer pour 9,99 €/mois →' : '🔓 Start for €9.99/mo →'}
               </button>
             )}
+            <p className="text-center text-[10px] text-stone-400 mt-2">
+              {isFr ? 'Apple Pay · Google Pay · CB · Résiliation en 1 clic' : 'Apple Pay · Google Pay · Card · Cancel in 1 click'}
+            </p>
           </div>
 
           {/* 2 — Annuel (best value) */}
           <div className="rounded-2xl p-4 relative" style={{ background: 'white', border: '1.5px solid #d6d3d1' }}>
-            <span className="absolute top-0 right-0 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
-              −75%
+            <span className="absolute top-0 right-0 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl" style={{ background: '#1f7a4d' }}>
+              −75% · {isFr ? 'MEILLEURE VALEUR' : 'BEST VALUE'}
             </span>
-            <div className="flex items-center justify-between mb-3 pr-12">
+            <div className="flex items-center justify-between mb-1 pr-28">
               <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">
                 {isFr ? '🗓 Annuel' : '🗓 Annual'}
               </span>
               <div className="text-right">
+                <span className="text-xs text-stone-400 line-through mr-1">119,88 €</span>
                 <span className="text-lg font-black text-stone-900">29,99 €</span>
                 <span className="text-stone-400 text-xs">{isFr ? '/an' : '/yr'}</span>
               </div>
             </div>
+            <p className="text-[10px] font-bold mb-3" style={{ color: '#1f7a4d' }}>{isFr ? '= 2,50 €/mois · économise 90 €' : '= €2.50/mo · save €90'}</p>
             <ul className="space-y-1.5 mb-4">
               {(isFr ? [
-                `${typeCode} + 15 profils MBTI débloqués`,
-                'Compatibilités · Quiz illimités · Duo',
-                '2,50 €/mois seulement',
+                `${typeCode} + les 16 profils MBTI débloqués`,
+                'Tous les quiz + duo illimité',
+                'Tous les futurs quiz inclus à vie',
               ] : [
-                `${typeCode} + all 15 MBTI profiles unlocked`,
-                'Compatibility · Unlimited quizzes · Duo',
-                'Only €2.50/month',
+                `${typeCode} + all 16 MBTI profiles unlocked`,
+                'All quizzes + unlimited duo',
+                'All future quizzes included forever',
               ]).map(b => (
                 <li key={b} className="flex items-center gap-2 text-xs text-stone-700">
-                  <span style={{ color: '#a94e18' }} className="font-bold flex-shrink-0">✓</span>{b}
+                  <span style={{ color: '#1f7a4d' }} className="font-bold flex-shrink-0">✓</span>{b}
                 </li>
               ))}
             </ul>
@@ -723,32 +745,46 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               onClick={() => doCheckout('annual')}
               disabled={loading}
               className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-              style={{ border: '1.5px solid rgba(169,78,24,0.4)', color: '#a94e18', background: 'rgba(169,78,24,0.05)' }}
+              style={{ border: '1.5px solid #1f7a4d', color: '#1f7a4d', background: 'rgba(31,122,77,0.05)' }}
             >
-              {loading ? '…' : isFr ? 'Souscrire maintenant →' : 'Subscribe now →'}
+              {loading ? '…' : isFr ? "Choisir l'annuel — 2,50 €/mois →" : 'Choose annual — €2.50/mo →'}
             </button>
           </div>
 
-          {/* 3 — Mensuel */}
-          <div className="rounded-xl px-4 py-3.5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold text-stone-500">{isFr ? '🔄 Mensuel · sans engagement' : '🔄 Monthly · cancel anytime'}</span>
-              <span className="text-sm font-black text-stone-900">9,99 €<span className="text-stone-400 text-xs font-normal">{isFr ? '/mois' : '/mo'}</span></span>
+          {/* 3 — Résultat unique (downsell) */}
+          <div className="rounded-xl px-4 py-3.5" style={{ background: '#fafafa', border: '1px solid #e7e5e0' }}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">{isFr ? 'Accès partiel' : 'Partial access'}</span>
+              <div className="text-right">
+                <span className="text-xs text-stone-300 line-through mr-1">9,99 €</span>
+                <span className="text-sm font-black text-stone-600">1,99 €</span>
+              </div>
             </div>
-            <ul className="space-y-1 mb-3">
-              {(isFr ? ['Accès illimité à tout', 'Résilie quand tu veux'] : ['Unlimited access to everything', 'Cancel whenever you want']).map(b => (
-                <li key={b} className="flex items-center gap-2 text-xs text-stone-500">
-                  <span className="text-emerald-500 font-bold flex-shrink-0 text-[10px]">✓</span>{b}
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => doCheckout('monthly')}
-              disabled={loading}
-              className="w-full py-2.5 rounded-lg font-semibold text-xs text-stone-600 border border-stone-300 bg-stone-50 hover:bg-stone-100 transition-all active:scale-[0.98] disabled:opacity-60"
-            >
-              {loading ? '…' : isFr ? 'Choisir ce plan →' : 'Choose this plan →'}
-            </button>
+            <div className="flex items-start gap-1.5 mb-2 rounded-lg px-2.5 py-2" style={{ background: 'rgba(169,78,24,0.05)', border: '1px solid rgba(169,78,24,0.15)' }}>
+              <span className="text-[10px] flex-shrink-0 mt-0.5">⚠️</span>
+              <p className="text-[10px] leading-snug" style={{ color: '#a94e18' }}>{isFr ? `Profil ${typeCode} uniquement — sans les autres types ni les quiz` : `${typeCode} profile only — no other types or quizzes`}</p>
+            </div>
+            {isInApp && inAppPayUrl ? (
+              <a
+                href={inAppPayUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
+                className="w-full py-2.5 rounded-lg font-semibold text-xs text-stone-500 text-center block"
+                style={{ border: '1px solid #e7e5e0', background: 'white', textDecoration: 'none' }}
+              >
+                {isFr ? `Voir uniquement mon profil ${typeCode} →` : `See only my ${typeCode} profile →`}
+              </a>
+            ) : (
+              <button
+                onClick={() => doCheckout('onetime')}
+                disabled={loading}
+                className="w-full py-2.5 rounded-lg font-semibold text-xs text-stone-500 border bg-white transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ borderColor: '#e7e5e0' }}
+              >
+                {loading ? '…' : isFr ? `Voir uniquement mon profil ${typeCode} →` : `See only my ${typeCode} profile →`}
+              </button>
+            )}
           </div>
 
         </div>

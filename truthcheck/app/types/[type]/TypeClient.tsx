@@ -11,9 +11,6 @@ interface Props {
   type: MbtiType;
 }
 
-const ONE_TIME_PRICE = '1,99 €';
-const MONTHLY_PRICE = '9,99 €';
-const ANNUAL_PRICE = '29,99 €';
 
 export default function TypeClient({ type }: Props) {
   const { data: session, status } = useSession();
@@ -223,64 +220,96 @@ export default function TypeClient({ type }: Props) {
         </div>
       </div>
 
-      {/* ── Paiement impulsif 1,99 € ── */}
-      <div className="mt-6 rounded-2xl border-2 p-6 text-center"
-        style={{ borderColor: `${type.accentColor}60`, background: `${type.accentColor}10` }}>
-        <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 text-white"
-          style={{ background: type.accentColor }}>
-          RÉSULTAT {type.code}
+      {/* ── HERO : Mensuel (MRR) ── */}
+      <div className="mt-6 rounded-2xl p-5 relative" style={{ background: 'rgba(169,78,24,0.10)', border: '2px solid rgba(169,78,24,0.45)' }}>
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span className="text-white text-[10px] font-black px-3 py-1 rounded-full whitespace-nowrap" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 10px rgba(169,78,24,0.4)' }}>
+            🔥 LE PLUS POPULAIRE
+          </span>
         </div>
-        <div className="text-4xl font-black text-white mb-1">{ONE_TIME_PRICE}</div>
-        <p className="text-stone-400 text-xs mb-5">{t.oneTimeDesc}</p>
-        <button
-          onClick={handleOneTime}
-          disabled={loading}
-          className="w-full max-w-xs px-7 py-4 rounded-xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-          style={{ background: `linear-gradient(135deg,${type.accentColor},#d17d52)`, boxShadow: `0 6px 24px ${type.accentColor}40` }}
-        >
-          {loading ? t.loading : t.unlockOneTime(ONE_TIME_PRICE)}
-        </button>
-      </div>
-
-      {/* ── Séparateur ── */}
-      <div className="flex items-center gap-3 my-5">
-        <div className="flex-1 h-px bg-white/8" />
-        <span className="text-stone-600 text-xs font-medium">{t.orPremium}</span>
-        <div className="flex-1 h-px bg-white/8" />
-      </div>
-
-      {/* ── Abonnement ── */}
-      <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <p className="text-xs text-stone-400 mb-1">{t.paywallTagline}</p>
-        <p className="text-xs text-stone-500 mb-4">{t.paywallPlus}</p>
-        <button
-          onClick={() => handleUnlock(false)}
-          disabled={loading}
-          className="w-full max-w-xs px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02] disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.3)' }}
-        >
-          {loading ? t.loading : t.unlockMonthly(MONTHLY_PRICE)}
-        </button>
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3 mb-3 text-left max-w-xs mx-auto">
-          {['Rapport MBTI complet', 'Amour & compatibilité', 'Forces & faiblesses', 'Tous les 16 types', 'Accès aux quiz UrCecret', 'Annulable à tout moment'].map(b => (
-            <li key={b} className="flex items-center gap-1.5 text-[11px] text-stone-400">
-              <span className="text-emerald-400 text-[10px]">✓</span>
-              {b}
+        <div className="flex items-center justify-between mt-2 mb-3">
+          <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#e0a380' }}>
+            Mensuel · sans engagement
+          </span>
+          <div className="text-right">
+            <span className="text-xs text-stone-500 line-through mr-1">29,99 €</span>
+            <span className="text-xl font-black text-white">9,99 €</span>
+            <span className="text-stone-400 text-xs">/mois</span>
+          </div>
+        </div>
+        <ul className="space-y-2 mb-4">
+          {[
+            `Profil ${type.code} complet : amour, carrière, face cachée`,
+            'Les 16 types MBTI débloqués (comprends les autres)',
+            'Tous les quiz + test de compatibilité duo illimité',
+            'Annulable en 1 clic — sans engagement',
+          ].map(b => (
+            <li key={b} className="flex items-start gap-2 text-xs text-stone-300">
+              <span className="font-bold flex-shrink-0 mt-0.5" style={{ color: '#e0a380' }}>✓</span>{b}
             </li>
           ))}
         </ul>
         <button
-          onClick={() => handleUnlock(true)}
+          onClick={() => handleUnlock(false)}
           disabled={loading}
-          className="w-full max-w-xs mt-1 px-7 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-60 text-white"
-          style={{ background: 'rgba(194,97,31,0.15)', border: '1px solid rgba(194,97,31,0.35)' }}
+          className="w-full py-4 rounded-xl font-black text-white text-sm transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-60"
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.4)' }}
         >
-          {t.unlockAnnual(ANNUAL_PRICE)}
+          {loading ? t.loading : '🔓 Commencer pour 9,99 €/mois →'}
         </button>
-        <p className="text-xs text-stone-600 mt-3">{t.guarantee}</p>
+        <p className="text-center text-[10px] text-stone-500 mt-2">Apple Pay · Google Pay · CB · Résiliation en 1 clic</p>
       </div>
 
-      <div className="text-center mt-5">
+      {/* ── Annuel (best value) ── */}
+      <div className="mt-3 rounded-2xl p-4 relative" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <span className="absolute top-0 right-0 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl" style={{ background: '#1f7a4d' }}>
+          −75% · MEILLEURE VALEUR
+        </span>
+        <div className="flex items-center justify-between mb-1 pr-28">
+          <span className="text-[11px] font-black uppercase tracking-widest text-stone-400">🗓 Annuel</span>
+          <div className="text-right">
+            <span className="text-xs text-stone-600 line-through mr-1">119,88 €</span>
+            <span className="text-lg font-black text-white">29,99 €</span>
+            <span className="text-stone-500 text-xs">/an</span>
+          </div>
+        </div>
+        <p className="text-[10px] font-bold mb-3" style={{ color: '#34d399' }}>= 2,50 €/mois · économise 90 €</p>
+        <button
+          onClick={() => handleUnlock(true)}
+          disabled={loading}
+          className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+          style={{ border: '1.5px solid #1f7a4d', color: '#34d399', background: 'rgba(31,122,77,0.08)' }}
+        >
+          {loading ? t.loading : "Choisir l'annuel — 2,50 €/mois →"}
+        </button>
+      </div>
+
+      {/* ── 1,99 € (downsell) ── */}
+      <div className="mt-3 rounded-xl px-4 py-3.5" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Accès partiel</span>
+          <div>
+            <span className="text-xs text-stone-600 line-through mr-1">9,99 €</span>
+            <span className="text-sm font-black text-stone-400">1,99 €</span>
+          </div>
+        </div>
+        <div className="flex items-start gap-1.5 mb-2 rounded-lg px-2.5 py-1.5" style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.15)' }}>
+          <span className="text-[10px] flex-shrink-0">⚠️</span>
+          <p className="text-[10px] leading-snug" style={{ color: '#e0a380' }}>Profil {type.code} uniquement — sans les autres types ni les quiz</p>
+        </div>
+        <button
+          onClick={handleOneTime}
+          disabled={loading}
+          className="w-full py-2 rounded-lg font-semibold text-xs text-stone-400 transition-all active:scale-[0.98] disabled:opacity-60"
+          style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+        >
+          {loading ? t.loading : `Voir uniquement mon profil ${type.code} →`}
+        </button>
+      </div>
+
+      <p className="text-center text-[10px] text-stone-600 mt-4">🔒 Paiement sécurisé Stripe · {t.guarantee}</p>
+
+      <div className="text-center mt-4">
         <a
           href="/types"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-stone-400 hover:text-white transition-all"

@@ -6,11 +6,12 @@ import { mbtiTypes } from '@/lib/mbti';
 import SuccessTracker from './SuccessTracker';
 
 async function verifyAndUnlock(sessionId: string | undefined, resultId: string | undefined, typeCode: string | undefined) {
-  if (!sessionId || !process.env.STRIPE_SECRET_KEY) return { paid: false, email: null as string | null, affiliateSlug: null as string | null };
+  if (!sessionId || !process.env.STRIPE_SECRET_KEY) return { paid: false, email: null as string | null, affiliateSlug: null as string | null, isOneTime: false };
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    if (session.payment_status !== 'paid') return { paid: false, email: null, affiliateSlug: null };
+    if (session.payment_status !== 'paid') return { paid: false, email: null, affiliateSlug: null, isOneTime: false };
+    const isOneTime = session.metadata?.oneTime === 'true' || session.mode === 'payment';
 
     if (resultId) {
       await prisma.quizResult.update({ where: { id: resultId }, data: { paid: true } }).catch(() => {});
@@ -45,9 +46,9 @@ async function verifyAndUnlock(sessionId: string | undefined, resultId: string |
       }
     }
 
-    return { paid: true, email, affiliateSlug };
+    return { paid: true, email, affiliateSlug, isOneTime };
   } catch {
-    return { paid: false, email: null, affiliateSlug: null };
+    return { paid: false, email: null, affiliateSlug: null, isOneTime: false };
   }
 }
 
@@ -230,7 +231,7 @@ export default async function SuccessPage({
   const sessionId = searchParams.session_id;
   const typeCode = searchParams.typeCode?.toUpperCase();
 
-  const { paid, email, affiliateSlug } = await verifyAndUnlock(sessionId, resultId, typeCode);
+  const { paid, email, affiliateSlug, isOneTime } = await verifyAndUnlock(sessionId, resultId, typeCode);
 
   let magicLinkSent = false;
   if (paid && email) {
@@ -348,6 +349,28 @@ export default async function SuccessPage({
             >
               Découvrir les 15 tests UrCecret →
             </Link>
+
+            {/* Upsell one-time → monthly (drive MRR) */}
+            {paid && isOneTime && typeCode && (
+              <div className="rounded-2xl p-4 text-left mt-1" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.05))', border: '1.5px solid rgba(169,78,24,0.3)' }}>
+                <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#a94e18' }}>Envie d&apos;aller plus loin&nbsp;?</p>
+                <p className="text-sm font-bold text-stone-900 mb-2 leading-snug">Débloque les 16 types + tous les quiz secrets pour 9,99&nbsp;€/mois</p>
+                <ul className="space-y-1 mb-3">
+                  {['💔 Ton/ta partenaire te trompe ?', '❤️ Suis-je vraiment amoureux·se ?', '🤝 Sont-ils de vrais amis ?', '🎭 Suis-je manipulé(e) ?'].map(q => (
+                    <li key={q} className="flex items-center gap-2 text-xs text-stone-600">
+                      <span className="font-bold" style={{ color: '#a94e18' }}>✓</span>{q}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={`/quiz/personnalite?pending=${typeCode}&intent=upgrade`}
+                  className="block w-full py-3 rounded-xl font-black text-white text-xs text-center transition-all"
+                  style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 16px rgba(169,78,24,0.3)' }}
+                >
+                  Passer à l&apos;accès complet — 9,99 €/mois →
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
