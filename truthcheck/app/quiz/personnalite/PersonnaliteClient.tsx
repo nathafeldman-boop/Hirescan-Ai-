@@ -26,12 +26,15 @@ function detectInAppBrowser(): boolean {
 }
 
 // ─── Short quiz: 8 questions per dimension = 32 total ───────────────────────────
-function getShortQuestions(all: MbtiQuestion[]): MbtiQuestion[] {
+// Balanced subset: keep the first `perDim` questions of each MBTI dimension.
+// computeMbtiType only scores answered questions, so a shorter quiz is safe and
+// still determines the type reliably — while dramatically boosting completion.
+function getBalancedQuestions(all: MbtiQuestion[], perDim: number): MbtiQuestion[] {
   const seen: Record<string, number> = {};
   const result: MbtiQuestion[] = [];
   for (const q of all) {
     seen[q.dimension] = (seen[q.dimension] ?? 0) + 1;
-    if (seen[q.dimension] <= 8) result.push(q);
+    if (seen[q.dimension] <= perDim) result.push(q);
   }
   return result;
 }
@@ -131,19 +134,24 @@ function QuizScreen({ onComplete, questions, t }: {
   // Keep ref in sync so visibilitychange always reads latest question
   useEffect(() => { currentRef.current = current; }, [current]);
 
-  // Track milestones + show motivation banner
+  // Track milestones + show motivation banner — percentage-based so it works
+  // for any quiz length (20q in-app / 24q browser).
   useEffect(() => {
-    const q = current + 1;
-    if ([10, 25, 50, 75].includes(q) && !trackedMilestones.current.has(q)) {
-      trackedMilestones.current.add(q);
-      fetch('/api/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: `/__quiz/q${q}` }),
-      }).catch(() => {});
-      if (MILESTONE_MSGS[q]) {
-        setMilestoneMsg(MILESTONE_MSGS[q]);
-        setTimeout(() => setMilestoneMsg(null), 2800);
+    const total = questions.length;
+    const pct = ((current + 1) / total) * 100;
+    for (const mark of [25, 50, 75]) {
+      if (pct >= mark && !trackedMilestones.current.has(mark)) {
+        trackedMilestones.current.add(mark);
+        fetch('/api/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: `/__quiz/q${mark}` }),
+        }).catch(() => {});
+        if (MILESTONE_MSGS[mark]) {
+          setMilestoneMsg(MILESTONE_MSGS[mark]);
+          setTimeout(() => setMilestoneMsg(null), 2800);
+        }
+        break;
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -899,7 +907,9 @@ export default function PersonnaliteClient() {
   const [mbtiType, setMbtiType] = useState('');
   const [isInApp] = useState(() => detectInAppBrowser());
   const baseQuestions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
-  const questions = isInApp ? getShortQuestions(baseQuestions) : baseQuestions;
+  // Short, completable quiz for everyone (was 70 questions in browser → huge drop-off).
+  // 6 per dimension (24q) in browser, 5 (20q) in TikTok in-app where patience is lowest.
+  const questions = getBalancedQuestions(baseQuestions, isInApp ? 5 : 6);
   const t = ui[lang].quiz;
 
   // Log initial phase and URL params on first render
