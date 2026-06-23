@@ -15,8 +15,9 @@ const TYPES = ['INFJ', 'INFP', 'ENFP', 'ENFJ', 'INTJ', 'INTP', 'ENTP', 'ISFJ', '
 const CITIES = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Lille', 'Toulouse', 'Nantes', 'Bruxelles', 'Genève', 'Montréal'];
 const ACTIONS = [
   'vient de débloquer son profil',
-  'a découvert son type',
-  'vient de lire son rapport complet',
+  'vient de débloquer son analyse complète',
+  'vient de payer son profil',
+  'a lu son analyse cette semaine',
 ];
 
 function rand<T>(arr: T[]): T {
@@ -58,8 +59,8 @@ export default function SocialProofToast() {
       showTimer = setTimeout(cycle, 4800 + 9000 + Math.random() * 4000);
     };
 
-    // first toast after a short delay so it doesn't pop instantly
-    showTimer = setTimeout(cycle, 4500);
+    // first toast after a short delay so it doesn't pop before the page finishes rendering
+    showTimer = setTimeout(cycle, 2000);
     return () => { clearTimeout(showTimer); clearTimeout(hideTimer); };
   }, [dismissed]);
 
