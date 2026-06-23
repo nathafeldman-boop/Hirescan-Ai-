@@ -178,7 +178,7 @@ export default function PersonnalitePage() {
             {[
               { n: '2,3M', label: 'tests passés' },
               { n: '16', label: 'types distincts' },
-              { n: '12 min', label: 'en moyenne' },
+              { n: '3 min', label: 'en moyenne' },
             ].map(({ n, label }) => (
               <div key={label}>
                 <div className="text-2xl font-black text-gray-900">{n}</div>

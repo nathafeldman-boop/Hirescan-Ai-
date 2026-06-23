@@ -575,6 +575,38 @@ function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boole
   );
 }
 
+// ─── Share my type — viral loop ────────────────────────────────────────────
+function ShareMyType({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
+  const [copied, setCopied] = useState(false);
+  const type = mbtiTypes[typeCode];
+  const url = typeof window !== 'undefined' ? `${window.location.origin}/quiz/personnalite` : 'https://urcecret.site/quiz/personnalite';
+  const text = isFr
+    ? `Je suis ${typeCode} ${type?.emoji ?? ''} "${type?.name ?? ''}" 🔮 — ce test MBTI est effrayant de précision\n${url}`
+    : `I'm ${typeCode} ${type?.emoji ?? ''} "${type?.name ?? ''}" 🔮 — this MBTI test is frighteningly accurate\n${url}`;
+
+  const share = async () => {
+    if (navigator.share) {
+      try { await navigator.share({ text: isFr ? `Je suis ${typeCode} ${type?.emoji ?? ''} — ${url}` : `I'm ${typeCode} ${type?.emoji ?? ''} — ${url}`, url }); return; } catch {}
+    }
+    try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch {}
+  };
+
+  return (
+    <button
+      onClick={share}
+      className="block w-full mt-4 rounded-2xl p-3.5 text-center transition-all active:scale-[0.98]"
+      style={{ background: 'rgba(169,78,24,0.05)', border: '1px solid rgba(169,78,24,0.18)', textDecoration: 'none' }}
+    >
+      <p className="text-sm font-black" style={{ color: '#a94e18' }}>
+        {copied ? '✅ Lien copié !' : (isFr ? `📤 Partager mon résultat ${typeCode}` : `📤 Share my ${typeCode} result`)}
+      </p>
+      <p className="text-[11px] text-stone-400 mt-0.5">
+        {isFr ? 'Envoie à un ami — découvrez vos compatibilités' : 'Send to a friend — discover your compatibility'}
+      </p>
+    </button>
+  );
+}
+
 // ─── Result teaser (free users — logged in or not) ─────────────────────────────
 // Auth gate removed: user goes straight to Stripe which collects their email.
 // The success page creates the account automatically from the Stripe email.
@@ -590,10 +622,13 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // where the post-payment redirect back to /success works correctly.
   const [inAppPayUrl, setInAppPayUrl] = useState<string | null>(null);
   const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
+  const [stickyBar, setStickyBar] = useState(false);
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
+    const t = setTimeout(() => setStickyBar(true), 15000);
+    return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -676,7 +711,18 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             {isFr ? `${type?.rarity ?? ''} de la population · ton analyse complète ci-dessous` : `${type?.rarity ?? ''} of people · your full analysis below`}
           </p>
           {isFr && type?.tagline && (
-            <p className="text-xs text-stone-500 italic mb-3 leading-snug">«&nbsp;{type.tagline}&nbsp;»</p>
+            <p className="text-xs text-stone-500 italic mb-2 leading-snug">«&nbsp;{type.tagline}&nbsp;»</p>
+          )}
+          {type?.famousExamples && type.famousExamples.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mb-3">
+              <span className="text-[10px] text-stone-400">{isFr ? `Célèbres ${typeCode} :` : `Famous ${typeCode}:`}</span>
+              {type.famousExamples.slice(0, 3).map((f: string) => (
+                <span key={f} className="text-[10px] font-semibold px-2 py-0.5 rounded-full text-stone-600"
+                      style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.12)' }}>
+                  {f}
+                </span>
+              ))}
+            </div>
           )}
           {isFr && HOOK_LINES[typeCode] ? (
             <div className="rounded-2xl px-4 py-3" style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.18)' }}>
@@ -936,20 +982,32 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             no Safari hop needed) → sends the targeted "profil prêt" email */}
         <PaywallEmailCapture typeCode={typeCode} isFr={isFr} />
 
-        {/* ── Portrait viral + Concours 1 000€ ─────────────────────────────── */}
-        <a
-          href={`/portrait?quiz=personnalite&type=${encodeURIComponent(typeCode)}&score=95`}
-          className="block w-full mt-5 rounded-2xl p-4 text-center"
-          style={{ background: 'linear-gradient(135deg,rgba(251,191,36,0.10),rgba(194,97,31,0.10))', border: '1px solid rgba(251,191,36,0.3)', textDecoration: 'none' }}
-        >
-          <p className="text-2xl mb-1">🏆</p>
-          <p className="font-black text-sm" style={{ color: '#fbbf24' }}>Concours · 1 000 €</p>
-          <p className="text-xs text-stone-400 mt-0.5">
-            {isFr ? 'Génère ton portrait viral et tente de gagner' : 'Generate your viral portrait and win'}
-          </p>
-        </a>
+        {/* ── Share CTA — viral loop ──────────────────────────────────────── */}
+        <ShareMyType typeCode={typeCode} isFr={isFr} />
 
       </div>
+
+      {/* Sticky bar — appears after 15s for users still on page (shows lowest price to convert hesitants) */}
+      {stickyBar && !loading && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 px-3 py-3" style={{ background: 'white', borderTop: '2px solid rgba(169,78,24,0.2)', boxShadow: '0 -4px 24px rgba(0,0,0,0.10)' }}>
+          <div className="max-w-sm mx-auto flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-black text-stone-900 leading-snug">
+                ⚡ {isFr ? `Commence à 1,99 € — profil ${typeCode} immédiat` : `Start at €1.99 — ${typeCode} profile instantly`}
+              </p>
+              <p className="text-[10px] text-stone-500 mt-0.5">{isFr ? 'Paiement unique · accès à vie · 7j remboursé' : 'One-time · lifetime access · 7-day refund'}</p>
+            </div>
+            <button
+              onClick={() => { setStickyBar(false); doCheckout('onetime'); }}
+              className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-white text-xs whitespace-nowrap transition-all active:scale-[0.97]"
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 12px rgba(169,78,24,0.3)' }}
+            >
+              {isFr ? '1,99 € →' : '€1.99 →'}
+            </button>
+            <button onClick={() => setStickyBar(false)} className="text-stone-400 text-base p-1 leading-none flex-shrink-0">✕</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
