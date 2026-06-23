@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
   const score   = parseInt(p.get('score') ?? '75', 10);
   const quiz    = p.get('quiz')  ?? 'personnalite';
 
+  const photo   = p.get('photo') ?? '';
   const isMbti  = quiz === 'personnalite' && type.length === 4 && MBTI_META[type];
   const meta    = isMbti ? MBTI_META[type] : scoreChar(score);
   const headline = isMbti ? type : `${score}%`;
@@ -83,12 +84,16 @@ export async function GET(req: NextRequest) {
           {/* Avatar circle */}
           <div style={{
             width: 280, height: 280, borderRadius: '50%',
-            background: `radial-gradient(circle at 40% 35%, ${meta.color}33, ${meta.color}11)`,
-            border: `3px solid ${meta.color}66`,
+            background: photo ? 'transparent' : `radial-gradient(circle at 40% 35%, ${meta.color}33, ${meta.color}11)`,
+            border: `3px solid ${meta.color}88`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
             boxShadow: `0 0 80px ${meta.shadow}, inset 0 0 40px ${meta.color}22`,
           }}>
-            <span style={{ fontSize: 140, lineHeight: 1 }}>{meta.char}</span>
+            {photo
+              ? <img src={photo} width={280} height={280} style={{ objectFit: 'cover' }} />
+              : <span style={{ fontSize: 140, lineHeight: 1 }}>{meta.char}</span>
+            }
           </div>
 
           {/* Headline */}

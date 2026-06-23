@@ -40,11 +40,37 @@ export default function PortraitPage() {
   const [copied, setCopied]       = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const [step, setStep]           = useState<'idle' | 'generating' | 'done'>('idle');
+  const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const imageUrl = portrait
-    ? `/api/portrait-og?quiz=${quizSlug}&type=${encodeURIComponent(typeCode)}&score=${score}&hook=${encodeURIComponent(portrait.hook)}&arch=${encodeURIComponent(portrait.archetype)}`
+    ? `/api/portrait-og?quiz=${quizSlug}&type=${encodeURIComponent(typeCode)}&score=${score}&hook=${encodeURIComponent(portrait.hook)}&arch=${encodeURIComponent(portrait.archetype)}${photoDataUrl ? `&photo=${encodeURIComponent(photoDataUrl)}` : ''}`
     : null;
+
+  function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = 200;
+    canvas.height = 200;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const img = new window.Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      const size = Math.min(img.width, img.height);
+      const sx = (img.width - size) / 2;
+      const sy = (img.height - size) / 2;
+      ctx.beginPath();
+      ctx.arc(100, 100, 100, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, 200, 200);
+      URL.revokeObjectURL(objectUrl);
+      setPhotoDataUrl(canvas.toDataURL('image/jpeg', 0.65));
+    };
+    img.src = objectUrl;
+  }
 
   async function generate() {
     setLoading(true);
@@ -129,6 +155,67 @@ export default function PortraitPage() {
             <p style={{ fontSize: 14, fontWeight: 600, color: '#d4d4d8', margin: 0 }}>{quizName}</p>
             <p style={{ fontSize: 12, color: '#71717a', margin: '3px 0 0' }}>Score : {score}% · Portrait personnalisé par IA</p>
           </div>
+        </div>
+
+        {/* Photo upload */}
+        <div style={{
+          borderRadius: 16, padding: '16px 18px',
+          background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+          marginBottom: 16,
+        }}>
+          <p style={{ fontSize: 12, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px' }}>
+            📸 Ta photo de profil TikTok (optionnel)
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* Preview circle */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
+                background: photoDataUrl ? 'transparent' : 'rgba(194,97,31,0.12)',
+                border: `2px ${photoDataUrl ? 'solid rgba(209,125,82,0.5)' : 'dashed rgba(194,97,31,0.35)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', overflow: 'hidden', position: 'relative',
+              }}
+            >
+              {photoDataUrl
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={photoDataUrl} alt="photo" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: '50%' }} />
+                : <span style={{ fontSize: 26 }}>🤳</span>
+              }
+            </div>
+            <div style={{ flex: 1 }}>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  background: 'rgba(194,97,31,0.12)', border: '1px solid rgba(194,97,31,0.3)',
+                  color: '#d17d52', borderRadius: 10, padding: '8px 16px',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'block',
+                  marginBottom: 6,
+                }}
+              >
+                {photoDataUrl ? '✓ Photo ajoutée — changer' : '+ Ajouter ma photo'}
+              </button>
+              <p style={{ fontSize: 11, color: '#52525b', margin: 0 }}>
+                Apparaîtra dans le cercle du portrait · JPG / PNG
+              </p>
+            </div>
+            {photoDataUrl && (
+              <button
+                onClick={() => { setPhotoDataUrl(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                style={{ background: 'none', border: 'none', color: '#52525b', fontSize: 18, cursor: 'pointer', padding: 4 }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoUpload}
+            style={{ display: 'none' }}
+          />
         </div>
 
         {/* Error message */}
@@ -254,6 +341,18 @@ export default function PortraitPage() {
             >
               Regénérer un autre portrait
             </button>
+            {!photoDataUrl && (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  width: '100%', padding: '10px', borderRadius: 12,
+                  background: 'rgba(194,97,31,0.08)', border: '1px solid rgba(194,97,31,0.2)',
+                  color: '#d17d52', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                📸 Ajouter ta photo et regénérer
+              </button>
+            )}
           </div>
         )}
 
