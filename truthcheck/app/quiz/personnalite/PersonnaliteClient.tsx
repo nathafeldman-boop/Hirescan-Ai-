@@ -937,10 +937,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <span className="text-[10px] text-stone-400 font-semibold">🔒 verrouillé</span>
           </div>
           {(isFr ? [
-            { icon: '💕', title: 'Amour & Relations', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète...' },
-            { icon: '💼', title: 'Carrière & Superpouvoir', preview: 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel...' },
-            { icon: '🌑', title: 'Face cachée & Angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face...' },
-            { icon: '🎯', title: 'Compatibilité exacte', preview: 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr...' },
+            { icon: '💕', title: 'Amour & Relations', preview: type?.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète…' },
+            { icon: '💼', title: 'Carrière & Superpouvoir', preview: type?.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel…' },
+            { icon: '🌑', title: 'Face cachée & Angles morts', preview: type?.growth?.slice(0, 90) ?? 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face…' },
+            { icon: '🎯', title: 'Compatibilité exacte', preview: type?.compatibleWith ? `Tes types les plus compatibles : ${type.compatibleWith.join(', ')} — et ceux qui te drainent systématiquement…` : 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr…' },
           ] : [
             { icon: '💕', title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that keeps repeating...' },
             { icon: '💼', title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage...' },
