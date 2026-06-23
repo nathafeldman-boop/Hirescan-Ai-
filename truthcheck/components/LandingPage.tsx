@@ -260,11 +260,11 @@ export default function LandingPage() {
               </p>
               <div className="space-y-2">
                 {[
+                  { href: '/quiz/personnalite', q: 'Quel est vraiment mon type MBTI ?',   sub: 'Effrayant de précision · 16 profils · résultat en 3 min', emoji: '🧠' },
                   { href: '/quiz/infidelite',   q: 'Mon/ma partenaire me trompe ?',       sub: '8 comportements analysés · 2 minutes',                  emoji: '💔' },
                   { href: '/quiz/amoureux',     q: 'Suis-je vraiment amoureux(se) ?',     sub: 'Amour, attachement ou habitude — analyse différenciée', emoji: '❤️' },
                   { href: '/quiz/manipule',     q: 'Suis-je manipulé(e) ?',               sub: 'Gaslighting, contrôle émotionnel, emprise — détection', emoji: '🎭' },
                   { href: '/quiz/vrais-amis',   q: 'Sont-ils de vrais amis ?',            sub: 'Dynamiques de réciprocité dans tes amitiés proches',    emoji: '🤝' },
-                  { href: '/quiz/personnalite', q: 'Quel est mon type de personnalité ?', sub: 'Test MBTI · 16 profils · fonctions cognitives de Jung', emoji: '🧠' },
                 ].map((q) => (
                   <Link
                     key={q.href}
