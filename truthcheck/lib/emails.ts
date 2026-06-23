@@ -112,11 +112,14 @@ export function emailResultReady(name: string | null, typeCode: string) {
 export function emailDay1(name: string | null, typeCode?: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   const code = typeCode?.toUpperCase() ?? null;
+  const hook = code ? HOOK_LINES[code] : null;
   const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quiz/personnalite`;
   return {
-    subject: code
-      ? `${firstName}, ton profil ${code} t'attend encore 👀`
-      : `${firstName}, ton résultat t'attend encore 👀`,
+    subject: hook
+      ? `${firstName} — tu n'as pas encore vu POURQUOI ${hook.toLowerCase().replace(/^pourquoi\s+/i, '')}`
+      : code
+        ? `${firstName}, ton profil ${code} t'attend encore 👀`
+        : `${firstName}, ton résultat t'attend encore 👀`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+1</p>
       <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${code ? `Ton profil ${code} est toujours là…` : 'Ton score est encore là…'}</h2>
