@@ -542,7 +542,7 @@ function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boole
     return (
       <div className="rounded-2xl p-4 mt-5 text-center" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
         <p className="text-2xl mb-1">📩</p>
-        <p className="text-sm font-bold text-stone-800">{isFr ? 'Email envoyé !' : 'Email sent!'}</p>
+        <p className="text-sm font-bold text-stone-800">{isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
         <p className="text-xs text-stone-500 mt-0.5">{isFr ? 'Vérifie ta boîte — ton profil t\'attend.' : 'Check your inbox — your profile awaits.'}</p>
       </div>
     );
@@ -550,8 +550,12 @@ function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boole
 
   return (
     <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-      <p className="text-sm font-bold text-stone-800 mb-1">{isFr ? 'Pas prêt ? Reçois ton profil par email 📩' : 'Not ready? Get your profile by email 📩'}</p>
-      <p className="text-xs text-stone-500 mb-3">{isFr ? 'On te garde ton résultat et on t\'envoie le lien.' : 'We\'ll save your result and send you the link.'}</p>
+      <p className="text-sm font-bold text-stone-800 mb-1">
+        📩 {isFr ? `Garde ton profil ${typeCode} — gratuit` : `Save your ${typeCode} profile — free`}
+      </p>
+      <p className="text-xs text-stone-500 mb-3">
+        {isFr ? 'Reçois ton profil par email. Aucun spam, aucun engagement.' : 'Get your profile by email. No spam, no commitment.'}
+      </p>
       <form onSubmit={submit} className="flex gap-2">
         <input
           type="email"
@@ -568,7 +572,7 @@ function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boole
           className="px-4 py-2.5 rounded-lg font-bold text-white text-sm flex-shrink-0 disabled:opacity-60"
           style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
         >
-          {state === 'loading' ? '…' : isFr ? 'Recevoir' : 'Send'}
+          {state === 'loading' ? '…' : isFr ? '→' : '→'}
         </button>
       </form>
     </div>
@@ -929,19 +933,19 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
-                className="w-full py-2.5 rounded-lg font-semibold text-xs text-stone-500 text-center block"
-                style={{ border: '1px solid #e7e5e0', background: 'white', textDecoration: 'none' }}
+                className="w-full py-2.5 rounded-lg font-semibold text-xs text-center block transition-all active:scale-[0.98]"
+                style={{ border: '1.5px solid rgba(169,78,24,0.4)', background: 'white', color: '#a94e18', textDecoration: 'none' }}
               >
-                {isFr ? `Voir uniquement mon profil ${typeCode} →` : `See only my ${typeCode} profile →`}
+                {isFr ? `⚡ Commencer pour 1,99 € →` : `⚡ Start for €1.99 →`}
               </a>
             ) : (
               <button
                 onClick={() => doCheckout('onetime')}
                 disabled={loading}
-                className="w-full py-2.5 rounded-lg font-semibold text-xs text-stone-500 border bg-white transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ borderColor: '#e7e5e0' }}
+                className="w-full py-2.5 rounded-lg font-semibold text-xs transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ border: '1.5px solid rgba(169,78,24,0.4)', background: 'white', color: '#a94e18' }}
               >
-                {loading ? '…' : isFr ? `Voir uniquement mon profil ${typeCode} →` : `See only my ${typeCode} profile →`}
+                {loading ? '…' : isFr ? `⚡ Commencer pour 1,99 € →` : `⚡ Start for €1.99 →`}
               </button>
             )}
           </div>
