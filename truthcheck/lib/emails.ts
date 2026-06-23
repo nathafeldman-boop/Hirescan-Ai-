@@ -1,5 +1,25 @@
 const BASE = 'https://urcecret.site';
 
+// Per-type emotional hook — mirrors the curiosity gap used on the paywall.
+const HOOK_LINES: Record<string, string> = {
+  INTJ: 'Pourquoi tu sembles froid(e) alors que tu ressens tout en profondeur',
+  INTP: 'Pourquoi tu procrastines sur tes propres projets malgré ton intelligence',
+  ENTJ: 'Pourquoi on te voit comme autoritaire quand tu veux juste être efficace',
+  ENTP: 'Pourquoi tu t\'ennuies si vite — même avec les gens que tu aimes',
+  INFJ: 'Pourquoi tu t\'épuises à tout porter pour les autres',
+  INFP: 'Pourquoi tu te sens incompris(e) même par ceux qui t\'aiment',
+  ENFJ: 'Pourquoi tu mets les autres avant toi jusqu\'à t\'oublier',
+  ENFP: 'Pourquoi tu commences tout avec passion sans jamais finir',
+  ISTJ: 'Pourquoi tu portes tout le monde sans que personne le remarque',
+  ISFJ: 'Pourquoi tu dis oui quand tu veux dire non — encore et encore',
+  ESTJ: 'Pourquoi on te trouve trop dur(e) quand tu veux juste aider',
+  ESFJ: 'Pourquoi tu as besoin que tout le monde aille bien pour aller bien',
+  ISTP: 'Pourquoi tu fuis dès que quelqu\'un s\'attache vraiment à toi',
+  ISFP: 'Pourquoi tu n\'oses pas montrer ce que tu crées vraiment',
+  ESTP: 'Pourquoi tu t\'ennuies dès que la relation devient sécurisante',
+  ESFP: 'Pourquoi tu as besoin d\'attention pour te sentir vraiment aimé(e)',
+};
+
 function wrap(content: string) {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -59,11 +79,19 @@ export function emailWelcome(name: string | null) {
 export function emailResultReady(name: string | null, typeCode: string) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   const code = typeCode.toUpperCase();
+  const hook = HOOK_LINES[code];
   return {
-    subject: `${firstName}, ton profil ${code} est prêt 🔓`,
+    subject: hook
+      ? `${firstName} (${code}) — ${hook.toLowerCase()}`
+      : `${firstName}, ton profil ${code} est prêt 🔓`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Ton résultat est sauvegardé</p>
       <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Tu es ${code} — mais tu n'as pas tout vu.</h2>
+      ${hook ? `
+      <div style="background:rgba(169,78,24,0.10);border:1px solid rgba(169,78,24,0.25);border-radius:12px;padding:16px 20px;margin-bottom:20px">
+        <p style="margin:0 0 4px;color:#c2611f;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px">Ton profil ${code} révèle</p>
+        <p style="margin:0;color:#fff;font-size:15px;font-weight:700;line-height:1.5">${hook}</p>
+      </div>` : ''}
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
         Ton profil complet t'attend : ta face cachée, ton schéma en amour, tes vraies forces et tes angles morts. La plupart des gens disent "c'est exactement moi" en le lisant.
       </p>
