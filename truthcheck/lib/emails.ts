@@ -253,6 +253,84 @@ export function emailPurchaseConfirm(name: string | null, type: 'onetime' | 'mon
   };
 }
 
+// Sent immediately on premium purchase — includes day 1 suivi content.
+export function emailPremiumWelcome(
+  name: string | null,
+  typeCode: string | null,
+  jour1: { titre: string; conseil: string; exercice: string } | null,
+) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const suiviLink = code ? `${BASE}/suivi/${code.toLowerCase()}` : `${BASE}/quiz/personnalite`;
+
+  return {
+    subject: code
+      ? `✦ Premium activé · Ton programme ${code} sur 15 jours commence aujourd'hui`
+      : `✦ Accès Premium activé — ton programme personnalisé t'attend`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#c2611f;font-size:12px;text-transform:uppercase;letter-spacing:1px">✦ UrCecret Premium activé</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">
+        ${firstName}, ton programme${code ? ` ${code}` : ''} sur 15 jours commence maintenant.
+      </h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        Chaque jour pendant 15 jours, tu reçois un conseil personnalisé${code ? ` pour ton type ${code}` : ''} — avec un exercice concret à appliquer tout de suite.
+      </p>
+      ${jour1 ? `
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.25);border-radius:14px;padding:20px 24px;margin-bottom:24px">
+        <p style="margin:0 0 4px;color:#c2611f;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px">Jour 1 · aujourd'hui</p>
+        <h3 style="margin:0 0 12px;color:#fff;font-size:17px;font-weight:800">${jour1.titre}</h3>
+        <p style="margin:0 0 16px;color:#a1a1aa;font-size:14px;line-height:1.75">${jour1.conseil}</p>
+        <div style="background:rgba(255,255,255,0.04);border-left:3px solid #a94e18;padding:12px 16px;border-radius:0 8px 8px 0">
+          <p style="margin:0 0 4px;color:#c2611f;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">⚡ Exercice du jour</p>
+          <p style="margin:0;color:#e4e4e7;font-size:13px;line-height:1.65">${jour1.exercice}</p>
+        </div>
+      </div>` : `
+      <div style="background:rgba(169,78,24,0.06);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0 0 6px;color:#c2611f;font-size:13px;font-weight:700">Pour activer ton programme 15 jours :</p>
+        <p style="margin:0;color:#a1a1aa;font-size:13px;line-height:1.6">Fais d'abord le test MBTI (3 min) — ton programme sera personnalisé selon ton type.</p>
+      </div>`}
+      ${cta(code ? `Voir mon programme ${code} complet →` : 'Faire mon test MBTI →', suiviLink)}
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:8px">
+        <p style="margin:0;color:#52525b;font-size:12px">Tu recevras un conseil par jour pendant 15 jours. Des questions ? Réponds directement à cet email.</p>
+      </div>
+    `),
+  };
+}
+
+// Sent daily for premium users — days 2–15 of their suivi program.
+export function emailSuiviDay(
+  name: string | null,
+  typeCode: string,
+  day: number,
+  jour: { titre: string; conseil: string; exercice: string; phase: string },
+) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode.toUpperCase();
+  const suiviLink = `${BASE}/suivi/${code.toLowerCase()}`;
+  const phaseLabel: Record<string, string> = {
+    moi: 'Semaine 1 · Découverte de soi',
+    relations: 'Semaine 2 · Tes relations',
+    projet: 'Semaine 3 · Ton projet de vie',
+  };
+
+  return {
+    subject: `Jour ${day} — ${jour.titre} · Programme ${code}`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:11px;text-transform:uppercase;letter-spacing:1px">${phaseLabel[jour.phase] ?? `Jour ${day}`} · Profil ${code}</p>
+      <h2 style="margin:0 0 20px;color:#fff;font-size:22px;font-weight:800">Jour ${day} — ${jour.titre}</h2>
+      <p style="margin:0 0 24px;color:#a1a1aa;font-size:15px;line-height:1.75">${jour.conseil}</p>
+      <div style="background:rgba(169,78,24,0.06);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:18px 20px;margin-bottom:28px">
+        <p style="margin:0 0 8px;color:#c2611f;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">⚡ Exercice du jour</p>
+        <p style="margin:0;color:#e4e4e7;font-size:14px;line-height:1.7">${jour.exercice}</p>
+      </div>
+      ${cta(`Voir mon programme ${code} →`, suiviLink)}
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;margin-top:8px">
+        <p style="margin:0;color:#3f3f46;font-size:11px;text-align:center">Jour ${day}/15 · Programme personnalisé ${code} · <a href="${BASE}/dashboard" style="color:#52525b">Gérer mes emails</a></p>
+      </div>
+    `),
+  };
+}
+
 export async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

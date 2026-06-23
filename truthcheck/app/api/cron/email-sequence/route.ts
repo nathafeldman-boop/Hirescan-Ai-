@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { emailDay1, emailDay3, emailDay7, sendEmail } from '@/lib/emails';
+import { emailDay1, emailDay3, emailDay7, emailSuiviDay, sendEmail } from '@/lib/emails';
+import { getSuivi } from '@/lib/suivi';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +52,48 @@ export async function GET(req: NextRequest) {
         sent++;
       } catch (e) {
         console.error(`Email ${seq.type} failed for ${user.email}:`, e);
+        errors++;
+      }
+    }
+  }
+
+  // ── Premium suivi sequences — days 2-15 ──
+  // Day 1 is sent at purchase time (premium_welcome). Days 2-15 come here.
+  for (let day = 2; day <= 15; day++) {
+    // Find premium_welcome logs sent (day-1) days ago → these users are on day `day` today
+    const welcomeStart = new Date(now.getTime() - day * 86400 * 1000);
+    const welcomeEnd   = new Date(now.getTime() - (day - 1) * 86400 * 1000);
+
+    const welcomeLogs = await prisma.emailLog.findMany({
+      where: {
+        type: 'premium_welcome',
+        sentAt: { gte: welcomeStart, lte: welcomeEnd },
+        user: {
+          tier: 'premium',
+          mbtiType: { not: null },
+          emailLogs: { none: { type: `suivi_d${day}` } },
+        },
+      },
+      select: {
+        userId: true,
+        user: { select: { email: true, name: true, mbtiType: true } },
+      },
+    });
+
+    for (const log of welcomeLogs) {
+      const { email: userEmail, name, mbtiType } = log.user;
+      if (!userEmail || !mbtiType) continue;
+      const suivi = getSuivi(mbtiType.toUpperCase());
+      if (!suivi) continue;
+      const jourData = suivi.jours[day - 1]; // day 1 was sent in welcome, index 0
+      if (!jourData) continue;
+      try {
+        const { subject, html } = emailSuiviDay(name, mbtiType.toUpperCase(), day, jourData);
+        await sendEmail(userEmail, subject, html);
+        await prisma.emailLog.create({ data: { userId: log.userId, type: `suivi_d${day}` } });
+        sent++;
+      } catch (e) {
+        console.error(`Suivi d${day} failed for ${userEmail}:`, e);
         errors++;
       }
     }

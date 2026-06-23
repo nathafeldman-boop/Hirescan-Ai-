@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
+import { emailPremiumWelcome, sendEmail } from '@/lib/emails';
+import { getSuivi } from '@/lib/suivi';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,6 +68,33 @@ export async function POST(req: NextRequest) {
           create: { email, tier: 'premium' },
           update: { tier: 'premium' },
         }).catch(() => {});
+      }
+
+      // ── Premium welcome email + suivi day 1 ──
+      const isPremiumPurchase =
+        email && (meta.annual === 'true' || session.mode === 'subscription' || meta.rapport === 'true' || (meta.oneTime === 'true' && !!meta.typeCode));
+      if (isPremiumPurchase && email) {
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true, name: true, mbtiType: true },
+          });
+          if (user) {
+            const alreadySent = await prisma.emailLog.findUnique({
+              where: { userId_type: { userId: user.id, type: 'premium_welcome' } },
+            });
+            if (!alreadySent) {
+              const typeCode = (meta.typeCode || user.mbtiType)?.toUpperCase() ?? null;
+              const suivi = typeCode ? getSuivi(typeCode) : null;
+              const jour1 = suivi?.jours[0] ?? null;
+              const { subject, html } = emailPremiumWelcome(user.name, typeCode, jour1);
+              await sendEmail(email, subject, html);
+              await prisma.emailLog.create({ data: { userId: user.id, type: 'premium_welcome' } });
+            }
+          }
+        } catch (e) {
+          console.error('Premium welcome email error:', e);
+        }
       }
 
       // ── Affiliate conversion tracking ──
