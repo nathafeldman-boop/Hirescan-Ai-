@@ -526,7 +526,12 @@ const TYPE_COUNTS: Record<string, number> = {
 // ─── Paywall email capture (abandon recovery) ───────────────────────────────────
 // For users not ready to pay: capture the email so we can send their welcome +
 // follow-up. POSTs to /api/save-email which fires a welcome email per new lead.
-function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
+// onCaptured: called with the email after save — parent can immediately offer checkout.
+function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
+  typeCode: string;
+  isFr: boolean;
+  onCaptured?: (email: string) => void;
+}) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'loading' | 'done'>('idle');
 
@@ -546,10 +551,18 @@ function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boole
 
   if (state === 'done') {
     return (
-      <div className="rounded-2xl p-4 mt-5 text-center" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-2xl mb-1">📩</p>
-        <p className="text-sm font-bold text-stone-800">{isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
-        <p className="text-xs text-stone-500 mt-0.5">{isFr ? 'Vérifie ta boîte — ton profil t\'attend.' : 'Check your inbox — your profile awaits.'}</p>
+      <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+        <p className="text-sm font-bold text-stone-800 mb-1">📩 {isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
+        <p className="text-xs text-stone-500 mb-3">
+          {isFr ? 'Vérifie ta boîte. Ou débloque tout de suite 👇' : 'Check your inbox. Or unlock right now 👇'}
+        </p>
+        <button
+          onClick={() => onCaptured?.(email.trim())}
+          className="w-full py-3 rounded-xl font-black text-white text-sm active:scale-[0.98] transition-all"
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 3px 14px rgba(169,78,24,0.32)' }}
+        >
+          {isFr ? `⚡ Débloquer mon profil ${typeCode} — 1,99 €` : `⚡ Unlock my ${typeCode} profile — €1.99`}
+        </button>
       </div>
     );
   }
@@ -578,7 +591,7 @@ function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boole
           className="px-4 py-2.5 rounded-lg font-bold text-white text-sm flex-shrink-0 disabled:opacity-60"
           style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
         >
-          {state === 'loading' ? '…' : isFr ? '→' : '→'}
+          {state === 'loading' ? '…' : '→'}
         </button>
       </form>
     </div>
@@ -808,8 +821,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInApp, typeCode]);
 
-  const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly') => {
-    diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
+  const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly', emailOverride?: string) => {
+    const email = emailOverride ?? userEmail;
+    diagLog(email ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
     track('checkout_click', {
       quiz: 'personnalite',
       value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
@@ -826,7 +840,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           origin: window.location.origin,
           quizSlug: 'personnalite',
           typeCode,
-          ...(userEmail ? { userEmail } : {}),
+          ...(email ? { userEmail: email } : {}),
           ...(checkoutType === 'annual' ? { annual: true } : {}),
           ...(checkoutType === 'onetime' ? { oneTime: true } : {}),
           ...(affiliateRef ? { affiliateRef } : {}),
@@ -1182,8 +1196,13 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <PaywallFAQ typeCode={typeCode} isFr={isFr} />
 
         {/* Abandon recovery — in-place email capture (works in TikTok webview too,
-            no Safari hop needed) → sends the targeted "profil prêt" email */}
-        <PaywallEmailCapture typeCode={typeCode} isFr={isFr} />
+            no Safari hop needed) → sends the targeted "profil prêt" email.
+            onCaptured: immediately offers 1,99€ checkout after email save (warm lead). */}
+        <PaywallEmailCapture
+          typeCode={typeCode}
+          isFr={isFr}
+          onCaptured={(capturedEmail) => doCheckout('onetime', capturedEmail)}
+        />
 
         {/* ── Share CTA — viral loop ──────────────────────────────────────── */}
         <ShareMyType typeCode={typeCode} isFr={isFr} />
