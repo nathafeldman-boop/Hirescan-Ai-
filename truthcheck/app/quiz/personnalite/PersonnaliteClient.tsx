@@ -124,7 +124,7 @@ function QuizScreen({ onComplete, questions, t }: {
   const MILESTONE_MSGS: Record<number, { emoji: string; title: string; sub: string }> = {
     25: { emoji: '🔥', title: 'Tu es dans le top 25 % !', sub: 'La plupart des gens s\'arrêtent avant toi. Continue — ton type se dessine.' },
     50: { emoji: '⚡', title: 'Ton profil prend forme...', sub: 'Le résultat révèle ta face cachée, ton schéma en amour et tes angles morts. Continue.' },
-    75: { emoji: '🔓', title: 'Ton type est presque déterminé !', sub: 'Profil complet + les quiz secrets (infidélité, amour, manipulation) à débloquer. Tu y es presque.' },
+    75: { emoji: '🔮', title: 'Ton type est presque là...', sub: 'Tu découvres dans quelques secondes. Et avec lui : pourquoi tu te comportes comme ça en amour et au travail.' },
   };
 
   useEffect(() => {
@@ -533,10 +533,10 @@ const TYPE_REVIEWS: Record<string, { name: string; age: number; quote: string }>
   INFP: { name: 'Emma', age: 22, quote: '"Tu te sens incompris même par ceux qui t\'aiment" — comment ils savent ça?' },
   ENFJ: { name: 'Camille', age: 26, quote: "Le chapitre sur le sacrifice de soi m'a obligée à mettre pause et à réfléchir." },
   ENFP: { name: 'Léa', age: 23, quote: 'Ma mère a lu le chapitre carrière et dit "enfin quelqu\'un qui t\'explique mieux que moi".' },
-  ISTJ: { name: 'Pierre', age: 34, quote: "Très factuel, très précis. La partie relations m'a surpris — je ne m'attendais pas à autant." },
+  ISTJ: { name: 'Pierre', age: 34, quote: "La section amour était inconfortable. Pas parce que c'était faux — exactement parce que c'était trop juste." },
   ISFJ: { name: 'Marie', age: 28, quote: '"Tu dis oui quand tu veux dire non" — j\'ai ri et pleuré en même temps. Exactement moi.' },
   ESTJ: { name: 'Nicolas', age: 32, quote: "La partie sur comment je suis perçu vs ce que je veux — ça explique tous mes conflits au travail." },
-  ESFJ: { name: 'Laura', age: 25, quote: "J'ai partagé la compatibilité avec mon copain. Ça a lancé une discussion de 2h." },
+  ESFJ: { name: 'Laura', age: 25, quote: "La partie \"Face cachée\" dit que je prends en charge les émotions de tout le monde sauf les miennes. J'ai dû m'arrêter." },
   ISTP: { name: 'Antoine', age: 27, quote: "Premier test perso qui ne me sonne pas creux. La section attachement est un peu trop vraie." },
   ISFP: { name: 'Chloé', age: 21, quote: "Je montrais jamais ce que je créais. Après le chapitre créativité — j'ai posté." },
   ESTP: { name: 'Kevin', age: 26, quote: "L'ennui en relation sécurisante... c'est exactement mon pattern. Je l'avais jamais nommé." },
