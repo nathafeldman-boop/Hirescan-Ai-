@@ -4,7 +4,7 @@ import { emailDay1, emailDay3, emailDay7, sendEmail } from '@/lib/emails';
 
 export const dynamic = 'force-dynamic';
 
-const SEQUENCES: { type: string; days: number; template: (name: string | null) => { subject: string; html: string } }[] = [
+const SEQUENCES: { type: string; days: number; template: (name: string | null, typeCode?: string | null) => { subject: string; html: string } }[] = [
   { type: 'day1', days: 1, template: emailDay1 },
   { type: 'day3', days: 3, template: emailDay3 },
   { type: 'day7', days: 7, template: emailDay7 },
@@ -39,13 +39,13 @@ export async function GET(req: NextRequest) {
         createdAt: { gte: windowStart, lte: windowEnd },
         emailLogs: { none: { type: seq.type } },
       },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, mbtiType: true },
     });
 
     for (const user of users) {
       if (!user.email) continue;
       try {
-        const { subject, html } = seq.template(user.name);
+        const { subject, html } = seq.template(user.name, user.mbtiType);
         await sendEmail(user.email, subject, html);
         await prisma.emailLog.create({ data: { userId: user.id, type: seq.type } });
         sent++;

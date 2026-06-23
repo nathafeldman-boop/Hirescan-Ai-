@@ -189,34 +189,62 @@ export default function TypeClient({ type }: Props) {
   return (
     <>
       {/* ── Teaser ── */}
-      <div className="mt-8 rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: type.accentColor }}>
-          Aperçu de ton profil
-        </p>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {localType.traits.slice(0, 3).map(trait => (
-            <span key={trait} className="px-3 py-1.5 rounded-full text-xs font-medium border"
-              style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
-              {trait}
-            </span>
+      <div className="mt-8 space-y-3">
+        {/* Free preview: traits + first sentence */}
+        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: type.accentColor }}>
+            {lang === 'en' ? 'Free preview' : 'Aperçu gratuit'}
+          </p>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {localType.traits.slice(0, 3).map(trait => (
+              <span key={trait} className="px-3 py-1.5 rounded-full text-xs font-medium border"
+                style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
+                {trait}
+              </span>
+            ))}
+          </div>
+          <p className="text-stone-200 text-sm leading-relaxed">
+            {localType.fullDesc.split(/(?<=[.!?])\s/)[0]}
+          </p>
+        </div>
+
+        {/* 4 locked chapters — show what's inside */}
+        <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.03)' }}>
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5"
+               style={{ background: `${type.accentColor}18` }}>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: type.accentColor }}>
+              {lang === 'en' ? `Full ${type.code} profile · 4 chapters` : `Profil ${type.code} complet · 4 chapitres`}
+            </p>
+            <span className="text-[10px] text-stone-500">🔒 verrouillé</span>
+          </div>
+          {(lang === 'en' ? [
+            { icon: '💕', title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that repeats...' },
+            { icon: '💼', title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage...' },
+            { icon: '🌑', title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that silently sabotages you — nobody dares to say it...' },
+            { icon: '🎯', title: 'Exact Compatibility', preview: 'The 3 types that truly get you — and the 2 profiles that always drain you...' },
+          ] : [
+            { icon: '💕', title: 'Amour & Relations', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète...' },
+            { icon: '💼', title: 'Carrière & Superpouvoir', preview: 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel...' },
+            { icon: '🌑', title: 'Face cachée & Angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face...' },
+            { icon: '🎯', title: 'Compatibilité exacte', preview: 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr...' },
+          ]).map((s, i, arr) => (
+            <div key={s.title} className={`flex items-center gap-3 px-4 py-3${i < arr.length - 1 ? ' border-b border-white/5' : ''}`}>
+              <span className="text-xl flex-shrink-0">{s.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-stone-300">{s.title}</p>
+                <p className="text-[11px] text-stone-500 leading-tight mt-0.5 blur-[4px] select-none pointer-events-none">{s.preview}</p>
+              </div>
+              <span className="text-stone-600 text-xs">🔒</span>
+            </div>
           ))}
         </div>
-        <p className="text-stone-200 text-sm leading-relaxed">
-          {localType.fullDesc.split(/(?<=[.!?])\s/)[0]}
-        </p>
-        <div className="relative mt-3 overflow-hidden" style={{ maxHeight: 54 }}>
-          <div style={{ filter: 'blur(5px)', userSelect: 'none', pointerEvents: 'none' }}>
-            <p className="text-stone-400 text-sm leading-relaxed">
-              {localType.fullDesc.split(/(?<=[.!?])\s/).slice(1, 4).join(' ')}
-            </p>
-          </div>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(9,9,11,0.97) 65%)' }} />
-        </div>
-        <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-white/8">
-          <svg className="w-3.5 h-3.5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <span className="text-[11px] text-stone-500">Rapport complet verrouillé — traits, amour, travail, forces…</span>
+
+        {/* Live social proof */}
+        <div className="flex items-center justify-center gap-2">
+          <span className="animate-pulse w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
+          <span className="text-[11px] text-stone-500">
+            {lang === 'en' ? `18 people viewing this profile right now` : `18 personnes consultent ce profil en ce moment`}
+          </span>
         </div>
       </div>
 

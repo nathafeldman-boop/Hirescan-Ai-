@@ -81,15 +81,19 @@ export function emailResultReady(name: string | null, typeCode: string) {
   };
 }
 
-export function emailDay1(name: string | null) {
+export function emailDay1(name: string | null, typeCode?: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quiz/personnalite`;
   return {
-    subject: `${firstName}, ton résultat t'attend encore 👀`,
+    subject: code
+      ? `${firstName}, ton profil ${code} t'attend encore 👀`
+      : `${firstName}, ton résultat t'attend encore 👀`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+1</p>
-      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Ton score est encore là…</h2>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${code ? `Ton profil ${code} est toujours là…` : 'Ton score est encore là…'}</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        Hier tu as commencé. Ton résultat est sauvegardé — mais la plupart des gens qui n'y reviennent pas dans 24h ne reviennent jamais.
+        Hier tu as passé le test. ${code ? `Tu es <strong style="color:#fff">${code}</strong> — et ton analyse complète t'attend :` : 'Ton résultat est sauvegardé —'} mais la plupart des gens qui n'y reviennent pas dans 24h ne reviennent jamais.
       </p>
       <div style="background:rgba(209,125,82,0.08);border:1px solid rgba(209,125,82,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
         <p style="margin:0;color:#d17d52;font-size:14px;font-style:italic;line-height:1.7">
@@ -98,68 +102,76 @@ export function emailDay1(name: string | null) {
         <p style="margin:8px 0 0;color:#52525b;font-size:12px">— Marie, 24 ans</p>
       </div>
       <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
-        Ton score exact + 10 points d'analyse détaillée = <strong style="color:#fff">1,99€</strong>. Une seule fois.
+        ${code ? `Ton profil ${code} complet (amour, carrière, face cachée) = ` : 'Ton score exact + 10 points d\'analyse détaillée = '}<strong style="color:#fff">1,99€</strong>. Une seule fois.
       </p>
-      ${cta('Voir mon résultat complet →', `${BASE}/quiz/personnalite`)}
-      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Paiement sécurisé · Accès immédiat · Anonyme</p>
+      ${cta(code ? `Voir mon profil ${code} →` : 'Voir mon résultat complet →', link)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Paiement sécurisé · Accès immédiat · Satisfait ou remboursé 7 jours</p>
     `),
   };
 }
 
-export function emailDay3(name: string | null) {
+export function emailDay3(name: string | null, typeCode?: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quizzes`;
   return {
-    subject: `${firstName}, 73% des gens avec ton profil ont été surpris 😳`,
+    subject: code
+      ? `${firstName}, ce que ton profil ${code} révèle sur ton schéma amoureux 😳`
+      : `${firstName}, 73% des gens avec ton profil ont été surpris 😳`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+3</p>
-      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Ce que ton résultat dit sur toi</h2>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${code ? `Ce que ton profil ${code} dit sur toi` : 'Ce que ton résultat dit sur toi'}</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
         73% des personnes qui lisent leur analyse complète disent que ça a changé leur façon de voir une situation dans leur vie.
       </p>
       <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
-        <p style="margin:0 0 12px;color:#c2611f;font-size:13px;font-weight:700">Ce que les gens découvrent :</p>
+        <p style="margin:0 0 12px;color:#c2611f;font-size:13px;font-weight:700">Ce que les gens découvrent dans leur profil ${code ?? 'MBTI'} :</p>
         <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.2">
-          <li>🧠 "Je comprends enfin pourquoi je réagis comme ça"</li>
-          <li>💔 "J'avais raison de me poser des questions"</li>
-          <li>🔥 "Ça m'a aidé à prendre la décision que j'évitais"</li>
-          <li>✨ "Je me suis reconnu(e) dans chaque ligne"</li>
+          <li>💕 Pourquoi tu te retrouves toujours dans le même schéma amoureux</li>
+          <li>🧠 Ce que tu fais sans le savoir qui te sabote au travail</li>
+          <li>🌑 Ta face cachée — celle que tu montres jamais</li>
+          <li>🎯 Les types exactement compatibles avec toi</li>
         </ul>
       </div>
       <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
         Ton analyse complète est encore disponible — <strong style="color:#fff">1,99€ une seule fois</strong>, accès à vie.
       </p>
-      ${cta('Lire mon analyse complète →', `${BASE}/quizzes`)}
-      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">+ accès à 15 quiz : infidélité, burnout, relations toxiques, amour…</p>
+      ${cta(code ? `Lire mon profil ${code} →` : 'Lire mon analyse complète →', link)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Paiement sécurisé · Satisfait ou remboursé 7 jours</p>
     `),
   };
 }
 
-export function emailDay7(name: string | null) {
+export function emailDay7(name: string | null, typeCode?: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quizzes`;
   return {
-    subject: `Dernier message, ${firstName} — ton résultat va expirer`,
+    subject: code
+      ? `Dernier message — ton profil ${code} expire dans 24h`
+      : `Dernier message, ${firstName} — ton résultat va expirer`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">J+7 · Dernier email</p>
-      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Ta chance de savoir la vérité</h2>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${code ? `Ton profil ${code} — dernière chance` : 'Ta chance de savoir la vérité'}</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        C'est le dernier email que je t'envoie. Dans 24h, ton analyse est archivée et tu devras tout refaire.
+        C'est le dernier email que je t'envoie. Dans 24h, ton analyse est archivée.
       </p>
       <div style="background:rgba(209,125,82,0.08);border:1px solid rgba(209,125,82,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
-        <p style="margin:0 0 4px;color:#d17d52;font-size:15px;font-weight:700">Ce que ${firstName} n'a pas encore vu :</p>
+        <p style="margin:0 0 4px;color:#d17d52;font-size:15px;font-weight:700">Ce que tu n'as pas encore vu${code ? ` sur ton profil ${code}` : ''} :</p>
         <ul style="margin:8px 0 0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2.1">
-          <li>Son score exact (pas juste une fourchette)</li>
-          <li>10 points d'analyse personnalisée</li>
-          <li>Ce que ses réponses révèlent sur sa situation</li>
-          <li>Les conseils concrets adaptés à son profil</li>
+          <li>💕 Ton schéma exact en amour — et pourquoi il se répète</li>
+          <li>💼 Ta carrière idéale selon ton type cognitif</li>
+          <li>🌑 Ta face cachée (celle que même tes proches ne voient pas)</li>
+          <li>🎯 Les types les plus compatibles avec toi — exactement</li>
         </ul>
       </div>
       <p style="margin:0 0 8px;color:#71717a;font-size:15px;line-height:1.7">
         Prix : <strong style="color:#fff">1,99€</strong> une seule fois. Moins qu'un café.
       </p>
       <p style="margin:0 0 24px;color:#52525b;font-size:13px;line-height:1.6">
-        Si tu préfères l'abonnement mensuel (9,99€/mois), tu as accès à tous les quiz + résultats à vie.
+        Ou accès illimité à tout UrCecret pour 9,99€/mois (résiliable en 1 clic).
       </p>
-      ${cta('Débloquer avant expiration →', `${BASE}/quizzes`)}
+      ${cta(code ? `Débloquer mon profil ${code} maintenant →` : 'Débloquer avant expiration →', link)}
       <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
         <p style="margin:0;color:#3f3f46;font-size:11px;text-align:center">Tu ne veux plus recevoir ces emails ? <a href="${BASE}/dashboard" style="color:#52525b">Se désabonner</a></p>
       </div>
