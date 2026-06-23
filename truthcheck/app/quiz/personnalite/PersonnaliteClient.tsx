@@ -1329,6 +1329,7 @@ export default function PersonnaliteClient() {
         window.history.replaceState(null, '', '/quiz/personnalite');
         setMbtiType(pending);
         setPhase('result');
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
       } else {
         try {
           const saved = localStorage.getItem('_mbti_pending');
@@ -1373,6 +1374,7 @@ export default function PersonnaliteClient() {
     }
     // Everyone (logged in free OR anonymous) sees the paywall directly
     setPhase('result');
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
   }, [answers, session, isPremium, router]);
 
   return (
