@@ -960,6 +960,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 {loading ? '…' : isFr ? '1,99 € →' : '€1.99 →'}
               </button>
             </div>
+            <p className="text-center text-[10px] mt-2" style={{ color: '#1f7a4d' }}>
+              {isFr ? '🛡️ Satisfait ou remboursé 7 jours — sans question' : '🛡️ 7-day money-back guarantee — no questions asked'}
+            </p>
           </div>
         )}
 
