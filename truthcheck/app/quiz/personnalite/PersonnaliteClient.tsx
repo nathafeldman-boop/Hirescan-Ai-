@@ -474,7 +474,13 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
     return () => clearInterval(id);
   }, []);
 
-  if (seconds <= 0) return null;
+  if (seconds <= 0) return (
+    <div className="flex items-center justify-center gap-1.5 mb-3">
+      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-black bg-red-50 border border-red-200 text-red-600">
+        🔥 {isFr ? 'Offre de lancement — prix réduit actif' : 'Launch offer — reduced price active'}
+      </span>
+    </div>
+  );
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = (seconds % 60).toString().padStart(2, '0');
@@ -889,6 +895,23 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </div>
           ) : null}
         </div>
+
+        {/* ─── Profile teaser — first lines of actual content, then fade out ── */}
+        {isFr && type?.fullDesc && (
+          <div className="rounded-2xl px-4 pt-4 pb-2 mb-3 relative overflow-hidden" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: '#a94e18' }}>
+              {`Aperçu de ton profil ${typeCode}`}
+            </p>
+            <p className="text-sm text-stone-700 leading-relaxed">
+              {type.fullDesc.slice(0, 130)}
+              <span className="text-stone-300 select-none pointer-events-none" style={{ filter: 'blur(4px)' }}>
+                {type.fullDesc.slice(130, 210)}…
+              </span>
+            </p>
+            <div className="absolute bottom-0 left-0 right-0 h-10"
+                 style={{ background: 'linear-gradient(to bottom, transparent, white)' }} />
+          </div>
+        )}
 
         {/* ─── 4 locked chapters — show what's inside to create desire ─────── */}
         <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '1px solid #e7e5e0', background: 'white' }}>
