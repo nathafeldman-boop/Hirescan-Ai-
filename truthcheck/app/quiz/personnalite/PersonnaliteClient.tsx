@@ -579,6 +579,129 @@ function PaywallEmailCapture({ typeCode, isFr }: { typeCode: string; isFr: boole
   );
 }
 
+// ─── FAQ — removes objections before they kill the sale ─────────────────────
+function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
+  const [open, setOpen] = useState<number | null>(null);
+
+  const items = isFr ? [
+    {
+      q: `C'est quoi exactement pour 1,99 €?`,
+      a: `Ton profil ${typeCode} complet en 4 chapitres : Amour & Relations, Carrière & Superpouvoir, Face cachée & Angles morts, Compatibilité exacte. Paiement unique — accès immédiat, à vie. Zéro abonnement.`,
+    },
+    {
+      q: `Est-ce un abonnement?`,
+      a: `Non. 1,99 € est un paiement unique, pas un abonnement. Tu paies une fois et tu gardes l'accès pour toujours. L'option mensuelle à 9,99 €/mois est un abonnement — résiliable en 1 clic depuis ton espace.`,
+    },
+    {
+      q: `Satisfait ou remboursé?`,
+      a: `Oui, 7 jours, aucune question posée. Envoie un email à support@urcecret.site et tu es remboursé(e) sous 24h.`,
+    },
+    {
+      q: `Mes données sont-elles protégées?`,
+      a: `Le paiement est traité à 100 % par Stripe — nous ne stockons aucune donnée bancaire. Tes réponses au quiz restent strictement anonymes.`,
+    },
+  ] : [
+    {
+      q: `What exactly do I get for €1.99?`,
+      a: `Your complete ${typeCode} profile in 4 chapters: Love & Relationships, Career & Superpower, Shadow Side & Blind Spots, Exact Compatibility. One-time payment — instant, lifetime access. Zero subscription.`,
+    },
+    {
+      q: `Is it a subscription?`,
+      a: `No. €1.99 is a one-time payment, not a subscription. Pay once, keep access forever. The €9.99/month option is a subscription — cancel in 1 click anytime.`,
+    },
+    {
+      q: `Money-back guarantee?`,
+      a: `Yes, 7 days, no questions asked. Email support@urcecret.site and you'll be refunded within 24h.`,
+    },
+    {
+      q: `Is my data protected?`,
+      a: `Payment is 100% processed by Stripe — we never store card data. Your quiz answers remain strictly anonymous.`,
+    },
+  ];
+
+  return (
+    <div className="mt-6">
+      <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center">
+        {isFr ? 'Questions fréquentes' : 'FAQ'}
+      </p>
+      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid #e7e5e0', background: 'white' }}>
+        {items.map((item, i) => (
+          <div key={i} className={i < items.length - 1 ? 'border-b border-stone-100' : ''}>
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              className="w-full text-left px-4 py-3.5 flex items-center justify-between gap-3"
+            >
+              <p className="text-xs font-bold text-stone-800 leading-snug">{item.q}</p>
+              <span
+                className="flex-shrink-0 text-stone-400 text-sm"
+                style={{ display: 'inline-block', transition: 'transform 0.2s', transform: open === i ? 'rotate(180deg)' : 'none' }}
+              >
+                ▾
+              </span>
+            </button>
+            {open === i && (
+              <div className="px-4 pb-4 -mt-1">
+                <p className="text-[12px] text-stone-600 leading-relaxed">{item.a}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Exit intent modal (mobile back button) ───────────────────────────────────
+function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
+  typeCode: string;
+  isFr: boolean;
+  onCheckout: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-end justify-center"
+      style={{ background: 'rgba(0,0,0,0.62)', backdropFilter: 'blur(4px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm rounded-t-3xl px-5 pt-6 pb-10"
+        style={{ background: '#faf9f7', animation: 'exitModalUp 0.32s cubic-bezier(0.22,1,0.36,1)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <style>{`@keyframes exitModalUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
+        <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+        <div className="text-center mb-5">
+          <div className="text-5xl mb-3">⏰</div>
+          <h3 className="text-xl font-black text-stone-900 leading-tight mb-2">
+            {isFr
+              ? `Ton profil ${typeCode} s'efface dans 24h`
+              : `Your ${typeCode} profile expires in 24h`}
+          </h3>
+          <p className="text-sm text-stone-500 leading-snug">
+            {isFr
+              ? `Une fois parti(e), ton profil ${typeCode} sera archivé. Débloque-le maintenant — une fois, pour toujours.`
+              : `Once you leave, your ${typeCode} profile gets archived. Unlock it now — once, forever.`}
+          </p>
+        </div>
+        <button
+          onClick={() => { onClose(); onCheckout(); }}
+          className="w-full py-4 rounded-2xl font-black text-white text-sm mb-3 active:scale-[0.98] transition-all"
+          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 24px rgba(169,78,24,0.4)' }}
+        >
+          {isFr ? `⚡ Débloquer maintenant — 1,99 €` : `⚡ Unlock now — €1.99`}
+        </button>
+        <button
+          onClick={onClose}
+          className="w-full py-2.5 text-xs text-stone-400 text-center active:opacity-70"
+        >
+          {isFr ? 'Non merci, je préfère partir' : "No thanks, I'll leave"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Share my type — viral loop ────────────────────────────────────────────
 function ShareMyType({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
   const [copied, setCopied] = useState(false);
@@ -627,12 +750,30 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const [inAppPayUrl, setInAppPayUrl] = useState<string | null>(null);
   const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
   const [stickyBar, setStickyBar] = useState(false);
+  const [exitModal, setExitModal] = useState(false);
+  const exitShown = useRef(false);
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
     const t = setTimeout(() => setStickyBar(true), 15000);
     return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Intercept browser back button — show exit intent modal instead of navigating away.
+  // Pushes a fake history entry on mount so the first back press triggers our handler.
+  useEffect(() => {
+    window.history.pushState({ paywall: true }, '');
+    const onPop = () => {
+      if (!exitShown.current) {
+        exitShown.current = true;
+        setExitModal(true);
+        window.history.pushState({ paywall: true }, '');
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -697,6 +838,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: '#faf9f7' }}>
       <SocialProofToast />
+      {exitModal && (
+        <ExitIntentModal
+          typeCode={typeCode}
+          isFr={isFr}
+          onCheckout={() => doCheckout('onetime')}
+          onClose={() => setExitModal(false)}
+        />
+      )}
       <div className="w-full max-w-sm">
 
         {/* ─── Hero: type revealed for free — trust + curiosity gap ─────────── */}
@@ -805,6 +954,30 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <p className="text-center text-[11px] text-stone-400 mt-2">
               {isFr ? "S'ouvre dans Safari · Google ou email 🔓" : 'Opens in Safari · Google or email 🔓'}
             </p>
+          </div>
+        )}
+
+        {/* ── Quick-entry CTA — 1,99€ first visible button (fastest path to pay) ── */}
+        {!isInApp && (
+          <div className="rounded-2xl px-4 py-3.5 mb-0 mt-4" style={{ background: 'rgba(169,78,24,0.05)', border: '1.5px solid rgba(169,78,24,0.3)' }}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-stone-900 leading-snug">
+                  {isFr ? `⚡ Juste mon profil ${typeCode}` : `⚡ Just my ${typeCode} profile`}
+                </p>
+                <p className="text-[11px] text-stone-500 mt-0.5">
+                  {isFr ? 'Paiement unique · pas d\'abonnement · accès à vie' : 'One-time · no subscription · lifetime access'}
+                </p>
+              </div>
+              <button
+                onClick={() => doCheckout('onetime')}
+                disabled={loading}
+                className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-sm transition-all active:scale-[0.97] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: 'white', boxShadow: '0 3px 12px rgba(169,78,24,0.3)', whiteSpace: 'nowrap' }}
+              >
+                {loading ? '…' : isFr ? '1,99 € →' : '€1.99 →'}
+              </button>
+            </div>
           </div>
         )}
 
@@ -981,6 +1154,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </div>
           ))}
         </div>
+
+        {/* FAQ — pre-empts the top objections (subscription fear, refund policy) */}
+        <PaywallFAQ typeCode={typeCode} isFr={isFr} />
 
         {/* Abandon recovery — in-place email capture (works in TikTok webview too,
             no Safari hop needed) → sends the targeted "profil prêt" email */}

@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { prisma } from '@/lib/db';
 import { mbtiTypes } from '@/lib/mbti';
 import SuccessTracker from './SuccessTracker';
+import SuccessUpsellButton from './SuccessUpsellButton';
 
 async function verifyAndUnlock(sessionId: string | undefined, resultId: string | undefined, typeCode: string | undefined) {
   if (!sessionId || !process.env.STRIPE_SECRET_KEY) return { paid: false, email: null as string | null, affiliateSlug: null as string | null, isOneTime: false };
@@ -386,13 +387,7 @@ export default async function SuccessPage({
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href={`/quiz/personnalite?pending=${typeCode}&intent=upgrade`}
-                  className="block w-full py-3.5 rounded-xl font-black text-white text-sm text-center transition-all hover:opacity-95 active:scale-[0.98]"
-                  style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
-                >
-                  Passer à l&apos;accès complet — 9,99 €/mois →
-                </Link>
+                <SuccessUpsellButton typeCode={typeCode} email={email} />
                 <p className="text-center text-[10px] text-stone-400 mt-2">Apple Pay · Google Pay · Résiliable en 1 clic</p>
               </div>
             )}
