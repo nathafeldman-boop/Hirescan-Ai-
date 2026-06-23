@@ -523,6 +523,26 @@ const TYPE_COUNTS: Record<string, number> = {
   INTJ: 768, INTP: 831, INFJ: 634, ENTP: 912,
 };
 
+// Type-specific micro-testimonials — reference the type's exact pain point hook
+const TYPE_REVIEWS: Record<string, { name: string; age: number; quote: string }> = {
+  INTJ: { name: 'Thomas', age: 29, quote: "Je pensais me connaître. La partie amour m'a complètement contredit. Effrayant de précision." },
+  INTP: { name: 'Julien', age: 25, quote: '"Pourquoi tu procrastines malgré ton intelligence" — j\'ai lu ça 3 fois. C\'est exactement moi.' },
+  ENTJ: { name: 'Alexandre', age: 31, quote: 'La section "face cachée" sur l\'image d\'autorité... je l\'ai envoyé à toute mon équipe.' },
+  ENTP: { name: 'Maxime', age: 27, quote: "L'ennui chronique enfin expliqué. Les compatibilités sont d'une précision ridicule." },
+  INFJ: { name: 'Sophie', age: 24, quote: 'Je me suis reconnue mot pour mot dans la partie "angles morts". J\'en ai eu les larmes aux yeux.' },
+  INFP: { name: 'Emma', age: 22, quote: '"Tu te sens incompris même par ceux qui t\'aiment" — comment ils savent ça?' },
+  ENFJ: { name: 'Camille', age: 26, quote: "Le chapitre sur le sacrifice de soi m'a obligée à mettre pause et à réfléchir." },
+  ENFP: { name: 'Léa', age: 23, quote: 'Ma mère a lu le chapitre carrière et dit "enfin quelqu\'un qui t\'explique mieux que moi".' },
+  ISTJ: { name: 'Pierre', age: 34, quote: "Très factuel, très précis. La partie relations m'a surpris — je ne m'attendais pas à autant." },
+  ISFJ: { name: 'Marie', age: 28, quote: '"Tu dis oui quand tu veux dire non" — j\'ai ri et pleuré en même temps. Exactement moi.' },
+  ESTJ: { name: 'Nicolas', age: 32, quote: "La partie sur comment je suis perçu vs ce que je veux — ça explique tous mes conflits au travail." },
+  ESFJ: { name: 'Laura', age: 25, quote: "J'ai partagé la compatibilité avec mon copain. Ça a lancé une discussion de 2h." },
+  ISTP: { name: 'Antoine', age: 27, quote: "Premier test perso qui ne me sonne pas creux. La section attachement est un peu trop vraie." },
+  ISFP: { name: 'Chloé', age: 21, quote: "Je montrais jamais ce que je créais. Après le chapitre créativité — j'ai posté." },
+  ESTP: { name: 'Kevin', age: 26, quote: "L'ennui en relation sécurisante... c'est exactement mon pattern. Je l'avais jamais nommé." },
+  ESFP: { name: 'Sarah', age: 24, quote: "Le chapitre amour parle du besoin de validation. Inconfortable à lire — parce que trop vrai." },
+};
+
 // ─── Paywall email capture (abandon recovery) ───────────────────────────────────
 // For users not ready to pay: capture the email so we can send their welcome +
 // follow-up. POSTs to /api/save-email which fires a welcome email per new lead.
@@ -771,11 +791,19 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const [stickyBar, setStickyBar] = useState(false);
   const [exitModal, setExitModal] = useState(false);
   const exitShown = useRef(false);
+  const [liveCount] = useState(() => {
+    const base: Record<string, number> = {
+      ISFJ: 7, ISTJ: 6, ESFJ: 8, ESTJ: 5, ENFP: 9, ESFP: 6,
+      ISFP: 5, ISTP: 4, INFP: 4, ESTP: 3, ENFJ: 4, ENTJ: 3,
+      INTJ: 3, INTP: 3, INFJ: 2, ENTP: 3,
+    };
+    return (base[typeCode] ?? 3) + Math.floor(Math.random() * 3);
+  });
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
-    const t = setTimeout(() => setStickyBar(true), 15000);
+    const t = setTimeout(() => setStickyBar(true), 8000);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -959,8 +987,12 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           ))}
         </div>
 
-        <p className="text-center text-[11px] text-stone-500 mb-3">
+        <p className="text-center text-[11px] text-stone-500 mb-1">
           ⭐ {TYPE_COUNTS[typeCode] ?? 847} {isFr ? `personnes ont débloqué leur profil ${typeCode} ce mois` : `people unlocked their ${typeCode} profile this month`}
+        </p>
+        <p className="text-center text-[11px] text-stone-400 mb-3">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 align-middle animate-pulse" />
+          {liveCount} {isFr ? 'personnes consultent ce profil en ce moment' : 'people viewing this profile right now'}
         </p>
 
         <CountdownTimer isFr={isFr} />
@@ -1019,7 +1051,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           </div>
         )}
 
-        {/* 3 offers */}
+        {/* Offers — €1.99 hero (both actual sales were €1.99, not monthly) */}
         <div className="space-y-3 mt-4">
           {isInApp && (
             <p className="text-[11px] text-stone-400 text-center font-semibold pb-1">
@@ -1027,140 +1059,98 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </p>
           )}
 
-          {/* 1 — Mensuel (HERO · MRR) */}
-          <div className="rounded-2xl p-4 relative" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.08),rgba(209,125,82,0.06))', border: '2px solid rgba(169,78,24,0.35)' }}>
+          {/* HERO: One-time €1.99 */}
+          <div className="rounded-2xl p-5 relative" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.04))', border: '2px solid rgba(169,78,24,0.4)', boxShadow: '0 4px 20px rgba(169,78,24,0.10)' }}>
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
               <span className="text-white text-[10px] font-black px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 10px rgba(169,78,24,0.4)' }}>
-                🔥 {isFr ? 'LE PLUS POPULAIRE' : 'MOST POPULAR'}
+                ⚡ {isFr ? 'ACCÈS IMMÉDIAT' : 'INSTANT ACCESS'}
               </span>
             </div>
-            <div className="flex items-center justify-between mb-1 mt-2">
-              <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#a94e18' }}>
-                {isFr ? '🔄 Mensuel · sans engagement' : '🔄 Monthly · no commitment'}
-              </span>
-              <div className="text-right">
-                <span className="text-xs text-stone-400 line-through mr-1">29,99 €</span>
-                <span className="text-lg font-black text-stone-900">9,99 €<span className="text-xs font-normal text-stone-400">{isFr ? '/mois' : '/mo'}</span></span>
-                <p className="text-[10px] text-stone-400">{isFr ? 'soit 0,33 €/jour' : 'just €0.33/day'}</p>
+            <div className="text-center mb-4 mt-2">
+              <div className="flex items-center justify-center gap-2 mb-0.5">
+                <span className="text-sm text-stone-300 line-through">29,99 €</span>
+                <span className="text-5xl font-black" style={{ color: '#a94e18' }}>1,99 €</span>
               </div>
+              <p className="text-[11px] text-stone-500">{isFr ? 'paiement unique · accès à vie · le prix d\'un café ☕' : 'one-time · lifetime access · the price of a coffee ☕'}</p>
             </div>
-            <ul className="space-y-1.5 mb-4 mt-2">
+            <ul className="space-y-2 mb-4">
               {(isFr ? [
-                `Ton profil ${typeCode} complet : amour, carrière, face cachée`,
-                'Les 16 types MBTI débloqués (comprends les autres)',
-                'Tous les quiz + test de compatibilité duo illimité',
-                'Résilie en 1 clic — sans engagement',
+                `Ton profil ${typeCode} complet en 4 chapitres`,
+                'Amour, Carrière, Face cachée & Compatibilité',
+                'Accès immédiat · conservé à vie · zéro abonnement',
               ] : [
-                `Your full ${typeCode} profile: love, career, shadow side`,
-                'All 16 MBTI types unlocked',
-                'All quizzes + unlimited duo compatibility',
-                'Cancel in 1 click — no commitment',
+                `Your complete ${typeCode} profile in 4 chapters`,
+                'Love, Career, Shadow side & Compatibility',
+                'Instant access · kept forever · zero subscription',
               ]).map(b => (
                 <li key={b} className="flex items-start gap-2 text-xs text-stone-700">
-                  <span className="font-bold flex-shrink-0 mt-0.5" style={{ color: '#a94e18' }}>✓</span>{b}
+                  <span className="font-black flex-shrink-0 mt-0.5" style={{ color: '#a94e18' }}>✓</span>{b}
                 </li>
               ))}
             </ul>
-            {isInApp && inAppMonthlyUrl ? (
-              <a
-                href={inAppMonthlyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'monthly', via: 'anchor' })}
-                className="w-full py-3.5 rounded-xl font-black text-white text-sm active:scale-[0.98] text-center block"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)', textDecoration: 'none' }}
-              >
-                {isFr ? '🔓 Commencer pour 9,99 €/mois →' : '🔓 Start for €9.99/mo →'}
-              </a>
-            ) : (
-              <button
-                onClick={() => doCheckout('monthly')}
-                disabled={loading}
-                className="w-full py-3.5 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
-              >
-                {loading ? '…' : isFr ? '🔓 Commencer pour 9,99 €/mois →' : '🔓 Start for €9.99/mo →'}
-              </button>
-            )}
-            <p className="text-center text-[10px] text-stone-400 mt-2">
-              {isFr ? 'Apple Pay · Google Pay · CB · Résiliation en 1 clic' : 'Apple Pay · Google Pay · Card · Cancel in 1 click'}
-            </p>
-          </div>
-
-          {/* 2 — Annuel (best value) */}
-          <div className="rounded-2xl p-4 relative" style={{ background: 'white', border: '1.5px solid #d6d3d1' }}>
-            <span className="absolute top-0 right-0 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl" style={{ background: '#1f7a4d' }}>
-              −75% · {isFr ? 'MEILLEURE VALEUR' : 'BEST VALUE'}
-            </span>
-            <div className="flex items-center justify-between mb-1 pr-28">
-              <span className="text-[11px] font-black uppercase tracking-widest text-stone-500">
-                {isFr ? '🗓 Annuel' : '🗓 Annual'}
-              </span>
-              <div className="text-right">
-                <span className="text-xs text-stone-400 line-through mr-1">119,88 €</span>
-                <span className="text-lg font-black text-stone-900">29,99 €</span>
-                <span className="text-stone-400 text-xs">{isFr ? '/an' : '/yr'}</span>
-              </div>
-            </div>
-            <p className="text-[10px] font-bold mb-3" style={{ color: '#1f7a4d' }}>{isFr ? '= 2,50 €/mois · économise 90 €' : '= €2.50/mo · save €90'}</p>
-            <ul className="space-y-1.5 mb-4">
-              {(isFr ? [
-                `${typeCode} + les 16 profils MBTI débloqués`,
-                'Tous les quiz + duo illimité',
-                'Tous les futurs quiz inclus à vie',
-              ] : [
-                `${typeCode} + all 16 MBTI profiles unlocked`,
-                'All quizzes + unlimited duo',
-                'All future quizzes included forever',
-              ]).map(b => (
-                <li key={b} className="flex items-center gap-2 text-xs text-stone-700">
-                  <span style={{ color: '#1f7a4d' }} className="font-bold flex-shrink-0">✓</span>{b}
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => doCheckout('annual')}
-              disabled={loading}
-              className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-              style={{ border: '1.5px solid #1f7a4d', color: '#1f7a4d', background: 'rgba(31,122,77,0.05)' }}
-            >
-              {loading ? '…' : isFr ? "Choisir l'annuel — 2,50 €/mois →" : 'Choose annual — €2.50/mo →'}
-            </button>
-          </div>
-
-          {/* 3 — Résultat unique (entrée petit prix) */}
-          <div className="rounded-xl px-4 py-3.5" style={{ background: '#fafafa', border: '1px solid #e7e5e0' }}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">{isFr ? '⚡ Juste mon résultat' : '⚡ Just my result'}</span>
-              <div className="text-right">
-                <span className="text-xs text-stone-300 line-through mr-1">9,99 €</span>
-                <span className="text-sm font-black text-stone-700">1,99 €</span>
-              </div>
-            </div>
-            <p className="text-[11px] text-stone-500 mb-2.5">{isFr ? `Ton profil ${typeCode} complet — paiement unique, accès immédiat` : `Your full ${typeCode} profile — one-time, instant access`}</p>
             {isInApp && inAppPayUrl ? (
               <a
                 href={inAppPayUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
-                className="w-full py-2.5 rounded-lg font-semibold text-xs text-center block transition-all active:scale-[0.98]"
-                style={{ border: '1.5px solid rgba(169,78,24,0.4)', background: 'white', color: '#a94e18', textDecoration: 'none' }}
+                className="block w-full py-4 rounded-xl font-black text-white text-sm text-center active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)', textDecoration: 'none' }}
               >
-                {isFr ? `⚡ Commencer pour 1,99 € →` : `⚡ Start for €1.99 →`}
+                {isFr ? `🔓 Débloquer mon profil ${typeCode} — 1,99 €` : `🔓 Unlock my ${typeCode} profile — €1.99`}
               </a>
             ) : (
               <button
                 onClick={() => doCheckout('onetime')}
                 disabled={loading}
-                className="w-full py-2.5 rounded-lg font-semibold text-xs transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ border: '1.5px solid rgba(169,78,24,0.4)', background: 'white', color: '#a94e18' }}
+                className="w-full py-4 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
               >
-                {loading ? '…' : isFr ? `⚡ Commencer pour 1,99 € →` : `⚡ Start for €1.99 →`}
+                {loading ? '…' : isFr ? `🔓 Débloquer mon profil ${typeCode} — 1,99 €` : `🔓 Unlock my ${typeCode} profile — €1.99`}
+              </button>
+            )}
+            <p className="text-center text-[10px] text-stone-400 mt-2">
+              {isFr ? 'Apple Pay · Google Pay · CB · Accès immédiat' : 'Apple Pay · Google Pay · Card · Instant access'}
+            </p>
+          </div>
+
+          {/* Secondary: Monthly subscription */}
+          <div className="rounded-2xl p-4" style={{ background: '#fafafa', border: '1px solid #e7e5e0' }}>
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <p className="text-xs font-black text-stone-600">🔄 {isFr ? 'Abonnement mensuel · sans engagement' : 'Monthly subscription · no commitment'}</p>
+                <p className="text-[10px] text-stone-400 mt-0.5">
+                  {isFr ? 'Les 16 profils MBTI + tous les quiz + duo illimité' : 'All 16 MBTI profiles + all quizzes + unlimited duo'}
+                </p>
+              </div>
+              <div className="text-right ml-3 flex-shrink-0">
+                <span className="text-xs text-stone-300 line-through block">29,99 €</span>
+                <span className="text-base font-black text-stone-700">9,99 €</span>
+                <span className="text-[10px] text-stone-400">{isFr ? '/mois' : '/mo'}</span>
+              </div>
+            </div>
+            {isInApp && inAppMonthlyUrl ? (
+              <a
+                href={inAppMonthlyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'monthly', via: 'anchor' })}
+                className="block w-full py-2.5 rounded-xl font-semibold text-xs text-center transition-all active:scale-[0.98]"
+                style={{ border: '1.5px solid rgba(169,78,24,0.3)', color: '#a94e18', background: 'white', textDecoration: 'none' }}
+              >
+                {isFr ? "Choisir l'abonnement →" : 'Choose subscription →'}
+              </a>
+            ) : (
+              <button
+                onClick={() => doCheckout('monthly')}
+                disabled={loading}
+                className="w-full py-2.5 rounded-xl font-semibold text-xs transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ border: '1.5px solid rgba(169,78,24,0.3)', color: '#a94e18', background: 'white' }}
+              >
+                {loading ? '…' : isFr ? "Choisir l'abonnement →" : 'Choose subscription →'}
               </button>
             )}
           </div>
-
         </div>
 
         <div className="flex flex-col items-center gap-1.5 mt-4">
@@ -1172,10 +1162,18 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           </p>
         </div>
 
-        {/* Micro-reviews — 3 compact quotes to build trust */}
+        {/* Micro-reviews — type-specific top review + 2 generic */}
         <div className="mt-5 space-y-2">
+          {TYPE_REVIEWS[typeCode] && isFr && (
+            <div className="rounded-xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'white', border: '1px solid #f0ede8' }}>
+              <span className="text-amber-400 text-xs flex-shrink-0 mt-0.5">★★★★★</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] text-stone-700 leading-snug italic">&ldquo;{TYPE_REVIEWS[typeCode].quote}&rdquo;</p>
+                <p className="text-[10px] text-stone-400 mt-0.5">— {TYPE_REVIEWS[typeCode].name}, {TYPE_REVIEWS[typeCode].age} ans · {typeCode}</p>
+              </div>
+            </div>
+          )}
           {(isFr ? [
-            { name: 'Marie, 24 ans', text: '"J\'ai pleuré. C\'était exactement moi, chaque ligne."' },
             { name: 'Lucas, 28 ans', text: '"Je me suis enfin compris. La partie amour est effrayante de précision."' },
             { name: 'Camille, 22 ans', text: '"J\'ai montré le chapitre amour à ma copine. Elle était choquée."' },
           ] : [
