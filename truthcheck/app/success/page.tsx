@@ -70,25 +70,36 @@ async function sendMagicLink(email: string, callbackUrl: string): Promise<boolea
     const resendKey = process.env.RESEND_API_KEY;
     if (!resendKey) return false;
 
+    const typeLabel = callbackUrl.includes('/types/') ? callbackUrl.split('/types/')[1]?.toUpperCase()?.split('?')[0] : null;
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'UrCecret <noreply@urcecret.site>',
         to: email,
-        subject: 'Ton accès UrCecret est prêt',
+        subject: typeLabel ? `✅ Ton profil ${typeLabel} est débloqué — accède-y ici` : '✅ Ton accès UrCecret est prêt',
         html: `
-          <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 16px;background:#ffffff;">
-            <h1 style="font-size:24px;font-weight:900;color:#111827;margin-bottom:8px;">Paiement confirmé !</h1>
-            <p style="color:#6b7280;font-size:15px;line-height:1.6;margin-bottom:24px;">
-              Ton accès premium UrCecret est actif. Clique ci-dessous pour voir ton profil complet.
+          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:32px 16px;background:#0d0d0d;">
+            <h1 style="font-size:11px;font-weight:800;color:#a94e18;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 20px">UrCecret</h1>
+            <h2 style="font-size:22px;font-weight:900;color:#ffffff;margin:0 0 12px;line-height:1.3">
+              ${typeLabel ? `Ton profil ${typeLabel} est débloqué 🔓` : 'Ton accès est prêt 🔓'}
+            </h2>
+            <p style="color:#71717a;font-size:15px;line-height:1.7;margin:0 0 24px">
+              ${typeLabel ? `Ton analyse complète ${typeLabel} — amour, carrière, face cachée, compatibilité — t'attend. Clique pour y accéder maintenant.` : 'Ton accès UrCecret Premium est actif. Clique ci-dessous pour accéder à ton profil.'}
             </p>
-            <a href="${magicUrl}"
-              style="display:inline-block;padding:16px 32px;background:#111827;color:#ffffff;font-weight:700;text-decoration:none;border-radius:12px;font-size:15px;">
-              Accéder à mon profil →
-            </a>
-            <p style="color:#9ca3af;font-size:12px;margin-top:24px;">
-              Ce lien est valable 24 heures. Si tu ne l'as pas demandé, ignore cet email.
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr><td align="center" style="padding:0 0 24px">
+                <a href="${magicUrl}"
+                  style="display:inline-block;padding:16px 36px;background:linear-gradient(135deg,#a94e18,#d17d52);color:#fff;font-weight:700;text-decoration:none;border-radius:12px;font-size:15px">
+                  ${typeLabel ? `Voir mon profil ${typeLabel} →` : 'Accéder à mon profil →'}
+                </a>
+              </td></tr>
+            </table>
+            <p style="color:#52525b;font-size:12px;margin:0 0 8px;text-align:center">
+              Paiement sécurisé par Stripe · Satisfait ou remboursé 7 jours
+            </p>
+            <p style="color:#3f3f46;font-size:11px;margin:0;text-align:center">
+              Ce lien est valable 24 heures.
             </p>
           </div>
         `,
@@ -352,23 +363,37 @@ export default async function SuccessPage({
 
             {/* Upsell one-time → monthly (drive MRR) */}
             {paid && isOneTime && typeCode && (
-              <div className="rounded-2xl p-4 text-left mt-1" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.05))', border: '1.5px solid rgba(169,78,24,0.3)' }}>
-                <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#a94e18' }}>Envie d&apos;aller plus loin&nbsp;?</p>
-                <p className="text-sm font-bold text-stone-900 mb-2 leading-snug">Débloque les 16 types + tous les quiz secrets pour 9,99&nbsp;€/mois</p>
-                <ul className="space-y-1 mb-3">
-                  {['💔 Ton/ta partenaire te trompe ?', '❤️ Suis-je vraiment amoureux·se ?', '🤝 Sont-ils de vrais amis ?', '🎭 Suis-je manipulé(e) ?'].map(q => (
-                    <li key={q} className="flex items-center gap-2 text-xs text-stone-600">
-                      <span className="font-bold" style={{ color: '#a94e18' }}>✓</span>{q}
+              <div className="rounded-2xl p-5 text-left mt-1" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.09),rgba(209,125,82,0.06))', border: '2px solid rgba(169,78,24,0.35)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#a94e18' }}>Profite de ta lancée 🔥</p>
+                  <span className="text-[10px] text-white font-black px-2 py-0.5 rounded-full" style={{ background: '#a94e18' }}>Offre unique</span>
+                </div>
+                <p className="text-sm font-black text-stone-900 mb-1 leading-snug">
+                  Tu viens de voir ton profil {typeCode}. Et les autres types qui te rendent fou·folle ?
+                </p>
+                <p className="text-xs text-stone-500 mb-3 leading-snug">
+                  Avec l&apos;accès complet, tu vois aussi leurs profils — et tu comprends enfin pourquoi vous vous comprenez (ou pas).
+                </p>
+                <ul className="space-y-1.5 mb-4">
+                  {[
+                    `Les 15 autres types MBTI débloqués (dont celui de tes proches)`,
+                    '💕 Quiz amour, infidélité, compatibilité — réponses honnêtes',
+                    '🎭 Test de manipulation · 🤝 Vrais amis · 💔 Relation toxique',
+                    'Résiliable en 1 clic — aucun engagement',
+                  ].map(q => (
+                    <li key={q} className="flex items-start gap-2 text-xs text-stone-700">
+                      <span className="font-bold flex-shrink-0 mt-0.5" style={{ color: '#a94e18' }}>✓</span>{q}
                     </li>
                   ))}
                 </ul>
                 <Link
                   href={`/quiz/personnalite?pending=${typeCode}&intent=upgrade`}
-                  className="block w-full py-3 rounded-xl font-black text-white text-xs text-center transition-all"
-                  style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 16px rgba(169,78,24,0.3)' }}
+                  className="block w-full py-3.5 rounded-xl font-black text-white text-sm text-center transition-all hover:opacity-95 active:scale-[0.98]"
+                  style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
                 >
                   Passer à l&apos;accès complet — 9,99 €/mois →
                 </Link>
+                <p className="text-center text-[10px] text-stone-400 mt-2">Apple Pay · Google Pay · Résiliable en 1 clic</p>
               </div>
             )}
           </div>
