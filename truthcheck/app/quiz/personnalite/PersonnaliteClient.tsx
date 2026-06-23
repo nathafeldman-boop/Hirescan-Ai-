@@ -939,6 +939,30 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           ) : null}
         </div>
 
+        {/* ─── Quick-entry CTA — immediately below hook, above the fold on mobile ── */}
+        {!isInApp && (
+          <div className="rounded-2xl px-4 py-3.5 mb-4" style={{ background: 'rgba(169,78,24,0.05)', border: '1.5px solid rgba(169,78,24,0.3)' }}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-stone-900 leading-snug">
+                  {isFr ? `⚡ Juste mon profil ${typeCode}` : `⚡ Just my ${typeCode} profile`}
+                </p>
+                <p className="text-[11px] text-stone-500 mt-0.5">
+                  {isFr ? 'Paiement unique · pas d\'abonnement · accès à vie' : 'One-time · no subscription · lifetime access'}
+                </p>
+              </div>
+              <button
+                onClick={() => doCheckout('onetime')}
+                disabled={loading}
+                className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-sm transition-all active:scale-[0.97] disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: 'white', boxShadow: '0 3px 12px rgba(169,78,24,0.3)', whiteSpace: 'nowrap' }}
+              >
+                {loading ? '…' : isFr ? '1,99 € →' : '€1.99 →'}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* ─── Profile teaser — first lines of actual content, then fade out ── */}
         {isFr && type?.fullDesc && (
           <div className="rounded-2xl px-4 pt-4 pb-2 mb-3 relative overflow-hidden" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
@@ -1024,30 +1048,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <p className="text-center text-[11px] text-stone-400 mt-2">
               {isFr ? "S'ouvre dans Safari · Google ou email 🔓" : 'Opens in Safari · Google or email 🔓'}
             </p>
-          </div>
-        )}
-
-        {/* ── Quick-entry CTA — 1,99€ first visible button (fastest path to pay) ── */}
-        {!isInApp && (
-          <div className="rounded-2xl px-4 py-3.5 mb-0 mt-4" style={{ background: 'rgba(169,78,24,0.05)', border: '1.5px solid rgba(169,78,24,0.3)' }}>
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-stone-900 leading-snug">
-                  {isFr ? `⚡ Juste mon profil ${typeCode}` : `⚡ Just my ${typeCode} profile`}
-                </p>
-                <p className="text-[11px] text-stone-500 mt-0.5">
-                  {isFr ? 'Paiement unique · pas d\'abonnement · accès à vie' : 'One-time · no subscription · lifetime access'}
-                </p>
-              </div>
-              <button
-                onClick={() => doCheckout('onetime')}
-                disabled={loading}
-                className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-sm transition-all active:scale-[0.97] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: 'white', boxShadow: '0 3px 12px rgba(169,78,24,0.3)', whiteSpace: 'nowrap' }}
-              >
-                {loading ? '…' : isFr ? '1,99 € →' : '€1.99 →'}
-              </button>
-            </div>
           </div>
         )}
 
