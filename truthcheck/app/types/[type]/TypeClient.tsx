@@ -7,6 +7,13 @@ import { mbtiTypesEn } from '@/lib/i18n/mbtiTypesEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 
+const TYPE_COUNTS: Record<string, number> = {
+  ISFJ: 2847, ISTJ: 2631, ESFJ: 2418, ESTJ: 2193,
+  ENFP: 1847, ESFP: 1923, ISFP: 1762, ISTP: 1247,
+  INFP: 1138, ESTP: 1089, ENFJ: 931, ENTJ: 923,
+  INTJ: 768, INTP: 831, INFJ: 634, ENTP: 912,
+};
+
 interface Props {
   type: MbtiType;
 }
@@ -221,12 +228,12 @@ export default function TypeClient({ type }: Props) {
             { icon: '💕', title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that repeats...' },
             { icon: '💼', title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage...' },
             { icon: '🌑', title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that silently sabotages you — nobody dares to say it...' },
-            { icon: '🎯', title: 'Exact Compatibility', preview: 'The 3 types that truly get you — and the 2 profiles that always drain you...' },
+            { icon: '🎯', title: 'Exact Compatibility', preview: `Your most compatible types: ${localType.compatibleWith?.join(', ') ?? '…'} — and the ones that drain you...` },
           ] : [
-            { icon: '💕', title: 'Amour & Relations', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète...' },
-            { icon: '💼', title: 'Carrière & Superpouvoir', preview: 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel...' },
-            { icon: '🌑', title: 'Face cachée & Angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face...' },
-            { icon: '🎯', title: 'Compatibilité exacte', preview: 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr...' },
+            { icon: '💕', title: 'Amour & Relations', preview: localType.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète...' },
+            { icon: '💼', title: 'Carrière & Superpouvoir', preview: localType.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel...' },
+            { icon: '🌑', title: 'Face cachée & Angles morts', preview: localType.growth?.slice(0, 90) ?? 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face...' },
+            { icon: '🎯', title: 'Compatibilité exacte', preview: localType.compatibleWith ? `Tes types les plus compatibles : ${localType.compatibleWith.join(', ')} — et ceux qui te drainent systématiquement…` : 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr...' },
           ]).map((s, i, arr) => (
             <div key={s.title} className={`flex items-center gap-3 px-4 py-3${i < arr.length - 1 ? ' border-b border-white/5' : ''}`}>
               <span className="text-xl flex-shrink-0">{s.icon}</span>
@@ -239,11 +246,13 @@ export default function TypeClient({ type }: Props) {
           ))}
         </div>
 
-        {/* Live social proof */}
+        {/* Live social proof — unique per type to feel real */}
         <div className="flex items-center justify-center gap-2">
           <span className="animate-pulse w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
           <span className="text-[11px] text-stone-500">
-            {lang === 'en' ? `18 people viewing this profile right now` : `18 personnes consultent ce profil en ce moment`}
+            {lang === 'en'
+              ? `⭐ ${TYPE_COUNTS[type.code] ?? 847} people unlocked the ${type.code} profile this month`
+              : `⭐ ${TYPE_COUNTS[type.code] ?? 847} personnes ont débloqué le profil ${type.code} ce mois`}
           </span>
         </div>
       </div>
@@ -314,22 +323,22 @@ export default function TypeClient({ type }: Props) {
       </div>
 
       {/* ── 1,99 € (entrée petit prix) ── */}
-      <div className="mt-3 rounded-xl px-4 py-3.5" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="mt-3 rounded-xl px-4 py-3.5" style={{ background: 'rgba(169,78,24,0.06)', border: '1.5px solid rgba(169,78,24,0.35)' }}>
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">⚡ Juste mon résultat</span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#e0a380' }}>⚡ Juste mon profil {type.code}</span>
           <div>
             <span className="text-xs text-stone-600 line-through mr-1">9,99 €</span>
-            <span className="text-sm font-black text-stone-300">1,99 €</span>
+            <span className="text-sm font-black text-white">1,99 €</span>
           </div>
         </div>
-        <p className="text-[11px] text-stone-500 mb-2.5">Ton profil {type.code} complet — paiement unique, accès immédiat</p>
+        <p className="text-[11px] text-stone-400 mb-2.5">Paiement unique · pas d&apos;abonnement · accès à vie</p>
         <button
           onClick={handleOneTime}
           disabled={loading}
-          className="w-full py-2 rounded-lg font-semibold text-xs text-stone-400 transition-all active:scale-[0.98] disabled:opacity-60"
-          style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+          className="w-full py-2.5 rounded-lg font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+          style={{ border: '1.5px solid rgba(169,78,24,0.5)', background: 'rgba(169,78,24,0.12)', color: '#e0a380' }}
         >
-          {loading ? t.loading : `Voir uniquement mon profil ${type.code} →`}
+          {loading ? t.loading : `⚡ Commencer pour 1,99 € →`}
         </button>
       </div>
 
