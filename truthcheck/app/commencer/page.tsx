@@ -17,257 +17,193 @@ function detectInAppBrowser(): boolean {
 
 export default function CommencerPage() {
   const router = useRouter();
-  const [isInApp, setIsInApp] = useState<boolean | null>(null);
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const inApp = detectInAppBrowser();
-    setIsInApp(inApp);
-    if (!inApp) router.replace('/quiz/personnalite');
+    if (!detectInAppBrowser()) {
+      router.replace('/quiz/personnalite');
+    } else {
+      setReady(true);
+    }
   }, [router]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    if (email) {
-      await fetch('/api/save-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      }).catch(() => {});
-    }
-    router.push('/quiz/personnalite');
-  }
-
-  if (isInApp === null || isInApp === false) return null;
+  if (!ready) return null;
 
   return (
-    <div
-      style={{
-        background: '#0d0d0d',
-        minHeight: '100vh',
+    <div style={{
+      background: '#060608',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+
+      {/* ── Arrow pointing to ··· top-right ── */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        padding: '20px 20px 0',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        gap: 10,
+        zIndex: 10,
+      }}>
+        {/* bouncing arrow */}
+        <div style={{ animation: 'bounce 1s ease-in-out infinite' }}>
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M8 36L36 8M36 8H18M36 8V26" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <div style={{
+          background: '#0ea5e9',
+          color: 'white',
+          fontWeight: 800,
+          fontSize: 15,
+          padding: '9px 16px',
+          borderRadius: 22,
+          whiteSpace: 'nowrap',
+          boxShadow: '0 4px 20px rgba(14,165,233,0.5)',
+        }}>
+          Appuie ici ↗
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+
+      {/* ── Main content ── */}
+      <div style={{
+        flex: 1,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px 20px',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        position: 'relative',
-      }}
-    >
-      {/* Arrow pointing to top-right ••• menu */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 18,
-          right: 18,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          gap: 8,
-        }}
-      >
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <path d="M6 30L30 6M30 6H14M30 6V22" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <div
-          style={{
-            background: '#0ea5e9',
-            color: 'white',
-            fontWeight: 700,
-            fontSize: 14,
-            padding: '8px 14px',
-            borderRadius: 20,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Appuie sur ••• ici
-        </div>
-      </div>
+        padding: '100px 24px 60px',
+        textAlign: 'center',
+        maxWidth: 420,
+        margin: '0 auto',
+      }}>
 
-      {/* Card */}
-      <div
-        style={{
-          background: '#1a1a1a',
-          borderRadius: 24,
-          padding: '32px 24px',
-          width: '100%',
-          maxWidth: 380,
-          marginTop: 80,
-        }}
-      >
-        {/* Logo + rating */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-          <div
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: 16,
-              background: 'linear-gradient(135deg,#6f3318,#8a3e16)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 30,
-              marginBottom: 10,
-            }}
-          >
-            🔮
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#d1d5db', fontSize: 13 }}>
-            <span style={{ color: '#fbbf24', letterSpacing: 2 }}>★★★★★</span>
-            <span style={{ fontWeight: 700, color: 'white' }}>4.9</span>
-            <span style={{ color: '#6b7280' }}>·</span>
-            <span>50K+ utilisateurs</span>
-          </div>
+        {/* Logo */}
+        <div style={{
+          fontSize: 52,
+          marginBottom: 24,
+          animation: 'pulse-glow 2s ease-in-out infinite',
+        }}>
+          🔮
         </div>
 
-        {/* Browser instructions */}
-        <h1
-          style={{
-            color: 'white',
-            fontSize: 20,
-            fontWeight: 800,
-            textAlign: 'center',
-            lineHeight: 1.3,
-            margin: '0 0 20px',
-          }}
-        >
-          Pour voir ton profil,<br />ouvre dans ton navigateur :
+        {/* Main message */}
+        <h1 style={{
+          color: '#ffffff',
+          fontSize: 32,
+          fontWeight: 900,
+          lineHeight: 1.2,
+          margin: '0 0 10px',
+          letterSpacing: '-0.5px',
+        }}>
+          Ouvre dans ton<br />navigateur
         </h1>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
-          <div
-            style={{
-              background: '#262626',
-              borderRadius: 12,
-              padding: '14px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
-          >
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: '#3f3f46',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 700,
-                fontSize: 14,
-                flexShrink: 0,
-              }}
-            >
-              1
-            </div>
-            <span style={{ color: '#e5e7eb', fontSize: 14, lineHeight: 1.4 }}>
-              Appuie sur <strong style={{ color: 'white' }}>•••</strong> en haut à droite
-            </span>
-          </div>
-
-          <div
-            style={{
-              background: '#262626',
-              borderRadius: 12,
-              padding: '14px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
-          >
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: '#3f3f46',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 700,
-                fontSize: 14,
-                flexShrink: 0,
-              }}
-            >
-              2
-            </div>
-            <span style={{ color: '#e5e7eb', fontSize: 14, lineHeight: 1.4 }}>
-              Puis <strong style={{ color: '#0ea5e9' }}>« Ouvrir dans le navigateur »</strong>
-            </span>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <div style={{ flex: 1, height: 1, background: '#2d2d2d' }} />
-          <span style={{ color: '#6b7280', fontSize: 12 }}>ou</span>
-          <div style={{ flex: 1, height: 1, background: '#2d2d2d' }} />
-        </div>
-
-        {/* Email capture */}
-        <p style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', margin: '0 0 14px', lineHeight: 1.5 }}>
-          Entre ton email pour recevoir<br />ton profil MBTI directement 💌
+        <p style={{
+          color: '#71717a',
+          fontSize: 16,
+          margin: '0 0 40px',
+          lineHeight: 1.5,
+        }}>
+          Pour voir ton profil MBTI complet,<br />tu dois quitter l&apos;appli TikTok.
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <input
-            type="email"
-            placeholder="ton@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              borderRadius: 12,
-              background: '#262626',
-              border: '1px solid #3f3f46',
-              color: 'white',
-              fontSize: 15,
-              outline: 'none',
-              boxSizing: 'border-box',
-            }}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '14px',
-              borderRadius: 12,
-              background: 'linear-gradient(135deg,#a94e18,#d17d52)',
-              color: 'white',
-              fontWeight: 700,
-              fontSize: 15,
-              border: 'none',
-              cursor: 'pointer',
-              opacity: loading ? 0.7 : 1,
-            }}
-          >
-            {loading ? 'Chargement...' : 'Commencer le test →'}
-          </button>
-        </form>
+        {/* Steps */}
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}>
 
-        <button
-          onClick={() => router.push('/quiz/personnalite')}
-          style={{
-            width: '100%',
-            marginTop: 10,
-            padding: '10px',
-            borderRadius: 12,
-            background: 'transparent',
-            border: '1px solid #2d2d2d',
-            color: '#6b7280',
-            fontSize: 13,
-            cursor: 'pointer',
-          }}
-        >
-          Faire le test sans compte
-        </button>
+          <div style={{
+            background: '#18181b',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 16,
+            padding: '18px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            textAlign: 'left',
+          }}>
+            <div style={{
+              width: 38, height: 38,
+              borderRadius: '50%',
+              background: 'rgba(14,165,233,0.15)',
+              border: '1.5px solid rgba(14,165,233,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#0ea5e9', fontWeight: 800, fontSize: 16,
+              flexShrink: 0,
+            }}>1</div>
+            <div>
+              <p style={{ margin: 0, color: '#e4e4e7', fontSize: 15, fontWeight: 600, lineHeight: 1.3 }}>
+                Appuie sur <strong style={{ color: 'white', fontWeight: 900 }}>•••</strong> en haut à droite
+              </p>
+              <p style={{ margin: '3px 0 0', color: '#52525b', fontSize: 12 }}>le menu avec les 3 points</p>
+            </div>
+          </div>
+
+          <div style={{
+            background: '#18181b',
+            border: '2px solid rgba(14,165,233,0.4)',
+            borderRadius: 16,
+            padding: '18px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            textAlign: 'left',
+            boxShadow: '0 0 24px rgba(14,165,233,0.12)',
+          }}>
+            <div style={{
+              width: 38, height: 38,
+              borderRadius: '50%',
+              background: 'rgba(14,165,233,0.15)',
+              border: '1.5px solid rgba(14,165,233,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#0ea5e9', fontWeight: 800, fontSize: 16,
+              flexShrink: 0,
+            }}>2</div>
+            <div>
+              <p style={{ margin: 0, color: '#e4e4e7', fontSize: 15, fontWeight: 600, lineHeight: 1.3 }}>
+                Appuie sur
+              </p>
+              <p style={{ margin: '2px 0 0', color: '#0ea5e9', fontSize: 16, fontWeight: 900 }}>
+                « Ouvrir dans le navigateur »
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Why */}
+        <p style={{
+          color: '#3f3f46',
+          fontSize: 12,
+          marginTop: 28,
+          lineHeight: 1.6,
+        }}>
+          Le navigateur est nécessaire pour le paiement sécurisé · Stripe ne fonctionne pas dans l&apos;appli TikTok
+        </p>
+
       </div>
     </div>
   );
