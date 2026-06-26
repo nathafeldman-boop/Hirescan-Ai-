@@ -803,8 +803,23 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
-    const t = setTimeout(() => setStickyBar(true), 8000);
-    return () => clearTimeout(t);
+    // Don't shove the paywall in their face on a timer — especially on TikTok.
+    // Let them READ the free profile first (that's what creates the value/desire),
+    // then surface the sticky bar once they've scrolled through the content.
+    let shown = false;
+    const show = () => { if (!shown) { shown = true; setStickyBar(true); } };
+    const onScroll = () => {
+      const reached = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      // In-app (TikTok): wait until they've consumed ~60% of the free content.
+      // Web: a bit earlier at ~45%.
+      const threshold = isInApp ? 0.6 : 0.45;
+      if (total > 0 && reached / total >= threshold) show();
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Long fallback so it still appears for users who don't scroll at all.
+    const t = setTimeout(show, isInApp ? 24000 : 12000);
+    return () => { window.removeEventListener('scroll', onScroll); clearTimeout(t); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
