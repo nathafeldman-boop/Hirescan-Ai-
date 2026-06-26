@@ -13,6 +13,8 @@ export default function SuccessTracker() {
 
   useEffect(() => {
     track('payment_success', { value: 1.99, currency: 'EUR', content_name: 'UrCecret Premium' });
+    // Clear the double-payment guard — purchase confirmed, future purchases allowed.
+    try { localStorage.removeItem('_urs_co'); } catch {}
 
     // Refresh session so the new premium tier is reflected, then send user
     // directly to their unlocked profile page.

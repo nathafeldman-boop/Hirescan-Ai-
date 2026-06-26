@@ -850,6 +850,20 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   }, [isInApp, typeCode]);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly', emailOverride?: string) => {
+    // ── Dedup guard: block a second checkout within 20 min of a first one ──
+    // Prevents double-charge when TikTok in-app browser fails to redirect to /success
+    // and the user taps the button again thinking payment didn't go through.
+    try {
+      const prev = localStorage.getItem('_urs_co');
+      if (prev) {
+        const { ts } = JSON.parse(prev) as { ts: number };
+        if (Date.now() - ts < 20 * 60 * 1000) {
+          alert('Un paiement est déjà en cours ou vient d\'être effectué. Vérifie tes emails ou attends quelques minutes avant de réessayer.');
+          return;
+        }
+      }
+    } catch { /* localStorage indisponible — on continue */ }
+
     const email = emailOverride ?? userEmail;
     diagLog(email ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
     track('checkout_click', {
@@ -861,6 +875,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
     try {
       let affiliateRef = '';
       try { affiliateRef = localStorage.getItem('_urs_ref') ?? ''; } catch {}
+      // Mark checkout started BEFORE the fetch so the guard fires even on double-tap
+      try { localStorage.setItem('_urs_co', JSON.stringify({ ts: Date.now(), type: checkoutType })); } catch {}
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -876,8 +892,12 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       });
       const data = await res.json() as { url?: string; error?: string };
       if (data.url) window.location.href = data.url;
-      else { alert(data.error ?? 'Erreur de paiement'); setLoading(false); }
+      else {
+        try { localStorage.removeItem('_urs_co'); } catch {}
+        alert(data.error ?? 'Erreur de paiement'); setLoading(false);
+      }
     } catch {
+      try { localStorage.removeItem('_urs_co'); } catch {}
       alert('Erreur réseau. Réessaie.');
       setLoading(false);
     }
