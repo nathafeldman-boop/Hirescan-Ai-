@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 function detectInAppBrowser(): boolean {
@@ -15,20 +15,62 @@ function detectInAppBrowser(): boolean {
   return false;
 }
 
+const TARGET_PATH = '/quiz/personnalite';
+
 export default function CommencerPage() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const [showManual, setShowManual] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+
+  // Build destination URL, preserving affiliate ref.
+  const buildUrl = useCallback((scheme: 'https' | 'safari') => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    const qs = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+    const host = 'urcecret.site';
+    if (scheme === 'safari') return `x-safari-https://${host}${TARGET_PATH}${qs}`;
+    return `https://${host}${TARGET_PATH}${qs}`;
+  }, []);
+
+  // One-tap: force-open the system browser (Chrome on Android, Safari on iOS).
+  const openInBrowser = useCallback(() => {
+    const ua = navigator.userAgent;
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    const qs = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+
+    if (/android/i.test(ua)) {
+      // Android intent:// — opens the user's default browser directly.
+      const intentUrl = `intent://urcecret.site${TARGET_PATH}${qs}#Intent;scheme=https;end`;
+      window.location.href = intentUrl;
+      // Reveal the manual fallback in case the intent is blocked.
+      setTimeout(() => setShowManual(true), 1200);
+      return;
+    }
+
+    if (/iphone|ipad/i.test(ua)) {
+      // iOS: x-safari-https:// opens Safari from a webview on many versions.
+      window.location.href = buildUrl('safari');
+      setTimeout(() => setShowManual(true), 1200);
+      return;
+    }
+
+    // Unknown — just navigate normally.
+    window.location.href = buildUrl('https');
+  }, [buildUrl]);
 
   useEffect(() => {
     // Preserve affiliate ref through the redirect so attribution survives.
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
-    const dest = ref ? `/quiz/personnalite?ref=${encodeURIComponent(ref)}` : '/quiz/personnalite';
+    const dest = ref ? `${TARGET_PATH}?ref=${encodeURIComponent(ref)}` : TARGET_PATH;
     if (!detectInAppBrowser()) {
       router.replace(dest);
-    } else {
-      setReady(true);
+      return;
     }
+    setIsIOS(/iphone|ipad/i.test(navigator.userAgent));
+    setReady(true);
   }, [router]);
 
   if (!ready) return null;
@@ -40,175 +82,107 @@ export default function CommencerPage() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      justifyContent: 'center',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      padding: '32px 24px',
       position: 'relative',
-      overflow: 'hidden',
     }}>
 
-      {/* ── Arrow pointing to ··· top-right ── */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        padding: '20px 20px 0',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 10,
-        zIndex: 10,
-      }}>
-        {/* bouncing arrow */}
-        <div style={{ animation: 'bounce 1s ease-in-out infinite' }}>
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <path d="M8 36L36 8M36 8H18M36 8V26" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-        <div style={{
-          background: '#0ea5e9',
-          color: 'white',
-          fontWeight: 800,
-          fontSize: 15,
-          padding: '9px 16px',
-          borderRadius: 22,
-          whiteSpace: 'nowrap',
-          boxShadow: '0 4px 20px rgba(14,165,233,0.5)',
-        }}>
-          Appuie ici ↗
-        </div>
-      </div>
-
       <style>{`
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
+        @keyframes pulse-glow { 0%,100%{opacity:.85;transform:scale(1)} 50%{opacity:1;transform:scale(1.015)} }
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
       `}</style>
 
-      {/* ── Main content ── */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '100px 24px 60px',
+      {/* Logo */}
+      <div style={{ fontSize: 46, marginBottom: 18 }}>🔮</div>
+
+      <h1 style={{
+        color: '#ffffff',
+        fontSize: 26,
+        fontWeight: 900,
+        lineHeight: 1.2,
         textAlign: 'center',
-        maxWidth: 420,
-        margin: '0 auto',
+        margin: '0 0 8px',
+        letterSpacing: '-0.5px',
       }}>
+        Ton profil MBTI<br />t&apos;attend
+      </h1>
 
-        {/* Logo */}
-        <div style={{
-          fontSize: 52,
-          marginBottom: 24,
-          animation: 'pulse-glow 2s ease-in-out infinite',
-        }}>
-          🔮
-        </div>
+      <p style={{
+        color: '#71717a',
+        fontSize: 15,
+        textAlign: 'center',
+        margin: '0 0 32px',
+        lineHeight: 1.5,
+        maxWidth: 320,
+      }}>
+        Une dernière étape : ouvre le test dans ton navigateur (1 tap).
+      </p>
 
-        {/* Main message */}
-        <h1 style={{
-          color: '#ffffff',
-          fontSize: 32,
-          fontWeight: 900,
-          lineHeight: 1.2,
-          margin: '0 0 10px',
-          letterSpacing: '-0.5px',
-        }}>
-          Ouvre dans ton<br />navigateur
-        </h1>
-
-        <p style={{
-          color: '#71717a',
-          fontSize: 16,
-          margin: '0 0 40px',
-          lineHeight: 1.5,
-        }}>
-          Pour voir ton profil MBTI complet,<br />tu dois quitter l&apos;appli TikTok.
-        </p>
-
-        {/* Steps */}
-        <div style={{
+      {/* ── ONE-TAP HERO BUTTON ── */}
+      <button
+        onClick={openInBrowser}
+        style={{
           width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
+          maxWidth: 360,
+          padding: '20px 24px',
+          borderRadius: 18,
+          border: 'none',
+          background: 'linear-gradient(135deg,#a94e18,#d17d52)',
+          color: '#ffffff',
+          fontSize: 18,
+          fontWeight: 900,
+          cursor: 'pointer',
+          boxShadow: '0 8px 32px rgba(169,78,24,0.5)',
+          animation: 'pulse-glow 1.8s ease-in-out infinite',
+        }}
+      >
+        Ouvrir le test maintenant →
+      </button>
+
+      <p style={{ color: '#52525b', fontSize: 12, marginTop: 14, textAlign: 'center' }}>
+        Gratuit · Résultat en 3 min · 16 profils
+      </p>
+
+      {/* ── Manual fallback (only if the one-tap is blocked) ── */}
+      {showManual && (
+        <div style={{
+          marginTop: 36,
+          width: '100%',
+          maxWidth: 360,
+          background: '#111114',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 16,
+          padding: '18px 20px',
         }}>
-
-          <div style={{
-            background: '#18181b',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 16,
-            padding: '18px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 16,
-            textAlign: 'left',
-          }}>
-            <div style={{
-              width: 38, height: 38,
-              borderRadius: '50%',
-              background: 'rgba(14,165,233,0.15)',
-              border: '1.5px solid rgba(14,165,233,0.4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#0ea5e9', fontWeight: 800, fontSize: 16,
-              flexShrink: 0,
-            }}>1</div>
-            <div>
-              <p style={{ margin: 0, color: '#e4e4e7', fontSize: 15, fontWeight: 600, lineHeight: 1.3 }}>
-                Appuie sur <strong style={{ color: 'white', fontWeight: 900 }}>•••</strong> en haut à droite
-              </p>
-              <p style={{ margin: '3px 0 0', color: '#52525b', fontSize: 12 }}>le menu avec les 3 points</p>
-            </div>
+          <p style={{ color: '#a1a1aa', fontSize: 13, fontWeight: 700, margin: '0 0 12px', textAlign: 'center' }}>
+            Ça ne s&apos;est pas ouvert ? Fais-le à la main :
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <span style={{ color: '#0ea5e9', fontWeight: 900, fontSize: 14 }}>1.</span>
+            <span style={{ color: '#d4d4d8', fontSize: 14 }}>
+              Appuie sur <strong style={{ color: 'white' }}>•••</strong> en haut à droite
+            </span>
           </div>
-
-          <div style={{
-            background: '#18181b',
-            border: '2px solid rgba(14,165,233,0.4)',
-            borderRadius: 16,
-            padding: '18px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 16,
-            textAlign: 'left',
-            boxShadow: '0 0 24px rgba(14,165,233,0.12)',
-          }}>
-            <div style={{
-              width: 38, height: 38,
-              borderRadius: '50%',
-              background: 'rgba(14,165,233,0.15)',
-              border: '1.5px solid rgba(14,165,233,0.4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#0ea5e9', fontWeight: 800, fontSize: 16,
-              flexShrink: 0,
-            }}>2</div>
-            <div>
-              <p style={{ margin: 0, color: '#e4e4e7', fontSize: 15, fontWeight: 600, lineHeight: 1.3 }}>
-                Appuie sur
-              </p>
-              <p style={{ margin: '2px 0 0', color: '#0ea5e9', fontSize: 16, fontWeight: 900 }}>
-                « Ouvrir dans le navigateur »
-              </p>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ color: '#0ea5e9', fontWeight: 900, fontSize: 14 }}>2.</span>
+            <span style={{ color: '#d4d4d8', fontSize: 14 }}>
+              <strong style={{ color: '#0ea5e9' }}>{isIOS ? '« Ouvrir dans Safari »' : '« Ouvrir dans le navigateur »'}</strong>
+            </span>
           </div>
-
         </div>
+      )}
 
-        {/* Why */}
-        <p style={{
-          color: '#3f3f46',
-          fontSize: 12,
-          marginTop: 28,
-          lineHeight: 1.6,
-        }}>
-          Le navigateur est nécessaire pour le paiement sécurisé · Stripe ne fonctionne pas dans l&apos;appli TikTok
-        </p>
-
-      </div>
+      {/* Arrow hint to ••• — subtle, only as a nudge */}
+      {!showManual && (
+        <div style={{ position: 'fixed', top: 14, right: 16, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, opacity: 0.5 }}>
+          <div style={{ animation: 'bounce 1.2s ease-in-out infinite' }}>
+            <svg width="30" height="30" viewBox="0 0 36 36" fill="none">
+              <path d="M6 30L30 6M30 6H14M30 6V22" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
