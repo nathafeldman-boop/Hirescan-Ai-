@@ -20,8 +20,12 @@ export default function CommencerPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Preserve affiliate ref through the redirect so attribution survives.
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    const dest = ref ? `/quiz/personnalite?ref=${encodeURIComponent(ref)}` : '/quiz/personnalite';
     if (!detectInAppBrowser()) {
-      router.replace('/quiz/personnalite');
+      router.replace(dest);
     } else {
       setReady(true);
     }

@@ -40,6 +40,21 @@ export function middleware(request: NextRequest) {
       sameSite: 'lax',
       httpOnly: true,
     });
+  } else {
+    // ── Self-healing attribution across the TikTok in-app → real browser handoff ──
+    // The httpOnly cookie set in the TikTok WebView does NOT transfer to Safari/Chrome
+    // when the user taps "open in browser" — only the URL survives. So if we already
+    // have a ref cookie but this URL lost its ?ref= param, re-inject it into the URL.
+    // This keeps the ref attached to whatever page the user opens in their real browser,
+    // which then re-sets the cookie there + captures it in localStorage on the quiz page.
+    const existingRef = request.cookies.get('urs_ref')?.value;
+    const isFunnelPage = ['/', '/commencer'].includes(request.nextUrl.pathname)
+      || request.nextUrl.pathname.startsWith('/quiz/');
+    if (existingRef && /^[a-z0-9_-]{2,32}$/i.test(existingRef) && isFunnelPage) {
+      const url = request.nextUrl.clone();
+      url.searchParams.set('ref', existingRef);
+      return NextResponse.redirect(url, 307);
+    }
   }
 
   // UTM attribution — capture toutes les sources publicitaires dans un cookie JSON
