@@ -625,7 +625,7 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
   const items = isFr ? [
     {
       q: `C'est quoi exactement pour 1,99 €?`,
-      a: `Ton profil ${typeCode} complet en 4 chapitres : Amour & Relations, Carrière & Superpouvoir, Face cachée & Angles morts, Compatibilité exacte. Paiement unique — accès immédiat, à vie. Zéro abonnement.`,
+      a: `2 résultats : ton profil ${typeCode} complet (Amour, Carrière, Face cachée, Compatibilité) + 1 quiz UrCecret au choix (infidélité, amour véritable, manipulation…) dont le résultat est aussi débloqué. Paiement unique — accès immédiat, à vie. Zéro abonnement.`,
     },
     {
       q: `Est-ce un abonnement?`,
@@ -642,7 +642,7 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
   ] : [
     {
       q: `What exactly do I get for €1.99?`,
-      a: `Your complete ${typeCode} profile in 4 chapters: Love & Relationships, Career & Superpower, Shadow Side & Blind Spots, Exact Compatibility. One-time payment — instant, lifetime access. Zero subscription.`,
+      a: `2 results: your complete ${typeCode} profile (Love, Career, Shadow side, Compatibility) + 1 UrCecret quiz of your choice (infidelity, true love, manipulation…) with its result unlocked too. One-time payment — instant, lifetime access. Zero subscription.`,
     },
     {
       q: `Is it a subscription?`,
@@ -965,10 +965,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <div className="flex items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-black text-stone-900 leading-snug">
-                  {isFr ? `⚡ Juste mon profil ${typeCode}` : `⚡ Just my ${typeCode} profile`}
+                  {isFr ? `🎁 Mon profil ${typeCode} + 1 quiz au choix` : `🎁 My ${typeCode} profile + 1 quiz`}
                 </p>
                 <p className="text-[11px] text-stone-500 mt-0.5">
-                  {isFr ? 'Paiement unique · pas d\'abonnement · accès à vie' : 'One-time · no subscription · lifetime access'}
+                  {isFr ? '2 résultats · paiement unique · accès à vie' : '2 results · one-time · lifetime access'}
                 </p>
               </div>
               <button
@@ -1086,7 +1086,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <div className="rounded-2xl p-5 relative" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.04))', border: '2px solid rgba(169,78,24,0.4)', boxShadow: '0 4px 20px rgba(169,78,24,0.10)' }}>
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
               <span className="text-white text-[10px] font-black px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 10px rgba(169,78,24,0.4)' }}>
-                ⚡ {isFr ? 'ACCÈS IMMÉDIAT' : 'INSTANT ACCESS'}
+                🎁 {isFr ? '2 RÉSULTATS POUR 1,99 €' : '2 RESULTS FOR €1.99'}
               </span>
             </div>
             <div className="text-center mb-4 mt-2">
@@ -1098,12 +1098,12 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </div>
             <ul className="space-y-2 mb-4">
               {(isFr ? [
-                `Ton profil ${typeCode} complet en 4 chapitres`,
-                'Amour, Carrière, Face cachée & Compatibilité',
+                `✦ Ton profil ${typeCode} complet (amour, carrière, face cachée)`,
+                '✦ 1 quiz UrCecret au choix — résultat débloqué aussi',
                 'Accès immédiat · conservé à vie · zéro abonnement',
               ] : [
-                `Your complete ${typeCode} profile in 4 chapters`,
-                'Love, Career, Shadow side & Compatibility',
+                `✦ Your complete ${typeCode} profile (love, career, shadow side)`,
+                '✦ 1 UrCecret quiz of your choice — result unlocked too',
                 'Instant access · kept forever · zero subscription',
               ]).map(b => (
                 <li key={b} className="flex items-start gap-2 text-xs text-stone-700">
@@ -1120,7 +1120,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="block w-full py-4 rounded-xl font-black text-white text-sm text-center active:scale-[0.98]"
                 style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)', textDecoration: 'none' }}
               >
-                {isFr ? `🔓 Débloquer mon profil ${typeCode} — 1,99 €` : `🔓 Unlock my ${typeCode} profile — €1.99`}
+                {isFr ? `🎁 2 résultats — mon profil ${typeCode} + 1 quiz — 1,99 €` : `🎁 2 results — my ${typeCode} profile + 1 quiz — €1.99`}
               </a>
             ) : (
               <button

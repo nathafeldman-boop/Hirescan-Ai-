@@ -256,12 +256,61 @@ export default async function SuccessPage({
       <SuccessTracker />
       <div className="relative z-10 w-full max-w-xl">
 
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="text-6xl mb-4">🎉</div>
-          <h1 className="font-display text-3xl font-black text-stone-900 mb-3">
+          <h1 className="font-display text-3xl font-black text-stone-900 mb-2">
             {typeCode ? `Profil ${typeCode} débloqué !` : 'Bienvenue dans UrCecret ✨'}
           </h1>
+          {typeCode && (
+            <p className="text-stone-500 text-sm">Résultat 1/2 — ton profil MBTI est prêt.</p>
+          )}
         </div>
+
+        {/* ── 2ème résultat — choix du quiz ── */}
+        {paid && typeCode && (
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '20px 20px 16px',
+            marginBottom: '24px',
+            border: '2px solid rgba(169,78,24,0.2)',
+            boxShadow: '0 4px 20px rgba(169,78,24,0.08)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <span style={{ fontSize: 22 }}>🎁</span>
+              <div>
+                <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: '#1c1917' }}>Résultat 2/2 — ton quiz offert</p>
+                <p style={{ margin: 0, fontSize: 12, color: '#78716c' }}>Fais-en un maintenant, ton résultat est déjà débloqué</p>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {[
+                { href: '/quiz/infidelite',      emoji: '💔', label: 'Infidélité' },
+                { href: '/quiz/amoureux',         emoji: '❤️', label: 'Suis-je amoureux ?' },
+                { href: '/quiz/manipule',         emoji: '🎭', label: 'Manipulé(e) ?' },
+                { href: '/quiz/vrais-amis',       emoji: '🤝', label: 'Vrais amis ?' },
+                { href: '/quiz/relation-toxique', emoji: '⚠️', label: 'Relation toxique' },
+                { href: '/quiz/burnout',          emoji: '🔥', label: 'Burnout' },
+              ].map(q => (
+                <Link
+                  key={q.href}
+                  href={q.href}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '10px 12px', borderRadius: 12,
+                    background: '#faf9f7', border: '1px solid #e7e3dc',
+                    textDecoration: 'none', color: '#1c1917',
+                    fontSize: 13, fontWeight: 600,
+                    transition: 'border-color 0.15s',
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>{q.emoji}</span>
+                  <span style={{ lineHeight: 1.2 }}>{q.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {paid && typeCode && affiliateSlug && mbtiTypes[typeCode] && (
           <div style={{ marginBottom: '32px' }}>
