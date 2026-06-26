@@ -965,7 +965,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <div className="flex items-center justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-black text-stone-900 leading-snug">
-                  {isFr ? `🎁 Mon profil ${typeCode} + 1 quiz au choix` : `🎁 My ${typeCode} profile + 1 quiz`}
+                  {isFr ? '🎁 Mon profil MBTI + 1 quiz au choix' : '🎁 My MBTI profile + 1 quiz'}
                 </p>
                 <p className="text-[11px] text-stone-500 mt-0.5">
                   {isFr ? '2 résultats · paiement unique · accès à vie' : '2 results · one-time · lifetime access'}
@@ -1120,7 +1120,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="block w-full py-4 rounded-xl font-black text-white text-sm text-center active:scale-[0.98]"
                 style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)', textDecoration: 'none' }}
               >
-                {isFr ? `🎁 2 résultats — mon profil ${typeCode} + 1 quiz — 1,99 €` : `🎁 2 results — my ${typeCode} profile + 1 quiz — €1.99`}
+                {isFr ? `🎁 2 résultats — mon profil MBTI + 1 quiz — 1,99 €` : `🎁 2 results — my MBTI profile + 1 quiz — €1.99`}
               </a>
             ) : (
               <button
