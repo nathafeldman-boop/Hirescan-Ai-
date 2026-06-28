@@ -113,6 +113,25 @@ export default function LandingPage() {
       {/* Paper grain — handcrafted texture */}
       <div className="grain-overlay" />
 
+      {/* ── Animation keyframes ─────────────────────────────────────────── */}
+      <style>{`
+        @keyframes urFadeUp { from { opacity:0; transform:translateY(22px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes urPop { 0% { opacity:0; transform:scale(0.82) } 100% { opacity:1; transform:scale(1) } }
+        @keyframes urFloatA { 0%,100% { transform:translate(0,0) rotate(0deg) } 50% { transform:translate(8px,-22px) rotate(6deg) } }
+        @keyframes urFloatB { 0%,100% { transform:translate(0,0) rotate(0deg) } 50% { transform:translate(-10px,16px) rotate(-5deg) } }
+        @keyframes urFloatC { 0%,100% { transform:translate(0,0) } 50% { transform:translate(6px,14px) } }
+        @keyframes urShine { 0% { transform:translateX(-130%) skewX(-18deg) } 55%,100% { transform:translateX(320%) skewX(-18deg) } }
+        @keyframes urCtaBreathe { 0%,100% { transform:scale(1); box-shadow:0 8px 28px rgba(169,78,24,0.38) } 50% { transform:scale(1.025); box-shadow:0 14px 38px rgba(169,78,24,0.5) } }
+        @keyframes urNudge { 0%,100% { transform:translateX(0) } 50% { transform:translateX(6px) } }
+        @keyframes urDraw { from { stroke-dashoffset:340 } to { stroke-dashoffset:0 } }
+        @keyframes urWiggle { 0%,100% { transform:rotate(-2.5deg) } 50% { transform:rotate(2.5deg) } }
+        @keyframes urFlamePulse { 0%,100% { transform:scale(1) } 50% { transform:scale(1.18) } }
+        .ur-anim { opacity:0; animation:urFadeUp .65s cubic-bezier(.22,1,.36,1) forwards; }
+        @media (prefers-reduced-motion: reduce) {
+          .ur-anim { opacity:1 !important; animation:none !important; }
+        }
+      `}</style>
+
       {/* Nav */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
@@ -140,50 +159,89 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative z-10 pt-36 pb-12 px-6 text-center">
-        <div className="max-w-xl mx-auto">
+      <section className="relative z-10 pt-32 pb-12 px-6 text-center overflow-hidden">
+
+        {/* Floating soft orbs — handcrafted, lively background */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute rounded-full" style={{ top: '8%', left: '-12%', width: 220, height: 220, background: 'radial-gradient(circle, rgba(169,78,24,0.16), transparent 70%)', filter: 'blur(8px)', animation: 'urFloatA 9s ease-in-out infinite' }} />
+          <div className="absolute rounded-full" style={{ top: '24%', right: '-14%', width: 260, height: 260, background: 'radial-gradient(circle, rgba(86,107,69,0.14), transparent 70%)', filter: 'blur(8px)', animation: 'urFloatB 11s ease-in-out infinite' }} />
+          <div className="absolute rounded-full" style={{ bottom: '2%', left: '20%', width: 180, height: 180, background: 'radial-gradient(circle, rgba(63,107,107,0.12), transparent 70%)', filter: 'blur(8px)', animation: 'urFloatC 13s ease-in-out infinite' }} />
+        </div>
+
+        <div className="max-w-xl mx-auto relative z-10">
 
           {/* Live social proof pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6"
-            style={{ background: 'rgba(169,78,24,0.07)', border: '1px solid rgba(169,78,24,0.18)', color: CLAY }}>
+          <div className="ur-anim inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6"
+            style={{ background: 'rgba(169,78,24,0.07)', border: '1px solid rgba(169,78,24,0.18)', color: CLAY, animationDelay: '.04s' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
-            {fromTiktok ? '🔥 Ce test circule sur TikTok en ce moment' : 'Test de personnalité · Résultat immédiat'}
+            {fromTiktok ? (
+              <span className="inline-flex items-center gap-1.5">
+                <span style={{ display: 'inline-block', animation: 'urFlamePulse 1.4s ease-in-out infinite' }}>🔥</span>
+                Ce test circule sur TikTok en ce moment
+              </span>
+            ) : 'Test de personnalité · Résultat immédiat'}
           </div>
 
-          <h1 className="font-display text-5xl sm:text-[58px] font-black leading-[1.04] mb-5 tracking-tight" style={{ color: '#2b2622' }}>
+          <h1 className="ur-anim font-display font-black mb-5 tracking-tight" style={{ color: '#2b2622', fontSize: 'clamp(2rem, 9vw, 3.4rem)', lineHeight: 1.06, wordBreak: 'break-word', animationDelay: '.12s' }}>
             {fromTiktok ? (
-              <>Tu réagis différemment<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>des autres</span> — voilà pourquoi</>
+              <>
+                Tu réagis{' '}
+                <span className="relative inline-block" style={{ color: CLAY, fontStyle: 'italic' }}>
+                  différemment
+                  <svg className="absolute left-0 -bottom-1 w-full" height="14" viewBox="0 0 220 14" fill="none" preserveAspectRatio="none" aria-hidden>
+                    <path d="M3 9C40 4 110 3 217 7" stroke={CLAY} strokeWidth="4" strokeLinecap="round"
+                      style={{ strokeDasharray: 340, strokeDashoffset: 340, animation: 'urDraw 1s ease .55s forwards' }} />
+                  </svg>
+                </span>
+                {' '}des autres.<br />Voilà pourquoi.
+              </>
             ) : (
-              <>Quel est<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type de personnalité ?</>
+              <>
+                Quel est{' '}
+                <span className="relative inline-block" style={{ color: CLAY, fontStyle: 'italic' }}>
+                  vraiment
+                  <svg className="absolute left-0 -bottom-1 w-full" height="14" viewBox="0 0 160 14" fill="none" preserveAspectRatio="none" aria-hidden>
+                    <path d="M3 9C30 4 90 3 157 7" stroke={CLAY} strokeWidth="4" strokeLinecap="round"
+                      style={{ strokeDasharray: 340, strokeDashoffset: 340, animation: 'urDraw 1s ease .55s forwards' }} />
+                  </svg>
+                </span>
+                {' '}ton type de personnalité ?
+              </>
             )}
           </h1>
 
-          <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-8">
+          <p className="ur-anim text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-8" style={{ animationDelay: '.2s' }}>
             {fromTiktok
               ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
               : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
           </p>
 
-          <Link
-            href={fromTiktok ? '/quiz/personnalite' : '/commencer'}
-            className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-black text-white text-base transition-all hover:opacity-90 active:scale-[0.98]"
-            style={{ background: CLAY, boxShadow: '0 8px 28px rgba(169,78,24,0.38)' }}
-          >
-            {fromTiktok ? 'Découvrir mon type — Gratuit →' : 'Découvrir mon type →'}
-          </Link>
-          <p className="text-stone-400 text-xs mt-3.5">
+          {/* CTA with sweeping shine + gentle breathe */}
+          <div className="ur-anim" style={{ animationDelay: '.28s' }}>
+            <Link
+              href={fromTiktok ? '/quiz/personnalite' : '/commencer'}
+              className="relative inline-flex items-center gap-2 px-9 py-4 rounded-full font-black text-white text-base overflow-hidden active:scale-[0.98]"
+              style={{ background: CLAY, animation: 'urCtaBreathe 2.6s ease-in-out infinite' }}
+            >
+              <span className="relative z-10">{fromTiktok ? 'Découvrir mon type — Gratuit' : 'Découvrir mon type'}</span>
+              <span className="relative z-10" style={{ display: 'inline-block', animation: 'urNudge 1.3s ease-in-out infinite' }}>→</span>
+              {/* shine sweep */}
+              <span aria-hidden className="absolute top-0 bottom-0 w-1/3" style={{ left: 0, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent)', animation: 'urShine 3.4s ease-in-out infinite' }} />
+            </Link>
+          </div>
+          <p className="ur-anim text-stone-400 text-xs mt-3.5" style={{ animationDelay: '.34s' }}>
             Gratuit · Résultat immédiat · Sans inscription
           </p>
 
           {/* Trust strip right under the CTA — where the click decision happens */}
-          <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="ur-anim flex items-center justify-center gap-2 mt-4" style={{ animationDelay: '.4s' }}>
             <span style={{ color: '#e0a380', letterSpacing: 1, fontSize: 13 }}>★★★★★</span>
             <span className="text-xs font-bold" style={{ color: '#2b2622' }}>4,9</span>
             <span className="text-xs text-stone-400">· +12 000 tests ce mois</span>
           </div>
           <div className="flex justify-center -space-x-2 mt-3">
             {['#a94e18', '#566b45', '#3f6b6b', '#b07d2b', '#8a3e16'].map((c, i) => (
-              <div key={i} className="w-7 h-7 rounded-full border-2 border-white" style={{ background: c }} />
+              <div key={i} className="w-7 h-7 rounded-full border-2 border-white" style={{ background: c, opacity: 0, animation: `urPop .5s cubic-bezier(.22,1,.36,1) ${0.46 + i * 0.07}s forwards` }} />
             ))}
           </div>
 
@@ -193,8 +251,8 @@ export default function LandingPage() {
               { value: '15 quiz', label: 'Différents thèmes' },
               { value: '+10 000', label: 'Résultats ce mois' },
               { value: 'Gratuit', label: 'Pour commencer' },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
+            ].map((s, i) => (
+              <div key={s.label} className="ur-anim text-center" style={{ animationDelay: `${0.6 + i * 0.1}s` }}>
                 <div className="font-display text-2xl font-black" style={{ color: '#2b2622' }}>{s.value}</div>
                 <div className="text-xs text-stone-400 mt-1">{s.label}</div>
               </div>
@@ -466,10 +524,11 @@ export default function LandingPage() {
         >
           <Link
             href={fromTiktok ? '/quiz/personnalite' : '/commencer'}
-            className="block w-full text-center py-4 rounded-full font-black text-white text-base transition-all active:scale-[0.98]"
+            className="relative block w-full text-center py-4 rounded-full font-black text-white text-base overflow-hidden active:scale-[0.98]"
             style={{ background: CLAY, boxShadow: '0 6px 24px rgba(169,78,24,0.40)' }}
           >
-            {fromTiktok ? 'Faire le test — Gratuit →' : 'Découvrir mon type →'}
+            <span className="relative z-10">{fromTiktok ? 'Faire le test — Gratuit →' : 'Découvrir mon type →'}</span>
+            <span aria-hidden className="absolute top-0 bottom-0 w-1/3" style={{ left: 0, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)', animation: 'urShine 3.4s ease-in-out infinite' }} />
           </Link>
         </div>
       )}
