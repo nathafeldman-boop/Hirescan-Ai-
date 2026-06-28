@@ -154,7 +154,7 @@ export default function LandingPage() {
             {fromTiktok ? (
               <>Tu réagis différemment<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>des autres</span> — voilà pourquoi</>
             ) : (
-              <>Quel est<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type ?</>
+              <>Quel est<br /><span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type de personnalité ?</>
             )}
           </h1>
 
