@@ -790,6 +790,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
   const [stickyBar, setStickyBar] = useState(false);
   const [exitModal, setExitModal] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const exitShown = useRef(false);
   const [liveCount] = useState(() => {
     const base: Record<string, number> = {
@@ -911,6 +912,25 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       return;
     }
     window.location.href = `https://urcecret.site/quiz/personnalite${qs}`;
+  }, [typeCode]);
+
+  // Reliable fallback when the in-app browser blocks the auto-open: copy the link
+  // so the user can paste it into their real browser.
+  const copyProfileLink = useCallback(async () => {
+    let ref = '';
+    try { ref = localStorage.getItem('_urs_ref') ?? ''; } catch {}
+    const url = `https://urcecret.site/quiz/personnalite?pending=${typeCode}${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Fallback for webviews without clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = url; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch {}
+      document.body.removeChild(ta);
+    }
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2500);
   }, [typeCode]);
 
   return (
@@ -1060,26 +1080,63 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             paywall et pourra payer sans friction. Le type est conservé (?pending). */}
         {isInApp ? (
           <div className="mt-4">
-            <div className="rounded-2xl p-5 text-center" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 28px rgba(169,78,24,0.35)' }}>
-              <p className="text-[10px] font-black uppercase tracking-widest mb-2 text-white/80">
-                {isFr ? 'Ton analyse complète est prête' : 'Your full analysis is ready'}
+            {/* Arrow pointing to the ••• menu at the very top-right of the webview */}
+            <div className="fixed top-2 right-3 z-[60] flex flex-col items-end pointer-events-none" style={{ animation: 'arrowBounce 1.1s ease-in-out infinite' }}>
+              <svg width="40" height="40" viewBox="0 0 36 36" fill="none">
+                <path d="M6 30L30 6M30 6H14M30 6V22" stroke="#a94e18" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-[11px] font-black px-2.5 py-1 rounded-full text-white" style={{ background: '#a94e18', whiteSpace: 'nowrap' }}>
+                {isFr ? 'le menu ••• est ici' : 'the ••• menu is here'}
+              </span>
+            </div>
+            <style>{`@keyframes arrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}`}</style>
+
+            <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 28px rgba(169,78,24,0.35)' }}>
+              <p className="text-lg font-black text-white leading-tight mb-1 text-center">
+                {isFr ? `Ton profil ${typeCode} complet est prêt` : `Your full ${typeCode} profile is ready`}
               </p>
-              <p className="text-lg font-black text-white leading-tight mb-1">
-                {isFr ? `Débloque ton profil ${typeCode} complet` : `Unlock your full ${typeCode} profile`}
-              </p>
-              <p className="text-xs text-white/80 mb-4 leading-snug">
+              <p className="text-xs text-white/80 mb-4 leading-snug text-center">
                 {isFr ? 'Amour · Carrière · Face cachée · Compatibilité' : 'Love · Career · Shadow side · Compatibility'}
               </p>
+
+              {/* CLEAR 2-STEP INSTRUCTIONS — the reliable path */}
+              <div className="rounded-xl p-4 mb-3" style={{ background: 'rgba(255,255,255,0.14)' }}>
+                <p className="text-[11px] font-black uppercase tracking-wider text-white mb-3 text-center">
+                  {isFr ? '👉 Ouvre-le dans ton navigateur (5 sec)' : '👉 Open it in your browser (5 sec)'}
+                </p>
+                <div className="flex items-center gap-3 mb-2.5">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-white text-sm font-black flex items-center justify-center" style={{ color: '#a94e18' }}>1</span>
+                  <p className="text-sm text-white font-semibold leading-snug">
+                    {isFr ? <>Appuie sur <span className="font-black">•••</span> tout en haut à droite ↗</> : <>Tap <span className="font-black">•••</span> at the very top right ↗</>}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-white text-sm font-black flex items-center justify-center" style={{ color: '#a94e18' }}>2</span>
+                  <p className="text-sm text-white font-semibold leading-snug">
+                    {isFr ? <>Choisis <span className="font-black">« Ouvrir dans le navigateur »</span></> : <>Choose <span className="font-black">&ldquo;Open in browser&rdquo;</span></>}
+                  </p>
+                </div>
+              </div>
+
+              {/* Try auto-open (works on some Android) */}
               <button
                 onClick={openInBrowser}
-                className="w-full py-4 rounded-xl font-black text-sm active:scale-[0.98] transition-transform"
+                className="w-full py-3.5 rounded-xl font-black text-sm active:scale-[0.98] transition-transform mb-2"
                 style={{ background: 'white', color: '#a94e18', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}
               >
-                {isFr ? 'Voir mon profil complet →' : 'See my full profile →'}
+                {isFr ? '⚡ Essayer l\'ouverture auto →' : '⚡ Try auto-open →'}
               </button>
-              <p className="text-[11px] text-white/75 mt-2.5">
-                {isFr ? '🔓 S\'ouvre dans ton navigateur · paiement sécurisé' : '🔓 Opens in your browser · secure payment'}
-              </p>
+
+              {/* Reliable fallback: copy link to paste in browser */}
+              <button
+                onClick={copyProfileLink}
+                className="w-full py-2.5 rounded-xl font-bold text-xs active:scale-[0.98] transition-transform"
+                style={{ background: 'rgba(255,255,255,0.18)', color: 'white', border: '1px solid rgba(255,255,255,0.35)' }}
+              >
+                {linkCopied
+                  ? (isFr ? '✓ Lien copié — colle-le dans ton navigateur' : '✓ Link copied — paste it in your browser')
+                  : (isFr ? '📋 Ou copie le lien' : '📋 Or copy the link')}
+              </button>
             </div>
           </div>
         ) : (
