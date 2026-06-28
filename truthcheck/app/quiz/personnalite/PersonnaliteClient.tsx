@@ -949,6 +949,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         {/* ─── Hero: type revealed for free — trust + curiosity gap ─────────── */}
         <div className="text-center mb-5">
+          {/* Type identity (badge, rarity, tagline, famous) — web only.
+              Hidden on TikTok in-app: revealing the full identity makes it feel
+              like a finished free result and people bounce. Keep only the hook. */}
+          {!isInApp && (<>
           <div className="inline-flex items-center gap-3 mb-3 px-5 py-3 rounded-2xl"
                style={{ background: 'white', border: '1.5px solid rgba(169,78,24,0.25)', boxShadow: '0 4px 16px rgba(169,78,24,0.08)' }}>
             <span className="text-4xl">{type?.emoji ?? '🔮'}</span>
@@ -976,6 +980,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               ))}
             </div>
           )}
+          </>)}
           {isFr && HOOK_LINES[typeCode] ? (
             <div className="rounded-2xl px-4 py-3" style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.18)' }}>
               <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#a94e18' }}>Ton profil complet révèle</p>
