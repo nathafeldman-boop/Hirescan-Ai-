@@ -590,10 +590,10 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
   return (
     <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
       <p className="text-sm font-bold text-stone-800 mb-1">
-        📩 {isFr ? `Garde ton profil ${typeCode} — gratuit` : `Save your ${typeCode} profile — free`}
+        📩 {isFr ? `Pas encore décidé ? Garde ton profil ${typeCode}` : `Not ready yet? Save your ${typeCode} profile`}
       </p>
       <p className="text-xs text-stone-500 mb-3">
-        {isFr ? 'Reçois ton profil par email. Aucun spam, aucun engagement.' : 'Get your profile by email. No spam, no commitment.'}
+        {isFr ? 'On t\'envoie ton type + un extrait de ton analyse par email — gratuit, sans spam. Tu pourras le débloquer quand tu veux.' : 'We\'ll email you your type + a free analysis preview — no spam. Unlock whenever you want.'}
       </p>
       <form onSubmit={submit} className="flex gap-2">
         <input
