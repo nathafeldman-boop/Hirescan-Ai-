@@ -22,7 +22,6 @@ import Tracker from './Tracker';
 import { Suspense } from 'react';
 import AffiliateTracker from '@/components/AffiliateTracker';
 import Analytics from '@/components/Analytics';
-import InAppGate from '@/components/InAppGate';
 
 const BASE = 'https://urcecret.site';
 
@@ -141,7 +140,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Analytics />
           </Suspense>
           {children}
-          <InAppGate />
         </Providers>
       </body>
     </html>
