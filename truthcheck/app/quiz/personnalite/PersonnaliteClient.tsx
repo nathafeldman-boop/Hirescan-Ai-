@@ -949,10 +949,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         {/* ─── Hero: type revealed for free — trust + curiosity gap ─────────── */}
         <div className="text-center mb-5">
-          {/* Type identity (badge, rarity, tagline, famous) — web only.
-              Hidden on TikTok in-app: revealing the full identity makes it feel
-              like a finished free result and people bounce. Keep only the hook. */}
-          {!isInApp && (<>
+          {/* Type badge only — the reward (their type). We intentionally do NOT
+              reveal the full result for free: no rarity, no tagline, no famous
+              people. The complete profile stays behind the paywall. */}
           <div className="inline-flex items-center gap-3 mb-3 px-5 py-3 rounded-2xl"
                style={{ background: 'white', border: '1.5px solid rgba(169,78,24,0.25)', boxShadow: '0 4px 16px rgba(169,78,24,0.08)' }}>
             <span className="text-4xl">{type?.emoji ?? '🔮'}</span>
@@ -963,24 +962,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               <div className="text-sm font-semibold text-stone-500 mt-0.5">{isFr ? (type?.name ?? '') : typeCode}</div>
             </div>
           </div>
-          <p className="text-xs text-stone-400 mb-2">
-            {isFr ? `${type?.rarity ?? ''} de la population · ton analyse complète ci-dessous` : `${type?.rarity ?? ''} of people · your full analysis below`}
-          </p>
-          {isFr && type?.tagline && (
-            <p className="text-xs text-stone-500 italic mb-2 leading-snug">«&nbsp;{type.tagline}&nbsp;»</p>
-          )}
-          {type?.famousExamples && type.famousExamples.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-1.5 mb-3">
-              <span className="text-[10px] text-stone-400">{isFr ? `Célèbres ${typeCode} :` : `Famous ${typeCode}:`}</span>
-              {type.famousExamples.slice(0, 3).map((f: string) => (
-                <span key={f} className="text-[10px] font-semibold px-2 py-0.5 rounded-full text-stone-600"
-                      style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.12)' }}>
-                  {f}
-                </span>
-              ))}
-            </div>
-          )}
-          </>)}
           {isFr && HOOK_LINES[typeCode] ? (
             <div className="rounded-2xl px-4 py-3" style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.18)' }}>
               <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#a94e18' }}>Ton profil complet révèle</p>
