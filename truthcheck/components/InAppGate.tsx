@@ -105,10 +105,20 @@ export default function InAppGate() {
           Ur<span style={{ color: '#a94e18' }}>Cecret</span>
         </p>
 
-        <p style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.35, margin: '0 0 24px' }}>
+        <p style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.35, margin: '0 0 16px' }}>
           Pour accéder aux tests et à toutes les fonctionnalités,
           ouvre cette page dans ton navigateur :
         </p>
+
+        {/* ── CTA hook above the tuto — gives them the WHY ── */}
+        <div style={{ background: 'rgba(169,78,24,0.08)', border: '1px solid rgba(169,78,24,0.22)', borderRadius: 14, padding: '14px 16px', marginBottom: 22, textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1c1917', lineHeight: 1.4 }}>
+            🔮 Ton profil de personnalité complet t&apos;attend
+          </p>
+          <p style={{ margin: '4px 0 0', fontSize: 12.5, color: '#7a6f63', lineHeight: 1.45 }}>
+            Ton type, pourquoi tu agis comme ça en amour &amp; au travail, ta face cachée — en 2 étapes ci-dessous 👇
+          </p>
+        </div>
 
         {/* 2 steps */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24, textAlign: 'left' }}>
