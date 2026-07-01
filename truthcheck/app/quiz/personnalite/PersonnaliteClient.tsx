@@ -842,15 +842,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly', emailOverride?: string) => {
     const email = emailOverride ?? userEmail;
-    // ── Account required before ANY payment ──
-    // A logged-out visitor with no captured email is sent to create an account
-    // first, then returned to their result page (?pending) to complete payment.
-    if (!email) {
-      diagLog('checkout_requires_account', { intent: checkoutType, typeCode });
-      const cb = `/quiz/personnalite?pending=${typeCode}`;
-      window.location.href = `/login?callbackUrl=${encodeURIComponent(cb)}`;
-      return;
-    }
+    // Direct checkout — NO forced account before paying. The account is created
+    // automatically from the Stripe email after payment (webhook + /success).
     diagLog(email ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
     track('checkout_click', {
       quiz: 'personnalite',
