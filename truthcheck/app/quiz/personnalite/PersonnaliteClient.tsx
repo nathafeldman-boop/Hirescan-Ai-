@@ -540,7 +540,7 @@ function worldOf(code: string) {
 
 // Glyphes maison — trait 1.5px, grille 24. Remplacent les emojis d'interface.
 function Glyph({ name, color = '#131110', size = 20 }: {
-  name: 'heart' | 'compass' | 'moon' | 'key' | 'lock' | 'shield';
+  name: 'heart' | 'compass' | 'moon' | 'key' | 'lock' | 'shield' | 'mirror' | 'spark' | 'eye' | 'leaf' | 'star';
   color?: string; size?: number;
 }) {
   const p = {
@@ -555,6 +555,11 @@ function Glyph({ name, color = '#131110', size = 20 }: {
     case 'key':     return <svg {...p}><circle cx="8" cy="15.5" r="3.5" /><path d="m10.5 13 8-8M15 7.5 17.5 10M18 4.5 20 6.5" /></svg>;
     case 'lock':    return <svg {...p}><rect x="5.5" y="10.5" width="13" height="9" rx="2" /><path d="M8.5 10.5v-3a3.5 3.5 0 0 1 7 0v3" /></svg>;
     case 'shield':  return <svg {...p}><path d="M12 3.5 5 6.2v5.1c0 4.4 3 7.6 7 9.2 4-1.6 7-4.8 7-9.2V6.2Z" /></svg>;
+    case 'mirror':  return <svg {...p}><ellipse cx="12" cy="10" rx="6.5" ry="7.5" /><path d="M12 17.5V21M8.5 21h7M9.2 6.8c.7-.9 1.8-1.6 3-1.8" /></svg>;
+    case 'spark':   return <svg {...p}><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.2 6.2l2.6 2.6M15.2 15.2l2.6 2.6M17.8 6.2l-2.6 2.6M8.8 15.2l-2.6 2.6" /></svg>;
+    case 'eye':     return <svg {...p}><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="3" /></svg>;
+    case 'leaf':    return <svg {...p}><path d="M5 19C5 10 10 5 19.5 4.5 20 14 15 19 6 19" /><path d="M5 19c3-3.5 6.5-7 10-9.5" /></svg>;
+    case 'star':    return <svg {...p}><path d="m12 3.5 2.4 5 5.6.7-4.1 3.8 1.1 5.5L12 15.8l-5 2.7 1.1-5.5L4 9.2l5.6-.7Z" /></svg>;
   }
 }
 
@@ -1082,7 +1087,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '1px solid #e6e0d4', background: 'white' }}>
           <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: '#f0ebe0' }}>
             <p className="text-[10px] uppercase" style={{ color: '#131110', letterSpacing: '0.2em', fontWeight: 700 }}>
-              {isFr ? `Profil ${typeCode} complet · 4 chapitres` : `Full ${typeCode} profile · 4 chapters`}
+              {isFr ? `Profil ${typeCode} complet · 8 chapitres` : `Full ${typeCode} profile · 8 chapters`}
             </p>
             <span className="flex items-center gap-1.5 text-[10px] text-stone-400 font-semibold">
               <Glyph name="lock" color="#a08655" size={13} />
@@ -1090,15 +1095,23 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </span>
           </div>
           {(isFr ? [
-            { glyph: 'heart' as const,   title: 'Amour & Relations', preview: type?.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète' },
-            { glyph: 'compass' as const, title: 'Carrière & Superpouvoir', preview: type?.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel' },
-            { glyph: 'moon' as const,    title: 'Face cachée & Angles morts', preview: type?.growth?.slice(0, 90) ?? 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face' },
-            { glyph: 'key' as const,     title: 'Compatibilité exacte', preview: type?.compatibleWith ? `Tes types les plus compatibles : ${type.compatibleWith.join(', ')} — et ceux qui te drainent` : 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr' },
+            { glyph: 'mirror' as const,  title: 'Qui tu es vraiment', preview: type?.fullDesc?.slice(0, 90) ?? 'Le portrait complet — celui que même tes proches n\'ont jamais mis en mots' },
+            { glyph: 'heart' as const,   title: 'Amour & attachement', preview: type?.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète' },
+            { glyph: 'compass' as const, title: 'Carrière & superpouvoir', preview: type?.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel' },
+            { glyph: 'spark' as const,   title: 'Tes forces', preview: type?.strengths?.length ? `${type.strengths.slice(0, 3).join(' · ')} — et comment t'appuyer dessus dans les moments qui comptent` : 'Ce sur quoi tu peux compter chez toi, même quand tout tremble' },
+            { glyph: 'eye' as const,     title: 'Tes angles morts', preview: type?.weaknesses?.length ? `${type.weaknesses.slice(0, 3).join(' · ')} — ce que personne n'ose te dire en face` : 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face' },
+            { glyph: 'moon' as const,    title: 'Ta face cachée & ta croissance', preview: type?.growth?.slice(0, 90) ?? 'Le côté de toi qui ne sort que sous pression — et comment en faire un allié' },
+            { glyph: 'key' as const,     title: 'Compatibilités exactes', preview: type?.compatibleWith ? `Tes types les plus compatibles : ${type.compatibleWith.join(', ')} — et ceux qui te drainent` : 'Les types qui te comprennent vraiment — et les profils qui te drainent à coup sûr' },
+            { glyph: 'star' as const,    title: `Les ${typeCode} célèbres`, preview: type?.famousExamples?.length ? `${type.famousExamples.slice(0, 3).join(' · ')} — ce que vous partagez, et ce que ça dit de ton potentiel` : 'Les figures publiques qui partagent ton fonctionnement exact' },
           ] : [
-            { glyph: 'heart' as const,   title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that keeps repeating' },
-            { glyph: 'compass' as const, title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage' },
-            { glyph: 'moon' as const,    title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that sabotages you — that nobody dares to say to your face' },
-            { glyph: 'key' as const,     title: 'Exact Compatibility', preview: 'The 3 types that truly get you — and the 2 profiles that always drain you' },
+            { glyph: 'mirror' as const,  title: 'Who you really are', preview: 'The full portrait — the one even the people close to you never put into words' },
+            { glyph: 'heart' as const,   title: 'Love & attachment', preview: 'Why you always invest more than the other — and the painful pattern that keeps repeating' },
+            { glyph: 'compass' as const, title: 'Career & superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage' },
+            { glyph: 'spark' as const,   title: 'Your strengths', preview: 'What you can count on in yourself, even when everything shakes' },
+            { glyph: 'eye' as const,     title: 'Your blind spots', preview: 'What you do unconsciously that sabotages you — that nobody dares to say to your face' },
+            { glyph: 'moon' as const,    title: 'Shadow side & growth', preview: 'The side of you that only shows under pressure — and how to make it an ally' },
+            { glyph: 'key' as const,     title: 'Exact compatibilities', preview: 'The types that truly get you — and the profiles that always drain you' },
+            { glyph: 'star' as const,    title: `Famous ${typeCode}s`, preview: 'The public figures who share your exact wiring — and what it says about your ceiling' },
           ]).map((s, i, arr) => (
             <div key={s.title} className={`flex items-start gap-3.5 px-5 py-3.5${i < arr.length - 1 ? ' border-b' : ''}`}
                  style={{ borderColor: '#f0ebe0' }}>
@@ -1112,6 +1125,37 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               <span className="flex-shrink-0 mt-1"><Glyph name="lock" color="#c9bda5" size={14} /></span>
             </div>
           ))}
+        </div>
+
+        {/* ─── Un profil qu'on rouvre toute sa vie — la valeur dans le temps ── */}
+        <div className="rounded-2xl px-5 py-4 mb-3" style={{ background: 'white', border: '1px solid #e6e0d4' }}>
+          <p className="text-[10px] uppercase mb-3" style={{ color: world.accent, letterSpacing: '0.2em', fontWeight: 700 }}>
+            {isFr ? 'Tu le rouvriras toute ta vie' : 'You will reopen it for life'}
+          </p>
+          <div className="space-y-2.5">
+            {(isFr ? [
+              'Avant un entretien — pour savoir comment te vendre sans te trahir',
+              'Au début d\'une relation — pour comprendre comment tu t\'attaches',
+              'Dans un conflit — pour voir ton angle mort avant qu\'il te coûte',
+              'À chaque grande décision — pour trancher selon ton vrai fonctionnement',
+            ] : [
+              'Before an interview — to sell yourself without betraying yourself',
+              'At the start of a relationship — to understand how you attach',
+              'In a conflict — to see your blind spot before it costs you',
+              'At every big decision — to choose according to your real wiring',
+            ]).map((m, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full" style={{ background: world.accent, opacity: 0.7 }} />
+                <p className="text-[12.5px] text-stone-600" style={{ lineHeight: 1.55 }}>{m}</p>
+              </div>
+            ))}
+          </div>
+          <div className="ur-rule my-3.5" />
+          <p className="text-[12px] text-stone-500 text-center" style={{ lineHeight: 1.55 }}>
+            {isFr
+              ? <>Un bilan de personnalité chez un praticien coûte 150 € ou plus.<br /><span className="font-semibold text-stone-800">Ton profil complet : 1,99 €, gardé à vie.</span></>
+              : <>A personality assessment with a practitioner costs €150+.<br /><span className="font-semibold text-stone-800">Your full profile: €1.99, kept for life.</span></>}
+          </p>
         </div>
 
         <p className="text-center text-[11px] text-stone-500 mb-1">
