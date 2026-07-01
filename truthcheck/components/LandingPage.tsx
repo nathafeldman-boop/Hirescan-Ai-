@@ -203,6 +203,29 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Pourquoi c'est différent — rangées éditoriales, pas des cartes ── */}
+      <section className="relative z-10 pb-12 px-6">
+        <div className="max-w-lg mx-auto">
+          <p className="text-[10px] font-bold uppercase text-center mb-6" style={{ color: CLAY, letterSpacing: '0.24em' }}>
+            Pourquoi ce test est différent
+          </p>
+          {[
+            { n: '01', t: 'Les 4 lettres, tout le monde te les donne.', d: 'Le pourquoi — comment tu aimes, décides, te sabotes — c\'est ça que ton profil explique.' },
+            { n: '02', t: 'Fondé sur les 8 fonctions cognitives de Jung.', d: 'Pas un quiz de magazine : le modèle qui décrit comment ton cerveau traite le monde.' },
+            { n: '03', t: 'Écrit pour être relu toute ta vie.', d: 'Avant un entretien, au début d\'une relation, dans un conflit, à chaque grande décision.' },
+          ].map((r, i, arr) => (
+            <div key={r.n} className={`flex items-start gap-5 py-5${i < arr.length - 1 ? ' border-b' : ''}`}
+                 style={{ borderColor: '#e8e0d0' }}>
+              <span className="font-display flex-shrink-0" style={{ fontSize: 15, color: CLAY, fontWeight: 600, marginTop: 2 }}>{r.n}</span>
+              <div>
+                <p className="text-[15px] font-bold text-stone-900 leading-snug" style={{ letterSpacing: '-0.01em' }}>{r.t}</p>
+                <p className="text-[13px] text-stone-500 mt-1" style={{ lineHeight: 1.6 }}>{r.d}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── Section 2 : MBTI pour traffic TikTok, quiz thématiques pour trafic organique ── */}
       <section className="relative z-10 pb-10 px-5">
         <div className="max-w-lg mx-auto">
