@@ -848,8 +848,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       const prev = localStorage.getItem('_urs_co');
       if (prev) {
         const { ts } = JSON.parse(prev) as { ts: number };
-        if (Date.now() - ts < 20 * 60 * 1000) {
-          alert('Un paiement est déjà en cours ou vient d\'être effectué. Vérifie tes emails ou attends quelques minutes avant de réessayer.');
+        // Only guard against an accidental double-tap (15s). A user who abandons
+        // or gets declined MUST be able to retry immediately — never block real retries.
+        if (Date.now() - ts < 15 * 1000) {
           return;
         }
       }
@@ -1389,42 +1390,21 @@ export default function PersonnaliteClient() {
         else { setPhase('result'); }
         return;
       }
-      try {
-        const saved = localStorage.getItem('_mbti_pending');
-        if (saved && mbtiTypes[saved]) {
-          diagLog('type_from_localstorage', { saved });
-          localStorage.removeItem('_mbti_pending');
-          fetch('/api/user/save-mbti', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mbtiType: saved }),
-          }).catch(() => {});
-          setMbtiType(saved);
-          if (isPremium) { router.push(`/types/${saved.toLowerCase()}`); }
-          else { setPhase('result'); }
-        }
-      } catch {}
+      // No ?pending in the URL → the test is FREE and must always be shown first.
+      // We deliberately do NOT auto-jump to the paywall from a stale localStorage
+      // type (that broke the "free test" promise and showed an old/fake result).
+      if (phase === 'gate') setPhase('quiz');
     } else {
-      // Not authenticated — if we were waiting for magic link, show paywall with type from URL/storage
+      // Not authenticated — only show the result if we're mid magic-link flow
+      // (explicit ?pending in the URL). Otherwise ALWAYS start with the free test.
       if (pending && mbtiTypes[pending]) {
         diagLog('pending_found_not_authed', { pending });
         window.history.replaceState(null, '', '/quiz/personnalite');
         setMbtiType(pending);
         setPhase('result');
         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
-      } else {
-        try {
-          const saved = localStorage.getItem('_mbti_pending');
-          if (saved && mbtiTypes[saved]) {
-            diagLog('type_from_localstorage_not_authed', { saved });
-            setMbtiType(saved);
-            setPhase('result');
-          } else if (phase === 'gate') {
-            setPhase('quiz');
-          }
-        } catch {
-          if (phase === 'gate') setPhase('quiz');
-        }
+      } else if (phase === 'gate') {
+        setPhase('quiz');
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
