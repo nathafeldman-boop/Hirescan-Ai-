@@ -123,15 +123,18 @@ export default function LandingPage() {
         }}
       >
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-xl font-black tracking-tight font-display" style={{ color: '#2b2622' }}>
-            Ur<span style={{ color: CLAY }}>Cecret</span>
+          <span className="text-xl tracking-tight font-display transition-colors duration-300"
+                style={{ color: scrolled ? '#2b2622' : '#f5f1e8', fontWeight: 600 }}>
+            Ur<span style={{ color: scrolled ? CLAY : '#eec9b8' }}>Cecret</span>
           </span>
           <div className="flex items-center gap-3">
             <UserMenu />
             <Link
               href="/quiz/personnalite"
-              className="text-sm font-bold px-5 py-2.5 rounded-full transition-all hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
-              style={{ background: '#131110', color: '#f5f1e8', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
+              className="text-sm font-bold px-5 py-2.5 rounded-full transition-all duration-300 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
+              style={scrolled
+                ? { background: '#131110', color: '#f5f1e8', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }
+                : { background: '#f5f1e8', color: '#131110', boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}
             >
               Commencer
             </Link>
@@ -139,68 +142,127 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative z-10 pt-36 pb-12 px-6 text-center">
-        <div className="max-w-xl mx-auto">
+      {/* ═══ HERO — scène d'encre « L'Intérieur » : atmosphère vivante ═══ */}
+      <section className="relative overflow-hidden text-center"
+               style={{ background: 'radial-gradient(150% 110% at 50% -10%, #26211d 0%, #17140f 48%, #0f0d0b 100%)' }}>
+        <style>{`
+          @keyframes heroGlowA { 0%,100% { transform: translate(0,0) scale(1); opacity:.5 } 50% { transform: translate(34px,-22px) scale(1.12); opacity:.85 } }
+          @keyframes heroGlowB { 0%,100% { transform: translate(0,0) scale(1); opacity:.35 } 50% { transform: translate(-40px,26px) scale(1.15); opacity:.6 } }
+          @keyframes heroGlowC { 0%,100% { transform: translate(0,0); opacity:.28 } 50% { transform: translate(20px,30px); opacity:.5 } }
+          @keyframes heroDust { 0% { transform: translateY(0); opacity:0 } 12% { opacity:.7 } 88% { opacity:.7 } 100% { transform: translateY(-105px); opacity:0 } }
+          @keyframes heroRay { 0%,100% { opacity:.5 } 50% { opacity:.95 } }
+          @keyframes heroUp { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+          @keyframes heroDraw { from { stroke-dashoffset:300 } to { stroke-dashoffset:0 } }
+          @keyframes heroShine { 0% { transform:translateX(-140%) skewX(-16deg) } 60%,100% { transform:translateX(340%) skewX(-16deg) } }
+          .hero-up { opacity:0; animation: heroUp .8s cubic-bezier(.22,1,.36,1) forwards }
+          @media (prefers-reduced-motion: reduce) {
+            .hero-up { opacity:1; animation:none }
+            .hero-anim * { animation:none !important }
+          }
+        `}</style>
 
-          {/* Live social proof pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6"
-            style={{ background: 'rgba(169,78,24,0.07)', border: '1px solid rgba(169,78,24,0.18)', color: CLAY }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+        {/* ── Atmosphère : trois lueurs qui dérivent lentement ── */}
+        <div aria-hidden className="hero-anim absolute inset-0 pointer-events-none">
+          <div className="absolute rounded-full" style={{ top: '-12%', left: '-18%', width: 380, height: 380, background: 'radial-gradient(circle, rgba(238,201,184,0.22) 0%, transparent 60%)', filter: 'blur(6px)', animation: 'heroGlowA 13s ease-in-out infinite' }} />
+          <div className="absolute rounded-full" style={{ top: '30%', right: '-22%', width: 420, height: 420, background: 'radial-gradient(circle, rgba(168,180,148,0.14) 0%, transparent 60%)', filter: 'blur(6px)', animation: 'heroGlowB 17s ease-in-out infinite' }} />
+          <div className="absolute rounded-full" style={{ bottom: '-14%', left: '22%', width: 340, height: 340, background: 'radial-gradient(circle, rgba(224,168,106,0.16) 0%, transparent 60%)', filter: 'blur(6px)', animation: 'heroGlowC 21s ease-in-out infinite' }} />
+          {/* poussière qui monte dans la lumière */}
+          {[8, 20, 33, 47, 58, 69, 78, 90, 15, 41, 63, 85].map((x, i) => (
+            <span key={i} className="absolute rounded-full"
+              style={{ left: `${x}%`, bottom: `${6 + (i % 4) * 16}%`, width: i % 3 === 0 ? 3 : 2, height: i % 3 === 0 ? 3 : 2,
+                       background: i % 2 === 0 ? 'rgba(238,201,184,0.8)' : 'rgba(245,241,232,0.55)',
+                       animation: `heroDust ${9 + (i % 5) * 2.6}s linear ${i * 0.9}s infinite` }} />
+          ))}
+        </div>
+
+        <div className="relative max-w-xl mx-auto px-6 pt-32 pb-14">
+
+          {/* La porte entrouverte — le rai de lumière respire */}
+          <svg className="hero-up mx-auto mb-7" width="74" height="104" viewBox="0 0 74 104" fill="none" aria-hidden style={{ animationDelay: '.05s' }}>
+            <rect x="10" y="6" width="54" height="92" rx="4" stroke="rgba(245,241,232,0.30)" strokeWidth="1.5" />
+            <path d="M21 11 L48 16 L48 95 L21 98 Z" fill="rgba(238,201,184,0.12)" stroke="rgba(238,201,184,0.55)" strokeWidth="1.5" strokeLinejoin="round" />
+            <circle cx="43" cy="55" r="2" fill="#eec9b8" />
+            <g style={{ animation: 'heroRay 3.8s ease-in-out infinite' }}>
+              <path d="M48 20 L68 12 M48 54 L71 54 M48 88 L68 96" stroke="rgba(238,201,184,0.45)" strokeWidth="1.2" strokeLinecap="round" />
+            </g>
+          </svg>
+
+          {/* Pill */}
+          <div className="hero-up inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-7"
+            style={{ background: 'rgba(238,201,184,0.09)', border: '1px solid rgba(238,201,184,0.28)', color: '#eec9b8', animationDelay: '.12s' }}>
+            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#eec9b8', animation: 'heroRay 2.2s ease-in-out infinite' }} />
             {fromTiktok ? 'Ce test circule sur TikTok en ce moment' : 'Test de personnalité · Résultat immédiat'}
           </div>
 
-          <h1 className="font-display font-black mb-5 tracking-tight" style={{ color: '#2b2622', fontSize: 'clamp(2rem, 9vw, 3.4rem)', lineHeight: 1.06, wordBreak: 'break-word' }}>
+          <h1 className="hero-up font-display mb-6" style={{ color: '#f5f1e8', fontSize: 'clamp(2.05rem, 8.6vw, 3.3rem)', lineHeight: 1.08, fontWeight: 600, letterSpacing: '-0.015em', wordBreak: 'break-word', animationDelay: '.2s' }}>
             {fromTiktok ? (
-              <>Tu réagis différemment <span style={{ color: CLAY, fontStyle: 'italic' }}>des autres</span> — voilà pourquoi</>
+              <>Tu réagis différemment{' '}
+                <em className="relative inline-block" style={{ color: '#eec9b8' }}>
+                  des autres
+                  <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden>
+                    <path d="M3 7C48 3 130 2.5 197 5.5" stroke="#eec9b8" strokeWidth="2.5" strokeLinecap="round"
+                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .7s forwards' }} />
+                  </svg>
+                </em>
+                {' '}— voilà pourquoi</>
             ) : (
-              <>Quel est <span style={{ color: CLAY, fontStyle: 'italic' }}>vraiment</span> ton type de personnalité ?</>
+              <>Quel est{' '}
+                <em className="relative inline-block" style={{ color: '#eec9b8' }}>
+                  vraiment
+                  <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 150 10" fill="none" preserveAspectRatio="none" aria-hidden>
+                    <path d="M3 7C36 3 100 2.5 147 5.5" stroke="#eec9b8" strokeWidth="2.5" strokeLinecap="round"
+                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .7s forwards' }} />
+                  </svg>
+                </em>
+                {' '}ton type de personnalité&nbsp;?</>
             )}
           </h1>
 
-          <p className="text-stone-500 text-base max-w-sm mx-auto leading-relaxed mb-8">
+          <p className="hero-up text-[15px] max-w-sm mx-auto mb-9" style={{ color: 'rgba(245,241,232,0.55)', lineHeight: 1.7, animationDelay: '.3s' }}>
             {fromTiktok
               ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
               : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
           </p>
 
-          <Link
-            href="/quiz/personnalite"
-            className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-base transition-all hover:opacity-90 active:scale-[0.98] whitespace-nowrap"
-            style={{ background: '#131110', color: '#f5f1e8', boxShadow: '0 14px 36px rgba(19,17,16,0.3)' }}
-          >
-            Découvrir mon type →
-          </Link>
-          <p className="text-stone-400 text-xs mt-3.5">
+          {/* CTA papier sur encre — reflet qui balaie */}
+          <div className="hero-up" style={{ animationDelay: '.4s' }}>
+            <Link
+              href="/quiz/personnalite"
+              className="relative inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-base overflow-hidden active:scale-[0.98] transition-transform whitespace-nowrap"
+              style={{ background: '#f5f1e8', color: '#131110', boxShadow: '0 16px 44px rgba(0,0,0,0.5), 0 0 60px rgba(238,201,184,0.12)' }}
+            >
+              <span className="relative z-10">Découvrir mon type →</span>
+              <span aria-hidden className="absolute top-0 bottom-0 w-1/3" style={{ left: 0, background: 'linear-gradient(90deg, transparent, rgba(19,17,16,0.10), transparent)', animation: 'heroShine 3.8s ease-in-out 1.4s infinite' }} />
+            </Link>
+          </div>
+          <p className="hero-up text-xs mt-4" style={{ color: 'rgba(245,241,232,0.38)', animationDelay: '.48s' }}>
             Gratuit · Résultat immédiat · Sans inscription
           </p>
 
-          {/* Trust strip right under the CTA — where the click decision happens */}
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <span style={{ color: '#e0a380', letterSpacing: 1, fontSize: 13 }}>★★★★★</span>
-            <span className="text-xs font-bold" style={{ color: '#2b2622' }}>4,9</span>
-            <span className="text-xs text-stone-400">· +12 000 tests ce mois</span>
-          </div>
-          <div className="flex justify-center -space-x-2 mt-3">
-            {['#a94e18', '#566b45', '#3f6b6b', '#b07d2b', '#8a3e16'].map((c, i) => (
-              <div key={i} className="w-7 h-7 rounded-full border-2 border-white" style={{ background: c }} />
-            ))}
+          {/* Confiance */}
+          <div className="hero-up flex items-center justify-center gap-2 mt-5" style={{ animationDelay: '.56s' }}>
+            <span style={{ color: '#eec9b8', letterSpacing: 2, fontSize: 12 }}>★★★★★</span>
+            <span className="text-xs font-bold" style={{ color: '#f5f1e8' }}>4,9</span>
+            <span className="text-xs" style={{ color: 'rgba(245,241,232,0.40)' }}>· +12 000 tests ce mois</span>
           </div>
 
-          {/* Stats */}
-          <div className="flex items-center justify-center gap-10 mt-12 pt-8" style={{ borderTop: '1px solid #e4d9c8' }}>
+          {/* Stats — filet de lumière */}
+          <div className="hero-up flex items-center justify-center gap-10 mt-10 pt-7" style={{ borderTop: '1px solid rgba(245,241,232,0.10)', animationDelay: '.64s' }}>
             {[
               { value: '15 quiz', label: 'Différents thèmes' },
               { value: '+10 000', label: 'Résultats ce mois' },
               { value: 'Gratuit', label: 'Pour commencer' },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <div className="font-display text-2xl font-black" style={{ color: '#2b2622' }}>{s.value}</div>
-                <div className="text-xs text-stone-400 mt-1">{s.label}</div>
+                <div className="font-display text-xl" style={{ color: '#f5f1e8', fontWeight: 600 }}>{s.value}</div>
+                <div className="text-[11px] mt-1" style={{ color: 'rgba(245,241,232,0.38)' }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Fondu encre → papier */}
+        <div aria-hidden className="h-16" style={{ background: 'linear-gradient(to bottom, transparent, #f7f3ec)' }} />
       </section>
 
       {/* ── Pourquoi c'est différent — rangées éditoriales, pas des cartes ── */}
@@ -232,7 +294,7 @@ export default function LandingPage() {
           {fromTiktok ? (
             <>
               <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
-                🧠 Les 4 familles MBTI
+                Les 4 familles MBTI
               </p>
               <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-1">
                 Quel type es-tu vraiment ?
@@ -273,7 +335,7 @@ export default function LandingPage() {
           ) : (
             <>
               <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
-                🔍 Questions secrètes
+                Questions secrètes
               </p>
               <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-1">
                 Des révélations que tu n&apos;attendais pas
@@ -320,22 +382,14 @@ export default function LandingPage() {
       <section className="relative z-10 py-4 px-4">
         <div className="max-w-lg mx-auto space-y-3">
           {[
-            { msg: "j'ai fait le quiz infidélité à 2h du matin… j'avais 78%. Deux semaines après j'avais ma réponse. L'analyse était précise à un niveau qui m'a mis mal à l'aise 😰", who: "Camille, 24 ans" },
-            { msg: "INTJ depuis 3 ans sur 16personalities — ici l'analyse des fonctions cognitives m'a appris des trucs que je ne savais pas sur moi-même. C'est pas le même niveau.", who: "Lucas, 22 ans" },
-            { msg: "j'ai envoyé le lien du quiz amoureux à mon meilleur ami sans lui dire pourquoi. Il a eu 82%. On s'est parlé pour la première fois en vrai après ça 🙏", who: "Jade, 27 ans" },
-          ].map(({ msg, who }) => (
-            <div
-              key={who}
-              className="flex items-start gap-3 rounded-2xl px-4 py-3"
-              style={{ background: '#fff', border: '1px solid #ece2d4' }}
-            >
-              <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-black text-white" style={{ background: CLAY }}>
-                {who[0]}
-              </div>
-              <div>
-                <p className="text-stone-700 text-sm leading-relaxed">{msg}</p>
-                <p className="text-stone-400 text-xs mt-1">— {who}</p>
-              </div>
+            { msg: "J'ai fait le quiz infidélité à 2h du matin… j'avais 78 %. Deux semaines après, j'avais ma réponse. L'analyse était précise à un niveau qui m'a mis mal à l'aise.", who: "Camille, 24 ans" },
+            { msg: "INTJ depuis 3 ans sur 16personalities — ici, l'analyse des fonctions cognitives m'a appris des choses que je ne savais pas sur moi-même. Ce n'est pas le même niveau.", who: "Lucas, 22 ans" },
+            { msg: "J'ai envoyé le quiz amoureux à mon meilleur ami sans lui dire pourquoi. Il a eu 82 %. On s'est parlé pour la première fois en vrai après ça.", who: "Jade, 27 ans" },
+          ].map(({ msg, who }, i, arr) => (
+            <div key={who} className={`relative pl-9 pr-2 py-5${i < arr.length - 1 ? ' border-b' : ''}`} style={{ borderColor: '#e8e0d0' }}>
+              <span aria-hidden className="font-display absolute left-0 top-3 select-none" style={{ fontSize: 40, lineHeight: 1, color: CLAY, opacity: 0.35 }}>“</span>
+              <p className="font-display text-stone-800" style={{ fontSize: 16.5, lineHeight: 1.55 }}>{msg}</p>
+              <p className="text-stone-400 text-xs mt-2" style={{ letterSpacing: '0.06em' }}>— {who}</p>
             </div>
           ))}
         </div>
@@ -349,7 +403,7 @@ export default function LandingPage() {
             style={{ background: '#fff', border: '1px solid #ece2d4' }}
           >
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#566b45' }}>💑 Mode duo</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#566b45' }}>Mode duo</p>
               <h2 className="font-display text-lg font-black text-stone-900 mb-1">
                 Test de compatibilité MBTI
               </h2>
@@ -372,7 +426,7 @@ export default function LandingPage() {
             style={{ background: '#fff', border: '1px solid #ece2d4' }}
           >
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: CLAY }}>⚗️ Mode groupe</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: CLAY }}>Mode groupe</p>
               <h2 className="font-display text-lg font-black text-stone-900 mb-1">
                 Fusion — Quiz de groupe
               </h2>
