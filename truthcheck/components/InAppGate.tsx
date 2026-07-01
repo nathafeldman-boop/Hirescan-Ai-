@@ -76,7 +76,7 @@ export default function InAppGate() {
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 2147483000,
-        background: '#f7f3ec', color: '#2b2622',
+        background: 'linear-gradient(178deg, #131110 0%, #221e1a 100%)', color: '#f5f1e8',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         padding: '28px 24px',
         fontFamily: 'var(--font-sans), -apple-system, BlinkMacSystemFont, sans-serif',
@@ -86,70 +86,81 @@ export default function InAppGate() {
       <style>{`
         @keyframes gateArrow { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
         @keyframes gateIn { from { opacity:0; transform: translateY(16px) } to { opacity:1; transform: translateY(0) } }
+        @keyframes gateGlow { 0%,100% { opacity:.5; transform: translateX(-50%) scale(1) } 50% { opacity:.85; transform: translateX(-50%) scale(1.07) } }
       `}</style>
 
-      {/* Arrow pointing to the ••• menu (top-right of the webview) */}
+      {/* Lumière d'aube — respire derrière la scène */}
+      <div aria-hidden style={{
+        position: 'absolute', top: -140, left: '50%', width: 380, height: 380,
+        borderRadius: '50%', pointerEvents: 'none',
+        background: 'radial-gradient(circle, rgba(238,201,184,0.30) 0%, transparent 62%)',
+        animation: 'gateGlow 4.5s ease-in-out infinite',
+      }} />
+
+      {/* Flèche vers le menu ••• — lumière sur encre */}
       <div style={{ position: 'fixed', top: 8, right: 14, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, animation: 'gateArrow 1.1s ease-in-out infinite' }}>
-        <svg width="42" height="42" viewBox="0 0 36 36" fill="none">
-          <path d="M6 30L30 6M30 6H14M30 6V22" stroke="#a94e18" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        <svg width="40" height="40" viewBox="0 0 36 36" fill="none">
+          <path d="M6 30L30 6M30 6H14M30 6V22" stroke="#eec9b8" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span style={{ background: '#a94e18', color: 'white', fontWeight: 800, fontSize: 12, padding: '6px 12px', borderRadius: 20, whiteSpace: 'nowrap' }}>
+        <span style={{ background: 'rgba(238,201,184,0.16)', border: '1px solid rgba(238,201,184,0.4)', color: '#eec9b8', fontWeight: 700, fontSize: 12, padding: '6px 12px', borderRadius: 20, whiteSpace: 'nowrap' }}>
           le menu ••• est ici
         </span>
       </div>
 
-      <div style={{ width: '100%', maxWidth: 380, textAlign: 'center', animation: 'gateIn .5s ease both' }}>
+      <div style={{ width: '100%', maxWidth: 380, textAlign: 'center', animation: 'gateIn .5s ease both', position: 'relative' }}>
 
-        {/* Brand */}
-        <p style={{ fontFamily: 'var(--font-display), serif', fontWeight: 900, fontSize: 26, margin: '0 0 28px', letterSpacing: '-0.5px' }}>
-          Ur<span style={{ color: '#a94e18' }}>Cecret</span>
+        {/* La porte entrouverte — un rai de lumière */}
+        <svg width="52" height="72" viewBox="0 0 52 72" fill="none" aria-hidden style={{ margin: '0 auto 18px', display: 'block' }}>
+          <rect x="6" y="4" width="40" height="64" rx="3" stroke="rgba(245,241,232,0.35)" strokeWidth="1.5" />
+          <path d="M14 8 L34 12 L34 66 L14 68 Z" fill="rgba(238,201,184,0.14)" stroke="rgba(238,201,184,0.55)" strokeWidth="1.5" strokeLinejoin="round" />
+          <circle cx="30" cy="39" r="1.6" fill="#eec9b8" />
+          <path d="M34 14 L46 8 M34 38 L48 38 M34 62 L46 68" stroke="rgba(238,201,184,0.35)" strokeWidth="1" strokeLinecap="round" />
+        </svg>
+
+        {/* Marque */}
+        <p style={{ fontFamily: 'var(--font-display), serif', fontWeight: 600, fontSize: 24, margin: '0 0 18px', letterSpacing: '-0.3px' }}>
+          Ur<span style={{ color: '#eec9b8' }}>Cecret</span>
         </p>
 
-        <p style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.35, margin: '0 0 16px' }}>
-          Pour accéder aux tests et à toutes les fonctionnalités,
-          ouvre cette page dans ton navigateur :
+        <p style={{ fontFamily: 'var(--font-display), serif', fontSize: 21, fontWeight: 500, lineHeight: 1.3, margin: '0 0 8px', color: '#f5f1e8' }}>
+          Ton profil complet t&apos;attend<br />
+          <em style={{ color: '#eec9b8' }}>de l&apos;autre côté.</em>
+        </p>
+        <p style={{ fontSize: 13.5, color: 'rgba(245,241,232,0.55)', lineHeight: 1.55, margin: '0 0 24px' }}>
+          Ton type, ta façon d&apos;aimer, ta face cachée —<br />
+          ouvre cette page dans ton navigateur pour y accéder.
         </p>
 
-        {/* ── CTA hook above the tuto — gives them the WHY ── */}
-        <div style={{ background: 'rgba(169,78,24,0.08)', border: '1px solid rgba(169,78,24,0.22)', borderRadius: 14, padding: '14px 16px', marginBottom: 22, textAlign: 'left' }}>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1c1917', lineHeight: 1.4 }}>
-            🔮 Ton profil de personnalité complet t&apos;attend
-          </p>
-          <p style={{ margin: '4px 0 0', fontSize: 12.5, color: '#7a6f63', lineHeight: 1.45 }}>
-            Ton type, pourquoi tu agis comme ça en amour &amp; au travail, ta face cachée — en 2 étapes ci-dessous 👇
-          </p>
-        </div>
-
-        {/* 2 steps */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24, textAlign: 'left' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#fff', border: '1px solid #ece2d4', borderRadius: 16, padding: '16px 18px' }}>
-            <span style={{ flexShrink: 0, width: 34, height: 34, borderRadius: '50%', background: 'rgba(169,78,24,0.10)', color: '#a94e18', fontWeight: 900, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>1</span>
-            <span style={{ fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>
-              Appuie sur <strong>•••</strong> tout en haut à droite ↗
+        {/* 2 étapes — verre sur encre */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22, textAlign: 'left' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: '15px 18px', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}>
+            <span style={{ flexShrink: 0, width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(238,201,184,0.45)', color: '#eec9b8', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>1</span>
+            <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.35, color: 'rgba(245,241,232,0.9)' }}>
+              Appuie sur <strong style={{ color: '#f5f1e8' }}>•••</strong> tout en haut à droite ↗
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#fff', border: '2px solid rgba(169,78,24,0.4)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 18px rgba(169,78,24,0.10)' }}>
-            <span style={{ flexShrink: 0, width: 34, height: 34, borderRadius: '50%', background: 'rgba(169,78,24,0.10)', color: '#a94e18', fontWeight: 900, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2</span>
-            <span style={{ fontSize: 15.5, fontWeight: 700, lineHeight: 1.3, color: '#a94e18' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(238,201,184,0.10)', border: '1px solid rgba(238,201,184,0.45)', borderRadius: 16, padding: '15px 18px', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', boxShadow: '0 8px 28px rgba(0,0,0,0.35)' }}>
+            <span style={{ flexShrink: 0, width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(238,201,184,0.6)', color: '#eec9b8', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2</span>
+            <span style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.35, color: '#eec9b8' }}>
               {isIOS ? '« Ouvrir dans Safari »' : '« Ouvrir dans le navigateur »'}
             </span>
           </div>
         </div>
 
-        {/* Try auto-open */}
+        {/* Ouverture auto — CTA papier sur encre */}
         <button
           onClick={openInBrowser}
-          style={{ width: '100%', padding: '15px', borderRadius: 14, border: 'none', background: '#a94e18', color: 'white', fontSize: 15, fontWeight: 900, cursor: 'pointer', boxShadow: '0 6px 22px rgba(169,78,24,0.4)', marginBottom: 10 }}
+          style={{ width: '100%', padding: '16px', borderRadius: 100, border: 'none', background: '#f5f1e8', color: '#131110', fontSize: 15, fontWeight: 700, cursor: 'pointer', boxShadow: '0 12px 34px rgba(0,0,0,0.45)', marginBottom: 10 }}
         >
-          ⚡ Essayer l&apos;ouverture automatique →
+          Essayer l&apos;ouverture automatique →
         </button>
 
-        {/* Copy link fallback */}
+        {/* Copie du lien — fantôme */}
         <button
           onClick={copyLink}
-          style={{ width: '100%', padding: '12px', borderRadius: 14, background: 'transparent', border: '1px solid #d9cdbb', color: '#7a6f63', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          style={{ width: '100%', padding: '13px', borderRadius: 100, background: 'transparent', border: '1px solid rgba(245,241,232,0.25)', color: 'rgba(245,241,232,0.6)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
         >
-          {copied ? '✓ Lien copié — colle-le dans ton navigateur' : '📋 Ou copie le lien'}
+          {copied ? '✓ Lien copié — colle-le dans ton navigateur' : 'Ou copie le lien'}
         </button>
       </div>
     </div>

@@ -130,8 +130,8 @@ export default function LandingPage() {
             <UserMenu />
             <Link
               href="/quiz/personnalite"
-              className="text-sm font-black px-5 py-2.5 rounded-full text-white transition-all hover:brightness-105 active:scale-[0.97] whitespace-nowrap"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 3px 12px rgba(169,78,24,0.32)' }}
+              className="text-sm font-bold px-5 py-2.5 rounded-full transition-all hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
+              style={{ background: '#131110', color: '#f5f1e8', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
             >
               Commencer
             </Link>
@@ -147,7 +147,7 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6"
             style={{ background: 'rgba(169,78,24,0.07)', border: '1px solid rgba(169,78,24,0.18)', color: CLAY }}>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
-            {fromTiktok ? '🔥 Ce test circule sur TikTok en ce moment' : 'Test de personnalité · Résultat immédiat'}
+            {fromTiktok ? 'Ce test circule sur TikTok en ce moment' : 'Test de personnalité · Résultat immédiat'}
           </div>
 
           <h1 className="font-display font-black mb-5 tracking-tight" style={{ color: '#2b2622', fontSize: 'clamp(2rem, 9vw, 3.4rem)', lineHeight: 1.06, wordBreak: 'break-word' }}>
@@ -166,8 +166,8 @@ export default function LandingPage() {
 
           <Link
             href="/quiz/personnalite"
-            className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-black text-white text-base transition-all hover:brightness-105 active:scale-[0.98] whitespace-nowrap"
-            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 10px 30px rgba(169,78,24,0.45)' }}
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-base transition-all hover:opacity-90 active:scale-[0.98] whitespace-nowrap"
+            style={{ background: '#131110', color: '#f5f1e8', boxShadow: '0 14px 36px rgba(19,17,16,0.3)' }}
           >
             Découvrir mon type →
           </Link>
@@ -466,8 +466,8 @@ export default function LandingPage() {
         >
           <Link
             href="/quiz/personnalite"
-            className="block w-full text-center py-4 rounded-full font-black text-white text-base transition-all active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 26px rgba(169,78,24,0.45)' }}
+            className="block w-full text-center py-4 rounded-full font-bold text-base transition-all active:scale-[0.98]"
+            style={{ background: '#131110', color: '#f5f1e8', boxShadow: '0 12px 30px rgba(19,17,16,0.32)' }}
           >
             Découvrir mon type →
           </Link>
