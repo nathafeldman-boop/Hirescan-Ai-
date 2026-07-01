@@ -523,6 +523,41 @@ const TYPE_COUNTS: Record<string, number> = {
   INTJ: 768, INTP: 831, INFJ: 634, ENTP: 912,
 };
 
+// ── « L'Intérieur » — 4 mondes visuels, un par famille cognitive ──────────
+// Chaque famille a son heure du jour, sa lumière, sa matière. Le monde
+// colore la révélation du type (glow, accents) — design uniquement.
+const WORLDS = {
+  NT: { accent: '#1b2340', light: '#8fa3d4', glow: 'rgba(143,163,212,0.30)' }, // Analystes — nuit
+  NF: { accent: '#c89a8e', light: '#eec9b8', glow: 'rgba(238,201,184,0.32)' }, // Diplomates — aube
+  SJ: { accent: '#5f6b54', light: '#a8b494', glow: 'rgba(168,180,148,0.30)' }, // Sentinelles — après-midi
+  SP: { accent: '#b8722c', light: '#e0a86a', glow: 'rgba(224,168,106,0.32)' }, // Explorateurs — heure dorée
+} as const;
+
+function worldOf(code: string) {
+  if (code[1] === 'N') return code[2] === 'T' ? WORLDS.NT : WORLDS.NF;
+  return code[3] === 'J' ? WORLDS.SJ : WORLDS.SP;
+}
+
+// Glyphes maison — trait 1.5px, grille 24. Remplacent les emojis d'interface.
+function Glyph({ name, color = '#131110', size = 20 }: {
+  name: 'heart' | 'compass' | 'moon' | 'key' | 'lock' | 'shield';
+  color?: string; size?: number;
+}) {
+  const p = {
+    width: size, height: size, viewBox: '0 0 24 24', fill: 'none',
+    stroke: color, strokeWidth: 1.5,
+    strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const,
+  };
+  switch (name) {
+    case 'heart':   return <svg {...p}><path d="M12 20.2 4.9 13a4.6 4.6 0 1 1 6.5-6.5l.6.6.6-.6A4.6 4.6 0 1 1 19.1 13Z" /></svg>;
+    case 'compass': return <svg {...p}><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5Z" /></svg>;
+    case 'moon':    return <svg {...p}><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>;
+    case 'key':     return <svg {...p}><circle cx="8" cy="15.5" r="3.5" /><path d="m10.5 13 8-8M15 7.5 17.5 10M18 4.5 20 6.5" /></svg>;
+    case 'lock':    return <svg {...p}><rect x="5.5" y="10.5" width="13" height="9" rx="2" /><path d="M8.5 10.5v-3a3.5 3.5 0 0 1 7 0v3" /></svg>;
+    case 'shield':  return <svg {...p}><path d="M12 3.5 5 6.2v5.1c0 4.4 3 7.6 7 9.2 4-1.6 7-4.8 7-9.2V6.2Z" /></svg>;
+  }
+}
+
 // Type-specific micro-testimonials — reference the type's exact pain point hook
 const TYPE_REVIEWS: Record<string, { name: string; age: number; quote: string }> = {
   INTJ: { name: 'Thomas', age: 29, quote: "Je pensais me connaître. La partie amour m'a complètement contredit. Effrayant de précision." },
@@ -782,6 +817,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 }) {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
+  const world = worldOf(typeCode);
   const [loading, setLoading] = useState(false);
   // Pre-fetched Stripe URLs for in-app browsers (TikTok etc.)
   // Using an <a href> instead of window.location.href lets TikTok open Stripe in Safari
@@ -939,105 +975,141 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       )}
       <div className="w-full max-w-sm">
 
-        {/* ─── Hero: type revealed for free — trust + curiosity gap ─────────── */}
-        <div className="text-center mb-5">
-          {/* Type badge only — the reward (their type). We intentionally do NOT
-              reveal the full result for free: no rarity, no tagline, no famous
-              people. The complete profile stays behind the paywall. */}
-          <div className="inline-flex items-center gap-3 mb-3 px-5 py-3 rounded-2xl"
-               style={{ background: 'white', border: '1.5px solid rgba(169,78,24,0.25)', boxShadow: '0 4px 16px rgba(169,78,24,0.08)' }}>
-            <span className="text-4xl">{type?.emoji ?? '🔮'}</span>
-            <div className="text-left">
-              <div className="text-3xl font-black tracking-widest leading-none" style={{ color: '#a94e18' }}>
-                {typeCode}
-              </div>
-              <div className="text-sm font-semibold text-stone-500 mt-0.5">{isFr ? (type?.name ?? '') : typeCode}</div>
+        {/* ─── La Révélation — la pièce s'éclaire dans le monde de sa famille ──
+            Le type est la récompense (gratuit) ; le reste du profil reste
+            derrière les portes. Encre + verre + lumière de la famille. */}
+        <div className="relative overflow-hidden rounded-3xl mb-4 px-6 pt-9 pb-8 text-center ur-reveal"
+             style={{ background: 'linear-gradient(176deg, #131110 0%, #211d1a 100%)' }}>
+
+          {/* Lumière volumétrique — respire doucement */}
+          <div aria-hidden className="absolute pointer-events-none rounded-full"
+               style={{ top: -90, left: '50%', width: 320, height: 320, transform: 'translateX(-50%)',
+                        background: `radial-gradient(circle, ${world.glow} 0%, transparent 62%)`,
+                        animation: 'urGlowBreathe 4.5s ease-in-out infinite' }} />
+
+          {/* 12 confettis de papier — une seule fois, gravité discrète */}
+          <div aria-hidden className="absolute inset-x-0 top-0 h-24 pointer-events-none">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <span key={i} className="absolute block rounded-[1px]"
+                style={{ left: `${8 + i * 7.4}%`, top: 6, width: 5, height: 8, opacity: 0,
+                         background: i % 3 === 0 ? world.light : i % 3 === 1 ? '#f5f1e8' : world.accent,
+                         animation: `urPaperFall 1.15s ease-in ${0.4 + (i % 5) * 0.13}s forwards` }} />
+            ))}
+          </div>
+
+          <p className="ur-fade-1 text-[11px] uppercase mb-4"
+             style={{ color: world.light, letterSpacing: '0.28em', fontWeight: 600 }}>
+            {isFr ? 'Ta pièce' : 'Your room'}
+          </p>
+
+          {/* Carte verre — le type, en Fraunces */}
+          <div className="ur-glass-ink ur-fade-1 inline-block rounded-2xl px-8 py-5 mb-5">
+            <div className="font-display leading-none"
+                 style={{ fontSize: 46, fontWeight: 600, letterSpacing: '0.13em', color: '#f5f1e8' }}>
+              {typeCode}
+            </div>
+            <div className="font-display italic mt-2" style={{ fontSize: 17, color: world.light }}>
+              {isFr ? (type?.name ?? '') : typeCode}
             </div>
           </div>
-          {isFr && HOOK_LINES[typeCode] ? (
-            <div className="rounded-2xl px-4 py-3" style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.18)' }}>
-              <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#a94e18' }}>Ton profil complet révèle</p>
-              <p className="text-sm font-bold text-stone-800 leading-snug">{HOOK_LINES[typeCode]}</p>
-            </div>
-          ) : !isFr ? (
-            <div className="rounded-2xl px-4 py-3" style={{ background: 'rgba(169,78,24,0.06)', border: '1px solid rgba(169,78,24,0.18)' }}>
-              <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#a94e18' }}>Your full profile reveals</p>
-              <p className="text-sm font-bold text-stone-800 leading-snug">Why you feel misunderstood — even by people who know you well</p>
-            </div>
-          ) : null}
+
+          {/* Le hook — la porte entrouverte */}
+          <div className="ur-fade-2">
+            <div className="ur-rule-ink w-24 mx-auto mb-3.5" />
+            <p className="text-[10px] uppercase mb-2"
+               style={{ color: 'rgba(245,241,232,0.42)', letterSpacing: '0.22em', fontWeight: 600 }}>
+              {isFr ? 'Ton profil complet révèle' : 'Your full profile reveals'}
+            </p>
+            <p className="font-display leading-snug px-1" style={{ fontSize: 17, color: '#f5f1e8' }}>
+              {isFr
+                ? (HOOK_LINES[typeCode] ?? 'Pourquoi tu fonctionnes comme ça — en amour, au travail, sous pression')
+                : 'Why you feel misunderstood — even by people who know you well'}
+            </p>
+          </div>
         </div>
 
         {/* ─── Quick-entry CTA — immediately below hook, above the fold on mobile ── */}
         {!isInApp && (
-          <div className="rounded-2xl px-4 py-3.5 mb-4" style={{ background: 'rgba(169,78,24,0.05)', border: '1.5px solid rgba(169,78,24,0.3)' }}>
+          <div className="rounded-2xl px-4 py-3.5 mb-4"
+               style={{ background: 'white', border: '1px solid #e6e0d4', boxShadow: '0 2px 16px rgba(19,17,16,0.05)' }}>
             <div className="flex items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-stone-900 leading-snug">
-                  {isFr ? '🎁 Mon profil MBTI + 1 quiz au choix' : '🎁 My MBTI profile + 1 quiz'}
-                </p>
-                <p className="text-[11px] text-stone-500 mt-0.5">
-                  {isFr ? '2 résultats · paiement unique · accès à vie' : '2 results · one-time · lifetime access'}
-                </p>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="flex-shrink-0"><Glyph name="key" color={world.accent} size={22} /></span>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-bold text-stone-900 leading-snug" style={{ letterSpacing: '-0.01em' }}>
+                    {isFr ? 'Mon profil MBTI + 1 quiz au choix' : 'My MBTI profile + 1 quiz'}
+                  </p>
+                  <p className="text-[11px] text-stone-500 mt-0.5">
+                    {isFr ? 'Deux résultats · un seul paiement · à vie' : 'Two results · one payment · lifetime'}
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => doCheckout('onetime')}
                 disabled={loading}
-                className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-sm transition-all active:scale-[0.97] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', color: 'white', boxShadow: '0 3px 12px rgba(169,78,24,0.3)', whiteSpace: 'nowrap' }}
+                className="flex-shrink-0 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-60"
+                style={{ background: '#131110', color: '#f5f1e8', whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
               >
-                {loading ? '…' : isFr ? '1,99 € →' : '€1.99 →'}
+                {loading ? '…' : '1,99 €'}
               </button>
             </div>
-            <p className="text-center text-[10px] mt-2" style={{ color: '#1f7a4d' }}>
-              {isFr ? '🛡️ Satisfait ou remboursé 7 jours — sans question' : '🛡️ 7-day money-back guarantee — no questions asked'}
+            <p className="text-center text-[11px] mt-2.5 text-stone-400">
+              {isFr ? 'Remboursé 7 jours, sans question.' : '7-day refund, no questions asked.'}
             </p>
           </div>
         )}
 
         {/* ─── Profile teaser — first lines of actual content, then fade out ── */}
         {isFr && type?.fullDesc && (
-          <div className="rounded-2xl px-4 pt-4 pb-2 mb-3 relative overflow-hidden" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-            <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: '#a94e18' }}>
+          <div className="rounded-2xl px-5 pt-4 pb-3 mb-3 relative overflow-hidden"
+               style={{ background: 'white', border: '1px solid #e6e0d4' }}>
+            <p className="text-[10px] uppercase mb-2.5"
+               style={{ color: world.accent, letterSpacing: '0.2em', fontWeight: 700 }}>
               {`Aperçu de ton profil ${typeCode}`}
             </p>
-            <p className="text-sm text-stone-700 leading-relaxed">
+            {/* L'encre s'évapore mi-phrase — pas de flou, une coupure. */}
+            <p className="text-[15px] text-stone-700" style={{ lineHeight: 1.65 }}>
               {type.fullDesc.slice(0, 130)}
-              <span className="text-stone-300 select-none pointer-events-none" style={{ filter: 'blur(4px)' }}>
-                {type.fullDesc.slice(130, 210)}…
+              <span className="ur-cut text-stone-500 select-none pointer-events-none">
+                {type.fullDesc.slice(130, 200)}
               </span>
             </p>
-            <div className="absolute bottom-0 left-0 right-0 h-10"
-                 style={{ background: 'linear-gradient(to bottom, transparent, white)' }} />
           </div>
         )}
 
-        {/* ─── 4 locked chapters — show what's inside to create desire ─────── */}
-        <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '1px solid #e7e5e0', background: 'white' }}>
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-100"
-               style={{ background: 'rgba(169,78,24,0.04)' }}>
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#a94e18' }}>
+        {/* ─── Les portes fermées — chaque chapitre laisse filtrer sa première
+            ligne, coupée mi-phrase. Le désir vient de la qualité visible. ── */}
+        <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '1px solid #e6e0d4', background: 'white' }}>
+          <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: '#f0ebe0' }}>
+            <p className="text-[10px] uppercase" style={{ color: '#131110', letterSpacing: '0.2em', fontWeight: 700 }}>
               {isFr ? `Profil ${typeCode} complet · 4 chapitres` : `Full ${typeCode} profile · 4 chapters`}
             </p>
-            <span className="text-[10px] text-stone-400 font-semibold">🔒 verrouillé</span>
+            <span className="flex items-center gap-1.5 text-[10px] text-stone-400 font-semibold">
+              <Glyph name="lock" color="#a08655" size={13} />
+              {isFr ? 'verrouillé' : 'locked'}
+            </span>
           </div>
           {(isFr ? [
-            { icon: '💕', title: 'Amour & Relations', preview: type?.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète…' },
-            { icon: '💼', title: 'Carrière & Superpouvoir', preview: type?.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel…' },
-            { icon: '🌑', title: 'Face cachée & Angles morts', preview: type?.growth?.slice(0, 90) ?? 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face…' },
-            { icon: '🎯', title: 'Compatibilité exacte', preview: type?.compatibleWith ? `Tes types les plus compatibles : ${type.compatibleWith.join(', ')} — et ceux qui te drainent systématiquement…` : 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr…' },
+            { glyph: 'heart' as const,   title: 'Amour & Relations', preview: type?.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète' },
+            { glyph: 'compass' as const, title: 'Carrière & Superpouvoir', preview: type?.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel' },
+            { glyph: 'moon' as const,    title: 'Face cachée & Angles morts', preview: type?.growth?.slice(0, 90) ?? 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face' },
+            { glyph: 'key' as const,     title: 'Compatibilité exacte', preview: type?.compatibleWith ? `Tes types les plus compatibles : ${type.compatibleWith.join(', ')} — et ceux qui te drainent` : 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr' },
           ] : [
-            { icon: '💕', title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that keeps repeating...' },
-            { icon: '💼', title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage...' },
-            { icon: '🌑', title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that sabotages you — that nobody dares to say to your face...' },
-            { icon: '🎯', title: 'Exact Compatibility', preview: 'The 3 types that truly get you — and the 2 profiles that always drain you...' },
+            { glyph: 'heart' as const,   title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that keeps repeating' },
+            { glyph: 'compass' as const, title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage' },
+            { glyph: 'moon' as const,    title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that sabotages you — that nobody dares to say to your face' },
+            { glyph: 'key' as const,     title: 'Exact Compatibility', preview: 'The 3 types that truly get you — and the 2 profiles that always drain you' },
           ]).map((s, i, arr) => (
-            <div key={s.title} className={`flex items-center gap-3 px-4 py-3${i < arr.length - 1 ? ' border-b border-stone-100' : ''}`}>
-              <span className="text-xl flex-shrink-0">{s.icon}</span>
+            <div key={s.title} className={`flex items-start gap-3.5 px-5 py-3.5${i < arr.length - 1 ? ' border-b' : ''}`}
+                 style={{ borderColor: '#f0ebe0' }}>
+              <span className="flex-shrink-0 mt-0.5"><Glyph name={s.glyph} color={world.accent} size={19} /></span>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-stone-800">{s.title}</p>
-                <p className="text-[11px] text-stone-400 leading-tight mt-0.5 blur-[4px] select-none pointer-events-none">{s.preview}</p>
+                <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>{s.title}</p>
+                <p className="text-[12px] text-stone-500 mt-0.5" style={{ lineHeight: 1.5 }}>
+                  <span className="ur-cut select-none pointer-events-none">{s.preview}</span>
+                </p>
               </div>
-              <span className="text-stone-300 text-xs">🔒</span>
+              <span className="flex-shrink-0 mt-1"><Glyph name="lock" color="#c9bda5" size={14} /></span>
             </div>
           ))}
         </div>

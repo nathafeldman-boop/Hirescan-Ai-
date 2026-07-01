@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { Fraunces, Nunito_Sans } from 'next/font/google';
+import { Fraunces, Instrument_Sans } from 'next/font/google';
 import './globals.css';
 import Providers from './Providers';
 
-// Warm, handcrafted type pairing — characterful soft serif for display,
-// rounded humanist sans for body. Replaces the default system stack that
-// reads as generic / AI-generated.
+// « L'Intérieur » type pairing — Fraunces (editorial soft serif, optical
+// sizing, italics reserved for emotional words) + Instrument Sans
+// (geometric-humanist, Söhne-class) for interface and body copy.
 const fraunces = Fraunces({
   subsets: ['latin'],
   display: 'swap',
@@ -13,7 +13,7 @@ const fraunces = Fraunces({
   style: ['normal', 'italic'],
 });
 
-const nunitoSans = Nunito_Sans({
+const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
@@ -119,7 +119,7 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${fraunces.variable} ${nunitoSans.variable}`}>
+    <html lang="fr" className={`${fraunces.variable} ${instrumentSans.variable}`}>
       <head>
         <script
           type="application/ld+json"

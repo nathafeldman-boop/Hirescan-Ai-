@@ -374,3 +374,88 @@ body {
   cursor: not-allowed;
   transform: none;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   « L'INTÉRIEUR » — design system UrCecret
+   Ta personnalité est une maison ; chaque type est une pièce.
+   4 mondes (un par famille MBTI) : heure du jour, lumière, matière.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Base */
+  --ink: #131110;
+  --ink-soft: #1d1a18;
+  --paper: #f5f1e8;
+  --paper-warm: #faf7f0;
+
+  /* Analystes — nuit profonde, verre & métal */
+  --world-nt: #1b2340;
+  --world-nt-light: #8fa3d4;
+  --world-nt-glow: rgba(143, 163, 212, 0.28);
+
+  /* Diplomates — aube, lin & brume */
+  --world-nf: #c89a8e;
+  --world-nf-light: #eec9b8;
+  --world-nf-glow: rgba(238, 201, 184, 0.30);
+
+  /* Sentinelles — après-midi, pierre & chêne */
+  --world-sj: #5f6b54;
+  --world-sj-light: #a8b494;
+  --world-sj-glow: rgba(168, 180, 148, 0.28);
+
+  /* Explorateurs — heure dorée, terracotta & laiton */
+  --world-sp: #b8722c;
+  --world-sp-light: #e0a86a;
+  --world-sp-glow: rgba(224, 168, 106, 0.30);
+}
+
+/* Verre sur encre — carte de révélation */
+.ur-glass-ink {
+  background: linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035));
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    0 24px 60px rgba(0,0,0,0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* La lumière qui monte — révélation du type */
+@keyframes urLightRise {
+  from { opacity: 0; transform: translateY(26px) scale(0.985); filter: brightness(0.55); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+}
+@keyframes urGlowBreathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 0.9;  transform: scale(1.06); }
+}
+@keyframes urInkFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes urPaperFall {
+  0%   { opacity: 0; transform: translateY(-8px) rotate(0deg); }
+  12%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(74px) rotate(140deg); }
+}
+.ur-reveal   { animation: urLightRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.ur-fade-1   { animation: urInkFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+.ur-fade-2   { animation: urInkFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.30s both; }
+.ur-fade-3   { animation: urInkFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+
+/* Phrase coupée mi-mot — remplace le flou template.
+   L'encre s'évapore sur la fin de la ligne. */
+.ur-cut {
+  position: relative;
+  display: inline;
+  -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent 96%);
+  mask-image: linear-gradient(90deg, #000 55%, transparent 96%);
+}
+
+/* Filet éditorial */
+.ur-rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(19,17,16,0.16), transparent); }
+.ur-rule-ink { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ur-reveal, .ur-fade-1, .ur-fade-2, .ur-fade-3 { animation: none; opacity: 1; }
+}
