@@ -130,10 +130,10 @@ export default function LandingPage() {
             <UserMenu />
             <Link
               href="/quiz/personnalite"
-              className="text-sm font-bold px-5 py-2.5 rounded-full text-white transition-all hover:opacity-90 active:scale-[0.98]"
-              style={{ background: CLAY, boxShadow: '0 2px 10px rgba(169,78,24,0.25)' }}
+              className="text-sm font-black px-5 py-2.5 rounded-full text-white transition-all hover:brightness-105 active:scale-[0.97] whitespace-nowrap"
+              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 3px 12px rgba(169,78,24,0.32)' }}
             >
-              Faire le test
+              Commencer
             </Link>
           </div>
         </div>
@@ -166,10 +166,10 @@ export default function LandingPage() {
 
           <Link
             href="/quiz/personnalite"
-            className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-black text-white text-base transition-all hover:opacity-90 active:scale-[0.98]"
-            style={{ background: CLAY, boxShadow: '0 8px 28px rgba(169,78,24,0.38)' }}
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-black text-white text-base transition-all hover:brightness-105 active:scale-[0.98] whitespace-nowrap"
+            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 10px 30px rgba(169,78,24,0.45)' }}
           >
-            Découvrir mon type — Gratuit →
+            Découvrir mon type →
           </Link>
           <p className="text-stone-400 text-xs mt-3.5">
             Gratuit · Résultat immédiat · Sans inscription
@@ -467,9 +467,9 @@ export default function LandingPage() {
           <Link
             href="/quiz/personnalite"
             className="block w-full text-center py-4 rounded-full font-black text-white text-base transition-all active:scale-[0.98]"
-            style={{ background: CLAY, boxShadow: '0 6px 24px rgba(169,78,24,0.40)' }}
+            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 26px rgba(169,78,24,0.45)' }}
           >
-            Découvrir mon type — Gratuit →
+            Découvrir mon type →
           </Link>
         </div>
       )}
