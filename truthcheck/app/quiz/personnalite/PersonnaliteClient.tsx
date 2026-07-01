@@ -841,21 +841,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   }, []);
 
   const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly', emailOverride?: string) => {
-    // ── Dedup guard: block a second checkout within 20 min of a first one ──
-    // Prevents double-charge when TikTok in-app browser fails to redirect to /success
-    // and the user taps the button again thinking payment didn't go through.
-    try {
-      const prev = localStorage.getItem('_urs_co');
-      if (prev) {
-        const { ts } = JSON.parse(prev) as { ts: number };
-        // Only guard against an accidental double-tap (15s). A user who abandons
-        // or gets declined MUST be able to retry immediately — never block real retries.
-        if (Date.now() - ts < 15 * 1000) {
-          return;
-        }
-      }
-    } catch { /* localStorage indisponible — on continue */ }
-
     const email = emailOverride ?? userEmail;
     diagLog(email ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
     track('checkout_click', {
@@ -867,8 +852,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
     try {
       let affiliateRef = '';
       try { affiliateRef = localStorage.getItem('_urs_ref') ?? ''; } catch {}
-      // Mark checkout started BEFORE the fetch so the guard fires even on double-tap
-      try { localStorage.setItem('_urs_co', JSON.stringify({ ts: Date.now(), type: checkoutType })); } catch {}
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -885,15 +868,21 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       const data = await res.json() as { url?: string; error?: string };
       if (data.url) window.location.href = data.url;
       else {
-        try { localStorage.removeItem('_urs_co'); } catch {}
         alert(data.error ?? 'Erreur de paiement'); setLoading(false);
       }
     } catch {
-      try { localStorage.removeItem('_urs_co'); } catch {}
       alert('Erreur réseau. Réessaie.');
       setLoading(false);
     }
   }, [typeCode, userEmail]);
+
+  // Re-enable the pay buttons when returning to the page (e.g. back button from
+  // Stripe restores the page from bfcache with loading still true → button stuck).
+  useEffect(() => {
+    const reset = () => setLoading(false);
+    window.addEventListener('pageshow', reset);
+    return () => window.removeEventListener('pageshow', reset);
+  }, []);
 
   // In-app (TikTok): force-open the REAL system browser at the paywall, carrying
   // the type (?pending=) + affiliate ref. The paywall/payment only ever happens in
@@ -1395,17 +1384,12 @@ export default function PersonnaliteClient() {
       // type (that broke the "free test" promise and showed an old/fake result).
       if (phase === 'gate') setPhase('quiz');
     } else {
-      // Not authenticated — only show the result if we're mid magic-link flow
-      // (explicit ?pending in the URL). Otherwise ALWAYS start with the free test.
-      if (pending && mbtiTypes[pending]) {
-        diagLog('pending_found_not_authed', { pending });
-        window.history.replaceState(null, '', '/quiz/personnalite');
-        setMbtiType(pending);
-        setPhase('result');
-        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
-      } else if (phase === 'gate') {
-        setPhase('quiz');
-      }
+      // Not authenticated → the test is FREE and must ALWAYS be shown first.
+      // A logged-out visitor NEVER lands on the paywall from a bare ?pending URL.
+      // The result only appears in-session right after finishing the quiz, or
+      // after signing in (handled by the authenticated branch above).
+      if (pending) { try { window.history.replaceState(null, '', '/quiz/personnalite'); } catch {} }
+      if (phase === 'gate') setPhase('quiz');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.email, sessionStatus]);
@@ -1420,9 +1404,10 @@ export default function PersonnaliteClient() {
     const type = computeMbtiType(answers);
     diagLog('analysis_done', { type, hasSession: !!session?.user, isPremium });
     setMbtiType(type);
+    // Persist the type in localStorage ONLY so the /login round-trip can reattach
+    // it to the post-auth callbackUrl. We do NOT put ?pending in the URL — that let
+    // logged-out visitors reload straight onto the paywall, skipping the free test.
     try { localStorage.setItem('_mbti_pending', type); } catch {}
-    // Also encode type in URL — survives TikTok browser localStorage wipe on navigation
-    try { window.history.replaceState(null, '', `/quiz/personnalite?pending=${type}`); } catch {}
     if (session?.user) {
       fetch('/api/user/save-mbti', {
         method: 'POST',
