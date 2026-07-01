@@ -607,7 +607,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
   if (state === 'done') {
     return (
       <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-sm font-bold text-stone-800 mb-1">📩 {isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
+        <p className="text-sm font-bold text-stone-800 mb-1">{isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
         <p className="text-xs text-stone-500 mb-3">
           {isFr ? 'Vérifie ta boîte. Ou débloque tout de suite 👇' : 'Check your inbox. Or unlock right now 👇'}
         </p>
@@ -616,7 +616,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
           className="w-full py-3 rounded-xl font-black text-white text-sm active:scale-[0.98] transition-all"
           style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 3px 14px rgba(169,78,24,0.32)' }}
         >
-          {isFr ? `⚡ Débloquer mon profil ${typeCode} — 1,99 €` : `⚡ Unlock my ${typeCode} profile — €1.99`}
+          {isFr ? `Débloquer mon profil ${typeCode} — 1,99 €` : `Unlock my ${typeCode} profile — €1.99`}
         </button>
       </div>
     );
@@ -625,7 +625,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
   return (
     <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
       <p className="text-sm font-bold text-stone-800 mb-1">
-        📩 {isFr ? `Pas encore décidé ? Garde ton profil ${typeCode}` : `Not ready yet? Save your ${typeCode} profile`}
+        {isFr ? `Pas encore décidé ? Garde ton profil ${typeCode}` : `Not ready yet? Save your ${typeCode} profile`}
       </p>
       <p className="text-xs text-stone-500 mb-3">
         {isFr ? 'On t\'envoie ton type + un extrait de ton analyse par email — gratuit, sans spam. Tu pourras le débloquer quand tu veux.' : 'We\'ll email you your type + a free analysis preview — no spam. Unlock whenever you want.'}
@@ -763,7 +763,7 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
           className="w-full py-4 rounded-2xl font-black text-white text-sm mb-3 active:scale-[0.98] transition-all"
           style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 24px rgba(169,78,24,0.4)' }}
         >
-          {isFr ? `⚡ Débloquer maintenant — 1,99 €` : `⚡ Unlock now — €1.99`}
+          {isFr ? `Débloquer maintenant — 1,99 €` : `Unlock now — €1.99`}
         </button>
         <button
           onClick={onClose}
@@ -1115,7 +1115,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         </div>
 
         <p className="text-center text-[11px] text-stone-500 mb-1">
-          ⭐ {TYPE_COUNTS[typeCode] ?? 847} {isFr ? `personnes ont débloqué leur profil ${typeCode} ce mois` : `people unlocked their ${typeCode} profile this month`}
+          {TYPE_COUNTS[typeCode] ?? 847} {isFr ? `personnes ont débloqué leur profil ${typeCode} ce mois` : `people unlocked their ${typeCode} profile this month`}
         </p>
         <p className="text-center text-[11px] text-stone-400 mb-3">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 align-middle animate-pulse" />
@@ -1174,7 +1174,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="w-full py-3.5 rounded-xl font-black text-sm active:scale-[0.98] transition-transform mb-2"
                 style={{ background: 'white', color: '#a94e18', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}
               >
-                {isFr ? '⚡ Essayer l\'ouverture auto →' : '⚡ Try auto-open →'}
+                {isFr ? 'Essayer l\'ouverture auto →' : 'Try auto-open →'}
               </button>
 
               {/* Reliable fallback: copy link to paste in browser */}
@@ -1199,74 +1199,87 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </p>
           )}
 
-          {/* HERO: One-time €1.99 */}
-          <div className="rounded-2xl p-5 relative" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.07),rgba(209,125,82,0.04))', border: '2px solid rgba(169,78,24,0.4)', boxShadow: '0 4px 20px rgba(169,78,24,0.10)' }}>
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <span className="text-white text-[10px] font-black px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 10px rgba(169,78,24,0.4)' }}>
-                🎁 {isFr ? '2 RÉSULTATS POUR 1,99 €' : '2 RESULTS FOR €1.99'}
-              </span>
-            </div>
-            <div className="text-center mb-4 mt-2">
-              <div className="flex items-center justify-center gap-2 mb-0.5">
-                <span className="text-sm text-stone-300 line-through">29,99 €</span>
-                <span className="text-5xl font-black" style={{ color: '#a94e18' }}>1,99 €</span>
+          {/* HERO: One-time €1.99 — carte d'encre, prix en Fraunces, CTA papier */}
+          <div className="relative overflow-hidden rounded-3xl px-5 pt-7 pb-5"
+               style={{ background: 'linear-gradient(176deg, #131110 0%, #23201c 100%)' }}>
+            <div aria-hidden className="absolute pointer-events-none rounded-full"
+                 style={{ top: -110, right: -70, width: 260, height: 260,
+                          background: `radial-gradient(circle, ${world.glow} 0%, transparent 62%)` }} />
+
+            <div className="relative">
+              <p className="text-center text-[10px] uppercase mb-3"
+                 style={{ color: world.light, letterSpacing: '0.24em', fontWeight: 600 }}>
+                {isFr ? 'Deux résultats · un paiement' : 'Two results · one payment'}
+              </p>
+
+              <div className="text-center mb-5">
+                <div className="flex items-baseline justify-center gap-2.5">
+                  <span className="text-sm line-through" style={{ color: 'rgba(245,241,232,0.30)' }}>29,99 €</span>
+                  <span className="font-display" style={{ fontSize: 46, fontWeight: 600, color: '#f5f1e8', letterSpacing: '-0.01em' }}>1,99 €</span>
+                </div>
+                <p className="text-[12px] mt-1" style={{ color: 'rgba(245,241,232,0.55)' }}>
+                  {isFr ? 'une seule fois · à vie · le prix d\'un café' : 'once · lifetime · the price of a coffee'}
+                </p>
               </div>
-              <p className="text-[11px] text-stone-500">{isFr ? 'paiement unique · accès à vie · le prix d\'un café ☕' : 'one-time · lifetime access · the price of a coffee ☕'}</p>
+
+              <ul className="space-y-2.5 mb-5">
+                {(isFr ? [
+                  `Ton profil ${typeCode} complet — amour, carrière, face cachée`,
+                  'Un quiz UrCecret au choix, résultat débloqué aussi',
+                  'Accès immédiat, conservé à vie, zéro abonnement',
+                ] : [
+                  `Your complete ${typeCode} profile — love, career, shadow side`,
+                  'One UrCecret quiz of your choice, result unlocked too',
+                  'Instant access, kept forever, zero subscription',
+                ]).map(b => (
+                  <li key={b} className="flex items-start gap-2.5 text-[13px]" style={{ color: 'rgba(245,241,232,0.85)', lineHeight: 1.5 }}>
+                    <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: world.light }}>✓</span>{b}
+                  </li>
+                ))}
+              </ul>
+
+              {isInApp && inAppPayUrl ? (
+                <a
+                  href={inAppPayUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
+                  className="block w-full py-4 rounded-full font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
+                  style={{ background: '#f5f1e8', color: '#131110', textDecoration: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
+                >
+                  {isFr ? `Débloquer mon profil ${typeCode} — 1,99 €` : `Unlock my ${typeCode} profile — €1.99`}
+                </a>
+              ) : (
+                <button
+                  onClick={() => doCheckout('onetime')}
+                  disabled={loading}
+                  className="w-full py-4 rounded-full font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
+                  style={{ background: '#f5f1e8', color: '#131110', boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
+                >
+                  {loading ? '…' : isFr ? `Débloquer mon profil ${typeCode} — 1,99 €` : `Unlock my ${typeCode} profile — €1.99`}
+                </button>
+              )}
+              <p className="text-center text-[11px] mt-2.5" style={{ color: 'rgba(245,241,232,0.45)' }}>
+                {isFr ? 'Apple Pay · Google Pay · CB — accès immédiat' : 'Apple Pay · Google Pay · Card — instant access'}
+              </p>
             </div>
-            <ul className="space-y-2 mb-4">
-              {(isFr ? [
-                `✦ Ton profil ${typeCode} complet (amour, carrière, face cachée)`,
-                '✦ 1 quiz UrCecret au choix — résultat débloqué aussi',
-                'Accès immédiat · conservé à vie · zéro abonnement',
-              ] : [
-                `✦ Your complete ${typeCode} profile (love, career, shadow side)`,
-                '✦ 1 UrCecret quiz of your choice — result unlocked too',
-                'Instant access · kept forever · zero subscription',
-              ]).map(b => (
-                <li key={b} className="flex items-start gap-2 text-xs text-stone-700">
-                  <span className="font-black flex-shrink-0 mt-0.5" style={{ color: '#a94e18' }}>✓</span>{b}
-                </li>
-              ))}
-            </ul>
-            {isInApp && inAppPayUrl ? (
-              <a
-                href={inAppPayUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
-                className="block w-full py-4 rounded-xl font-black text-white text-sm text-center active:scale-[0.98]"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)', textDecoration: 'none' }}
-              >
-                {isFr ? `🎁 2 résultats — mon profil MBTI + 1 quiz — 1,99 €` : `🎁 2 results — my MBTI profile + 1 quiz — €1.99`}
-              </a>
-            ) : (
-              <button
-                onClick={() => doCheckout('onetime')}
-                disabled={loading}
-                className="w-full py-4 rounded-xl font-black text-white text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.35)' }}
-              >
-                {loading ? '…' : isFr ? `🔓 Débloquer mon profil ${typeCode} — 1,99 €` : `🔓 Unlock my ${typeCode} profile — €1.99`}
-              </button>
-            )}
-            <p className="text-center text-[10px] text-stone-400 mt-2">
-              {isFr ? 'Apple Pay · Google Pay · CB · Accès immédiat' : 'Apple Pay · Google Pay · Card · Instant access'}
-            </p>
           </div>
 
-          {/* Secondary: Monthly subscription */}
-          <div className="rounded-2xl p-4" style={{ background: '#fafafa', border: '1px solid #e7e5e0' }}>
+          {/* Secondary: Monthly subscription — carte papier calme */}
+          <div className="rounded-2xl px-5 py-4" style={{ background: 'white', border: '1px solid #e6e0d4' }}>
             <div className="flex items-start justify-between mb-3">
               <div>
-                <p className="text-xs font-black text-stone-600">🔄 {isFr ? 'Abonnement mensuel · sans engagement' : 'Monthly subscription · no commitment'}</p>
-                <p className="text-[10px] text-stone-400 mt-0.5">
-                  {isFr ? 'Les 16 profils MBTI + tous les quiz + duo illimité' : 'All 16 MBTI profiles + all quizzes + unlimited duo'}
+                <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>
+                  {isFr ? 'Accès illimité, sans engagement' : 'Unlimited access, no commitment'}
+                </p>
+                <p className="text-[11px] text-stone-500 mt-0.5" style={{ lineHeight: 1.5 }}>
+                  {isFr ? 'Les 16 profils, tous les quiz, le mode duo' : 'All 16 profiles, every quiz, duo mode'}
                 </p>
               </div>
               <div className="text-right ml-3 flex-shrink-0">
-                <span className="text-xs text-stone-300 line-through block">29,99 €</span>
-                <span className="text-base font-black text-stone-700">9,99 €</span>
-                <span className="text-[10px] text-stone-400">{isFr ? '/mois' : '/mo'}</span>
+                <span className="text-[11px] text-stone-300 line-through block">29,99 €</span>
+                <span className="font-display text-lg text-stone-900" style={{ fontWeight: 600 }}>9,99 €</span>
+                <span className="text-[11px] text-stone-400"> {isFr ? '/mois' : '/mo'}</span>
               </div>
             </div>
             {isInApp && inAppMonthlyUrl ? (
@@ -1275,19 +1288,19 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'monthly', via: 'anchor' })}
-                className="block w-full py-2.5 rounded-xl font-semibold text-xs text-center transition-all active:scale-[0.98]"
-                style={{ border: '1.5px solid rgba(169,78,24,0.3)', color: '#a94e18', background: 'white', textDecoration: 'none' }}
+                className="block w-full py-3 rounded-full font-semibold text-[13px] text-center transition-all active:scale-[0.98]"
+                style={{ border: '1px solid #131110', color: '#131110', background: 'transparent', textDecoration: 'none' }}
               >
-                {isFr ? "Choisir l'abonnement →" : 'Choose subscription →'}
+                {isFr ? "Choisir l'abonnement" : 'Choose subscription'}
               </a>
             ) : (
               <button
                 onClick={() => doCheckout('monthly')}
                 disabled={loading}
-                className="w-full py-2.5 rounded-xl font-semibold text-xs transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ border: '1.5px solid rgba(169,78,24,0.3)', color: '#a94e18', background: 'white' }}
+                className="w-full py-3 rounded-full font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ border: '1px solid #131110', color: '#131110', background: 'transparent' }}
               >
-                {loading ? '…' : isFr ? "Choisir l'abonnement →" : 'Choose subscription →'}
+                {loading ? '…' : isFr ? "Choisir l'abonnement" : 'Choose subscription'}
               </button>
             )}
           </div>
@@ -1296,7 +1309,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         <div className="flex flex-col items-center gap-1.5 mt-4">
           <p className="text-center text-[11px] text-stone-400">
-            {isFr ? '🔒 Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : '🔒 Secure Stripe · Card, Apple Pay, Google Pay'}
+            {isFr ? 'Paiement sécurisé Stripe · CB, Apple Pay, Google Pay' : 'Secure Stripe payment · Card, Apple Pay, Google Pay'}
           </p>
           <p className="text-center text-[11px] font-semibold" style={{ color: '#1f7a4d' }}>
             {isFr ? '✓ Satisfait ou remboursé sous 7 jours' : '✓ 7-day money-back guarantee'}
@@ -1356,8 +1369,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <div className="flex-1 min-w-0">
               <p className="text-xs font-black text-stone-900 leading-snug">
                 {isInApp
-                  ? (isFr ? `🔓 Débloque ton profil ${typeCode} complet` : `🔓 Unlock your full ${typeCode} profile`)
-                  : (isFr ? `⚡ Commence à 1,99 € — profil ${typeCode} immédiat` : `⚡ Start at €1.99 — ${typeCode} profile instantly`)}
+                  ? (isFr ? `Débloque ton profil ${typeCode} complet` : `Unlock your full ${typeCode} profile`)
+                  : (isFr ? `Ton profil ${typeCode} complet — 1,99 €` : `Your full ${typeCode} profile — €1.99`)}
               </p>
               <p className="text-[10px] text-stone-500 mt-0.5">
                 {isInApp
