@@ -831,7 +831,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
   const [stickyBar, setStickyBar] = useState(false);
   const [exitModal, setExitModal] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
   const exitShown = useRef(false);
   const [liveCount] = useState(() => {
     const base: Record<string, number> = {
@@ -927,44 +926,31 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
     return () => window.removeEventListener('pageshow', reset);
   }, []);
 
-  // In-app (TikTok): force-open the REAL system browser at the paywall, carrying
-  // the type (?pending=) + affiliate ref. The paywall/payment only ever happens in
-  // a real browser — never inside the TikTok webview where it kills conversions.
-  const openInBrowser = useCallback(() => {
-    const ua = navigator.userAgent;
-    let ref = '';
-    try { ref = localStorage.getItem('_urs_ref') ?? ''; } catch {}
-    const qs = `?pending=${typeCode}${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`;
-    diagLog('inapp_open_browser', { typeCode });
-    if (/android/i.test(ua)) {
-      window.location.href = `intent://urcecret.site/quiz/personnalite${qs}#Intent;scheme=https;end`;
-      return;
-    }
-    if (/iphone|ipad/i.test(ua)) {
-      window.location.href = `x-safari-https://urcecret.site/quiz/personnalite${qs}`;
-      return;
-    }
-    window.location.href = `https://urcecret.site/quiz/personnalite${qs}`;
-  }, [typeCode]);
-
-  // Reliable fallback when the in-app browser blocks the auto-open: copy the link
-  // so the user can paste it into their real browser.
-  const copyProfileLink = useCallback(async () => {
-    let ref = '';
-    try { ref = localStorage.getItem('_urs_ref') ?? ''; } catch {}
-    const url = `https://urcecret.site/quiz/personnalite?pending=${typeCode}${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      // Fallback for webviews without clipboard API
-      const ta = document.createElement('textarea');
-      ta.value = url; document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch {}
-      document.body.removeChild(ta);
-    }
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2500);
-  }, [typeCode]);
+  // In-app (TikTok) : pré-charge les URLs Stripe dès l'affichage du résultat.
+  // C'est le mécanisme de l'ère qui a généré 100 % des ventes réelles : le
+  // <a target="_blank"> ouvre Stripe hors du webview et le paiement aboutit
+  // (encaissements Maeva/eric/Nolan). Ne pas retirer sans données contraires.
+  useEffect(() => {
+    if (!isInApp || !typeCode) return;
+    let affiliateRef = '';
+    try { affiliateRef = localStorage.getItem('_urs_ref') ?? ''; } catch {}
+    const base = {
+      origin: window.location.origin,
+      quizSlug: 'personnalite',
+      typeCode,
+      ...(userEmail ? { userEmail } : {}),
+      ...(affiliateRef ? { affiliateRef } : {}),
+    };
+    fetch('/api/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...base, oneTime: true }),
+    }).then(r => r.json()).then(d => { if (d.url) setInAppPayUrl(d.url); }).catch(() => {});
+    fetch('/api/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...base }),
+    }).then(r => r.json()).then(d => { if (d.url) setInAppMonthlyUrl(d.url); }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInApp, typeCode]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: '#faf9f7', animation: 'paywallReveal 0.45s ease' }}>
@@ -1168,80 +1154,13 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         <CountdownTimer isFr={isFr} />
 
-        {/* ── TikTok in-app : on NE montre PAS le paywall ici (ça démotive et fait
-            perdre des ventes dans le webview). À la place, un écran unique 1-tap
-            qui bascule l'utilisateur dans son VRAI navigateur, où il verra le
-            paywall et pourra payer sans friction. Le type est conservé (?pending). */}
-        {isInApp ? (
-          <div className="mt-4">
-            {/* Arrow pointing to the ••• menu at the very top-right of the webview */}
-            <div className="fixed top-2 right-3 z-[60] flex flex-col items-end pointer-events-none" style={{ animation: 'arrowBounce 1.1s ease-in-out infinite' }}>
-              <svg width="40" height="40" viewBox="0 0 36 36" fill="none">
-                <path d="M6 30L30 6M30 6H14M30 6V22" stroke="#a94e18" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="text-[11px] font-black px-2.5 py-1 rounded-full text-white" style={{ background: '#a94e18', whiteSpace: 'nowrap' }}>
-                {isFr ? 'le menu ••• est ici' : 'the ••• menu is here'}
-              </span>
-            </div>
-            <style>{`@keyframes arrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}`}</style>
+        {/* ── Offres — visibles pour TOUT LE MONDE, y compris in-app TikTok.
+            C'est le funnel qui a généré 100 % des ventes réelles : les liens
+            Stripe sont préchargés et ouverts via <a target="_blank"> depuis
+            le webview (le paiement aboutit, prouvé par les encaissements). ── */}
+        {(
 
-            <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 28px rgba(169,78,24,0.35)' }}>
-              <p className="text-lg font-black text-white leading-tight mb-1 text-center">
-                {isFr ? `Ton profil ${typeCode} complet est prêt` : `Your full ${typeCode} profile is ready`}
-              </p>
-              <p className="text-xs text-white/80 mb-4 leading-snug text-center">
-                {isFr ? 'Amour · Carrière · Face cachée · Compatibilité' : 'Love · Career · Shadow side · Compatibility'}
-              </p>
-
-              {/* CLEAR 2-STEP INSTRUCTIONS — the reliable path */}
-              <div className="rounded-xl p-4 mb-3" style={{ background: 'rgba(255,255,255,0.14)' }}>
-                <p className="text-[11px] font-black uppercase tracking-wider text-white mb-3 text-center">
-                  {isFr ? '👉 Ouvre-le dans ton navigateur (5 sec)' : '👉 Open it in your browser (5 sec)'}
-                </p>
-                <div className="flex items-center gap-3 mb-2.5">
-                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-white text-sm font-black flex items-center justify-center" style={{ color: '#a94e18' }}>1</span>
-                  <p className="text-sm text-white font-semibold leading-snug">
-                    {isFr ? <>Appuie sur <span className="font-black">•••</span> tout en haut à droite ↗</> : <>Tap <span className="font-black">•••</span> at the very top right ↗</>}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-white text-sm font-black flex items-center justify-center" style={{ color: '#a94e18' }}>2</span>
-                  <p className="text-sm text-white font-semibold leading-snug">
-                    {isFr ? <>Choisis <span className="font-black">« Ouvrir dans le navigateur »</span></> : <>Choose <span className="font-black">&ldquo;Open in browser&rdquo;</span></>}
-                  </p>
-                </div>
-              </div>
-
-              {/* Try auto-open (works on some Android) */}
-              <button
-                onClick={openInBrowser}
-                className="w-full py-3.5 rounded-xl font-black text-sm active:scale-[0.98] transition-transform mb-2"
-                style={{ background: 'white', color: '#a94e18', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}
-              >
-                {isFr ? 'Essayer l\'ouverture auto →' : 'Try auto-open →'}
-              </button>
-
-              {/* Reliable fallback: copy link to paste in browser */}
-              <button
-                onClick={copyProfileLink}
-                className="w-full py-2.5 rounded-xl font-bold text-xs active:scale-[0.98] transition-transform"
-                style={{ background: 'rgba(255,255,255,0.18)', color: 'white', border: '1px solid rgba(255,255,255,0.35)' }}
-              >
-                {linkCopied
-                  ? (isFr ? '✓ Lien copié — colle-le dans ton navigateur' : '✓ Link copied — paste it in your browser')
-                  : (isFr ? '📋 Ou copie le lien' : '📋 Or copy the link')}
-              </button>
-            </div>
-          </div>
-        ) : (
-
-        /* Offers — €1.99 hero (both actual sales were €1.99, not monthly) */
         <div className="space-y-3 mt-4">
-          {isInApp && (
-            <p className="text-[11px] text-stone-400 text-center font-semibold pb-1">
-              {isFr ? '— ou déverrouiller directement —' : '— or unlock directly —'}
-            </p>
-          )}
 
           {/* HERO: One-time €1.99 — carte d'encre, prix en Fraunces, CTA papier */}
           <div className="relative overflow-hidden rounded-3xl px-5 pt-7 pb-5"
@@ -1398,7 +1317,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <PaywallEmailCapture
           typeCode={typeCode}
           isFr={isFr}
-          onCaptured={(capturedEmail) => { if (isInApp) openInBrowser(); else doCheckout('onetime', capturedEmail); }}
+          onCaptured={(capturedEmail) => doCheckout('onetime', capturedEmail)}
         />
 
         {/* ── Share CTA — viral loop ──────────────────────────────────────── */}
@@ -1412,22 +1331,18 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <div className="max-w-sm mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-black text-stone-900 leading-snug">
-                {isInApp
-                  ? (isFr ? `Débloque ton profil ${typeCode} complet` : `Unlock your full ${typeCode} profile`)
-                  : (isFr ? `Ton profil ${typeCode} complet — 1,99 €` : `Your full ${typeCode} profile — €1.99`)}
+                {isFr ? `Ton profil ${typeCode} complet — 1,99 €` : `Your full ${typeCode} profile — €1.99`}
               </p>
               <p className="text-[10px] text-stone-500 mt-0.5">
-                {isInApp
-                  ? (isFr ? 'S\'ouvre dans ton navigateur · paiement sécurisé' : 'Opens in your browser · secure payment')
-                  : (isFr ? 'Paiement unique · accès à vie · 7j remboursé' : 'One-time · lifetime access · 7-day refund')}
+                {isFr ? 'Paiement unique · accès à vie · 7j remboursé' : 'One-time · lifetime access · 7-day refund'}
               </p>
             </div>
             <button
-              onClick={() => { setStickyBar(false); if (isInApp) openInBrowser(); else doCheckout('onetime'); }}
+              onClick={() => { setStickyBar(false); doCheckout('onetime'); }}
               className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-white text-xs whitespace-nowrap transition-all active:scale-[0.97]"
               style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 12px rgba(169,78,24,0.3)' }}
             >
-              {isInApp ? (isFr ? 'Ouvrir →' : 'Open →') : (isFr ? '1,99 € →' : '€1.99 →')}
+              {isFr ? '1,99 € →' : '€1.99 →'}
             </button>
             <button onClick={() => setStickyBar(false)} className="text-stone-400 text-base p-1 leading-none flex-shrink-0">✕</button>
           </div>
