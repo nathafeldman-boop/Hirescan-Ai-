@@ -1050,26 +1050,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           </div>
         )}
 
-        {/* ─── Profile teaser — first lines of actual content, then fade out ── */}
-        {isFr && type?.fullDesc && (
-          <div className="rounded-2xl px-5 pt-4 pb-3 mb-3 relative overflow-hidden"
-               style={{ background: 'white', border: '1px solid #e6e0d4' }}>
-            <p className="text-[10px] uppercase mb-2.5"
-               style={{ color: world.accent, letterSpacing: '0.2em', fontWeight: 700 }}>
-              {`Aperçu de ton profil ${typeCode}`}
-            </p>
-            {/* L'encre s'évapore mi-phrase — pas de flou, une coupure. */}
-            <p className="text-[15px] text-stone-700" style={{ lineHeight: 1.65 }}>
-              {type.fullDesc.slice(0, 130)}
-              <span className="ur-cut text-stone-500 select-none pointer-events-none">
-                {type.fullDesc.slice(130, 200)}
-              </span>
-            </p>
-          </div>
-        )}
-
-        {/* ─── Les portes fermées — chaque chapitre laisse filtrer sa première
-            ligne, coupée mi-phrase. Le désir vient de la qualité visible. ── */}
+        {/* ─── Les portes fermées — titres seulement + teaser générique.
+            Rien du vrai contenu du profil n'est montré avant le paiement. ── */}
         <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '1px solid #e6e0d4', background: 'white' }}>
           <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: '#f0ebe0' }}>
             <p className="text-[10px] uppercase" style={{ color: '#131110', letterSpacing: '0.2em', fontWeight: 700 }}>
@@ -1081,14 +1063,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </span>
           </div>
           {(isFr ? [
-            { glyph: 'mirror' as const,  title: 'Qui tu es vraiment', preview: type?.fullDesc?.slice(0, 90) ?? 'Le portrait complet — celui que même tes proches n\'ont jamais mis en mots' },
-            { glyph: 'heart' as const,   title: 'Amour & attachement', preview: type?.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète' },
-            { glyph: 'compass' as const, title: 'Carrière & superpouvoir', preview: type?.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel' },
-            { glyph: 'spark' as const,   title: 'Tes forces', preview: type?.strengths?.length ? `${type.strengths.slice(0, 3).join(' · ')} — et comment t'appuyer dessus dans les moments qui comptent` : 'Ce sur quoi tu peux compter chez toi, même quand tout tremble' },
-            { glyph: 'eye' as const,     title: 'Tes angles morts', preview: type?.weaknesses?.length ? `${type.weaknesses.slice(0, 3).join(' · ')} — ce que personne n'ose te dire en face` : 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face' },
-            { glyph: 'moon' as const,    title: 'Ta face cachée & ta croissance', preview: type?.growth?.slice(0, 90) ?? 'Le côté de toi qui ne sort que sous pression — et comment en faire un allié' },
-            { glyph: 'key' as const,     title: 'Compatibilités exactes', preview: type?.compatibleWith ? `Tes types les plus compatibles : ${type.compatibleWith.join(', ')} — et ceux qui te drainent` : 'Les types qui te comprennent vraiment — et les profils qui te drainent à coup sûr' },
-            { glyph: 'star' as const,    title: `Les ${typeCode} célèbres`, preview: type?.famousExamples?.length ? `${type.famousExamples.slice(0, 3).join(' · ')} — ce que vous partagez, et ce que ça dit de ton potentiel` : 'Les figures publiques qui partagent ton fonctionnement exact' },
+            { glyph: 'mirror' as const,  title: 'Qui tu es vraiment', preview: 'Le portrait complet — celui que même tes proches n\'ont jamais mis en mots' },
+            { glyph: 'heart' as const,   title: 'Amour & attachement', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète' },
+            { glyph: 'compass' as const, title: 'Carrière & superpouvoir', preview: 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel' },
+            { glyph: 'spark' as const,   title: 'Tes forces', preview: 'Ce sur quoi tu peux compter chez toi, même quand tout tremble' },
+            { glyph: 'eye' as const,     title: 'Tes angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face' },
+            { glyph: 'moon' as const,    title: 'Ta face cachée & ta croissance', preview: 'Le côté de toi qui ne sort que sous pression — et comment en faire un allié' },
+            { glyph: 'key' as const,     title: 'Compatibilités exactes', preview: 'Les types qui te comprennent vraiment — et les profils qui te drainent à coup sûr' },
+            { glyph: 'star' as const,    title: `Les ${typeCode} célèbres`, preview: 'Les figures publiques qui partagent ton fonctionnement exact' },
           ] : [
             { glyph: 'mirror' as const,  title: 'Who you really are', preview: 'The full portrait — the one even the people close to you never put into words' },
             { glyph: 'heart' as const,   title: 'Love & attachment', preview: 'Why you always invest more than the other — and the painful pattern that keeps repeating' },
