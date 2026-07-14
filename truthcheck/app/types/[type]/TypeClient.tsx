@@ -221,7 +221,7 @@ export default function TypeClient({ type }: Props) {
           <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: type.accentColor }}>
             {lang === 'en' ? 'Free preview' : 'Aperçu gratuit'}
           </p>
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-2">
             {localType.traits.slice(0, 3).map(trait => (
               <span key={trait} className="px-3 py-1.5 rounded-full text-xs font-medium border"
                 style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
@@ -229,9 +229,6 @@ export default function TypeClient({ type }: Props) {
               </span>
             ))}
           </div>
-          <p className="text-stone-200 text-sm leading-relaxed">
-            {localType.fullDesc.split(/(?<=[.!?])\s/)[0]}
-          </p>
         </div>
 
         {/* Hook line — curiosity gap, mirrors the paywall */}
@@ -257,12 +254,12 @@ export default function TypeClient({ type }: Props) {
             { icon: '💕', title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that repeats...' },
             { icon: '💼', title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage...' },
             { icon: '🌑', title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that silently sabotages you — nobody dares to say it...' },
-            { icon: '🎯', title: 'Exact Compatibility', preview: `Your most compatible types: ${localType.compatibleWith?.join(', ') ?? '…'} — and the ones that drain you...` },
+            { icon: '🎯', title: 'Exact Compatibility', preview: 'The types that truly get you — and the ones that drain you...' },
           ] : [
-            { icon: '💕', title: 'Amour & Relations', preview: localType.inLove?.slice(0, 90) ?? 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète...' },
-            { icon: '💼', title: 'Carrière & Superpouvoir', preview: localType.atWork?.slice(0, 90) ?? 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel...' },
-            { icon: '🌑', title: 'Face cachée & Angles morts', preview: localType.growth?.slice(0, 90) ?? 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face...' },
-            { icon: '🎯', title: 'Compatibilité exacte', preview: localType.compatibleWith ? `Tes types les plus compatibles : ${localType.compatibleWith.join(', ')} — et ceux qui te drainent systématiquement…` : 'Les 3 types qui te comprennent vraiment — et les 2 profils qui te drainent à coup sûr...' },
+            { icon: '💕', title: 'Amour & Relations', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète...' },
+            { icon: '💼', title: 'Carrière & Superpouvoir', preview: 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel...' },
+            { icon: '🌑', title: 'Face cachée & Angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face...' },
+            { icon: '🎯', title: 'Compatibilité exacte', preview: 'Les types qui te comprennent vraiment — et ceux qui te drainent systématiquement...' },
           ]).map((s, i, arr) => (
             <div key={s.title} className={`flex items-center gap-3 px-4 py-3${i < arr.length - 1 ? ' border-b border-white/5' : ''}`}>
               <span className="text-xl flex-shrink-0">{s.icon}</span>
