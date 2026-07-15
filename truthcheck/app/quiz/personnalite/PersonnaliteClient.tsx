@@ -621,7 +621,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
           className="w-full py-3 rounded-xl font-black text-white text-sm active:scale-[0.98] transition-all"
           style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 3px 14px rgba(169,78,24,0.32)' }}
         >
-          {isFr ? `Débloquer mon profil ${typeCode} — 1,99 €` : `Unlock my ${typeCode} profile — €1.99`}
+          {isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
         </button>
       </div>
     );
@@ -630,7 +630,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
   return (
     <div className="rounded-lg p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
       <p className="text-sm font-bold text-stone-800 mb-1">
-        {isFr ? `Pas encore décidé ? Garde ton profil ${typeCode}` : `Not ready yet? Save your ${typeCode} profile`}
+        {isFr ? `Pas encore décidé ? Garde ton profil` : `Not ready yet? Save your profile`}
       </p>
       <p className="text-xs text-stone-500 mb-3">
         {isFr ? 'On t\'envoie ton type + un extrait de ton analyse par email — gratuit, sans spam. Tu pourras le débloquer quand tu veux.' : 'We\'ll email you your type + a free analysis preview — no spam. Unlock whenever you want.'}
@@ -665,7 +665,7 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
   const items = isFr ? [
     {
       q: `C'est quoi exactement pour 1,99 €?`,
-      a: `2 résultats : ton profil ${typeCode} complet (Amour, Carrière, Face cachée, Compatibilité) + 1 quiz UrCecret au choix (infidélité, amour véritable, manipulation…) dont le résultat est aussi débloqué. Paiement unique — accès immédiat, à vie. Zéro abonnement.`,
+      a: `2 résultats : ton profil complet (Amour, Carrière, Face cachée, Compatibilité) + 1 quiz UrCecret au choix (infidélité, amour véritable, manipulation…) dont le résultat est aussi débloqué. Paiement unique, accès immédiat, à vie. Zéro abonnement.`,
     },
     {
       q: `Est-ce un abonnement?`,
@@ -682,7 +682,7 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
   ] : [
     {
       q: `What exactly do I get for €1.99?`,
-      a: `2 results: your complete ${typeCode} profile (Love, Career, Shadow side, Compatibility) + 1 UrCecret quiz of your choice (infidelity, true love, manipulation…) with its result unlocked too. One-time payment — instant, lifetime access. Zero subscription.`,
+      a: `2 results: your complete profile (Love, Career, Shadow side, Compatibility) + 1 UrCecret quiz of your choice (infidelity, true love, manipulation…) with its result unlocked too. One-time payment, instant, lifetime access. Zero subscription.`,
     },
     {
       q: `Is it a subscription?`,
@@ -754,13 +754,13 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
           <div className="text-5xl mb-3">⏰</div>
           <h3 className="text-xl font-black text-stone-900 leading-tight mb-2">
             {isFr
-              ? `Ton profil ${typeCode} s'efface dans 24h`
-              : `Your ${typeCode} profile expires in 24h`}
+              ? `Ton profil s'efface dans 24h`
+              : `Your profile expires in 24h`}
           </h3>
           <p className="text-sm text-stone-500 leading-snug">
             {isFr
-              ? `Une fois parti(e), ton profil ${typeCode} sera archivé. Débloque-le maintenant — une fois, pour toujours.`
-              : `Once you leave, your ${typeCode} profile gets archived. Unlock it now — once, forever.`}
+              ? `Une fois parti(e), ton profil sera archivé. Débloque-le maintenant, une fois, pour toujours.`
+              : `Once you leave, your profile gets archived. Unlock it now, once, forever.`}
           </p>
         </div>
         <button
@@ -782,36 +782,9 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
 }
 
 // ─── Share my type — viral loop ────────────────────────────────────────────
-function ShareMyType({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
-  const [copied, setCopied] = useState(false);
-  const type = mbtiTypes[typeCode];
-  const url = typeof window !== 'undefined' ? `${window.location.origin}/quiz/personnalite` : 'https://urcecret.site/quiz/personnalite';
-  const text = isFr
-    ? `Je suis ${typeCode} ${type?.emoji ?? ''} "${type?.name ?? ''}" 🔮 — ce test MBTI est effrayant de précision\n${url}`
-    : `I'm ${typeCode} ${type?.emoji ?? ''} "${type?.name ?? ''}" 🔮 — this MBTI test is frighteningly accurate\n${url}`;
-
-  const share = async () => {
-    if (navigator.share) {
-      try { await navigator.share({ text: isFr ? `Je suis ${typeCode} ${type?.emoji ?? ''} — ${url}` : `I'm ${typeCode} ${type?.emoji ?? ''} — ${url}`, url }); return; } catch {}
-    }
-    try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch {}
-  };
-
-  return (
-    <button
-      onClick={share}
-      className="block w-full mt-4 rounded-lg p-3.5 text-center transition-all active:scale-[0.98]"
-      style={{ background: 'rgba(169,78,24,0.05)', border: '1px solid rgba(169,78,24,0.18)', textDecoration: 'none' }}
-    >
-      <p className="text-sm font-black" style={{ color: '#a94e18' }}>
-        {copied ? '✅ Lien copié !' : (isFr ? `📤 Partager mon résultat ${typeCode}` : `📤 Share my ${typeCode} result`)}
-      </p>
-      <p className="text-[11px] text-stone-400 mt-0.5">
-        {isFr ? 'Envoie à un ami — découvrez vos compatibilités' : 'Send to a friend — discover your compatibility'}
-      </p>
-    </button>
-  );
-}
+// Le partage du type se fait uniquement après paiement, sur /success
+// (MbtiShareCard). Le retirer d'ici évite de révéler le résultat gratuitement
+// via le texte de partage avant l'achat.
 
 // ─── Result teaser (free users — logged in or not) ─────────────────────────────
 // Auth gate removed: user goes straight to Stripe which collects their email.
@@ -966,9 +939,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       )}
       <div className="w-full max-w-sm">
 
-        {/* ─── Couverture de dossier — plate, alignée à gauche, sans lueur ni
-            confettis. Le type est la récompense gratuite ; le reste reste
-            classé. Une seule étiquette de couleur par famille cognitive. ── */}
+        {/* ─── Couverture de dossier — RIEN du résultat n'est révélé avant
+            paiement. Ni le code, ni le nom, ni la famille : juste un dossier
+            scellé. Le type complet n'apparaît qu'après paiement (/success). ── */}
         <div className="relative rounded-lg mb-4 px-6 pt-6 pb-7 ur-reveal"
              style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
 
@@ -976,19 +949,20 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <span className="ur-label text-[10px]" style={{ color: 'rgba(246,245,240,0.45)' }}>
               {isFr ? 'DOSSIER PERSONNEL' : 'PERSONAL FILE'}
             </span>
-            <span className="ur-label text-[10px] px-2 py-1 rounded-sm"
-                  style={{ color: world.light, background: `${world.accent}33`, border: `1px solid ${world.accent}66` }}>
-              {world.label}
+            <span className="ur-label text-[10px] px-2 py-1 rounded-sm flex items-center gap-1.5"
+                  style={{ color: 'var(--stamp)', border: '1px solid var(--stamp)' }}>
+              <Glyph name="lock" color="var(--stamp)" size={11} />
+              {isFr ? 'SCELLÉ' : 'SEALED'}
             </span>
           </div>
 
           <div className="ur-fade-1">
-            <div className="font-display leading-none"
-                 style={{ fontSize: 52, fontWeight: 800, letterSpacing: '-0.01em', color: '#F6F5F0' }}>
-              {typeCode}
+            <div className="font-display leading-none select-none" aria-hidden
+                 style={{ fontSize: 52, fontWeight: 800, letterSpacing: '0.06em', color: 'rgba(246,245,240,0.18)' }}>
+              ????
             </div>
-            <div className="font-display mt-2" style={{ fontSize: 18, fontWeight: 500, color: world.light }}>
-              {isFr ? (type?.name ?? '') : typeCode}
+            <div className="font-display mt-2" style={{ fontSize: 15, fontWeight: 500, color: 'rgba(246,245,240,0.4)' }}>
+              {isFr ? 'Ton type reste confidentiel tant que le dossier n\'est pas ouvert.' : 'Your type stays confidential until the file is unlocked.'}
             </div>
           </div>
 
@@ -999,8 +973,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </p>
             <p className="font-display leading-snug" style={{ fontSize: 17, fontWeight: 500, color: '#F6F5F0' }}>
               {isFr
-                ? (HOOK_LINES[typeCode] ?? 'Pourquoi tu fonctionnes comme ça, en amour, au travail, sous pression.')
-                : 'Why you feel misunderstood, even by people who know you well.'}
+                ? 'Ton type exact, pourquoi tu fonctionnes comme ça, en amour, au travail, sous pression.'
+                : 'Your exact type, why you function this way, in love, at work, under pressure.'}
             </p>
           </div>
         </div>
@@ -1041,7 +1015,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <div className="rounded-lg overflow-hidden mb-3" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
           <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: '#f0ebe0' }}>
             <p className="text-[10px] uppercase" style={{ color: '#131110', letterSpacing: '0.2em', fontWeight: 700 }}>
-              {isFr ? `Profil ${typeCode} complet · 8 chapitres` : `Full ${typeCode} profile · 8 chapters`}
+              {isFr ? `Profil complet · 8 chapitres` : `Full profile · 8 chapters`}
             </p>
             <span className="flex items-center gap-1.5 text-[10px] text-stone-400 font-semibold">
               <Glyph name="lock" color="#a08655" size={13} />
@@ -1056,7 +1030,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             { glyph: 'eye' as const,     title: 'Tes angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face' },
             { glyph: 'moon' as const,    title: 'Ta face cachée & ta croissance', preview: 'Le côté de toi qui ne sort que sous pression — et comment en faire un allié' },
             { glyph: 'key' as const,     title: 'Compatibilités exactes', preview: 'Les types qui te comprennent vraiment — et les profils qui te drainent à coup sûr' },
-            { glyph: 'star' as const,    title: `Les ${typeCode} célèbres`, preview: 'Les figures publiques qui partagent ton fonctionnement exact' },
+            { glyph: 'star' as const,    title: 'Célébrités du même profil', preview: 'Les figures publiques qui partagent ton fonctionnement exact' },
           ] : [
             { glyph: 'mirror' as const,  title: 'Who you really are', preview: 'The full portrait — the one even the people close to you never put into words' },
             { glyph: 'heart' as const,   title: 'Love & attachment', preview: 'Why you always invest more than the other — and the painful pattern that keeps repeating' },
@@ -1065,7 +1039,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             { glyph: 'eye' as const,     title: 'Your blind spots', preview: 'What you do unconsciously that sabotages you — that nobody dares to say to your face' },
             { glyph: 'moon' as const,    title: 'Shadow side & growth', preview: 'The side of you that only shows under pressure — and how to make it an ally' },
             { glyph: 'key' as const,     title: 'Exact compatibilities', preview: 'The types that truly get you — and the profiles that always drain you' },
-            { glyph: 'star' as const,    title: `Famous ${typeCode}s`, preview: 'The public figures who share your exact wiring — and what it says about your ceiling' },
+            { glyph: 'star' as const,    title: 'Famous people, same profile', preview: 'The public figures who share your exact wiring, and what it says about your ceiling' },
           ]).map((s, i, arr) => (
             <div key={s.title} className={`flex items-start gap-3.5 px-5 py-3.5${i < arr.length - 1 ? ' border-b' : ''}`}
                  style={{ borderColor: '#f0ebe0' }}>
@@ -1113,7 +1087,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         </div>
 
         <p className="text-center text-[11px] text-stone-500 mb-1">
-          {TYPE_COUNTS[typeCode] ?? 847} {isFr ? `personnes ont débloqué leur profil ${typeCode} ce mois` : `people unlocked their ${typeCode} profile this month`}
+          {TYPE_COUNTS[typeCode] ?? 847} {isFr ? `personnes ont débloqué leur profil ce mois` : `people unlocked their profile this month`}
         </p>
         <p className="text-center text-[11px] text-stone-400 mb-3">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 align-middle animate-pulse" />
@@ -1148,11 +1122,11 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
             <ul className="space-y-2.5 mb-5">
               {(isFr ? [
-                `Ton profil ${typeCode} complet : amour, carrière, face cachée`,
+                `Ton profil complet : amour, carrière, face cachée`,
                 'Un quiz UrCecret au choix, résultat débloqué aussi',
                 'Accès immédiat, conservé à vie, zéro abonnement',
               ] : [
-                `Your complete ${typeCode} profile: love, career, shadow side`,
+                `Your complete profile: love, career, shadow side`,
                 'One UrCecret quiz of your choice, result unlocked too',
                 'Instant access, kept forever, zero subscription',
               ]).map(b => (
@@ -1171,7 +1145,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="block w-full py-4 rounded-md font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
                 style={{ background: 'var(--stamp)', color: '#F6F5F0', textDecoration: 'none' }}
               >
-                {isFr ? `Débloquer mon profil ${typeCode}, 1,99 €` : `Unlock my ${typeCode} profile, €1.99`}
+                {isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
               </a>
             ) : (
               <button
@@ -1180,7 +1154,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="w-full py-4 rounded-md font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ background: 'var(--stamp)', color: '#F6F5F0' }}
               >
-                {loading ? '…' : isFr ? `Débloquer mon profil ${typeCode}, 1,99 €` : `Unlock my ${typeCode} profile, €1.99`}
+                {loading ? '…' : isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
               </button>
             )}
             <p className="text-center text-[11px] mt-2.5" style={{ color: 'rgba(245,241,232,0.45)' }}>
@@ -1246,7 +1220,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               <span className="text-amber-400 text-xs flex-shrink-0 mt-0.5">★★★★★</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-stone-700 leading-snug italic">&ldquo;{TYPE_REVIEWS[typeCode].quote}&rdquo;</p>
-                <p className="text-[10px] text-stone-400 mt-0.5">— {TYPE_REVIEWS[typeCode].name}, {TYPE_REVIEWS[typeCode].age} ans · {typeCode}</p>
+                <p className="text-[10px] text-stone-400 mt-0.5">{TYPE_REVIEWS[typeCode].name}, {TYPE_REVIEWS[typeCode].age} ans</p>
               </div>
             </div>
           )}
@@ -1280,9 +1254,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           onCaptured={(capturedEmail) => doCheckout('onetime', capturedEmail)}
         />
 
-        {/* ── Share CTA — viral loop ──────────────────────────────────────── */}
-        <ShareMyType typeCode={typeCode} isFr={isFr} />
-
       </div>
 
       {/* Sticky bar — appears after 15s for users still on page (shows lowest price to convert hesitants) */}
@@ -1291,7 +1262,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <div className="max-w-sm mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-black text-stone-900 leading-snug">
-                {isFr ? `Ton profil ${typeCode} complet — 1,99 €` : `Your full ${typeCode} profile — €1.99`}
+                {isFr ? `Ton profil complet, 1,99 €` : `Your full profile, €1.99`}
               </p>
               <p className="text-[10px] text-stone-500 mt-0.5">
                 {isFr ? 'Paiement unique · accès à vie · 7j remboursé' : 'One-time · lifetime access · 7-day refund'}
