@@ -1,22 +1,28 @@
 import type { Metadata } from 'next';
-import { Fraunces, Instrument_Sans } from 'next/font/google';
+import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import Providers from './Providers';
 
-// « L'Intérieur » type pairing — Fraunces (editorial soft serif, optical
-// sizing, italics reserved for emotional words) + Instrument Sans
-// (geometric-humanist, Söhne-class) for interface and body copy.
-const fraunces = Fraunces({
+// « Le Dossier » type system — Bricolage Grotesque (display, strong distinct
+// character, not a default pairing) + Instrument Sans (body/UI) + JetBrains
+// Mono (small metadata labels — dossier numbers, classification tags).
+const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-display',
-  style: ['normal', 'italic'],
 });
 
 const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-mono',
+  weight: ['500', '700'],
 });
 import Tracker from './Tracker';
 import { Suspense } from 'react';
@@ -118,7 +124,7 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${fraunces.variable} ${instrumentSans.variable}`}>
+    <html lang="fr" className={`${bricolage.variable} ${instrumentSans.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           type="application/ld+json"

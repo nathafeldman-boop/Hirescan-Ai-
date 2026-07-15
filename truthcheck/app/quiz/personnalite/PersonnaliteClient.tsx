@@ -200,7 +200,7 @@ function QuizScreen({ onComplete, questions, t }: {
       {/* Milestone motivation banner */}
       {milestoneMsg && (
         <div
-          className="fixed inset-x-4 top-4 z-50 rounded-2xl p-4 text-center shadow-2xl"
+          className="fixed inset-x-4 top-4 z-50 rounded-lg p-4 text-center shadow-2xl"
           style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', animation: 'fadeInDown 0.3s ease' }}
           onClick={() => setMilestoneMsg(null)}
         >
@@ -235,7 +235,7 @@ function QuizScreen({ onComplete, questions, t }: {
               key={key}
               onClick={() => handleChoice(key)}
               disabled={animating}
-              className={`w-full text-left px-5 py-3.5 rounded-2xl border-2 transition-all duration-150 text-sm font-semibold flex items-center gap-3 ${
+              className={`w-full text-left px-5 py-3.5 rounded-lg border-2 transition-all duration-150 text-sm font-semibold flex items-center gap-3 ${
                 isSelected
                   ? 'scale-[0.98]'
                   : 'border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50'
@@ -275,7 +275,7 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   }, [onDone]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--paper)' }}>
       <div className="text-center max-w-sm">
         <div className="text-5xl mb-4 animate-pulse">🔮</div>
         <div className="mb-6" style={{ color: '#c2611f' }}><BrainIcon /></div>
@@ -351,10 +351,10 @@ function InAppBrowserOverlay() {
       {/* Blurred MBTI profile card — Zeigarnik hook */}
       <div className="relative mb-7" style={{ animation: 'iab-float 2.6s ease-in-out infinite' }}>
         {/* Ambient glow */}
-        <div className="absolute inset-0 rounded-3xl blur-2xl opacity-60"
+        <div className="absolute inset-0 rounded-lg blur-2xl opacity-60"
              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', transform: 'scale(1.15)' }}/>
 
-        <div className="relative rounded-3xl px-7 py-5"
+        <div className="relative rounded-lg px-7 py-5"
              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', animation: 'iab-glow 2.2s ease-in-out infinite' }}>
 
           <p className="text-white/40 text-xs uppercase tracking-widest mb-4 font-semibold">
@@ -396,7 +396,7 @@ function InAppBrowserOverlay() {
 
       {/* Steps */}
       <div className="w-full max-w-[17rem] mb-6 space-y-2.5 text-left">
-        <div className="flex items-start gap-3 p-3.5 rounded-2xl"
+        <div className="flex items-start gap-3 p-3.5 rounded-lg"
              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
           <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
                 style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>1</span>
@@ -404,7 +404,7 @@ function InAppBrowserOverlay() {
             Appuie sur les <strong className="text-white">⋯</strong> en haut à droite
           </p>
         </div>
-        <div className="flex items-start gap-3 p-3.5 rounded-2xl"
+        <div className="flex items-start gap-3 p-3.5 rounded-lg"
              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
           <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
                 style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>2</span>
@@ -418,7 +418,7 @@ function InAppBrowserOverlay() {
       <div className="w-full max-w-[17rem] space-y-3">
         <button
           onClick={openInChrome}
-          className="w-full py-[1.05rem] rounded-2xl font-black text-white text-base transition-all active:scale-[0.97]"
+          className="w-full py-[1.05rem] rounded-lg font-black text-white text-base transition-all active:scale-[0.97]"
           style={{
             background: copied ? 'linear-gradient(135deg,#16a34a,#22c55e)' : 'linear-gradient(270deg,#a94e18,#d17d52,#a94e18)',
             backgroundSize: '300% 100%',
@@ -435,7 +435,7 @@ function InAppBrowserOverlay() {
         {!copied && (
           <button
             onClick={copyLink}
-            className="w-full py-3 rounded-2xl font-semibold text-sm transition-all active:scale-[0.97]"
+            className="w-full py-3 rounded-lg font-semibold text-sm transition-all active:scale-[0.97]"
             style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.65)' }}>
             📋 Copier le lien
           </button>
@@ -523,14 +523,14 @@ const TYPE_COUNTS: Record<string, number> = {
   INTJ: 768, INTP: 831, INFJ: 634, ENTP: 912,
 };
 
-// ── « L'Intérieur » — 4 mondes visuels, un par famille cognitive ──────────
-// Chaque famille a son heure du jour, sa lumière, sa matière. Le monde
-// colore la révélation du type (glow, accents) — design uniquement.
+// ── « Le Dossier » — classification plate par famille cognitive ───────────
+// Une étiquette de couleur par famille, comme un onglet de classeur.
+// Pas d'ambiance lumineuse : juste un accent flat + son nom clair.
 const WORLDS = {
-  NT: { accent: '#1b2340', light: '#8fa3d4', glow: 'rgba(143,163,212,0.30)' }, // Analystes — nuit
-  NF: { accent: '#c89a8e', light: '#eec9b8', glow: 'rgba(238,201,184,0.32)' }, // Diplomates — aube
-  SJ: { accent: '#5f6b54', light: '#a8b494', glow: 'rgba(168,180,148,0.30)' }, // Sentinelles — après-midi
-  SP: { accent: '#b8722c', light: '#e0a86a', glow: 'rgba(224,168,106,0.32)' }, // Explorateurs — heure dorée
+  NT: { accent: '#35506B', light: '#89A4BC', label: 'Analystes' },
+  NF: { accent: '#6B3F52', light: '#B98CA0', label: 'Diplomates' },
+  SJ: { accent: '#43502F', light: '#9AAA7C', label: 'Sentinelles' },
+  SP: { accent: '#7A4A1E', light: '#C99762', label: 'Explorateurs' },
 } as const;
 
 function worldOf(code: string) {
@@ -611,7 +611,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
 
   if (state === 'done') {
     return (
-      <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+      <div className="rounded-lg p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
         <p className="text-sm font-bold text-stone-800 mb-1">{isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
         <p className="text-xs text-stone-500 mb-3">
           {isFr ? 'Vérifie ta boîte. Ou débloque tout de suite 👇' : 'Check your inbox. Or unlock right now 👇'}
@@ -628,7 +628,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
   }
 
   return (
-    <div className="rounded-2xl p-4 mt-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
+    <div className="rounded-lg p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
       <p className="text-sm font-bold text-stone-800 mb-1">
         {isFr ? `Pas encore décidé ? Garde ton profil ${typeCode}` : `Not ready yet? Save your ${typeCode} profile`}
       </p>
@@ -643,7 +643,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
           value={email}
           onChange={e => setEmail(e.target.value)}
           className="flex-1 min-w-0 px-3 py-2.5 rounded-lg text-sm outline-none"
-          style={{ background: '#faf9f7', border: '1px solid #e7e5e0', color: '#2b2622' }}
+          style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: '#2b2622' }}
         />
         <button
           type="submit"
@@ -703,7 +703,7 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
       <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center">
         {isFr ? 'Questions fréquentes' : 'FAQ'}
       </p>
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid #e7e5e0', background: 'white' }}>
+      <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
         {items.map((item, i) => (
           <div key={i} className={i < items.length - 1 ? 'border-b border-stone-100' : ''}>
             <button
@@ -745,7 +745,7 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
     >
       <div
         className="w-full max-w-sm rounded-t-3xl px-5 pt-6 pb-10"
-        style={{ background: '#faf9f7', animation: 'exitModalUp 0.32s cubic-bezier(0.22,1,0.36,1)' }}
+        style={{ background: 'var(--paper)', animation: 'exitModalUp 0.32s cubic-bezier(0.22,1,0.36,1)' }}
         onClick={e => e.stopPropagation()}
       >
         <style>{`@keyframes exitModalUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
@@ -765,7 +765,7 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
         </div>
         <button
           onClick={() => { onClose(); onCheckout(); }}
-          className="w-full py-4 rounded-2xl font-black text-white text-sm mb-3 active:scale-[0.98] transition-all"
+          className="w-full py-4 rounded-lg font-black text-white text-sm mb-3 active:scale-[0.98] transition-all"
           style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 24px rgba(169,78,24,0.4)' }}
         >
           {isFr ? `Débloquer maintenant — 1,99 €` : `Unlock now — €1.99`}
@@ -800,7 +800,7 @@ function ShareMyType({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
   return (
     <button
       onClick={share}
-      className="block w-full mt-4 rounded-2xl p-3.5 text-center transition-all active:scale-[0.98]"
+      className="block w-full mt-4 rounded-lg p-3.5 text-center transition-all active:scale-[0.98]"
       style={{ background: 'rgba(169,78,24,0.05)', border: '1px solid rgba(169,78,24,0.18)', textDecoration: 'none' }}
     >
       <p className="text-sm font-black" style={{ color: '#a94e18' }}>
@@ -953,7 +953,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   }, [isInApp, typeCode]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: '#faf9f7', animation: 'paywallReveal 0.45s ease' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: 'var(--paper)', animation: 'paywallReveal 0.45s ease' }}>
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <SocialProofToast />
       {exitModal && (
@@ -966,63 +966,49 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       )}
       <div className="w-full max-w-sm">
 
-        {/* ─── La Révélation — la pièce s'éclaire dans le monde de sa famille ──
-            Le type est la récompense (gratuit) ; le reste du profil reste
-            derrière les portes. Encre + verre + lumière de la famille. */}
-        <div className="relative overflow-hidden rounded-3xl mb-4 px-6 pt-9 pb-8 text-center ur-reveal"
-             style={{ background: 'linear-gradient(176deg, #131110 0%, #211d1a 100%)' }}>
+        {/* ─── Couverture de dossier — plate, alignée à gauche, sans lueur ni
+            confettis. Le type est la récompense gratuite ; le reste reste
+            classé. Une seule étiquette de couleur par famille cognitive. ── */}
+        <div className="relative rounded-lg mb-4 px-6 pt-6 pb-7 ur-reveal"
+             style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
 
-          {/* Lumière volumétrique — respire doucement */}
-          <div aria-hidden className="absolute pointer-events-none rounded-full"
-               style={{ top: -90, left: '50%', width: 320, height: 320, transform: 'translateX(-50%)',
-                        background: `radial-gradient(circle, ${world.glow} 0%, transparent 62%)`,
-                        animation: 'urGlowBreathe 4.5s ease-in-out infinite' }} />
-
-          {/* 12 confettis de papier — une seule fois, gravité discrète */}
-          <div aria-hidden className="absolute inset-x-0 top-0 h-24 pointer-events-none">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <span key={i} className="absolute block rounded-[1px]"
-                style={{ left: `${8 + i * 7.4}%`, top: 6, width: 5, height: 8, opacity: 0,
-                         background: i % 3 === 0 ? world.light : i % 3 === 1 ? '#f5f1e8' : world.accent,
-                         animation: `urPaperFall 1.15s ease-in ${0.4 + (i % 5) * 0.13}s forwards` }} />
-            ))}
+          <div className="flex items-center justify-between mb-6">
+            <span className="ur-label text-[10px]" style={{ color: 'rgba(246,245,240,0.45)' }}>
+              {isFr ? 'DOSSIER PERSONNEL' : 'PERSONAL FILE'}
+            </span>
+            <span className="ur-label text-[10px] px-2 py-1 rounded-sm"
+                  style={{ color: world.light, background: `${world.accent}33`, border: `1px solid ${world.accent}66` }}>
+              {world.label}
+            </span>
           </div>
 
-          <p className="ur-fade-1 text-[11px] uppercase mb-4"
-             style={{ color: world.light, letterSpacing: '0.28em', fontWeight: 600 }}>
-            {isFr ? 'Ta pièce' : 'Your room'}
-          </p>
-
-          {/* Carte verre — le type, en Fraunces */}
-          <div className="ur-glass-ink ur-fade-1 inline-block rounded-2xl px-8 py-5 mb-5">
+          <div className="ur-fade-1">
             <div className="font-display leading-none"
-                 style={{ fontSize: 46, fontWeight: 600, letterSpacing: '0.13em', color: '#f5f1e8' }}>
+                 style={{ fontSize: 52, fontWeight: 800, letterSpacing: '-0.01em', color: '#F6F5F0' }}>
               {typeCode}
             </div>
-            <div className="font-display italic mt-2" style={{ fontSize: 17, color: world.light }}>
+            <div className="font-display mt-2" style={{ fontSize: 18, fontWeight: 500, color: world.light }}>
               {isFr ? (type?.name ?? '') : typeCode}
             </div>
           </div>
 
-          {/* Le hook — la porte entrouverte */}
-          <div className="ur-fade-2">
-            <div className="ur-rule-ink w-24 mx-auto mb-3.5" />
-            <p className="text-[10px] uppercase mb-2"
-               style={{ color: 'rgba(245,241,232,0.42)', letterSpacing: '0.22em', fontWeight: 600 }}>
+          <div className="ur-fade-2 mt-6">
+            <div className="ur-rule-ink mb-4" />
+            <p className="ur-label text-[10px] mb-2" style={{ color: 'rgba(246,245,240,0.4)' }}>
               {isFr ? 'Ton profil complet révèle' : 'Your full profile reveals'}
             </p>
-            <p className="font-display leading-snug px-1" style={{ fontSize: 17, color: '#f5f1e8' }}>
+            <p className="font-display leading-snug" style={{ fontSize: 17, fontWeight: 500, color: '#F6F5F0' }}>
               {isFr
-                ? (HOOK_LINES[typeCode] ?? 'Pourquoi tu fonctionnes comme ça — en amour, au travail, sous pression')
-                : 'Why you feel misunderstood — even by people who know you well'}
+                ? (HOOK_LINES[typeCode] ?? 'Pourquoi tu fonctionnes comme ça, en amour, au travail, sous pression.')
+                : 'Why you feel misunderstood, even by people who know you well.'}
             </p>
           </div>
         </div>
 
         {/* ─── Quick-entry CTA — immediately below hook, above the fold on mobile ── */}
         {!isInApp && (
-          <div className="rounded-2xl px-4 py-3.5 mb-4"
-               style={{ background: 'white', border: '1px solid #e6e0d4', boxShadow: '0 2px 16px rgba(19,17,16,0.05)' }}>
+          <div className="rounded-lg px-4 py-3.5 mb-4"
+               style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', boxShadow: '0 2px 16px rgba(19,17,16,0.05)' }}>
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <span className="flex-shrink-0"><Glyph name="key" color={world.accent} size={22} /></span>
@@ -1039,7 +1025,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 onClick={() => doCheckout('onetime')}
                 disabled={loading}
                 className="flex-shrink-0 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-60"
-                style={{ background: '#131110', color: '#f5f1e8', whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
+                style={{ background: 'var(--ink)', color: '#F6F5F0', whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
               >
                 {loading ? '…' : '1,99 €'}
               </button>
@@ -1052,7 +1038,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         {/* ─── Les portes fermées — titres seulement + teaser générique.
             Rien du vrai contenu du profil n'est montré avant le paiement. ── */}
-        <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '1px solid #e6e0d4', background: 'white' }}>
+        <div className="rounded-lg overflow-hidden mb-3" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
           <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: '#f0ebe0' }}>
             <p className="text-[10px] uppercase" style={{ color: '#131110', letterSpacing: '0.2em', fontWeight: 700 }}>
               {isFr ? `Profil ${typeCode} complet · 8 chapitres` : `Full ${typeCode} profile · 8 chapters`}
@@ -1096,7 +1082,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         </div>
 
         {/* ─── Un profil qu'on rouvre toute sa vie — la valeur dans le temps ── */}
-        <div className="rounded-2xl px-5 py-4 mb-3" style={{ background: 'white', border: '1px solid #e6e0d4' }}>
+        <div className="rounded-lg px-5 py-4 mb-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
           <p className="text-[10px] uppercase mb-3" style={{ color: world.accent, letterSpacing: '0.2em', fontWeight: 700 }}>
             {isFr ? 'Tu le rouvriras toute ta vie' : 'You will reopen it for life'}
           </p>
@@ -1144,74 +1130,66 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         <div className="space-y-3 mt-4">
 
-          {/* HERO: One-time €1.99 — carte d'encre, prix en Fraunces, CTA papier */}
-          <div className="relative overflow-hidden rounded-3xl px-5 pt-7 pb-5"
-               style={{ background: 'linear-gradient(176deg, #131110 0%, #23201c 100%)' }}>
-            <div aria-hidden className="absolute pointer-events-none rounded-full"
-                 style={{ top: -110, right: -70, width: 260, height: 260,
-                          background: `radial-gradient(circle, ${world.glow} 0%, transparent 62%)` }} />
+          {/* HERO: One-time €1.99 — panneau dossier plat, prix en accent-tampon */}
+          <div className="relative rounded-lg px-5 pt-6 pb-5" style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
+            <p className="ur-label text-[10px] mb-4" style={{ color: 'rgba(246,245,240,0.45)' }}>
+              {isFr ? 'Deux résultats, un paiement' : 'Two results, one payment'}
+            </p>
 
-            <div className="relative">
-              <p className="text-center text-[10px] uppercase mb-3"
-                 style={{ color: world.light, letterSpacing: '0.24em', fontWeight: 600 }}>
-                {isFr ? 'Deux résultats · un paiement' : 'Two results · one payment'}
-              </p>
-
-              <div className="text-center mb-5">
-                <div className="flex items-baseline justify-center gap-2.5">
-                  <span className="text-sm line-through" style={{ color: 'rgba(245,241,232,0.30)' }}>29,99 €</span>
-                  <span className="font-display" style={{ fontSize: 46, fontWeight: 600, color: '#f5f1e8', letterSpacing: '-0.01em' }}>1,99 €</span>
-                </div>
-                <p className="text-[12px] mt-1" style={{ color: 'rgba(245,241,232,0.55)' }}>
-                  {isFr ? 'une seule fois · à vie · le prix d\'un café' : 'once · lifetime · the price of a coffee'}
-                </p>
+            <div className="mb-5">
+              <div className="flex items-baseline gap-2.5">
+                <span className="font-display" style={{ fontSize: 44, fontWeight: 800, color: 'var(--stamp)', letterSpacing: '-0.01em' }}>1,99 €</span>
+                <span className="text-sm line-through" style={{ color: 'rgba(245,241,232,0.30)' }}>29,99 €</span>
               </div>
-
-              <ul className="space-y-2.5 mb-5">
-                {(isFr ? [
-                  `Ton profil ${typeCode} complet — amour, carrière, face cachée`,
-                  'Un quiz UrCecret au choix, résultat débloqué aussi',
-                  'Accès immédiat, conservé à vie, zéro abonnement',
-                ] : [
-                  `Your complete ${typeCode} profile — love, career, shadow side`,
-                  'One UrCecret quiz of your choice, result unlocked too',
-                  'Instant access, kept forever, zero subscription',
-                ]).map(b => (
-                  <li key={b} className="flex items-start gap-2.5 text-[13px]" style={{ color: 'rgba(245,241,232,0.85)', lineHeight: 1.5 }}>
-                    <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: world.light }}>✓</span>{b}
-                  </li>
-                ))}
-              </ul>
-
-              {isInApp && inAppPayUrl ? (
-                <a
-                  href={inAppPayUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
-                  className="block w-full py-4 rounded-full font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
-                  style={{ background: '#f5f1e8', color: '#131110', textDecoration: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
-                >
-                  {isFr ? `Débloquer mon profil ${typeCode} — 1,99 €` : `Unlock my ${typeCode} profile — €1.99`}
-                </a>
-              ) : (
-                <button
-                  onClick={() => doCheckout('onetime')}
-                  disabled={loading}
-                  className="w-full py-4 rounded-full font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
-                  style={{ background: '#f5f1e8', color: '#131110', boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
-                >
-                  {loading ? '…' : isFr ? `Débloquer mon profil ${typeCode} — 1,99 €` : `Unlock my ${typeCode} profile — €1.99`}
-                </button>
-              )}
-              <p className="text-center text-[11px] mt-2.5" style={{ color: 'rgba(245,241,232,0.45)' }}>
-                {isFr ? 'Apple Pay · Google Pay · CB — accès immédiat' : 'Apple Pay · Google Pay · Card — instant access'}
+              <p className="text-[12px] mt-1" style={{ color: 'rgba(245,241,232,0.55)' }}>
+                {isFr ? 'Une seule fois, à vie, le prix d\'un café' : 'Once, lifetime, the price of a coffee'}
               </p>
             </div>
+
+            <ul className="space-y-2.5 mb-5">
+              {(isFr ? [
+                `Ton profil ${typeCode} complet : amour, carrière, face cachée`,
+                'Un quiz UrCecret au choix, résultat débloqué aussi',
+                'Accès immédiat, conservé à vie, zéro abonnement',
+              ] : [
+                `Your complete ${typeCode} profile: love, career, shadow side`,
+                'One UrCecret quiz of your choice, result unlocked too',
+                'Instant access, kept forever, zero subscription',
+              ]).map(b => (
+                <li key={b} className="flex items-start gap-2.5 text-[13px]" style={{ color: 'rgba(245,241,232,0.85)', lineHeight: 1.5 }}>
+                  <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: 'var(--stamp)' }}>✓</span>{b}
+                </li>
+              ))}
+            </ul>
+
+            {isInApp && inAppPayUrl ? (
+              <a
+                href={inAppPayUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
+                className="block w-full py-4 rounded-md font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
+                style={{ background: 'var(--stamp)', color: '#F6F5F0', textDecoration: 'none' }}
+              >
+                {isFr ? `Débloquer mon profil ${typeCode}, 1,99 €` : `Unlock my ${typeCode} profile, €1.99`}
+              </a>
+            ) : (
+              <button
+                onClick={() => doCheckout('onetime')}
+                disabled={loading}
+                className="w-full py-4 rounded-md font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'var(--stamp)', color: '#F6F5F0' }}
+              >
+                {loading ? '…' : isFr ? `Débloquer mon profil ${typeCode}, 1,99 €` : `Unlock my ${typeCode} profile, €1.99`}
+              </button>
+            )}
+            <p className="text-center text-[11px] mt-2.5" style={{ color: 'rgba(245,241,232,0.45)' }}>
+              {isFr ? 'Apple Pay, Google Pay, CB. Accès immédiat.' : 'Apple Pay, Google Pay, Card. Instant access.'}
+            </p>
           </div>
 
-          {/* Secondary: Monthly subscription — carte papier calme */}
-          <div className="rounded-2xl px-5 py-4" style={{ background: 'white', border: '1px solid #e6e0d4' }}>
+          {/* Secondary: Monthly subscription — panneau papier, plat */}
+          <div className="rounded-lg px-5 py-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
             <div className="flex items-start justify-between mb-3">
               <div>
                 <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>
@@ -1223,7 +1201,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               </div>
               <div className="text-right ml-3 flex-shrink-0">
                 <span className="text-[11px] text-stone-300 line-through block">29,99 €</span>
-                <span className="font-display text-lg text-stone-900" style={{ fontWeight: 600 }}>9,99 €</span>
+                <span className="font-display text-lg text-stone-900" style={{ fontWeight: 700 }}>9,99 €</span>
                 <span className="text-[11px] text-stone-400"> {isFr ? '/mois' : '/mo'}</span>
               </div>
             </div>
@@ -1264,7 +1242,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         {/* Micro-reviews — type-specific top review + 2 generic */}
         <div className="mt-5 space-y-2">
           {TYPE_REVIEWS[typeCode] && isFr && (
-            <div className="rounded-xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'white', border: '1px solid #f0ede8' }}>
+            <div className="rounded-xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid #f0ede8' }}>
               <span className="text-amber-400 text-xs flex-shrink-0 mt-0.5">★★★★★</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-stone-700 leading-snug italic">&ldquo;{TYPE_REVIEWS[typeCode].quote}&rdquo;</p>
@@ -1280,7 +1258,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             { name: 'Lucas, 28', text: '"I finally understood myself. The love section is frighteningly accurate."' },
             { name: 'Camille, 22', text: '"I showed the love chapter to my partner. She was shocked."' },
           ]).map(r => (
-            <div key={r.name} className="rounded-xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'white', border: '1px solid #f0ede8' }}>
+            <div key={r.name} className="rounded-xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid #f0ede8' }}>
               <span className="text-amber-400 text-xs flex-shrink-0 mt-0.5">★★★★★</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-stone-700 leading-snug italic">{r.text}</p>
@@ -1309,7 +1287,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
       {/* Sticky bar — appears after 15s for users still on page (shows lowest price to convert hesitants) */}
       {stickyBar && !loading && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 px-3 py-3" style={{ background: 'white', borderTop: '2px solid rgba(169,78,24,0.2)', boxShadow: '0 -4px 24px rgba(0,0,0,0.10)' }}>
+        <div className="fixed bottom-0 left-0 right-0 z-50 px-3 py-3" style={{ background: 'var(--paper-panel)', borderTop: '2px solid rgba(169,78,24,0.2)', boxShadow: '0 -4px 24px rgba(0,0,0,0.10)' }}>
           <div className="max-w-sm mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-black text-stone-900 leading-snug">
@@ -1453,7 +1431,7 @@ export default function PersonnaliteClient() {
   }, [answers, session, isPremium, router]);
 
   return (
-    <main className="min-h-screen text-stone-900" style={{ background: '#faf9f7' }}>
+    <main className="min-h-screen text-stone-900" style={{ background: 'var(--paper)' }}>
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
@@ -1461,7 +1439,7 @@ export default function PersonnaliteClient() {
         <AnalysisScreen onDone={handleAnalysisDone} t={t} />
       )}
       {phase === 'gate' && (
-        <div className="min-h-screen flex items-center justify-center" style={{ background: '#faf9f7' }}>
+        <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--paper)' }}>
           <div className="flex flex-col items-center gap-4">
             <div className="text-4xl animate-spin" style={{ animationDuration: '1.5s' }}>🔮</div>
             <p className="text-stone-400 text-sm font-medium">Chargement de tes résultats…</p>
