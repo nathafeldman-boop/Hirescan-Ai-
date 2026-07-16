@@ -9,6 +9,7 @@ import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
 import SocialProofToast from '@/components/SocialProofToast';
+import Seal from '@/components/Seal';
 
 // ─── In-app browser detection ───────────────────────────────────────────────────
 function detectInAppBrowser(): boolean {
@@ -96,10 +97,10 @@ function ProgressBar({ current, total, label }: { current: number; total: number
         <span>{label}</span>
         <span>{pct}%</span>
       </div>
-      <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
+      <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--line)' }}>
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: 'linear-gradient(to right,#a94e18,#d17d52)' }}
+          style={{ width: `${pct}%`, background: 'var(--gold)' }}
         />
       </div>
     </div>
@@ -117,14 +118,14 @@ function QuizScreen({ onComplete, questions, t }: {
   const [answers, setAnswers] = useState<Answers>({});
   const [selected, setSelected] = useState<QuizAnswer | null>(null);
   const [animating, setAnimating] = useState(false);
-  const [milestoneMsg, setMilestoneMsg] = useState<{ emoji: string; title: string; sub: string } | null>(null);
+  const [milestoneMsg, setMilestoneMsg] = useState<{ title: string; sub: string } | null>(null);
   const trackedMilestones = useRef<Set<number>>(new Set());
   const currentRef = useRef(0);
 
-  const MILESTONE_MSGS: Record<number, { emoji: string; title: string; sub: string }> = {
-    25: { emoji: '🔥', title: 'Tu es dans le top 25 % !', sub: 'La plupart des gens s\'arrêtent avant toi. Continue — ton type se dessine.' },
-    50: { emoji: '⚡', title: 'Ton profil prend forme...', sub: 'Le résultat révèle ta face cachée, ton schéma en amour et tes angles morts. Continue.' },
-    75: { emoji: '🔮', title: 'Ton type est presque là...', sub: 'Tu découvres dans quelques secondes. Et avec lui : pourquoi tu te comportes comme ça en amour et au travail.' },
+  const MILESTONE_MSGS: Record<number, { title: string; sub: string }> = {
+    25: { title: 'Tu es dans le top 25 %.', sub: 'La plupart des gens s\'arrêtent avant toi. Continue, ton type se dessine.' },
+    50: { title: 'Ton profil prend forme.', sub: 'Le résultat révèle ta face cachée, ton schéma en amour et tes angles morts.' },
+    75: { title: 'Ton type est presque là.', sub: 'Tu découvres dans quelques secondes pourquoi tu te comportes comme ça.' },
   };
 
   useEffect(() => {
@@ -200,51 +201,47 @@ function QuizScreen({ onComplete, questions, t }: {
       {/* Milestone motivation banner */}
       {milestoneMsg && (
         <div
-          className="fixed inset-x-4 top-4 z-50 rounded-lg p-4 text-center shadow-2xl"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', animation: 'fadeInDown 0.3s ease' }}
+          className="fixed inset-x-4 top-4 z-50 rounded-2xl p-4 text-center shadow-2xl"
+          style={{ background: 'var(--gold)', animation: 'fadeInDown 0.3s ease' }}
           onClick={() => setMilestoneMsg(null)}
         >
-          <p className="text-2xl mb-1">{milestoneMsg.emoji}</p>
-          <p className="text-white font-black text-base leading-tight">{milestoneMsg.title}</p>
-          <p className="text-white/80 text-xs mt-1 leading-snug">{milestoneMsg.sub}</p>
+          <p className="font-display italic font-bold text-base leading-tight" style={{ color: 'var(--ink)' }}>{milestoneMsg.title}</p>
+          <p className="text-xs mt-1 leading-snug" style={{ color: 'rgba(21,18,31,0.65)' }}>{milestoneMsg.sub}</p>
         </div>
       )}
       <ProgressBar current={current + 1} total={questions.length} label={t.questionOf(current + 1, questions.length)} />
 
       <div className="mb-10 text-center">
-        <div className="text-4xl mb-3">
-          {q.dimension === 'EI' ? '🧭' : q.dimension === 'SN' ? '🌟' : q.dimension === 'TF' ? '🧠' : '📅'}
-        </div>
-        <p className="text-xs text-stone-400 uppercase tracking-widest mb-4">
+        <p className="ur-label text-[11px] mb-4" style={{ color: 'var(--gold)' }}>
           {t.dimLabel[q.dimension]}
         </p>
-        <h2 className="text-xl sm:text-2xl font-bold text-stone-900 leading-snug">{q.text}</h2>
+        <h2 className="font-display text-xl sm:text-2xl leading-snug" style={{ color: 'var(--ink)', fontWeight: 600 }}>{q.text}</h2>
       </div>
 
       <div className="flex flex-col gap-2.5">
         {([
-          { key: 'A' as const, label: "Totalement d'accord", color: '#a94e18' },
-          { key: 'B' as const, label: "Plutôt d'accord",     color: '#d17d52' },
-          { key: 'C' as const, label: 'Neutre',              color: '#9ca3af' },
-          { key: 'D' as const, label: "Plutôt pas d'accord", color: '#f97316' },
-          { key: 'E' as const, label: "Pas du tout d'accord",color: '#ef4444' },
-        ] as { key: QuizAnswer; label: string; color: string }[]).map(({ key, label, color }) => {
+          { key: 'A' as const, label: "Totalement d'accord" },
+          { key: 'B' as const, label: "Plutôt d'accord" },
+          { key: 'C' as const, label: 'Neutre' },
+          { key: 'D' as const, label: "Plutôt pas d'accord" },
+          { key: 'E' as const, label: "Pas du tout d'accord" },
+        ] as { key: QuizAnswer; label: string }[]).map(({ key, label }) => {
           const isSelected = selected === key;
           return (
             <button
               key={key}
               onClick={() => handleChoice(key)}
               disabled={animating}
-              className={`w-full text-left px-5 py-3.5 rounded-lg border-2 transition-all duration-150 text-sm font-semibold flex items-center gap-3 ${
-                isSelected
-                  ? 'scale-[0.98]'
-                  : 'border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50'
+              className={`w-full text-left px-5 py-3.5 rounded-2xl border transition-all duration-150 text-sm font-semibold flex items-center gap-3 ${
+                isSelected ? 'scale-[0.98]' : 'hover:opacity-80'
               }`}
-              style={isSelected ? { borderColor: color, backgroundColor: color + '12', color } : {}}
+              style={isSelected
+                ? { borderColor: 'var(--gold)', backgroundColor: 'var(--gold-soft)', color: 'var(--ink)' }
+                : { borderColor: 'var(--line)', backgroundColor: 'var(--paper-panel)', color: 'var(--ink)' }}
             >
               <span className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all"
-                style={isSelected ? { borderColor: color, backgroundColor: color } : { borderColor: '#d6d3d1' }}>
-                {isSelected && <span className="w-2 h-2 rounded-full bg-white" />}
+                style={isSelected ? { borderColor: 'var(--gold)', backgroundColor: 'var(--gold)' } : { borderColor: 'var(--line)' }}>
+                {isSelected && <span className="w-2 h-2 rounded-full" style={{ background: 'var(--ink)' }} />}
               </span>
               {label}
             </button>
@@ -277,14 +274,13 @@ function AnalysisScreen({ onDone, t }: { onDone: () => void; t: QuizT }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--paper)' }}>
       <div className="text-center max-w-sm">
-        <div className="text-5xl mb-4 animate-pulse">🔮</div>
-        <div className="mb-6" style={{ color: '#c2611f' }}><BrainIcon /></div>
-        <h2 className="text-xl font-bold text-stone-900 mb-2">{t.analysisStages[stage]}</h2>
+        <div className="flex justify-center mb-6"><Seal size={64} color="var(--gold)" spin /></div>
+        <h2 className="font-display text-xl leading-snug mb-2" style={{ color: 'var(--ink)', fontWeight: 600 }}>{t.analysisStages[stage]}</h2>
         <p className="text-stone-500 text-sm mb-8">{t.doNotClose}</p>
-        <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
+        <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--line)' }}>
           <div
             className="h-full rounded-full transition-all duration-100"
-            style={{ width: `${progress}%`, background: 'linear-gradient(to right,#a94e18,#d17d52)' }}
+            style={{ width: `${progress}%`, background: 'var(--gold)' }}
           />
         </div>
         <p className="text-xs text-stone-400 mt-3">{progress}%</p>
@@ -352,7 +348,7 @@ function InAppBrowserOverlay() {
       <div className="relative mb-7" style={{ animation: 'iab-float 2.6s ease-in-out infinite' }}>
         {/* Ambient glow */}
         <div className="absolute inset-0 rounded-lg blur-2xl opacity-60"
-             style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', transform: 'scale(1.15)' }}/>
+             style={{ background: 'var(--gold)', transform: 'scale(1.15)' }}/>
 
         <div className="relative rounded-lg px-7 py-5"
              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', animation: 'iab-glow 2.2s ease-in-out infinite' }}>
@@ -399,7 +395,7 @@ function InAppBrowserOverlay() {
         <div className="flex items-start gap-3 p-3.5 rounded-lg"
              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
           <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>1</span>
+                style={{ background: 'var(--gold)' }}>1</span>
           <p className="text-white/75 text-sm leading-snug pt-0.5">
             Appuie sur les <strong className="text-white">⋯</strong> en haut à droite
           </p>
@@ -407,7 +403,7 @@ function InAppBrowserOverlay() {
         <div className="flex items-start gap-3 p-3.5 rounded-lg"
              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
           <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>2</span>
+                style={{ background: 'var(--gold)' }}>2</span>
           <p className="text-white/75 text-sm leading-snug pt-0.5">
             Appuie sur <strong className="text-white">&quot;Ouvrir dans le navigateur&quot;</strong>
           </p>
@@ -476,8 +472,9 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
 
   if (seconds <= 0) return (
     <div className="flex items-center justify-center gap-1.5 mb-3">
-      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-black bg-red-50 border border-red-200 text-red-600">
-        🔥 {isFr ? 'Offre de lancement — prix réduit actif' : 'Launch offer — reduced price active'}
+      <span className="ur-label inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px]"
+            style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
+        {isFr ? 'Offre de lancement, prix réduit actif' : 'Launch offer, reduced price active'}
       </span>
     </div>
   );
@@ -488,8 +485,9 @@ function CountdownTimer({ isFr }: { isFr: boolean }) {
 
   return (
     <div className="flex items-center justify-center gap-1.5 mb-3">
-      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-black bg-red-50 border border-red-200 text-red-600">
-        🔥 {isFr ? `Offre de lancement — expire dans ${label}` : `Launch offer — expires in ${label}`}
+      <span className="ur-label inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px]"
+            style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
+        {isFr ? `Offre de lancement, expire dans ${label}` : `Launch offer, expires in ${label}`}
       </span>
     </div>
   );
@@ -523,20 +521,6 @@ const TYPE_COUNTS: Record<string, number> = {
   INTJ: 768, INTP: 831, INFJ: 634, ENTP: 912,
 };
 
-// ── « Le Dossier » — classification plate par famille cognitive ───────────
-// Une étiquette de couleur par famille, comme un onglet de classeur.
-// Pas d'ambiance lumineuse : juste un accent flat + son nom clair.
-const WORLDS = {
-  NT: { accent: '#35506B', light: '#89A4BC', label: 'Analystes' },
-  NF: { accent: '#6B3F52', light: '#B98CA0', label: 'Diplomates' },
-  SJ: { accent: '#43502F', light: '#9AAA7C', label: 'Sentinelles' },
-  SP: { accent: '#7A4A1E', light: '#C99762', label: 'Explorateurs' },
-} as const;
-
-function worldOf(code: string) {
-  if (code[1] === 'N') return code[2] === 'T' ? WORLDS.NT : WORLDS.NF;
-  return code[3] === 'J' ? WORLDS.SJ : WORLDS.SP;
-}
 
 // Glyphes maison — trait 1.5px, grille 24. Remplacent les emojis d'interface.
 function Glyph({ name, color = '#131110', size = 20 }: {
@@ -611,15 +595,15 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
 
   if (state === 'done') {
     return (
-      <div className="rounded-lg p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+      <div className="rounded-2xl p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
         <p className="text-sm font-bold text-stone-800 mb-1">{isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
         <p className="text-xs text-stone-500 mb-3">
-          {isFr ? 'Vérifie ta boîte. Ou débloque tout de suite 👇' : 'Check your inbox. Or unlock right now 👇'}
+          {isFr ? 'Vérifie ta boîte, ou débloque tout de suite.' : 'Check your inbox, or unlock right now.'}
         </p>
         <button
           onClick={() => onCaptured?.(email.trim())}
-          className="w-full py-3 rounded-xl font-black text-white text-sm active:scale-[0.98] transition-all"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 3px 14px rgba(169,78,24,0.32)' }}
+          className="w-full py-3 rounded-full font-black text-sm active:scale-[0.98] transition-all"
+          style={{ background: 'var(--gold)', color: 'var(--ink)' }}
         >
           {isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
         </button>
@@ -628,12 +612,12 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
   }
 
   return (
-    <div className="rounded-lg p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+    <div className="rounded-2xl p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
       <p className="text-sm font-bold text-stone-800 mb-1">
         {isFr ? `Pas encore décidé ? Garde ton profil` : `Not ready yet? Save your profile`}
       </p>
       <p className="text-xs text-stone-500 mb-3">
-        {isFr ? 'On t\'envoie ton type + un extrait de ton analyse par email — gratuit, sans spam. Tu pourras le débloquer quand tu veux.' : 'We\'ll email you your type + a free analysis preview — no spam. Unlock whenever you want.'}
+        {isFr ? 'On te garde une place, gratuit, sans spam. Tu pourras le débloquer quand tu veux.' : 'We\'ll hold your spot, no spam. Unlock whenever you want.'}
       </p>
       <form onSubmit={submit} className="flex gap-2">
         <input
@@ -642,14 +626,14 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
           placeholder={isFr ? 'ton@email.com' : 'your@email.com'}
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="flex-1 min-w-0 px-3 py-2.5 rounded-lg text-sm outline-none"
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: '#2b2622' }}
+          className="flex-1 min-w-0 px-3 py-2.5 rounded-full text-sm outline-none"
+          style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
         />
         <button
           type="submit"
           disabled={state === 'loading'}
-          className="px-4 py-2.5 rounded-lg font-bold text-white text-sm flex-shrink-0 disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
+          className="px-4 py-2.5 rounded-full font-bold text-sm flex-shrink-0 disabled:opacity-60"
+          style={{ background: 'var(--gold)', color: 'var(--ink)' }}
         >
           {state === 'loading' ? '…' : '→'}
         </button>
@@ -700,10 +684,10 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
 
   return (
     <div className="mt-6">
-      <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center">
+      <p className="ur-label text-[10px] mb-3 text-center" style={{ color: 'var(--ink)', opacity: 0.5 }}>
         {isFr ? 'Questions fréquentes' : 'FAQ'}
       </p>
-      <div className="rounded-lg overflow-hidden" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
         {items.map((item, i) => (
           <div key={i} className={i < items.length - 1 ? 'border-b border-stone-100' : ''}>
             <button
@@ -749,10 +733,10 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
         onClick={e => e.stopPropagation()}
       >
         <style>{`@keyframes exitModalUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
-        <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+        <div className="w-10 h-1 rounded-full mx-auto mb-5" style={{ background: 'var(--line)' }} />
         <div className="text-center mb-5">
-          <div className="text-5xl mb-3">⏰</div>
-          <h3 className="text-xl font-black text-stone-900 leading-tight mb-2">
+          <div className="flex justify-center mb-3"><Seal size={44} color="var(--gold)" /></div>
+          <h3 className="font-display text-xl leading-tight mb-2" style={{ color: 'var(--ink)', fontWeight: 700 }}>
             {isFr
               ? `Ton profil s'efface dans 24h`
               : `Your profile expires in 24h`}
@@ -765,10 +749,10 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
         </div>
         <button
           onClick={() => { onClose(); onCheckout(); }}
-          className="w-full py-4 rounded-lg font-black text-white text-sm mb-3 active:scale-[0.98] transition-all"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 24px rgba(169,78,24,0.4)' }}
+          className="w-full py-4 rounded-full font-black text-sm mb-3 active:scale-[0.98] transition-all"
+          style={{ background: 'var(--gold)', color: 'var(--ink)' }}
         >
-          {isFr ? `Débloquer maintenant — 1,99 €` : `Unlock now — €1.99`}
+          {isFr ? `Débloquer maintenant, 1,99 €` : `Unlock now, €1.99`}
         </button>
         <button
           onClick={onClose}
@@ -795,7 +779,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 }) {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
-  const world = worldOf(typeCode);
   const [loading, setLoading] = useState(false);
   // Pre-fetched Stripe URLs for in-app browsers (TikTok etc.)
   // Using an <a href> instead of window.location.href lets TikTok open Stripe in Safari
@@ -939,39 +922,35 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       )}
       <div className="w-full max-w-sm">
 
-        {/* ─── Couverture de dossier — RIEN du résultat n'est révélé avant
-            paiement. Ni le code, ni le nom, ni la famille : juste un dossier
-            scellé. Le type complet n'apparaît qu'après paiement (/success). ── */}
-        <div className="relative rounded-lg mb-4 px-6 pt-6 pb-7 ur-reveal"
-             style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
+        {/* ─── L'oracle voilé — RIEN du résultat n'est révélé avant paiement.
+            Ni le code, ni le nom, ni la famille : le sceau tourne, encore
+            fermé. Le type complet n'apparaît qu'après paiement (/success). ── */}
+        <div className="relative rounded-[28px] mb-4 px-6 pt-8 pb-8 text-center ur-reveal overflow-hidden"
+             style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
+          <div aria-hidden className="absolute pointer-events-none rounded-full"
+               style={{ top: -70, left: '50%', width: 260, height: 260, transform: 'translateX(-50%)',
+                        background: 'radial-gradient(circle, var(--gold-soft) 0%, transparent 70%)' }} />
 
-          <div className="flex items-center justify-between mb-6">
-            <span className="ur-label text-[10px]" style={{ color: 'rgba(246,245,240,0.45)' }}>
-              {isFr ? 'DOSSIER PERSONNEL' : 'PERSONAL FILE'}
-            </span>
-            <span className="ur-label text-[10px] px-2 py-1 rounded-sm flex items-center gap-1.5"
-                  style={{ color: 'var(--stamp)', border: '1px solid var(--stamp)' }}>
-              <Glyph name="lock" color="var(--stamp)" size={11} />
-              {isFr ? 'SCELLÉ' : 'SEALED'}
-            </span>
+          <p className="ur-label text-[10px] mb-6 relative" style={{ color: 'var(--gold)' }}>
+            {isFr ? 'Ta lecture est prête' : 'Your reading is ready'}
+          </p>
+
+          <div className="ur-fade-1 relative flex justify-center mb-5">
+            <Seal size={76} spin />
           </div>
 
-          <div className="ur-fade-1">
-            <div className="font-display leading-none select-none" aria-hidden
-                 style={{ fontSize: 52, fontWeight: 800, letterSpacing: '0.06em', color: 'rgba(246,245,240,0.18)' }}>
-              ????
-            </div>
-            <div className="font-display mt-2" style={{ fontSize: 15, fontWeight: 500, color: 'rgba(246,245,240,0.4)' }}>
-              {isFr ? 'Ton type reste confidentiel tant que le dossier n\'est pas ouvert.' : 'Your type stays confidential until the file is unlocked.'}
-            </div>
+          <div className="ur-fade-1 relative">
+            <p className="font-display italic leading-snug" style={{ fontSize: 19, fontWeight: 500, color: '#FAF6EC' }}>
+              {isFr ? 'Ton type reste voilé tant que le sceau n\'est pas ouvert.' : 'Your type stays veiled until the seal is opened.'}
+            </p>
           </div>
 
-          <div className="ur-fade-2 mt-6">
+          <div className="ur-fade-2 mt-7 relative">
             <div className="ur-rule-ink mb-4" />
-            <p className="ur-label text-[10px] mb-2" style={{ color: 'rgba(246,245,240,0.4)' }}>
+            <p className="ur-label text-[10px] mb-2" style={{ color: 'rgba(250,246,236,0.45)' }}>
               {isFr ? 'Ton profil complet révèle' : 'Your full profile reveals'}
             </p>
-            <p className="font-display leading-snug" style={{ fontSize: 17, fontWeight: 500, color: '#F6F5F0' }}>
+            <p className="font-display leading-snug" style={{ fontSize: 17, fontWeight: 500, color: '#FAF6EC' }}>
               {isFr
                 ? 'Ton type exact, pourquoi tu fonctionnes comme ça, en amour, au travail, sous pression.'
                 : 'Your exact type, why you function this way, in love, at work, under pressure.'}
@@ -981,11 +960,11 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         {/* ─── Quick-entry CTA — immediately below hook, above the fold on mobile ── */}
         {!isInApp && (
-          <div className="rounded-lg px-4 py-3.5 mb-4"
-               style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', boxShadow: '0 2px 16px rgba(19,17,16,0.05)' }}>
+          <div className="rounded-2xl px-4 py-3.5 mb-4"
+               style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <span className="flex-shrink-0"><Glyph name="key" color={world.accent} size={22} /></span>
+                <span className="flex-shrink-0"><Glyph name="key" color="var(--gold)" size={22} /></span>
                 <div className="min-w-0">
                   <p className="text-[13px] font-bold text-stone-900 leading-snug" style={{ letterSpacing: '-0.01em' }}>
                     {isFr ? 'Mon profil MBTI + 1 quiz au choix' : 'My MBTI profile + 1 quiz'}
@@ -999,7 +978,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 onClick={() => doCheckout('onetime')}
                 disabled={loading}
                 className="flex-shrink-0 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-60"
-                style={{ background: 'var(--ink)', color: '#F6F5F0', whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
+                style={{ background: 'var(--ink)', color: '#FAF6EC', whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
               >
                 {loading ? '…' : '1,99 €'}
               </button>
@@ -1012,7 +991,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         {/* ─── Les portes fermées — titres seulement + teaser générique.
             Rien du vrai contenu du profil n'est montré avant le paiement. ── */}
-        <div className="rounded-lg overflow-hidden mb-3" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
+        <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
           <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: '#f0ebe0' }}>
             <p className="text-[10px] uppercase" style={{ color: '#131110', letterSpacing: '0.2em', fontWeight: 700 }}>
               {isFr ? `Profil complet · 8 chapitres` : `Full profile · 8 chapters`}
@@ -1023,13 +1002,13 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </span>
           </div>
           {(isFr ? [
-            { glyph: 'mirror' as const,  title: 'Qui tu es vraiment', preview: 'Le portrait complet — celui que même tes proches n\'ont jamais mis en mots' },
-            { glyph: 'heart' as const,   title: 'Amour & attachement', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète' },
-            { glyph: 'compass' as const, title: 'Carrière & superpouvoir', preview: 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel' },
+            { glyph: 'mirror' as const,  title: 'Qui tu es vraiment', preview: 'Le portrait complet, celui que même tes proches n\'ont jamais mis en mots' },
+            { glyph: 'heart' as const,   title: 'Amour & attachement', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre, et le schéma douloureux qui se répète' },
+            { glyph: 'compass' as const, title: 'Carrière & superpouvoir', preview: 'La compétence rare que tu as sans le savoir, et comment la transformer en avantage réel' },
             { glyph: 'spark' as const,   title: 'Tes forces', preview: 'Ce sur quoi tu peux compter chez toi, même quand tout tremble' },
-            { glyph: 'eye' as const,     title: 'Tes angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face' },
-            { glyph: 'moon' as const,    title: 'Ta face cachée & ta croissance', preview: 'Le côté de toi qui ne sort que sous pression — et comment en faire un allié' },
-            { glyph: 'key' as const,     title: 'Compatibilités exactes', preview: 'Les types qui te comprennent vraiment — et les profils qui te drainent à coup sûr' },
+            { glyph: 'eye' as const,     title: 'Tes angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote, et que personne n\'ose te dire en face' },
+            { glyph: 'moon' as const,    title: 'Ta face cachée & ta croissance', preview: 'Le côté de toi qui ne sort que sous pression, et comment en faire un allié' },
+            { glyph: 'key' as const,     title: 'Compatibilités exactes', preview: 'Les types qui te comprennent vraiment, et les profils qui te drainent à coup sûr' },
             { glyph: 'star' as const,    title: 'Célébrités du même profil', preview: 'Les figures publiques qui partagent ton fonctionnement exact' },
           ] : [
             { glyph: 'mirror' as const,  title: 'Who you really are', preview: 'The full portrait — the one even the people close to you never put into words' },
@@ -1042,30 +1021,30 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             { glyph: 'star' as const,    title: 'Famous people, same profile', preview: 'The public figures who share your exact wiring, and what it says about your ceiling' },
           ]).map((s, i, arr) => (
             <div key={s.title} className={`flex items-start gap-3.5 px-5 py-3.5${i < arr.length - 1 ? ' border-b' : ''}`}
-                 style={{ borderColor: '#f0ebe0' }}>
-              <span className="flex-shrink-0 mt-0.5"><Glyph name={s.glyph} color={world.accent} size={19} /></span>
+                 style={{ borderColor: 'var(--line)' }}>
+              <span className="flex-shrink-0 mt-0.5"><Glyph name={s.glyph} color="var(--gold)" size={19} /></span>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>{s.title}</p>
                 <p className="text-[12px] text-stone-500 mt-0.5" style={{ lineHeight: 1.5 }}>
                   <span className="ur-cut select-none pointer-events-none">{s.preview}</span>
                 </p>
               </div>
-              <span className="flex-shrink-0 mt-1"><Glyph name="lock" color="#c9bda5" size={14} /></span>
+              <span className="flex-shrink-0 mt-1"><Glyph name="lock" color="var(--gold)" size={14} /></span>
             </div>
           ))}
         </div>
 
         {/* ─── Un profil qu'on rouvre toute sa vie — la valeur dans le temps ── */}
-        <div className="rounded-lg px-5 py-4 mb-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-          <p className="text-[10px] uppercase mb-3" style={{ color: world.accent, letterSpacing: '0.2em', fontWeight: 700 }}>
+        <div className="rounded-2xl px-5 py-4 mb-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+          <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>
             {isFr ? 'Tu le rouvriras toute ta vie' : 'You will reopen it for life'}
           </p>
           <div className="space-y-2.5">
             {(isFr ? [
-              'Avant un entretien — pour savoir comment te vendre sans te trahir',
-              'Au début d\'une relation — pour comprendre comment tu t\'attaches',
-              'Dans un conflit — pour voir ton angle mort avant qu\'il te coûte',
-              'À chaque grande décision — pour trancher selon ton vrai fonctionnement',
+              'Avant un entretien, pour savoir comment te vendre sans te trahir',
+              'Au début d\'une relation, pour comprendre comment tu t\'attaches',
+              'Dans un conflit, pour voir ton angle mort avant qu\'il te coûte',
+              'À chaque grande décision, pour trancher selon ton vrai fonctionnement',
             ] : [
               'Before an interview — to sell yourself without betraying yourself',
               'At the start of a relationship — to understand how you attach',
@@ -1073,7 +1052,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               'At every big decision — to choose according to your real wiring',
             ]).map((m, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full" style={{ background: world.accent, opacity: 0.7 }} />
+                <span className="flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full" style={{ background: 'var(--gold)', opacity: 0.7 }} />
                 <p className="text-[12.5px] text-stone-600" style={{ lineHeight: 1.55 }}>{m}</p>
               </div>
             ))}
@@ -1104,23 +1083,26 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         <div className="space-y-3 mt-4">
 
-          {/* HERO: One-time €1.99 — panneau dossier plat, prix en accent-tampon */}
-          <div className="relative rounded-lg px-5 pt-6 pb-5" style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
-            <p className="ur-label text-[10px] mb-4" style={{ color: 'rgba(246,245,240,0.45)' }}>
+          {/* HERO: One-time €1.99 — encre profonde, prix en or, sceau discret */}
+          <div className="relative rounded-[28px] px-5 pt-6 pb-5 overflow-hidden" style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
+            <div aria-hidden className="absolute pointer-events-none" style={{ top: -30, right: -30, opacity: 0.12 }}>
+              <Seal size={140} />
+            </div>
+            <p className="ur-label text-[10px] mb-4 relative" style={{ color: 'rgba(250,246,236,0.45)' }}>
               {isFr ? 'Deux résultats, un paiement' : 'Two results, one payment'}
             </p>
 
-            <div className="mb-5">
+            <div className="mb-5 relative">
               <div className="flex items-baseline gap-2.5">
-                <span className="font-display" style={{ fontSize: 44, fontWeight: 800, color: 'var(--stamp)', letterSpacing: '-0.01em' }}>1,99 €</span>
-                <span className="text-sm line-through" style={{ color: 'rgba(245,241,232,0.30)' }}>29,99 €</span>
+                <span className="font-display" style={{ fontSize: 44, fontWeight: 700, color: 'var(--gold)', letterSpacing: '-0.01em' }}>1,99 €</span>
+                <span className="text-sm line-through" style={{ color: 'rgba(250,246,236,0.30)' }}>29,99 €</span>
               </div>
-              <p className="text-[12px] mt-1" style={{ color: 'rgba(245,241,232,0.55)' }}>
+              <p className="text-[12px] mt-1" style={{ color: 'rgba(250,246,236,0.55)' }}>
                 {isFr ? 'Une seule fois, à vie, le prix d\'un café' : 'Once, lifetime, the price of a coffee'}
               </p>
             </div>
 
-            <ul className="space-y-2.5 mb-5">
+            <ul className="space-y-2.5 mb-5 relative">
               {(isFr ? [
                 `Ton profil complet : amour, carrière, face cachée`,
                 'Un quiz UrCecret au choix, résultat débloqué aussi',
@@ -1130,8 +1112,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 'One UrCecret quiz of your choice, result unlocked too',
                 'Instant access, kept forever, zero subscription',
               ]).map(b => (
-                <li key={b} className="flex items-start gap-2.5 text-[13px]" style={{ color: 'rgba(245,241,232,0.85)', lineHeight: 1.5 }}>
-                  <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: 'var(--stamp)' }}>✓</span>{b}
+                <li key={b} className="flex items-start gap-2.5 text-[13px]" style={{ color: 'rgba(250,246,236,0.85)', lineHeight: 1.5 }}>
+                  <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: 'var(--gold)' }}>✓</span>{b}
                 </li>
               ))}
             </ul>
@@ -1142,8 +1124,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
-                className="block w-full py-4 rounded-md font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
-                style={{ background: 'var(--stamp)', color: '#F6F5F0', textDecoration: 'none' }}
+                className="relative block w-full py-4 rounded-full font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
+                style={{ background: 'var(--gold)', color: 'var(--ink)', textDecoration: 'none' }}
               >
                 {isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
               </a>
@@ -1151,19 +1133,19 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               <button
                 onClick={() => doCheckout('onetime')}
                 disabled={loading}
-                className="w-full py-4 rounded-md font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'var(--stamp)', color: '#F6F5F0' }}
+                className="relative w-full py-4 rounded-full font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'var(--gold)', color: 'var(--ink)' }}
               >
                 {loading ? '…' : isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
               </button>
             )}
-            <p className="text-center text-[11px] mt-2.5" style={{ color: 'rgba(245,241,232,0.45)' }}>
+            <p className="text-center text-[11px] mt-2.5 relative" style={{ color: 'rgba(250,246,236,0.45)' }}>
               {isFr ? 'Apple Pay, Google Pay, CB. Accès immédiat.' : 'Apple Pay, Google Pay, Card. Instant access.'}
             </p>
           </div>
 
           {/* Secondary: Monthly subscription — panneau papier, plat */}
-          <div className="rounded-lg px-5 py-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+          <div className="rounded-2xl px-5 py-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
             <div className="flex items-start justify-between mb-3">
               <div>
                 <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>
@@ -1186,7 +1168,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 rel="noopener noreferrer"
                 onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'monthly', via: 'anchor' })}
                 className="block w-full py-3 rounded-full font-semibold text-[13px] text-center transition-all active:scale-[0.98]"
-                style={{ border: '1px solid #131110', color: '#131110', background: 'transparent', textDecoration: 'none' }}
+                style={{ border: '1px solid var(--ink)', color: 'var(--ink)', background: 'transparent', textDecoration: 'none' }}
               >
                 {isFr ? "Choisir l'abonnement" : 'Choose subscription'}
               </a>
@@ -1195,7 +1177,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 onClick={() => doCheckout('monthly')}
                 disabled={loading}
                 className="w-full py-3 rounded-full font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ border: '1px solid #131110', color: '#131110', background: 'transparent' }}
+                style={{ border: '1px solid var(--ink)', color: 'var(--ink)', background: 'transparent' }}
               >
                 {loading ? '…' : isFr ? "Choisir l'abonnement" : 'Choose subscription'}
               </button>
@@ -1216,8 +1198,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         {/* Micro-reviews — type-specific top review + 2 generic */}
         <div className="mt-5 space-y-2">
           {TYPE_REVIEWS[typeCode] && isFr && (
-            <div className="rounded-xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid #f0ede8' }}>
-              <span className="text-amber-400 text-xs flex-shrink-0 mt-0.5">★★★★★</span>
+            <div className="rounded-2xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+              <span style={{ color: 'var(--gold)' }} className="text-xs flex-shrink-0 mt-0.5">★★★★★</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-stone-700 leading-snug italic">&ldquo;{TYPE_REVIEWS[typeCode].quote}&rdquo;</p>
                 <p className="text-[10px] text-stone-400 mt-0.5">{TYPE_REVIEWS[typeCode].name}, {TYPE_REVIEWS[typeCode].age} ans</p>
@@ -1232,11 +1214,11 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             { name: 'Lucas, 28', text: '"I finally understood myself. The love section is frighteningly accurate."' },
             { name: 'Camille, 22', text: '"I showed the love chapter to my partner. She was shocked."' },
           ]).map(r => (
-            <div key={r.name} className="rounded-xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid #f0ede8' }}>
-              <span className="text-amber-400 text-xs flex-shrink-0 mt-0.5">★★★★★</span>
+            <div key={r.name} className="rounded-2xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+              <span style={{ color: 'var(--gold)' }} className="text-xs flex-shrink-0 mt-0.5">★★★★★</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-stone-700 leading-snug italic">{r.text}</p>
-                <p className="text-[10px] text-stone-400 mt-0.5">— {r.name}</p>
+                <p className="text-[10px] text-stone-400 mt-0.5">{r.name}</p>
               </div>
             </div>
           ))}
@@ -1258,20 +1240,20 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
       {/* Sticky bar — appears after 15s for users still on page (shows lowest price to convert hesitants) */}
       {stickyBar && !loading && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 px-3 py-3" style={{ background: 'var(--paper-panel)', borderTop: '2px solid rgba(169,78,24,0.2)', boxShadow: '0 -4px 24px rgba(0,0,0,0.10)' }}>
+        <div className="fixed bottom-0 left-0 right-0 z-50 px-3 py-3" style={{ background: 'var(--paper-panel)', borderTop: '1px solid var(--gold-line)', boxShadow: '0 -4px 24px rgba(0,0,0,0.10)' }}>
           <div className="max-w-sm mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-black text-stone-900 leading-snug">
                 {isFr ? `Ton profil complet, 1,99 €` : `Your full profile, €1.99`}
               </p>
               <p className="text-[10px] text-stone-500 mt-0.5">
-                {isFr ? 'Paiement unique · accès à vie · 7j remboursé' : 'One-time · lifetime access · 7-day refund'}
+                {isFr ? 'Paiement unique, accès à vie, 7j remboursé' : 'One-time, lifetime access, 7-day refund'}
               </p>
             </div>
             <button
               onClick={() => { setStickyBar(false); doCheckout('onetime'); }}
-              className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-white text-xs whitespace-nowrap transition-all active:scale-[0.97]"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 12px rgba(169,78,24,0.3)' }}
+              className="flex-shrink-0 px-4 py-2.5 rounded-full font-black text-xs whitespace-nowrap transition-all active:scale-[0.97]"
+              style={{ background: 'var(--gold)', color: 'var(--ink)' }}
             >
               {isFr ? '1,99 € →' : '€1.99 →'}
             </button>
