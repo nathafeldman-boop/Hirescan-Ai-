@@ -5,6 +5,7 @@ import { mbtiTypes, ALL_MBTI_TYPES, MbtiType } from '@/lib/mbti';
 import TypeClient from './TypeClient';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import Seal from '@/components/Seal';
 
 export function generateStaticParams() {
   return ALL_MBTI_TYPES.map(code => ({ type: code.toLowerCase() }));
@@ -49,9 +50,9 @@ function FAQ({ type }: { type: MbtiType }) {
   ];
   return (
     <div className="mt-12 space-y-3">
-      <h2 className="font-display text-lg font-black text-white">Questions fréquentes — {type.code}</h2>
+      <h2 className="font-display text-lg font-black text-white">Questions fréquentes, {type.code}</h2>
       {faqs.map(({ q, a }) => (
-        <details key={q} className="group rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <details key={q} className="group rounded-2xl" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
           <summary className="px-5 py-4 cursor-pointer text-sm font-medium text-stone-300 list-none flex justify-between items-center hover:text-white transition-colors">
             {q}
             <span className="text-stone-600 group-open:rotate-180 transition-transform">▾</span>
@@ -92,12 +93,12 @@ export default function TypePage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
-      <main className="min-h-screen bg-[#0a0705] text-white">
+      <main className="min-h-screen text-white" style={{ background: 'var(--ink)' }}>
 
-        <header className="relative z-10 sticky top-0" style={{ background: 'rgba(10,7,5,0.88)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <header className="relative z-10 sticky top-0" style={{ background: 'var(--ink)', borderBottom: '1px solid var(--line-ink)' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="font-display text-xl font-black">
-              Ur<span style={{ color: '#e8a94d' }}>Cecret</span>
+            <Link href="/" className="font-display text-xl italic font-bold">
+              UrCecret
             </Link>
             <div className="flex items-center gap-3">
               <Link href="/types" className="text-xs text-zinc-500 hover:text-white transition-colors">← Tous les types</Link>
@@ -110,13 +111,13 @@ export default function TypePage({ params }: Props) {
         <div className="relative z-10 max-w-2xl mx-auto px-4 py-10">
           {/* Hero */}
           <div className="text-center mb-8">
-            <div className="text-6xl mb-4">{type.emoji}</div>
-            <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3"
-              style={{ background: `${type.accentColor}20`, color: type.accentColor, border: `1px solid ${type.accentColor}40` }}>
+            <div className="flex justify-center mb-4"><Seal size={72} spin /></div>
+            <div className="ur-label inline-block px-3 py-1 rounded-full text-[10px] mb-3"
+              style={{ background: 'var(--gold-soft)', color: 'var(--gold)', border: '1px solid var(--gold-line)' }}>
               {type.rarity} de la population
             </div>
             <h1 className="font-display text-3xl font-black text-white mb-2">
-              {code} — {type.name}
+              {code}, {type.name}
             </h1>
             <p className="text-stone-400 text-base italic">{type.tagline}</p>
           </div>
@@ -137,15 +138,15 @@ export default function TypePage({ params }: Props) {
           <FAQ type={type} />
 
           {/* All types nav */}
-          <div className="mt-12 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="mt-12 pt-8" style={{ borderTop: '1px solid var(--line-ink)' }}>
             <h2 className="text-sm font-bold text-stone-500 mb-4">Explore les 16 types</h2>
             <div className="flex flex-wrap gap-2">
               {ALL_MBTI_TYPES.map(c => (
                 <Link key={c} href={`/types/${c.toLowerCase()}`}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all"
+                  className="px-3 py-1.5 rounded-full text-xs font-bold border transition-all"
                   style={c === code
-                    ? { color: '#fff', borderColor: '#e8a94d', background: 'rgba(232,169,77,0.15)' }
-                    : { color: '#6b6060', borderColor: 'rgba(255,255,255,0.1)' }
+                    ? { color: '#fff', borderColor: 'var(--gold)', background: 'var(--gold-soft)' }
+                    : { color: '#6b6060', borderColor: 'var(--line-ink)' }
                   }>
                   {c}
                 </Link>

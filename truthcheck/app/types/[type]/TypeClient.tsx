@@ -6,6 +6,7 @@ import { MbtiType } from '@/lib/mbti';
 import { mbtiTypesEn } from '@/lib/i18n/mbtiTypesEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
+import Seal from '@/components/Seal';
 
 const TYPE_COUNTS: Record<string, number> = {
   ISFJ: 2847, ISTJ: 2631, ESFJ: 2418, ESTJ: 2193,
@@ -127,42 +128,42 @@ export default function TypeClient({ type }: Props) {
       <div className="mt-10 space-y-6">
         {/* Bannière débloqué */}
         <div className="rounded-2xl p-5 border text-center"
-          style={{ borderColor: `${type.accentColor}50`, background: `${type.accentColor}15` }}>
+          style={{ borderColor: `var(--gold-line)`, background: `var(--gold-soft)` }}>
           <p className="text-sm font-bold text-white">{t.unlockedBanner}</p>
         </div>
 
-        <Section title={t.sectionTraits} accent={type.accentColor}>
+        <Section title={t.sectionTraits} accent="var(--gold)">
           <div className="flex flex-wrap gap-2">
             {localType.traits.map(trait => (
               <span key={trait} className="px-3 py-1.5 rounded-full text-xs font-medium border"
-                style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
+                style={{ borderColor: `var(--gold-line)`, color: 'var(--gold)', background: `var(--gold-soft)` }}>
                 {trait}
               </span>
             ))}
           </div>
         </Section>
 
-        <Section title={t.sectionWhoAreYou} accent={type.accentColor}>
+        <Section title={t.sectionWhoAreYou} accent="var(--gold)">
           <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.fullDesc}</p>
         </Section>
 
-        <Section title={t.sectionInLove} accent={type.accentColor}>
+        <Section title={t.sectionInLove} accent="var(--gold)">
           <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.inLove}</p>
         </Section>
 
-        <Section title={t.sectionAtWork} accent={type.accentColor}>
+        <Section title={t.sectionAtWork} accent="var(--gold)">
           <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.atWork}</p>
         </Section>
 
         <div className="grid sm:grid-cols-2 gap-6">
-          <Section title={t.sectionStrengths} accent={type.accentColor}>
+          <Section title={t.sectionStrengths} accent="var(--gold)">
             <ul className="space-y-2">
               {localType.strengths.map(s => (
                 <li key={s} className="flex gap-2 text-sm text-stone-300"><span className="text-emerald-400 mt-0.5">✓</span>{s}</li>
               ))}
             </ul>
           </Section>
-          <Section title={t.sectionWeaknesses} accent={type.accentColor}>
+          <Section title={t.sectionWeaknesses} accent="var(--gold)">
             <ul className="space-y-2">
               {localType.weaknesses.map(s => (
                 <li key={s} className="flex gap-2 text-sm text-stone-300"><span className="text-amber-400 mt-0.5">!</span>{s}</li>
@@ -171,24 +172,24 @@ export default function TypeClient({ type }: Props) {
           </Section>
         </div>
 
-        <Section title={t.sectionGrowth} accent={type.accentColor}>
+        <Section title={t.sectionGrowth} accent="var(--gold)">
           <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.growth}</p>
         </Section>
 
-        <Section title={t.sectionFamous} accent={type.accentColor}>
+        <Section title={t.sectionFamous} accent="var(--gold)">
           <div className="flex flex-wrap gap-2">
             {type.famousExamples.map(f => (
-              <span key={f} className="px-3 py-1.5 rounded-full text-xs font-medium text-stone-300" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>{f}</span>
+              <span key={f} className="px-3 py-1.5 rounded-full text-xs font-medium text-stone-300" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>{f}</span>
             ))}
           </div>
         </Section>
 
-        <Section title={t.sectionCompatibility} accent={type.accentColor}>
+        <Section title={t.sectionCompatibility} accent="var(--gold)">
           <div className="flex flex-wrap gap-3">
             {type.compatibleWith.map(c => (
               <a key={c} href={`/types/${c.toLowerCase()}`}
                 className="px-4 py-2 rounded-lg text-sm font-bold text-stone-300 hover:text-white transition-all"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
                 {c}
               </a>
             ))}
@@ -196,12 +197,12 @@ export default function TypeClient({ type }: Props) {
         </Section>
 
         <div className="rounded-2xl p-6 border text-center"
-          style={{ borderColor: `${type.accentColor}30`, background: `${type.accentColor}10` }}>
-          <h3 className="text-lg font-black text-white mb-2">Ton accès UrCecret est ouvert 🔓</h3>
+          style={{ borderColor: `var(--gold-line)`, background: `var(--gold-soft)` }}>
+          <h3 className="text-lg font-black text-white mb-2">Ton accès UrCecret est ouvert</h3>
           <p className="text-sm text-stone-400 mb-4 max-w-sm mx-auto">{t.quizzesDesc}</p>
           <a href="/duo"
-            className="inline-block px-7 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
-            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.3)' }}>
+            className="inline-block px-7 py-3.5 rounded-full font-bold text-sm transition-all hover:scale-[1.02]"
+            style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
             Test de compatibilité →
           </a>
         </div>
@@ -217,14 +218,14 @@ export default function TypeClient({ type }: Props) {
       {/* ── Teaser ── */}
       <div className="mt-8 space-y-3">
         {/* Free preview: traits + first sentence */}
-        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: type.accentColor }}>
+        <div className="rounded-2xl p-5" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--gold)' }}>
             {lang === 'en' ? 'Free preview' : 'Aperçu gratuit'}
           </p>
           <div className="flex flex-wrap gap-2">
             {localType.traits.slice(0, 3).map(trait => (
               <span key={trait} className="px-3 py-1.5 rounded-full text-xs font-medium border"
-                style={{ borderColor: `${type.accentColor}50`, color: type.accentColor, background: `${type.accentColor}15` }}>
+                style={{ borderColor: `var(--gold-line)`, color: 'var(--gold)', background: `var(--gold-soft)` }}>
                 {trait}
               </span>
             ))}
@@ -233,8 +234,8 @@ export default function TypeClient({ type }: Props) {
 
         {/* Hook line — curiosity gap, mirrors the paywall */}
         {HOOK_LINES[type.code] && lang !== 'en' && (
-          <div className="rounded-2xl px-4 py-3.5" style={{ background: 'rgba(169,78,24,0.08)', border: '1px solid rgba(169,78,24,0.22)' }}>
-            <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: '#e0a380' }}>
+          <div className="rounded-2xl px-4 py-3.5" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: 'var(--gold)' }}>
               Ton profil complet révèle
             </p>
             <p className="text-sm font-bold text-stone-200 leading-snug">{HOOK_LINES[type.code]}</p>
@@ -242,32 +243,32 @@ export default function TypeClient({ type }: Props) {
         )}
 
         {/* 4 locked chapters — show what's inside */}
-        <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.03)' }}>
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5"
-               style={{ background: `${type.accentColor}18` }}>
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: type.accentColor }}>
-              {lang === 'en' ? `Full ${type.code} profile · 4 chapters` : `Profil ${type.code} complet · 4 chapitres`}
+        <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--line-ink)', background: 'var(--ink-soft)' }}>
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--line-ink)]"
+               style={{ background: `var(--gold-soft)` }}>
+            <p className="ur-label text-[10px]" style={{ color: 'var(--gold)' }}>
+              {lang === 'en' ? `Full ${type.code} profile, 4 chapters` : `Profil ${type.code} complet, 4 chapitres`}
             </p>
-            <span className="text-[10px] text-stone-500">🔒 verrouillé</span>
+            <span className="ur-label text-[10px] text-stone-500">{lang === 'en' ? 'locked' : 'verrouillé'}</span>
           </div>
           {(lang === 'en' ? [
-            { icon: '💕', title: 'Love & Relationships', preview: 'Why you always invest more than the other — and the painful pattern that repeats...' },
-            { icon: '💼', title: 'Career & Superpower', preview: 'The rare skill you have without knowing it — and how to turn it into a real advantage...' },
-            { icon: '🌑', title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that silently sabotages you — nobody dares to say it...' },
-            { icon: '🎯', title: 'Exact Compatibility', preview: 'The types that truly get you — and the ones that drain you...' },
+            { title: 'Love & Relationships', preview: 'Why you always invest more than the other, and the painful pattern that repeats' },
+            { title: 'Career & Superpower', preview: 'The rare skill you have without knowing it, and how to turn it into a real advantage' },
+            { title: 'Shadow Side & Blind Spots', preview: 'What you do unconsciously that silently sabotages you' },
+            { title: 'Exact Compatibility', preview: 'The types that truly get you, and the ones that drain you' },
           ] : [
-            { icon: '💕', title: 'Amour & Relations', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre — et le schéma douloureux qui se répète...' },
-            { icon: '💼', title: 'Carrière & Superpouvoir', preview: 'La compétence rare que tu as sans le savoir — et comment la transformer en avantage réel...' },
-            { icon: '🌑', title: 'Face cachée & Angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote — et que personne n\'ose te dire en face...' },
-            { icon: '🎯', title: 'Compatibilité exacte', preview: 'Les types qui te comprennent vraiment — et ceux qui te drainent systématiquement...' },
+            { title: 'Amour & Relations', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre, et le schéma douloureux qui se répète' },
+            { title: 'Carrière & Superpouvoir', preview: 'La compétence rare que tu as sans le savoir, et comment la transformer en avantage réel' },
+            { title: 'Face cachée & Angles morts', preview: 'Ce que tu fais inconsciemment qui te sabote' },
+            { title: 'Compatibilité exacte', preview: 'Les types qui te comprennent vraiment, et ceux qui te drainent' },
           ]).map((s, i, arr) => (
-            <div key={s.title} className={`flex items-center gap-3 px-4 py-3${i < arr.length - 1 ? ' border-b border-white/5' : ''}`}>
-              <span className="text-xl flex-shrink-0">{s.icon}</span>
+            <div key={s.title} className={`flex items-center gap-3 px-4 py-3${i < arr.length - 1 ? ' border-b border-[var(--line-ink)]' : ''}`}>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-stone-300">{s.title}</p>
-                <p className="text-[11px] text-stone-500 leading-tight mt-0.5 blur-[4px] select-none pointer-events-none">{s.preview}</p>
+                <p className="text-[11px] text-stone-500 leading-tight mt-0.5">
+                  <span className="ur-cut select-none pointer-events-none">{s.preview}</span>
+                </p>
               </div>
-              <span className="text-stone-600 text-xs">🔒</span>
             </div>
           ))}
         </div>
@@ -277,53 +278,54 @@ export default function TypeClient({ type }: Props) {
           <span className="animate-pulse w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
           <span className="text-[11px] text-stone-500">
             {lang === 'en'
-              ? `⭐ ${TYPE_COUNTS[type.code] ?? 847} people unlocked the ${type.code} profile this month`
-              : `⭐ ${TYPE_COUNTS[type.code] ?? 847} personnes ont débloqué le profil ${type.code} ce mois`}
+              ? `${TYPE_COUNTS[type.code] ?? 847} people unlocked the ${type.code} profile this month`
+              : `${TYPE_COUNTS[type.code] ?? 847} personnes ont débloqué le profil ${type.code} ce mois`}
           </span>
         </div>
       </div>
 
       {/* ── HERO : 1,99 € paiement unique ── */}
-      <div className="mt-6 rounded-2xl p-5 relative" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.10),rgba(209,125,82,0.06))', border: '2px solid rgba(169,78,24,0.45)', boxShadow: '0 4px 20px rgba(169,78,24,0.12)' }}>
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="text-white text-[10px] font-black px-3 py-1 rounded-full whitespace-nowrap" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 2px 10px rgba(169,78,24,0.4)' }}>
-            ⚡ ACCÈS IMMÉDIAT
-          </span>
+      <div className="mt-6 rounded-[28px] p-5 relative overflow-hidden" style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
+        <div aria-hidden className="absolute pointer-events-none" style={{ top: -30, right: -30, opacity: 0.1 }}>
+          <Seal size={130} />
         </div>
-        <div className="text-center mt-2 mb-4">
-          <div className="flex items-center justify-center gap-2 mb-0.5">
+        <p className="ur-label text-[10px] mb-4 relative" style={{ color: 'var(--gold)' }}>
+          {lang === 'en' ? 'Instant access' : 'Accès immédiat'}
+        </p>
+        <div className="mb-4 relative">
+          <div className="flex items-baseline gap-2">
+            <span className="text-5xl font-black" style={{ color: 'var(--gold)' }}>1,99 €</span>
             <span className="text-sm text-stone-500 line-through">29,99 €</span>
-            <span className="text-5xl font-black" style={{ color: '#e0a380' }}>1,99 €</span>
           </div>
-          <p className="text-[11px] text-stone-500">paiement unique · accès à vie · le prix d&apos;un café ☕</p>
+          <p className="text-[11px] text-stone-500 mt-1">paiement unique, accès à vie, le prix d&apos;un café</p>
         </div>
-        <ul className="space-y-2 mb-4">
+        <ul className="space-y-2 mb-4 relative">
           {[
             `Profil ${type.code} complet en 4 chapitres`,
             'Amour, Carrière, Face cachée & Compatibilité',
-            'Accès immédiat · conservé à vie · zéro abonnement',
+            'Accès immédiat, conservé à vie, zéro abonnement',
           ].map(b => (
             <li key={b} className="flex items-start gap-2 text-xs text-stone-300">
-              <span className="font-black flex-shrink-0 mt-0.5" style={{ color: '#e0a380' }}>✓</span>{b}
+              <span className="font-black flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }}>✓</span>{b}
             </li>
           ))}
         </ul>
         <button
           onClick={handleOneTime}
           disabled={loading}
-          className="w-full py-4 rounded-xl font-black text-white text-sm transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.4)' }}
+          className="relative w-full py-4 rounded-full font-black text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+          style={{ background: 'var(--gold)', color: 'var(--ink)' }}
         >
-          {loading ? t.loading : `🔓 Débloquer mon profil ${type.code} — 1,99 €`}
+          {loading ? t.loading : `Débloquer mon profil ${type.code}, 1,99 €`}
         </button>
-        <p className="text-center text-[10px] text-stone-500 mt-2">Apple Pay · Google Pay · CB · Accès immédiat</p>
+        <p className="text-center text-[10px] text-stone-500 mt-2 relative">Apple Pay, Google Pay, CB. Accès immédiat.</p>
       </div>
 
       {/* ── Mensuel (secondary) ── */}
-      <div className="mt-3 rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
+      <div className="mt-3 rounded-2xl p-4" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
         <div className="flex items-start justify-between mb-3">
           <div>
-            <p className="text-xs font-black text-stone-400">🔄 Abonnement mensuel · sans engagement</p>
+            <p className="text-xs font-black text-stone-400">Abonnement mensuel, sans engagement</p>
             <p className="text-[10px] text-stone-500 mt-0.5">Les 16 profils MBTI + tous les quiz + duo illimité</p>
           </div>
           <div className="text-right ml-3 flex-shrink-0">
@@ -335,22 +337,22 @@ export default function TypeClient({ type }: Props) {
         <button
           onClick={() => handleUnlock(false)}
           disabled={loading}
-          className="w-full py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-          style={{ border: '1.5px solid rgba(169,78,24,0.3)', color: '#e0a380', background: 'rgba(169,78,24,0.06)' }}
+          className="w-full py-2.5 rounded-full font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+          style={{ border: '1px solid var(--gold-line)', color: 'var(--gold)', background: 'var(--gold-soft)' }}
         >
           {loading ? t.loading : "Choisir l'abonnement →"}
         </button>
       </div>
 
-      <p className="text-center text-[10px] text-stone-600 mt-4">🔒 Paiement sécurisé Stripe · {t.guarantee}</p>
+      <p className="text-center text-[10px] text-stone-600 mt-4">Paiement sécurisé Stripe, {t.guarantee}</p>
 
       <div className="text-center mt-4">
         <a
           href="/types"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-stone-400 hover:text-white transition-all"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-stone-400 hover:text-white transition-all"
+          style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}
         >
-          🔍 Voir les 16 types
+          Voir les 16 types
         </a>
       </div>
     </>
@@ -359,7 +361,7 @@ export default function TypeClient({ type }: Props) {
 
 function Section({ title, accent, children }: { title: string; accent: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+    <div className="rounded-2xl p-6" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
       <h2 className="font-display text-base font-bold text-white mb-4 flex items-center gap-2">
         <span className="inline-block w-1.5 h-4 rounded-full" style={{ background: accent }} />
         {title}
