@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import UserMenu from './UserMenu';
 import { mbtiTypes } from '@/lib/mbti';
 import SocialProofToast from './SocialProofToast';
+import Seal from './Seal';
 
 const GROUPS = [
   {
@@ -48,14 +49,14 @@ const MBTI_LETTERS = [
   { letter: 'J/P', label: 'Jugement · Perception', color: '#43502F', desc: 'Révèle quelle fonction est en surface. Une fonction de Jugement (T ou F) donne une structure visible ; une fonction de Perception (N ou S) rend plus adaptable. Ton intérieur est souvent l\'inverse.' },
 ];
 
-const CLAY = 'var(--stamp)';
+const CLAY = 'var(--gold)';
 
 function InAppBanner({ onClose }: { onClose: () => void }) {
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(window.location.href); } catch {}
   };
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 rounded-md px-4 py-3 flex items-center gap-3"
+    <div className="fixed bottom-4 left-4 right-4 z-50 rounded-2xl px-4 py-3 flex items-center gap-3"
       style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
       <p className="flex-1 text-white text-xs leading-snug" style={{ fontFamily: 'var(--font-sans)' }}>
         Pour voir tes résultats, <strong>ouvre dans ton navigateur</strong> (⋯ puis Ouvrir dans le navigateur)
@@ -112,23 +113,23 @@ export default function LandingPage() {
       <nav
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
-          background: scrolled ? 'rgba(236,234,226,0.94)' : 'transparent',
+          background: scrolled ? 'rgba(242,236,222,0.94)' : 'transparent',
           backdropFilter: scrolled ? 'blur(10px)' : 'none',
           borderBottom: scrolled ? '1px solid var(--line)' : '1px solid transparent',
         }}
       >
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-lg font-display transition-colors duration-300" style={{ color: scrolled ? 'var(--ink)' : '#F6F5F0', fontWeight: 800 }}>
+          <span className="text-lg font-display italic transition-colors duration-300" style={{ color: scrolled ? 'var(--ink)' : '#FAF6EC', fontWeight: 700 }}>
             UrCecret
           </span>
           <div className="flex items-center gap-3">
             <UserMenu />
             <Link
               href="/quiz/personnalite"
-              className="text-sm font-bold px-5 py-2.5 rounded-md transition-all duration-300 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
+              className="text-sm font-bold px-5 py-2.5 rounded-full transition-all duration-300 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
               style={scrolled
-                ? { background: 'var(--ink)', color: '#F6F5F0' }
-                : { background: '#F6F5F0', color: 'var(--ink)' }}
+                ? { background: 'var(--ink)', color: '#FAF6EC' }
+                : { background: 'var(--gold)', color: 'var(--ink)' }}
             >
               Commencer
             </Link>
@@ -136,83 +137,82 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ═══ HERO — couverture de dossier : plate, alignée à gauche ═══ */}
-      <section className="relative overflow-hidden" style={{ background: 'var(--ink)' }}>
+      {/* ═══ HERO — le sceau se révèle, la promesse d'une lecture mystique ═══ */}
+      <section className="relative overflow-hidden text-center" style={{ background: 'var(--ink)' }}>
         <style>{`
           @keyframes heroUp { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:translateY(0) } }
           @keyframes heroDraw { from { stroke-dashoffset:300 } to { stroke-dashoffset:0 } }
+          @keyframes sealFadeIn { from { opacity:0; transform:scale(0.9) } to { opacity:1; transform:scale(1) } }
           .hero-up { opacity:0; animation: heroUp .5s ease forwards }
+          .hero-seal { opacity:0; animation: sealFadeIn .7s ease forwards }
           @media (prefers-reduced-motion: reduce) {
-            .hero-up { opacity:1; animation:none }
+            .hero-up, .hero-seal { opacity:1; animation:none }
           }
         `}</style>
 
-        <div className="relative max-w-xl mx-auto px-6 pt-28 pb-16">
+        <div className="relative max-w-xl mx-auto px-6 pt-24 pb-16">
 
-          {/* En-tête dossier : label mono + tampon rotatif, alignés, pas de badge pill */}
-          <div className="hero-up flex items-start justify-between mb-10">
-            <span className="ur-label text-[11px]" style={{ color: 'rgba(246,245,240,0.5)' }}>
-              {fromTiktok ? 'VU SUR TIKTOK' : 'TEST DE PERSONNALITÉ'}
-            </span>
-            <span className="ur-label text-[10px] px-2.5 py-1 rounded-sm flex-shrink-0"
-                  style={{ color: 'var(--stamp)', border: '1.5px solid var(--stamp)', transform: 'rotate(-4deg)' }}>
-              PERSONNEL
-            </span>
+          <div className="hero-seal flex justify-center mb-6">
+            <Seal size={72} spin />
           </div>
 
-          <h1 className="hero-up font-display mb-6" style={{ color: '#F6F5F0', fontSize: 'clamp(2.1rem, 8.6vw, 3.4rem)', lineHeight: 1.05, fontWeight: 800, letterSpacing: '-0.02em', wordBreak: 'break-word', animationDelay: '.06s' }}>
+          <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
+            {fromTiktok ? 'Vu sur TikTok' : 'Test de personnalité'}
+          </p>
+
+          <h1 className="hero-up font-display mb-6" style={{ color: '#FAF6EC', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
             {fromTiktok ? (
               <>Tu réagis différemment{' '}
-                <span className="relative inline-block" style={{ color: 'var(--stamp)' }}>
+                <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
                   des autres
                   <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden>
-                    <path d="M3 7C48 3 130 2.5 197 5.5" stroke="var(--stamp)" strokeWidth="2.5" strokeLinecap="round"
-                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .5s forwards' }} />
+                    <path d="M3 7C48 3 130 2.5 197 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
+                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
                   </svg>
-                </span>
+                </em>
                 . Voilà pourquoi.</>
             ) : (
               <>Quel est{' '}
-                <span className="relative inline-block" style={{ color: 'var(--stamp)' }}>
+                <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
                   vraiment
                   <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 150 10" fill="none" preserveAspectRatio="none" aria-hidden>
-                    <path d="M3 7C36 3 100 2.5 147 5.5" stroke="var(--stamp)" strokeWidth="2.5" strokeLinecap="round"
-                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .5s forwards' }} />
+                    <path d="M3 7C36 3 100 2.5 147 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
+                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
                   </svg>
-                </span>
+                </em>
                 {' '}ton type de personnalité&nbsp;?</>
             )}
           </h1>
 
-          <p className="hero-up text-[15px] max-w-sm mb-9" style={{ color: 'rgba(246,245,240,0.55)', lineHeight: 1.65, animationDelay: '.12s' }}>
+          <p className="hero-up text-[15px] max-w-sm mx-auto mb-9" style={{ color: 'rgba(250,246,236,0.55)', lineHeight: 1.65, animationDelay: '.16s' }}>
             {fromTiktok
               ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
               : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
           </p>
 
-          <div className="hero-up" style={{ animationDelay: '.18s' }}>
+          <div className="hero-up" style={{ animationDelay: '.22s' }}>
             <Link
               href="/quiz/personnalite"
-              className="inline-flex items-center gap-2 px-9 py-4 rounded-md font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
-              style={{ background: 'var(--stamp)', color: '#F6F5F0' }}
+              className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
+              style={{ background: 'var(--gold)', color: 'var(--ink)' }}
             >
               Découvrir mon type →
             </Link>
           </div>
-          <p className="hero-up text-xs mt-4" style={{ color: 'rgba(246,245,240,0.38)', animationDelay: '.24s' }}>
+          <p className="hero-up text-xs mt-4" style={{ color: 'rgba(250,246,236,0.38)', animationDelay: '.28s' }}>
             Gratuit, résultat immédiat, sans inscription.
           </p>
 
           {/* Faits vérifiables, pas de stats inventées */}
-          <div className="hero-up flex items-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line-ink)', animationDelay: '.3s' }}>
+          <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line-ink)', animationDelay: '.34s' }}>
             {[
               { value: '16', label: 'Profils distincts' },
               { value: '12', label: 'Questions' },
               { value: '3 min', label: 'Résultat' },
             ].map((s) => (
               <div key={s.label}>
-                <div className="font-display text-xl" style={{ color: '#F6F5F0', fontWeight: 800 }}>{s.value}</div>
-                <div className="text-[11px] mt-1" style={{ color: 'rgba(246,245,240,0.4)' }}>{s.label}</div>
+                <div className="font-display text-xl" style={{ color: '#FAF6EC', fontWeight: 700 }}>{s.value}</div>
+                <div className="text-[11px] mt-1" style={{ color: 'rgba(250,246,236,0.4)' }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -263,16 +263,16 @@ export default function LandingPage() {
                   <Link
                     key={q.q}
                     href={q.href}
-                    className="flex items-center gap-4 p-4 rounded-md transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    className="flex items-center gap-4 p-4 rounded-2xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                     style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
                   >
-                    <span className="ur-label flex-shrink-0 w-9 h-9 rounded-sm flex items-center justify-center text-[10px]"
-                          style={{ background: 'var(--ink)', color: '#F6F5F0' }}>{q.tag}</span>
+                    <span className="ur-label flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-[10px]"
+                          style={{ background: 'var(--ink)', color: '#FAF6EC' }}>{q.tag}</span>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
                       <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
                     </div>
-                    <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--stamp-soft)' }}>
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--gold-soft)' }}>
                       <svg className="w-3.5 h-3.5" style={{ color: CLAY }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                       </svg>
@@ -306,14 +306,14 @@ export default function LandingPage() {
                   <Link
                     key={q.href}
                     href={q.href}
-                    className="flex items-center gap-4 p-4 rounded-md transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    className="flex items-center gap-4 p-4 rounded-2xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                     style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
                   >
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
                       <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
                     </div>
-                    <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(169,78,24,0.08)' }}>
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--gold-soft)' }}>
                       <svg className="w-3.5 h-3.5" style={{ color: CLAY }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                       </svg>
@@ -337,7 +337,7 @@ export default function LandingPage() {
             { msg: "INTJ depuis 3 ans sur 16personalities. Ici, l'analyse des fonctions cognitives m'a appris des choses que je ne savais pas sur moi-même. Ce n'est pas le même niveau.", who: "Lucas, 22 ans" },
             { msg: "J'ai envoyé le quiz amoureux à mon meilleur ami sans lui dire pourquoi. Il a eu 82 %. On s'est parlé pour la première fois en vrai après ça.", who: "Jade, 27 ans" },
           ].map(({ msg, who }, i, arr) => (
-            <div key={who} className={`relative pl-9 pr-2 py-5${i < arr.length - 1 ? ' border-b' : ''}`} style={{ borderColor: '#e8e0d0' }}>
+            <div key={who} className={`relative pl-9 pr-2 py-5${i < arr.length - 1 ? ' border-b' : ''}`} style={{ borderColor: 'var(--line)' }}>
               <span aria-hidden className="font-display absolute left-0 top-3 select-none" style={{ fontSize: 40, lineHeight: 1, color: CLAY, opacity: 0.35 }}>“</span>
               <p className="font-display text-stone-800" style={{ fontSize: 16.5, lineHeight: 1.55 }}>{msg}</p>
               <p className="text-stone-400 text-xs mt-2" style={{ letterSpacing: '0.06em' }}>{who}</p>
@@ -350,7 +350,7 @@ export default function LandingPage() {
       <section className="relative z-10 py-6 px-6">
         <div className="max-w-lg mx-auto">
           <div
-            className="rounded-md p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
+            className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
             style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
           >
             <div>
@@ -364,8 +364,8 @@ export default function LandingPage() {
             </div>
             <Link
               href="/duo"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-md font-semibold text-sm transition-all hover:opacity-90 whitespace-nowrap"
-              style={{ background: 'var(--ink)', color: '#F6F5F0' }}
+              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all hover:opacity-90 whitespace-nowrap"
+              style={{ background: 'var(--ink)', color: '#FAF6EC' }}
             >
               Tester la compatibilité →
             </Link>
@@ -373,11 +373,11 @@ export default function LandingPage() {
 
           {/* Fusion card */}
           <div
-            className="rounded-md p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-3"
+            className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-3"
             style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
           >
             <div>
-              <p className="ur-label text-[10px] mb-1.5" style={{ color: 'var(--stamp)' }}>Mode groupe</p>
+              <p className="ur-label text-[10px] mb-1.5" style={{ color: 'var(--gold)' }}>Mode groupe</p>
               <h2 className="font-display text-lg font-black text-stone-900 mb-1">
                 Fusion, quiz de groupe
               </h2>
@@ -387,8 +387,8 @@ export default function LandingPage() {
             </div>
             <Link
               href="/fusion"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-md font-semibold text-sm transition-all hover:opacity-90 whitespace-nowrap"
-              style={{ background: 'var(--stamp)', color: '#F6F5F0' }}
+              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all hover:opacity-90 whitespace-nowrap"
+              style={{ background: 'var(--gold)', color: '#FAF6EC' }}
             >
               Lancer un Fusion →
             </Link>
@@ -402,8 +402,8 @@ export default function LandingPage() {
           {GROUPS.map((group) => (
             <div key={group.key}>
               <div className="flex items-center gap-3 mb-4">
-                <span className="ur-label w-9 h-9 rounded-sm flex-shrink-0 flex items-center justify-center text-[10px]"
-                      style={{ background: group.color, color: '#F6F5F0' }}>
+                <span className="ur-label w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-[10px]"
+                      style={{ background: group.color, color: '#FAF6EC' }}>
                   {group.tag}
                 </span>
                 <div>
@@ -418,7 +418,7 @@ export default function LandingPage() {
                     <Link
                       key={code}
                       href={`/types/${code.toLowerCase()}`}
-                      className="block p-5 rounded-md transition-all hover:-translate-y-0.5 group"
+                      className="block p-5 rounded-2xl transition-all hover:-translate-y-0.5 group"
                       style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
                     >
                       <div
@@ -453,12 +453,12 @@ export default function LandingPage() {
             {MBTI_LETTERS.map((item) => (
               <div
                 key={item.letter}
-                className="flex items-start gap-5 p-4 rounded-md"
+                className="flex items-start gap-5 p-4 rounded-2xl"
                 style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
               >
                 <div
-                  className="ur-label flex-shrink-0 w-14 h-12 rounded-sm flex items-center justify-center text-sm"
-                  style={{ background: item.color, color: '#F6F5F0' }}
+                  className="ur-label flex-shrink-0 w-14 h-12 rounded-full flex items-center justify-center text-sm"
+                  style={{ background: item.color, color: '#FAF6EC' }}
                 >
                   {item.letter}
                 </div>
@@ -497,8 +497,8 @@ export default function LandingPage() {
         >
           <Link
             href="/quiz/personnalite"
-            className="block w-full text-center py-4 rounded-md font-bold text-base transition-all active:scale-[0.98]"
-            style={{ background: 'var(--stamp)', color: '#F6F5F0' }}
+            className="block w-full text-center py-4 rounded-full font-bold text-base transition-all active:scale-[0.98]"
+            style={{ background: 'var(--gold)', color: '#FAF6EC' }}
           >
             Découvrir mon type →
           </Link>
