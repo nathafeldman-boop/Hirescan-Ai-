@@ -1,28 +1,22 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from 'next/font/google';
+import { Playfair_Display, Instrument_Sans } from 'next/font/google';
 import './globals.css';
 import Providers from './Providers';
 
-// « Le Dossier » type system — Bricolage Grotesque (display, strong distinct
-// character, not a default pairing) + Instrument Sans (body/UI) + JetBrains
-// Mono (small metadata labels — dossier numbers, classification tags).
-const bricolage = Bricolage_Grotesque({
+// « L'Oracle » type system — Playfair Display (high-contrast didone, the
+// dramatic, mystical/editorial register: tarot title cards, astrology decks)
+// + Instrument Sans (body/UI, neutral workhorse).
+const playfair = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-display',
+  style: ['normal', 'italic'],
 });
 
 const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-mono',
-  weight: ['500', '700'],
 });
 import Tracker from './Tracker';
 import { Suspense } from 'react';
@@ -124,7 +118,7 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${bricolage.variable} ${instrumentSans.variable} ${jetbrainsMono.variable}`}>
+    <html lang="fr" className={`${playfair.variable} ${instrumentSans.variable}`}>
       <head>
         <script
           type="application/ld+json"

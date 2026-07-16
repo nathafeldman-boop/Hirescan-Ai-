@@ -376,43 +376,44 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   « LE DOSSIER » — design system UrCecret
-   Ton profil de personnalité est un dossier, pas un poster pastel.
-   Noir structurel, papier gris désaturé, un seul accent-tampon rouge
-   utilisé en aplat (jamais en dégradé). Coins nets, zéro glassmorphism,
-   zéro lueur animée. Classification par famille = étiquette plate, pas
-   ambiance lumineuse.
+   « L'ORACLE » — design system UrCecret
+   Ton profil de personnalité est une révélation, pas un poster pastel
+   ni un dossier administratif. Indigo profond, or antique en aplat
+   unique, sceau circulaire dessiné à la main comme motif signature.
+   Boutons ronds, richesse typographique (didone dramatique), zéro
+   glassmorphism, zéro glow animé qui dérive.
    ═══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Base */
-  --ink: #111111;
-  --ink-soft: #1c1c1c;
-  --paper: #ECEAE2;
-  --paper-panel: #F6F5F0;
+  /* Base — indigo profond, pas noir pur */
+  --ink: #15121F;
+  --ink-soft: #1F1B2E;
+  --paper: #F2ECDE;
+  --paper-panel: #FAF6EC;
 
-  /* Accent-tampon — unique, plat, jamais en dégradé */
-  --stamp: #D6371F;
-  --stamp-soft: rgba(214, 55, 31, 0.08);
+  /* Or antique — unique accent, toujours en aplat, jamais en dégradé */
+  --gold: #C9A227;
+  --gold-soft: rgba(201, 162, 39, 0.10);
+  --gold-line: rgba(201, 162, 39, 0.35);
 
   /* Filets */
-  --line: rgba(17, 17, 17, 0.14);
-  --line-ink: rgba(246, 245, 240, 0.16);
+  --line: rgba(21, 18, 31, 0.14);
+  --line-ink: rgba(250, 246, 236, 0.14);
 
-  /* Classification par famille — étiquettes plates façon onglet de dossier */
-  --fam-nt: #35506B; /* Analystes */
-  --fam-nf: #6B3F52; /* Diplomates */
-  --fam-sj: #43502F; /* Sentinelles */
-  --fam-sp: #7A4A1E; /* Explorateurs */
+  /* Classification par famille — pierres précieuses sourdes, étiquette seule */
+  --fam-nt: #2B4570; /* Analystes — saphir */
+  --fam-nf: #5B3A63; /* Diplomates — améthyste */
+  --fam-sj: #2E4A3A; /* Sentinelles — émeraude */
+  --fam-sp: #8A5A2A; /* Explorateurs — cuivre */
 }
 
-/* Panneau dossier sur encre — bordure nette, pas de flou/transparence */
+/* Panneau sur encre — bordure filet or, pas de flou/transparence empilée */
 .ur-glass-ink {
   background: var(--ink-soft);
-  border: 1px solid var(--line-ink);
+  border: 1px solid var(--gold-line);
 }
 
-/* Entrée sobre — un seul mouvement, pas de lueur qui respire */
+/* Entrée sobre — un seul mouvement */
 @keyframes urLightRise {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -421,10 +422,16 @@ body {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+/* Rotation infime du sceau — un cadran, pas un blob qui dérive */
+@keyframes urSealTurn {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 .ur-reveal   { animation: urLightRise 0.4s ease both; }
 .ur-fade-1   { animation: urInkFadeUp 0.4s ease 0.08s both; }
 .ur-fade-2   { animation: urInkFadeUp 0.4s ease 0.16s both; }
 .ur-fade-3   { animation: urInkFadeUp 0.4s ease 0.24s both; }
+.ur-seal-turn { animation: urSealTurn 90s linear infinite; }
 
 /* Phrase coupée mi-mot — remplace le flou template.
    L'encre s'évapore sur la fin de la ligne. */
@@ -439,14 +446,14 @@ body {
 .ur-rule { height: 1px; background: var(--line); }
 .ur-rule-ink { height: 1px; background: var(--line-ink); }
 
-/* Label dossier — mono, tracké, petit */
+/* Label — petites capitales tracées, plus de mono "dossier" */
 .ur-label {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-sans), sans-serif;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ur-reveal, .ur-fade-1, .ur-fade-2, .ur-fade-3 { animation: none; opacity: 1; }
+  .ur-reveal, .ur-fade-1, .ur-fade-2, .ur-fade-3, .ur-seal-turn { animation: none; opacity: 1; }
 }
