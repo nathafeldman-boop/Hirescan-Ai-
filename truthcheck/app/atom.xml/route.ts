@@ -46,8 +46,8 @@ export function GET() {
   <id>${BASE}/</id>
   <updated>${now}</updated>
   <author><name>UrCecret</name><uri>${BASE}</uri></author>
-  <icon>${BASE}/favicon.svg</icon>
-  <logo>${BASE}/favicon.svg</logo>
+  <icon>${BASE}/icon.png</icon>
+  <logo>${BASE}/logo-oracle.png</logo>
   <rights>© ${year} UrCecret</rights>
   <generator uri="${BASE}" version="1.0">UrCecret</generator>
 ${entries}

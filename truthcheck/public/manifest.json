@@ -4,14 +4,16 @@
   "description": "Test de personnalité MBTI gratuit (16 types) + 15 quiz anonymes sur l'infidélité, l'amour et tes amis.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#8b5cf6",
+  "background_color": "#15121F",
+  "theme_color": "#15121F",
   "lang": "fr",
   "dir": "ltr",
   "orientation": "portrait",
   "scope": "/",
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "/icon.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/apple-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/logo-oracle.png", "sizes": "256x256", "type": "image/png", "purpose": "any" }
   ],
   "shortcuts": [
     { "name": "Mon partenaire me trompe ?", "short_name": "Infidélité", "url": "/quiz/infidelite", "description": "Détecte les signes d'infidélité" },

@@ -154,6 +154,17 @@ export default function PersonnalitePage() {
         </header>
 
         <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+          {/* Crest — emblème de marque, sur surface claire (le champ crème du
+              médaillon se fond dans --paper). Version WebP légère (~26 Ko). */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-oracle-256.webp"
+            alt="UrCecret"
+            width={104}
+            height={104}
+            className="mx-auto mb-6 ur-reveal"
+            style={{ width: 104, height: 104 }}
+          />
           {/* Badge */}
           <div className="ur-badge mb-8 gap-2" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)' }} />

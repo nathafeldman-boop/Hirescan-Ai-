@@ -80,9 +80,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: [
+      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/logo-oracle.png', sizes: '256x256', type: 'image/png' },
+    ],
+    shortcut: '/icon.png',
+    apple: '/apple-icon.png',
   },
 };
 
@@ -92,7 +95,7 @@ const organizationSchema = {
   name: 'UrCecret',
   alternateName: ['UrCecret', 'urcecret.site'],
   url: BASE,
-  logo: `${BASE}/favicon.svg`,
+  logo: `${BASE}/logo-oracle.png`,
   description: 'Test de personnalité MBTI gratuit — 16 types psychologiques en français.',
   foundingDate: '2024',
   sameAs: [],

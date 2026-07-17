@@ -96,7 +96,7 @@ const articleSchema = {
   headline: 'Test de Personnalité MBTI Gratuit — Les 16 Types en Français',
   description: 'Guide complet sur le test de personnalité MBTI : les 16 types, comment interpréter son résultat, et le test gratuit en français.',
   author: { '@type': 'Organization', name: 'UrCecret', url: BASE },
-  publisher: { '@type': 'Organization', name: 'UrCecret', logo: { '@type': 'ImageObject', url: `${BASE}/favicon.svg` } },
+  publisher: { '@type': 'Organization', name: 'UrCecret', logo: { '@type': 'ImageObject', url: `${BASE}/logo-oracle.png` } },
   url: `${BASE}/test-personnalite-mbti`,
   mainEntityOfPage: `${BASE}/test-personnalite-mbti`,
 };

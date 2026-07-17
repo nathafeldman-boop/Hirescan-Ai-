@@ -390,7 +390,7 @@ export default function SuisJePage({ params }: Props) {
       '@type': 'Organization',
       name: 'UrCecret',
       url: 'https://urcecret.site',
-      logo: { '@type': 'ImageObject', url: 'https://urcecret.site/favicon.svg' },
+      logo: { '@type': 'ImageObject', url: 'https://urcecret.site/logo-oracle.png' },
     },
     url: `https://urcecret.site/suis-je/${slug}`,
     mainEntityOfPage: `https://urcecret.site/suis-je/${slug}`,

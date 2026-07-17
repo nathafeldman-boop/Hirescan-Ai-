@@ -45,7 +45,7 @@ export async function GET() {
     <atom:link href="${BASE}/feed.xml" rel="self" type="application/rss+xml"/>
     <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <image>
-      <url>${BASE}/favicon.svg</url>
+      <url>${BASE}/logo-oracle.png</url>
       <title>UrCecret</title>
       <link>${BASE}</link>
     </image>
