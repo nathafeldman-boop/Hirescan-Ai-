@@ -55,7 +55,7 @@ model User {
   image         String?
   rizzScore     Int       @default(0)
   rizzLevel     Int       @default(1)
-  tier          String    @default("free") // free | pro | premium
+  tier          String    @default("free") // free | plus (5€) | premium (10€)
   mbtiType      String?   // e.g. "ENTJ"
   mbtiTestCount Int       @default(0)
   createdAt     DateTime  @default(now())
@@ -66,6 +66,22 @@ model User {
   quizResults  QuizResult[]
   analyses     ScreenshotAnalysis[]
   emailLogs    EmailLog[]
+  chatUsage    ChatUsage[]
+}
+
+// Compteur quotidien de messages chatbot par utilisateur — sert à appliquer
+// les quotas par jour selon l'abonnement (voir lib/chat.ts). Une ligne par
+// (utilisateur, jour). Rien de payant/sensible ici.
+model ChatUsage {
+  id     String @id @default(cuid())
+  userId String
+  day    String // "YYYY-MM-DD" (fuseau Europe/Paris)
+  count  Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@index([userId])
 }
 
 model QuizResult {

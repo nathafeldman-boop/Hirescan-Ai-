@@ -122,7 +122,17 @@ export default function LandingPage() {
           <span className="text-lg font-display italic transition-colors duration-300" style={{ color: scrolled ? 'var(--ink)' : '#FAF6EC', fontWeight: 700 }}>
             UrCecret
           </span>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/chat"
+              className="text-sm font-semibold px-3.5 py-2 rounded-full transition-all duration-300 hover:opacity-80 active:scale-[0.97] whitespace-nowrap inline-flex items-center gap-1.5"
+              style={{
+                color: scrolled ? 'var(--ink)' : '#FAF6EC',
+                border: `1px solid ${scrolled ? 'var(--line)' : 'rgba(250,246,236,0.28)'}`,
+              }}
+            >
+              <span aria-hidden>✦</span> Chatbot
+            </Link>
             <UserMenu />
             <Link
               href="/quiz/personnalite"
