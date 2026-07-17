@@ -44,8 +44,17 @@ export async function POST(req: NextRequest) {
   const user = session?.user as { id?: string; tier?: string; name?: string | null } | undefined;
   if (!user?.id) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  const body = await req.json().catch(() => null) as { message?: string } | null;
-  const message = typeof body?.message === 'string' ? body.message.trim().slice(0, 4000) : '';
+  // Rétro-compatible : nouvelle UI → { message } ; anciens clients en cache →
+  // { messages: [...] } (on extrait le dernier message utilisateur). Évite de
+  // casser un onglet ouvert avant la mise à jour.
+  const body = await req.json().catch(() => null) as
+    { message?: string; messages?: { role?: string; content?: string }[] } | null;
+  let message = typeof body?.message === 'string' ? body.message.trim() : '';
+  if (!message && Array.isArray(body?.messages)) {
+    const lastUser = [...body.messages].reverse().find((m) => m?.role === 'user' && typeof m?.content === 'string');
+    message = (lastUser?.content ?? '').trim();
+  }
+  message = message.slice(0, 4000);
   if (!message) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
   // Le coach a besoin du test : sans type, on invite à le passer (sans appel payant).
