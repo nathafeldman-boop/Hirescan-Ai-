@@ -120,11 +120,7 @@ function SignsSection({ type }: { type: MbtiTypeFree }) {
         {type.traits.map((trait, i) => (
           <div
             key={trait}
-            className="flex items-start gap-4 rounded-xl px-5 py-4"
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
+            className="ur-panel-ink flex items-start gap-4 px-5 py-4"
           >
             <span
               className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black"
@@ -151,8 +147,7 @@ function SignsSection({ type }: { type: MbtiTypeFree }) {
             return (
               <div
                 key={`locked-${idx}`}
-                className="flex items-start gap-4 rounded-xl px-5 py-4"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+                className="ur-panel-ink flex items-start gap-4 px-5 py-4"
               >
                 <span
                   className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black"
@@ -174,13 +169,7 @@ function SignsSection({ type }: { type: MbtiTypeFree }) {
 
 function DefinitionSection({ type }: { type: MbtiTypeFree }) {
   return (
-    <section
-      className="mb-10 rounded-2xl px-6 py-6"
-      style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.07)',
-      }}
-    >
+    <section className="ur-panel-ink mb-10 px-6 py-6">
       <h2 className="font-display text-lg font-black text-white mb-3">
         Ce qui te définit en tant que {type.code}
       </h2>
@@ -213,10 +202,7 @@ function CtaCard({ type }: { type: MbtiTypeFree }) {
     <section className="mb-10">
       <div
         className="rounded-2xl px-6 py-8 text-center"
-        style={{
-          background: 'linear-gradient(135deg, rgba(169,78,24,0.15) 0%, rgba(209,125,82,0.15) 100%)',
-          border: '1px solid rgba(209,125,82,0.25)',
-        }}
+        style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}
       >
         <div className="text-4xl mb-3">{type.emoji}</div>
         <h2 className="font-display text-xl font-black text-white mb-2">
@@ -227,11 +213,7 @@ function CtaCard({ type }: { type: MbtiTypeFree }) {
         </p>
         <Link
           href="/quiz/personnalite"
-          className="inline-block px-8 py-3.5 rounded-xl font-black text-sm text-white transition-transform hover:scale-105 active:scale-95"
-          style={{
-            background: 'linear-gradient(to right, #a94e18, #d17d52)',
-            boxShadow: '0 4px 24px rgba(169,78,24,0.4)',
-          }}
+          className="ur-btn-gold inline-flex px-8 py-3.5 text-sm"
         >
           Passer le test MBTI gratuit →
         </Link>
@@ -252,11 +234,7 @@ function FaqSection({ type }: { type: MbtiTypeFree }) {
         {faqs.map(({ q, a }) => (
           <details
             key={q}
-            className="group rounded-xl"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
+            className="ur-panel-ink group"
           >
             <summary className="px-5 py-4 cursor-pointer text-sm font-semibold text-stone-300 list-none flex justify-between items-center hover:text-white transition-colors">
               <span>{q}</span>
@@ -292,7 +270,7 @@ function RelatedTypesSection({ type }: { type: MbtiTypeFree }) {
                     background: type.accentColor,
                     borderColor: type.accentColor,
                   }
-                : { borderColor: 'rgba(255,255,255,0.1)' }
+                : { borderColor: 'var(--line-ink)' }
             }
           >
             Suis-je {c} ?
@@ -327,18 +305,10 @@ function Footer() {
   return (
     <footer
       className="py-8 text-center"
-      style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+      style={{ borderTop: '1px solid var(--line-ink)' }}
     >
       <Link href="/" className="text-lg font-black">
-        <span
-          style={{
-            background: 'linear-gradient(to right,#d17d52,#e0a380)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          Ur
-        </span>
+        <span style={{ color: 'var(--gold)' }}>Ur</span>
         <span className="text-white">Cecret</span>
       </Link>
       <p className="mt-2 text-xs text-stone-600">
@@ -446,11 +416,11 @@ export default function SuisJePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
 
-      <main className="min-h-screen bg-[#09090b] text-white">
-        {/* Ambiance background */}
+      <main className="min-h-screen text-white" style={{ background: 'var(--ink)' }}>
+        {/* Ambiance background — teinte du type, très discrète */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           <div
-            className="absolute top-0 right-1/3 w-96 h-96 rounded-full blur-3xl opacity-[0.07]"
+            className="absolute top-0 right-1/3 w-96 h-96 rounded-full blur-3xl opacity-[0.06]"
             style={{ background: type.accentColor }}
           />
         </div>
@@ -459,23 +429,20 @@ export default function SuisJePage({ params }: Props) {
         <header
           className="relative z-20 sticky top-0"
           style={{
-            background: 'rgba(9,9,11,0.85)',
+            background: 'rgba(21,18,31,0.9)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            borderBottom: '1px solid var(--line-ink)',
           }}
         >
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="font-display text-xl font-black">
-              <span style={{ color: '#e8a94d' }}>Ur</span>
+              <span style={{ color: 'var(--gold)' }}>Ur</span>
               <span className="text-white">Cecret</span>
             </Link>
             <Link
               href="/quiz/personnalite"
-              className="px-4 py-2 rounded-xl text-xs font-black text-white transition-all hover:scale-105"
-              style={{
-                background: 'linear-gradient(to right, #a94e18, #d17d52)',
-              }}
+              className="ur-btn-gold px-4 py-2 text-xs"
             >
               Test MBTI gratuit
             </Link>
@@ -510,13 +477,7 @@ export default function SuisJePage({ params }: Props) {
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
               Suis-je{' '}
-              <span
-                style={{
-                  background: `linear-gradient(to right, ${type.accentColor}, #d17d52)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
+              <span style={{ color: type.accentColor }}>
                 {code}
               </span>{' '}
               ?
@@ -531,7 +492,7 @@ export default function SuisJePage({ params }: Props) {
           <div
             className="mb-8 rounded-2xl px-6 py-5"
             style={{
-              background: `linear-gradient(135deg, ${type.accentColor}10 0%, rgba(209,125,82,0.06) 100%)`,
+              background: `${type.accentColor}10`,
               border: `1px solid ${type.accentColor}25`,
             }}
           >
@@ -554,13 +515,7 @@ export default function SuisJePage({ params }: Props) {
           <SuisJePremiumSections code={type.code} />
 
           {/* Lien vers profil complet */}
-          <div
-            className="mb-10 rounded-xl px-5 py-4 flex items-center justify-between gap-4"
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
-          >
+          <div className="ur-panel-ink mb-10 px-5 py-4 flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold text-white">Profil {code} complet</p>
               <p className="text-xs text-stone-500 mt-0.5">
@@ -569,11 +524,7 @@ export default function SuisJePage({ params }: Props) {
             </div>
             <Link
               href={`/types/${slug}`}
-              className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold text-stone-300 hover:text-white transition-colors"
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
+              className="ur-btn-outline flex-shrink-0 px-4 py-2 text-xs"
             >
               Voir →
             </Link>

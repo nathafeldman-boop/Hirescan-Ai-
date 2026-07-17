@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import type { FusionQuestion, FusionResult } from '@/lib/fusion';
+import Seal from '@/components/Seal';
 
 type Phase = 'loading' | 'waiting' | 'quiz' | 'waiting-others' | 'paywall' | 'result';
 
@@ -146,9 +147,9 @@ export default function FusionClient({ code }: { code: string }) {
   const myName = session.participants.find(p => p.id === participantId)?.name ?? '';
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#faf9f7' }}>
+    <main className="min-h-screen flex items-center justify-center px-4 text-white" style={{ background: 'var(--ink)' }}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.07] bg-violet-500" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.06]" style={{ background: 'var(--gold)' }} />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
@@ -186,7 +187,7 @@ export default function FusionClient({ code }: { code: string }) {
 
 function Loading() {
   return (
-    <main className="min-h-screen flex items-center justify-center" style={{ background: '#faf9f7' }}>
+    <main className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ink)' }}>
       <div className="text-stone-400 text-sm animate-pulse">Connexion à la session...</div>
     </main>
   );
@@ -204,28 +205,28 @@ function WaitingRoom({ code, participants, isHost, onStart }: {
   return (
     <div className="text-center">
       <div className="text-4xl mb-3">⚗️</div>
-      <h1 className="text-2xl font-black text-stone-900 mb-1">Salle d&apos;attente</h1>
-      <p className="text-stone-500 text-sm mb-6">Partage le code avec tes amis</p>
+      <h1 className="text-2xl font-black text-white mb-1">Salle d&apos;attente</h1>
+      <p className="text-stone-400 text-sm mb-6">Partage le code avec tes amis</p>
 
       <button
         onClick={copyCode}
-        className="mx-auto mb-6 flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-2xl tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
-        style={{ background: 'white', border: '2px solid #e7e5e0', color: '#a94e18' }}
+        className="mx-auto mb-6 flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-2xl tracking-widest transition-all active:scale-[0.98]"
+        style={{ background: 'var(--ink-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}
       >
         {code}
-        <span className="text-sm font-semibold text-stone-400">{copied ? '✓' : '📋'}</span>
+        <span className="text-sm font-semibold text-stone-500">{copied ? '✓' : '📋'}</span>
       </button>
 
-      <div className="rounded-2xl p-4 mb-6" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">
+      <div className="rounded-2xl p-4 mb-6" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+        <p className="ur-label text-[10px] text-stone-500 mb-3">
           {participants.length} participant{participants.length > 1 ? 's' : ''} connecté{participants.length > 1 ? 's' : ''}
         </p>
         <div className="space-y-2">
           {participants.map((p, i) => (
-            <div key={p.id} className="flex items-center gap-2 text-sm font-medium text-stone-700">
+            <div key={p.id} className="flex items-center gap-2 text-sm font-medium text-stone-300">
               <span className="text-base">{i === 0 ? '👑' : '👤'}</span>
               {p.name}
-              {i === 0 && <span className="text-xs text-stone-400 ml-1">· créateur</span>}
+              {i === 0 && <span className="text-xs text-stone-500 ml-1">· créateur</span>}
             </div>
           ))}
         </div>
@@ -235,13 +236,12 @@ function WaitingRoom({ code, participants, isHost, onStart }: {
         <button
           onClick={onStart}
           disabled={participants.length < 2}
-          className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
+          className="ur-btn-gold block w-full py-4 text-center"
         >
           {participants.length < 2 ? 'En attente d\'un autre joueur...' : `🚀 Lancer le quiz (${participants.length} joueurs)`}
         </button>
       ) : (
-        <p className="text-stone-400 text-sm animate-pulse">En attente que le créateur lance le quiz...</p>
+        <p className="text-stone-500 text-sm animate-pulse">En attente que le créateur lance le quiz...</p>
       )}
     </div>
   );
@@ -256,15 +256,15 @@ function QuizView({ question, current, total, onAnswer }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-semibold text-stone-400 uppercase tracking-wide">Question {current + 1}/{total}</span>
-        <span className="text-xs text-stone-400">{Math.round(progress)}%</span>
+        <span className="ur-label text-[10px] text-stone-500">Question {current + 1}/{total}</span>
+        <span className="text-xs text-stone-500">{Math.round(progress)}%</span>
       </div>
-      <div className="w-full h-1.5 rounded-full mb-6" style={{ background: '#e7e5e0' }}>
-        <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: 'linear-gradient(90deg,#a94e18,#d17d52)' }} />
+      <div className="w-full h-1.5 rounded-full mb-6" style={{ background: 'var(--line-ink)' }}>
+        <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: 'var(--gold)' }} />
       </div>
 
-      <div className="rounded-2xl p-5 mb-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-stone-900 font-semibold text-base leading-relaxed">{question.text}</p>
+      <div className="rounded-2xl p-5 mb-5" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+        <p className="text-white font-semibold text-base leading-relaxed">{question.text}</p>
       </div>
 
       <div className="space-y-3">
@@ -274,10 +274,10 @@ function QuizView({ question, current, total, onAnswer }: {
             <button
               key={letter}
               onClick={() => onAnswer(question.id, letter)}
-              className="w-full text-left px-4 py-4 rounded-2xl font-medium text-stone-700 transition-all hover:scale-[1.01] active:scale-[0.99]"
-              style={{ background: 'white', border: '2px solid #e7e5e0' }}
+              className="w-full text-left px-4 py-4 rounded-2xl font-medium text-stone-300 transition-all active:scale-[0.99]"
+              style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}
             >
-              <span className="font-black text-stone-300 mr-3">{letter}</span>
+              <span className="font-black text-stone-600 mr-3">{letter}</span>
               {opt.text}
             </button>
           );
@@ -294,22 +294,22 @@ function WaitingOthers({ participants, myName }: { participants: Participant[]; 
   return (
     <div className="text-center">
       <div className="text-4xl mb-4">⏳</div>
-      <h2 className="text-xl font-black text-stone-900 mb-2">Tes réponses sont enregistrées</h2>
-      <p className="text-stone-500 text-sm mb-6">
+      <h2 className="text-xl font-black text-white mb-2">Tes réponses sont enregistrées</h2>
+      <p className="text-stone-400 text-sm mb-6">
         En attente des autres joueurs...
       </p>
-      <div className="rounded-2xl p-4 mb-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">{done}/{total} terminés</p>
+      <div className="rounded-2xl p-4 mb-4" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+        <p className="ur-label text-[10px] text-stone-500 mb-3">{done}/{total} terminés</p>
         <div className="space-y-2">
           {participants.map(p => (
             <div key={p.id} className="flex items-center justify-between text-sm">
-              <span className="font-medium text-stone-700">{p.name} {p.name === myName && '(toi)'}</span>
-              <span>{p.done ? '✅' : <span className="text-stone-300 animate-pulse">○</span>}</span>
+              <span className="font-medium text-stone-300">{p.name} {p.name === myName && '(toi)'}</span>
+              <span>{p.done ? '✅' : <span className="text-stone-600 animate-pulse">○</span>}</span>
             </div>
           ))}
         </div>
       </div>
-      <p className="text-xs text-stone-400 animate-pulse">Calcul en cours dès que tout le monde a répondu...</p>
+      <p className="text-xs text-stone-500 animate-pulse">Calcul en cours dès que tout le monde a répondu...</p>
     </div>
   );
 }
@@ -320,14 +320,14 @@ function PaywallView({ onPay, loading, participants }: {
   return (
     <div className="text-center">
       <div className="text-4xl mb-3">🔬</div>
-      <h2 className="text-2xl font-black text-stone-900 mb-2">Votre profil Fusion est prêt</h2>
-      <p className="text-stone-500 text-sm mb-6">
+      <h2 className="text-2xl font-black text-white mb-2">Votre profil Fusion est prêt</h2>
+      <p className="text-stone-400 text-sm mb-6">
         {participants.length} joueurs · Résultat calculé
       </p>
 
-      <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Ce que vous découvrez</p>
-        <ul className="space-y-2 text-sm text-stone-600">
+      <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+        <p className="ur-label text-[10px] text-stone-500 mb-3">Ce que vous découvrez</p>
+        <ul className="space-y-2 text-sm text-stone-300">
           <li className="flex gap-2"><span>🏷️</span> Le nom et archétype de votre groupe</li>
           <li className="flex gap-2"><span>⚡</span> Vos 5 forces collectives</li>
           <li className="flex gap-2"><span>⚠️</span> Vos risques et angles morts</li>
@@ -338,21 +338,20 @@ function PaywallView({ onPay, loading, participants }: {
 
       <div
         className="rounded-2xl p-4 mb-6 text-center"
-        style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.06),rgba(209,125,82,0.06))', border: '1px solid rgba(169,78,24,0.15)' }}
+        style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}
       >
-        <p className="text-stone-500 text-xs mb-1">Accès unique pour tout le groupe</p>
-        <p className="text-3xl font-black text-stone-900">1,99 €</p>
+        <p className="text-stone-400 text-xs mb-1">Accès unique pour tout le groupe</p>
+        <p className="text-3xl font-black" style={{ color: 'var(--gold)' }}>1,99 €</p>
       </div>
 
       <button
         onClick={onPay}
         disabled={loading}
-        className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-        style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.3)' }}
+        className="ur-btn-gold block w-full py-4 text-center"
       >
         {loading ? 'Redirection...' : '🔓 Révéler le profil du groupe — 1,99 €'}
       </button>
-      <p className="text-xs text-stone-400 mt-3">Paiement sécurisé · Un seul paiement pour tout le groupe</p>
+      <p className="text-xs text-stone-500 mt-3">Paiement sécurisé · Un seul paiement pour tout le groupe</p>
     </div>
   );
 }
@@ -375,60 +374,60 @@ function ResultView({ result, code, participants }: {
 
   return (
     <div className="text-center">
+      <div className="flex justify-center mb-3"><Seal size={56} spin /></div>
       <div className="text-5xl mb-3">{result.type.emoji}</div>
-      <p className="text-sm font-semibold mb-1" style={{ color }}>Votre profil Fusion</p>
-      <h1 className="text-3xl font-black text-stone-900 mb-2">{result.type.name}</h1>
-      <p className="text-stone-500 italic text-sm mb-4">"{result.type.tagline}"</p>
+      <p className="ur-label text-[10px] mb-1" style={{ color }}>Votre profil Fusion</p>
+      <h1 className="text-3xl font-black text-white mb-2">{result.type.name}</h1>
+      <p className="text-stone-400 italic text-sm mb-4">"{result.type.tagline}"</p>
 
       <div className="flex justify-center gap-4 mb-6">
         <div className="text-center">
           <p className="text-2xl font-black" style={{ color }}>{result.compatibility}%</p>
-          <p className="text-xs text-stone-400">Compatibilité</p>
+          <p className="text-xs text-stone-500">Compatibilité</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-black text-stone-700">{participants.length}</p>
-          <p className="text-xs text-stone-400">Joueurs</p>
+          <p className="text-2xl font-black text-white">{participants.length}</p>
+          <p className="text-xs text-stone-500">Joueurs</p>
         </div>
       </div>
 
-      <div className="rounded-2xl p-4 mb-4 text-left" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-stone-600 text-sm leading-relaxed">{result.type.description}</p>
+      <div className="rounded-2xl p-4 mb-4 text-left" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+        <p className="text-stone-300 text-sm leading-relaxed">{result.type.description}</p>
       </div>
 
-      <div className="rounded-2xl p-4 mb-4 text-left" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Forces collectives</p>
+      <div className="rounded-2xl p-4 mb-4 text-left" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+        <p className="ur-label text-[10px] text-stone-500 mb-3">Forces collectives</p>
         <ul className="space-y-1.5">
           {result.type.forces.map((f, i) => (
-            <li key={i} className="flex gap-2 text-sm text-stone-700"><span style={{ color }}>✦</span>{f}</li>
+            <li key={i} className="flex gap-2 text-sm text-stone-300"><span style={{ color }}>✦</span>{f}</li>
           ))}
         </ul>
       </div>
 
-      <div className="rounded-2xl p-4 mb-4 text-left" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-        <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Risques à surveiller</p>
+      <div className="rounded-2xl p-4 mb-4 text-left" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
+        <p className="ur-label text-[10px] text-stone-500 mb-3">Risques à surveiller</p>
         <ul className="space-y-1.5">
           {result.type.risques.map((r, i) => (
-            <li key={i} className="flex gap-2 text-sm text-stone-600"><span>⚠️</span>{r}</li>
+            <li key={i} className="flex gap-2 text-sm text-stone-300"><span>⚠️</span>{r}</li>
           ))}
         </ul>
       </div>
 
       <div className="rounded-2xl p-4 mb-6 text-left" style={{ background: `${color}10`, border: `1px solid ${color}30` }}>
-        <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color }}>Votre potentiel</p>
-        <p className="text-sm text-stone-700 leading-relaxed">{result.type.potentiel}</p>
+        <p className="ur-label text-[10px] mb-1" style={{ color }}>Votre potentiel</p>
+        <p className="text-sm text-stone-300 leading-relaxed">{result.type.potentiel}</p>
       </div>
 
       <button
         onClick={share}
-        className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] mb-3"
-        style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
+        className="ur-btn-gold block w-full py-4 text-center mb-3"
       >
         {copied ? '✓ Lien copié !' : '🔗 Partager le résultat'}
       </button>
       <a
         href="/fusion"
-        className="block w-full py-3 rounded-2xl font-semibold text-stone-600 text-center text-sm hover:bg-stone-100 transition"
-        style={{ background: 'white', border: '1px solid #e7e5e0' }}
+        className="block w-full py-3 rounded-full font-semibold text-stone-400 text-center text-sm hover:text-white transition"
+        style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}
       >
         Nouveau quiz Fusion →
       </a>

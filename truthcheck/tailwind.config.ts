@@ -13,31 +13,23 @@ const config: Config = {
         sans: ['var(--font-sans)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
       },
       colors: {
-        // Warm, handcrafted palette — clay terracotta accent, sage, warm cream
-        clay: {
-          50: '#fbf3ee',
-          100: '#f6e4d8',
-          200: '#ecc6ad',
-          300: '#e0a380',
-          400: '#d17d52',
-          500: '#c2611f',
-          600: '#a94e18',
-          700: '#8a3e16',
-          800: '#6f3318',
-          900: '#5b2c17',
+        // « L'Oracle » design system — voir DESIGN_SYSTEM.md et les tokens
+        // CSS dans app/globals.css (:root). Ces alias Tailwind pointent vers
+        // les mêmes variables, pour pouvoir écrire bg-ink / text-gold au lieu
+        // de style={{background:'var(--ink)'}} partout dans le nouveau code.
+        ink: 'var(--ink)',
+        'ink-soft': 'var(--ink-soft)',
+        paper: 'var(--paper)',
+        'paper-panel': 'var(--paper-panel)',
+        gold: {
+          DEFAULT: 'var(--gold)',
+          soft: 'var(--gold-soft)',
+          line: 'var(--gold-line)',
         },
-        sage: {
-          100: '#e7ece2',
-          300: '#aebf9c',
-          500: '#7d9466',
-          700: '#566b45',
-        },
-        cream: {
-          DEFAULT: '#f7f3ec',
-          100: '#fbf8f2',
-          200: '#efe8db',
-        },
-        ink: '#2b2622',
+        'fam-nt': 'var(--fam-nt)',
+        'fam-nf': 'var(--fam-nf)',
+        'fam-sj': 'var(--fam-sj)',
+        'fam-sp': 'var(--fam-sp)',
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-out forwards',

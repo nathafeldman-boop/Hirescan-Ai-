@@ -45,7 +45,7 @@ export default function SuisJePremiumSections({ code }: Props) {
     return (
       <>
         <section className="mb-10">
-          <div className="rounded-2xl px-6 py-6" style={{ background: 'rgba(224,163,128,0.05)', border: '1px solid rgba(224,163,128,0.15)' }}>
+          <div className="ur-panel-ink px-6 py-6">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">💕</span>
               <h2 className="font-display text-lg font-black text-white">Le {code} en amour</h2>
@@ -55,7 +55,7 @@ export default function SuisJePremiumSections({ code }: Props) {
         </section>
 
         <section className="mb-10">
-          <div className="rounded-2xl px-6 py-6" style={{ background: 'rgba(176,125,43,0.05)', border: '1px solid rgba(176,125,43,0.15)' }}>
+          <div className="ur-panel-ink px-6 py-6">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">💼</span>
               <h2 className="font-display text-lg font-black text-white">Le {code} au travail</h2>
@@ -68,7 +68,7 @@ export default function SuisJePremiumSections({ code }: Props) {
           <h2 className="font-display text-lg font-black text-white mb-4">Célébrités {code} — tu es en bonne compagnie</h2>
           <div className="flex flex-wrap gap-2">
             {premium.famousExamples.map(celeb => (
-              <span key={celeb} className="px-4 py-2 rounded-full text-sm font-medium" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: '#e4e4e7' }}>
+              <span key={celeb} className="ur-panel-ink px-4 py-2 text-sm font-medium text-zinc-200" style={{ borderRadius: '999px' }}>
                 {celeb}
               </span>
             ))}
@@ -79,7 +79,7 @@ export default function SuisJePremiumSections({ code }: Props) {
           <h2 className="font-display text-lg font-black text-white mb-4">Types compatibles avec {code}</h2>
           <div className="flex flex-wrap gap-2">
             {premium.compatibleWith.map(c => (
-              <Link key={c} href={`/suis-je/${c.toLowerCase()}`} className="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: '#e4e4e7' }}>
+              <Link key={c} href={`/suis-je/${c.toLowerCase()}`} className="ur-panel-ink px-4 py-2 text-sm font-semibold text-zinc-200 transition-all hover:scale-105">
                 {c}
               </Link>
             ))}
@@ -91,13 +91,12 @@ export default function SuisJePremiumSections({ code }: Props) {
 
   // Non premium : teaser verrouillé, aucun contenu payant affiché.
   return (
-    <section className="mb-10 rounded-2xl px-6 py-8 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+    <section className="ur-panel-ink mb-10 px-6 py-8 text-center">
       <p className="text-sm font-bold text-white mb-1">Amour, carrière, célébrités & compatibilité {code}</p>
       <p className="text-xs text-stone-500 mb-5 max-w-sm mx-auto">Cette partie du profil {code} est verrouillée.</p>
       <Link
         href={`/types/${code.toLowerCase()}`}
-        className="inline-block px-6 py-3 rounded-xl font-black text-sm text-white transition-all hover:scale-105"
-        style={{ background: 'linear-gradient(to right, #a94e18, #d17d52)' }}
+        className="ur-btn-gold inline-flex px-6 py-3 text-sm"
       >
         Débloquer mon profil {code}, 1,99 €
       </Link>

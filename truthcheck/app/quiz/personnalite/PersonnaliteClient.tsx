@@ -336,40 +336,26 @@ function InAppBrowserOverlay() {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
-         style={{ background: 'linear-gradient(160deg,#0a0014 0%,#0e0020 60%,#0a0010 100%)' }}>
+         style={{ background: 'var(--ink)' }}>
 
       <style>{`
         @keyframes iab-float { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-9px)} }
-        @keyframes iab-glow  { 0%,100%{box-shadow:0 0 28px rgba(169,78,24,.45)} 50%{box-shadow:0 0 48px rgba(209,125,82,.65)} }
-        @keyframes iab-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
-        @keyframes iab-shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
       `}</style>
 
-      {/* Blurred MBTI profile card — Zeigarnik hook */}
+      {/* Sceau verrouillé — carte de type floutée, la promesse du dossier scellé */}
       <div className="relative mb-7" style={{ animation: 'iab-float 2.6s ease-in-out infinite' }}>
-        {/* Ambient glow */}
-        <div className="absolute inset-0 rounded-lg blur-2xl opacity-60"
-             style={{ background: 'var(--gold)', transform: 'scale(1.15)' }}/>
+        <div className="ur-panel-ink relative px-7 py-5">
 
-        <div className="relative rounded-lg px-7 py-5"
-             style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', animation: 'iab-glow 2.2s ease-in-out infinite' }}>
-
-          <p className="text-white/40 text-xs uppercase tracking-widest mb-4 font-semibold">
+          <p className="ur-label text-[10px] mb-4" style={{ color: 'var(--gold)' }}>
             Ton type MBTI
           </p>
 
-          {/* 4 blurred type letters */}
+          {/* 4 lettres verrouillées */}
           <div className="flex gap-2 justify-center mb-4">
             {[0,1,2,3].map(i => (
               <div key={i}
-                   className="w-12 h-14 rounded-xl flex items-center justify-center text-2xl font-black text-white/20"
-                   style={{
-                     background: i%2===0 ? 'rgba(169,78,24,0.35)' : 'rgba(209,125,82,0.22)',
-                     border: '1px solid rgba(255,255,255,0.15)',
-                     filter: 'blur(5px)',
-                     animation: `iab-float ${2.2+i*0.18}s ease-in-out infinite`,
-                     animationDelay: `${i*0.12}s`
-                   }}>
+                   className="w-12 h-14 rounded-xl flex items-center justify-center text-2xl font-black"
+                   style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--ink-text-faint)' }}>
                 ?
               </div>
             ))}
@@ -377,36 +363,34 @@ function InAppBrowserOverlay() {
 
           <div className="flex items-center justify-center gap-2">
             <span className="text-sm">🔒</span>
-            <p className="text-white/50 text-xs font-medium">Connexion requise pour révéler</p>
+            <p className="text-xs font-medium" style={{ color: 'var(--ink-text-muted)' }}>Connexion requise pour révéler</p>
           </div>
         </div>
       </div>
 
       {/* Headline */}
-      <h2 className="text-[1.6rem] font-black text-white mb-2 leading-tight">
-        Ton profil est prêt&nbsp;! 🔮
+      <h2 className="font-display text-[1.6rem] font-black text-white mb-2 leading-tight">
+        Ton profil est prêt&nbsp;!
       </h2>
-      <p className="text-white/55 text-sm mb-6 leading-relaxed max-w-[17rem]">
+      <p className="text-sm mb-6 leading-relaxed max-w-[17rem]" style={{ color: 'var(--ink-text-muted)' }}>
         Pour voir ton type et créer ton compte, ouvre dans ton navigateur —{' '}
-        <strong className="text-white/90">ça prend 5 secondes</strong>
+        <strong style={{ color: 'var(--ink-text)' }}>ça prend 5 secondes</strong>
       </p>
 
       {/* Steps */}
       <div className="w-full max-w-[17rem] mb-6 space-y-2.5 text-left">
-        <div className="flex items-start gap-3 p-3.5 rounded-lg"
-             style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
-          <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
-                style={{ background: 'var(--gold)' }}>1</span>
-          <p className="text-white/75 text-sm leading-snug pt-0.5">
-            Appuie sur les <strong className="text-white">⋯</strong> en haut à droite
+        <div className="ur-panel-ink flex items-start gap-3 p-3.5">
+          <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black"
+                style={{ background: 'var(--gold)', color: 'var(--ink)' }}>1</span>
+          <p className="text-sm leading-snug pt-0.5" style={{ color: 'var(--ink-text-muted)' }}>
+            Appuie sur les <strong style={{ color: 'var(--ink-text)' }}>⋯</strong> en haut à droite
           </p>
         </div>
-        <div className="flex items-start gap-3 p-3.5 rounded-lg"
-             style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)' }}>
-          <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black text-white"
-                style={{ background: 'var(--gold)' }}>2</span>
-          <p className="text-white/75 text-sm leading-snug pt-0.5">
-            Appuie sur <strong className="text-white">&quot;Ouvrir dans le navigateur&quot;</strong>
+        <div className="ur-panel-ink flex items-start gap-3 p-3.5">
+          <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black"
+                style={{ background: 'var(--gold)', color: 'var(--ink)' }}>2</span>
+          <p className="text-sm leading-snug pt-0.5" style={{ color: 'var(--ink-text-muted)' }}>
+            Appuie sur <strong style={{ color: 'var(--ink-text)' }}>&quot;Ouvrir dans le navigateur&quot;</strong>
           </p>
         </div>
       </div>
@@ -415,31 +399,25 @@ function InAppBrowserOverlay() {
       <div className="w-full max-w-[17rem] space-y-3">
         <button
           onClick={openInChrome}
-          className="w-full py-[1.05rem] rounded-lg font-black text-white text-base transition-all active:scale-[0.97]"
-          style={{
-            background: copied ? 'linear-gradient(135deg,#16a34a,#22c55e)' : 'linear-gradient(270deg,#a94e18,#d17d52,#a94e18)',
-            backgroundSize: '300% 100%',
-            animation: copied ? 'none' : 'iab-shimmer 3s linear infinite, iab-glow 2s ease-in-out infinite',
-            boxShadow: copied ? '0 10px 36px rgba(34,197,94,0.4)' : '0 10px 36px rgba(169,78,24,0.55)'
-          }}>
+          className={copied ? 'w-full py-[1.05rem] rounded-full font-black text-base transition-all active:scale-[0.97]' : 'ur-btn-gold w-full py-[1.05rem] text-base'}
+          style={copied ? { background: '#4ADE80', color: 'var(--ink)' } : undefined}>
           {copied ? '✅ Lien copié — colle dans Safari / Chrome !' : '🔓 Voir mon type MBTI'}
         </button>
         {copied && (
-          <p className="text-white/60 text-xs text-center leading-snug px-2">
+          <p className="text-xs text-center leading-snug px-2" style={{ color: 'var(--ink-text-muted)' }}>
             Le lien est dans ton presse-papiers — colle-le dans ton navigateur
           </p>
         )}
         {!copied && (
           <button
             onClick={copyLink}
-            className="w-full py-3 rounded-lg font-semibold text-sm transition-all active:scale-[0.97]"
-            style={{ background: 'rgba(255,255,255,0.07)', border: '1.5px solid rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.65)' }}>
+            className="ur-btn-outline w-full py-3 text-sm font-semibold">
             📋 Copier le lien
           </button>
         )}
       </div>
 
-      <p className="text-white/25 text-[11px] mt-5 max-w-[15rem] leading-relaxed">
+      <p className="text-[11px] mt-5 max-w-[15rem] leading-relaxed" style={{ color: 'var(--ink-text-faint)' }}>
         Tes réponses sont sauvegardées — ton profil t&apos;attendra 🔒
       </p>
     </div>

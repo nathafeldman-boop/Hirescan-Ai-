@@ -69,10 +69,9 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
     .sort((a, b) => b.score - a.score)
     .slice(0, 6);
 
-  const scoreColor =
-    compat.score >= 85 ? '#22c55e' :
-    compat.score >= 70 ? '#d17d52' :
-    compat.score >= 55 ? '#f59e0b' : '#f87171';
+  // Un seul accent (l'or) — le degré de compatibilité se lit dans le score et
+  // le label, pas dans un code couleur rouge/orange/vert générique.
+  const scoreColor = 'var(--gold)';
 
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -140,23 +139,23 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
-      <main className="min-h-screen bg-[#09090b] text-white">
-        {/* Background atmosphere */}
+      <main className="min-h-screen text-white" style={{ background: 'var(--ink)' }}>
+        {/* Background atmosphere — teinte de chaque type, très discrète */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full blur-3xl opacity-[0.08]" style={{ background: A.accentColor }} />
-          <div className="absolute bottom-1/4 right-0 w-80 h-80 rounded-full blur-3xl opacity-[0.06]" style={{ background: B.accentColor }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full blur-3xl opacity-[0.06]" style={{ background: A.accentColor }} />
+          <div className="absolute bottom-1/4 right-0 w-80 h-80 rounded-full blur-3xl opacity-[0.05]" style={{ background: B.accentColor }} />
         </div>
 
         {/* Nav */}
-        <header className="relative z-10 sticky top-0" style={{ background: 'rgba(9,9,11,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <header className="relative z-10 sticky top-0" style={{ background: 'rgba(21,18,31,0.9)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line-ink)' }}>
           <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+              <span style={{ color: 'var(--gold)' }}>Ur</span>
               <span className="text-white">Cecret</span>
             </Link>
             <nav className="flex items-center gap-4 text-xs text-zinc-400">
               <Link href="/types" className="hover:text-white transition-colors">Types</Link>
-              <Link href="/quiz/personnalite" className="font-bold transition-colors" style={{ color: '#d17d52' }}>
+              <Link href="/quiz/personnalite" className="font-bold transition-colors" style={{ color: 'var(--gold)' }}>
                 Passer le test →
               </Link>
             </nav>
@@ -186,9 +185,9 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
 
               {/* Score ring */}
               <div className="flex flex-col items-center">
-                <div className="relative w-24 h-24 flex items-center justify-center rounded-full" style={{ border: `3px solid ${scoreColor}`, boxShadow: `0 0 24px ${scoreColor}40` }}>
+                <div className="relative w-24 h-24 flex items-center justify-center rounded-full" style={{ border: `1px solid ${scoreColor}` }}>
                   <div>
-                    <div className="text-2xl font-black" style={{ color: scoreColor }}>{compat.score}</div>
+                    <div className="font-display text-2xl font-black" style={{ color: scoreColor }}>{compat.score}</div>
                     <div className="text-[10px] text-zinc-500 -mt-1">/100</div>
                   </div>
                 </div>
@@ -212,7 +211,7 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
           </section>
 
           {/* En amour */}
-          <section className="mb-6 rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <section className="ur-panel-ink mb-6 p-6">
             <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
               <span>💞</span> En amour
             </h2>
@@ -220,7 +219,7 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
           </section>
 
           {/* Au travail */}
-          <section className="mb-6 rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <section className="ur-panel-ink mb-6 p-6">
             <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
               <span>💼</span> Au travail
             </h2>
@@ -229,13 +228,13 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
 
           {/* Forces partagées */}
           {compat.sharedStrengths.length > 0 && (
-            <section className="mb-6 rounded-2xl p-6" style={{ background: 'rgba(209,125,82,0.06)', border: '1px solid rgba(209,125,82,0.15)' }}>
+            <section className="mb-6 rounded-2xl p-6" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
               <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
                 <span>✨</span> Forces communes
               </h2>
               <div className="flex flex-wrap gap-2">
                 {compat.sharedStrengths.map((s) => (
-                  <span key={s} className="px-3 py-1 rounded-full text-xs font-medium text-zinc-200" style={{ background: 'rgba(209,125,82,0.12)', border: '1px solid rgba(209,125,82,0.2)' }}>
+                  <span key={s} className="ur-badge text-zinc-100" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
                     {s}
                   </span>
                 ))}
@@ -244,7 +243,7 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
           )}
 
           {/* Défis */}
-          <section className="mb-6 rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <section className="ur-panel-ink mb-6 p-6">
             <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
               <span>⚡</span> Points de friction
             </h2>
@@ -259,14 +258,14 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
           </section>
 
           {/* Tips */}
-          <section className="mb-10 rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <section className="ur-panel-ink mb-10 p-6">
             <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
               <span>💡</span> Conseils pour mieux vous comprendre
             </h2>
             <ul className="space-y-2">
               {compat.tips.map((tip, i) => (
                 <li key={i} className="text-sm text-zinc-400 flex gap-2">
-                  <span className="shrink-0" style={{ color: '#d17d52' }}>→</span>
+                  <span className="shrink-0" style={{ color: 'var(--gold)' }}>→</span>
                   {tip}
                 </li>
               ))}
@@ -274,13 +273,12 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
           </section>
 
           {/* CTA */}
-          <div className="mb-10 rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.2),rgba(209,125,82,0.1))', border: '1px solid rgba(209,125,82,0.2)' }}>
+          <div className="mb-10 rounded-2xl p-6 text-center" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
             <p className="text-white font-bold mb-1">Découvre ton type MBTI</p>
             <p className="text-zinc-400 text-xs mb-4">24 questions · résultat instantané · gratuit</p>
             <Link
               href="/quiz/personnalite"
-              className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02] hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 24px rgba(169,78,24,0.35)' }}
+              className="ur-btn-gold inline-flex px-6 py-3 text-sm"
             >
               Passer le test gratuitement →
             </Link>
@@ -291,7 +289,7 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
             <h2 className="text-base font-black text-white mb-4">Questions fréquentes</h2>
             <div className="space-y-3">
               {faqSchema.mainEntity.map((item, i) => (
-                <details key={i} className="rounded-xl group" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <details key={i} className="ur-panel-ink rounded-xl group">
                   <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-zinc-200 list-none flex justify-between items-center">
                     {item.name}
                     <span className="text-zinc-600 group-open:rotate-180 transition-transform">▾</span>
@@ -310,8 +308,7 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
                 <Link
                   key={code}
                   href={`/types/${code.toLowerCase()}`}
-                  className="rounded-2xl p-4 flex items-center gap-3 transition-all hover:scale-[1.01]"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+                  className="ur-panel-ink p-4 flex items-center gap-3 transition-all hover:scale-[1.01]"
                 >
                   <span className="text-2xl">{type.emoji}</span>
                   <div>
@@ -333,8 +330,8 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
                   <Link
                     key={code}
                     href={`/compatibilite/${pairSlug}`}
-                    className="px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-[1.02]"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#d17d52' }}
+                    className="ur-badge transition-all hover:scale-[1.02]"
+                    style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)', color: 'var(--gold)' }}
                   >
                     {codeA} × {code}
                   </Link>

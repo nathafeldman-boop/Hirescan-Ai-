@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import type { DuoQuiz } from '@/lib/duoQuizzes';
 import { decodeDuoAnswers, encodeDuoAnswers, compareDuoAnswers, getDuoInsight } from '@/lib/duoQuizzes';
+import Seal from '@/components/Seal';
 
 interface Props {
   quiz: DuoQuiz;
@@ -96,19 +97,15 @@ export default function DuoCompareClient({ quiz }: Props) {
   /* ── INVALID LINK ── */
   if (!partnerAnswers || partnerAnswers.length !== quiz.questions.length) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#09090b' }}>
+      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: 'var(--ink)' }}>
         <div className="w-full max-w-sm text-center">
           <div className="text-5xl mb-5">🔗</div>
-          <h1 className="text-2xl font-black text-white mb-3">Lien invalide ou incomplet</h1>
+          <h1 className="font-display text-2xl font-black text-white mb-3">Lien invalide ou incomplet</h1>
           <p className="text-zinc-400 text-sm leading-relaxed mb-6">
             Ce lien ne contient pas les réponses de ton/ta partenaire. Demande-lui de
             refaire le quiz depuis le début.
           </p>
-          <Link
-            href="/duo"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white"
-            style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)' }}
-          >
+          <Link href="/duo" className="ur-btn-gold inline-flex items-center gap-2 px-5 py-3 text-sm">
             ← Aller au Mode Duo
           </Link>
         </div>
@@ -119,7 +116,7 @@ export default function DuoCompareClient({ quiz }: Props) {
   /* ── INTRO ── */
   if (phase === 'intro') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#09090b' }}>
+      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: 'var(--ink)' }}>
         <div className="w-full max-w-md text-center">
           <div
             className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center text-4xl"
@@ -127,11 +124,11 @@ export default function DuoCompareClient({ quiz }: Props) {
           >
             {quiz.emoji}
           </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-4">
-            <span className="w-2 h-2 rounded-full bg-green-400" />
-            <span className="text-xs text-zinc-400 font-medium">Réponses de ton/ta partenaire reçues ✓</span>
+          <div className="ur-badge mb-4" style={{ border: '1px solid var(--line-ink)', background: 'var(--ink-soft)', color: 'var(--ink-text-muted)' }}>
+            <span className="w-2 h-2 rounded-full mr-2 bg-green-400" />
+            <span>Réponses de ton/ta partenaire reçues ✓</span>
           </div>
-          <h1 className="text-2xl font-black text-white mb-3 leading-tight">{quiz.title}</h1>
+          <h1 className="font-display text-2xl font-black text-white mb-3 leading-tight">{quiz.title}</h1>
           <p className="text-zinc-400 text-sm leading-relaxed mb-8">
             Réponds maintenant à ton tour. Dès que tu auras terminé,
             vous verrez vos réponses comparées question par question.
@@ -167,12 +164,12 @@ export default function DuoCompareClient({ quiz }: Props) {
       agreementPct >= 70 ? '💚' : agreementPct >= 40 ? '🔶' : '🔴';
 
     return (
-      <main className="min-h-screen bg-[#09090b] flex flex-col">
+      <main className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--ink)' }}>
         {/* Mid-reveal hook */}
         {showMidHook && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(9,9,11,0.96)' }}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(21,18,31,0.96)' }}>
             <div className="text-center px-6">
-              <div className="text-5xl mb-5">🧠</div>
+              <div className="flex justify-center mb-5"><Seal size={56} spin /></div>
               <p className="text-white font-black text-2xl mb-2">L&apos;IA analyse vos réponses…</p>
               <p className="text-zinc-500 text-sm">Les divergences apparaissent</p>
             </div>
@@ -180,7 +177,7 @@ export default function DuoCompareClient({ quiz }: Props) {
         )}
 
         {/* Header */}
-        <header className="sticky top-0 z-20 border-b border-white/5 backdrop-blur-md" style={{ background: 'rgba(9,9,11,0.85)' }}>
+        <header className="sticky top-0 z-20 border-b backdrop-blur-md" style={{ background: 'rgba(21,18,31,0.85)', borderColor: 'var(--line-ink)' }}>
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/duo" className="text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 text-sm">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -267,7 +264,7 @@ export default function DuoCompareClient({ quiz }: Props) {
                   return (
                     <div
                       key={i}
-                      className="glass rounded-xl p-4 transition-all duration-500"
+                      className="ur-panel-ink p-4 transition-all duration-500"
                       style={{ opacity: isRevealed ? 1 : 0, transform: isRevealed ? 'translateY(0)' : 'translateY(8px)' }}
                     >
                       <div className="flex items-start gap-2 mb-3">
@@ -299,21 +296,18 @@ export default function DuoCompareClient({ quiz }: Props) {
             {/* CTA */}
             <div
               className="rounded-2xl p-5 mb-6 text-center"
-              style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.1), rgba(209,125,82,0.1))', border: '1px solid rgba(194,97,31,0.3)' }}
+              style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}
             >
               <p className="text-white font-bold text-sm mb-1">Découvrez d&apos;autres vérités sur votre couple</p>
               <p className="text-zinc-500 text-xs mb-4">5 quiz duo disponibles · 100% anonyme</p>
-              <Link
-                href="/duo"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98]"
-                style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 20px rgba(194,97,31,0.35)' }}
-              >
+              <Link href="/duo" className="ur-btn-gold inline-flex items-center gap-2 px-5 py-2.5 text-sm">
                 Voir tous les quiz duo →
               </Link>
               <div className="mt-3">
                 <Link
                   href="/quizzes"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/15 text-sm font-semibold text-zinc-300 hover:text-white hover:border-white/30 transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-semibold text-zinc-300 hover:text-white transition-all"
+                  style={{ borderColor: 'var(--line-ink)' }}
                 >
                   🏠 Voir tous les quizzes
                 </Link>
@@ -331,9 +325,9 @@ export default function DuoCompareClient({ quiz }: Props) {
 
   /* ── QUIZ ── */
   return (
-    <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#09090b' }}>
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--ink)' }}>
       {showMidHook && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(9,9,11,0.96)', backdropFilter: 'blur(4px)' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(21,18,31,0.96)', backdropFilter: 'blur(4px)' }}>
           <div className="text-center px-6">
             <div className="text-5xl mb-5">🧠</div>
             <p className="text-white font-black text-2xl mb-2">L&apos;IA analyse tes réponses…</p>
@@ -356,8 +350,8 @@ export default function DuoCompareClient({ quiz }: Props) {
       )}
 
       <header
-        className="sticky top-0 backdrop-blur-md border-b border-white/5 z-20"
-        style={{ background: 'rgba(9,9,11,0.85)' }}
+        className="sticky top-0 backdrop-blur-md border-b z-20"
+        style={{ background: 'rgba(21,18,31,0.85)', borderColor: 'var(--line-ink)' }}
       >
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <button
@@ -393,32 +387,35 @@ export default function DuoCompareClient({ quiz }: Props) {
             transitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
           }`}
         >
-          <div className="glass rounded-2xl p-6 sm:p-8 mb-6">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: quiz.accentColor }}>
+          <div className="ur-panel-ink p-6 sm:p-8 mb-6">
+            <div className="ur-label text-xs mb-4" style={{ color: 'var(--gold)' }}>
               Question {currentIndex + 1}
             </div>
-            <p className="text-xl sm:text-2xl font-semibold text-white leading-relaxed">{question.text}</p>
+            <p className="font-display text-xl sm:text-2xl font-semibold text-white leading-relaxed">{question.text}</p>
           </div>
 
-          <div className="space-y-3 mb-8" style={{ '--quiz-accent': quiz.accentColor } as React.CSSProperties}>
+          <div className="space-y-3 mb-8">
             {question.options.map((option, i) => {
               const isSelected = selected === i;
               return (
                 <button
                   key={i}
                   onClick={() => handleSelect(i)}
-                  className={`quiz-opt${isSelected ? ' quiz-opt-selected' : ''}`}
+                  className="w-full text-left px-5 py-3.5 rounded-2xl border transition-all duration-150 text-sm font-semibold flex items-center gap-3"
+                  style={isSelected
+                    ? { borderColor: 'var(--gold)', backgroundColor: 'var(--gold-soft)', color: 'var(--gold)' }
+                    : { borderColor: 'var(--line-ink)', backgroundColor: 'var(--ink-soft)', color: 'var(--ink-text)' }}
                 >
                   <span
                     className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-200"
                     style={
                       isSelected
-                        ? { borderColor: quiz.accentColor, backgroundColor: quiz.accentColor }
-                        : { borderColor: 'rgba(255,255,255,0.3)' }
+                        ? { borderColor: 'var(--gold)', backgroundColor: 'var(--gold)' }
+                        : { borderColor: 'var(--line-ink)' }
                     }
                   >
                     {isSelected && (
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3 h-3" style={{ color: 'var(--ink)' }} fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}

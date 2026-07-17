@@ -87,26 +87,26 @@ async function sendMagicLink(email: string, callbackUrl: string): Promise<boolea
         to: email,
         subject: typeLabel ? `✅ Ton profil ${typeLabel} est débloqué — accède-y ici` : '✅ Ton accès UrCecret est prêt',
         html: `
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:32px 16px;background:#0d0d0d;">
-            <h1 style="font-size:11px;font-weight:800;color:#a94e18;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 20px">UrCecret</h1>
-            <h2 style="font-size:22px;font-weight:900;color:#ffffff;margin:0 0 12px;line-height:1.3">
+          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:32px 16px;background:#15121F;">
+            <h1 style="font-size:11px;font-weight:800;color:#C9A227;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 20px">UrCecret</h1>
+            <h2 style="font-size:22px;font-weight:900;color:#FAF6EC;margin:0 0 12px;line-height:1.3">
               ${typeLabel ? `Ton profil ${typeLabel} est débloqué 🔓` : 'Ton accès est prêt 🔓'}
             </h2>
-            <p style="color:#71717a;font-size:15px;line-height:1.7;margin:0 0 24px">
+            <p style="color:rgba(250,246,236,0.55);font-size:15px;line-height:1.7;margin:0 0 24px">
               ${typeLabel ? `Ton analyse complète ${typeLabel} — amour, carrière, face cachée, compatibilité — t'attend. Clique pour y accéder maintenant.` : 'Ton accès UrCecret Premium est actif. Clique ci-dessous pour accéder à ton profil.'}
             </p>
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr><td align="center" style="padding:0 0 24px">
                 <a href="${magicUrl}"
-                  style="display:inline-block;padding:16px 36px;background:linear-gradient(135deg,#a94e18,#d17d52);color:#fff;font-weight:700;text-decoration:none;border-radius:12px;font-size:15px">
+                  style="display:inline-block;padding:16px 36px;background:#C9A227;color:#15121F;font-weight:700;text-decoration:none;border-radius:999px;font-size:15px">
                   ${typeLabel ? `Voir mon profil ${typeLabel} →` : 'Accéder à mon profil →'}
                 </a>
               </td></tr>
             </table>
-            <p style="color:#52525b;font-size:12px;margin:0 0 8px;text-align:center">
+            <p style="color:rgba(250,246,236,0.35);font-size:12px;margin:0 0 8px;text-align:center">
               Paiement sécurisé par Stripe · Satisfait ou remboursé 7 jours
             </p>
-            <p style="color:#3f3f46;font-size:11px;margin:0;text-align:center">
+            <p style="color:rgba(250,246,236,0.25);font-size:11px;margin:0;text-align:center">
               Ce lien est valable 24 heures.
             </p>
           </div>
@@ -128,7 +128,7 @@ function MbtiShareCard({ typeCode, affiliateSlug }: { typeCode: string; affiliat
 
   return (
     <div style={{
-      background: `linear-gradient(145deg, #0d0d0d 0%, #1a1a1a 40%, ${accent}22 100%)`,
+      background: 'var(--ink)',
       border: `1px solid ${accent}44`,
       borderRadius: '20px',
       padding: '28px 24px',
@@ -136,7 +136,7 @@ function MbtiShareCard({ typeCode, affiliateSlug }: { typeCode: string; affiliat
       margin: '0 auto',
       position: 'relative',
       overflow: 'hidden',
-      boxShadow: `0 0 40px ${accent}33, 0 20px 60px rgba(0,0,0,0.5)`,
+      boxShadow: `0 12px 40px rgba(0,0,0,0.35)`,
     }}>
       <div style={{
         position: 'absolute',
@@ -259,35 +259,28 @@ export default async function SuccessPage({
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#f7f3ec' }}>
+    <main className="min-h-screen flex items-center justify-center px-4 text-white" style={{ background: 'var(--ink)' }}>
       <SuccessTracker paid={paid} amountEur={amountEur} />
       <div className="relative z-10 w-full max-w-xl">
 
         <div className="text-center mb-6">
           <div className="text-6xl mb-4">🎉</div>
-          <h1 className="font-display text-3xl font-black text-stone-900 mb-2">
+          <h1 className="font-display text-3xl font-black text-white mb-2">
             {paid && typeCode ? `Profil ${typeCode} débloqué !` : 'Bienvenue dans UrCecret ✨'}
           </h1>
           {paid && typeCode && (
-            <p className="text-stone-500 text-sm">Résultat 1/2 — ton profil MBTI est prêt.</p>
+            <p className="text-sm" style={{ color: 'var(--ink-text-muted)' }}>Résultat 1/2 — ton profil MBTI est prêt.</p>
           )}
         </div>
 
         {/* ── 2ème résultat — choix du quiz ── */}
         {paid && typeCode && (
-          <div style={{
-            background: 'white',
-            borderRadius: '20px',
-            padding: '20px 20px 16px',
-            marginBottom: '24px',
-            border: '2px solid rgba(169,78,24,0.2)',
-            boxShadow: '0 4px 20px rgba(169,78,24,0.08)',
-          }}>
+          <div className="ur-panel-ink mb-6" style={{ padding: '20px 20px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
               <span style={{ fontSize: 22 }}>🎁</span>
               <div>
-                <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: '#1c1917' }}>Résultat 2/2 — ton quiz offert</p>
-                <p style={{ margin: 0, fontSize: 12, color: '#78716c' }}>Fais-en un maintenant, ton résultat est déjà débloqué</p>
+                <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: 'var(--ink-text)' }}>Résultat 2/2 — ton quiz offert</p>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--ink-text-muted)' }}>Fais-en un maintenant, ton résultat est déjà débloqué</p>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -305,8 +298,8 @@ export default async function SuccessPage({
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '10px 12px', borderRadius: 12,
-                    background: '#faf9f7', border: '1px solid #e7e3dc',
-                    textDecoration: 'none', color: '#1c1917',
+                    background: 'var(--ink)', border: '1px solid var(--line-ink)',
+                    textDecoration: 'none', color: 'var(--ink-text)',
                     fontSize: 13, fontWeight: 600,
                     transition: 'border-color 0.15s',
                   }}
@@ -323,10 +316,8 @@ export default async function SuccessPage({
           <div style={{ marginBottom: '32px' }}>
             <MbtiShareCard typeCode={typeCode} affiliateSlug={affiliateSlug} />
 
-            <div style={{
+            <div className="ur-panel-ink" style={{
               marginTop: '20px',
-              background: '#111827',
-              borderRadius: '16px',
               padding: '20px 24px',
               textAlign: 'center',
             }}>
@@ -334,43 +325,38 @@ export default async function SuccessPage({
               <p style={{
                 fontSize: '15px',
                 fontWeight: 700,
-                color: '#ffffff',
-                fontFamily: 'system-ui, sans-serif',
+                color: 'var(--ink-text)',
                 marginBottom: '6px',
               }}>Partage sur TikTok &amp; gagne des prix</p>
               <p style={{
                 fontSize: '13px',
-                color: '#9ca3af',
-                fontFamily: 'system-ui, sans-serif',
+                color: 'var(--ink-text-muted)',
                 marginBottom: '12px',
                 lineHeight: '1.5',
               }}>
                 Filme ta réaction, montre ta carte, ajoute le lien en bio — chaque vente via ton lien augmente la cagnotte.
               </p>
               <div style={{
-                background: '#1f2937',
+                background: 'var(--ink)',
+                border: '1px solid var(--line-ink)',
                 borderRadius: '10px',
                 padding: '10px 14px',
                 marginBottom: '12px',
                 fontFamily: 'monospace',
                 fontSize: '13px',
-                color: mbtiTypes[typeCode]?.accentColor ?? '#d17d52',
+                color: 'var(--gold)',
                 wordBreak: 'break-all',
               }}>
                 https://urcecret.site/?ref={affiliateSlug}
               </div>
               <Link
                 href="/cagnotte"
+                className="ur-btn-gold"
                 style={{
-                  display: 'inline-block',
+                  display: 'inline-flex',
                   padding: '12px 24px',
-                  background: `linear-gradient(135deg, ${mbtiTypes[typeCode]?.accentColor ?? '#a94e18'}, ${mbtiTypes[typeCode]?.accentColor ?? '#a94e18'}bb)`,
-                  color: '#ffffff',
-                  fontWeight: 700,
                   fontSize: '14px',
-                  borderRadius: '10px',
                   textDecoration: 'none',
-                  fontFamily: 'system-ui, sans-serif',
                 }}
               >
                 🏆 Voir la cagnotte du mois →
@@ -382,20 +368,20 @@ export default async function SuccessPage({
         <div className="text-center space-y-4 mb-8">
           {magicLinkSent && email ? (
             <div>
-              <p className="text-stone-500 leading-relaxed mb-2">
+              <p className="leading-relaxed mb-2" style={{ color: 'var(--ink-text-muted)' }}>
                 Un lien d&apos;accès a été envoyé à{' '}
-                <span style={{ color: '#a94e18' }} className="font-semibold">{email}</span>.
+                <span style={{ color: 'var(--gold)' }} className="font-semibold">{email}</span>.
               </p>
-              <p className="text-stone-400 text-sm">Ouvre ton appli mail et clique le lien — ça prend 10 secondes.</p>
+              <p className="text-sm" style={{ color: 'var(--ink-text-faint)' }}>Ouvre ton appli mail et clique le lien — ça prend 10 secondes.</p>
             </div>
           ) : (
             <div>
-              <p className="text-stone-500 leading-relaxed mb-2">
+              <p className="leading-relaxed mb-2" style={{ color: 'var(--ink-text-muted)' }}>
                 {paid && typeCode
                   ? `Ton profil ${typeCode} est débloqué — fais défiler pour le lire intégralement.`
                   : `Ton accès UrCecret est actif. Fais défiler pour découvrir ton analyse.`}
               </p>
-              <p className="text-stone-400 text-xs">💡 Ajoute cette page en favori pour y revenir.</p>
+              <p className="text-xs" style={{ color: 'var(--ink-text-faint)' }}>💡 Ajoute cette page en favori pour y revenir.</p>
             </div>
           )}
 
@@ -403,8 +389,7 @@ export default async function SuccessPage({
             {!typeCode && resultId && (
               <Link
                 href={`/share/${resultId}`}
-                className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.3)' }}
+                className="ur-btn-gold block w-full py-4 text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 Voir mon analyse complète →
               </Link>
@@ -412,23 +397,23 @@ export default async function SuccessPage({
 
             <Link
               href="/quizzes"
-              className="block w-full py-3 rounded-2xl font-semibold text-stone-600 text-center transition-all text-sm hover:bg-stone-100"
-              style={{ background: 'white', border: '1px solid #e7e5e0' }}
+              className="ur-panel-ink block w-full py-3 font-semibold text-center transition-all text-sm hover:opacity-90"
+              style={{ color: 'var(--ink-text-muted)' }}
             >
               Découvrir les 15 tests UrCecret →
             </Link>
 
             {/* Upsell one-time → monthly (drive MRR) */}
             {paid && isOneTime && typeCode && (
-              <div className="rounded-2xl p-5 text-left mt-1" style={{ background: 'linear-gradient(135deg,rgba(169,78,24,0.09),rgba(209,125,82,0.06))', border: '2px solid rgba(169,78,24,0.35)' }}>
+              <div className="rounded-2xl p-5 text-left mt-1" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#a94e18' }}>Profite de ta lancée 🔥</p>
-                  <span className="text-[10px] text-white font-black px-2 py-0.5 rounded-full" style={{ background: '#a94e18' }}>Offre unique</span>
+                  <p className="ur-label text-[10px]" style={{ color: 'var(--gold)' }}>Profite de ta lancée 🔥</p>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>Offre unique</span>
                 </div>
-                <p className="text-sm font-black text-stone-900 mb-1 leading-snug">
+                <p className="text-sm font-black text-white mb-1 leading-snug">
                   Tu viens de voir ton profil {typeCode}. Et les autres types qui te rendent fou·folle ?
                 </p>
-                <p className="text-xs text-stone-500 mb-3 leading-snug">
+                <p className="text-xs mb-3 leading-snug" style={{ color: 'var(--ink-text-muted)' }}>
                   Avec l&apos;accès complet, tu vois aussi leurs profils — et tu comprends enfin pourquoi vous vous comprenez (ou pas).
                 </p>
                 <ul className="space-y-1.5 mb-4">
@@ -438,20 +423,20 @@ export default async function SuccessPage({
                     '🎭 Test de manipulation · 🤝 Vrais amis · 💔 Relation toxique',
                     'Résiliable en 1 clic — aucun engagement',
                   ].map(q => (
-                    <li key={q} className="flex items-start gap-2 text-xs text-stone-700">
-                      <span className="font-bold flex-shrink-0 mt-0.5" style={{ color: '#a94e18' }}>✓</span>{q}
+                    <li key={q} className="flex items-start gap-2 text-xs" style={{ color: 'var(--ink-text-muted)' }}>
+                      <span className="font-bold flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }}>✓</span>{q}
                     </li>
                   ))}
                 </ul>
                 <SuccessUpsellButton typeCode={typeCode} email={email} />
-                <p className="text-center text-[10px] text-stone-400 mt-2">Apple Pay · Google Pay · Résiliable en 1 clic</p>
+                <p className="text-center text-[10px] mt-2" style={{ color: 'var(--ink-text-faint)' }}>Apple Pay · Google Pay · Résiliable en 1 clic</p>
               </div>
             )}
           </div>
         </div>
 
         {!paid && (
-          <p className="text-center mt-6 text-xs text-stone-400">
+          <p className="text-center mt-6 text-xs" style={{ color: 'var(--ink-text-faint)' }}>
             Si ton analyse ne s&apos;affiche pas, attends quelques secondes et réessaie.
           </p>
         )}
@@ -461,21 +446,21 @@ export default async function SuccessPage({
           if (!t) return null;
           return (
             <div className="max-w-xl mx-auto px-4 pb-16 space-y-4">
-              <div className="rounded-2xl p-6 text-center" style={{ background: 'white', border: '1px solid #e7e5e0', borderTop: `3px solid ${t.accentColor}` }}>
+              <div className="ur-panel-ink p-6 text-center" style={{ borderTop: `3px solid ${t.accentColor}` }}>
                 <div className="text-5xl mb-3">{t.emoji}</div>
                 <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: t.accentColor }}>{t.code}</p>
-                <h2 className="text-2xl font-black text-stone-900 mb-2">{t.name}</h2>
-                <p className="text-stone-500 text-sm leading-relaxed mb-3">{t.tagline}</p>
-                <span className="inline-block bg-stone-100 text-stone-500 text-xs px-3 py-1 rounded-full">{t.rarity} de la population</span>
+                <h2 className="font-display text-2xl font-black text-white mb-2">{t.name}</h2>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--ink-text-muted)' }}>{t.tagline}</p>
+                <span className="ur-badge" style={{ background: 'var(--gold-soft)', color: 'var(--gold)' }}>{t.rarity} de la population</span>
               </div>
 
-              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Profil complet</p>
-                <p className="text-stone-700 text-sm leading-relaxed">{t.fullDesc}</p>
+              <div className="ur-panel-ink p-5">
+                <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Profil complet</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>{t.fullDesc}</p>
               </div>
 
-              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Traits principaux</p>
+              <div className="ur-panel-ink p-5">
+                <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Traits principaux</p>
                 <div className="flex flex-wrap gap-2">
                   {t.traits.map(tr => (
                     <span key={tr} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: `${t.accentColor}18`, border: `1px solid ${t.accentColor}40`, color: t.accentColor }}>{tr}</span>
@@ -483,55 +468,55 @@ export default async function SuccessPage({
                 </div>
               </div>
 
-              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">En amour ❤️</p>
-                <p className="text-stone-700 text-sm leading-relaxed">{t.inLove}</p>
+              <div className="ur-panel-ink p-5">
+                <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>En amour ❤️</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>{t.inLove}</p>
               </div>
-              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Au travail 💼</p>
-                <p className="text-stone-700 text-sm leading-relaxed">{t.atWork}</p>
+              <div className="ur-panel-ink p-5">
+                <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Au travail 💼</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>{t.atWork}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                  <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Forces ✨</p>
+                <div className="ur-panel-ink p-4">
+                  <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Forces ✨</p>
                   <ul className="space-y-1.5">
-                    {t.strengths.map(s => <li key={s} className="text-xs text-stone-700 flex gap-1.5"><span className="text-stone-400 flex-shrink-0">+</span>{s}</li>)}
+                    {t.strengths.map(s => <li key={s} className="text-xs flex gap-1.5" style={{ color: 'var(--ink-text-muted)' }}><span className="flex-shrink-0" style={{ color: 'var(--gold)' }}>+</span>{s}</li>)}
                   </ul>
                 </div>
-                <div className="rounded-2xl p-4" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                  <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Points fragiles ⚡</p>
+                <div className="ur-panel-ink p-4">
+                  <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Points fragiles ⚡</p>
                   <ul className="space-y-1.5">
-                    {t.weaknesses.map(w => <li key={w} className="text-xs text-stone-700 flex gap-1.5"><span className="text-stone-500 flex-shrink-0">−</span>{w}</li>)}
+                    {t.weaknesses.map(w => <li key={w} className="text-xs flex gap-1.5" style={{ color: 'var(--ink-text-muted)' }}><span className="flex-shrink-0" style={{ color: 'var(--ink-text-faint)' }}>−</span>{w}</li>)}
                   </ul>
                 </div>
               </div>
 
-              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Croissance personnelle 🌱</p>
-                <p className="text-stone-700 text-sm leading-relaxed">{t.growth}</p>
+              <div className="ur-panel-ink p-5">
+                <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Croissance personnelle 🌱</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>{t.growth}</p>
               </div>
 
-              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Compatibles avec 💞</p>
+              <div className="ur-panel-ink p-5">
+                <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Compatibles avec 💞</p>
                 <div className="flex flex-wrap gap-2">
                   {t.compatibleWith.map(c => (
-                    <span key={c} className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(224,163,128,0.1)', border: '1px solid rgba(224,163,128,0.3)', color: '#d17d52' }}>{c}</span>
+                    <span key={c} className="ur-badge" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}>{c}</span>
                   ))}
                 </div>
               </div>
 
               {t.famousExamples.length > 0 && (
-                <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                  <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Célébrités {t.code}</p>
-                  <p className="text-stone-600 text-sm">{t.famousExamples.join(' · ')}</p>
+                <div className="ur-panel-ink p-5">
+                  <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-faint)' }}>Célébrités {t.code}</p>
+                  <p className="text-sm" style={{ color: 'var(--ink-text-muted)' }}>{t.famousExamples.join(' · ')}</p>
                 </div>
               )}
 
               {email && (
-                <div className="rounded-2xl p-5 text-center" style={{ background: 'white', border: '1px solid #e7e5e0' }}>
-                  <p className="text-stone-500 text-sm mb-3">Connecte-toi pour retrouver ton profil à tout moment</p>
-                  <Link href="/auth/signin" className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm" style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
+                <div className="ur-panel-ink p-5 text-center">
+                  <p className="text-sm mb-3" style={{ color: 'var(--ink-text-muted)' }}>Connecte-toi pour retrouver ton profil à tout moment</p>
+                  <Link href="/auth/signin" className="ur-btn-gold inline-flex px-6 py-3 text-sm">
                     Se connecter avec {email} →
                   </Link>
                 </div>

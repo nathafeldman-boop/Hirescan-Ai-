@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --bg: #09090b;
+  /* Legacy fallback — superseded by --ink below. Kept only so any stray
+     reference doesn't hard-fail; do not use in new code. */
+  --bg: #15121F;
 }
 
 * {
@@ -400,11 +402,92 @@ body {
   --line: rgba(21, 18, 31, 0.14);
   --line-ink: rgba(250, 246, 236, 0.14);
 
-  /* Classification par famille — pierres précieuses sourdes, étiquette seule */
-  --fam-nt: #2B4570; /* Analystes — saphir */
-  --fam-nf: #5B3A63; /* Diplomates — améthyste */
-  --fam-sj: #2E4A3A; /* Sentinelles — émeraude */
-  --fam-sp: #8A5A2A; /* Explorateurs — cuivre */
+  /* Texte sur --ink : jamais #fff pur — un blanc cassé cohérent avec --paper-panel */
+  --ink-text: #FAF6EC;
+  --ink-text-muted: rgba(250, 246, 236, 0.55);
+  --ink-text-faint: rgba(250, 246, 236, 0.38);
+
+  /* Classification par famille — pierres précieuses sourdes, étiquette seule.
+     Valeurs alignées sur celles déjà en production dans LandingPage.tsx. */
+  --fam-nt: #35506B; /* Analystes — saphir */
+  --fam-nf: #6B3F52; /* Diplomates — améthyste */
+  --fam-sj: #43502F; /* Sentinelles — émeraude */
+  --fam-sp: #7A4A1E; /* Explorateurs — cuivre */
+}
+
+/* ── Composants clés — mêmes tokens, appliqués de façon cohérente partout.
+   Voir DESIGN_SYSTEM.md pour la direction artistique documentée. ── */
+
+/* Bouton pilule doré — action principale (CTA de conversion) */
+.ur-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--ink);
+  font-weight: 700;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+.ur-btn-gold:hover { opacity: 0.92; }
+.ur-btn-gold:active { transform: scale(0.98); }
+.ur-btn-gold:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Bouton pilule encre — action secondaire, sur fond clair (--paper) */
+.ur-btn-ink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--ink-text);
+  font-weight: 700;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+.ur-btn-ink:hover { opacity: 0.92; }
+.ur-btn-ink:active { transform: scale(0.98); }
+
+/* Bouton pilule contour — action tertiaire, sur fond sombre (--ink) */
+.ur-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--gold-line);
+  color: var(--gold);
+  font-weight: 700;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.ur-btn-outline:hover { background: var(--gold-soft); }
+.ur-btn-outline:active { transform: scale(0.98); }
+
+/* Panneau — carte sur fond clair (--paper) */
+.ur-panel {
+  background: var(--paper-panel);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+}
+
+/* Panneau — carte sur fond sombre (--ink) */
+.ur-panel-ink {
+  background: var(--ink-soft);
+  border: 1px solid var(--line-ink);
+  border-radius: 1rem;
+}
+
+/* Étiquette pilule — rareté, tag de famille, statut */
+.ur-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 /* Panneau sur encre — bordure filet or, pas de flou/transparence empilée */

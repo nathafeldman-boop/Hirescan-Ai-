@@ -130,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="search" type="application/opensearchdescription+xml" title="UrCecret" href="/opensearch.xml" />
       </head>
-      <body className="min-h-screen bg-[#09090b] text-white antialiased">
+      <body className="min-h-screen bg-ink text-white antialiased">
         <Providers>
           <Tracker />
           <Suspense fallback={null}>

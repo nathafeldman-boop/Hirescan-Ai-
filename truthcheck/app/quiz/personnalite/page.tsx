@@ -138,15 +138,15 @@ export default function PersonnalitePage() {
       </div>
 
       {/* Hero landing page */}
-      <main className="min-h-screen bg-white text-gray-900">
-        <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+      <main className="min-h-screen" style={{ background: 'var(--paper)', color: 'var(--ink)' }}>
+        <header className="sticky top-0 z-20" style={{ borderBottom: '1px solid var(--line)', background: 'rgba(242,236,222,0.9)', backdropFilter: 'blur(10px)' }}>
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-black">
-              <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-              <span className="text-gray-900">Cecret</span>
+              <span style={{ color: 'var(--gold)' }}>Ur</span>
+              <span style={{ color: 'var(--ink)' }}>Cecret</span>
             </Link>
             <div className="flex items-center gap-3">
-              <Link href="/types" className="text-xs text-gray-500 hover:text-gray-900 transition-colors">16 types MBTI →</Link>
+              <Link href="/types" className="text-xs text-stone-500 hover:text-stone-900 transition-colors">16 types MBTI →</Link>
               <LanguageSwitcher />
               <UserMenu />
             </div>
@@ -155,20 +155,18 @@ export default function PersonnalitePage() {
 
         <div className="max-w-3xl mx-auto px-4 py-16 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold mb-8" style={{ background: 'rgba(194,97,31,0.08)', border: '1px solid rgba(194,97,31,0.2)', color: '#c2611f' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#c2611f' }} />
+          <div className="ur-badge mb-8 gap-2" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)' }} />
             Gratuit · 3 minutes · Résultat instantané
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl font-black mb-5 leading-tight text-gray-900">
+          <h1 className="font-display text-4xl sm:text-5xl font-black mb-5 leading-tight" style={{ color: 'var(--ink)' }}>
             Test{' '}
-            <span style={{ background: 'linear-gradient(to right,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              MBTI
-            </span>
+            <em className="not-italic" style={{ color: 'var(--gold)' }}>MBTI</em>
             {' '}Gratuit — Quel est ton type ?
           </h1>
 
-          <p className="text-lg text-gray-500 mb-10 max-w-xl mx-auto leading-relaxed">
+          <p className="text-lg text-stone-500 mb-10 max-w-xl mx-auto leading-relaxed">
             24 questions · 16 types de personnalité · INFJ, ENFP, INTJ et plus.
             Le test MBTI en français — résultat instantané en moins de 3 minutes.
           </p>
@@ -181,8 +179,8 @@ export default function PersonnalitePage() {
               { n: '3 min', label: 'en moyenne' },
             ].map(({ n, label }) => (
               <div key={label}>
-                <div className="text-2xl font-black text-gray-900">{n}</div>
-                <div className="text-xs text-gray-400">{label}</div>
+                <div className="font-display text-2xl font-black" style={{ color: 'var(--ink)' }}>{n}</div>
+                <div className="text-xs text-stone-400">{label}</div>
               </div>
             ))}
           </div>
@@ -192,12 +190,12 @@ export default function PersonnalitePage() {
             {TYPE_PREVIEW.map(t => (
               <div
                 key={t.code}
-                className="rounded-lg p-3 text-center border bg-gray-50"
+                className="ur-panel rounded-lg p-3 text-center"
                 style={{ borderColor: `${t.color}40` }}
               >
                 <div className="text-xl mb-1">{t.emoji}</div>
-                <div className="text-xs font-bold text-gray-900">{t.code}</div>
-                <div className="text-xs text-gray-500 leading-tight">{t.name}</div>
+                <div className="text-xs font-bold" style={{ color: 'var(--ink)' }}>{t.code}</div>
+                <div className="text-xs text-stone-500 leading-tight">{t.name}</div>
               </div>
             ))}
           </div>
@@ -211,17 +209,17 @@ export default function PersonnalitePage() {
               { icon: '⚡', title: 'Résultat immédiat', desc: 'Ton type parmi les 16 profils en moins de 3 minutes. Gratuit, sans inscription.' },
               { icon: '🔓', title: 'Rapport complet en option', desc: 'Relations, carrière, forces, croissance personnelle. Accessible avec Premium.' },
             ].map(({ icon, title, desc }) => (
-              <div key={title} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
+              <div key={title} className="ur-panel p-5">
                 <div className="text-2xl mb-3">{icon}</div>
-                <h3 className="font-bold text-gray-900 text-sm mb-1">{title}</h3>
-                <p className="text-gray-500 text-xs leading-relaxed">{desc}</p>
+                <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--ink)' }}>{title}</h3>
+                <p className="text-stone-500 text-xs leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
 
           {/* SEO text */}
-          <div className="mt-16 text-left space-y-4 text-sm text-gray-500 leading-relaxed max-w-2xl mx-auto">
-            <h2 className="text-base font-bold text-gray-900">Pourquoi passer ce test de personnalité ?</h2>
+          <div className="mt-16 text-left space-y-4 text-sm text-stone-500 leading-relaxed max-w-2xl mx-auto">
+            <h2 className="text-base font-bold" style={{ color: 'var(--ink)' }}>Pourquoi passer ce test de personnalité ?</h2>
             <p>
               La théorie des 16 types de personnalité est l&apos;un des modèles psychologiques les plus utilisés au
               monde. Basé sur les travaux de Carl Jung, puis développé par Isabel Briggs Myers et Katharine Cook
@@ -232,11 +230,11 @@ export default function PersonnalitePage() {
               décisions, traites l&apos;information et organises ta vie. Ce n&apos;est pas une case dans laquelle t&apos;enfermer —
               c&apos;est un miroir qui révèle tes forces naturelles.
             </p>
-            <h2 className="text-base font-bold text-gray-900">Comment fonctionne ce test ?</h2>
+            <h2 className="text-base font-bold" style={{ color: 'var(--ink)' }}>Comment fonctionne ce test ?</h2>
             <p>
-              Notre test analyse tes préférences sur 4 axes : <strong className="text-gray-700">Extraversion vs Introversion</strong> (où tu
-              puises ton énergie), <strong className="text-gray-700">Sensation vs Intuition</strong> (comment tu perçois l&apos;information),
-              <strong className="text-gray-700"> Pensée vs Sentiment</strong> (comment tu prends des décisions), et <strong className="text-gray-700">Jugement vs Perception</strong> (comment
+              Notre test analyse tes préférences sur 4 axes : <strong style={{ color: 'var(--ink)' }}>Extraversion vs Introversion</strong> (où tu
+              puises ton énergie), <strong style={{ color: 'var(--ink)' }}>Sensation vs Intuition</strong> (comment tu perçois l&apos;information),
+              <strong style={{ color: 'var(--ink)' }}> Pensée vs Sentiment</strong> (comment tu prends des décisions), et <strong style={{ color: 'var(--ink)' }}>Jugement vs Perception</strong> (comment
               tu organises ta vie). Le résultat : l&apos;un des 16 types comme INFJ, ENFP, INTJ, ou ESFP.
             </p>
           </div>

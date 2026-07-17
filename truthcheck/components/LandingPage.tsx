@@ -13,7 +13,7 @@ const GROUPS = [
     title: 'Analystes',
     desc: 'Rationnels, stratèges, orientés systèmes',
     codes: ['INTJ', 'INTP', 'ENTJ', 'ENTP'],
-    color: '#35506B',
+    color: 'var(--fam-nt)',
     tag: 'NT',
   },
   {
@@ -21,7 +21,7 @@ const GROUPS = [
     title: 'Diplomates',
     desc: 'Empathiques, idéalistes, axés relations',
     codes: ['INFJ', 'INFP', 'ENFJ', 'ENFP'],
-    color: '#6B3F52',
+    color: 'var(--fam-nf)',
     tag: 'NF',
   },
   {
@@ -29,7 +29,7 @@ const GROUPS = [
     title: 'Sentinelles',
     desc: 'Organisés, fiables, attachés aux structures',
     codes: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'],
-    color: '#43502F',
+    color: 'var(--fam-sj)',
     tag: 'SJ',
   },
   {
@@ -37,16 +37,16 @@ const GROUPS = [
     title: 'Explorateurs',
     desc: 'Adaptables, pragmatiques, orientés action',
     codes: ['ISTP', 'ISFP', 'ESTP', 'ESFP'],
-    color: '#7A4A1E',
+    color: 'var(--fam-sp)',
     tag: 'SP',
   },
 ];
 
 const MBTI_LETTERS = [
-  { letter: 'E/I', label: 'Extraversion · Introversion', color: '#35506B', desc: 'Indique si ta fonction cognitive dominante est dirigée vers l\'extérieur (action, personnes) ou vers l\'intérieur (réflexion, solitude). Ce n\'est pas la timidité, c\'est la direction de ton énergie.' },
-  { letter: 'N/S', label: 'Intuition · Sensation', color: '#6B3F52', desc: 'Tes deux fonctions de perception. Jung distingue la Sensation (concret, présent, détails) de l\'iNtuition (abstrait, futur, patterns). L\'une est dominante, l\'autre auxiliaire dans ton stack.' },
-  { letter: 'T/F', label: 'Pensée · Sentiment', color: '#7A4A1E', desc: 'Tes deux fonctions de jugement : la Pensée (logique, systèmes, objectivité) et le Sentiment (valeurs, harmonie, impact humain). Ces fonctions déterminent comment tu décides, pas ce que tu ressens.' },
-  { letter: 'J/P', label: 'Jugement · Perception', color: '#43502F', desc: 'Révèle quelle fonction est en surface. Une fonction de Jugement (T ou F) donne une structure visible ; une fonction de Perception (N ou S) rend plus adaptable. Ton intérieur est souvent l\'inverse.' },
+  { letter: 'E/I', label: 'Extraversion · Introversion', color: 'var(--fam-nt)', desc: 'Indique si ta fonction cognitive dominante est dirigée vers l\'extérieur (action, personnes) ou vers l\'intérieur (réflexion, solitude). Ce n\'est pas la timidité, c\'est la direction de ton énergie.' },
+  { letter: 'N/S', label: 'Intuition · Sensation', color: 'var(--fam-nf)', desc: 'Tes deux fonctions de perception. Jung distingue la Sensation (concret, présent, détails) de l\'iNtuition (abstrait, futur, patterns). L\'une est dominante, l\'autre auxiliaire dans ton stack.' },
+  { letter: 'T/F', label: 'Pensée · Sentiment', color: 'var(--fam-sp)', desc: 'Tes deux fonctions de jugement : la Pensée (logique, systèmes, objectivité) et le Sentiment (valeurs, harmonie, impact humain). Ces fonctions déterminent comment tu décides, pas ce que tu ressens.' },
+  { letter: 'J/P', label: 'Jugement · Perception', color: 'var(--fam-sj)', desc: 'Révèle quelle fonction est en surface. Une fonction de Jugement (T ou F) donne une structure visible ; une fonction de Perception (N ou S) rend plus adaptable. Ton intérieur est souvent l\'inverse.' },
 ];
 
 const CLAY = 'var(--gold)';

@@ -55,7 +55,7 @@ export default function FusionLanding() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#f7f3ec' }}>
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--paper)', color: 'var(--ink)' }}>
       <div className="w-full max-w-sm text-center">
         <div className="text-5xl mb-4">⚗️</div>
         <h1 className="font-display text-3xl font-black text-stone-900 mb-2">Fusion</h1>
@@ -67,15 +67,13 @@ export default function FusionLanding() {
           <div className="space-y-3">
             <button
               onClick={() => setMode('create')}
-              className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 32px rgba(169,78,24,0.25)' }}
+              className="ur-btn-gold block w-full py-4 text-center"
             >
               ✨ Créer une session
             </button>
             <button
               onClick={() => setMode('join')}
-              className="block w-full py-4 rounded-2xl font-bold text-stone-700 text-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'white', border: '2px solid #e7e5e0' }}
+              className="ur-btn-ink block w-full py-4 text-center"
             >
               🔗 Rejoindre avec un code
             </button>
@@ -87,7 +85,8 @@ export default function FusionLanding() {
             <div className="text-left">
               <label className="block text-xs font-semibold text-stone-500 mb-1 uppercase tracking-wide">Ton prénom</label>
               <input
-                className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-white text-stone-900 font-medium outline-none focus:border-violet-400 transition"
+                className="w-full px-4 py-3 rounded-xl font-medium outline-none transition focus:border-[var(--gold)]"
+                style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}
                 placeholder="Ex: Alex"
                 value={name}
                 onChange={e => setName(e.target.value)}
@@ -100,8 +99,7 @@ export default function FusionLanding() {
             <button
               onClick={handleCreate}
               disabled={loading}
-              className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
+              className="ur-btn-gold block w-full py-4 text-center"
             >
               {loading ? 'Création...' : 'Créer la session →'}
             </button>
@@ -114,7 +112,8 @@ export default function FusionLanding() {
             <div className="text-left">
               <label className="block text-xs font-semibold text-stone-500 mb-1 uppercase tracking-wide">Ton prénom</label>
               <input
-                className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-white text-stone-900 font-medium outline-none focus:border-violet-400 transition"
+                className="w-full px-4 py-3 rounded-xl font-medium outline-none transition focus:border-[var(--gold)]"
+                style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}
                 placeholder="Ex: Alex"
                 value={name}
                 onChange={e => setName(e.target.value)}
@@ -125,7 +124,8 @@ export default function FusionLanding() {
             <div className="text-left">
               <label className="block text-xs font-semibold text-stone-500 mb-1 uppercase tracking-wide">Code de session</label>
               <input
-                className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-white text-stone-900 font-bold text-center tracking-widest text-lg outline-none focus:border-violet-400 transition uppercase"
+                className="w-full px-4 py-3 rounded-xl font-bold text-center tracking-widest text-lg outline-none transition uppercase focus:border-[var(--gold)]"
+                style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}
                 placeholder="EX: K7P2XQ"
                 value={code}
                 onChange={e => setCode(e.target.value.toUpperCase().slice(0, 6))}
@@ -137,8 +137,7 @@ export default function FusionLanding() {
             <button
               onClick={handleJoin}
               disabled={loading}
-              className="block w-full py-4 rounded-2xl font-bold text-white text-center transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}
+              className="ur-btn-gold block w-full py-4 text-center"
             >
               {loading ? 'Connexion...' : 'Rejoindre →'}
             </button>

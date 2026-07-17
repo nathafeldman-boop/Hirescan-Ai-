@@ -7,16 +7,16 @@ import { ALL_MBTI_TYPES, mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import { getMbtiCompatibility } from '@/lib/mbtiCompatibility';
 
 const GROUPS = [
-  { label: 'Analystes', codes: ['INTJ','INTP','ENTJ','ENTP'], color: '#a94e18' },
-  { label: 'Diplomates', codes: ['INFJ','INFP','ENFJ','ENFP'], color: '#059669' },
-  { label: 'Sentinelles', codes: ['ISTJ','ISFJ','ESTJ','ESFJ'], color: '#0284c7' },
-  { label: 'Explorateurs', codes: ['ISTP','ISFP','ESTP','ESFP'], color: '#d97706' },
+  { label: 'Analystes', codes: ['INTJ','INTP','ENTJ','ENTP'], color: 'var(--fam-nt)' },
+  { label: 'Diplomates', codes: ['INFJ','INFP','ENFJ','ENFP'], color: 'var(--fam-nf)' },
+  { label: 'Sentinelles', codes: ['ISTJ','ISFJ','ESTJ','ESFJ'], color: 'var(--fam-sj)' },
+  { label: 'Explorateurs', codes: ['ISTP','ISFP','ESTP','ESFP'], color: 'var(--fam-sp)' },
 ];
 
 function TypePicker({ value, onChange, label }: { value: string; onChange: (t: string) => void; label: string }) {
   return (
     <div className="flex-1">
-      <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">{label}</p>
+      <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink)' }}>{label}</p>
       <div className="space-y-2">
         {GROUPS.map(g => (
           <div key={g.label}>
@@ -29,8 +29,8 @@ function TypePicker({ value, onChange, label }: { value: string; onChange: (t: s
                   <button key={code} onClick={() => onChange(code)}
                     className="rounded-xl py-2 text-xs font-black border-2 transition-all"
                     style={selected
-                      ? { borderColor: g.color, backgroundColor: g.color, color: '#fff' }
-                      : { borderColor: '#e5e7eb', backgroundColor: '#fff', color: '#374151' }
+                      ? { borderColor: g.color, backgroundColor: g.color, color: 'var(--paper-panel)' }
+                      : { borderColor: 'var(--line)', backgroundColor: 'var(--paper-panel)', color: 'var(--ink)' }
                     }>
                     {t?.emoji ?? ''}<br />{code}
                   </button>
@@ -46,13 +46,13 @@ function TypePicker({ value, onChange, label }: { value: string; onChange: (t: s
 
 function PremiumGate({ onUpgrade, loading }: { onUpgrade: (annual: boolean) => void; loading: boolean }) {
   return (
-    <div className="rounded-2xl p-6 text-center" style={{ border: '2px solid rgba(194,97,31,0.25)', background: 'rgba(194,97,31,0.05)' }}>
+    <div className="ur-panel p-6 text-center" style={{ borderWidth: '2px', borderColor: 'var(--gold-line)', background: 'var(--gold-soft)' }}>
       <div className="text-4xl mb-4">🌑</div>
-      <h2 className="font-display text-lg font-black text-gray-900 mb-2">Fonctionnalité Pro</h2>
-      <p className="text-sm text-gray-600 mb-2 leading-relaxed">
+      <h2 className="font-display text-lg font-black mb-2" style={{ color: 'var(--ink)' }}>Fonctionnalité Pro</h2>
+      <p className="text-sm text-stone-600 mb-2 leading-relaxed">
         Le mode compatibilité MBTI est réservé aux membres Pro.
       </p>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-stone-500 mb-6">
         Compare ton type avec n&apos;importe qui — partenaire, ami, collègue — et découvre votre alchimie sur 4 dimensions.
       </p>
 
@@ -60,9 +60,9 @@ function PremiumGate({ onUpgrade, loading }: { onUpgrade: (annual: boolean) => v
         <button
           onClick={() => onUpgrade(true)}
           disabled={loading}
-          className="w-full py-3.5 rounded-2xl font-black text-white text-sm relative overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 6px 20px rgba(169,78,24,0.3)' }}>
-          <span className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg">
+          className="ur-btn-gold w-full py-3.5 text-sm relative overflow-hidden disabled:opacity-60"
+        >
+          <span className="absolute top-0 right-0 text-[9px] font-black px-1.5 py-0.5 rounded-bl-lg" style={{ background: 'var(--ink)', color: 'var(--gold)' }}>
             −75%
           </span>
           {loading ? 'Chargement…' : 'Annuel — 29,99 €/an'}
@@ -70,12 +70,13 @@ function PremiumGate({ onUpgrade, loading }: { onUpgrade: (annual: boolean) => v
         <button
           onClick={() => onUpgrade(false)}
           disabled={loading}
-          className="w-full py-2.5 rounded-2xl font-semibold text-gray-700 text-sm border border-gray-200 hover:bg-white transition-all disabled:opacity-60">
+          className="w-full py-2.5 rounded-full font-semibold text-sm border transition-all hover:opacity-80 disabled:opacity-60"
+          style={{ color: 'var(--ink)', borderColor: 'var(--line)', background: 'var(--paper-panel)' }}>
           Mensuel — 9,99 €/mois
         </button>
       </div>
 
-      <p className="text-[11px] text-gray-400 mt-4">Inclus : 16 profils MBTI + compatibilité + quiz illimité</p>
+      <p className="text-[11px] text-stone-400 mt-4">Inclus : 16 profils MBTI + compatibilité + quiz illimité</p>
     </div>
   );
 }
@@ -127,7 +128,7 @@ export default function DuoMbtiClient() {
   }, [session?.user?.email]);
 
   if (status === 'loading') {
-    return <div className="py-20 text-center text-gray-300 text-sm animate-pulse">Chargement…</div>;
+    return <div className="py-20 text-center text-stone-400 text-sm animate-pulse">Chargement…</div>;
   }
 
   if (!isPremium) {
@@ -141,7 +142,7 @@ export default function DuoMbtiClient() {
     return (
       <div>
         {/* Back */}
-        <button onClick={() => setMode('select')} className="text-sm text-gray-500 hover:text-gray-900 mb-6 flex items-center gap-1 transition-colors">
+        <button onClick={() => setMode('select')} className="text-sm text-stone-500 hover:text-stone-900 mb-6 flex items-center gap-1 transition-colors">
           ← Modifier les types
         </button>
 
@@ -153,45 +154,43 @@ export default function DuoMbtiClient() {
             <span className="text-2xl">{tA?.emoji}</span>
             <div>
               <p className="text-3xl font-black" style={{ color: compat.color }}>{compat.score}%</p>
-              <p className="text-sm font-bold text-gray-700">{compat.label}</p>
+              <p className="text-sm font-bold text-stone-700">{compat.label}</p>
             </div>
             <span className="text-2xl">{tB?.emoji}</span>
           </div>
           <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="font-black text-gray-900">{typeA}</span>
-            <span className="text-gray-400">+</span>
-            <span className="font-black text-gray-900">{typeB}</span>
+            <span className="font-black" style={{ color: 'var(--ink)' }}>{typeA}</span>
+            <span className="text-stone-400">+</span>
+            <span className="font-black" style={{ color: 'var(--ink)' }}>{typeB}</span>
           </div>
-          <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden max-w-xs mx-auto mb-5">
+          <div className="w-full h-3 rounded-full overflow-hidden max-w-xs mx-auto mb-5" style={{ background: 'var(--line)' }}>
             <div className="h-full rounded-full transition-all duration-1000"
-              style={{ width: `${compat.score}%`, background: `linear-gradient(to right, ${compat.color}99, ${compat.color})` }} />
+              style={{ width: `${compat.score}%`, background: compat.color }} />
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed max-w-sm mx-auto">{compat.summary}</p>
+          <p className="text-sm text-stone-600 leading-relaxed max-w-sm mx-auto">{compat.summary}</p>
         </div>
 
         {/* Dimension breakdown */}
         <div className="space-y-3 mb-8">
-          <h2 className="text-sm font-black text-gray-900 uppercase tracking-widest">Analyse dimension par dimension</h2>
+          <h2 className="ur-label text-sm" style={{ color: 'var(--ink)' }}>Analyse dimension par dimension</h2>
           {compat.dimensions.map(d => (
             <div key={d.dim} className={`rounded-xl p-4 border ${d.aligned ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
               <div className="flex items-center gap-2 mb-2">
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${d.aligned ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}`}>
                   {d.aligned ? '✓ Alignés' : '≠ Différents'}
                 </span>
-                <span className="text-xs text-gray-500">{d.labelA} · {d.labelB}</span>
+                <span className="text-xs text-stone-500">{d.labelA} · {d.labelB}</span>
               </div>
-              <p className="text-xs text-gray-600 leading-relaxed">{d.analysis}</p>
+              <p className="text-xs text-stone-600 leading-relaxed">{d.analysis}</p>
             </div>
           ))}
         </div>
 
         {/* CTA */}
-        <div className="rounded-2xl bg-gray-50 border border-gray-200 p-5 text-center">
-          <p className="text-sm font-bold text-gray-900 mb-1">Découvrir ton profil complet</p>
-          <p className="text-xs text-gray-500 mb-4">Forces, faiblesses, amour, carrière — le rapport complet de ton type.</p>
-          <Link href={`/types/${typeA.toLowerCase()}`}
-            className="inline-block px-6 py-3 rounded-xl font-bold text-white text-sm"
-            style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
+        <div className="ur-panel p-5 text-center">
+          <p className="text-sm font-bold mb-1" style={{ color: 'var(--ink)' }}>Découvrir ton profil complet</p>
+          <p className="text-xs text-stone-500 mb-4">Forces, faiblesses, amour, carrière — le rapport complet de ton type.</p>
+          <Link href={`/types/${typeA.toLowerCase()}`} className="ur-btn-gold inline-flex px-6 py-3 text-sm">
             Voir mon profil {typeA} →
           </Link>
         </div>
@@ -203,7 +202,7 @@ export default function DuoMbtiClient() {
     <div>
       {/* Partner came via URL */}
       {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('a') && typeA && (
-        <div className="rounded-xl bg-violet-50 border border-violet-200 p-3 mb-5 text-xs text-violet-700 flex items-center gap-2">
+        <div className="rounded-xl p-3 mb-5 text-xs flex items-center gap-2" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--ink)' }}>
           <span className="text-base">{mbtiTypes[typeA]?.emoji}</span>
           <span>Ton partenaire a partagé son type : <strong>{typeA} — {mbtiTypes[typeA]?.name}</strong>. Sélectionne le tien.</span>
         </div>
@@ -217,16 +216,15 @@ export default function DuoMbtiClient() {
 
       {/* Share button (if A selected but not B) */}
       {typeA && !typeB && (
-        <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 mb-4 text-center">
-          <p className="text-sm text-gray-600 mb-3">Ton partenaire ne connaît pas son type ? Envoie-lui le lien pour qu&apos;il le découvre.</p>
+        <div className="ur-panel p-4 mb-4 text-center">
+          <p className="text-sm text-stone-600 mb-3">Ton partenaire ne connaît pas son type ? Envoie-lui le lien pour qu&apos;il le découvre.</p>
           <div className="flex gap-2 justify-center">
-            <button onClick={handleShare}
-              className="px-4 py-2.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95"
-              style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)' }}>
+            <button onClick={handleShare} className="ur-btn-gold px-4 py-2.5 text-sm active:scale-95">
               {copied ? '✓ Lien copié !' : '🔗 Copier mon lien à partager'}
             </button>
             <Link href="/quiz/personnalite"
-              className="px-4 py-2.5 rounded-xl font-semibold text-gray-700 text-sm border border-gray-200 hover:bg-gray-100 transition-all">
+              className="px-4 py-2.5 rounded-full font-semibold text-sm border transition-all hover:opacity-80"
+              style={{ color: 'var(--ink)', borderColor: 'var(--line)', background: 'var(--paper-panel)' }}>
               Je ne sais pas mon type
             </Link>
           </div>
@@ -235,15 +233,13 @@ export default function DuoMbtiClient() {
 
       {/* Analyse button */}
       {typeA && typeB && (
-        <button onClick={() => setMode('result')}
-          className="w-full py-4 rounded-2xl font-black text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 8px 30px rgba(169,78,24,0.35)' }}>
+        <button onClick={() => setMode('result')} className="ur-btn-gold w-full py-4 text-base">
           Analyser notre compatibilité {mbtiTypes[typeA]?.emoji} + {mbtiTypes[typeB]?.emoji} →
         </button>
       )}
 
       {(!typeA || !typeB) && (
-        <p className="text-center text-gray-400 text-sm mt-4">
+        <p className="text-center text-stone-400 text-sm mt-4">
           {!typeA && !typeB ? 'Sélectionne vos deux types MBTI pour voir votre compatibilité' :
            !typeA ? 'Sélectionne ton type MBTI' : 'Sélectionne le type de ton partenaire'}
         </p>

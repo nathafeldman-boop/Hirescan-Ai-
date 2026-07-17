@@ -87,7 +87,7 @@ export default function DuoQuizClient({ quiz }: Props) {
   /* ── INTRO ── */
   if (phase === 'intro') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#09090b' }}>
+      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: 'var(--ink)' }}>
         <div className="w-full max-w-md text-center">
           <div
             className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center text-4xl"
@@ -95,14 +95,14 @@ export default function DuoQuizClient({ quiz }: Props) {
           >
             {quiz.emoji}
           </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-4">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: quiz.accentColor }} />
-            <span className="text-xs text-zinc-400 font-medium uppercase tracking-widest">Mode Équipe</span>
+          <div className="ur-badge mb-4" style={{ border: '1px solid var(--line-ink)', background: 'var(--ink-soft)', color: 'var(--ink-text-muted)' }}>
+            <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: quiz.accentColor }} />
+            <span className="ur-label">Mode Équipe</span>
           </div>
-          <h1 className="text-2xl font-black text-white mb-3 leading-tight">{quiz.title}</h1>
-          <p className="text-zinc-400 text-sm leading-relaxed mb-8">{quiz.description}</p>
+          <h1 className="font-display text-2xl font-black mb-3 leading-tight" style={{ color: 'var(--ink-text)' }}>{quiz.title}</h1>
+          <p className="text-sm leading-relaxed mb-8" style={{ color: 'var(--ink-text-muted)' }}>{quiz.description}</p>
 
-          <div className="glass rounded-2xl p-4 mb-8 text-left space-y-3">
+          <div className="ur-panel-ink p-4 mb-8 text-left space-y-3">
             {[
               'Tu réponds seul(e) — tes réponses restent cachées',
               'Tu envoies le lien à ton/ta partenaire',
@@ -142,10 +142,10 @@ export default function DuoQuizClient({ quiz }: Props) {
   /* ── SHARE ── */
   if (phase === 'share') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#09090b' }}>
+      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: 'var(--ink)' }}>
         <div className="w-full max-w-md text-center">
           <div className="text-5xl mb-4">🧩</div>
-          <h2 className="text-2xl font-black text-white mb-2">Tes réponses sont prêtes !</h2>
+          <h2 className="font-display text-2xl font-black text-white mb-2">Tes réponses sont prêtes !</h2>
           <p className="text-zinc-400 text-sm leading-relaxed mb-6">
             Partage le lien <strong className="text-zinc-200">ou le code</strong> à tes coéquipier(s).
             Quand ils auront répondu, comparez vos secrets ensemble.
@@ -154,20 +154,20 @@ export default function DuoQuizClient({ quiz }: Props) {
           {/* Code d'entrée — hero element */}
           <div
             className="rounded-2xl p-5 mb-4 border text-center"
-            style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.12), rgba(209,125,82,0.06))', borderColor: 'rgba(194,97,31,0.4)' }}
+            style={{ background: 'var(--gold-soft)', borderColor: 'var(--gold-line)' }}
           >
-            <p className="text-xs text-zinc-500 mb-3 uppercase tracking-widest font-semibold">Code d&apos;entrée équipe</p>
+            <p className="ur-label text-xs mb-3" style={{ color: 'var(--ink-text-muted)' }}>Code d&apos;entrée équipe</p>
             <div className="flex items-center justify-center gap-3 mb-3">
               <span
                 className="text-3xl font-black tracking-[0.25em] font-mono"
-                style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+                style={{ color: 'var(--gold)' }}
               >
                 {teamCode}
               </span>
               <button
                 onClick={copyCode}
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border"
-                style={{ borderColor: 'rgba(194,97,31,0.4)', color: codeCopied ? '#d17d52' : '#71717a', background: 'rgba(194,97,31,0.08)' }}
+                style={{ borderColor: 'var(--gold-line)', color: codeCopied ? 'var(--gold)' : 'var(--ink-text-muted)', background: 'var(--ink-soft)' }}
               >
                 {codeCopied ? '✓ Copié' : 'Copier'}
               </button>
@@ -210,11 +210,11 @@ export default function DuoQuizClient({ quiz }: Props) {
 
   /* ── QUIZ ── */
   return (
-    <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#09090b' }}>
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--ink)' }}>
       {/* Header */}
       <header
-        className="sticky top-0 backdrop-blur-md border-b border-white/5 z-20"
-        style={{ background: 'rgba(9,9,11,0.85)' }}
+        className="sticky top-0 backdrop-blur-md border-b z-20"
+        style={{ background: 'rgba(21,18,31,0.85)', borderColor: 'var(--line-ink)' }}
       >
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <button
@@ -251,32 +251,35 @@ export default function DuoQuizClient({ quiz }: Props) {
             transitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
           }`}
         >
-          <div className="glass rounded-2xl p-6 sm:p-8 mb-6">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: quiz.accentColor }}>
+          <div className="ur-panel-ink p-6 sm:p-8 mb-6">
+            <div className="ur-label text-xs mb-4" style={{ color: 'var(--gold)' }}>
               Question {currentIndex + 1}
             </div>
-            <p className="text-xl sm:text-2xl font-semibold text-white leading-relaxed">{question.text}</p>
+            <p className="font-display text-xl sm:text-2xl font-semibold text-white leading-relaxed">{question.text}</p>
           </div>
 
-          <div className="space-y-3 mb-8" style={{ '--quiz-accent': quiz.accentColor } as React.CSSProperties}>
+          <div className="space-y-3 mb-8">
             {question.options.map((option, i) => {
               const isSelected = selected === i;
               return (
                 <button
                   key={i}
                   onClick={() => handleSelect(i)}
-                  className={`quiz-opt${isSelected ? ' quiz-opt-selected' : ''}`}
+                  className="w-full text-left px-5 py-3.5 rounded-2xl border transition-all duration-150 text-sm font-semibold flex items-center gap-3"
+                  style={isSelected
+                    ? { borderColor: 'var(--gold)', backgroundColor: 'var(--gold-soft)', color: 'var(--gold)' }
+                    : { borderColor: 'var(--line-ink)', backgroundColor: 'var(--ink-soft)', color: 'var(--ink-text)' }}
                 >
                   <span
                     className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-200"
                     style={
                       isSelected
-                        ? { borderColor: quiz.accentColor, backgroundColor: quiz.accentColor }
-                        : { borderColor: 'rgba(255,255,255,0.3)' }
+                        ? { borderColor: 'var(--gold)', backgroundColor: 'var(--gold)' }
+                        : { borderColor: 'var(--line-ink)' }
                     }
                   >
                     {isSelected && (
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3 h-3" style={{ color: 'var(--ink)' }} fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
