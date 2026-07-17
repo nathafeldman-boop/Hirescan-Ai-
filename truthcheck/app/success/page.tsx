@@ -2,23 +2,30 @@ import Link from 'next/link';
 import Stripe from 'stripe';
 import crypto from 'crypto';
 import { prisma } from '@/lib/db';
-import { mbtiTypes } from '@/lib/mbti';
+import { mbtiTypes } from '@/lib/mbti-server';
 import SuccessTracker from './SuccessTracker';
 import SuccessUpsellButton from './SuccessUpsellButton';
 
 async function verifyAndUnlock(sessionId: string | undefined, resultId: string | undefined, typeCode: string | undefined) {
-  if (!sessionId || !process.env.STRIPE_SECRET_KEY) return { paid: false, email: null as string | null, affiliateSlug: null as string | null, isOneTime: false };
+  if (!sessionId || !process.env.STRIPE_SECRET_KEY) return { paid: false, email: null as string | null, affiliateSlug: null as string | null, isOneTime: false, amountEur: 0 };
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    if (session.payment_status !== 'paid') return { paid: false, email: null, affiliateSlug: null, isOneTime: false };
+    if (session.payment_status !== 'paid') return { paid: false, email: null, affiliateSlug: null, isOneTime: false, amountEur: 0 };
     const isOneTime = session.metadata?.oneTime === 'true' || session.mode === 'payment';
+    // Montant réel vérifié par Stripe — jamais une valeur codée en dur, pour que
+    // le pixel "purchase" envoyé aux plateformes pub (TikTok/GA4) reflète la
+    // vraie valeur de la vente et n'en fausse pas l'optimisation.
+    const amountEur = (session.amount_total ?? 0) / 100;
 
     if (resultId) {
       await prisma.quizResult.update({ where: { id: resultId }, data: { paid: true } }).catch(() => {});
     }
 
-    const email = session.customer_details?.email ?? null;
+    // Normalisé en minuscules : NextAuth (EmailProvider) stocke les emails en
+    // lowercase, mais Stripe renvoie l'email tel que saisi au checkout (casse
+    // libre) — voir app/api/webhook/route.ts pour le même correctif.
+    const email = session.customer_details?.email?.toLowerCase().trim() ?? null;
     if (email) {
       await prisma.user.upsert({
         where: { email },
@@ -47,9 +54,9 @@ async function verifyAndUnlock(sessionId: string | undefined, resultId: string |
       }
     }
 
-    return { paid: true, email, affiliateSlug, isOneTime };
+    return { paid: true, email, affiliateSlug, isOneTime, amountEur };
   } catch {
-    return { paid: false, email: null, affiliateSlug: null, isOneTime: false };
+    return { paid: false, email: null, affiliateSlug: null, isOneTime: false, amountEur: 0 };
   }
 }
 
@@ -243,7 +250,7 @@ export default async function SuccessPage({
   const sessionId = searchParams.session_id;
   const typeCode = searchParams.typeCode?.toUpperCase();
 
-  const { paid, email, affiliateSlug, isOneTime } = await verifyAndUnlock(sessionId, resultId, typeCode);
+  const { paid, email, affiliateSlug, isOneTime, amountEur } = await verifyAndUnlock(sessionId, resultId, typeCode);
 
   let magicLinkSent = false;
   if (paid && email) {
@@ -253,15 +260,15 @@ export default async function SuccessPage({
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4" style={{ background: '#f7f3ec' }}>
-      <SuccessTracker />
+      <SuccessTracker paid={paid} amountEur={amountEur} />
       <div className="relative z-10 w-full max-w-xl">
 
         <div className="text-center mb-6">
           <div className="text-6xl mb-4">🎉</div>
           <h1 className="font-display text-3xl font-black text-stone-900 mb-2">
-            {typeCode ? `Profil ${typeCode} débloqué !` : 'Bienvenue dans UrCecret ✨'}
+            {paid && typeCode ? `Profil ${typeCode} débloqué !` : 'Bienvenue dans UrCecret ✨'}
           </h1>
-          {typeCode && (
+          {paid && typeCode && (
             <p className="text-stone-500 text-sm">Résultat 1/2 — ton profil MBTI est prêt.</p>
           )}
         </div>
@@ -384,7 +391,7 @@ export default async function SuccessPage({
           ) : (
             <div>
               <p className="text-stone-500 leading-relaxed mb-2">
-                {typeCode
+                {paid && typeCode
                   ? `Ton profil ${typeCode} est débloqué — fais défiler pour le lire intégralement.`
                   : `Ton accès UrCecret est actif. Fais défiler pour découvrir ton analyse.`}
               </p>

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { mbtiTypes, ALL_MBTI_TYPES, MbtiType } from '@/lib/mbti';
+import { ALL_MBTI_TYPES, MbtiType } from '@/lib/mbti';
+import { mbtiTypes } from '@/lib/mbti-server';
 import TypeClient from './TypeClient';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -40,13 +41,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// ⚠️ N'utilise QUE des champs gratuits (shortDesc, traits) — cette FAQ est
+// server-rendered et publique (SEO). Ne jamais y injecter inLove/atWork/
+// strengths/famousExamples/etc. : ce texte deviendrait visible dans le HTML
+// de la page pour tout le monde, sans paiement (voir lib/mbti-premium.ts).
 function FAQ({ type }: { type: MbtiType }) {
   const faqs = [
     { q: `Quelle est la personnalité ${type.code} ?`, a: type.shortDesc },
-    { q: `Quel est le type de personnalité ${type.code} en amour ?`, a: type.inLove },
-    { q: `Le type ${type.code} en carrière`, a: type.atWork },
-    { q: `Quels sont les points forts du type ${type.code} ?`, a: type.strengths.join(', ') + '.' },
-    { q: `Qui sont les célébrités ${type.code} ?`, a: `Des personnalités connues de type ${type.code} incluent : ${type.famousExamples.join(', ')}.` },
+    { q: `Quels sont les traits du type ${type.code} ?`, a: `${type.traits.join(', ')}.` },
+    { q: `Le type ${type.code} en amour et au travail`, a: `Le profil complet ${type.code} (amour, carrière, face cachée, compatibilité, célébrités du même profil) est disponible après déblocage, pour 1,99 €.` },
   ];
   return (
     <div className="mt-12 space-y-3">
@@ -74,8 +77,7 @@ export default function TypePage({ params }: Props) {
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: `Quelle est la personnalité ${code} ?`, acceptedAnswer: { '@type': 'Answer', text: type.shortDesc } },
-      { '@type': 'Question', name: `Type ${code} en amour`, acceptedAnswer: { '@type': 'Answer', text: type.inLove } },
-      { '@type': 'Question', name: `Célébrités de type ${code}`, acceptedAnswer: { '@type': 'Answer', text: `Célébrités ${code} : ${type.famousExamples.join(', ')}.` } },
+      { '@type': 'Question', name: `Quels sont les traits du type ${code} ?`, acceptedAnswer: { '@type': 'Answer', text: `${type.traits.join(', ')}.` } },
     ],
   };
 
@@ -131,8 +133,14 @@ export default function TypePage({ params }: Props) {
             <span className="text-zinc-400">{code}</span>
           </nav>
 
-          {/* Main client content (paywall etc.) */}
-          <TypeClient type={type} />
+          {/* Main client content (paywall etc.) — on ne passe QUE les champs
+              gratuits : le payload envoyé au navigateur (props d'un composant
+              client) ne doit jamais contenir le contenu payant, même si le
+              composant lui-même ne l'affiche pas avant paiement. */}
+          <TypeClient type={{
+            code: type.code, name: type.name, tagline: type.tagline, emoji: type.emoji,
+            accentColor: type.accentColor, rarity: type.rarity, shortDesc: type.shortDesc, traits: type.traits,
+          }} />
 
           {/* FAQ — server-rendered for SEO */}
           <FAQ type={type} />

@@ -145,10 +145,15 @@ model EmailLog {
 model PageView {
   id        String   @id @default(cuid())
   path      String
+  // Identifiant anonyme client (lib/visitorId.ts) — permet de compter les
+  // étapes du funnel en visiteurs uniques, pas en événements bruts. Nullable
+  // pour rester compatible avec les lignes existantes créées avant ce champ.
+  visitorId String?
   createdAt DateTime @default(now())
 
   @@index([path])
   @@index([createdAt])
+  @@index([visitorId])
 }
 
 model FusionGroup {

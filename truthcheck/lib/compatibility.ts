@@ -1,4 +1,5 @@
-import { mbtiTypes, MbtiType } from './mbti';
+import { MbtiType } from './mbti';
+import { mbtiTypes } from './mbti-server';
 
 export const ALL_MBTI_TYPES = [
   'INTJ','INTP','ENTJ','ENTP',
@@ -75,7 +76,7 @@ export function getCompatibility(codeA: string, codeB: string): CompatibilityRes
 
   // Shared strengths (from traits intersection)
   const traitsA = new Set(A.traits ?? []);
-  const sharedStrengths = (B.traits ?? []).filter(t => traitsA.has(t));
+  const sharedStrengths = (B.traits ?? []).filter((t: string) => traitsA.has(t));
 
   // Challenges — from differing poles
   const challenges: string[] = [];

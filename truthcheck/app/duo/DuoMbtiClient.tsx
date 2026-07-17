@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { ALL_MBTI_TYPES, mbtiTypes } from '@/lib/mbti';
+import { ALL_MBTI_TYPES, mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import { getMbtiCompatibility } from '@/lib/mbtiCompatibility';
 
 const GROUPS = [

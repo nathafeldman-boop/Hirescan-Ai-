@@ -1,7 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { mbtiTypes, ALL_MBTI_TYPES } from '@/lib/mbti';
+import { ALL_MBTI_TYPES } from '@/lib/mbti';
+// ⚠️ On importe QUE les champs gratuits ici — cette page est server-rendered
+// et publique (SEO). famousExamples/compatibleWith sont payants
+// (lib/mbti-premium.ts) et ne doivent jamais apparaître dans le HTML public ;
+// voir CelebritesClient.tsx pour la version débloquée (post-paiement).
+import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
+import { getCompatibility } from '@/lib/compatibility';
+import CelebritesClient from './CelebritesClient';
 
 // ─── Static generation pour les 16 types ────────────────────────────────────
 export function generateStaticParams() {
@@ -34,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: {
       title: `Célébrités ${code} — Personnalités de type ${t.name} | UrCecret`,
-      description: `${t.famousExamples.slice(0, 3).join(', ')} et d'autres personnalités de type ${code}. Découvrez ce qui les unit.`,
+      description: `Découvrez quelles célébrités partagent le profil ${code} (${t.name}) et ce qui les unit.`,
       type: 'article',
       images: [{
         url: `https://urcecret.site/api/og?type=${code}`,
@@ -58,6 +65,15 @@ export default function CelebritesPage({ params }: Props) {
 
   const slug = params.type.toLowerCase();
 
+  // Classement calculé via le même score algorithmique que getCompatibility()
+  // (fonctions cognitives, lettres partagées) — pas le champ payant compatibleWith.
+  const bestMatches = ALL_MBTI_TYPES
+    .filter(c => c !== code)
+    .map(c => ({ code: c, score: getCompatibility(code, c).score }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map(m => m.code);
+
   // ── Structured data ───────────────────────────────────────────────────────
 
   const breadcrumbSchema = {
@@ -80,7 +96,7 @@ export default function CelebritesPage({ params }: Props) {
         name: `Quelle célébrité est de type ${code} ?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Des célébrités de type ${code} incluent : ${type.famousExamples.join(', ')}. Ces personnalités partagent les traits caractéristiques du type ${code} : ${type.traits.slice(0, 4).join(', ')}.`,
+          text: `Plusieurs personnalités connues partagent le profil ${code}. Elles ont en commun les traits caractéristiques du type ${code} : ${type.traits.slice(0, 4).join(', ')}. La liste complète est disponible dans le profil débloqué.`,
         },
       },
       {
@@ -104,7 +120,7 @@ export default function CelebritesPage({ params }: Props) {
         name: `Comment savoir si je suis ${code} ?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Pour savoir si vous êtes de type ${code}, faites le test de personnalité MBTI gratuit sur UrCecret. En quelques minutes, répondez à nos questions et découvrez si vous partagez les traits des personnalités ${code} comme ${type.famousExamples.slice(0, 2).join(' et ')}.`,
+          text: `Pour savoir si vous êtes de type ${code}, faites le test de personnalité MBTI gratuit sur UrCecret. En quelques minutes, répondez à nos questions et découvrez si vous partagez les traits des célébrités ${code}.`,
         },
       },
     ],
@@ -121,7 +137,6 @@ export default function CelebritesPage({ params }: Props) {
       '@type': 'Thing',
       name: `Type de personnalité MBTI ${code}`,
     },
-    mentions: type.famousExamples.map(name => ({ '@type': 'Person', name })),
   };
 
   return (
@@ -223,41 +238,7 @@ export default function CelebritesPage({ params }: Props) {
               Personnalités célèbres de type {code}
             </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {type.famousExamples.map((celeb, i) => (
-                <div
-                  key={celeb}
-                  className="rounded-xl p-4 flex flex-col items-center text-center transition-all hover:scale-[1.02]"
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
-                  {/* Initiales stylisées */}
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-black mb-3"
-                    style={{
-                      background: i % 2 === 0 ? `${type.accentColor}25` : 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${i % 2 === 0 ? `${type.accentColor}50` : 'rgba(255,255,255,0.1)'}`,
-                      color: i % 2 === 0 ? type.accentColor : '#a1a1aa',
-                    }}
-                    aria-hidden="true"
-                  >
-                    {celeb.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
-                  </div>
-                  <span className="text-sm font-semibold text-zinc-200 leading-snug">{celeb}</span>
-                  <span
-                    className="mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full"
-                    style={{
-                      background: `${type.accentColor}15`,
-                      color: type.accentColor,
-                    }}
-                  >
-                    {code}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <CelebritesClient code={code} accentColor={type.accentColor} />
           </section>
 
           {/* ── Ce qui les unit — traits communs ── */}
@@ -334,10 +315,10 @@ export default function CelebritesPage({ params }: Props) {
               >
                 Profil complet {code} →
               </Link>
-              {type.compatibleWith.length > 0 && (
+              {bestMatches.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-zinc-600">Compatible avec :</span>
-                  {type.compatibleWith.map(c => (
+                  {bestMatches.map(c => (
                     <Link
                       key={c}
                       href={`/types/${c.toLowerCase()}`}
@@ -369,7 +350,7 @@ export default function CelebritesPage({ params }: Props) {
               Et toi, es-tu {code} ?
             </h2>
             <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto leading-relaxed">
-              Partages-tu les traits de {type.famousExamples[0]} ou {type.famousExamples[1]} ?
+              Partages-tu les traits des célébrités {code} ?
               Fais le test gratuit pour découvrir ton vrai type MBTI — 24 questions, résultat instantané.
             </p>
             <Link
@@ -406,9 +387,9 @@ export default function CelebritesPage({ params }: Props) {
                   <span className="text-zinc-600 group-open:rotate-180 transition-transform duration-200" aria-hidden="true">▾</span>
                 </summary>
                 <p className="px-5 pb-5 text-sm text-zinc-400 leading-relaxed">
-                  Des personnalités célèbres de type {code} incluent{' '}
-                  <strong className="text-zinc-300">{type.famousExamples.join(', ')}</strong>.
-                  Ces personnalités incarnent les traits caractéristiques du type {code} :{' '}
+                  Plusieurs personnalités célèbres partagent le profil {code} — la liste complète est
+                  disponible dans le profil débloqué. Ces personnalités incarnent les traits
+                  caractéristiques du type {code} :{' '}
                   {type.traits.slice(0, 4).join(', ')}.
                 </p>
               </details>
@@ -463,7 +444,7 @@ export default function CelebritesPage({ params }: Props) {
                       test de personnalité MBTI gratuit sur UrCecret
                     </Link>.
                     En quelques minutes, répondez à nos 24 questions et découvrez si vous partagez
-                    les traits de {type.famousExamples[0]} ou {type.famousExamples[1]}.
+                    les traits des célébrités {code}.
                   </p>
                   <p>
                     Les {code} se reconnaissent souvent à leur tendance à être{' '}

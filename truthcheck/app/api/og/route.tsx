@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { mbtiTypes } from '@/lib/mbti';
+import { mbtiTypes } from '@/lib/mbti-server';
 
 export const runtime = 'edge';
 

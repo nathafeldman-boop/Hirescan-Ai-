@@ -1,5 +1,7 @@
 /* Central analytics dispatcher — fires to TikTok Pixel, GA4, and internal DB */
 
+import { getVisitorId } from './visitorId';
+
 declare global {
   interface Window {
     ttq?: {
@@ -65,7 +67,7 @@ export function track(event: AnalyticsEvent, props: TrackProps = {}) {
     fetch('/api/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path }),
+      body: JSON.stringify({ path, visitorId: getVisitorId() }),
     }).catch(() => {});
   } catch {
     // never throw — tracking must not break the app

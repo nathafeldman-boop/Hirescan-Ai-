@@ -9,11 +9,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true }); // silent drop
     }
 
-    const { slug } = await req.json() as { slug?: string };
+    const { slug, visitorId } = await req.json() as { slug?: string; visitorId?: string };
     if (!slug || !/^[a-z0-9_-]{2,32}$/i.test(slug)) {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
-    await prisma.pageView.create({ data: { path: `/__aff/${slug}` } });
+    const cleanVisitorId = typeof visitorId === 'string' && /^[a-f0-9-]{10,64}$/i.test(visitorId) ? visitorId : undefined;
+    await prisma.pageView.create({ data: { path: `/__aff/${slug}`, visitorId: cleanVisitorId } });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false }, { status: 500 });

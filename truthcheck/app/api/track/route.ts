@@ -15,11 +15,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true }); // silent drop, not an error
   }
 
-  const { path } = await req.json().catch(() => ({ path: '/' }));
+  const { path, visitorId } = await req.json().catch(() => ({ path: '/', visitorId: undefined }));
   if (!path || path.startsWith('/natha-admin') || path.startsWith('/api')) {
     return NextResponse.json({ ok: true });
   }
 
-  await prisma.pageView.create({ data: { path } }).catch(() => {});
+  const cleanVisitorId = typeof visitorId === 'string' && /^[a-f0-9-]{10,64}$/i.test(visitorId) ? visitorId : undefined;
+  await prisma.pageView.create({ data: { path, visitorId: cleanVisitorId } }).catch(() => {});
   return NextResponse.json({ ok: true });
 }

@@ -74,9 +74,13 @@ export default async function NathaAdminPage() {
   ]);
 
   // Quiz drop-off funnel (MBTI personnalite)
-  const [fStart, fQ10, fQ25, fQ50, fQ75, fComplete, fPaywall, fCheckout] = await Promise.all([
+  // Note : pas de step "Q10" ici — le tracker de milestones (PersonnaliteClient.tsx)
+  // n'écrit jamais /__quiz/q10 (seulement q25/q50/q75, basés sur % de progression,
+  // pas sur le numéro de question). Un ancien "Q10 atteinte" était affiché ici alors
+  // qu'il était toujours à 0 — funnel cassé (étape fantôme). Retiré plutôt que
+  // recréé, pour ne pas ajouter un nouvel événement non demandé.
+  const [fStart, fQ25, fQ50, fQ75, fComplete, fPaywall, fCheckout] = await Promise.all([
     prisma.pageView.count({ where: { path: '/__evt/quiz_start/personnalite' } }),
-    prisma.pageView.count({ where: { path: '/__quiz/q10' } }),
     prisma.pageView.count({ where: { path: '/__quiz/q25' } }),
     prisma.pageView.count({ where: { path: '/__quiz/q50' } }),
     prisma.pageView.count({ where: { path: '/__quiz/q75' } }),
@@ -360,7 +364,6 @@ export default async function NathaAdminPage() {
           {fStart > 0 && (() => {
             const steps = [
               { label: 'Démarré le quiz', n: fStart, color: C.blue },
-              { label: 'Q10 atteinte', n: fQ10, color: C.purple },
               { label: 'Q25 atteinte', n: fQ25, color: C.purple },
               { label: 'Q50 atteinte', n: fQ50, color: C.yellow },
               { label: 'Q75 atteinte', n: fQ75, color: C.orange },

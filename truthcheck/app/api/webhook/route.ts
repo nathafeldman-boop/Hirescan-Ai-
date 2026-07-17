@@ -34,7 +34,12 @@ export async function POST(req: NextRequest) {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const meta = session.metadata ?? {};
-      const email = session.customer_details?.email ?? null;
+      // Normalisé en minuscules : NextAuth (EmailProvider) stocke les emails en
+      // lowercase, mais Stripe renvoie l'email tel que saisi au checkout (casse
+      // libre). Sans normalisation, upsert({where:{email}}) peut créer un
+      // second compte "premium" fantôme au lieu de mettre à niveau le vrai
+      // compte du client — paiement effectué mais accès jamais débloqué.
+      const email = session.customer_details?.email?.toLowerCase().trim() ?? null;
 
       // ── Fusion group unlock ──
       if (meta.fusionGroupId) {
@@ -145,7 +150,7 @@ export async function POST(req: NextRequest) {
     // ── Subscription renewal → keep tier premium ──
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object as Stripe.Invoice;
-      const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email : null;
+      const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email.toLowerCase().trim() : null;
       if (customerEmail) {
         await prisma.user.upsert({
           where: { email: customerEmail },
@@ -161,7 +166,7 @@ export async function POST(req: NextRequest) {
       const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
       const customer = await stripe.customers.retrieve(customerId).catch(() => null);
       if (customer && !customer.deleted) {
-        const customerEmail = (customer as Stripe.Customer).email;
+        const customerEmail = (customer as Stripe.Customer).email?.toLowerCase().trim();
         if (customerEmail) {
           await prisma.user.updateMany({
             where: { email: customerEmail },
@@ -178,7 +183,7 @@ export async function POST(req: NextRequest) {
         const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
         const customer = await stripe.customers.retrieve(customerId).catch(() => null);
         if (customer && !customer.deleted) {
-          const customerEmail = (customer as Stripe.Customer).email;
+          const customerEmail = (customer as Stripe.Customer).email?.toLowerCase().trim();
           if (customerEmail) {
             await prisma.user.updateMany({
               where: { email: customerEmail },
@@ -194,7 +199,7 @@ export async function POST(req: NextRequest) {
       const invoice = event.data.object as Stripe.Invoice;
       // Only downgrade after final failed attempt (next_payment_attempt = null)
       if (invoice.next_payment_attempt === null) {
-        const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email : null;
+        const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email.toLowerCase().trim() : null;
         if (customerEmail) {
           await prisma.user.updateMany({
             where: { email: customerEmail },

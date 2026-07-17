@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { mbtiTypes } from '@/lib/mbti';
+import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 
 interface Props {
   user: {

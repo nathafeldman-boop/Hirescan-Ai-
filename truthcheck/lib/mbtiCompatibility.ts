@@ -1,4 +1,4 @@
-import { mbtiTypes, ALL_MBTI_TYPES } from './mbti';
+import { ALL_MBTI_TYPES } from './mbti';
 
 export interface CompatibilityResult {
   score: number;
@@ -36,12 +36,11 @@ export function getMbtiCompatibility(typeA: string, typeB: string): Compatibilit
   const pairs = dims4.map((dim, i) => ({ dim, a: typeA[i], b: typeB[i] }));
   const diffCount = pairs.filter(p => p.a !== p.b).length;
 
-  // Bonus if each is in the other's compatible list
-  const tA = mbtiTypes[typeA];
-  const tB = mbtiTypes[typeB];
-  const compatBonus =
-    (tA?.compatibleWith?.includes(typeB) ? 7 : 0) +
-    (tB?.compatibleWith?.includes(typeA) ? 7 : 0);
+  // Note : le bonus "compatibleWith" a été retiré ici — ce champ est un
+  // contenu payant (lib/mbti-premium.ts) et cette fonction est utilisée par
+  // un composant client (DuoMbtiClient.tsx). L'importer aurait fait fuiter
+  // le profil payant des 16 types dans le bundle JS public.
+  const compatBonus = 0;
 
   const baseScores: Record<number, number> = { 0: 94, 1: 83, 2: 70, 3: 57, 4: 44 };
   const score = Math.min(97, (baseScores[diffCount] ?? 50) + compatBonus);

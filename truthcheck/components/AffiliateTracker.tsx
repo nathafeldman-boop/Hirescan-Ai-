@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { getVisitorId } from '@/lib/visitorId';
 
 export default function AffiliateTracker() {
   const params = useSearchParams();
@@ -19,7 +20,7 @@ export default function AffiliateTracker() {
     fetch('/api/affiliate-click', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: ref }),
+      body: JSON.stringify({ slug: ref, visitorId: getVisitorId() }),
     }).catch(() => {});
   }, [params]);
 

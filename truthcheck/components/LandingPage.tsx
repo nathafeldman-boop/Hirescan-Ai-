@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import UserMenu from './UserMenu';
-import { mbtiTypes } from '@/lib/mbti';
+import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import SocialProofToast from './SocialProofToast';
 import Seal from './Seal';
 

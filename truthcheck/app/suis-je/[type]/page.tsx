@@ -1,7 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { mbtiTypes, ALL_MBTI_TYPES, MbtiType } from '@/lib/mbti';
+import { ALL_MBTI_TYPES } from '@/lib/mbti';
+// ⚠️ On importe QUE les champs gratuits ici — cette page est server-rendered
+// et publique (SEO). inLove/atWork/strengths/famousExamples/compatibleWith
+// sont payants (lib/mbti-premium.ts) et ne doivent jamais apparaître dans le
+// HTML public ; voir SuisJePremiumSections.tsx pour la version débloquée
+// (post-paiement, chargée côté client après vérification serveur).
+import { mbtiTypesFree as mbtiTypes, MbtiTypeFree } from '@/lib/mbti-free';
+import SuisJePremiumSections from './SuisJePremiumSections';
 
 // ─── Static generation ───────────────────────────────────────────────────────
 
@@ -85,34 +92,25 @@ function traitToSign(trait: string, index: number): string {
 
 // ─── FAQ données par type ─────────────────────────────────────────────────────
 
-function buildFaqs(t: MbtiType): { q: string; a: string }[] {
+// ⚠️ N'utilise QUE des champs gratuits — cette FAQ est server-rendered et
+// publique (SEO/JSON-LD). Le détail amour/carrière/célébrités/compatibilité
+// est payant (lib/mbti-premium.ts) : on y renvoie sans jamais le citer.
+function buildFaqs(t: MbtiTypeFree): { q: string; a: string }[] {
   return [
     {
       q: `Suis-je vraiment ${t.code} ?`,
       a: `Pour savoir si tu es ${t.code} (${t.name}), identifie-toi aux traits suivants : ${t.traits.join(', ')}. ${t.shortDesc} Si ces descriptions résonnent profondément avec qui tu es, tu es très probablement ${t.code}.`,
     },
     {
-      q: `Quelle est la différence entre ${t.code} et les types proches ?`,
-      a: `Le ${t.code} se distingue par sa combinaison unique de ${t.traits.slice(0, 3).join(', ')}. ${t.tagline}. Les types compatibles ou proches sont : ${t.compatibleWith.join(', ')} — mais chacun a ses propres nuances distinctes.`,
-    },
-    {
-      q: `Comment le ${t.code} se comporte-t-il en amour ?`,
-      a: t.inLove,
-    },
-    {
-      q: `Quelle carrière convient au type ${t.code} ?`,
-      a: t.atWork,
-    },
-    {
-      q: `Quelles célébrités sont de type ${t.code} ?`,
-      a: `Des personnalités connues de type ${t.code} (${t.name}) incluent : ${t.famousExamples.join(', ')}. Ces exemples illustrent la diversité et la profondeur de ce type de personnalité.`,
+      q: `Le ${t.code} en amour, au travail et en compatibilité`,
+      a: `Le profil complet ${t.code} (amour, carrière, face cachée, célébrités du même profil, compatibilité) est disponible après déblocage, pour 1,99 €.`,
     },
   ];
 }
 
 // ─── Composants serveur ───────────────────────────────────────────────────────
 
-function SignsSection({ type }: { type: MbtiType }) {
+function SignsSection({ type }: { type: MbtiTypeFree }) {
   return (
     <section className="mb-10">
       <h2 className="font-display text-xl font-black text-white mb-5">
@@ -144,34 +142,27 @@ function SignsSection({ type }: { type: MbtiType }) {
             </div>
           </div>
         ))}
-        {/* Signes 6-8 basés sur les forces si traits < 8 */}
+        {/* Signes supplémentaires : réservés au profil débloqué (forces
+            détaillées, lib/mbti-premium.ts) — jamais rendus ici en clair,
+            juste un teaser verrouillé façon TypeClient.tsx. */}
         {type.traits.length < 8 &&
-          type.strengths.slice(0, 8 - type.traits.length).map((strength, i) => {
+          Array.from({ length: 8 - type.traits.length }).map((_, i) => {
             const idx = type.traits.length + i;
             return (
               <div
-                key={strength}
+                key={`locked-${idx}`}
                 className="flex items-start gap-4 rounded-xl px-5 py-4"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.07)',
-                }}
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
                 <span
                   className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black"
-                  style={{
-                    background: `${type.accentColor}20`,
-                    color: type.accentColor,
-                    border: `1px solid ${type.accentColor}40`,
-                  }}
+                  style={{ background: `${type.accentColor}20`, color: type.accentColor, border: `1px solid ${type.accentColor}40` }}
                 >
                   {idx + 1}
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-white mb-0.5">{strength}</p>
-                  <p className="text-sm text-stone-400 leading-relaxed">
-                    Tu excelles naturellement dans : {strength.toLowerCase()}.
-                  </p>
+                  <p className="text-sm font-semibold text-stone-500 ur-cut select-none pointer-events-none">Signe verrouillé</p>
+                  <p className="text-sm text-stone-600">Dans le profil {type.code} complet.</p>
                 </div>
               </div>
             );
@@ -181,7 +172,7 @@ function SignsSection({ type }: { type: MbtiType }) {
   );
 }
 
-function DefinitionSection({ type }: { type: MbtiType }) {
+function DefinitionSection({ type }: { type: MbtiTypeFree }) {
   return (
     <section
       className="mb-10 rounded-2xl px-6 py-6"
@@ -213,76 +204,11 @@ function DefinitionSection({ type }: { type: MbtiType }) {
   );
 }
 
-function InLoveSection({ type }: { type: MbtiType }) {
-  return (
-    <section className="mb-10">
-      <div
-        className="rounded-2xl px-6 py-6"
-        style={{
-          background: 'rgba(224,163,128,0.05)',
-          border: '1px solid rgba(224,163,128,0.15)',
-        }}
-      >
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg">💕</span>
-          <h2 className="font-display text-lg font-black text-white">
-            Le {type.code} en amour
-          </h2>
-        </div>
-        <p className="text-sm text-stone-300 leading-relaxed">{type.inLove}</p>
-      </div>
-    </section>
-  );
-}
+// Note : les sections "en amour", "au travail" et "célébrités" sont payantes
+// (lib/mbti-premium.ts) — voir SuisJePremiumSections.tsx, chargé côté client
+// uniquement après vérification serveur du paiement.
 
-function AtWorkSection({ type }: { type: MbtiType }) {
-  return (
-    <section className="mb-10">
-      <div
-        className="rounded-2xl px-6 py-6"
-        style={{
-          background: 'rgba(176,125,43,0.05)',
-          border: '1px solid rgba(176,125,43,0.15)',
-        }}
-      >
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg">💼</span>
-          <h2 className="font-display text-lg font-black text-white">
-            Le {type.code} au travail
-          </h2>
-        </div>
-        <p className="text-sm text-stone-300 leading-relaxed">{type.atWork}</p>
-      </div>
-    </section>
-  );
-}
-
-function CelebSection({ type }: { type: MbtiType }) {
-  return (
-    <section className="mb-10">
-      <h2 className="font-display text-lg font-black text-white mb-4">
-        Célébrités {type.code} — tu es en bonne compagnie
-      </h2>
-      <div className="flex flex-wrap gap-2">
-        {type.famousExamples.map(celeb => (
-          <span
-            key={celeb}
-            className="px-4 py-2 rounded-full text-sm font-medium"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: '#e4e4e7',
-            }}
-          >
-            {celeb}
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function CtaCard({ type }: { type: MbtiType }) {
+function CtaCard({ type }: { type: MbtiTypeFree }) {
   return (
     <section className="mb-10">
       <div
@@ -315,7 +241,7 @@ function CtaCard({ type }: { type: MbtiType }) {
   );
 }
 
-function FaqSection({ type }: { type: MbtiType }) {
+function FaqSection({ type }: { type: MbtiTypeFree }) {
   const faqs = buildFaqs(type);
   return (
     <section className="mb-10">
@@ -346,7 +272,7 @@ function FaqSection({ type }: { type: MbtiType }) {
   );
 }
 
-function RelatedTypesSection({ type }: { type: MbtiType }) {
+function RelatedTypesSection({ type }: { type: MbtiTypeFree }) {
   return (
     <section className="mb-10 pt-8 border-t border-white/[0.06]">
       <h2 className="text-sm font-bold text-stone-500 mb-4">Explore aussi</h2>
@@ -623,37 +549,9 @@ export default function SuisJePage({ params }: Props) {
           {/* CTA milieu de page */}
           <CtaCard type={type} />
 
-          {/* En amour */}
-          <InLoveSection type={type} />
-
-          {/* Au travail */}
-          <AtWorkSection type={type} />
-
-          {/* Célébrités */}
-          <CelebSection type={type} />
-
-          {/* Types compatibles */}
-          <section className="mb-10">
-            <h2 className="font-display text-lg font-black text-white mb-4">
-              Types compatibles avec {type.code}
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {type.compatibleWith.map(c => (
-                <Link
-                  key={c}
-                  href={`/suis-je/${c.toLowerCase()}`}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    color: '#e4e4e7',
-                  }}
-                >
-                  {c} — {mbtiTypes[c]?.name ?? c}
-                </Link>
-              ))}
-            </div>
-          </section>
+          {/* Amour, travail, célébrités, compatibilité — payant, débloqué
+              côté client après vérification serveur du paiement */}
+          <SuisJePremiumSections code={type.code} />
 
           {/* Lien vers profil complet */}
           <div

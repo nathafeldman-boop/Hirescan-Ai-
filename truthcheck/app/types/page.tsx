@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { mbtiTypes, ALL_MBTI_TYPES } from '@/lib/mbti';
+import { ALL_MBTI_TYPES } from '@/lib/mbti';
+import { mbtiTypes } from '@/lib/mbti-server';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 

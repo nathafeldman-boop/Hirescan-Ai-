@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { mbtiTypes } from '@/lib/mbti';
+import { mbtiTypes } from '@/lib/mbti-server';
 import { getCompatibility, getAllPairs, parsePair } from '@/lib/compatibility';
 
 const BASE = 'https://urcecret.site';
@@ -58,6 +58,16 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
   if (!A || !B) notFound();
 
   const compat = getCompatibility(codeA, codeB);
+
+  // Note : on ne lit jamais A.compatibleWith ici (champ payant, lib/mbti-premium.ts)
+  // — cette page est server-rendered et publique (SEO/FAQ schema). Le classement
+  // ci-dessous est recalculé via le même score algorithmique que getCompatibility()
+  // (fonctions cognitives, lettres partagées), pas une copie du contenu payant.
+  const otherCompatibilities = Object.keys(mbtiTypes)
+    .filter(c => c !== codeA && c !== codeB)
+    .map(c => ({ code: c, score: getCompatibility(codeA, c).score }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6);
 
   const scoreColor =
     compat.score >= 85 ? '#22c55e' :
@@ -317,9 +327,7 @@ export default function CompatibilitePage({ params }: { params: { pair: string }
           <section className="mb-6">
             <h2 className="text-sm font-bold text-zinc-500 mb-3">Autres compatibilités {codeA}</h2>
             <div className="flex flex-wrap gap-2">
-              {(A.compatibleWith ?? []).filter(c => c !== codeB).slice(0, 6).map((code) => {
-                const t = mbtiTypes[code];
-                if (!t) return null;
+              {otherCompatibilities.map(({ code }) => {
                 const pairSlug = [codeA, code].sort().map(s => s.toLowerCase()).join('-');
                 return (
                   <Link

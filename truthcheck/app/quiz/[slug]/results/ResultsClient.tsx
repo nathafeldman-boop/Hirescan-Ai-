@@ -800,10 +800,14 @@ export default function ResultsClient({ quiz }: Props) {
                   ))}
                 </div>
 
-                {/* The analysis continues — blurred to prove there's real depth behind the unlock */}
+                {/* The analysis continues — blurred to prove there's real depth behind the unlock.
+                    Note : on n'affiche QUE un texte générique ici, jamais analysis.slice(3,6) —
+                    un flou CSS n'est pas une protection, ce texte resterait lisible dans le DOM
+                    (inspecteur / view-source) même flouté. Le vrai contenu n'est révélé qu'en
+                    isPremium (branche ci-dessus, session serveur vérifiée). */}
                 <div className="relative mt-3" aria-hidden>
                   <div className="space-y-3" style={{ filter: 'blur(5px)', opacity: 0.4, userSelect: 'none', pointerEvents: 'none' }}>
-                    {analysis.slice(3, 6).map((line, i) => (
+                    {['Suite de l\'analyse réservée aux membres.', 'Suite de l\'analyse réservée aux membres.', 'Suite de l\'analyse réservée aux membres.'].map((line, i) => (
                       <p key={i} className="text-zinc-400 text-sm leading-relaxed">{line}</p>
                     ))}
                   </div>

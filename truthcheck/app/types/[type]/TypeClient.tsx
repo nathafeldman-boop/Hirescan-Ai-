@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { MbtiType } from '@/lib/mbti';
-import { mbtiTypesEn } from '@/lib/i18n/mbtiTypesEn';
+import { MbtiTypeFree } from '@/lib/mbti-free';
+import { MbtiTypePremium } from '@/lib/mbti-premium';
+import { mbtiTypesEnFree } from '@/lib/i18n/mbtiTypesEnFree';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import Seal from '@/components/Seal';
@@ -35,7 +36,7 @@ const HOOK_LINES: Record<string, string> = {
 };
 
 interface Props {
-  type: MbtiType;
+  type: MbtiTypeFree;
 }
 
 
@@ -45,8 +46,25 @@ export default function TypeClient({ type }: Props) {
   const sessionLoading = status === 'loading';
   const { lang } = useLang();
   const t = ui[lang].type;
-  const enData = mbtiTypesEn[type.code] ?? {};
-  const localType: MbtiType = lang === 'en' ? { ...type, ...enData } as MbtiType : type;
+  const enData = mbtiTypesEnFree[type.code] ?? {};
+  const localType: MbtiTypeFree = lang === 'en' ? { ...type, ...enData } as MbtiTypeFree : type;
+
+  // Contenu payant : jamais importé statiquement (fuirait dans le bundle
+  // client public). Récupéré uniquement après vérification serveur du
+  // paiement, via /api/profile/[code] (voir ce fichier pour le détail).
+  const [premium, setPremium] = useState<MbtiTypePremium | null>(null);
+  const [premiumLoading, setPremiumLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isPremium) { setPremium(null); return; }
+    let cancelled = false;
+    setPremiumLoading(true);
+    fetch(`/api/profile/${type.code}?lang=${lang}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (!cancelled) { setPremium(data); setPremiumLoading(false); } })
+      .catch(() => { if (!cancelled) setPremiumLoading(false); });
+    return () => { cancelled = true; };
+  }, [isPremium, type.code, lang]);
 
   const [loading, setLoading] = useState(false);
 
@@ -124,6 +142,13 @@ export default function TypeClient({ type }: Props) {
   // PREMIUM : rapport complet révélé + accès aux 15 tests UrCecret
   // ─────────────────────────────────────────────────────────────
   if (isPremium) {
+    if (premiumLoading || !premium) {
+      return (
+        <div className="mt-10 flex justify-center py-16">
+          <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+        </div>
+      );
+    }
     return (
       <div className="mt-10 space-y-6">
         {/* Bannière débloqué */}
@@ -144,28 +169,28 @@ export default function TypeClient({ type }: Props) {
         </Section>
 
         <Section title={t.sectionWhoAreYou} accent="var(--gold)">
-          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.fullDesc}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{premium.fullDesc}</p>
         </Section>
 
         <Section title={t.sectionInLove} accent="var(--gold)">
-          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.inLove}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{premium.inLove}</p>
         </Section>
 
         <Section title={t.sectionAtWork} accent="var(--gold)">
-          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.atWork}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{premium.atWork}</p>
         </Section>
 
         <div className="grid sm:grid-cols-2 gap-6">
           <Section title={t.sectionStrengths} accent="var(--gold)">
             <ul className="space-y-2">
-              {localType.strengths.map(s => (
+              {premium.strengths.map(s => (
                 <li key={s} className="flex gap-2 text-sm text-stone-300"><span className="text-emerald-400 mt-0.5">✓</span>{s}</li>
               ))}
             </ul>
           </Section>
           <Section title={t.sectionWeaknesses} accent="var(--gold)">
             <ul className="space-y-2">
-              {localType.weaknesses.map(s => (
+              {premium.weaknesses.map(s => (
                 <li key={s} className="flex gap-2 text-sm text-stone-300"><span className="text-amber-400 mt-0.5">!</span>{s}</li>
               ))}
             </ul>
@@ -173,12 +198,12 @@ export default function TypeClient({ type }: Props) {
         </div>
 
         <Section title={t.sectionGrowth} accent="var(--gold)">
-          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{localType.growth}</p>
+          <p className="text-stone-300 text-sm leading-relaxed whitespace-pre-line">{premium.growth}</p>
         </Section>
 
         <Section title={t.sectionFamous} accent="var(--gold)">
           <div className="flex flex-wrap gap-2">
-            {type.famousExamples.map(f => (
+            {premium.famousExamples.map(f => (
               <span key={f} className="px-3 py-1.5 rounded-full text-xs font-medium text-stone-300" style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>{f}</span>
             ))}
           </div>
@@ -186,7 +211,7 @@ export default function TypeClient({ type }: Props) {
 
         <Section title={t.sectionCompatibility} accent="var(--gold)">
           <div className="flex flex-wrap gap-3">
-            {type.compatibleWith.map(c => (
+            {premium.compatibleWith.map(c => (
               <a key={c} href={`/types/${c.toLowerCase()}`}
                 className="px-4 py-2 rounded-lg text-sm font-bold text-stone-300 hover:text-white transition-all"
                 style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)' }}>
