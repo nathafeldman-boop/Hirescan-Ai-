@@ -22,6 +22,7 @@ import Tracker from './Tracker';
 import { Suspense } from 'react';
 import AffiliateTracker from '@/components/AffiliateTracker';
 import Analytics from '@/components/Analytics';
+import ChatFab from '@/components/ChatFab';
 
 const BASE = 'https://urcecret.site';
 
@@ -146,6 +147,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Analytics />
           </Suspense>
           {children}
+          <Suspense fallback={null}>
+            <ChatFab />
+          </Suspense>
         </Providers>
       </body>
     </html>
