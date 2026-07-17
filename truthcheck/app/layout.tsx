@@ -80,11 +80,14 @@ export const metadata: Metadata = {
     },
   },
   icons: {
+    // Google Search n'affiche un favicon que si c'est un carré multiple de 48px.
     icon: [
-      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/logo-oracle.png', sizes: '256x256', type: 'image/png' },
+      { url: '/favicon-48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/favicon-96.png', sizes: '96x96', type: 'image/png' },
+      { url: '/favicon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon-512.png', sizes: '512x512', type: 'image/png' },
     ],
-    shortcut: '/icon.png',
+    shortcut: '/favicon-96.png',
     apple: '/apple-icon.png',
   },
 };
