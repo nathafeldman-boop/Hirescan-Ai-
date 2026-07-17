@@ -346,55 +346,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Compatibility CTA */}
-      <section className="relative z-10 py-6 px-6">
-        <div className="max-w-lg mx-auto">
-          <div
-            className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
-            style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
-          >
-            <div>
-              <p className="ur-label text-[10px] mb-1.5" style={{ color: 'var(--ink)', opacity: 0.55 }}>Mode duo</p>
-              <h2 className="font-display text-lg font-black text-stone-900 mb-1">
-                Test de compatibilité MBTI
-              </h2>
-              <p className="text-stone-500 text-xs leading-relaxed max-w-xs">
-                Chacun répond séparément. Les deux profils sont comparés sur 4 dimensions cognitives.
-              </p>
-            </div>
-            <Link
-              href="/duo"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all hover:opacity-90 whitespace-nowrap"
-              style={{ background: 'var(--ink)', color: '#FAF6EC' }}
-            >
-              Tester la compatibilité →
-            </Link>
-          </div>
-
-          {/* Fusion card */}
-          <div
-            className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-3"
-            style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
-          >
-            <div>
-              <p className="ur-label text-[10px] mb-1.5" style={{ color: 'var(--gold)' }}>Mode groupe</p>
-              <h2 className="font-display text-lg font-black text-stone-900 mb-1">
-                Fusion, quiz de groupe
-              </h2>
-              <p className="text-stone-500 text-xs leading-relaxed max-w-xs">
-                2 à 10 personnes répondent ensemble et découvrent le profil collectif de leur groupe.
-              </p>
-            </div>
-            <Link
-              href="/fusion"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all hover:opacity-90 whitespace-nowrap"
-              style={{ background: 'var(--gold)', color: '#FAF6EC' }}
-            >
-              Lancer un Fusion →
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* 4 family sections */}
       <section className="relative z-10 py-10 px-6">
@@ -480,8 +431,7 @@ export default function LandingPage() {
           </span>
           <div className="flex items-center gap-6 text-stone-400 text-xs">
             <Link href="/types" className="hover:text-stone-700 transition-colors">16 types</Link>
-            <Link href="/duo" className="hover:text-stone-700 transition-colors">Compatibilité</Link>
-            <Link href="/fusion" className="hover:text-stone-700 transition-colors">Fusion</Link>
+            <Link href="/quiz/personnalite" className="hover:text-stone-700 transition-colors">Test MBTI</Link>
             <Link href="/mentions-legales" className="hover:text-stone-700 transition-colors">Mentions légales</Link>
             <Link href="/politique-confidentialite" className="hover:text-stone-700 transition-colors">Confidentialité</Link>
           </div>

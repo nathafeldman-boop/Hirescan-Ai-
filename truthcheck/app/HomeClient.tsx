@@ -96,7 +96,7 @@ export default function HomeClient() {
         <span style={{ fontWeight: 700, fontSize: 18, letterSpacing: '-0.5px' }}>UrCecret</span>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <Link href="/quiz/personnalite" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, padding: '6px 12px' }}>Quiz</Link>
-          <Link href="/duo" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, padding: '6px 12px' }}>Mode duo</Link>
+          <Link href="/types" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, padding: '6px 12px' }}>16 types</Link>
           <Link href="/api/auth/signin" style={{
             background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
             color: '#fff', borderRadius: 8, padding: '6px 16px', fontSize: 14, textDecoration: 'none',

@@ -225,10 +225,10 @@ export default function TypeClient({ type }: Props) {
           style={{ borderColor: `var(--gold-line)`, background: `var(--gold-soft)` }}>
           <h3 className="text-lg font-black text-white mb-2">Ton accès UrCecret est ouvert</h3>
           <p className="text-sm text-stone-400 mb-4 max-w-sm mx-auto">{t.quizzesDesc}</p>
-          <a href="/duo"
+          <a href="/types"
             className="inline-block px-7 py-3.5 rounded-full font-bold text-sm transition-all hover:scale-[1.02]"
             style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
-            Test de compatibilité →
+            Explore les 16 types →
           </a>
         </div>
       </div>

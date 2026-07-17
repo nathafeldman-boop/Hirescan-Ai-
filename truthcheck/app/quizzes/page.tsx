@@ -101,36 +101,6 @@ export default function QuizzesPage() {
               </h1>
             </div>
 
-            {/* Mode Équipe banner */}
-            <Link
-              href="/duo"
-              className="group relative rounded-2xl overflow-hidden mb-4 block transition-all duration-300 hover:scale-[1.02] active:scale-[0.99]"
-              style={{ background: 'white', border: '1px solid rgba(169,78,24,0.2)', boxShadow: '0 2px 12px rgba(169,78,24,0.08)' }}
-            >
-              <div className="relative p-5 flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl"
-                  style={{ background: 'rgba(169,78,24,0.08)', border: '1px solid rgba(169,78,24,0.15)' }}>
-                  🧩
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-stone-900 font-black text-base">Mode Équipe</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(209,125,82,0.1)', color: '#d17d52', border: '1px solid rgba(209,125,82,0.2)' }}>
-                      Nouveau
-                    </span>
-                  </div>
-                  <p className="text-stone-400 text-xs leading-relaxed">
-                    Rejoint avec un code · Chacun répond seul · Comparez vos secrets
-                  </p>
-                </div>
-                <svg className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                  style={{ color: '#a94e18' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
-
             {/* Personnalité 16 types banner */}
             <Link
               href="/quiz/personnalite"

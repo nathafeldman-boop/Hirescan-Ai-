@@ -1020,37 +1020,6 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
           </div>
 
-          {/* Mode Duo CTA */}
-          <div
-            className="mt-4 rounded-2xl overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.12), rgba(209,125,82,0.10))', border: '1px solid rgba(194,97,31,0.28)' }}
-          >
-            <div className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">🔥</span>
-                <div>
-                  <p className="text-white font-black text-sm leading-snug">Tu penses vraiment le/la connaître ?</p>
-                  <p className="text-zinc-500 text-xs mt-0.5">Fais ce quiz avec lui/elle — vous serez surpris</p>
-                </div>
-              </div>
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(`🔥 Tu penses me connaître vraiment ?\n\nFais ce quiz et compare tes réponses avec les miennes sans tricher 👀\n\nhttps://urcecret.site/duo`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98] mb-2"
-                style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 20px rgba(194,97,31,0.35)' }}
-              >
-                📲 Envoie ce défi à ton/ta partenaire
-              </a>
-              <Link
-                href="/duo"
-                className="block text-center text-xs text-zinc-600 hover:text-zinc-400 transition-colors py-1"
-              >
-                Voir les 5 quiz duo →
-              </Link>
-            </div>
-          </div>
-
           {/* MBTI cross-sell */}
           <div
             className="mt-4 rounded-2xl overflow-hidden border"

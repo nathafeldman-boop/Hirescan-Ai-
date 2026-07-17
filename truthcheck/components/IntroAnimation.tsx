@@ -346,15 +346,6 @@ export default function IntroAnimation({ onComplete }: Props) {
           >
             💔 Questionnaires vérité
           </Link>
-
-          <Link
-            href="/duo"
-            className="w-full py-3.5 rounded-2xl font-bold text-white text-center text-sm transition-all active:scale-95 border border-white/20 hover:border-white/40"
-            style={{ background: 'rgba(255,255,255,0.06)' }}
-            onClick={onComplete}
-          >
-            🧩 Mode Équipe
-          </Link>
         </div>
 
         <button

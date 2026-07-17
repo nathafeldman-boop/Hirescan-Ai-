@@ -8,6 +8,17 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   productionBrowserSourceMaps: false,
+  async redirects() {
+    // Modes Duo (compatibilité interactive) et Fusion (quiz de groupe) retirés.
+    // On redirige leurs URLs vers le test MBTI pour ne pas casser les liens
+    // entrants ni le SEO. (Les pages SEO /compatibilite/[pair] restent, elles.)
+    return [
+      { source: '/duo', destination: '/quiz/personnalite', permanent: true },
+      { source: '/duo/:path*', destination: '/quiz/personnalite', permanent: true },
+      { source: '/fusion', destination: '/quiz/personnalite', permanent: true },
+      { source: '/fusion/:path*', destination: '/quiz/personnalite', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

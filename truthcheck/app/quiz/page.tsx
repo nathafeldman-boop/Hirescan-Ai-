@@ -18,26 +18,6 @@ function BrainIcon({ color }: { color: string }) {
   );
 }
 
-function DuoIcon({ color }: { color: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="8" cy="7" r="3" />
-      <path d="M3 20v-1a5 5 0 0 1 10 0v1" />
-      <circle cx="16" cy="7" r="3" strokeOpacity="0.55" />
-      <path d="M13 20v-1a5 5 0 0 1 8 0v1" strokeOpacity="0.55" />
-      <line x1="12" y1="10" x2="12" y2="14" strokeDasharray="2 1.5" strokeOpacity="0.35" />
-    </svg>
-  );
-}
-
-function ArrowRight({ color = '#fff', size = 16 }: { color?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <path d="M3 8h10M9 4l4 4-4 4" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default function QuizIndexPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#09090b', color: '#fff', fontFamily: 'system-ui, sans-serif' }}>
@@ -54,9 +34,6 @@ export default function QuizIndexPage() {
           UrCecret
         </Link>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Link href="/duo" style={{ color: 'rgba(255,255,255,0.65)', textDecoration: 'none', fontSize: 14, padding: '6px 12px' }}>
-            Mode duo
-          </Link>
           <UserMenu />
         </div>
       </nav>
@@ -78,65 +55,6 @@ export default function QuizIndexPage() {
             {quizzes.length + 1} quiz · résultats immédiats · analyse IA
           </p>
         </div>
-
-        {/* DUO MODE — prominent discovery block */}
-        <Link href="/duo" style={{ textDecoration: 'none', color: '#fff', display: 'block', marginBottom: 52 }}>
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.03) 100%)',
-            border: '1px solid rgba(16,185,129,0.28)',
-            borderRadius: 20, padding: '28px 32px',
-            position: 'relative', overflow: 'hidden',
-          }}>
-            <div style={{
-              position: 'absolute', top: -50, right: -50,
-              width: 220, height: 220,
-              background: 'radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 70%)',
-              borderRadius: '50%', pointerEvents: 'none',
-            }} />
-            <div style={{
-              position: 'absolute', bottom: -30, left: '40%',
-              width: 120, height: 120,
-              background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)',
-              borderRadius: '50%', pointerEvents: 'none',
-            }} />
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20, position: 'relative', flexWrap: 'wrap' }}>
-              <div style={{
-                width: 56, height: 56, borderRadius: 16,
-                background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                boxShadow: '0 0 24px rgba(16,185,129,0.15)',
-              }}>
-                <div style={{ width: 30, height: 30 }}><DuoIcon color="#10b981" /></div>
-              </div>
-
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#10b981', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 7 }}>
-                  Nouveau · Mode duo
-                </div>
-                <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 5, letterSpacing: '-0.5px' }}>
-                  Jouez à deux — comparez vos réponses
-                </div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                  <span>5 quiz de compatibilité</span>
-                  <span>·</span>
-                  <span>Code partageable</span>
-                  <span>·</span>
-                  <span>Score commun</span>
-                </div>
-              </div>
-
-              <div style={{
-                background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.28)',
-                borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, color: '#10b981',
-                display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
-              }}>
-                Démarrer
-                <ArrowRight color="#10b981" />
-              </div>
-            </div>
-          </div>
-        </Link>
 
         {/* MBTI featured */}
         <div style={{ marginBottom: 48 }}>

@@ -163,18 +163,15 @@ export default function DashboardClient({ user }: Props) {
         {/* Feature row */}
         <div className="grid grid-cols-2 gap-3">
           <Link
-            href={isPremium ? '/duo' : '/pricing'}
+            href="/quiz/personnalite"
             className="rounded-2xl p-4 transition-all hover:scale-[1.02] group"
             style={{ background: theme.card, border: `1px solid ${theme.cardBorder}` }}
           >
             <div className="flex items-start justify-between mb-3">
-              <span className="text-2xl">💑</span>
-              {!isPremium && (
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full" style={{ background: theme.accentBg, color: theme.accent }}>Pro</span>
-              )}
+              <span className="text-2xl">🧭</span>
             </div>
-            <p className="text-sm font-bold" style={{ color: theme.text }}>Compatibilité</p>
-            <p className="text-xs mt-0.5 leading-snug" style={{ color: theme.muted }}>Compare avec quelqu&apos;un</p>
+            <p className="text-sm font-bold" style={{ color: theme.text }}>Test MBTI</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: theme.muted }}>Découvre ton type</p>
           </Link>
 
           <Link
