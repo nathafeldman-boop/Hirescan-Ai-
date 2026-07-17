@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { mbtiTypes } from '@/lib/mbti-server';
 import SuccessTracker from './SuccessTracker';
 import SuccessUpsellButton from './SuccessUpsellButton';
+import ShareResultCard from '@/components/ShareResultCard';
 
 async function verifyAndUnlock(sessionId: string | undefined, resultId: string | undefined, typeCode: string | undefined) {
   if (!sessionId || !process.env.STRIPE_SECRET_KEY) return { paid: false, email: null as string | null, affiliateSlug: null as string | null, isOneTime: false, amountEur: 0 };
@@ -272,6 +273,13 @@ export default async function SuccessPage({
             <p className="text-sm" style={{ color: 'var(--ink-text-muted)' }}>Résultat 1/2 — ton profil MBTI est prêt.</p>
           )}
         </div>
+
+        {/* Carte partageable — enregistrable en photo pour les réseaux */}
+        {paid && typeCode && mbtiTypes[typeCode] && (
+          <div className="mb-6">
+            <ShareResultCard code={typeCode} />
+          </div>
+        )}
 
         {/* ── 2ème résultat — choix du quiz ── */}
         {paid && typeCode && (
