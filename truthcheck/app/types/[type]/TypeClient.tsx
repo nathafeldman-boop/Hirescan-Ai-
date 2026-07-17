@@ -223,13 +223,18 @@ export default function TypeClient({ type }: Props) {
 
         <div className="rounded-2xl p-6 border text-center"
           style={{ borderColor: `var(--gold-line)`, background: `var(--gold-soft)` }}>
-          <h3 className="text-lg font-black text-white mb-2">Ton accès UrCecret est ouvert</h3>
-          <p className="text-sm text-stone-400 mb-4 max-w-sm mx-auto">{t.quizzesDesc}</p>
-          <a href="/types"
+          <h3 className="text-lg font-black text-white mb-2">Continue avec ton coach</h3>
+          <p className="text-sm text-stone-400 mb-4 max-w-sm mx-auto">
+            Ton coach IA connaît ton profil {type.code}. Pose-lui tout — relations, travail, décisions — il te répond d’après ton test.
+          </p>
+          <a href="/chat?start=result"
             className="inline-block px-7 py-3.5 rounded-full font-bold text-sm transition-all hover:scale-[1.02]"
             style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
-            Explore les 16 types →
+            🔮 Approfondis avec ton coach →
           </a>
+          <div className="mt-3">
+            <a href="/types" className="text-xs" style={{ color: 'var(--ink-text-muted)' }}>Explore les 16 types →</a>
+          </div>
         </div>
       </div>
     );

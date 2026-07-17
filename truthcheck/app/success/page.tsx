@@ -281,6 +281,13 @@ export default async function SuccessPage({
           </div>
         )}
 
+        {/* Pont vers le coach IA — démarre une lecture personnalisée du profil */}
+        {paid && typeCode && (
+          <Link href="/chat?start=result" className="ur-btn-gold w-full py-4 text-sm mb-6">
+            🔮 Approfondis ton profil avec ton coach →
+          </Link>
+        )}
+
         {/* ── 2ème résultat — choix du quiz ── */}
         {paid && typeCode && (
           <div className="ur-panel-ink mb-6" style={{ padding: '20px 20px 16px' }}>

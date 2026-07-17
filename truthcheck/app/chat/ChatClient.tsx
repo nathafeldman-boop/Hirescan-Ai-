@@ -24,6 +24,35 @@ export default function ChatClient() {
   const [mbtiType, setMbtiType] = useState<string | null>(null);
   const [openCat, setOpenCat] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const seededRef = useRef(false);
+
+  // Ouverture "déjà lancée" depuis un résultat : le coach démarre par une
+  // lecture personnalisée. Le message d'amorce est envoyé mais NON affiché —
+  // on ne montre que la réponse du coach (effet "il me connaît déjà").
+  const seedCoach = useCallback(async (prompt: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: prompt }),
+      });
+      if (res.status === 429) {
+        const d = await res.json().catch(() => ({}));
+        setQuotaHit(true); setRemaining(0);
+        if (typeof d.limit === 'number') setLimit(d.limit);
+        return;
+      }
+      if (!res.ok) return;
+      const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number };
+      if (data.needsTest) { setHasProfile(false); return; }
+      setMessages([{ role: 'assistant', content: data.reply ?? '' }]);
+      if (typeof data.remaining === 'number') setRemaining(data.remaining);
+      if (typeof data.limit === 'number') setLimit(data.limit);
+      if ((data.remaining ?? 1) <= 0) setQuotaHit(true);
+    } catch { /* on ignore : l'utilisateur peut écrire lui-même */ }
+    finally { setLoading(false); }
+  }, []);
 
   // ── Chargement de l'historique (mémoire) ──
   useEffect(() => {
@@ -35,14 +64,25 @@ export default function ChatClient() {
         if (cancelled || !d) { setBooting(false); return; }
         setHasProfile(!!d.hasProfile);
         setMbtiType(d.mbtiType ?? null);
-        setMessages(Array.isArray(d.messages) ? d.messages : []);
+        const msgs = Array.isArray(d.messages) ? d.messages : [];
+        setMessages(msgs);
         setRemaining(d.remaining ?? null);
         setLimit(d.limit ?? null);
         if (typeof d.remaining === 'number' && d.remaining <= 0) setQuotaHit(true);
         setBooting(false);
+
+        // Amorce depuis un résultat (?start=…) : uniquement si le fil est vide.
+        let wantSeed = false;
+        try { wantSeed = !!new URLSearchParams(window.location.search).get('start'); } catch {}
+        if (wantSeed) { try { window.history.replaceState(null, '', '/chat'); } catch {} }
+        if (wantSeed && msgs.length === 0 && d.hasProfile && d.remaining > 0 && !seededRef.current) {
+          seededRef.current = true;
+          void seedCoach('Présente-moi mon profil comme si tu me connaissais déjà : mes 2 plus grandes forces, mon principal angle mort, et le premier truc sur lequel je devrais travailler. Parle-moi de MOI d’après mon test, pas en généralités.');
+        }
       })
       .catch(() => { if (!cancelled) setBooting(false); });
     return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   useEffect(() => {
