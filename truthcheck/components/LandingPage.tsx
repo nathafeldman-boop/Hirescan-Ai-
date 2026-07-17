@@ -123,20 +123,24 @@ export default function LandingPage() {
             UrCecret
           </span>
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Chatbot : accès secondaire, discret — le test MBTI reste la star */}
             <Link
               href="/chat"
-              className="text-sm font-semibold px-3.5 py-2 rounded-full transition-all duration-300 hover:opacity-80 active:scale-[0.97] whitespace-nowrap inline-flex items-center gap-1.5"
+              className="flex-shrink-0 text-[13px] font-semibold px-3 py-1.5 rounded-full transition-all duration-300 hover:opacity-100 active:scale-[0.97] whitespace-nowrap inline-flex items-center gap-1"
               style={{
                 color: scrolled ? 'var(--ink)' : '#FAF6EC',
-                border: `1px solid ${scrolled ? 'var(--line)' : 'rgba(250,246,236,0.28)'}`,
+                opacity: 0.75,
+                border: `1px solid ${scrolled ? 'var(--line)' : 'rgba(250,246,236,0.22)'}`,
               }}
             >
               <span aria-hidden>✦</span> Chatbot
             </Link>
             <UserMenu />
+            {/* CTA principal (le test) — masqué sur mobile car le hero juste en
+                dessous porte déjà le gros CTA, et la barre sticky prend le relais */}
             <Link
               href="/quiz/personnalite"
-              className="text-sm font-bold px-5 py-2.5 rounded-full transition-all duration-300 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
+              className="hidden sm:inline-flex text-sm font-bold px-5 py-2.5 rounded-full transition-all duration-300 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
               style={scrolled
                 ? { background: 'var(--ink)', color: '#FAF6EC' }
                 : { background: 'var(--gold)', color: 'var(--ink)' }}

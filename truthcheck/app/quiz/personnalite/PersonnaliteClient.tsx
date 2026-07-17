@@ -1249,7 +1249,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 export default function PersonnaliteClient() {
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
-  const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
+  const isPremium = ['premium', 'plus'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
   const { lang } = useLang();
   const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>(() => {
     if (typeof window !== 'undefined') {

@@ -15,7 +15,7 @@ interface Props {
 // (même route que TypeClient.tsx).
 export default function CelebritesClient({ code, accentColor }: Props) {
   const { data: session, status } = useSession();
-  const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
+  const isPremium = ['premium', 'plus'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
   const sessionLoading = status === 'loading';
 
   const [famousExamples, setFamousExamples] = useState<string[] | null>(null);

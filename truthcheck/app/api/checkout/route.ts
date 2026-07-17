@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
+import { PLUS_PRICE_ID } from '@/lib/plans';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, rapport, typeCode, affiliateRef, fusionGroupId, fusionCode } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, plus, rapport, typeCode, affiliateRef, fusionGroupId, fusionCode } = await req.json();
     const affiliateSlug = req.cookies.get('urs_ref')?.value || (typeof affiliateRef === 'string' ? affiliateRef : '') || '';
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
@@ -129,6 +130,21 @@ export async function POST(req: NextRequest) {
         cancel_url: cancelUrl,
       });
       return NextResponse.json({ url: annualSession.url });
+    }
+
+    // ── Abonnement "plus" — 5€/mois (MBTI débloqué + 30 messages chatbot/jour) ──
+    if (plus) {
+      const plusSession = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [{ price: PLUS_PRICE_ID, quantity: 1 }],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        // plan:'plus' → le webhook fixe tier='plus' (et pas 'premium')
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', plan: 'plus', affiliateSlug, ...utmMeta },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      return NextResponse.json({ url: plusSession.url });
     }
 
     // ── One-time purchase: unlock just this result ──

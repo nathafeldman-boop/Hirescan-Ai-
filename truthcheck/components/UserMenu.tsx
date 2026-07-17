@@ -35,7 +35,7 @@ export default function UserMenu() {
 
   const user = session.user;
   const tier = (user as { tier?: string }).tier ?? 'free';
-  const isPremium = tier === 'premium';
+  const isPremium = tier === 'premium' || tier === 'plus';
   const initials = (user.name?.charAt(0) ?? user.email?.charAt(0) ?? '?').toUpperCase();
 
   async function openBillingPortal() {

@@ -43,7 +43,7 @@ const LIGHT = {
 };
 
 export default function DashboardClient({ user }: Props) {
-  const isPremium = user.tier === 'premium' || user.tier === 'pro';
+  const isPremium = user.tier === 'premium' || user.tier === 'pro' || user.tier === 'plus';
   const theme = isPremium ? DARK : LIGHT;
   const type = user.mbtiType ? mbtiTypes[user.mbtiType] : null;
   const firstName = user.name?.split(' ')[0] ?? 'toi';

@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
 import { emailPremiumWelcome, sendEmail } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
+import { PLUS_PRICE_ID } from '@/lib/plans';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,11 +68,13 @@ export async function POST(req: NextRequest) {
       }
 
       // ── Subscription or rapport → upgrade user tier ──
+      // plan:'plus' (abonnement 5€) → tier 'plus' ; sinon 'premium'.
       if (email && (meta.annual === 'true' || session.mode === 'subscription' || meta.rapport === 'true')) {
+        const tier = meta.plan === 'plus' ? 'plus' : 'premium';
         await prisma.user.upsert({
           where: { email },
-          create: { email, tier: 'premium' },
-          update: { tier: 'premium' },
+          create: { email, tier },
+          update: { tier },
         }).catch(() => {});
       }
 
@@ -147,15 +150,18 @@ export async function POST(req: NextRequest) {
       }).catch(() => {});
     }
 
-    // ── Subscription renewal → keep tier premium ──
+    // ── Subscription renewal → maintient le bon palier ──
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object as Stripe.Invoice;
       const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email.toLowerCase().trim() : null;
       if (customerEmail) {
+        // On lit le prix facturé pour ne pas passer un abonné 5€ (plus) en premium.
+        const isPlus = invoice.lines?.data?.some((l) => l.price?.id === PLUS_PRICE_ID) ?? false;
+        const tier = isPlus ? 'plus' : 'premium';
         await prisma.user.upsert({
           where: { email: customerEmail },
-          create: { email: customerEmail, tier: 'premium' },
-          update: { tier: 'premium' },
+          create: { email: customerEmail, tier },
+          update: { tier },
         }).catch(() => {});
       }
     }
@@ -176,7 +182,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Subscription updated (plan change) → keep premium ──
+    // ── Subscription updated (plan change) → maintient le bon palier ──
     if (event.type === 'customer.subscription.updated') {
       const sub = event.data.object as Stripe.Subscription;
       if (sub.status === 'active' || sub.status === 'trialing') {
@@ -185,9 +191,11 @@ export async function POST(req: NextRequest) {
         if (customer && !customer.deleted) {
           const customerEmail = (customer as Stripe.Customer).email?.toLowerCase().trim();
           if (customerEmail) {
+            const isPlus = sub.items?.data?.some((i) => i.price?.id === PLUS_PRICE_ID) ?? false;
+            const tier = isPlus ? 'plus' : 'premium';
             await prisma.user.updateMany({
               where: { email: customerEmail },
-              data: { tier: 'premium' },
+              data: { tier },
             }).catch(() => {});
           }
         }

@@ -103,7 +103,7 @@ export default function ResultsClient({ quiz }: Props) {
   const score = Math.max(0, Math.min(100, rawScore));
 
   const { data: session, status } = useSession();
-  const isPremium = (session?.user as { tier?: string } | undefined)?.tier === 'premium';
+  const isPremium = ['premium', 'plus'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
   const sessionLoading = status === 'loading';
 
   const tier = getResultTier(quiz, score);
