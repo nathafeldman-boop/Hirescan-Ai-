@@ -31,19 +31,9 @@ export const MAX_TOKENS = 600;
 // On ne renvoie que les N derniers messages à l'API (contexte borné = coût borné).
 export const MAX_HISTORY = 12;
 
-export const SYSTEM_PROMPT = `Tu es l'assistant d'UrCecret, un guide bienveillant et perspicace spécialisé dans la personnalité : le modèle des 16 types (MBTI) et les 8 fonctions cognitives de Carl Jung.
-
-Ton rôle : aider la personne à mieux se comprendre — son fonctionnement, ses forces, ses angles morts, ses relations, ses choix de vie — à la lumière de son type de personnalité.
-
-Style :
-- Réponds toujours en français, sur un ton chaleureux, direct et concret. Tutoie la personne.
-- Sois concis : quelques paragraphes courts maximum, pas de pavé. Va à l'essentiel.
-- Appuie-toi sur les fonctions cognitives quand c'est pertinent, sans jargon inutile.
-
-Règles importantes :
-- Si tu ne connais pas le type MBTI de la personne, ne l'invente pas : demande-lui, ou propose-lui de passer le test UrCecret pour le découvrir.
-- Tu n'es pas thérapeute ni médecin. Face à une détresse psychologique réelle (dépression, pensées suicidaires, danger), exprime de l'empathie et oriente clairement vers un professionnel de santé ou une ligne d'écoute.
-- Reste dans ton domaine : personnalité, connaissance de soi, relations, développement personnel. Décline poliment ce qui en sort.`;
+// Le prompt système est désormais construit par requête (coach personnalisé) —
+// voir lib/coach.ts (coachSystemPrompt + buildCoachContext). callMistral le
+// reçoit en paramètre.
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -57,14 +47,14 @@ interface MistralResult {
   status?: number;
 }
 
-// Appelle l'API Mistral avec l'historique + le prompt système. Retourne la
-// réponse de l'assistant, ou une erreur exploitable côté route.
-export async function callMistral(history: ChatMessage[]): Promise<MistralResult> {
+// Appelle l'API Mistral avec le prompt système (coach) + l'historique borné.
+// Retourne la réponse de l'assistant, ou une erreur exploitable côté route.
+export async function callMistral(system: string, history: ChatMessage[]): Promise<MistralResult> {
   const key = process.env.MISTRAL_API_KEY;
   if (!key) return { ok: false, error: 'not_configured', status: 503 };
 
   const messages = [
-    { role: 'system' as const, content: SYSTEM_PROMPT },
+    { role: 'system' as const, content: system },
     ...history.slice(-MAX_HISTORY).map((m) => ({ role: m.role, content: m.content })),
   ];
 

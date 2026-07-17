@@ -131,7 +131,13 @@ export const mbtiQuestions: MbtiQuestion[] = [
   { id: 70, dimension: 'TF', text: "Je préfère tenir compte du contexte humain.",                              optionA: { text: OUI, pole: 'F' }, optionB: { text: NON, pole: 'T' } },
 ];
 
-export function computeMbtiType(answers: Record<number, QuizAnswer>): string {
+// Score par axe : la lettre gagnante + la force de préférence (50–100%).
+export interface MbtiDimensionScore { letter: string; pct: number }
+export type MbtiAxis = 'EI' | 'SN' | 'TF' | 'JP';
+export type MbtiScores = Record<MbtiAxis, MbtiDimensionScore>;
+export interface MbtiProfile { type: string; scores: MbtiScores }
+
+function rawPoleScores(answers: Record<number, QuizAnswer>): Record<string, number> {
   const sc: Record<string, number> = { E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0 };
   for (const q of mbtiQuestions) {
     const ans = answers[q.id];
@@ -143,7 +149,27 @@ export function computeMbtiType(answers: Record<number, QuizAnswer>): string {
     else if (ans === 'E') sc[q.optionB.pole] += 2;
     // C = neutral, no points
   }
+  return sc;
+}
+
+export function computeMbtiType(answers: Record<number, QuizAnswer>): string {
+  const sc = rawPoleScores(answers);
   return `${sc.E >= sc.I ? 'E' : 'I'}${sc.S >= sc.N ? 'S' : 'N'}${sc.T >= sc.F ? 'T' : 'F'}${sc.J >= sc.P ? 'J' : 'P'}`;
+}
+
+// Comme computeMbtiType, mais conserve la FORCE de préférence par axe —
+// c'est ce signal (ex : "Sentiment 80%", "J/P 54% proche de la limite") qui
+// permet au coach IA de personnaliser au lieu de rester générique.
+export function computeMbtiProfile(answers: Record<number, QuizAnswer>): MbtiProfile {
+  const sc = rawPoleScores(answers);
+  const axis = (a: string, b: string): MbtiDimensionScore => {
+    const total = sc[a] + sc[b];
+    const winner = sc[a] >= sc[b] ? a : b;
+    const pct = total > 0 ? Math.round((Math.max(sc[a], sc[b]) / total) * 100) : 50;
+    return { letter: winner, pct };
+  };
+  const scores: MbtiScores = { EI: axis('E', 'I'), SN: axis('S', 'N'), TF: axis('T', 'F'), JP: axis('J', 'P') };
+  return { type: `${scores.EI.letter}${scores.SN.letter}${scores.TF.letter}${scores.JP.letter}`, scores };
 }
 
 export { ALL_MBTI_TYPES } from './mbti-free';

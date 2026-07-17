@@ -4,15 +4,9 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
 import Seal from '@/components/Seal';
+import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
 interface Msg { role: 'user' | 'assistant'; content: string }
-
-const STARTERS = [
-  'Explique-moi les fonctions cognitives de Jung simplement.',
-  'Pourquoi j\'ai autant de mal à prendre des décisions ?',
-  'Quel type de métier correspond à ma personnalité ?',
-  'Comment mieux communiquer avec quelqu\'un de très différent de moi ?',
-];
 
 export default function ChatClient() {
   const { data: session, status } = useSession();
@@ -21,11 +15,35 @@ export default function ChatClient() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [booting, setBooting] = useState(true);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [limit, setLimit] = useState<number | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [quotaHit, setQuotaHit] = useState(false);
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  const [mbtiType, setMbtiType] = useState<string | null>(null);
+  const [openCat, setOpenCat] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // ── Chargement de l'historique (mémoire) ──
+  useEffect(() => {
+    if (status !== 'authenticated') { if (status !== 'loading') setBooting(false); return; }
+    let cancelled = false;
+    fetch('/api/chat')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !d) { setBooting(false); return; }
+        setHasProfile(!!d.hasProfile);
+        setMbtiType(d.mbtiType ?? null);
+        setMessages(Array.isArray(d.messages) ? d.messages : []);
+        setRemaining(d.remaining ?? null);
+        setLimit(d.limit ?? null);
+        if (typeof d.remaining === 'number' && d.remaining <= 0) setQuotaHit(true);
+        setBooting(false);
+      })
+      .catch(() => { if (!cancelled) setBooting(false); });
+    return () => { cancelled = true; };
+  }, [status]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -35,57 +53,41 @@ export default function ChatClient() {
     const content = text.trim();
     if (!content || loading || quotaHit) return;
     setNotice(null);
-    const next: Msg[] = [...messages, { role: 'user', content }];
-    setMessages(next);
+    setOpenCat(null);
+    const prev = messages;
+    setMessages([...prev, { role: 'user', content }]);
     setInput('');
     setLoading(true);
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({ message: content }),
       });
-      if (res.status === 401) {
-        setNotice('Connecte-toi pour discuter avec l\'assistant.');
-        setMessages(messages);
-        setLoading(false);
-        return;
-      }
+      if (res.status === 401) { setNotice('Connecte-toi pour parler à ton coach.'); setMessages(prev); return; }
       if (res.status === 429) {
         const d = await res.json().catch(() => ({}));
-        setQuotaHit(true);
-        setRemaining(0);
+        setQuotaHit(true); setRemaining(0);
         if (typeof d.limit === 'number') setLimit(d.limit);
-        setLoading(false);
         return;
       }
-      if (res.status === 503) {
-        setNotice('L\'assistant arrive très bientôt — il n\'est pas encore activé.');
-        setMessages(messages);
-        setLoading(false);
-        return;
-      }
-      if (!res.ok) {
-        setNotice('L\'assistant est momentanément indisponible. Réessaie dans un instant.');
-        setMessages(messages);
-        setLoading(false);
-        return;
-      }
-      const data = await res.json() as { reply: string; remaining: number; limit: number };
-      setMessages([...next, { role: 'assistant', content: data.reply }]);
-      setRemaining(data.remaining);
-      setLimit(data.limit);
-      if (data.remaining <= 0) setQuotaHit(true);
+      if (res.status === 503) { setNotice('Ton coach arrive très bientôt — il n\'est pas encore activé.'); setMessages(prev); return; }
+      if (!res.ok) { setNotice('Ton coach est momentanément indisponible. Réessaie dans un instant.'); setMessages(prev); return; }
+      const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number };
+      if (data.needsTest) { setHasProfile(false); setMessages(prev); return; }
+      setMessages([...prev, { role: 'user', content }, { role: 'assistant', content: data.reply ?? '' }]);
+      if (typeof data.remaining === 'number') setRemaining(data.remaining);
+      if (typeof data.limit === 'number') setLimit(data.limit);
+      if ((data.remaining ?? 1) <= 0) setQuotaHit(true);
     } catch {
-      setNotice('Erreur réseau. Réessaie.');
-      setMessages(messages);
+      setNotice('Erreur réseau. Réessaie.'); setMessages(prev);
     } finally {
       setLoading(false);
     }
   }, [messages, loading, quotaHit]);
 
-  // ── Chargement session ──
-  if (status === 'loading') {
+  // ── États de chargement / gate ──
+  if (status === 'loading' || booting) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ink)' }}>
         <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
@@ -93,18 +95,34 @@ export default function ChatClient() {
     );
   }
 
-  // ── Gate connexion (compte obligatoire) ──
   if (!session?.user) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--ink)' }}>
         <div className="mb-6"><Seal size={64} spin /></div>
-        <h1 className="font-display text-2xl font-black text-white mb-2">Assistant UrCecret</h1>
+        <h1 className="font-display text-2xl font-black text-white mb-2">Ton coach personnel</h1>
         <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
-          Discute avec l&apos;IA pour mieux comprendre ta personnalité. Connecte-toi pour commencer — 5 messages offerts par jour.
+          Un coach qui te connaît déjà grâce à ton test. Connecte-toi pour commencer — 5 messages offerts par jour.
         </p>
         <button onClick={() => signIn(undefined, { callbackUrl: '/chat' })} className="ur-btn-gold px-7 py-3.5 text-sm">
           Se connecter →
         </button>
+        <Link href="/" className="mt-5 text-xs" style={{ color: 'var(--ink-text-faint)' }}>← Retour à l&apos;accueil</Link>
+      </main>
+    );
+  }
+
+  // Pas de test fait → le coach ne peut pas personnaliser
+  if (hasProfile === false) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--ink)' }}>
+        <div className="mb-6"><Seal size={64} spin /></div>
+        <h1 className="font-display text-2xl font-black text-white mb-2">D&apos;abord, ton test</h1>
+        <p className="text-sm mb-8 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
+          Ton coach s&apos;appuie sur ton profil de personnalité pour te répondre. Fais le test (3 min) et il saura exactement qui tu es.
+        </p>
+        <Link href="/quiz/personnalite" className="ur-btn-gold px-7 py-3.5 text-sm">
+          Passer le test →
+        </Link>
         <Link href="/" className="mt-5 text-xs" style={{ color: 'var(--ink-text-faint)' }}>← Retour à l&apos;accueil</Link>
       </main>
     );
@@ -122,7 +140,7 @@ export default function ChatClient() {
         </Link>
         <div className="flex items-center gap-2">
           <Seal size={20} />
-          <span className="font-display text-sm font-bold text-white">Assistant UrCecret</span>
+          <span className="font-display text-sm font-bold text-white">Ton coach{mbtiType ? ` · ${mbtiType}` : ''}</span>
         </div>
         <span className="text-[11px] tabular-nums" style={{ color: 'var(--ink-text-faint)' }}>
           {remaining !== null && limit !== null ? `${remaining}/${limit}` : ''}
@@ -133,19 +151,38 @@ export default function ChatClient() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-4 py-6">
           {empty ? (
-            <div className="flex flex-col items-center text-center pt-10">
+            <div className="flex flex-col items-center text-center pt-6">
               <div className="mb-5"><Seal size={56} spin /></div>
-              <h2 className="font-display text-xl font-black text-white mb-2">Qu&apos;est-ce qui t&apos;intrigue chez toi ?</h2>
-              <p className="text-sm mb-8 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
-                Pose ta question, ou commence par une de celles-ci :
+              <h2 className="font-display text-xl font-black text-white mb-2">Salut — je connais déjà ton profil.</h2>
+              <p className="text-sm mb-7 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
+                Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.
               </p>
-              <div className="w-full grid gap-2.5">
-                {STARTERS.map((s) => (
-                  <button key={s} onClick={() => send(s)}
-                    className="ur-panel-ink text-left px-4 py-3 text-sm transition-all hover:scale-[1.01]"
-                    style={{ color: 'var(--ink-text)' }}>
-                    {s}
-                  </button>
+              <div className="w-full flex flex-col gap-2">
+                {COACH_CATEGORIES.map((c) => (
+                  <div key={c.key}>
+                    <button
+                      onClick={() => setOpenCat(openCat === c.key ? null : c.key)}
+                      className="ur-panel-ink w-full flex items-center justify-between px-4 py-3 text-sm transition-all"
+                      style={{ color: 'var(--ink-text)' }}
+                    >
+                      <span className="flex items-center gap-2.5"><span className="text-base">{c.emoji}</span>{c.label}</span>
+                      <span className="text-stone-600" style={{ transform: openCat === c.key ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>▾</span>
+                    </button>
+                    {openCat === c.key && (
+                      <div className="mt-2 mb-1 flex flex-col gap-2 pl-1">
+                        {c.prompts.map((p) => (
+                          <button
+                            key={p}
+                            onClick={() => send(p)}
+                            className="text-left text-sm px-4 py-2.5 rounded-xl transition-all hover:scale-[1.01]"
+                            style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--ink-text)' }}
+                          >
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -173,21 +210,17 @@ export default function ChatClient() {
             </div>
           )}
 
-          {notice && (
-            <p className="mt-6 text-center text-xs" style={{ color: 'var(--ink-text-muted)' }}>{notice}</p>
-          )}
+          {notice && <p className="mt-6 text-center text-xs" style={{ color: 'var(--ink-text-muted)' }}>{notice}</p>}
 
           {quotaHit && (
             <div className="mt-6 rounded-2xl p-5 text-center" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
               <p className="text-sm font-bold text-white mb-1">Tu as utilisé tes {limit ?? ''} messages du jour</p>
               <p className="text-xs mb-4" style={{ color: 'var(--ink-text-muted)' }}>
                 {tier === 'free'
-                  ? 'Passe à un abonnement pour discuter davantage chaque jour — et débloquer ton profil MBTI complet.'
+                  ? 'Passe à un abonnement pour parler à ton coach bien plus chaque jour.'
                   : 'Ton quota se réinitialise demain (minuit, heure de Paris).'}
               </p>
-              {tier === 'free' && (
-                <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Voir les abonnements →</Link>
-              )}
+              {tier === 'free' && <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Voir les abonnements →</Link>}
             </div>
           )}
         </div>
@@ -195,31 +228,22 @@ export default function ChatClient() {
 
       {/* Input bar */}
       <div className="sticky bottom-0" style={{ background: 'var(--ink)', borderTop: '1px solid var(--line-ink)' }}>
-        <form
-          onSubmit={(e) => { e.preventDefault(); void send(input); }}
-          className="max-w-2xl mx-auto px-4 py-3 flex items-end gap-2"
-        >
+        <form onSubmit={(e) => { e.preventDefault(); void send(input); }} className="max-w-2xl mx-auto px-4 py-3 flex items-end gap-2">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(input); } }}
             rows={1}
-            placeholder={quotaHit ? 'Quota du jour atteint' : 'Pose ta question…'}
+            placeholder={quotaHit ? 'Quota du jour atteint' : 'Écris à ton coach…'}
             disabled={quotaHit}
             className="flex-1 resize-none rounded-2xl px-4 py-3 text-sm outline-none disabled:opacity-50"
             style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)', color: 'var(--ink-text)', maxHeight: 140 }}
           />
-          <button
-            type="submit"
-            disabled={loading || quotaHit || !input.trim()}
-            aria-label="Envoyer"
-            className="ur-btn-gold flex-shrink-0 w-11 h-11 !p-0 text-lg disabled:opacity-40"
-          >
-            ↑
-          </button>
+          <button type="submit" disabled={loading || quotaHit || !input.trim()} aria-label="Envoyer"
+            className="ur-btn-gold flex-shrink-0 w-11 h-11 !p-0 text-lg disabled:opacity-40">↑</button>
         </form>
         <p className="text-center text-[10px] pb-2" style={{ color: 'var(--ink-text-faint)' }}>
-          L&apos;assistant peut se tromper. Ce n&apos;est pas un avis médical.
+          Ton coach s&apos;appuie sur ton test. Ce n&apos;est pas un avis médical.
         </p>
       </div>
     </main>

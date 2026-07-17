@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { mbtiQuestions, computeMbtiType, MbtiQuestion } from '@/lib/mbti';
+import { mbtiQuestions, computeMbtiType, computeMbtiProfile, MbtiQuestion } from '@/lib/mbti';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
@@ -1307,10 +1307,14 @@ export default function PersonnaliteClient() {
       if (pending && mbtiTypes[pending]) {
         diagLog('pending_found_authed', { pending });
         window.history.replaceState(null, '', '/quiz/personnalite');
+        // Rattache aussi les scores calculés au test (stockés avant la connexion)
+        // pour que le coach IA soit personnalisé dès la première visite.
+        let pendingScores: unknown = undefined;
+        try { const raw = localStorage.getItem('_mbti_scores'); if (raw) pendingScores = JSON.parse(raw); } catch {}
         fetch('/api/user/save-mbti', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mbtiType: pending }),
+          body: JSON.stringify({ mbtiType: pending, ...(pendingScores ? { scores: pendingScores } : {}) }),
         }).catch(() => {});
         setMbtiType(pending);
         if (isPremium) { router.push(`/types/${pending.toLowerCase()}`); }
@@ -1339,18 +1343,23 @@ export default function PersonnaliteClient() {
   };
 
   const handleAnalysisDone = useCallback(async () => {
-    const type = computeMbtiType(answers);
+    const profile = computeMbtiProfile(answers);
+    const type = profile.type;
     diagLog('analysis_done', { type, hasSession: !!session?.user, isPremium });
     setMbtiType(type);
     // Persist the type in localStorage ONLY so the /login round-trip can reattach
     // it to the post-auth callbackUrl. We do NOT put ?pending in the URL — that let
     // logged-out visitors reload straight onto the paywall, skipping the free test.
-    try { localStorage.setItem('_mbti_pending', type); } catch {}
+    try {
+      localStorage.setItem('_mbti_pending', type);
+      // Scores conservés pour être rattachés au compte après connexion (coach IA).
+      localStorage.setItem('_mbti_scores', JSON.stringify(profile.scores));
+    } catch {}
     if (session?.user) {
       fetch('/api/user/save-mbti', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mbtiType: type }),
+        body: JSON.stringify({ mbtiType: type, scores: profile.scores }),
       }).catch(() => {});
       if (isPremium) {
         router.push(`/types/${type.toLowerCase()}`);

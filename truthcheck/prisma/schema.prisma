@@ -57,6 +57,10 @@ model User {
   rizzLevel     Int       @default(1)
   tier          String    @default("free") // free | plus (5€) | premium (10€)
   mbtiType      String?   // e.g. "ENTJ"
+  // Force de préférence par axe, calculée au test — ex :
+  // { "EI": {"letter":"I","pct":68}, "SN": {...}, "TF": {...}, "JP": {...} }
+  // C'est le signal unique par utilisateur qui personnalise le coach IA.
+  mbtiScores    Json?
   mbtiTestCount Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -67,6 +71,22 @@ model User {
   analyses     ScreenshotAnalysis[]
   emailLogs    EmailLog[]
   chatUsage    ChatUsage[]
+  chatMessages ChatMessage[]
+}
+
+// Historique du coach IA — un enregistrement par message (utilisateur ou
+// assistant). Permet la mémoire de conversation d'une session à l'autre.
+// On ne recharge que les N derniers pour le contexte (coût borné).
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String   // 'user' | 'assistant'
+  content   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 // Compteur quotidien de messages chatbot par utilisateur — sert à appliquer
