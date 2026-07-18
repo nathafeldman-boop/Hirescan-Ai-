@@ -6,6 +6,7 @@ import UserMenu from './UserMenu';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import SocialProofToast from './SocialProofToast';
 import Seal from './Seal';
+import TypeEmblem from './TypeEmblem';
 
 const GROUPS = [
   {
@@ -349,6 +350,36 @@ export default function LandingPage() {
       </section>
 
 
+      {/* Vitrine — ta carte de résultat (montre ce qu'on obtient) */}
+      <section className="relative z-10 py-12 px-6" style={{ background: 'var(--ink)' }}>
+        <div className="max-w-lg mx-auto text-center">
+          <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>Ton résultat</p>
+          <h2 className="font-display text-2xl font-black mb-2" style={{ color: '#FAF6EC' }}>
+            Ta carte, prête à partager
+          </h2>
+          <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
+            Chaque résultat devient ta carte perso — à enregistrer et poster.
+          </p>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-6 px-6 justify-start sm:justify-center">
+            {['infj', 'enfp', 'intj'].map((c) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={c}
+                src={`/api/card?type=${c}`}
+                alt={`Exemple de carte ${c.toUpperCase()}`}
+                loading="lazy"
+                decoding="async"
+                className="flex-shrink-0 rounded-2xl"
+                style={{ width: 190, border: '1px solid var(--line-ink)' }}
+              />
+            ))}
+          </div>
+          <Link href="/quiz/personnalite" className="inline-block mt-6 text-sm font-bold" style={{ color: 'var(--gold)' }}>
+            Obtenir ma carte →
+          </Link>
+        </div>
+      </section>
+
       {/* 4 family sections */}
       <section className="relative z-10 py-10 px-6">
         <div className="max-w-5xl mx-auto space-y-10">
@@ -371,20 +402,15 @@ export default function LandingPage() {
                     <Link
                       key={code}
                       href={`/types/${code.toLowerCase()}`}
-                      className="block p-5 rounded-2xl transition-all hover:-translate-y-0.5 group"
+                      className="flex flex-col items-center text-center p-4 rounded-2xl transition-all hover:-translate-y-0.5"
                       style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
                     >
-                      <div
-                        className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-black mb-3 tracking-widest"
-                        style={{ background: group.color + '15', color: group.color }}
-                      >
+                      <TypeEmblem emoji={t.emoji} accentColor={t.accentColor} size={64} />
+                      <div className="mt-3 text-sm font-black tracking-widest" style={{ color: t.accentColor }}>
                         {code}
                       </div>
-                      <p className="font-bold text-stone-900 text-sm leading-snug mb-1">
+                      <p className="font-bold text-stone-900 text-xs mt-0.5 leading-snug">
                         {t.name}
-                      </p>
-                      <p className="text-stone-400 text-xs leading-snug line-clamp-2">
-                        {t.tagline}
                       </p>
                     </Link>
                   );
@@ -395,30 +421,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* MBTI letters explanation */}
-      <section className="relative z-10 py-16 px-6">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 text-center mb-3">Fonctionnement, théorie de Carl Jung</p>
-          <h2 className="font-display text-3xl font-black text-stone-900 text-center mb-10">
-            Les 4 dimensions, 8 fonctions cognitives
+      {/* Les 4 dimensions — compact & visuel */}
+      <section className="relative z-10 py-14 px-6">
+        <div className="max-w-lg mx-auto">
+          <p className="ur-label text-[10px] text-center mb-3" style={{ color: CLAY }}>Théorie de Carl Jung</p>
+          <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-8">
+            4 dimensions, 16 profils
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             {MBTI_LETTERS.map((item) => (
               <div
                 key={item.letter}
-                className="flex items-start gap-5 p-4 rounded-2xl"
+                className="flex items-center gap-3 p-4 rounded-2xl"
                 style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
               >
                 <div
-                  className="ur-label flex-shrink-0 w-14 h-12 rounded-full flex items-center justify-center text-sm"
+                  className="ur-label flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-xs"
                   style={{ background: item.color, color: '#FAF6EC' }}
                 >
                   {item.letter}
                 </div>
-                <div className="pt-0.5">
-                  <p className="font-semibold text-stone-900 text-sm mb-1">{item.label}</p>
-                  <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
-                </div>
+                <p className="font-semibold text-stone-900 text-xs leading-snug">{item.label}</p>
               </div>
             ))}
           </div>
