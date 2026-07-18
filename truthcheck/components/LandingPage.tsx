@@ -7,6 +7,7 @@ import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import Seal from './Seal';
 import TypeEmblem from './TypeEmblem';
 import ReviewsMarquee from './ReviewsMarquee';
+import CosmicBackdrop from './CosmicBackdrop';
 
 const GROUPS = [
   {
@@ -348,8 +349,9 @@ export default function LandingPage() {
 
 
       {/* Vitrine — ta carte de résultat (montre ce qu'on obtient) */}
-      <section className="relative z-10 py-12 px-6" style={{ background: 'var(--ink)' }}>
-        <div className="max-w-lg mx-auto text-center">
+      <section className="relative z-10 py-12 px-6 overflow-hidden" style={{ background: 'var(--ink)' }}>
+        <CosmicBackdrop />
+        <div className="relative z-10 max-w-lg mx-auto text-center">
           <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>Ton résultat</p>
           <h2 className="font-display text-2xl font-black mb-2" style={{ color: '#FAF6EC' }}>
             Ta carte, prête à partager
@@ -420,17 +422,20 @@ export default function LandingPage() {
 
       {/* CTA — après avoir vu les 16 profils */}
       <section className="relative z-10 pb-12 px-6">
-        <div className="max-w-lg mx-auto rounded-2xl p-7 text-center" style={{ background: 'var(--ink)' }}>
-          <div className="flex justify-center mb-4"><Seal size={44} /></div>
-          <h2 className="font-display text-2xl font-black mb-2" style={{ color: '#FAF6EC' }}>
-            Il y en a un qui est le tien.
-          </h2>
-          <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
-            Tu viens de voir les 16 profils. Lequel es-tu vraiment ? Tu le sais dans 3 minutes.
-          </p>
-          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-8 py-4 text-base">
-            Révéler mon type →
-          </Link>
+        <div className="relative overflow-hidden max-w-lg mx-auto rounded-2xl p-7 text-center" style={{ background: 'var(--ink)' }}>
+          <CosmicBackdrop />
+          <div className="relative z-10">
+            <div className="flex justify-center mb-4"><Seal size={44} /></div>
+            <h2 className="font-display text-2xl font-black mb-2" style={{ color: '#FAF6EC' }}>
+              Il y en a un qui est le tien.
+            </h2>
+            <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
+              Tu viens de voir les 16 profils. Lequel es-tu vraiment ? Tu le sais dans 3 minutes.
+            </p>
+            <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-8 py-4 text-base">
+              Révéler mon type →
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -461,19 +466,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA de clôture */}
+      {/* CTA de clôture — bande cosmique */}
       <section className="relative z-10 pb-14 px-6">
-        <div className="max-w-lg mx-auto text-center">
-          <h2 className="font-display text-3xl font-black text-stone-900 mb-3 leading-tight">
-            Arrête de te demander qui tu es.
-          </h2>
-          <p className="text-stone-500 text-sm mb-7 max-w-xs mx-auto">
-            Ton type, ta carte, et un coach qui te connaît déjà — le tout gratuit pour commencer.
-          </p>
-          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-9 py-4 text-base">
-            Faire le test maintenant →
-          </Link>
-          <p className="text-xs text-stone-400 mt-3">3 minutes · résultat immédiat · sans inscription</p>
+        <div className="relative overflow-hidden max-w-lg mx-auto rounded-3xl px-6 py-12 text-center" style={{ background: 'var(--ink)' }}>
+          <CosmicBackdrop />
+          <div className="relative z-10">
+            <div className="flex justify-center mb-5"><Seal size={52} spin /></div>
+            <h2 className="font-display text-3xl font-black mb-3 leading-tight" style={{ color: '#FAF6EC' }}>
+              Arrête de te demander qui tu es.
+            </h2>
+            <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
+              Ton type, ta carte, et un coach qui te connaît déjà — gratuit pour commencer.
+            </p>
+            <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-9 py-4 text-base">
+              Faire le test maintenant →
+            </Link>
+            <p className="text-xs mt-3" style={{ color: 'rgba(250,246,236,0.38)' }}>3 minutes · résultat immédiat · sans inscription</p>
+          </div>
         </div>
       </section>
 
