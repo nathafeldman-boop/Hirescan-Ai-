@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import UserMenu from './UserMenu';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
-import SocialProofToast from './SocialProofToast';
 import Seal from './Seal';
 import TypeEmblem from './TypeEmblem';
+import ReviewsMarquee from './ReviewsMarquee';
 
 const GROUPS = [
   {
@@ -103,7 +103,6 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden relative" style={{ background: 'var(--paper)', color: 'var(--ink)' }}>
-      <SocialProofToast />
       {/* InAppBanner intentionnellement retiré de la landing — le banner est géré sur la page de résultats uniquement pour ne pas bloquer le traffic ads TikTok/Instagram */}
       {false && inApp && !bannerDismissed && <InAppBanner onClose={() => setBannerDismissed(true)} />}
 
@@ -332,20 +331,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="relative z-10 py-4 px-4">
-        <div className="max-w-lg mx-auto space-y-3">
-          {[
-            { msg: "J'ai fait le quiz infidélité à 2h du matin… j'avais 78 %. Deux semaines après, j'avais ma réponse. L'analyse était précise à un niveau qui m'a mis mal à l'aise.", who: "Camille, 24 ans" },
-            { msg: "INTJ depuis 3 ans sur 16personalities. Ici, l'analyse des fonctions cognitives m'a appris des choses que je ne savais pas sur moi-même. Ce n'est pas le même niveau.", who: "Lucas, 22 ans" },
-            { msg: "J'ai envoyé le quiz amoureux à mon meilleur ami sans lui dire pourquoi. Il a eu 82 %. On s'est parlé pour la première fois en vrai après ça.", who: "Jade, 27 ans" },
-          ].map(({ msg, who }, i, arr) => (
-            <div key={who} className={`relative pl-9 pr-2 py-5${i < arr.length - 1 ? ' border-b' : ''}`} style={{ borderColor: 'var(--line)' }}>
-              <span aria-hidden className="font-display absolute left-0 top-3 select-none" style={{ fontSize: 40, lineHeight: 1, color: CLAY, opacity: 0.35 }}>“</span>
-              <p className="font-display text-stone-800" style={{ fontSize: 16.5, lineHeight: 1.55 }}>{msg}</p>
-              <p className="text-stone-400 text-xs mt-2" style={{ letterSpacing: '0.06em' }}>{who}</p>
-            </div>
-          ))}
+      {/* Avis qui défilent */}
+      <ReviewsMarquee />
+
+      {/* CTA — après la preuve sociale */}
+      <section className="relative z-10 pt-2 pb-12 px-6">
+        <div className="max-w-lg mx-auto text-center">
+          <h2 className="font-display text-2xl font-black text-stone-900 mb-2">Ils ont osé se regarder en face.</h2>
+          <p className="text-stone-500 text-sm mb-6 max-w-xs mx-auto">À ton tour. 3 minutes, et tu sais enfin pourquoi tu fonctionnes comme ça.</p>
+          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-8 py-4 text-base">
+            Découvrir qui je suis vraiment →
+          </Link>
+          <p className="text-xs text-stone-400 mt-3">Gratuit · sans inscription · résultat immédiat</p>
         </div>
       </section>
 
@@ -421,6 +418,22 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* CTA — après avoir vu les 16 profils */}
+      <section className="relative z-10 pb-12 px-6">
+        <div className="max-w-lg mx-auto rounded-2xl p-7 text-center" style={{ background: 'var(--ink)' }}>
+          <div className="flex justify-center mb-4"><Seal size={44} /></div>
+          <h2 className="font-display text-2xl font-black mb-2" style={{ color: '#FAF6EC' }}>
+            Il y en a un qui est le tien.
+          </h2>
+          <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
+            Tu viens de voir les 16 profils. Lequel es-tu vraiment ? Tu le sais dans 3 minutes.
+          </p>
+          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-8 py-4 text-base">
+            Révéler mon type →
+          </Link>
+        </div>
+      </section>
+
       {/* Les 4 dimensions — compact & visuel */}
       <section className="relative z-10 py-14 px-6">
         <div className="max-w-lg mx-auto">
@@ -445,6 +458,22 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* CTA de clôture */}
+      <section className="relative z-10 pb-14 px-6">
+        <div className="max-w-lg mx-auto text-center">
+          <h2 className="font-display text-3xl font-black text-stone-900 mb-3 leading-tight">
+            Arrête de te demander qui tu es.
+          </h2>
+          <p className="text-stone-500 text-sm mb-7 max-w-xs mx-auto">
+            Ton type, ta carte, et un coach qui te connaît déjà — le tout gratuit pour commencer.
+          </p>
+          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-9 py-4 text-base">
+            Faire le test maintenant →
+          </Link>
+          <p className="text-xs text-stone-400 mt-3">3 minutes · résultat immédiat · sans inscription</p>
         </div>
       </section>
 

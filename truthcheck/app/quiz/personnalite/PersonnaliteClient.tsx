@@ -9,7 +9,6 @@ import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
-import SocialProofToast from '@/components/SocialProofToast';
 import Seal from '@/components/Seal';
 
 // ─── In-app browser detection ───────────────────────────────────────────────────
@@ -890,7 +889,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: 'var(--paper)', animation: 'paywallReveal 0.45s ease' }}>
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
-      <SocialProofToast />
       {exitModal && (
         <ExitIntentModal
           typeCode={typeCode}
