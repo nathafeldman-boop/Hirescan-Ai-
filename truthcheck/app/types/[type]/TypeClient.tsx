@@ -8,6 +8,7 @@ import { mbtiTypesEnFree } from '@/lib/i18n/mbtiTypesEnFree';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import Seal from '@/components/Seal';
+import ShareResultCard from '@/components/ShareResultCard';
 
 const TYPE_COUNTS: Record<string, number> = {
   ISFJ: 2847, ISTJ: 2631, ESFJ: 2418, ESTJ: 2193,
@@ -156,6 +157,9 @@ export default function TypeClient({ type }: Props) {
           style={{ borderColor: `var(--gold-line)`, background: `var(--gold-soft)` }}>
           <p className="text-sm font-bold text-white">{t.unlockedBanner}</p>
         </div>
+
+        {/* Carte à partager / télécharger (TikTok, Insta…) */}
+        <ShareResultCard code={type.code} />
 
         <Section title={t.sectionTraits} accent="var(--gold)">
           <div className="flex flex-wrap gap-2">
