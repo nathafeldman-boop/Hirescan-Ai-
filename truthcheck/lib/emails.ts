@@ -75,6 +75,39 @@ export function emailWelcome(name: string | null) {
   };
 }
 
+// Broadcast — annonce à tous les inscrits : le Coach IA personnel + l'offre Plus 5€/mois.
+// Ré-engagement honnête (pas de fausse urgence), centré sur la nouvelle valeur.
+export function emailCoachAnnounce(name: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  return {
+    subject: `${firstName}, ton Coach IA personnel est arrivé 🔮`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#c2611f;font-size:12px;text-transform:uppercase;letter-spacing:1px">✦ Nouveau sur UrCecret</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Un coach qui te connaît déjà grâce à ton test.</h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        Hey ${firstName}, on vient de lancer quelque chose qu'on voulait te montrer : un <strong style="color:#fff">Coach IA personnel</strong>. Il n'est pas générique — il connaît ton type MBTI et te répond d'après <em>ton</em> profil, pas des banalités.
+      </p>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:18px 20px;margin-bottom:24px">
+        <p style="margin:0 0 10px;color:#c2611f;font-size:13px;font-weight:700">Ce que tu peux enfin lui demander :</p>
+        <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2">
+          <li>❤️ Pourquoi tu reproduis le même schéma en amour</li>
+          <li>💼 Comment te vendre en entretien sans te trahir</li>
+          <li>💪 Reprendre confiance selon ton vrai fonctionnement</li>
+          <li>🧠 Trancher une décision qui te bloque</li>
+        </ul>
+      </div>
+      <p style="margin:0 0 8px;color:#71717a;font-size:15px;line-height:1.7">
+        Tout ça avec l'offre <strong style="color:#fff">Plus à 5 €/mois</strong> : ton profil complet débloqué + ton coach (30 messages/jour). Résiliable en 1 clic, sans engagement.
+      </p>
+      ${cta('Découvrir mon Coach IA →', `${BASE}/quiz/personnalite`)}
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:8px">
+        <p style="margin:0;color:#52525b;font-size:12px">Une question ? Réponds directement à cet email.
+          <a href="${BASE}/dashboard" style="color:#52525b">Gérer mes emails</a>.</p>
+      </div>
+    `),
+  };
+}
+
 // Sent when a lead abandons the paywall. Purchase-focused. The type is
 // intentionally NEVER named here (subject or body) — it stays locked behind
 // payment, exactly like on the site. The internal ?pending= link param is
