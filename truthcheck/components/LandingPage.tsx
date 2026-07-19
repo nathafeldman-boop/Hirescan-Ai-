@@ -506,7 +506,7 @@ export default function LandingPage() {
       {stickyVisible && (
         <div
           className="fixed bottom-0 left-0 right-0 z-40 sm:hidden"
-          style={{ padding: '12px 16px 28px', background: 'linear-gradient(to top, var(--paper) 65%, transparent)' }}
+          style={{ padding: '12px 92px 28px 16px', background: 'linear-gradient(to top, var(--paper) 65%, transparent)' }}
         >
           <Link
             href="/quiz/personnalite"

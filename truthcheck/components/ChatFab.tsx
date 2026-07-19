@@ -11,9 +11,6 @@ const HIDE_ON = ['/chat', '/success', '/quiz/personnalite', '/quiz/'];
 
 export default function ChatFab() {
   const pathname = usePathname() ?? '';
-  // Masquée sur la landing (le visiteur n'a pas encore fait le test → le coach
-  // le renverrait au test ; ça évite aussi le chevauchement avec la barre CTA).
-  if (pathname === '/') return null;
   if (HIDE_ON.some((p) => pathname === p || pathname.startsWith(p))) return null;
 
   return (
