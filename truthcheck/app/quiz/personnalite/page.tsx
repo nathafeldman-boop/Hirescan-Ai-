@@ -153,7 +153,10 @@ export default function PersonnalitePage() {
           </div>
         </header>
 
-        <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <div className="quiz-page-wrap max-w-3xl mx-auto px-4 py-16 text-center">
+          {/* Décor marketing/SEO au-dessus du quiz — masqué pendant le test via
+              body.quiz-active (voir globals) mais conservé dans le DOM pour Google. */}
+          <div className="quiz-chrome">
           {/* Crest — emblème de marque, sur surface claire (le champ crème du
               médaillon se fond dans --paper). Version WebP légère (~26 Ko). */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -210,9 +213,12 @@ export default function PersonnalitePage() {
               </div>
             ))}
           </div>
+          </div>{/* /quiz-chrome (au-dessus) */}
 
           <PersonnaliteClient />
 
+          {/* Décor marketing/SEO sous le quiz — masqué pendant le test. */}
+          <div className="quiz-chrome">
           {/* How it works */}
           <div className="mt-16 grid sm:grid-cols-3 gap-6 text-left">
             {[
@@ -249,6 +255,7 @@ export default function PersonnalitePage() {
               tu organises ta vie). Le résultat : l&apos;un des 16 types comme INFJ, ENFP, INTJ, ou ESFP.
             </p>
           </div>
+          </div>{/* /quiz-chrome (dessous) */}
         </div>
       </main>
     </>
