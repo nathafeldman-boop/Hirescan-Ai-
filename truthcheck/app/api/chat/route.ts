@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { callMistral, dailyLimitFor, parisDay, MAX_HISTORY, ChatMessage } from '@/lib/chat';
 import { buildCoachContext, coachSystemPrompt } from '@/lib/coach';
+import { hasPremiumAccess } from '@/lib/plans';
 import type { MbtiScores } from '@/lib/mbti';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,13 @@ export async function GET() {
   const uid = (session?.user as { id?: string } | undefined)?.id;
   const tier = (session?.user as { tier?: string } | undefined)?.tier;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
+
+  // Coach réservé aux abonnés (Plus/Premium). Pour un compte gratuit on ne révèle
+  // NI le type NI l'historique → le résultat reste derrière le paiement.
+  if (!hasPremiumAccess(tier)) {
+    const u = await prisma.user.findUnique({ where: { id: uid }, select: { mbtiType: true } }).catch(() => null);
+    return NextResponse.json({ locked: true, hasProfile: !!u?.mbtiType, mbtiType: null, messages: [], remaining: 0, limit: 0 });
+  }
 
   const user = await prisma.user.findUnique({ where: { id: uid }, select: { mbtiType: true } }).catch(() => null);
   const day = parisDay();
@@ -43,6 +51,12 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const user = session?.user as { id?: string; tier?: string; name?: string | null } | undefined;
   if (!user?.id) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
+
+  // Verrou paiement : le coach (qui révèle le type + le profil) est réservé aux
+  // abonnés. Un compte gratuit ne peut PAS l'utiliser → plus de fuite du résultat.
+  if (!hasPremiumAccess(user.tier)) {
+    return NextResponse.json({ error: 'payment_required', tier: user.tier ?? 'free' }, { status: 402 });
+  }
 
   // Rétro-compatible : nouvelle UI → { message } ; anciens clients en cache →
   // { messages: [...] } (on extrait le dernier message utilisateur). Évite de

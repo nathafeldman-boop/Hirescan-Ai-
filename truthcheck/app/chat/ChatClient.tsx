@@ -22,6 +22,7 @@ export default function ChatClient() {
   const [quotaHit, setQuotaHit] = useState(false);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [mbtiType, setMbtiType] = useState<string | null>(null);
+  const [locked, setLocked] = useState(false); // coach réservé aux abonnés (Plus/Premium)
   const [openCat, setOpenCat] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef(false);
@@ -43,6 +44,7 @@ export default function ChatClient() {
         if (typeof d.limit === 'number') setLimit(d.limit);
         return;
       }
+      if (res.status === 402) { setLocked(true); return; }
       if (!res.ok) return;
       const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number };
       if (data.needsTest) { setHasProfile(false); return; }
@@ -63,6 +65,8 @@ export default function ChatClient() {
       .then((d) => {
         if (cancelled || !d) { setBooting(false); return; }
         setHasProfile(!!d.hasProfile);
+        // Compte gratuit → coach verrouillé, aucun contenu (type/historique) révélé.
+        if (d.locked) { setLocked(true); setBooting(false); return; }
         setMbtiType(d.mbtiType ?? null);
         const msgs = Array.isArray(d.messages) ? d.messages : [];
         setMessages(msgs);
@@ -105,6 +109,7 @@ export default function ChatClient() {
         body: JSON.stringify({ message: content }),
       });
       if (res.status === 401) { setNotice('Connecte-toi pour parler à ton coach.'); setMessages(prev); return; }
+      if (res.status === 402) { setLocked(true); setMessages(prev); return; }
       if (res.status === 429) {
         const d = await res.json().catch(() => ({}));
         setQuotaHit(true); setRemaining(0);
@@ -141,11 +146,29 @@ export default function ChatClient() {
         <div className="mb-6"><Seal size={64} spin /></div>
         <h1 className="font-display text-2xl font-black text-white mb-2">Ton coach personnel</h1>
         <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
-          Un coach qui te connaît déjà grâce à ton test. Connecte-toi pour commencer — 5 messages offerts par jour.
+          Un coach qui te connaît déjà grâce à ton test. Connecte-toi pour commencer.
         </p>
         <button onClick={() => signIn(undefined, { callbackUrl: '/chat' })} className="ur-btn-gold px-7 py-3.5 text-sm">
           Se connecter →
         </button>
+        <Link href="/" className="mt-5 text-xs" style={{ color: 'var(--ink-text-faint)' }}>← Retour à l&apos;accueil</Link>
+      </main>
+    );
+  }
+
+  // Coach réservé aux abonnés (Plus / Premium) → écran de déblocage.
+  // On ne révèle NI le type NI le profil tant que l'abonnement n'est pas actif.
+  if (locked) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--ink)' }}>
+        <div className="mb-6"><Seal size={64} spin /></div>
+        <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>Coach IA · réservé aux membres</p>
+        <h1 className="font-display text-2xl font-black text-white mb-2">Débloque ton coach personnel</h1>
+        <p className="text-sm mb-8 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
+          Ton coach connaît ton type et te répond d&apos;après ton test — forces, angles morts, amour, travail.
+          Il est inclus dès l&apos;offre <span style={{ color: 'var(--gold)' }}>Plus à 5 €/mois</span>.
+        </p>
+        <Link href="/pricing" className="ur-btn-gold px-7 py-3.5 text-sm">Débloquer mon coach — 5 €/mois →</Link>
         <Link href="/" className="mt-5 text-xs" style={{ color: 'var(--ink-text-faint)' }}>← Retour à l&apos;accueil</Link>
       </main>
     );

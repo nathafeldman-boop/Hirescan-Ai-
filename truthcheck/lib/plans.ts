@@ -1,9 +1,9 @@
 // ── Abonnements UrCecret ─────────────────────────────────────────────────────
 // Un seul endroit qui décrit les paliers payants.
 //
-//  - free    : gratuit (MBTI de base, 5 messages chatbot/jour)
-//  - plus    : abonnement 5€/mois → MBTI débloqué + 30 messages/jour
-//  - premium : abonnements 9,99€/mois ou 29,99€/an → MBTI débloqué + 50/jour
+//  - free    : gratuit (test MBTI seulement ; PAS d'accès au Coach IA)
+//  - plus    : abonnement 5€/mois → MBTI débloqué + Coach IA (30 messages/jour)
+//  - premium : abonnements 9,99€/mois ou 29,99€/an → MBTI débloqué + Coach (50/jour)
 //
 // Les IDs de prix Stripe ne sont PAS secrets (ils apparaissent côté client dans
 // n'importe quelle intégration Stripe), mais restent surchargables par variable
