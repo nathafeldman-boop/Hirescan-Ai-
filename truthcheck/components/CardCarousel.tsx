@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 
 // Carrousel mobile des cartes de résultat — scroll-snap natif (swipe fluide),
 // une carte centrée à la fois avec un aperçu de la suivante, points de pagination.
@@ -10,6 +10,9 @@ const TYPES = ['infj', 'enfp', 'intj', 'entp', 'infp', 'istp'];
 export default function CardCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
+  // Pause temporaire de l'auto-play quand l'utilisateur interagit (swipe/tap).
+  const pausedUntil = useRef(0);
 
   const onScroll = useCallback(() => {
     const el = trackRef.current;
@@ -24,21 +27,44 @@ export default function CardCarousel() {
       const d = Math.abs(cCenter - center);
       if (d < bestDist) { bestDist = d; best = i; }
     });
+    activeRef.current = best;
     setActive(best);
   }, []);
 
-  const scrollTo = (i: number) => {
+  const scrollTo = useCallback((i: number) => {
     const el = trackRef.current;
     if (!el) return;
     const child = el.children[i] as HTMLElement | undefined;
     if (child) el.scrollTo({ left: child.offsetLeft - (el.clientWidth - child.offsetWidth) / 2, behavior: 'smooth' });
-  };
+  }, []);
+
+  // Pause quand l'utilisateur reprend la main (5 s après la dernière interaction).
+  const pause = useCallback(() => { pausedUntil.current = Date.now() + 5000; }, []);
+
+  // Auto-play : avance d'une carte toutes les 2,8 s, boucle à la première.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(() => {
+      if (Date.now() < pausedUntil.current) return;
+      const el = trackRef.current;
+      if (!el || document.hidden) return;
+      // Ne défile pas si l'élément n'est pas visible à l'écran (perf + pertinence).
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+      const next = (activeRef.current + 1) % TYPES.length;
+      scrollTo(next);
+    }, 2800);
+    return () => clearInterval(id);
+  }, [scrollTo]);
 
   return (
     <div className="relative">
       <div
         ref={trackRef}
         onScroll={onScroll}
+        onPointerDown={pause}
+        onTouchStart={pause}
+        onWheel={pause}
         className="flex gap-4 overflow-x-auto pb-1 -mx-6 px-6 no-scrollbar"
         style={{ scrollSnapType: 'x mandatory', scrollPadding: '0 1.5rem', WebkitOverflowScrolling: 'touch' }}
       >
@@ -73,7 +99,7 @@ export default function CardCarousel() {
         {TYPES.map((c, i) => (
           <button
             key={c}
-            onClick={() => scrollTo(i)}
+            onClick={() => { pause(); scrollTo(i); }}
             aria-label={`Voir la carte ${c.toUpperCase()}`}
             className="rounded-full transition-all"
             style={{
