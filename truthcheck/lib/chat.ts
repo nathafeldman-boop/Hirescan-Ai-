@@ -6,9 +6,9 @@
 export type Tier = 'free' | 'plus' | 'premium';
 
 // Quotas de messages PAR JOUR selon l'abonnement.
-// free = 5 · plus (5€) = 30 · premium (10€) = 50.
+// free = 3 (version découverte bridée, sans le type) · plus (5€) = 30 · premium = 50.
 export const DAILY_LIMITS: Record<Tier, number> = {
-  free: 5,
+  free: 3,
   plus: 30,
   premium: 50,
 };
