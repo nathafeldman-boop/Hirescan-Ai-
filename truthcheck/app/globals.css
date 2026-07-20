@@ -540,3 +540,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ur-reveal, .ur-fade-1, .ur-fade-2, .ur-fade-3, .ur-seal-turn { animation: none; opacity: 1; }
 }
+
+/* Focus quiz — masque le décor marketing/SEO pendant que le test MBTI est monté.
+   Le contenu reste dans le DOM (juste caché) → indexé par Google, invisible pour
+   l'utilisateur en plein test. Voir PersonnaliteClient (classe body.quiz-active). */
+body.quiz-active .quiz-chrome { display: none; }
+body.quiz-active .quiz-page-wrap { padding-top: 0; padding-bottom: 0; }

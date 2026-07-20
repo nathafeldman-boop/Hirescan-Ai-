@@ -197,7 +197,7 @@ function QuizScreen({ onComplete, questions, t }: {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-10">
+    <div className="min-h-[100dvh] max-w-xl mx-auto px-4 py-8 flex flex-col">
       {/* Milestone motivation banner */}
       {milestoneMsg && (
         <div
@@ -211,6 +211,8 @@ function QuizScreen({ onComplete, questions, t }: {
       )}
       <ProgressBar current={current + 1} total={questions.length} label={t.questionOf(current + 1, questions.length)} />
 
+      {/* Question + réponses centrées verticalement → remplit l'écran, plus de vide */}
+      <div className="flex-1 flex flex-col justify-center">
       <div className="mb-10 text-center">
         <p className="ur-label text-[11px] mb-4" style={{ color: 'var(--gold)' }}>
           {t.dimLabel[q.dimension]}
@@ -247,6 +249,7 @@ function QuizScreen({ onComplete, questions, t }: {
             </button>
           );
         })}
+      </div>
       </div>
     </div>
   );
@@ -1342,6 +1345,14 @@ export default function PersonnaliteClient() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Masque le décor marketing/SEO autour du quiz (hero, "24 questions", texte SEO)
+  // tant que le quiz est monté → écran net, sans les blocs qui dépassaient.
+  // Le contenu reste dans le DOM (juste caché) donc Google l'indexe toujours.
+  useEffect(() => {
+    document.body.classList.add('quiz-active');
+    return () => { document.body.classList.remove('quiz-active'); };
+  }, []);
+
   // Affiliate tracking — persist ref in localStorage as fallback (cookie set by middleware, httpOnly)
   useEffect(() => {
     try {
@@ -1438,10 +1449,10 @@ export default function PersonnaliteClient() {
   }, [answers, session, isPremium, router]);
 
   return (
-    // Couche plein écran : le quiz démarre immédiatement, donc on couvre la page
-    // marketing/SEO qui l'entoure (elle reste dans le DOM pour Google, mais
-    // n'apparaît plus derrière le quiz → fini le grand vide + les blocs qui dépassent).
-    <main className="fixed inset-0 z-40 overflow-y-auto overflow-x-hidden text-stone-900" style={{ background: 'var(--paper)' }}>
+    // Scroll normal (fenêtre) → la barre collante + le retour en haut de la page
+    // de résultat fonctionnent. Le contenu marketing/SEO autour est masqué via la
+    // classe body `quiz-active` (posée par l'effet ci-dessous) mais reste dans le DOM.
+    <main className="min-h-[100dvh] text-stone-900" style={{ background: 'var(--paper)' }}>
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
