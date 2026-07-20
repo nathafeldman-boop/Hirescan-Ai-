@@ -763,6 +763,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // where the post-payment redirect back to /success works correctly.
   const [inAppPayUrl, setInAppPayUrl] = useState<string | null>(null);
   const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
+  const [inAppPlusUrl, setInAppPlusUrl] = useState<string | null>(null);
   const [stickyBar, setStickyBar] = useState(false);
   const [exitModal, setExitModal] = useState(false);
   const exitShown = useRef(false);
@@ -814,14 +815,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly', emailOverride?: string) => {
+  const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly' | 'plus', emailOverride?: string) => {
     const email = emailOverride ?? userEmail;
     // Direct checkout — NO forced account before paying. The account is created
     // automatically from the Stripe email after payment (webhook + /success).
     diagLog(email ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
     track('checkout_click', {
       quiz: 'personnalite',
-      value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : 9.99,
+      value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : checkoutType === 'plus' ? 5 : 9.99,
       currency: 'EUR',
     });
     setLoading(true);
@@ -838,6 +839,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           ...(email ? { userEmail: email } : {}),
           ...(checkoutType === 'annual' ? { annual: true } : {}),
           ...(checkoutType === 'onetime' ? { oneTime: true } : {}),
+          ...(checkoutType === 'plus' ? { plus: true } : {}),
           ...(affiliateRef ? { affiliateRef } : {}),
         }),
       });
@@ -883,6 +885,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...base }),
     }).then(r => r.json()).then(d => { if (d.url) setInAppMonthlyUrl(d.url); }).catch(() => {});
+    fetch('/api/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...base, plus: true }),
+    }).then(r => r.json()).then(d => { if (d.url) setInAppPlusUrl(d.url); }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInApp, typeCode]);
 
@@ -1119,6 +1125,68 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <p className="text-center text-[11px] mt-2.5 relative" style={{ color: 'rgba(250,246,236,0.45)' }}>
               {isFr ? 'Apple Pay, Google Pay, CB. Accès immédiat.' : 'Apple Pay, Google Pay, Card. Instant access.'}
             </p>
+          </div>
+
+          {/* Plus — 5€/mois : profil débloqué + Coach IA personnel. Le milieu de
+              gamme, mis en avant : la vraie valeur récurrente (coach ancré sur le test). */}
+          <div className="relative rounded-[24px] px-5 pt-5 pb-4 overflow-hidden"
+               style={{ background: 'var(--paper-panel)', border: '1.5px solid var(--gold)' }}>
+            <span className="absolute top-0 right-4 -translate-y-1/2 px-2.5 py-1 rounded-full text-[9px] font-black tracking-widest"
+                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
+              {isFr ? 'LE PLUS CHOISI' : 'MOST POPULAR'}
+            </span>
+            <div className="flex items-start justify-between mb-3">
+              <div className="min-w-0 pr-3">
+                <p className="text-[14px] font-black text-stone-900" style={{ letterSpacing: '-0.01em' }}>
+                  {isFr ? 'Plus — ton profil + ton Coach IA' : 'Plus — your profile + your AI Coach'}
+                </p>
+                <p className="text-[11px] text-stone-500 mt-0.5" style={{ lineHeight: 1.5 }}>
+                  {isFr ? 'Ton profil complet débloqué, puis un coach qui te connaît déjà' : 'Your full profile unlocked, then a coach who already knows you'}
+                </p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <span className="font-display text-2xl text-stone-900" style={{ fontWeight: 800 }}>5 €</span>
+                <span className="text-[11px] text-stone-400"> {isFr ? '/mois' : '/mo'}</span>
+              </div>
+            </div>
+            <ul className="space-y-2 mb-4">
+              {(isFr ? [
+                'Ton profil MBTI complet débloqué',
+                'Ton Coach IA personnel, 30 messages/jour',
+                'Il connaît ton type et te répond d\'après ton test',
+                'Résiliable en 1 clic, sans engagement',
+              ] : [
+                'Your complete MBTI profile unlocked',
+                'Your personal AI Coach, 30 messages/day',
+                'It knows your type and answers based on your test',
+                'Cancel in 1 click, no commitment',
+              ]).map(b => (
+                <li key={b} className="flex items-start gap-2.5 text-[12.5px] text-stone-700" style={{ lineHeight: 1.5 }}>
+                  <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: 'var(--gold)' }}>✓</span>{b}
+                </li>
+              ))}
+            </ul>
+            {isInApp && inAppPlusUrl ? (
+              <a
+                href={inAppPlusUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'plus', via: 'anchor' })}
+                className="block w-full py-3.5 rounded-full font-bold text-[14px] text-center transition-all active:scale-[0.98]"
+                style={{ background: 'var(--gold)', color: 'var(--ink)', textDecoration: 'none' }}
+              >
+                {isFr ? 'Débloquer + mon Coach IA, 5 €/mois' : 'Unlock + my AI Coach, €5/mo'}
+              </a>
+            ) : (
+              <button
+                onClick={() => doCheckout('plus')}
+                disabled={loading}
+                className="w-full py-3.5 rounded-full font-bold text-[14px] transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'var(--gold)', color: 'var(--ink)' }}
+              >
+                {loading ? '…' : isFr ? 'Débloquer + mon Coach IA, 5 €/mois' : 'Unlock + my AI Coach, €5/mo'}
+              </button>
+            )}
           </div>
 
           {/* Secondary: Monthly subscription — panneau papier, plat */}
