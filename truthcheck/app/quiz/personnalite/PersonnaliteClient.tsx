@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { mbtiQuestions, computeMbtiType, computeMbtiProfile, MbtiQuestion } from '@/lib/mbti';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
@@ -1313,6 +1313,52 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   );
 }
 
+// ─── Sign-in gate ───────────────────────────────────────────────────────────────
+// Affiché AVANT le test : on demande la connexion dès que la personne veut faire
+// le test MBTI. La connexion revient sur /quiz/personnalite → le test démarre.
+function SignInGate({ isFr }: { isFr: boolean }) {
+  const [loading, setLoading] = useState(false);
+  return (
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center px-5 py-10" style={{ background: 'var(--paper)' }}>
+      <div className="w-full max-w-sm text-center">
+        <div className="flex justify-center mb-6"><Seal size={64} color="var(--gold)" spin /></div>
+        <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>
+          {isFr ? 'Test MBTI · 24 questions · gratuit' : 'MBTI test · 24 questions · free'}
+        </p>
+        <h1 className="font-display text-2xl leading-snug mb-2" style={{ color: 'var(--ink)', fontWeight: 700 }}>
+          {isFr ? 'Connecte-toi pour découvrir ton type' : 'Sign in to discover your type'}
+        </h1>
+        <p className="text-sm text-stone-500 mb-7 leading-relaxed">
+          {isFr
+            ? 'On garde ton résultat et ton profil pour ton Coach IA. 10 secondes, sans mot de passe.'
+            : 'We save your result and profile for your AI coach. 10 seconds, no password.'}
+        </p>
+
+        <button
+          onClick={() => { setLoading(true); signIn('google', { callbackUrl: '/quiz/personnalite' }); }}
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-3 py-4 rounded-full font-bold text-sm mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
+          style={{ background: 'var(--ink)', color: '#FAF6EC' }}
+        >
+          {loading ? '…' : (<><span className="bg-white rounded-full p-0.5"><GoogleIcon /></span>{isFr ? 'Continuer avec Google' : 'Continue with Google'}</>)}
+        </button>
+
+        <a
+          href="/login?callbackUrl=/quiz/personnalite"
+          className="block w-full py-3.5 rounded-full font-semibold text-sm transition-all active:scale-[0.98]"
+          style={{ border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper-panel)' }}
+        >
+          {isFr ? 'Par email ou avec un code' : 'By email or with a code'}
+        </a>
+
+        <p className="text-[11px] text-stone-400 mt-5 leading-relaxed">
+          {isFr ? 'En continuant, tu acceptes nos conditions d\'utilisation.' : 'By continuing, you accept our terms.'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Root component ─────────────────────────────────────────────────────────────
 
 export default function PersonnaliteClient() {
@@ -1453,6 +1499,16 @@ export default function PersonnaliteClient() {
     // de résultat fonctionnent. Le contenu marketing/SEO autour est masqué via la
     // classe body `quiz-active` (posée par l'effet ci-dessous) mais reste dans le DOM.
     <main className="min-h-[100dvh] text-stone-900" style={{ background: 'var(--paper)' }}>
+      {/* Connexion obligatoire avant le test. Tant que la session charge → spinner ;
+          si non connecté → écran de connexion ; sinon → le test. */}
+      {sessionStatus === 'loading' ? (
+        <div className="min-h-[100dvh] flex items-center justify-center" style={{ background: 'var(--paper)' }}>
+          <div className="text-4xl animate-spin" style={{ animationDuration: '1.5s' }}>🔮</div>
+        </div>
+      ) : sessionStatus === 'unauthenticated' ? (
+        <SignInGate isFr={lang !== 'en'} />
+      ) : (
+      <>
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
@@ -1469,6 +1525,8 @@ export default function PersonnaliteClient() {
       )}
       {phase === 'result' && (
         <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} isInApp={isInApp} />
+      )}
+      </>
       )}
     </main>
   );
