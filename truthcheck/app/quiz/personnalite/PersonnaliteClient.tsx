@@ -1438,7 +1438,10 @@ export default function PersonnaliteClient() {
   }, [answers, session, isPremium, router]);
 
   return (
-    <main className="min-h-screen text-stone-900" style={{ background: 'var(--paper)' }}>
+    // Couche plein écran : le quiz démarre immédiatement, donc on couvre la page
+    // marketing/SEO qui l'entoure (elle reste dans le DOM pour Google, mais
+    // n'apparaît plus derrière le quiz → fini le grand vide + les blocs qui dépassent).
+    <main className="fixed inset-0 z-40 overflow-y-auto overflow-x-hidden text-stone-900" style={{ background: 'var(--paper)' }}>
       {phase === 'quiz' && (
         <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
       )}
