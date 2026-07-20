@@ -100,7 +100,13 @@ export function emailCoachAnnounce(name: string | null) {
         Tout ça avec l'offre <strong style="color:#fff">Plus à 5 €/mois</strong> : ton profil complet débloqué + ton coach (30 messages/jour). Résiliable en 1 clic, sans engagement.
       </p>
       ${cta('Découvrir mon Coach IA →', `${BASE}/quiz/personnalite`)}
-      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:8px">
+      <p style="margin:4px 0 0;text-align:center;color:#71717a;font-size:13px">Déjà fait ton test ?</p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding:10px 0 4px">
+          <a href="${BASE}/chat" style="display:inline-block;background:transparent;border:1px solid rgba(209,125,82,0.5);color:#d17d52;text-decoration:none;font-weight:700;font-size:14px;padding:12px 30px;border-radius:12px">Parler à mon Coach IA maintenant →</a>
+        </td></tr>
+      </table>
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
         <p style="margin:0;color:#52525b;font-size:12px">Une question ? Réponds directement à cet email.
           <a href="${BASE}/dashboard" style="color:#52525b">Gérer mes emails</a>.</p>
       </div>
