@@ -8,6 +8,7 @@ import Seal from './Seal';
 import TypeEmblem from './TypeEmblem';
 import ReviewsMarquee from './ReviewsMarquee';
 import CosmicBackdrop from './CosmicBackdrop';
+import CardCarousel from './CardCarousel';
 
 const GROUPS = [
   {
@@ -359,21 +360,11 @@ export default function LandingPage() {
           <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
             Chaque résultat devient ta carte perso — à enregistrer et poster.
           </p>
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-6 px-6 justify-start sm:justify-center">
-            {['infj', 'enfp', 'intj'].map((c) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={c}
-                src={`/api/card?type=${c}`}
-                alt={`Exemple de carte ${c.toUpperCase()}`}
-                loading="lazy"
-                decoding="async"
-                className="flex-shrink-0 rounded-2xl"
-                style={{ width: 190, border: '1px solid var(--line-ink)' }}
-              />
-            ))}
-          </div>
-          <Link href="/quiz/personnalite" className="inline-block mt-6 text-sm font-bold" style={{ color: 'var(--gold)' }}>
+          <CardCarousel />
+          <p className="text-[11px] mt-4" style={{ color: 'rgba(250,246,236,0.4)' }}>
+            Glisse pour découvrir d&apos;autres cartes
+          </p>
+          <Link href="/quiz/personnalite" className="inline-block mt-3 text-sm font-bold" style={{ color: 'var(--gold)' }}>
             Obtenir ma carte →
           </Link>
         </div>
