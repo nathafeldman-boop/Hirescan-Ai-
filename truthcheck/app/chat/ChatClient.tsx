@@ -22,7 +22,7 @@ export default function ChatClient() {
   const [quotaHit, setQuotaHit] = useState(false);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [mbtiType, setMbtiType] = useState<string | null>(null);
-  const [locked, setLocked] = useState(false); // coach réservé aux abonnés (Plus/Premium)
+  const [isFree, setIsFree] = useState(false); // coach en version découverte bridée (compte gratuit)
   const [openCat, setOpenCat] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef(false);
@@ -44,7 +44,6 @@ export default function ChatClient() {
         if (typeof d.limit === 'number') setLimit(d.limit);
         return;
       }
-      if (res.status === 402) { setLocked(true); return; }
       if (!res.ok) return;
       const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number };
       if (data.needsTest) { setHasProfile(false); return; }
@@ -65,8 +64,7 @@ export default function ChatClient() {
       .then((d) => {
         if (cancelled || !d) { setBooting(false); return; }
         setHasProfile(!!d.hasProfile);
-        // Compte gratuit → coach verrouillé, aucun contenu (type/historique) révélé.
-        if (d.locked) { setLocked(true); setBooting(false); return; }
+        setIsFree(!!d.free); // compte gratuit → coach bridé (pas de type révélé)
         setMbtiType(d.mbtiType ?? null);
         const msgs = Array.isArray(d.messages) ? d.messages : [];
         setMessages(msgs);
@@ -79,7 +77,7 @@ export default function ChatClient() {
         let wantSeed = false;
         try { wantSeed = !!new URLSearchParams(window.location.search).get('start'); } catch {}
         if (wantSeed) { try { window.history.replaceState(null, '', '/chat'); } catch {} }
-        if (wantSeed && msgs.length === 0 && d.hasProfile && d.remaining > 0 && !seededRef.current) {
+        if (wantSeed && !d.free && msgs.length === 0 && d.hasProfile && d.remaining > 0 && !seededRef.current) {
           seededRef.current = true;
           void seedCoach('Présente-moi mon profil comme si tu me connaissais déjà : mes 2 plus grandes forces, mon principal angle mort, et le premier truc sur lequel je devrais travailler. Parle-moi de MOI d’après mon test, pas en généralités.');
         }
@@ -109,7 +107,6 @@ export default function ChatClient() {
         body: JSON.stringify({ message: content }),
       });
       if (res.status === 401) { setNotice('Connecte-toi pour parler à ton coach.'); setMessages(prev); return; }
-      if (res.status === 402) { setLocked(true); setMessages(prev); return; }
       if (res.status === 429) {
         const d = await res.json().catch(() => ({}));
         setQuotaHit(true); setRemaining(0);
@@ -156,24 +153,6 @@ export default function ChatClient() {
     );
   }
 
-  // Coach réservé aux abonnés (Plus / Premium) → écran de déblocage.
-  // On ne révèle NI le type NI le profil tant que l'abonnement n'est pas actif.
-  if (locked) {
-    return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--ink)' }}>
-        <div className="mb-6"><Seal size={64} spin /></div>
-        <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>Coach IA · réservé aux membres</p>
-        <h1 className="font-display text-2xl font-black text-white mb-2">Débloque ton coach personnel</h1>
-        <p className="text-sm mb-8 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
-          Ton coach connaît ton type et te répond d&apos;après ton test — forces, angles morts, amour, travail.
-          Il est inclus dès l&apos;offre <span style={{ color: 'var(--gold)' }}>Plus à 5 €/mois</span>.
-        </p>
-        <Link href="/pricing" className="ur-btn-gold px-7 py-3.5 text-sm">Débloquer mon coach — 5 €/mois →</Link>
-        <Link href="/" className="mt-5 text-xs" style={{ color: 'var(--ink-text-faint)' }}>← Retour à l&apos;accueil</Link>
-      </main>
-    );
-  }
-
   // Pas de test fait → le coach ne peut pas personnaliser
   if (hasProfile === false) {
     return (
@@ -210,15 +189,27 @@ export default function ChatClient() {
         </span>
       </header>
 
+      {/* Bandeau upsell — version découverte (compte gratuit) */}
+      {isFree && (
+        <Link href="/pricing" className="block px-4 py-2 text-center text-[11px] font-semibold"
+          style={{ background: 'var(--gold-soft)', borderBottom: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
+          ✦ Version découverte · débloque ton coach selon TON type — 5 €/mois →
+        </Link>
+      )}
+
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-4 py-6">
           {empty ? (
             <div className="flex flex-col items-center text-center pt-6">
               <div className="mb-5"><Seal size={56} spin /></div>
-              <h2 className="font-display text-xl font-black text-white mb-2">Salut — je connais déjà ton profil.</h2>
+              <h2 className="font-display text-xl font-black text-white mb-2">
+                {isFree ? 'Salut 👋 De quoi tu veux parler ?' : 'Salut — je connais déjà ton profil.'}
+              </h2>
               <p className="text-sm mb-7 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
-                Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.
+                {isFree
+                  ? <>Version découverte : je te donne de vrais conseils, mais généraux. Pour des réponses selon <span style={{ color: 'var(--gold)' }}>ton type exact</span> et ton test, débloque ton profil.</>
+                  : <>Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.</>}
               </p>
               <div className="w-full flex flex-col gap-2">
                 {COACH_CATEGORIES.map((c) => (

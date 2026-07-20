@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { callMistral, dailyLimitFor, parisDay, MAX_HISTORY, ChatMessage } from '@/lib/chat';
-import { buildCoachContext, coachSystemPrompt } from '@/lib/coach';
+import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree } from '@/lib/coach';
 import { hasPremiumAccess } from '@/lib/plans';
 import type { MbtiScores } from '@/lib/mbti';
 
@@ -19,27 +19,27 @@ export async function GET() {
   const tier = (session?.user as { tier?: string } | undefined)?.tier;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  // Coach réservé aux abonnés (Plus/Premium). Pour un compte gratuit on ne révèle
-  // NI le type NI l'historique → le résultat reste derrière le paiement.
-  if (!hasPremiumAccess(tier)) {
-    const u = await prisma.user.findUnique({ where: { id: uid }, select: { mbtiType: true } }).catch(() => null);
-    return NextResponse.json({ locked: true, hasProfile: !!u?.mbtiType, mbtiType: null, messages: [], remaining: 0, limit: 0 });
-  }
-
+  const isPremium = hasPremiumAccess(tier);
   const user = await prisma.user.findUnique({ where: { id: uid }, select: { mbtiType: true } }).catch(() => null);
   const day = parisDay();
   const usage = await prisma.chatUsage.findUnique({ where: { userId_day: { userId: uid, day } } }).catch(() => null);
   const limit = dailyLimitFor(tier);
-  const rows = await prisma.chatMessage.findMany({
-    where: { userId: uid },
-    orderBy: { createdAt: 'desc' },
-    take: DISPLAY_HISTORY,
-    select: { role: true, content: true },
-  }).catch(() => []);
+  // Compte gratuit → coach bridé : on ne renvoie NI le type (header) NI l'historique
+  // (qui pourrait contenir un ancien message révélant le type). Le résultat payant
+  // reste derrière le paiement ; le coach fonctionne mais en version découverte.
+  const rows = isPremium
+    ? await prisma.chatMessage.findMany({
+        where: { userId: uid },
+        orderBy: { createdAt: 'desc' },
+        take: DISPLAY_HISTORY,
+        select: { role: true, content: true },
+      }).catch(() => [])
+    : [];
 
   return NextResponse.json({
     hasProfile: !!user?.mbtiType,
-    mbtiType: user?.mbtiType ?? null,
+    mbtiType: isPremium ? (user?.mbtiType ?? null) : null,
+    free: !isPremium,
     messages: rows.reverse(),
     remaining: Math.max(0, limit - (usage?.count ?? 0)),
     limit,
@@ -52,11 +52,9 @@ export async function POST(req: NextRequest) {
   const user = session?.user as { id?: string; tier?: string; name?: string | null } | undefined;
   if (!user?.id) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  // Verrou paiement : le coach (qui révèle le type + le profil) est réservé aux
-  // abonnés. Un compte gratuit ne peut PAS l'utiliser → plus de fuite du résultat.
-  if (!hasPremiumAccess(user.tier)) {
-    return NextResponse.json({ error: 'payment_required', tier: user.tier ?? 'free' }, { status: 402 });
-  }
+  // Abonné (Plus/Premium) → coach personnalisé complet. Gratuit → coach bridé
+  // (générique, sans le type ni le profil payant). Voir le choix du prompt plus bas.
+  const isPremium = hasPremiumAccess(user.tier);
 
   // Rétro-compatible : nouvelle UI → { message } ; anciens clients en cache →
   // { messages: [...] } (on extrait le dernier message utilisateur). Évite de
@@ -92,13 +90,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'quota_exceeded', limit, tier: user.tier ?? 'free' }, { status: 429 });
   }
 
-  // Contexte = profil coach + N derniers messages (mémoire bornée)
-  const prior = await prisma.chatMessage.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' },
-    take: MAX_HISTORY,
-    select: { role: true, content: true },
-  }).catch(() => []);
+  // Contexte = N derniers messages (mémoire bornée). En gratuit, on NE recharge
+  // PAS l'historique (il pourrait contenir un ancien message avec le type) →
+  // le modèle bridé ne peut pas le ressortir.
+  const prior = isPremium
+    ? await prisma.chatMessage.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+        take: MAX_HISTORY,
+        select: { role: true, content: true },
+      }).catch(() => [])
+    : [];
   const history: ChatMessage[] = [
     ...prior.reverse().map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
     { role: 'user', content: message },
@@ -106,7 +108,10 @@ export async function POST(req: NextRequest) {
 
   const scores = (dbUser.mbtiScores as unknown as MbtiScores | null) ?? null;
   const firstName = dbUser.name?.split(' ')[0] ?? null;
-  const system = coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType, scores));
+  // Abonné → coach ancré sur le test ; gratuit → coach bridé (aucun type transmis au modèle).
+  const system = isPremium
+    ? coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType, scores))
+    : coachSystemPromptFree(firstName);
 
   const result = await callMistral(system, history);
   if (!result.ok || !result.reply) {
