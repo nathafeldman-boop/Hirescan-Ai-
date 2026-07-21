@@ -12,6 +12,9 @@
 
 export const PLUS_PRICE_ID = process.env.STRIPE_PLUS_PRICE_ID || 'price_1TuIYlRd6r34OMU6YitKmqi6';
 
+// Abonnement Starter 1,99€/mois (produit prod_UvbsvlC5t2TyBX).
+export const STARTER_PRICE_ID = process.env.STRIPE_STARTER_PRICE_ID || 'price_1TvkeeRd6r34OMU670sEzLfb';
+
 // Un abonné "plus" (5€) OU "premium" (10€) a accès au contenu MBTI payant.
 export function hasPremiumAccess(tier?: string | null): boolean {
   return tier === 'plus' || tier === 'premium';

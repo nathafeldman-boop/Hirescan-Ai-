@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
-import { PLUS_PRICE_ID } from '@/lib/plans';
+import { PLUS_PRICE_ID, STARTER_PRICE_ID } from '@/lib/plans';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -137,15 +137,7 @@ export async function POST(req: NextRequest) {
     if (starter) {
       const starterSession = await stripe.checkout.sessions.create({
         mode: 'subscription',
-        line_items: [{
-          price_data: {
-            currency: 'eur',
-            product: ONE_TIME_PRODUCT_ID,
-            unit_amount: 199,
-            recurring: { interval: 'month' as const },
-          },
-          quantity: 1,
-        }],
+        line_items: [{ price: STARTER_PRICE_ID, quantity: 1 }],
         allow_promotion_codes: true,
         ...(userEmail ? { customer_email: userEmail } : {}),
         // plan:'starter' → le webhook fixe tier='starter'
