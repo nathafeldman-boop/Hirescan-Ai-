@@ -28,10 +28,14 @@ async function verifyAndUnlock(sessionId: string | undefined, resultId: string |
     // libre) — voir app/api/webhook/route.ts pour le même correctif.
     const email = session.customer_details?.email?.toLowerCase().trim() ?? null;
     if (email) {
+      // Tier fidèle à l'offre achetée (comme le webhook) — sinon un abonné
+      // Starter 1,99€ ou Plus 5€ serait écrasé en 'premium' en arrivant ici.
+      const plan = session.metadata?.plan;
+      const tier = plan === 'starter' ? 'starter' : plan === 'plus' ? 'plus' : 'premium';
       await prisma.user.upsert({
         where: { email },
-        create: { email, name: session.customer_details?.name ?? null, tier: 'premium' },
-        update: { tier: 'premium' },
+        create: { email, name: session.customer_details?.name ?? null, tier },
+        update: { tier },
       }).catch(() => {});
     }
 

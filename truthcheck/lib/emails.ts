@@ -362,6 +362,11 @@ export function emailSuiviDay(
 export const ADMIN_NOTIF_EMAIL = process.env.ADMIN_NOTIF_EMAIL || 'nathabuisseness@gmail.com';
 
 const SALE_FLAVORS: Record<string, { emoji: string; title: string; punch: string; color: string }> = {
+  starter: {
+    emoji: '🌱', color: '#34d399',
+    title: 'Nouvel abonné STARTER — 1,99 €/mois',
+    punch: '+1,99 € de MRR ! L\'offre d\'entrée récurrente fait son travail — prochaine étape : l\'upsell vers Plus.',
+  },
   onetime: {
     emoji: '☕', color: '#d17d52',
     title: 'Déblocage 1,99 €',

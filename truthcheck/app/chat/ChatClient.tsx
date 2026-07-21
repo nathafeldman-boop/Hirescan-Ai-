@@ -197,7 +197,7 @@ export default function ChatClient() {
       {isFree && (
         <Link href="/pricing" className="block px-4 py-2 text-center text-[11px] font-semibold"
           style={{ background: 'var(--gold-soft)', borderBottom: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
-          ✦ Version découverte · débloque ton coach selon TON type — 5 €/mois →
+          ✦ Version découverte (5 messages/mois) · Nova selon TON type dès 1,99 €/mois →
         </Link>
       )}
 
@@ -280,13 +280,15 @@ export default function ChatClient() {
 
           {quotaHit && (
             <div className="mt-6 rounded-2xl p-5 text-center" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
-              <p className="text-sm font-bold text-white mb-1">Tu as utilisé tes {limit ?? ''} messages du jour</p>
+              <p className="text-sm font-bold text-white mb-1">
+                {isFree ? `Tu as utilisé tes ${limit ?? ''} messages découverte du mois` : `Tu as utilisé tes ${limit ?? ''} messages du jour`}
+              </p>
               <p className="text-xs mb-4" style={{ color: 'var(--ink-text-muted)' }}>
-                {tier === 'free'
-                  ? 'Passe à un abonnement pour parler à Nova bien plus chaque jour.'
+                {isFree
+                  ? 'Dès 1,99 €/mois : ton profil complet + Nova tous les jours (5 messages/jour).'
                   : 'Ton quota se réinitialise demain (minuit, heure de Paris).'}
               </p>
-              {tier === 'free' && <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Voir les abonnements →</Link>}
+              {isFree && <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Débloquer Nova — dès 1,99 €/mois →</Link>}
 
               {/* Parrainage : +3 messages / invité inscrit, +3 par jour si l'invité paie */}
               {inviteCode && (

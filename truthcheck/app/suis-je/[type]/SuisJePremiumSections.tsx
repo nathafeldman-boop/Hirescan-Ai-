@@ -16,7 +16,7 @@ interface Props {
 // TypeClient.tsx).
 export default function SuisJePremiumSections({ code }: Props) {
   const { data: session, status } = useSession();
-  const isPremium = ['premium', 'plus'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
   const sessionLoading = status === 'loading';
 
   const [premium, setPremium] = useState<MbtiTypePremium | null>(null);

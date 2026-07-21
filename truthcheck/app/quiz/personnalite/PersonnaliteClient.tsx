@@ -586,7 +586,7 @@ function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
           className="w-full py-3 rounded-full font-black text-sm active:scale-[0.98] transition-all"
           style={{ background: 'var(--gold)', color: 'var(--ink)' }}
         >
-          {isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
+          {isFr ? `Débloquer mon profil + Nova, 1,99 €/mois` : `Unlock my profile + Nova, €1.99/mo`}
         </button>
       </div>
     );
@@ -629,12 +629,12 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
 
   const items = isFr ? [
     {
-      q: `C'est quoi exactement pour 1,99 €?`,
-      a: `2 résultats : ton profil complet (Amour, Carrière, Face cachée, Compatibilité) + 1 quiz UrCecret au choix (infidélité, amour véritable, manipulation…) dont le résultat est aussi débloqué. Paiement unique, accès immédiat, à vie. Zéro abonnement.`,
+      q: `C'est quoi exactement pour 1,99 €/mois?`,
+      a: `Ton profil complet (Amour, Carrière, Face cachée, Compatibilité) + Nova, ton coach IA personnel qui connaît ton type — 5 messages par jour. Accès immédiat tant que l'abonnement est actif.`,
     },
     {
-      q: `Est-ce un abonnement?`,
-      a: `Non. 1,99 € est un paiement unique, pas un abonnement. Tu paies une fois et tu gardes l'accès pour toujours. L'option mensuelle à 9,99 €/mois est un abonnement — résiliable en 1 clic depuis ton espace.`,
+      q: `Est-ce un abonnement? Je peux annuler?`,
+      a: `Oui, c'est un abonnement à 1,99 €/mois — le prix d'un café. Résiliable en 1 clic à tout moment depuis ton espace, sans engagement ni frais cachés. Tu peux tester un mois et arrêter si ça ne te plaît pas.`,
     },
     {
       q: `Satisfait ou remboursé?`,
@@ -646,12 +646,12 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
     },
   ] : [
     {
-      q: `What exactly do I get for €1.99?`,
-      a: `2 results: your complete profile (Love, Career, Shadow side, Compatibility) + 1 UrCecret quiz of your choice (infidelity, true love, manipulation…) with its result unlocked too. One-time payment, instant, lifetime access. Zero subscription.`,
+      q: `What exactly do I get for €1.99/mo?`,
+      a: `Your complete profile (Love, Career, Shadow side, Compatibility) + Nova, your personal AI coach who knows your type — 5 messages per day. Instant access while subscribed.`,
     },
     {
-      q: `Is it a subscription?`,
-      a: `No. €1.99 is a one-time payment, not a subscription. Pay once, keep access forever. The €9.99/month option is a subscription — cancel in 1 click anytime.`,
+      q: `Is it a subscription? Can I cancel?`,
+      a: `Yes, €1.99/month — the price of a coffee. Cancel in 1 click anytime from your account, no commitment, no hidden fees. Try it for a month and stop if it's not for you.`,
     },
     {
       q: `Money-back guarantee?`,
@@ -733,7 +733,7 @@ function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
           className="w-full py-4 rounded-full font-black text-sm mb-3 active:scale-[0.98] transition-all"
           style={{ background: 'var(--gold)', color: 'var(--ink)' }}
         >
-          {isFr ? `Débloquer maintenant, 1,99 €` : `Unlock now, €1.99`}
+          {isFr ? `Débloquer maintenant, 1,99 €/mois` : `Unlock now, €1.99/mo`}
         </button>
         <button
           onClick={onClose}
@@ -818,14 +818,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const doCheckout = useCallback(async (checkoutType: 'onetime' | 'annual' | 'monthly' | 'plus', emailOverride?: string) => {
+  const doCheckout = useCallback(async (checkoutType: 'starter' | 'onetime' | 'annual' | 'monthly' | 'plus', emailOverride?: string) => {
     const email = emailOverride ?? userEmail;
     // Direct checkout — NO forced account before paying. The account is created
     // automatically from the Stripe email after payment (webhook + /success).
     diagLog(email ? 'checkout_with_email' : 'checkout_no_email', { intent: checkoutType });
     track('checkout_click', {
       quiz: 'personnalite',
-      value: checkoutType === 'onetime' ? 1.99 : checkoutType === 'annual' ? 29.99 : checkoutType === 'plus' ? 5 : 9.99,
+      value: (checkoutType === 'onetime' || checkoutType === 'starter') ? 1.99 : checkoutType === 'annual' ? 29.99 : checkoutType === 'plus' ? 5 : 9.99,
       currency: 'EUR',
     });
     setLoading(true);
@@ -842,6 +842,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           ...(email ? { userEmail: email } : {}),
           ...(checkoutType === 'annual' ? { annual: true } : {}),
           ...(checkoutType === 'onetime' ? { oneTime: true } : {}),
+          ...(checkoutType === 'starter' ? { starter: true } : {}),
           ...(checkoutType === 'plus' ? { plus: true } : {}),
           ...(affiliateRef ? { affiliateRef } : {}),
         }),
@@ -882,7 +883,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
     };
     fetch('/api/checkout', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...base, oneTime: true }),
+      body: JSON.stringify({ ...base, starter: true }),
     }).then(r => r.json()).then(d => { if (d.url) setInAppPayUrl(d.url); }).catch(() => {});
     fetch('/api/checkout', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -902,7 +903,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <ExitIntentModal
           typeCode={typeCode}
           isFr={isFr}
-          onCheckout={() => doCheckout('onetime')}
+          onCheckout={() => doCheckout('starter')}
           onClose={() => setExitModal(false)}
         />
       )}
@@ -953,20 +954,20 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 <span className="flex-shrink-0"><Glyph name="key" color="var(--gold)" size={22} /></span>
                 <div className="min-w-0">
                   <p className="text-[13px] font-bold text-stone-900 leading-snug" style={{ letterSpacing: '-0.01em' }}>
-                    {isFr ? 'Mon profil MBTI + 1 quiz au choix' : 'My MBTI profile + 1 quiz'}
+                    {isFr ? 'Mon profil MBTI + Nova, mon coach IA' : 'My MBTI profile + Nova, my AI coach'}
                   </p>
                   <p className="text-[11px] text-stone-500 mt-0.5">
-                    {isFr ? 'Deux résultats · un seul paiement · à vie' : 'Two results · one payment · lifetime'}
+                    {isFr ? 'Le prix d\'un café · résiliable en 1 clic' : 'The price of a coffee · cancel in 1 click'}
                   </p>
                 </div>
               </div>
               <button
-                onClick={() => doCheckout('onetime')}
+                onClick={() => doCheckout('starter')}
                 disabled={loading}
                 className="flex-shrink-0 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-60"
                 style={{ background: 'var(--ink)', color: '#FAF6EC', whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
               >
-                {loading ? '…' : '1,99 €'}
+                {loading ? '…' : '1,99 €/mois'}
               </button>
             </div>
             <p className="text-center text-[11px] mt-2.5 text-stone-400">
@@ -1046,8 +1047,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <div className="ur-rule my-3.5" />
           <p className="text-[12px] text-stone-500 text-center" style={{ lineHeight: 1.55 }}>
             {isFr
-              ? <>Un bilan de personnalité chez un praticien coûte 150 € ou plus.<br /><span className="font-semibold text-stone-800">Ton profil complet : 1,99 €, gardé à vie.</span></>
-              : <>A personality assessment with a practitioner costs €150+.<br /><span className="font-semibold text-stone-800">Your full profile: €1.99, kept for life.</span></>}
+              ? <>Un bilan de personnalité chez un praticien coûte 150 € ou plus.<br /><span className="font-semibold text-stone-800">Ton profil complet + un coach : 1,99 €/mois, résiliable en 1 clic.</span></>
+              : <>A personality assessment with a practitioner costs €150+.<br /><span className="font-semibold text-stone-800">Your full profile + a coach: €1.99/mo, cancel anytime.</span></>}
           </p>
         </div>
 
@@ -1069,34 +1070,34 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         <div className="space-y-3 mt-4">
 
-          {/* HERO: One-time €1.99 — encre profonde, prix en or, sceau discret */}
+          {/* HERO: Starter 1,99€/mois — profil + Nova. Encre profonde, prix en or. */}
           <div className="relative rounded-[28px] px-5 pt-6 pb-5 overflow-hidden" style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
             <div aria-hidden className="absolute pointer-events-none" style={{ top: -30, right: -30, opacity: 0.12 }}>
               <Seal size={140} />
             </div>
             <p className="ur-label text-[10px] mb-4 relative" style={{ color: 'rgba(250,246,236,0.45)' }}>
-              {isFr ? 'Deux résultats, un paiement' : 'Two results, one payment'}
+              {isFr ? 'Ton profil + ton coach' : 'Your profile + your coach'}
             </p>
 
             <div className="mb-5 relative">
               <div className="flex items-baseline gap-2.5">
                 <span className="font-display" style={{ fontSize: 44, fontWeight: 700, color: 'var(--gold)', letterSpacing: '-0.01em' }}>1,99 €</span>
-                <span className="text-sm line-through" style={{ color: 'rgba(250,246,236,0.30)' }}>29,99 €</span>
+                <span className="text-base" style={{ color: 'rgba(250,246,236,0.55)' }}>{isFr ? '/mois' : '/mo'}</span>
               </div>
               <p className="text-[12px] mt-1" style={{ color: 'rgba(250,246,236,0.55)' }}>
-                {isFr ? 'Une seule fois, à vie, le prix d\'un café' : 'Once, lifetime, the price of a coffee'}
+                {isFr ? 'Le prix d\'un café · résiliable en 1 clic, sans engagement' : 'The price of a coffee · cancel in 1 click, no commitment'}
               </p>
             </div>
 
             <ul className="space-y-2.5 mb-5 relative">
               {(isFr ? [
                 `Ton profil complet : amour, carrière, face cachée`,
-                'Un quiz UrCecret au choix, résultat débloqué aussi',
-                'Accès immédiat, conservé à vie, zéro abonnement',
+                'Nova, ton coach IA perso : 5 messages par jour',
+                'Accès immédiat, annulable à tout moment',
               ] : [
                 `Your complete profile: love, career, shadow side`,
-                'One UrCecret quiz of your choice, result unlocked too',
-                'Instant access, kept forever, zero subscription',
+                'Nova, your personal AI coach: 5 messages a day',
+                'Instant access, cancel anytime',
               ]).map(b => (
                 <li key={b} className="flex items-start gap-2.5 text-[13px]" style={{ color: 'rgba(250,246,236,0.85)', lineHeight: 1.5 }}>
                   <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: 'var(--gold)' }}>✓</span>{b}
@@ -1113,16 +1114,16 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="relative block w-full py-4 rounded-full font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
                 style={{ background: 'var(--gold)', color: 'var(--ink)', textDecoration: 'none' }}
               >
-                {isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
+                {isFr ? `Débloquer mon profil + Nova, 1,99 €/mois` : `Unlock my profile + Nova, €1.99/mo`}
               </a>
             ) : (
               <button
-                onClick={() => doCheckout('onetime')}
+                onClick={() => doCheckout('starter')}
                 disabled={loading}
                 className="relative w-full py-4 rounded-full font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ background: 'var(--gold)', color: 'var(--ink)' }}
               >
-                {loading ? '…' : isFr ? `Débloquer mon profil complet, 1,99 €` : `Unlock my complete profile, €1.99`}
+                {loading ? '…' : isFr ? `Débloquer mon profil + Nova, 1,99 €/mois` : `Unlock my profile + Nova, €1.99/mo`}
               </button>
             )}
             <p className="text-center text-[11px] mt-2.5 relative" style={{ color: 'rgba(250,246,236,0.45)' }}>
@@ -1281,7 +1282,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         <PaywallEmailCapture
           typeCode={typeCode}
           isFr={isFr}
-          onCaptured={(capturedEmail) => doCheckout('onetime', capturedEmail)}
+          onCaptured={(capturedEmail) => doCheckout('starter', capturedEmail)}
         />
 
       </div>
@@ -1292,18 +1293,18 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <div className="max-w-sm mx-auto flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-black text-stone-900 leading-snug">
-                {isFr ? `Ton profil complet, 1,99 €` : `Your full profile, €1.99`}
+                {isFr ? `Ton profil + Nova, 1,99 €/mois` : `Your profile + Nova, €1.99/mo`}
               </p>
               <p className="text-[10px] text-stone-500 mt-0.5">
-                {isFr ? 'Paiement unique, accès à vie, 7j remboursé' : 'One-time, lifetime access, 7-day refund'}
+                {isFr ? 'Résiliable en 1 clic · 7 j remboursé' : 'Cancel in 1 click · 7-day refund'}
               </p>
             </div>
             <button
-              onClick={() => { setStickyBar(false); doCheckout('onetime'); }}
+              onClick={() => { setStickyBar(false); doCheckout('starter'); }}
               className="flex-shrink-0 px-4 py-2.5 rounded-full font-black text-xs whitespace-nowrap transition-all active:scale-[0.97]"
               style={{ background: 'var(--gold)', color: 'var(--ink)' }}
             >
-              {isFr ? '1,99 € →' : '€1.99 →'}
+              {isFr ? '1,99 €/mois →' : '€1.99/mo →'}
             </button>
             <button onClick={() => setStickyBar(false)} className="text-stone-400 text-base p-1 leading-none flex-shrink-0">✕</button>
           </div>
@@ -1364,7 +1365,7 @@ function SignInGate({ isFr }: { isFr: boolean }) {
 export default function PersonnaliteClient() {
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
-  const isPremium = ['premium', 'plus'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
   const { lang } = useLang();
   const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>(() => {
     if (typeof window !== 'undefined') {

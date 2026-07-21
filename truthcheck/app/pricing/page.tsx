@@ -9,8 +9,14 @@ import Seal from '@/components/Seal';
 
 const FREE_PERKS = [
   'Ton type MBTI de base (les 4 lettres)',
-  '5 messages par jour avec l’assistant IA',
+  'Nova en version découverte — 5 messages par mois',
   'Quiz relationnels — résultats partiels',
+];
+
+const STARTER_PERKS = [
+  'Ton profil MBTI complet : amour, carrière, face cachée',
+  'Nova, ton coach IA perso — 5 messages par jour',
+  'Résiliable en 1 clic, sans engagement',
 ];
 
 const PLUS_PERKS = [
@@ -27,10 +33,11 @@ const PREMIUM_PERKS = [
   'Tous les futurs quiz inclus, à vie',
 ];
 
-function CheckoutButton({ label, annual, plus, userEmail, variant }: {
+function CheckoutButton({ label, annual, plus, starter, userEmail, variant }: {
   label: string;
   annual?: boolean;
   plus?: boolean;
+  starter?: boolean;
   userEmail?: string | null;
   variant: 'gold' | 'outline';
 }) {
@@ -45,6 +52,7 @@ function CheckoutButton({ label, annual, plus, userEmail, variant }: {
         body: JSON.stringify({
           annual: annual ?? false,
           plus: plus ?? false,
+          starter: starter ?? false,
           userEmail: userEmail ?? undefined,
           origin: window.location.origin,
         }),
@@ -127,6 +135,26 @@ export default function PricingPage() {
           <div className="w-full py-3 rounded-full text-center text-sm font-semibold text-stone-500" style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
             {isPremium ? 'Ancien plan' : 'Ton plan actuel'}
           </div>
+        </div>
+
+        {/* Plan Starter — 1,99€/mois : l'entrée MRR (profil + Nova) */}
+        <div className="ur-panel-ink p-5 mb-4">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="min-w-0">
+              <p className="font-bold text-white">Starter · mensuel</p>
+              <p className="text-stone-500 text-sm">Ton profil + ton coach, prix d’un café</p>
+            </div>
+            <Price amount="1,99 €" unit="par mois" />
+          </div>
+          <ul className="space-y-2.5 mb-5">
+            {STARTER_PERKS.map((p) => (
+              <li key={p} className="flex items-start gap-2.5 text-sm text-stone-300">
+                <span className="flex-shrink-0 mt-px" style={{ color: 'var(--gold)' }}>✓</span>
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+          <CheckoutButton label="Commencer — 1,99 €/mois" starter userEmail={userEmail} variant="outline" />
         </div>
 
         {/* Plan Plus — 5€/mois */}
