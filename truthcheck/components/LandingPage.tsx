@@ -121,7 +121,7 @@ export default function LandingPage() {
         }}
       >
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-lg font-display italic transition-colors duration-300" style={{ color: scrolled ? 'var(--ink)' : '#FAF6EC', fontWeight: 700 }}>
+          <span className="text-lg font-display italic transition-colors duration-300" style={{ color: 'var(--ink)', fontWeight: 700 }}>
             UrCecret
           </span>
           <div className="flex items-center gap-3">
@@ -131,9 +131,7 @@ export default function LandingPage() {
             <Link
               href="/quiz/personnalite"
               className="text-sm font-bold px-5 py-2.5 rounded-full transition-all duration-300 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
-              style={scrolled
-                ? { background: 'var(--ink)', color: '#FAF6EC' }
-                : { background: 'var(--gold)', color: 'var(--ink)' }}
+              style={{ background: 'var(--ink)', color: '#FAF6EC' }}
             >
               Commencer
             </Link>
@@ -141,8 +139,9 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ═══ HERO — le sceau se révèle, la promesse d'une lecture mystique ═══ */}
-      <section className="relative overflow-hidden text-center" style={{ background: 'var(--ink)' }}>
+      {/* ═══ HERO — le sceau se révèle, la promesse d'une lecture mystique.
+          Fond papier beige (demande explicite) : textes en encre. ═══ */}
+      <section className="relative overflow-hidden text-center" style={{ background: 'var(--paper)' }}>
         <style>{`
           @keyframes heroUp { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:translateY(0) } }
           @keyframes heroDraw { from { stroke-dashoffset:300 } to { stroke-dashoffset:0 } }
@@ -164,7 +163,7 @@ export default function LandingPage() {
             {fromTiktok ? 'Vu sur TikTok' : 'Test de personnalité'}
           </p>
 
-          <h1 className="hero-up font-display mb-6" style={{ color: '#FAF6EC', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
+          <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
             {fromTiktok ? (
               <>Tu réagis différemment{' '}
                 <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
@@ -188,7 +187,7 @@ export default function LandingPage() {
             )}
           </h1>
 
-          <p className="hero-up text-[15px] max-w-sm mx-auto mb-9" style={{ color: 'rgba(250,246,236,0.55)', lineHeight: 1.65, animationDelay: '.16s' }}>
+          <p className="hero-up text-[15px] max-w-sm mx-auto mb-9 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
             {fromTiktok
               ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
               : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
@@ -203,20 +202,20 @@ export default function LandingPage() {
               Découvrir mon type →
             </Link>
           </div>
-          <p className="hero-up text-xs mt-4" style={{ color: 'rgba(250,246,236,0.38)', animationDelay: '.28s' }}>
+          <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
             Gratuit, résultat immédiat, sans inscription.
           </p>
 
           {/* Faits vérifiables, pas de stats inventées */}
-          <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line-ink)', animationDelay: '.34s' }}>
+          <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
             {[
               { value: '16', label: 'Profils distincts' },
               { value: '12', label: 'Questions' },
               { value: '3 min', label: 'Résultat' },
             ].map((s) => (
               <div key={s.label}>
-                <div className="font-display text-xl" style={{ color: '#FAF6EC', fontWeight: 700 }}>{s.value}</div>
-                <div className="text-[11px] mt-1" style={{ color: 'rgba(250,246,236,0.4)' }}>{s.label}</div>
+                <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
+                <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
               </div>
             ))}
           </div>
@@ -243,10 +242,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Section 2 : MBTI pour traffic TikTok, quiz thématiques pour trafic organique ── */}
+      {/* ── Section 2 : les 4 familles MBTI (les quiz thématiques ont été retirés
+          de la home — le site est 100 % centré sur LE test). ── */}
       <section className="relative z-10 pb-10 px-5">
         <div className="max-w-lg mx-auto">
-          {fromTiktok ? (
+          {(
             <>
               <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
                 Les 4 familles MBTI
@@ -286,47 +286,6 @@ export default function LandingPage() {
               </div>
               <Link href="/quiz/personnalite" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
                 Faire le test complet →
-              </Link>
-            </>
-          ) : (
-            <>
-              <p className="text-xs font-bold uppercase tracking-widest text-center mb-3" style={{ color: CLAY }}>
-                Questions secrètes
-              </p>
-              <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-1">
-                Des révélations que tu n&apos;attendais pas
-              </h2>
-              <p className="text-stone-400 text-center text-xs mb-5">
-                Anonyme · Résultat immédiat · Sans inscription
-              </p>
-              <div className="space-y-2">
-                {[
-                  { href: '/quiz/personnalite', q: 'Quel est vraiment mon type MBTI ?',   sub: 'Effrayant de précision, 16 profils, résultat en 3 min' },
-                  { href: '/quiz/infidelite',   q: 'Mon/ma partenaire me trompe ?',       sub: '8 comportements analysés, 2 minutes' },
-                  { href: '/quiz/amoureux',     q: 'Suis-je vraiment amoureux(se) ?',     sub: 'Amour, attachement ou habitude, analyse différenciée' },
-                  { href: '/quiz/manipule',     q: 'Suis-je manipulé(e) ?',               sub: 'Gaslighting, contrôle émotionnel, emprise' },
-                  { href: '/quiz/vrais-amis',   q: 'Sont-ils de vrais amis ?',            sub: 'Dynamiques de réciprocité dans tes amitiés proches' },
-                ].map((q) => (
-                  <Link
-                    key={q.href}
-                    href={q.href}
-                    className="flex items-center gap-4 p-4 rounded-2xl transition-all hover:-translate-y-0.5 active:scale-[0.98]"
-                    style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-stone-900 text-sm leading-snug">{q.q}</p>
-                      <p className="text-stone-400 text-xs mt-0.5">{q.sub}</p>
-                    </div>
-                    <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--gold-soft)' }}>
-                      <svg className="w-3.5 h-3.5" style={{ color: CLAY }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              <Link href="/quizzes" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
-                Voir tous les quiz →
               </Link>
             </>
           )}
