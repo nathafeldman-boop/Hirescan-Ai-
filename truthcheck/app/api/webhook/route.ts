@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
-import { emailPremiumWelcome, sendEmail } from '@/lib/emails';
+import { emailPremiumWelcome, emailAdminSale, sendEmail, ADMIN_NOTIF_EMAIL } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
 import { PLUS_PRICE_ID } from '@/lib/plans';
 
@@ -125,6 +125,32 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Type d'offre — sert à l'attribution ET à la notification vente.
+      // 'plus' (5€) est distingué du mensuel 9,99€ via metadata.plan.
+      const productType =
+          meta.annual === 'true'          ? 'annual'
+        : meta.rapport === 'true'         ? 'rapport'
+        : meta.fusionGroupId              ? 'fusion'
+        : meta.oneTime === 'true'         ? 'onetime'
+        : session.mode === 'subscription' ? (meta.plan === 'plus' ? 'plus' : 'monthly')
+        : 'onetime';
+
+      // ── Notification vente → email admin, personnalisé selon l'offre ──
+      try {
+        const { subject, html } = emailAdminSale({
+          productType,
+          amountCents: session.amount_total ?? 0,
+          buyerEmail: email,
+          quizSlug: meta.quizSlug || null,
+          utmSource: meta.utmSource || null,
+          affiliateSlug: meta.affiliateSlug || null,
+          landingPath: meta.landingPath || null,
+        });
+        await sendEmail(ADMIN_NOTIF_EMAIL, subject, html);
+      } catch (e) {
+        console.error('Admin sale notif error:', e);
+      }
+
       // ── Attribution complète — chaque paiement tracé avec sa source ──
       await prisma.conversion.upsert({
         where: { stripeSessionId: session.id },
@@ -133,12 +159,7 @@ export async function POST(req: NextRequest) {
           email:           email ?? undefined,
           amountCents:     session.amount_total ?? 0,
           quizSlug:        meta.quizSlug     || undefined,
-          productType:     meta.annual === 'true'          ? 'annual'
-                         : meta.rapport === 'true'         ? 'rapport'
-                         : meta.fusionGroupId              ? 'fusion'
-                         : meta.oneTime === 'true'         ? 'onetime'
-                         : session.mode === 'subscription' ? 'monthly'
-                         : 'onetime',
+          productType,
           utmSource:       meta.utmSource    || undefined,
           utmMedium:       meta.utmMedium    || undefined,
           utmCampaign:     meta.utmCampaign  || undefined,
@@ -154,15 +175,32 @@ export async function POST(req: NextRequest) {
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object as Stripe.Invoice;
       const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email.toLowerCase().trim() : null;
+      // On lit le prix facturé pour ne pas passer un abonné 5€ (plus) en premium.
+      const isPlus = invoice.lines?.data?.some((l) => l.price?.id === PLUS_PRICE_ID) ?? false;
       if (customerEmail) {
-        // On lit le prix facturé pour ne pas passer un abonné 5€ (plus) en premium.
-        const isPlus = invoice.lines?.data?.some((l) => l.price?.id === PLUS_PRICE_ID) ?? false;
         const tier = isPlus ? 'plus' : 'premium';
         await prisma.user.upsert({
           where: { email: customerEmail },
           create: { email: customerEmail, tier },
           update: { tier },
         }).catch(() => {});
+      }
+
+      // Notification renouvellement UNIQUEMENT (billing_reason 'subscription_cycle').
+      // Le 1er paiement d'un abonnement est déjà notifié via checkout.session.completed.
+      if (invoice.billing_reason === 'subscription_cycle') {
+        try {
+          const amount = invoice.amount_paid ?? 0;
+          const { subject, html } = emailAdminSale({
+            productType: isPlus ? 'plus' : amount >= 2500 ? 'annual' : 'monthly',
+            amountCents: amount,
+            buyerEmail: customerEmail,
+            renewal: true,
+          });
+          await sendEmail(ADMIN_NOTIF_EMAIL, subject, html);
+        } catch (e) {
+          console.error('Admin renewal notif error:', e);
+        }
       }
     }
 
