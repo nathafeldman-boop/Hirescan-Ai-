@@ -356,6 +356,84 @@ export function emailSuiviDay(
   };
 }
 
+// ── Notification admin : une vente ! ────────────────────────────────────────
+// Envoyée à TOI (pas au client) à chaque paiement, personnalisée selon l'offre.
+// L'adresse est surchargable via ADMIN_NOTIF_EMAIL dans Vercel.
+export const ADMIN_NOTIF_EMAIL = process.env.ADMIN_NOTIF_EMAIL || 'nathabuisseness@gmail.com';
+
+const SALE_FLAVORS: Record<string, { emoji: string; title: string; punch: string; color: string }> = {
+  onetime: {
+    emoji: '☕', color: '#d17d52',
+    title: 'Déblocage 1,99 €',
+    punch: 'Quelqu\'un vient de payer pour découvrir son profil. Le funnel TikTok → test → paywall fait son travail.',
+  },
+  plus: {
+    emoji: '🔮', color: '#c2a24a',
+    title: 'Nouvel abonné PLUS — 5 €/mois',
+    punch: 'Le Coach IA a convaincu ! +5 € de MRR. Objectif : qu\'il parle à son coach cette semaine (les utilisateurs actifs ne résilient presque jamais).',
+  },
+  monthly: {
+    emoji: '⭐', color: '#34d399',
+    title: 'Nouvel abonné PREMIUM — 9,99 €/mois',
+    punch: '+9,99 € de MRR. C\'est ton offre la plus rentable en récurrent — chouchoute-le.',
+  },
+  annual: {
+    emoji: '👑', color: '#fbbf24',
+    title: 'ABONNEMENT ANNUEL — 29,99 €',
+    punch: '30 € cash, zéro churn pendant 12 mois. La meilleure vente possible. 🎉',
+  },
+  rapport: {
+    emoji: '📜', color: '#a78bfa',
+    title: 'Rapport complet — 19,99 €',
+    punch: 'Gros panier one-shot — le rapport premium se vend.',
+  },
+};
+
+export function emailAdminSale(opts: {
+  productType: string;
+  amountCents: number;
+  buyerEmail: string | null;
+  quizSlug?: string | null;
+  utmSource?: string | null;
+  affiliateSlug?: string | null;
+  landingPath?: string | null;
+  renewal?: boolean;
+}) {
+  const f = SALE_FLAVORS[opts.productType] ?? {
+    emoji: '💰', color: '#d17d52', title: `Paiement — ${(opts.amountCents / 100).toFixed(2).replace('.', ',')} €`,
+    punch: 'Nouvelle vente sur UrCecret.',
+  };
+  const amount = (opts.amountCents / 100).toFixed(2).replace('.', ',');
+  const source = opts.affiliateSlug
+    ? `Affilié : ${opts.affiliateSlug}`
+    : opts.utmSource
+      ? `Source : ${opts.utmSource}`
+      : 'Source : organique / direct';
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:4px 0;color:#71717a;font-size:13px;width:110px">${label}</td><td style="padding:4px 0;color:#e4e4e7;font-size:13px;font-weight:600">${value}</td></tr>`;
+
+  return {
+    subject: opts.renewal
+      ? `♻️ Renouvellement ${amount} € — UrCecret`
+      : `${f.emoji} ${f.title} — ça vient de payer !`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:${f.color};font-size:12px;text-transform:uppercase;letter-spacing:1px">${opts.renewal ? '♻️ Renouvellement' : '💸 Nouvelle vente'}</p>
+      <h2 style="margin:0 0 8px;color:#fff;font-size:24px;font-weight:900">${f.emoji} ${amount} €</h2>
+      <p style="margin:0 0 20px;color:#a1a1aa;font-size:14px;line-height:1.7">${opts.renewal ? 'Un abonné vient de renouveler — le MRR tient.' : f.punch}</p>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 18px;margin-bottom:20px">
+        <table cellpadding="0" cellspacing="0" style="width:100%">
+          ${row('Offre', f.title)}
+          ${row('Client', opts.buyerEmail ?? 'inconnu')}
+          ${opts.quizSlug ? row('Quiz', opts.quizSlug) : ''}
+          ${row('Acquisition', source)}
+          ${opts.landingPath ? row('Page d\'entrée', opts.landingPath) : ''}
+        </table>
+      </div>
+      <p style="margin:0;color:#52525b;font-size:12px">Détails complets dans le <a href="${BASE}/admin" style="color:#71717a">dashboard admin</a> et sur Stripe.</p>
+    `),
+  };
+}
+
 export async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
