@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
 import { emailPremiumWelcome, emailAdminSale, sendEmail, ADMIN_NOTIF_EMAIL } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
-import { PLUS_PRICE_ID } from '@/lib/plans';
+import { PLUS_PRICE_ID, STARTER_PRICE_ID } from '@/lib/plans';
 
 export const dynamic = 'force-dynamic';
 
@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
       // On lit le prix facturé pour attribuer le bon palier au renouvellement :
       // 5€ (price id) → plus · 1,99€ (montant) → starter · sinon premium.
       const isPlus = invoice.lines?.data?.some((l) => l.price?.id === PLUS_PRICE_ID) ?? false;
-      const isStarter = !isPlus && (invoice.lines?.data?.some((l) => l.price?.unit_amount === 199) ?? false);
+      const isStarter = !isPlus && (invoice.lines?.data?.some((l) => l.price?.id === STARTER_PRICE_ID || l.price?.unit_amount === 199) ?? false);
       if (customerEmail) {
         const tier = isPlus ? 'plus' : isStarter ? 'starter' : 'premium';
         await prisma.user.upsert({
@@ -260,7 +260,7 @@ export async function POST(req: NextRequest) {
           const customerEmail = (customer as Stripe.Customer).email?.toLowerCase().trim();
           if (customerEmail) {
             const isPlus = sub.items?.data?.some((i) => i.price?.id === PLUS_PRICE_ID) ?? false;
-            const isStarter = !isPlus && (sub.items?.data?.some((i) => i.price?.unit_amount === 199) ?? false);
+            const isStarter = !isPlus && (sub.items?.data?.some((i) => i.price?.id === STARTER_PRICE_ID || i.price?.unit_amount === 199) ?? false);
             const tier = isPlus ? 'plus' : isStarter ? 'starter' : 'premium';
             await prisma.user.updateMany({
               where: { email: customerEmail },
