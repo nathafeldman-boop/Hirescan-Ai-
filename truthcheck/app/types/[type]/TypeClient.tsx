@@ -43,7 +43,7 @@ interface Props {
 
 export default function TypeClient({ type }: Props) {
   const { data: session, status } = useSession();
-  const isPremium = ['premium', 'plus'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
   const sessionLoading = status === 'loading';
   const { lang } = useLang();
   const t = ui[lang].type;

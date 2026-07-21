@@ -3,24 +3,32 @@
 // et l'appel à l'API Mistral. La clé n'est JAMAIS dans le code — elle vient de
 // la variable d'environnement MISTRAL_API_KEY (à définir dans Vercel).
 
-export type Tier = 'free' | 'plus' | 'premium';
+export type Tier = 'free' | 'starter' | 'plus' | 'premium';
 
 // Quotas de messages PAR JOUR selon l'abonnement.
-// free = 3 (version découverte bridée, sans le type) · plus (5€) = 30 · premium = 50.
-export const DAILY_LIMITS: Record<Tier, number> = {
-  free: 3,
+// starter (1,99€) = 5 · plus (5€) = 30 · premium = 50.
+// Le palier GRATUIT n'est pas journalier : 5 messages PAR MOIS (découverte).
+export const DAILY_LIMITS: Record<Exclude<Tier, 'free'>, number> = {
+  starter: 5,
   plus: 30,
   premium: 50,
 };
+export const FREE_MONTHLY_LIMIT = 5;
 
 export function dailyLimitFor(tier: string | undefined): number {
-  return DAILY_LIMITS[(tier as Tier)] ?? DAILY_LIMITS.free;
+  return DAILY_LIMITS[(tier as Exclude<Tier, 'free'>)] ?? DAILY_LIMITS.starter;
 }
 
 // Jour courant au fuseau Europe/Paris, format "YYYY-MM-DD" — sert de clé de
 // quota. Le quota se réinitialise à minuit, heure de Paris.
 export function parisDay(now: Date = new Date()): string {
   return now.toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' }); // ex: 2026-07-17
+}
+
+// Mois courant à Paris, "YYYY-MM" — clé de quota du palier gratuit (5/mois).
+// Réutilise la même table ChatUsage (le champ `day` stocke la clé, jour ou mois).
+export function parisMonth(now: Date = new Date()): string {
+  return parisDay(now).slice(0, 7); // ex: 2026-07
 }
 
 // Modèle Mistral économique — adapté à un assistant conversationnel court.

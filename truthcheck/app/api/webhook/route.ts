@@ -68,9 +68,9 @@ export async function POST(req: NextRequest) {
       }
 
       // ── Subscription or rapport → upgrade user tier ──
-      // plan:'plus' (abonnement 5€) → tier 'plus' ; sinon 'premium'.
+      // plan:'starter' (1,99€) → 'starter' ; plan:'plus' (5€) → 'plus' ; sinon 'premium'.
       if (email && (meta.annual === 'true' || session.mode === 'subscription' || meta.rapport === 'true')) {
-        const tier = meta.plan === 'plus' ? 'plus' : 'premium';
+        const tier = meta.plan === 'starter' ? 'starter' : meta.plan === 'plus' ? 'plus' : 'premium';
         await prisma.user.upsert({
           where: { email },
           create: { email, tier },
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
         : meta.rapport === 'true'         ? 'rapport'
         : meta.fusionGroupId              ? 'fusion'
         : meta.oneTime === 'true'         ? 'onetime'
-        : session.mode === 'subscription' ? (meta.plan === 'plus' ? 'plus' : 'monthly')
+        : session.mode === 'subscription' ? (meta.plan === 'starter' ? 'starter' : meta.plan === 'plus' ? 'plus' : 'monthly')
         : 'onetime';
 
       // ── Notification vente → email admin, personnalisé selon l'offre ──
@@ -203,10 +203,12 @@ export async function POST(req: NextRequest) {
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object as Stripe.Invoice;
       const customerEmail = typeof invoice.customer_email === 'string' ? invoice.customer_email.toLowerCase().trim() : null;
-      // On lit le prix facturé pour ne pas passer un abonné 5€ (plus) en premium.
+      // On lit le prix facturé pour attribuer le bon palier au renouvellement :
+      // 5€ (price id) → plus · 1,99€ (montant) → starter · sinon premium.
       const isPlus = invoice.lines?.data?.some((l) => l.price?.id === PLUS_PRICE_ID) ?? false;
+      const isStarter = !isPlus && (invoice.lines?.data?.some((l) => l.price?.unit_amount === 199) ?? false);
       if (customerEmail) {
-        const tier = isPlus ? 'plus' : 'premium';
+        const tier = isPlus ? 'plus' : isStarter ? 'starter' : 'premium';
         await prisma.user.upsert({
           where: { email: customerEmail },
           create: { email: customerEmail, tier },
@@ -220,7 +222,7 @@ export async function POST(req: NextRequest) {
         try {
           const amount = invoice.amount_paid ?? 0;
           const { subject, html } = emailAdminSale({
-            productType: isPlus ? 'plus' : amount >= 2500 ? 'annual' : 'monthly',
+            productType: isPlus ? 'plus' : isStarter ? 'starter' : amount >= 2500 ? 'annual' : 'monthly',
             amountCents: amount,
             buyerEmail: customerEmail,
             renewal: true,
@@ -258,7 +260,8 @@ export async function POST(req: NextRequest) {
           const customerEmail = (customer as Stripe.Customer).email?.toLowerCase().trim();
           if (customerEmail) {
             const isPlus = sub.items?.data?.some((i) => i.price?.id === PLUS_PRICE_ID) ?? false;
-            const tier = isPlus ? 'plus' : 'premium';
+            const isStarter = !isPlus && (sub.items?.data?.some((i) => i.price?.unit_amount === 199) ?? false);
+            const tier = isPlus ? 'plus' : isStarter ? 'starter' : 'premium';
             await prisma.user.updateMany({
               where: { email: customerEmail },
               data: { tier },

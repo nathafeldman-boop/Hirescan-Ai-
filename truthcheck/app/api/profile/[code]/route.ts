@@ -13,7 +13,7 @@ import { mbtiTypesEnPremium } from '@/lib/i18n/mbtiTypesEnPremium';
 // ne peut pas être falsifié depuis le navigateur.
 export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
   const session = await getServerSession(authOptions);
-  const isPremium = ['premium', 'plus'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
   if (!isPremium) {
     return NextResponse.json({ error: 'Paiement requis' }, { status: 403 });
   }

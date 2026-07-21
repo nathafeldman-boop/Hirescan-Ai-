@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, plus, rapport, typeCode, affiliateRef, fusionGroupId, fusionCode } = await req.json();
+    const { resultId, quizSlug, score, origin, userEmail, oneTime, annual, plus, starter, rapport, typeCode, affiliateRef, fusionGroupId, fusionCode } = await req.json();
     const affiliateSlug = req.cookies.get('urs_ref')?.value || (typeof affiliateRef === 'string' ? affiliateRef : '') || '';
     const baseUrl = origin || req.headers.get('origin') || 'http://localhost:3000';
 
@@ -130,6 +130,30 @@ export async function POST(req: NextRequest) {
         cancel_url: cancelUrl,
       });
       return NextResponse.json({ url: annualSession.url });
+    }
+
+    // ── Abonnement "starter" — 1,99€/mois (profil MBTI + Nova 5 messages/jour) ──
+    // Remplace l'ancien 1,99€ one-shot sur le paywall MBTI → chaque vente = MRR.
+    if (starter) {
+      const starterSession = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [{
+          price_data: {
+            currency: 'eur',
+            product: ONE_TIME_PRODUCT_ID,
+            unit_amount: 199,
+            recurring: { interval: 'month' as const },
+          },
+          quantity: 1,
+        }],
+        allow_promotion_codes: true,
+        ...(userEmail ? { customer_email: userEmail } : {}),
+        // plan:'starter' → le webhook fixe tier='starter'
+        metadata: { resultId: resultId ?? '', quizSlug: quizSlug ?? '', plan: 'starter', affiliateSlug, ...(typeCode ? { typeCode } : {}), ...utmMeta },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      return NextResponse.json({ url: starterSession.url });
     }
 
     // ── Abonnement "plus" — 5€/mois (MBTI débloqué + 30 messages chatbot/jour) ──

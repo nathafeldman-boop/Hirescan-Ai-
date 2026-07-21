@@ -1,7 +1,8 @@
 // ── Abonnements UrCecret ─────────────────────────────────────────────────────
 // Un seul endroit qui décrit les paliers payants.
 //
-//  - free    : gratuit (test MBTI seulement ; PAS d'accès au Coach IA)
+//  - free    : gratuit — test MBTI + Nova découverte (5 messages PAR MOIS)
+//  - starter : abonnement 1,99€/mois → profil MBTI débloqué + Nova (5 messages/jour)
 //  - plus    : abonnement 5€/mois → MBTI débloqué + Coach IA (30 messages/jour)
 //  - premium : abonnements 9,99€/mois ou 29,99€/an → MBTI débloqué + Coach (50/jour)
 //
@@ -14,4 +15,10 @@ export const PLUS_PRICE_ID = process.env.STRIPE_PLUS_PRICE_ID || 'price_1TuIYlRd
 // Un abonné "plus" (5€) OU "premium" (10€) a accès au contenu MBTI payant.
 export function hasPremiumAccess(tier?: string | null): boolean {
   return tier === 'plus' || tier === 'premium';
+}
+
+// Tout abonné payant (starter 1,99€ inclus) : profil MBTI complet débloqué
+// + Nova personnalisée (elle connaît le type). Seul le quota diffère par palier.
+export function hasPaidAccess(tier?: string | null): boolean {
+  return tier === 'starter' || tier === 'plus' || tier === 'premium';
 }
