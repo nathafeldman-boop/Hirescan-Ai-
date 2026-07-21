@@ -10,7 +10,9 @@ export default function Tracker() {
     fetch('/api/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: pathname }),
+      // document.referrer = d'où vient le visiteur (google, tiktok…) — reste
+      // celui de l'arrivée sur le site pendant toute la navigation SPA.
+      body: JSON.stringify({ path: pathname, referrer: document.referrer || undefined }),
     }).catch(() => {});
   }, [pathname]);
 

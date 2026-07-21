@@ -54,6 +54,9 @@ interface Stats {
     createdAt: string;
   }>;
   sourceBreakdown?: Record<string, { count: number; revenueCents: number }>;
+  // Attribution des VISITES (visiteurs uniques par source, depuis PageView.source)
+  visitSources7d?: Record<string, number>;
+  visitSourcesToday?: Record<string, number>;
 }
 
 interface StripeStats {
@@ -707,6 +710,49 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
         {tab === 'sources' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {sectionTitle('Sources d\'acquisition', 'Attribution complète · chaque paiement tracé avec sa source')}
+
+            {/* D'où viennent les VISITES (visiteurs uniques, PageView.source) */}
+            {card(
+              <>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
+                  <span style={{ fontWeight: 600, fontSize: 14 }}>D&apos;où viennent les visites</span>
+                  <span style={{ color: '#52525b', fontSize: 11 }}>visiteurs uniques · aff: = affilié · google = SEO · direct = lien sans tracking</span>
+                </div>
+                <div style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+                  {([['Aujourd\'hui', stats.visitSourcesToday], ['7 derniers jours', stats.visitSources7d]] as const).map(([label, srcMap]) => {
+                    const entries = Object.entries(srcMap ?? {}).sort((a, b) => b[1] - a[1]);
+                    const total = entries.reduce((s, [, n]) => s + n, 0);
+                    return (
+                      <div key={label}>
+                        <p style={{ color: '#71717a', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>
+                          {label} · {total} visiteur{total > 1 ? 's' : ''}
+                        </p>
+                        {entries.length === 0 ? (
+                          <p style={{ color: '#3f3f46', fontSize: 12 }}>Aucune visite trackée (les nouvelles visites apparaîtront ici)</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {entries.map(([src, n]) => {
+                              const pct = total > 0 ? Math.round((n / total) * 100) : 0;
+                              return (
+                                <div key={src}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                                    <span style={{ color: src === 'non tracé' ? '#52525b' : '#d4d4d8', fontSize: 12.5, fontWeight: 500 }}>{src}</span>
+                                    <span style={{ color: '#71717a', fontSize: 12 }}>{n} · {pct}%</span>
+                                  </div>
+                                  <div style={{ height: 5, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', width: `${pct}%`, background: src === 'non tracé' ? '#3f3f46' : 'linear-gradient(90deg,#0ea5e9,#38bdf8)', borderRadius: 999 }} />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
             {/* KPI cards — top sources */}
             {stats.sourceBreakdown && Object.keys(stats.sourceBreakdown).length > 0 && (() => {
