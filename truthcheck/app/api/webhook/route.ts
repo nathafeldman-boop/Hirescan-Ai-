@@ -125,6 +125,34 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // ── Parrainage : le filleul paie plus de 2 € → +3 messages/jour au parrain ──
+      // Une seule fois par filleul (referralRewarded), plafonné à +15/jour.
+      if (email && (session.amount_total ?? 0) >= 200) {
+        try {
+          const buyer = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true, referredById: true, referralRewarded: true },
+          });
+          if (buyer?.referredById && !buyer.referralRewarded) {
+            const inviter = await prisma.user.findUnique({
+              where: { id: buyer.referredById },
+              select: { chatBonusDaily: true },
+            });
+            if (inviter) {
+              await prisma.$transaction([
+                prisma.user.update({
+                  where: { id: buyer.referredById },
+                  data: { chatBonusDaily: Math.min((inviter.chatBonusDaily ?? 0) + 3, 15) },
+                }),
+                prisma.user.update({ where: { id: buyer.id }, data: { referralRewarded: true } }),
+              ]);
+            }
+          }
+        } catch (e) {
+          console.error('Referral reward error:', e);
+        }
+      }
+
       // Type d'offre — sert à l'attribution ET à la notification vente.
       // 'plus' (5€) est distingué du mensuel 9,99€ via metadata.plan.
       const productType =

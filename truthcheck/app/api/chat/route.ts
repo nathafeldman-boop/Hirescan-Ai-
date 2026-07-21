@@ -20,10 +20,15 @@ export async function GET() {
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
   const isPremium = hasPremiumAccess(tier);
-  const user = await prisma.user.findUnique({ where: { id: uid }, select: { mbtiType: true } }).catch(() => null);
+  const user = await prisma.user.findUnique({
+    where: { id: uid },
+    select: { mbtiType: true, chatBonusCredits: true, chatBonusDaily: true },
+  }).catch(() => null);
   const day = parisDay();
   const usage = await prisma.chatUsage.findUnique({ where: { userId_day: { userId: uid, day } } }).catch(() => null);
-  const limit = dailyLimitFor(tier);
+  // Quota du jour = base (palier) + bonus permanent parrainage. Les crédits
+  // one-off s'ajoutent au "restant" affiché (ils prennent le relais après le quota).
+  const limit = dailyLimitFor(tier) + (user?.chatBonusDaily ?? 0);
   // Compte gratuit → coach bridé : on ne renvoie NI le type (header) NI l'historique
   // (qui pourrait contenir un ancien message révélant le type). Le résultat payant
   // reste derrière le paiement ; le coach fonctionne mais en version découverte.
@@ -41,8 +46,10 @@ export async function GET() {
     mbtiType: isPremium ? (user?.mbtiType ?? null) : null,
     free: !isPremium,
     messages: rows.reverse(),
-    remaining: Math.max(0, limit - (usage?.count ?? 0)),
+    remaining: Math.max(0, limit - (usage?.count ?? 0)) + (user?.chatBonusCredits ?? 0),
     limit,
+    // Lien de parrainage : +3 messages à l'inscription d'un invité, +3/jour s'il paie.
+    inviteCode: uid,
   });
 }
 
@@ -72,22 +79,28 @@ export async function POST(req: NextRequest) {
   // Le coach a besoin du test : sans type, on invite à le passer (sans appel payant).
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { mbtiType: true, mbtiScores: true, name: true },
+    select: { mbtiType: true, mbtiScores: true, name: true, chatBonusCredits: true, chatBonusDaily: true },
   }).catch(() => null);
   if (!dbUser?.mbtiType) {
     return NextResponse.json({ needsTest: true }, { status: 200 });
   }
 
-  // Quota du jour
-  const limit = dailyLimitFor(user.tier);
+  // Quota du jour = base (palier) + bonus permanent parrainage. Au-delà, les
+  // crédits one-off (parrainage inscription) prennent le relais, un par message.
+  const limit = dailyLimitFor(user.tier) + (dbUser.chatBonusDaily ?? 0);
   const day = parisDay();
   const usage = await prisma.chatUsage.upsert({
     where: { userId_day: { userId: user.id, day } },
     create: { userId: user.id, day, count: 0 },
     update: {},
   }).catch(() => null);
+  let useBonusCredit = false;
   if ((usage?.count ?? 0) >= limit) {
-    return NextResponse.json({ error: 'quota_exceeded', limit, tier: user.tier ?? 'free' }, { status: 429 });
+    if ((dbUser.chatBonusCredits ?? 0) > 0) {
+      useBonusCredit = true;
+    } else {
+      return NextResponse.json({ error: 'quota_exceeded', limit, tier: user.tier ?? 'free' }, { status: 429 });
+    }
   }
 
   // Contexte = N derniers messages (mémoire bornée). En gratuit, on NE recharge
@@ -130,7 +143,17 @@ export async function POST(req: NextRequest) {
     where: { userId_day: { userId: user.id, day } },
     data: { count: { increment: 1 } },
   }).catch(() => null);
+  // Message au-delà du quota → consomme un crédit bonus parrainage.
+  let creditsLeft = dbUser.chatBonusCredits ?? 0;
+  if (useBonusCredit) {
+    const u = await prisma.user.update({
+      where: { id: user.id },
+      data: { chatBonusCredits: { decrement: 1 } },
+      select: { chatBonusCredits: true },
+    }).catch(() => null);
+    creditsLeft = Math.max(0, u?.chatBonusCredits ?? creditsLeft - 1);
+  }
 
-  const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1));
+  const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1)) + creditsLeft;
   return NextResponse.json({ reply: result.reply, remaining, limit });
 }

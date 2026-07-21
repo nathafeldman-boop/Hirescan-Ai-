@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
-import Seal from '@/components/Seal';
+import NovaAvatar from '@/components/NovaAvatar';
 import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
 interface Msg { role: 'user' | 'assistant'; content: string }
@@ -23,6 +23,8 @@ export default function ChatClient() {
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [mbtiType, setMbtiType] = useState<string | null>(null);
   const [isFree, setIsFree] = useState(false); // coach en version découverte bridée (compte gratuit)
+  const [inviteCode, setInviteCode] = useState<string | null>(null); // lien de parrainage
+  const [inviteCopied, setInviteCopied] = useState(false);
   const [openCat, setOpenCat] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef(false);
@@ -70,6 +72,7 @@ export default function ChatClient() {
         setMessages(msgs);
         setRemaining(d.remaining ?? null);
         setLimit(d.limit ?? null);
+        setInviteCode(typeof d.inviteCode === 'string' ? d.inviteCode : null);
         if (typeof d.remaining === 'number' && d.remaining <= 0) setQuotaHit(true);
         setBooting(false);
 
@@ -140,10 +143,10 @@ export default function ChatClient() {
   if (!session?.user) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--ink)' }}>
-        <div className="mb-6"><Seal size={64} spin /></div>
-        <h1 className="font-display text-2xl font-black text-white mb-2">Ton coach personnel</h1>
+        <div className="mb-6"><NovaAvatar size={80} glow /></div>
+        <h1 className="font-display text-2xl font-black text-white mb-2">Nova, ton coach personnel</h1>
         <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
-          Un coach qui te connaît déjà grâce à ton test. Connecte-toi pour commencer.
+          Elle te connaît déjà grâce à ton test. Connecte-toi pour lui parler.
         </p>
         <button onClick={() => signIn(undefined, { callbackUrl: '/chat' })} className="ur-btn-gold px-7 py-3.5 text-sm">
           Se connecter →
@@ -157,10 +160,10 @@ export default function ChatClient() {
   if (hasProfile === false) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--ink)' }}>
-        <div className="mb-6"><Seal size={64} spin /></div>
+        <div className="mb-6"><NovaAvatar size={80} glow /></div>
         <h1 className="font-display text-2xl font-black text-white mb-2">D&apos;abord, ton test</h1>
         <p className="text-sm mb-8 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
-          Ton coach s&apos;appuie sur ton profil de personnalité pour te répondre. Fais le test (3 min) et il saura exactement qui tu es.
+          Nova s&apos;appuie sur ton profil de personnalité pour te répondre. Fais le test (3 min) et elle saura exactement qui tu es.
         </p>
         <Link href="/quiz/personnalite" className="ur-btn-gold px-7 py-3.5 text-sm">
           Passer le test →
@@ -181,8 +184,9 @@ export default function ChatClient() {
           <span>←</span> Accueil
         </Link>
         <div className="flex items-center gap-2">
-          <Seal size={20} />
-          <span className="font-display text-sm font-bold text-white">Ton coach{mbtiType ? ` · ${mbtiType}` : ''}</span>
+          <NovaAvatar size={26} />
+          <span className="font-display text-sm font-bold text-white">Nova{mbtiType ? ` · ${mbtiType}` : ''}</span>
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#4ADE80' }} aria-label="en ligne" />
         </div>
         <span className="text-[11px] tabular-nums" style={{ color: 'var(--ink-text-faint)' }}>
           {remaining !== null && limit !== null ? `${remaining}/${limit}` : ''}
@@ -202,9 +206,9 @@ export default function ChatClient() {
         <div className="max-w-2xl mx-auto px-4 py-6">
           {empty ? (
             <div className="flex flex-col items-center text-center pt-6">
-              <div className="mb-5"><Seal size={56} spin /></div>
+              <div className="mb-5"><NovaAvatar size={92} glow /></div>
               <h2 className="font-display text-xl font-black text-white mb-2">
-                {isFree ? 'Salut 👋 De quoi tu veux parler ?' : 'Salut — je connais déjà ton profil.'}
+                {isFree ? 'Salut, moi c\'est Nova 👋' : 'Salut, moi c\'est Nova — je connais déjà ton profil.'}
               </h2>
               <p className="text-sm mb-7 max-w-sm leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
                 {isFree
@@ -243,7 +247,13 @@ export default function ChatClient() {
           ) : (
             <div className="space-y-4">
               {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start items-end gap-2'}`}>
+                  {/* Avatar de Nova uniquement sur le dernier message d'une suite (comme WhatsApp) */}
+                  {m.role === 'assistant' && (
+                    <div className="flex-shrink-0 mb-0.5" style={{ width: 28 }}>
+                      {(i === messages.length - 1 || messages[i + 1]?.role === 'user') && <NovaAvatar size={28} />}
+                    </div>
+                  )}
                   <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${m.role === 'user' ? '' : 'ur-panel-ink'}`}
                     style={m.role === 'user'
                       ? { background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--ink-text)' }
@@ -253,8 +263,10 @@ export default function ChatClient() {
                 </div>
               ))}
               {loading && (
-                <div className="flex justify-start">
+                <div className="flex justify-start items-end gap-2">
+                  <div className="flex-shrink-0 mb-0.5"><NovaAvatar size={28} /></div>
                   <div className="ur-panel-ink rounded-2xl px-4 py-3 flex gap-1.5 items-center">
+                    <span className="text-[11px] mr-1" style={{ color: 'var(--ink-text-faint)' }}>Nova écrit</span>
                     <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)' }} />
                     <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)', animationDelay: '0.2s' }} />
                     <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)', animationDelay: '0.4s' }} />
@@ -271,10 +283,35 @@ export default function ChatClient() {
               <p className="text-sm font-bold text-white mb-1">Tu as utilisé tes {limit ?? ''} messages du jour</p>
               <p className="text-xs mb-4" style={{ color: 'var(--ink-text-muted)' }}>
                 {tier === 'free'
-                  ? 'Passe à un abonnement pour parler à ton coach bien plus chaque jour.'
+                  ? 'Passe à un abonnement pour parler à Nova bien plus chaque jour.'
                   : 'Ton quota se réinitialise demain (minuit, heure de Paris).'}
               </p>
               {tier === 'free' && <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Voir les abonnements →</Link>}
+
+              {/* Parrainage : +3 messages / invité inscrit, +3 par jour si l'invité paie */}
+              {inviteCode && (
+                <div className="mt-4 pt-4 text-left" style={{ borderTop: '1px solid var(--gold-line)' }}>
+                  <p className="text-xs font-bold text-white mb-1">🎁 Ou gagne des messages gratuits</p>
+                  <p className="text-[11px] mb-3 leading-relaxed" style={{ color: 'var(--ink-text-muted)' }}>
+                    Invite un ami : <strong style={{ color: 'var(--gold)' }}>+3 messages</strong> quand il crée son compte,
+                    et <strong style={{ color: 'var(--gold)' }}>+3 messages par jour à vie</strong> s&apos;il débloque son profil.
+                  </p>
+                  <button
+                    onClick={async () => {
+                      const url = `${window.location.origin}/quiz/personnalite?invite=${inviteCode}`;
+                      const text = 'Fais ce test de personnalité, le résultat est bluffant 🔮';
+                      try {
+                        if (navigator.share) { await navigator.share({ title: 'UrCecret', text, url }); return; }
+                      } catch { /* partage annulé */ }
+                      try { await navigator.clipboard.writeText(url); setInviteCopied(true); setTimeout(() => setInviteCopied(false), 2500); } catch {}
+                    }}
+                    className="w-full py-3 rounded-full font-bold text-xs transition-all active:scale-[0.98]"
+                    style={{ background: 'var(--gold)', color: 'var(--ink)' }}
+                  >
+                    {inviteCopied ? '✅ Lien copié — envoie-le !' : '📤 Inviter un ami'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -288,7 +325,7 @@ export default function ChatClient() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(input); } }}
             rows={1}
-            placeholder={quotaHit ? 'Quota du jour atteint' : 'Écris à ton coach…'}
+            placeholder={quotaHit ? 'Quota du jour atteint' : 'Écris à Nova…'}
             disabled={quotaHit}
             className="flex-1 resize-none rounded-2xl px-4 py-3 text-sm outline-none disabled:opacity-50"
             style={{ background: 'var(--ink-soft)', border: '1px solid var(--line-ink)', color: 'var(--ink-text)', maxHeight: 140 }}
@@ -297,7 +334,7 @@ export default function ChatClient() {
             className="ur-btn-gold flex-shrink-0 w-11 h-11 !p-0 text-lg disabled:opacity-40">↑</button>
         </form>
         <p className="text-center text-[10px] pb-2" style={{ color: 'var(--ink-text-faint)' }}>
-          Ton coach s&apos;appuie sur ton test. Ce n&apos;est pas un avis médical.
+          Nova s&apos;appuie sur ton test. Ce n&apos;est pas un avis médical.
         </p>
       </div>
     </main>
