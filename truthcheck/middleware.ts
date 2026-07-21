@@ -57,6 +57,18 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Parrainage — ?invite=<userId> → cookie 30 jours. Réclamé après création de
+  // compte par /api/referral/claim (+3 messages au parrain ; +3/jour si l'invité paie).
+  const invite = request.nextUrl.searchParams.get('invite') ?? '';
+  if (invite && /^c[a-z0-9]{8,40}$/i.test(invite)) {
+    response.cookies.set('urs_invite', invite, {
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/',
+      sameSite: 'lax',
+      httpOnly: true,
+    });
+  }
+
   // UTM attribution — capture toutes les sources publicitaires dans un cookie JSON
   const utmSource   = request.nextUrl.searchParams.get('utm_source')   ?? '';
   const utmMedium   = request.nextUrl.searchParams.get('utm_medium')   ?? '';

@@ -62,6 +62,16 @@ model User {
   // C'est le signal unique par utilisateur qui personnalise le coach IA.
   mbtiScores    Json?
   mbtiTestCount Int       @default(0)
+  // ── Parrainage (messages coach bonus) ──
+  // referredById : qui a invité ce compte (réclamé via /api/referral/claim).
+  // referralRewarded : le paiement 2€+ de CE compte a déjà récompensé son parrain.
+  // chatBonusCredits : messages bonus one-off (+3 par inscription parrainée),
+  //   consommés quand le quota du jour est épuisé.
+  // chatBonusDaily : bonus PERMANENT par jour (+3 par filleul payant, plafonné).
+  referredById     String?
+  referralRewarded Boolean @default(false)
+  chatBonusCredits Int     @default(0)
+  chatBonusDaily   Int     @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
