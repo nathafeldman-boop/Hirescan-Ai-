@@ -185,6 +185,11 @@ model PageView {
   // étapes du funnel en visiteurs uniques, pas en événements bruts. Nullable
   // pour rester compatible avec les lignes existantes créées avant ce champ.
   visitorId String?
+  // Attribution : d'où vient la visite. `source` = étiquette compacte calculée
+  // (aff:<slug> | utm_source | hôte du referrer | direct), `referrer` = hôte brut.
+  // Nullable pour les lignes créées avant ces champs.
+  source    String?
+  referrer  String?
   createdAt DateTime @default(now())
 
   @@index([path])

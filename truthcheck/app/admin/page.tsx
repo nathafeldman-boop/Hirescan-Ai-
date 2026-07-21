@@ -19,6 +19,7 @@ export default async function AdminPage() {
     totalPageViews,
     recentConversions,
     recentSignups,
+    recentViewsForSources,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { tier: 'premium' } }),
@@ -54,6 +55,12 @@ export default async function AdminPage() {
       orderBy: { createdAt: 'desc' },
       take: 50,
       select: { id: true, email: true, name: true, tier: true, createdAt: true },
+    }),
+    // Attribution des VISITES (7 derniers jours) — exclut les événements internes
+    // du funnel (/__diag, /__quiz, /__aff) pour ne compter que les vraies pages.
+    prisma.pageView.findMany({
+      where: { createdAt: { gte: sevenDaysAgo }, NOT: { path: { startsWith: '/__' } } },
+      select: { source: true, visitorId: true, id: true, createdAt: true },
     }),
   ]);
 
@@ -105,6 +112,19 @@ export default async function AdminPage() {
     if (u.mbtiType) mbtiDistribution[u.mbtiType] = (mbtiDistribution[u.mbtiType] ?? 0) + 1;
   });
 
+  // Sources des visites — visiteurs UNIQUES par source (fallback : 1 ligne = 1
+  // visiteur si visitorId absent). Lignes d'avant le déploiement → "non tracé".
+  const buildSources = (rows: typeof recentViewsForSources) => {
+    const perSource: Record<string, Set<string>> = {};
+    rows.forEach(v => {
+      const src = v.source ?? 'non tracé';
+      (perSource[src] ??= new Set()).add(v.visitorId ?? v.id);
+    });
+    return Object.fromEntries(Object.entries(perSource).map(([s, set]) => [s, set.size]));
+  };
+  const visitSources7d    = buildSources(recentViewsForSources);
+  const visitSourcesToday = buildSources(recentViewsForSources.filter(v => v.createdAt >= startOfToday));
+
   // Affiliate clicks
   const affiliateClicks: Record<string, number> = {};
   affiliateClickViews.forEach(v => {
@@ -137,7 +157,7 @@ export default async function AdminPage() {
     totalRevenueCents, todayRevenueCents, monthRevenueCents, yearRevenueCents, weekRevenueCents,
     revenueByMonth,
     affiliates, affiliateClicks,
-    totalPageViews,
+    totalPageViews, visitSources7d, visitSourcesToday,
     recentConversions: recentConvsMapped,
     recentSignups,
   }));
