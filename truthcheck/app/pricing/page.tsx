@@ -178,9 +178,8 @@ export default function PricingPage() {
           <CheckoutButton label="Choisir Plus — 5 €/mois" plus userEmail={userEmail} variant="outline" />
         </div>
 
-        {/* Plan Premium — vedette : UNE carte, deux façons de payer (9,99 €/mois
-            ou 29,99 €/an). Sommet de l'échelle croissante. */}
-        <div className="relative rounded-2xl p-5 mb-6" style={{ background: 'var(--ink-soft)', border: '1px solid var(--gold)' }}>
+        {/* Plan Annuel — vedette, sommet de l'échelle croissante */}
+        <div className="relative rounded-2xl p-5 mb-4" style={{ background: 'var(--ink-soft)', border: '1px solid var(--gold)' }}>
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <span className="ur-label text-[10px] px-3 py-1 rounded-full whitespace-nowrap" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
               La plus populaire
@@ -189,15 +188,15 @@ export default function PricingPage() {
 
           <div className="flex items-start justify-between gap-4 mb-1 mt-1">
             <div className="min-w-0">
-              <p className="font-black text-white">Premium · tout UrCecret</p>
-              <p className="text-stone-500 text-sm">L&apos;expérience complète, sans limite</p>
+              <p className="font-black text-white">Accès illimité · 1 an</p>
+              <p className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>soit 0,08 €/jour</p>
             </div>
-            <Price amount="9,99 €" unit="par mois" />
+            <Price amount="29,99 €" unit="par an" />
           </div>
 
           <div className="mb-4">
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--gold-soft)', color: 'var(--gold)', border: '1px solid var(--gold-line)' }}>
-              ou 29,99 €/an · −75 % · soit 2,50 €/mois
+              −75% · 2,50 €/mois
             </span>
           </div>
 
@@ -211,10 +210,19 @@ export default function PricingPage() {
             ))}
           </ul>
 
-          <div className="space-y-2.5">
-            <CheckoutButton label="Tout débloquer 1 an — 29,99 € (−75 %)" annual userEmail={userEmail} variant="gold" />
-            <CheckoutButton label="Ou en mensuel — 9,99 €/mois" userEmail={userEmail} variant="outline" />
+          <CheckoutButton label="Tout débloquer — 29,99 €/an" annual userEmail={userEmail} variant="gold" />
+        </div>
+
+        {/* Option mensuelle — même palier Premium, sans engagement */}
+        <div className="ur-panel-ink p-5 mb-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="min-w-0">
+              <p className="font-bold text-white">Mensuel · sans engagement</p>
+              <p className="text-stone-500 text-sm">Même accès · annule quand tu veux</p>
+            </div>
+            <Price amount="9,99 €" unit="par mois" />
           </div>
+          <CheckoutButton label="Choisir le mensuel — 9,99 €" userEmail={userEmail} variant="outline" />
         </div>
 
         <p className="text-center text-stone-500 text-xs mb-6">
