@@ -439,6 +439,74 @@ export function emailAdminSale(opts: {
   };
 }
 
+// ── Rétention aux paliers M1 / M3 / M5 ──────────────────────────────────────
+// Conseil growth : une grosse promesse + un paywall à l'entrée convertit, mais
+// c'est la RÉTENTION aux points de décision (renouvellement) qui décide si le
+// MRR tient. Ces 3 emails visent les moments où un abonné se demande "je garde
+// ou j'arrête ?" — pas une relance de vente, un rappel de valeur + une raison
+// concrète de rester. Envoyés une fois par abonné (voir cron email-sequence).
+export function emailRetentionM1(name: string | null, typeCode: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const hook = code ? HOOK_LINES[code] : null;
+  return {
+    subject: `${firstName}, ça fait 1 mois — voilà ce que tu peux faire avec Nova`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">1 mois avec UrCecret</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Tu as un coach qui te connaît. La plupart des gens l'oublient.</h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        ${hook ? `On avait identifié un truc chez toi dès le début : <em style="color:#e4e4e7">"${hook}"</em>. Ça reste vrai un mois plus tard ?` : `Ton profil est débloqué depuis un mois — mais un profil qu'on relit une fois ne sert à rien.`}
+      </p>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;color:#d17d52;font-size:14px;font-style:italic;line-height:1.7">
+          Pose-lui la vraie question du moment : une décision qui traîne, une relation qui coince, un choix de carrière. C'est fait pour ça — pas juste pour le jour où tu as payé.
+        </p>
+      </div>
+      ${cta('Parler à Nova maintenant →', `${BASE}/chat`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Une question, un souci avec ton abonnement ? Réponds à cet email.</p>
+    `),
+  };
+}
+
+export function emailRetentionM3(name: string | null, typeCode: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  return {
+    subject: `${firstName}, 3 mois — ce que ton profil ${code ?? ''} a changé (ou pas)`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">3 mois avec UrCecret</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">3 mois, c'est assez pour tester si ça marche vraiment.</h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        Sois honnête avec toi-même : depuis ton test, tu as pris au moins une décision — au travail, en amour, ou avec toi-même — en te disant "ça, c'est mon profil qui parle". Si oui, Nova peut aller plus loin. Si non, c'est le moment de vraiment l'utiliser, pas de l'oublier.
+      </p>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0 0 8px;color:#c2611f;font-size:13px;font-weight:700">Un truc que peu de gens font :</p>
+        <p style="margin:0;color:#a1a1aa;font-size:14px;line-height:1.7">Invite un(e) ami(e) à faire le test avec ton lien perso (dans /chat) — s'il débloque son profil, tu gagnes des messages Nova en plus, à vie.</p>
+      </div>
+      ${cta('Voir mon lien de parrainage →', `${BASE}/chat`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Envie d'économiser sur ton abonnement ? <a href="${BASE}/pricing" style="color:#71717a">Regarde l'offre annuelle</a>.</p>
+    `),
+  };
+}
+
+export function emailRetentionM5(name: string | null, typeCode: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  return {
+    subject: `${firstName}, 5 mois avec Nova — le bilan`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">5 mois avec UrCecret</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">On ne va pas te vendre autre chose. Juste te demander un truc.</h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        5 mois, c'est long. Si Nova${code ? ` et ton profil ${code}` : ''} t'ont vraiment aidé, réponds à cet email et dis-nous comment — ça compte plus que n'importe quelle pub qu'on pourrait faire.
+        Et si ça fait un moment que tu n'as pas ouvert le chat, c'est peut-être le signe qu'il faut y retourner : une bonne question suffit pour que ça reparte.
+      </p>
+      ${cta('Retourner parler à Nova →', `${BASE}/chat`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Envie d'économiser sur ton abonnement ? <a href="${BASE}/pricing" style="color:#71717a">Regarde l'offre annuelle</a> · <a href="${BASE}/dashboard" style="color:#52525b">Gérer mon abonnement</a></p>
+    `),
+  };
+}
+
 export async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
