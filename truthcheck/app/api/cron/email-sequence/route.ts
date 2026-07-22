@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { emailDay1, emailDay3, emailDay7, emailSuiviDay, sendEmail } from '@/lib/emails';
+import { emailDay1, emailDay3, emailDay7, emailSuiviDay, emailRetentionM1, emailRetentionM3, emailRetentionM5, sendEmail } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
 
 export const dynamic = 'force-dynamic';
@@ -94,6 +94,50 @@ export async function GET(req: NextRequest) {
         sent++;
       } catch (e) {
         console.error(`Suivi d${day} failed for ${userEmail}:`, e);
+        errors++;
+      }
+    }
+  }
+
+  // ── Rétention M1 / M3 / M5 — ancrée sur premium_welcome (loggué pour TOUT
+  // abonnement payant : starter/plus/premium, voir webhook checkout.session.completed).
+  // On ne cible que les comptes encore payants (tier != free) : un utilisateur
+  // qui a déjà résilié/churné ne reçoit pas de relance de rétention pour rien.
+  const RETENTION_STEPS: { type: string; days: number; template: (name: string | null, typeCode: string | null) => { subject: string; html: string } }[] = [
+    { type: 'retention_m1', days: 30,  template: emailRetentionM1 },
+    { type: 'retention_m3', days: 90,  template: emailRetentionM3 },
+    { type: 'retention_m5', days: 150, template: emailRetentionM5 },
+  ];
+
+  for (const step of RETENTION_STEPS) {
+    const anchorStart = new Date(now.getTime() - (step.days + 1) * 86400 * 1000);
+    const anchorEnd   = new Date(now.getTime() - step.days * 86400 * 1000);
+
+    const welcomeLogs = await prisma.emailLog.findMany({
+      where: {
+        type: 'premium_welcome',
+        sentAt: { gte: anchorStart, lte: anchorEnd },
+        user: {
+          tier: { not: 'free' },
+          emailLogs: { none: { type: step.type } },
+        },
+      },
+      select: {
+        userId: true,
+        user: { select: { email: true, name: true, mbtiType: true } },
+      },
+    });
+
+    for (const log of welcomeLogs) {
+      const { email: userEmail, name, mbtiType } = log.user;
+      if (!userEmail) continue;
+      try {
+        const { subject, html } = step.template(name, mbtiType);
+        await sendEmail(userEmail, subject, html);
+        await prisma.emailLog.create({ data: { userId: log.userId, type: step.type } });
+        sent++;
+      } catch (e) {
+        console.error(`Retention ${step.type} failed for ${userEmail}:`, e);
         errors++;
       }
     }
