@@ -19,17 +19,16 @@ const STARTER_PERKS = [
   'Résiliable en 1 clic, sans engagement',
 ];
 
+// Échelle CROISSANTE : chaque palier ajoute au précédent (pas de répétitions).
 const PLUS_PERKS = [
-  'Ton profil MBTI complet + les 16 types en détail',
-  '30 messages par jour avec l’assistant IA',
-  'Les 15 quiz secrets débloqués',
+  'Nova passe à 30 messages par jour (au lieu de 5)',
+  'Les 15 quiz secrets débloqués (couple, amitié, manipulation…)',
+  'Les 16 types MBTI en détail',
 ];
 
 const PREMIUM_PERKS = [
-  'Ton profil MBTI complet + les 16 types en détail',
-  '50 messages par jour avec l’assistant IA',
-  'Les 15 quiz secrets débloqués (couple, amitié, manipulation…)',
-  'Suivi personnalisé sur 15 jours',
+  'Nova passe à 50 messages par jour',
+  'Suivi personnalisé sur 15 jours (un conseil + exercice chaque jour)',
   'Tous les futurs quiz inclus, à vie',
 ];
 
@@ -146,6 +145,7 @@ export default function PricingPage() {
             </div>
             <Price amount="1,99 €" unit="par mois" />
           </div>
+          <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--gold)' }}>Tout le Gratuit, et en plus :</p>
           <ul className="space-y-2.5 mb-5">
             {STARTER_PERKS.map((p) => (
               <li key={p} className="flex items-start gap-2.5 text-sm text-stone-300">
@@ -166,6 +166,7 @@ export default function PricingPage() {
             </div>
             <Price amount="5 €" unit="par mois" />
           </div>
+          <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--gold)' }}>Tout Starter, et en plus :</p>
           <ul className="space-y-2.5 mb-5">
             {PLUS_PERKS.map((p) => (
               <li key={p} className="flex items-start gap-2.5 text-sm text-stone-300">
@@ -177,7 +178,7 @@ export default function PricingPage() {
           <CheckoutButton label="Choisir Plus — 5 €/mois" plus userEmail={userEmail} variant="outline" />
         </div>
 
-        {/* Plan Annuel — vedette */}
+        {/* Plan Annuel — vedette, sommet de l'échelle croissante */}
         <div className="relative rounded-2xl p-5 mb-4" style={{ background: 'var(--ink-soft)', border: '1px solid var(--gold)' }}>
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <span className="ur-label text-[10px] px-3 py-1 rounded-full whitespace-nowrap" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
@@ -199,6 +200,7 @@ export default function PricingPage() {
             </span>
           </div>
 
+          <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--gold)' }}>Tout Plus, et en plus :</p>
           <ul className="space-y-2.5 mb-6">
             {PREMIUM_PERKS.map((p) => (
               <li key={p} className="flex items-start gap-2.5 text-sm text-stone-300">
@@ -211,7 +213,7 @@ export default function PricingPage() {
           <CheckoutButton label="Tout débloquer — 29,99 €/an" annual userEmail={userEmail} variant="gold" />
         </div>
 
-        {/* Option mensuelle */}
+        {/* Option mensuelle — même palier Premium, sans engagement */}
         <div className="ur-panel-ink p-5 mb-6">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="min-w-0">
