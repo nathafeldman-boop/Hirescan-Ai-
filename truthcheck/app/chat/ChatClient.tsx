@@ -6,7 +6,11 @@ import Link from 'next/link';
 import NovaAvatar from '@/components/NovaAvatar';
 import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
-interface Msg { role: 'user' | 'assistant'; content: string }
+interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
+
+// Taille max du fichier original (avant encodage base64, qui l'agrandit ~x1.37).
+// Reste sous la limite serveur (~4,5 Mo décodés) avec de la marge.
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 export default function ChatClient() {
   const { data: session, status } = useSession();
@@ -26,8 +30,23 @@ export default function ChatClient() {
   const [inviteCode, setInviteCode] = useState<string | null>(null); // lien de parrainage
   const [inviteCopied, setInviteCopied] = useState(false);
   const [openCat, setOpenCat] = useState<string | null>(null);
+  const [pendingImage, setPendingImage] = useState<string | null>(null); // data URI en attente d'envoi
+  const [imageError, setImageError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Choix d'une photo (galerie ou appareil photo mobile) → aperçu avant envoi.
+  const pickImage = useCallback((file: File | null) => {
+    setImageError(null);
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setImageError('Ce fichier n\'est pas une image.'); return; }
+    if (file.size > MAX_IMAGE_BYTES) { setImageError('Photo trop lourde (max 4 Mo) — réessaie avec une image plus légère.'); return; }
+    const reader = new FileReader();
+    reader.onload = () => { if (typeof reader.result === 'string') setPendingImage(reader.result); };
+    reader.onerror = () => setImageError('Impossible de lire cette photo, réessaie.');
+    reader.readAsDataURL(file);
+  }, []);
 
   // Ouverture "déjà lancée" depuis un résultat : le coach démarre par une
   // lecture personnalisée. Le message d'amorce est envoyé mais NON affiché —
@@ -96,18 +115,20 @@ export default function ChatClient() {
 
   const send = useCallback(async (text: string) => {
     const content = text.trim();
-    if (!content || loading || quotaHit) return;
+    const image = pendingImage;
+    if ((!content && !image) || loading || quotaHit) return;
     setNotice(null);
     setOpenCat(null);
     const prev = messages;
-    setMessages([...prev, { role: 'user', content }]);
+    setMessages([...prev, { role: 'user', content, ...(image ? { image } : {}) }]);
     setInput('');
+    setPendingImage(null);
     setLoading(true);
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: content }),
+        body: JSON.stringify({ message: content, ...(image ? { imageBase64: image } : {}) }),
       });
       if (res.status === 401) { setNotice('Connecte-toi pour parler à ton coach.'); setMessages(prev); return; }
       if (res.status === 429) {
@@ -116,11 +137,12 @@ export default function ChatClient() {
         if (typeof d.limit === 'number') setLimit(d.limit);
         return;
       }
+      if (res.status === 413) { setNotice('Cette photo est trop lourde, réessaie avec une image plus légère.'); setMessages(prev); return; }
       if (res.status === 503) { setNotice('Ton coach arrive très bientôt — il n\'est pas encore activé.'); setMessages(prev); return; }
       if (!res.ok) { setNotice('Ton coach est momentanément indisponible. Réessaie dans un instant.'); setMessages(prev); return; }
       const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number };
       if (data.needsTest) { setHasProfile(false); setMessages(prev); return; }
-      setMessages([...prev, { role: 'user', content }, { role: 'assistant', content: data.reply ?? '' }]);
+      setMessages([...prev, { role: 'user', content, ...(image ? { image } : {}) }, { role: 'assistant', content: data.reply ?? '' }]);
       if (typeof data.remaining === 'number') setRemaining(data.remaining);
       if (typeof data.limit === 'number') setLimit(data.limit);
       if ((data.remaining ?? 1) <= 0) setQuotaHit(true);
@@ -129,7 +151,7 @@ export default function ChatClient() {
     } finally {
       setLoading(false);
     }
-  }, [messages, loading, quotaHit]);
+  }, [messages, loading, quotaHit, pendingImage]);
 
   // ── États de chargement / gate ──
   if (status === 'loading' || booting) {
@@ -269,11 +291,15 @@ export default function ChatClient() {
                       {(i === messages.length - 1 || messages[i + 1]?.role === 'user') && <NovaAvatar size={28} />}
                     </div>
                   )}
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${m.role === 'user' ? '' : 'ur-panel'}`}
+                  <div className={`max-w-[85%] rounded-2xl overflow-hidden text-sm leading-relaxed whitespace-pre-line ${m.role === 'user' ? '' : 'ur-panel'} ${m.image ? '' : 'px-4 py-3'}`}
                     style={m.role === 'user'
                       ? { background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--ink)' }
                       : { color: 'var(--ink)' }}>
-                    {m.content}
+                    {m.image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.image} alt="Photo envoyée à Nova" className="w-full block" style={{ maxHeight: 260, objectFit: 'cover' }} />
+                    )}
+                    {m.content && <div className={m.image ? 'px-4 py-3' : ''}>{m.content}</div>}
                   </div>
                 </div>
               ))}
@@ -336,18 +362,51 @@ export default function ChatClient() {
 
       {/* Input bar */}
       <div className="sticky bottom-0" style={{ background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
+        {/* Aperçu de la photo en attente d'envoi */}
+        {pendingImage && (
+          <div className="max-w-2xl mx-auto px-4 pt-3">
+            <div className="relative inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={pendingImage} alt="Photo à envoyer" className="rounded-xl" style={{ height: 72, width: 72, objectFit: 'cover', border: '1px solid var(--line)' }} />
+              <button
+                type="button"
+                onClick={() => setPendingImage(null)}
+                aria-label="Retirer la photo"
+                className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
+                style={{ background: 'var(--ink)', color: '#FAF6EC' }}
+              >✕</button>
+            </div>
+          </div>
+        )}
+        {imageError && <p className="max-w-2xl mx-auto px-4 pt-2 text-[11px]" style={{ color: '#dc2626' }}>{imageError}</p>}
+
         <form onSubmit={(e) => { e.preventDefault(); void send(input); }} className="max-w-2xl mx-auto px-4 py-3 flex items-end gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => { pickImage(e.target.files?.[0] ?? null); e.target.value = ''; }}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={quotaHit}
+            aria-label="Envoyer une photo à Nova"
+            className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-lg disabled:opacity-40"
+            style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+          >📷</button>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(input); } }}
             rows={1}
-            placeholder={quotaHit ? 'Quota du jour atteint' : 'Écris à Nova…'}
+            placeholder={quotaHit ? 'Quota du jour atteint' : pendingImage ? 'Ajoute un message (facultatif)…' : 'Écris à Nova…'}
             disabled={quotaHit}
             className="flex-1 resize-none rounded-2xl px-4 py-3 text-sm outline-none disabled:opacity-50"
             style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)', maxHeight: 140 }}
           />
-          <button type="submit" disabled={loading || quotaHit || !input.trim()} aria-label="Envoyer"
+          <button type="submit" disabled={loading || quotaHit || (!input.trim() && !pendingImage)} aria-label="Envoyer"
             className="ur-btn-gold flex-shrink-0 w-11 h-11 !p-0 text-lg disabled:opacity-40">↑</button>
         </form>
         <p className="text-center text-[10px] pb-2" style={{ color: '#a8a29e' }}>
