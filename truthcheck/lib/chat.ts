@@ -66,7 +66,13 @@ interface MistralResult {
 
 // Appelle l'API Mistral avec le prompt système (coach) + l'historique borné.
 // Retourne la réponse de l'assistant, ou une erreur exploitable côté route.
-export async function callMistral(system: string, history: ChatMessage[]): Promise<MistralResult> {
+// `opts` permet d'ajuster max_tokens/température pour des appels non-chat
+// (ex: génération de quiz JSON, qui a besoin de plus de tokens en sortie).
+export async function callMistral(
+  system: string,
+  history: ChatMessage[],
+  opts?: { maxTokens?: number; temperature?: number },
+): Promise<MistralResult> {
   const key = process.env.MISTRAL_API_KEY;
   if (!key) return { ok: false, error: 'not_configured', status: 503 };
 
@@ -85,8 +91,8 @@ export async function callMistral(system: string, history: ChatMessage[]): Promi
       body: JSON.stringify({
         model: MISTRAL_MODEL,
         messages,
-        max_tokens: MAX_TOKENS,
-        temperature: 0.6,
+        max_tokens: opts?.maxTokens ?? MAX_TOKENS,
+        temperature: opts?.temperature ?? 0.6,
       }),
     });
 

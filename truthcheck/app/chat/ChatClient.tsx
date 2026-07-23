@@ -32,6 +32,15 @@ export default function ChatClient() {
   const [openCat, setOpenCat] = useState<string | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null); // data URI en attente d'envoi
   const [imageError, setImageError] = useState<string | null>(null);
+
+  // ── Créateur de test partageable (réservé aux abonnés) ──
+  const [quizBuilderOpen, setQuizBuilderOpen] = useState(false);
+  const [quizTopic, setQuizTopic] = useState('');
+  const [quizCreating, setQuizCreating] = useState(false);
+  const [quizError, setQuizError] = useState<string | null>(null);
+  const [quizResult, setQuizResult] = useState<{ id: string; title: string; intro: string } | null>(null);
+  const [quizLinkCopied, setQuizLinkCopied] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -152,6 +161,42 @@ export default function ChatClient() {
       setLoading(false);
     }
   }, [messages, loading, quotaHit, pendingImage]);
+
+  // Demande à Nova de générer un mini-test partageable sur un thème donné —
+  // consomme 1 message du même quota que le chat (voir /api/quiz-builder/create).
+  const createQuiz = useCallback(async () => {
+    const topic = quizTopic.trim();
+    if (!topic || quizCreating) return;
+    setQuizError(null);
+    setQuizCreating(true);
+    try {
+      const res = await fetch('/api/quiz-builder/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 402) { setQuizError('Cette fonctionnalité est réservée aux abonnés.'); return; }
+      if (res.status === 429) { setQuizError('Tu as utilisé tous tes messages du jour — réessaie demain.'); return; }
+      if (!res.ok) { setQuizError('La génération a échoué, réessaie avec un autre thème.'); return; }
+      setQuizResult({ id: data.id, title: data.title, intro: data.intro });
+      if (typeof data.remaining === 'number') setRemaining(data.remaining);
+      if (typeof data.limit === 'number') setLimit(data.limit);
+    } catch {
+      setQuizError('Erreur réseau, réessaie.');
+    } finally {
+      setQuizCreating(false);
+    }
+  }, [quizTopic, quizCreating]);
+
+  const shareQuizLink = useCallback(async (id: string, title: string) => {
+    const url = `${window.location.origin}/q/${id}`;
+    const text = `${title} — fais ce test 👀`;
+    try {
+      if (navigator.share) { await navigator.share({ title, text, url }); return; }
+    } catch { /* partage annulé */ }
+    try { await navigator.clipboard.writeText(url); setQuizLinkCopied(true); setTimeout(() => setQuizLinkCopied(false), 2500); } catch {}
+  }, []);
 
   // ── États de chargement / gate ──
   if (status === 'loading' || booting) {
@@ -280,6 +325,26 @@ export default function ChatClient() {
                   </div>
                 ))}
               </div>
+
+              {/* Créateur de test partageable — réservé aux abonnés, argument
+                  de conversion supplémentaire pour les comptes gratuits. */}
+              {!isFree ? (
+                <button
+                  onClick={() => setQuizBuilderOpen(true)}
+                  className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
+                  style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}
+                >
+                  🧪 Créer un test à partager avec tes amis
+                </button>
+              ) : (
+                <Link
+                  href="/pricing"
+                  className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs font-semibold transition-all"
+                  style={{ background: 'var(--paper-panel)', border: '1px dashed var(--line)', color: '#a8a29e' }}
+                >
+                  🧪 Créer tes propres tests à partager — débloque avec un abonnement
+                </Link>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -413,6 +478,72 @@ export default function ChatClient() {
           Nova s&apos;appuie sur ton test. Ce n&apos;est pas un avis médical.
         </p>
       </div>
+
+      {/* Créateur de test partageable — overlay */}
+      {quizBuilderOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) setQuizBuilderOpen(false); }}
+        >
+          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
+            {quizResult ? (
+              <div className="text-center">
+                <div className="mb-4"><NovaAvatar size={56} glow /></div>
+                <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Ton test est prêt !</p>
+                <h3 className="font-display text-lg font-black mb-2" style={{ color: 'var(--ink)' }}>{quizResult.title}</h3>
+                <p className="text-xs mb-5 leading-relaxed" style={{ color: '#78716c' }}>{quizResult.intro}</p>
+                <button
+                  onClick={() => shareQuizLink(quizResult.id, quizResult.title)}
+                  className="ur-btn-gold w-full py-3 text-sm mb-2"
+                >
+                  {quizLinkCopied ? '✅ Lien copié — envoie-le !' : '📤 Partager mon test'}
+                </button>
+                <button
+                  onClick={() => { setQuizBuilderOpen(false); setQuizResult(null); setQuizTopic(''); }}
+                  className="w-full py-2.5 text-xs"
+                  style={{ color: '#a8a29e' }}
+                >
+                  Fermer
+                </button>
+              </div>
+            ) : (
+              <div>
+                <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Nova crée un test pour toi</p>
+                <h3 className="font-display text-lg font-black mb-2" style={{ color: 'var(--ink)' }}>Sur quel thème ?</h3>
+                <p className="text-xs mb-4 leading-relaxed" style={{ color: '#78716c' }}>
+                  Ex : « mes vrais amis », « suis-je fait pour l&apos;entrepreneuriat », « mon rapport au stress »…
+                </p>
+                <textarea
+                  value={quizTopic}
+                  onChange={(e) => setQuizTopic(e.target.value)}
+                  rows={2}
+                  placeholder="Décris le thème de ton test…"
+                  disabled={quizCreating}
+                  className="w-full resize-none rounded-xl px-3.5 py-3 text-sm outline-none mb-3 disabled:opacity-50"
+                  style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+                />
+                {quizError && <p className="text-xs mb-3 text-center" style={{ color: '#dc2626' }}>{quizError}</p>}
+                <button
+                  onClick={createQuiz}
+                  disabled={quizCreating || !quizTopic.trim()}
+                  className="ur-btn-gold w-full py-3 text-sm mb-2 disabled:opacity-50"
+                >
+                  {quizCreating ? 'Nova réfléchit…' : 'Créer mon test →'}
+                </button>
+                <button
+                  onClick={() => setQuizBuilderOpen(false)}
+                  disabled={quizCreating}
+                  className="w-full py-2.5 text-xs disabled:opacity-50"
+                  style={{ color: '#a8a29e' }}
+                >
+                  Annuler
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
