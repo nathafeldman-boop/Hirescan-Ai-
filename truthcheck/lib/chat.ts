@@ -43,9 +43,18 @@ export const MAX_HISTORY = 12;
 // voir lib/coach.ts (coachSystemPrompt + buildCoachContext). callMistral le
 // reçoit en paramètre.
 
+// Contenu multimodal (vision) — mistral-small-latest accepte du texte + des
+// images dans le même message (parties de contenu, format identique à OpenAI).
+// On ne construit ce format QUE pour le tour courant (voir /api/chat) : les
+// images ne sont jamais réinjectées dans l'historique rechargé, pour ne pas
+// alourdir chaque appel suivant en tokens/coût.
+export type MistralContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: string };
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
-  content: string;
+  content: string | MistralContentPart[];
 }
 
 interface MistralResult {

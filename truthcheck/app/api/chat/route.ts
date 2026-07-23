@@ -12,6 +12,10 @@ export const dynamic = 'force-dynamic';
 // Combien de messages on recharge pour l'affichage (mémoire visible).
 const DISPLAY_HISTORY = 40;
 
+// Photo envoyée à Nova (vision, mistral-small-latest) : data URI base64, taille
+// plafonnée pour rester raisonnable en coût/latence (~4,5 Mo décodés).
+const MAX_IMAGE_DATA_URI_LENGTH = 6_000_000;
+
 // ── GET : recharge l'historique + l'état (quota, profil présent) ──
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -69,14 +73,28 @@ export async function POST(req: NextRequest) {
   // { messages: [...] } (on extrait le dernier message utilisateur). Évite de
   // casser un onglet ouvert avant la mise à jour.
   const body = await req.json().catch(() => null) as
-    { message?: string; messages?: { role?: string; content?: string }[] } | null;
+    { message?: string; messages?: { role?: string; content?: string }[]; imageBase64?: string } | null;
   let message = typeof body?.message === 'string' ? body.message.trim() : '';
   if (!message && Array.isArray(body?.messages)) {
     const lastUser = [...body.messages].reverse().find((m) => m?.role === 'user' && typeof m?.content === 'string');
     message = (lastUser?.content ?? '').trim();
   }
   message = message.slice(0, 4000);
-  if (!message) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+
+  // Photo optionnelle (Nova vision) — data URI envoyée par le client.
+  const rawImage = typeof body?.imageBase64 === 'string' ? body.imageBase64 : '';
+  let imageDataUri: string | null = null;
+  if (rawImage) {
+    if (!/^data:image\/(jpe?g|png|webp|gif);base64,/i.test(rawImage)) {
+      return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+    }
+    if (rawImage.length > MAX_IMAGE_DATA_URI_LENGTH) {
+      return NextResponse.json({ error: 'image_too_large' }, { status: 413 });
+    }
+    imageDataUri = rawImage;
+  }
+
+  if (!message && !imageDataUri) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
@@ -120,9 +138,18 @@ export async function POST(req: NextRequest) {
         select: { role: true, content: true },
       }).catch(() => [])
     : [];
+  // Photo : contenu multimodal pour CE tour uniquement (jamais réinjecté dans
+  // l'historique rechargé — voir lib/chat.ts). Sans photo, un simple texte.
+  const currentUserContent: ChatMessage['content'] = imageDataUri
+    ? [
+        { type: 'text', text: message || 'Qu\'est-ce que tu penses de cette photo ?' },
+        { type: 'image_url', image_url: imageDataUri },
+      ]
+    : message;
+
   const history: ChatMessage[] = [
     ...prior.reverse().map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
-    { role: 'user', content: message },
+    { role: 'user', content: currentUserContent },
   ];
 
   const scores = (dbUser.mbtiScores as unknown as MbtiScores | null) ?? null;
@@ -142,10 +169,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'assistant_unavailable' }, { status: 502 });
   }
 
-  // Persiste la paire + décompte 1 message
+  // Persiste la paire + décompte 1 message. On ne stocke JAMAIS la photo elle-
+  // même (juste un texte/légende) — évite d'alourdir la DB et les tours suivants.
   await prisma.chatMessage.createMany({
     data: [
-      { userId: user.id, role: 'user', content: message },
+      { userId: user.id, role: 'user', content: message || (imageDataUri ? '[Photo envoyée]' : '') },
       { userId: user.id, role: 'assistant', content: result.reply },
     ],
   }).catch(() => {});
