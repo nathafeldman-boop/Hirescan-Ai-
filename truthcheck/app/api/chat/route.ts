@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { callMistral, dailyLimitFor, parisDay, parisMonth, FREE_MONTHLY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
-import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree } from '@/lib/coach';
+import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree, coachSystemPromptFreeNoTest } from '@/lib/coach';
 import { hasPaidAccess } from '@/lib/plans';
 import type { MbtiScores } from '@/lib/mbti';
 
@@ -78,12 +78,16 @@ export async function POST(req: NextRequest) {
   message = message.slice(0, 4000);
   if (!message) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
-  // Le coach a besoin du test : sans type, on invite à le passer (sans appel payant).
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
     select: { mbtiType: true, mbtiScores: true, name: true, chatBonusCredits: true, chatBonusDaily: true },
   }).catch(() => null);
-  if (!dbUser?.mbtiType) {
+  if (!dbUser) return NextResponse.json({ error: 'assistant_unavailable' }, { status: 502 });
+  // Un abonné PAYANT paie justement pour le coach personnalisé selon SON test —
+  // sans profil, on l'invite à le passer d'abord. Un compte GRATUIT, lui, peut
+  // essayer Nova sans avoir fait le test (découverte) : elle répond en général
+  // et rappelle à chaque réponse de faire le test (voir coachSystemPromptFreeNoTest).
+  if (isPremium && !dbUser.mbtiType) {
     return NextResponse.json({ needsTest: true }, { status: 200 });
   }
 
@@ -123,10 +127,14 @@ export async function POST(req: NextRequest) {
 
   const scores = (dbUser.mbtiScores as unknown as MbtiScores | null) ?? null;
   const firstName = dbUser.name?.split(' ')[0] ?? null;
-  // Abonné → coach ancré sur le test ; gratuit → coach bridé (aucun type transmis au modèle).
+  // Payant → coach ancré sur le test complet. Gratuit + test fait → coach bridé
+  // (générique, aucun type transmis). Gratuit + test PAS fait → coach découverte
+  // (rappelle de faire le test à chaque réponse).
   const system = isPremium
-    ? coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType, scores))
-    : coachSystemPromptFree(firstName);
+    ? coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType as string, scores))
+    : dbUser.mbtiType
+      ? coachSystemPromptFree(firstName)
+      : coachSystemPromptFreeNoTest(firstName);
 
   const result = await callMistral(system, history);
   if (!result.ok || !result.reply) {
