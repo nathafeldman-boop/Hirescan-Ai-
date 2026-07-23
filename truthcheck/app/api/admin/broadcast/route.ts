@@ -9,17 +9,21 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET ?? 'urcecret-admin-natha-2024';
 
 // Envoi groupé à tous les inscrits (table User).
 // Sécurité : secret admin obligatoire + `dry`/`test` avant tout envoi réel.
+// Déduplication : chaque envoi est loggué (EmailLog type 'coach_announce') →
+// relancer la campagne ne renvoie QU'AUX nouveaux inscrits qui ne l'ont pas
+// encore reçue, jamais un doublon à ceux qui l'ont déjà eue.
 //
-//   Prévisualiser le nombre de destinataires :
+//   Prévisualiser le nombre de NOUVEAUX destinataires (pas encore reçu) :
 //     GET /api/admin/broadcast?secret=…&dry=1
-//   Test sur une seule adresse (recommandé avant le vrai envoi) :
+//   Test sur une seule adresse (recommandé avant le vrai envoi, n'affecte pas le log) :
 //     GET /api/admin/broadcast?secret=…&test=moi@exemple.com
-//   Envoi réel à TOUS les inscrits (action irréversible) :
+//   Envoi réel aux nouveaux inscrits seulement (action irréversible) :
 //     GET /api/admin/broadcast?secret=…&confirm=SEND
 //
 // Resend : endpoint batch (100 max/appel), petit délai entre lots.
 const BATCH_SIZE = 100;
 const BATCH_DELAY_MS = 600;
+const EMAIL_LOG_TYPE = 'coach_announce';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -37,15 +41,17 @@ export async function GET(req: NextRequest) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return NextResponse.json({ error: 'RESEND_API_KEY manquante' }, { status: 500 });
 
-  // Destinataires : inscrits avec un email réel (on exclut les testeurs synthétiques @urcecret.app)
+  // Destinataires : inscrits avec un email réel (on exclut les testeurs synthétiques
+  // @urcecret.app) qui n'ont PAS déjà reçu cette campagne (EmailLog).
   const users = await prisma.user.findMany({
     where: {
       email: { not: null },
       NOT: { email: { endsWith: '@urcecret.app' } },
+      emailLogs: { none: { type: EMAIL_LOG_TYPE } },
     },
-    select: { email: true, name: true },
+    select: { id: true, email: true, name: true },
   });
-  const recipients = users.filter((u): u is { email: string; name: string | null } => !!u.email);
+  const recipients = users.filter((u): u is { id: string; email: string; name: string | null } => !!u.email);
 
   // ── Mode dry : compter sans envoyer ──
   if (searchParams.get('dry')) {
@@ -89,6 +95,12 @@ export async function GET(req: NextRequest) {
       });
       if (res.ok) {
         sent += chunk.length;
+        // Log immédiatement — si le process est interrompu après ce lot, les
+        // suivants ne recevront pas de doublon lors d'une relance de la campagne.
+        await prisma.emailLog.createMany({
+          data: chunk.map((u) => ({ userId: u.id, type: EMAIL_LOG_TYPE })),
+          skipDuplicates: true,
+        }).catch(() => {});
       } else {
         failed += chunk.length;
         const txt = await res.text().catch(() => '');
