@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { hasProfileAccess } from '@/lib/plans';
 import { MbtiTypePremium } from '@/lib/mbti-premium';
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
 // TypeClient.tsx).
 export default function SuisJePremiumSections({ code }: Props) {
   const { data: session, status } = useSession();
-  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = hasProfileAccess((session?.user as { tier?: string } | undefined)?.tier);
   const sessionLoading = status === 'loading';
 
   const [premium, setPremium] = useState<MbtiTypePremium | null>(null);

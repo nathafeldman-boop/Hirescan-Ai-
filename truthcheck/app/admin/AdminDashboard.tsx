@@ -135,10 +135,11 @@ const FONT_DISPLAY = 'var(--font-display), Georgia, serif';
 
 // Un seul palier par tier — couleurs distinctes, jamais réutilisées ailleurs.
 const TIER_STYLE: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  free:    { label: 'Gratuit', color: '#71717a', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.09)' },
-  starter: { label: 'Starter', color: PALETTE.sky,     bg: 'rgba(56,189,248,0.14)',  border: 'rgba(56,189,248,0.3)' },
-  plus:    { label: 'Plus',    color: PALETTE.gold,    bg: 'rgba(209,125,82,0.16)',  border: 'rgba(209,125,82,0.32)' },
-  premium: { label: 'Premium', color: PALETTE.amber,   bg: 'rgba(251,191,36,0.16)',  border: 'rgba(251,191,36,0.32)' },
+  free:     { label: 'Gratuit',  color: '#71717a', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.09)' },
+  unlocked: { label: 'Unlocked', color: PALETTE.violet, bg: 'rgba(167,139,250,0.14)', border: 'rgba(167,139,250,0.3)' },
+  starter:  { label: 'Starter',  color: PALETTE.sky,     bg: 'rgba(56,189,248,0.14)',  border: 'rgba(56,189,248,0.3)' },
+  plus:     { label: 'Plus',     color: PALETTE.gold,    bg: 'rgba(209,125,82,0.16)',  border: 'rgba(209,125,82,0.32)' },
+  premium:  { label: 'Premium',  color: PALETTE.amber,   bg: 'rgba(251,191,36,0.16)',  border: 'rgba(251,191,36,0.32)' },
 };
 
 // ── KPI Card — chiffre en avant, lisible d'un coup d'œil, tient sur mobile ──

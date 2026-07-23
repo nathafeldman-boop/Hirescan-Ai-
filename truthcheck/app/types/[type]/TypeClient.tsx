@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { hasProfileAccess } from '@/lib/plans';
 import { MbtiTypeFree } from '@/lib/mbti-free';
 import { MbtiTypePremium } from '@/lib/mbti-premium';
 import { mbtiTypesEnFree } from '@/lib/i18n/mbtiTypesEnFree';
@@ -43,7 +44,7 @@ interface Props {
 
 export default function TypeClient({ type }: Props) {
   const { data: session, status } = useSession();
-  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = hasProfileAccess((session?.user as { tier?: string } | undefined)?.tier);
   const sessionLoading = status === 'loading';
   const { lang } = useLang();
   const t = ui[lang].type;

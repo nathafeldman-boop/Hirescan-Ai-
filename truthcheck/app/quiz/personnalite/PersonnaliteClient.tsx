@@ -9,6 +9,7 @@ import { mbtiQuestionsEn } from '@/lib/i18n/mbtiQuestionsEn';
 import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
+import { hasProfileAccess } from '@/lib/plans';
 import Seal from '@/components/Seal';
 
 // ─── In-app browser detection ───────────────────────────────────────────────────
@@ -629,12 +630,8 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
 
   const items = isFr ? [
     {
-      q: `C'est quoi exactement pour 1,99 €/mois?`,
-      a: `Ton profil complet (Amour, Carrière, Face cachée, Compatibilité) + Nova, ton coach IA personnel qui connaît ton type — 5 messages par jour. Accès immédiat tant que l'abonnement est actif.`,
-    },
-    {
-      q: `Est-ce un abonnement? Je peux annuler?`,
-      a: `Oui, c'est un abonnement à 1,99 €/mois — le prix d'un café. Résiliable en 1 clic à tout moment depuis ton espace, sans engagement ni frais cachés. Tu peux tester un mois et arrêter si ça ne te plaît pas.`,
+      q: `Quelle est la différence entre les deux offres à 1,99 €?`,
+      a: `"Juste mon résultat" (1,99 € une seule fois) débloque ton profil complet à vie, sans abonnement ni coach. "Ton profil + ton coach" (1,99 €/mois) débloque le même profil ET Nova, ton coach IA qui connaît ton type — 5 messages par jour. Résiliable en 1 clic à tout moment, sans engagement.`,
     },
     {
       q: `Satisfait ou remboursé?`,
@@ -646,12 +643,8 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
     },
   ] : [
     {
-      q: `What exactly do I get for €1.99/mo?`,
-      a: `Your complete profile (Love, Career, Shadow side, Compatibility) + Nova, your personal AI coach who knows your type — 5 messages per day. Instant access while subscribed.`,
-    },
-    {
-      q: `Is it a subscription? Can I cancel?`,
-      a: `Yes, €1.99/month — the price of a coffee. Cancel in 1 click anytime from your account, no commitment, no hidden fees. Try it for a month and stop if it's not for you.`,
+      q: `What's the difference between the two €1.99 offers?`,
+      a: `"Just my result" (€1.99 once) unlocks your full profile for life, no subscription, no coach. "My profile + my coach" (€1.99/mo) unlocks the same profile AND Nova, your AI coach who knows your type — 5 messages a day. Cancel in 1 click anytime, no commitment.`,
     },
     {
       q: `Money-back guarantee?`,
@@ -767,6 +760,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const [inAppPayUrl, setInAppPayUrl] = useState<string | null>(null);
   const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
   const [inAppPlusUrl, setInAppPlusUrl] = useState<string | null>(null);
+  const [inAppOneTimeUrl, setInAppOneTimeUrl] = useState<string | null>(null);
   const [stickyBar, setStickyBar] = useState(false);
   const [exitModal, setExitModal] = useState(false);
   const exitShown = useRef(false);
@@ -893,6 +887,10 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...base, plus: true }),
     }).then(r => r.json()).then(d => { if (d.url) setInAppPlusUrl(d.url); }).catch(() => {});
+    fetch('/api/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...base, oneTime: true }),
+    }).then(r => r.json()).then(d => { if (d.url) setInAppOneTimeUrl(d.url); }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInApp, typeCode]);
 
@@ -1131,6 +1129,47 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </p>
           </div>
 
+          {/* One-shot 1,99€ SANS abonnement — juste le résultat, à vie, pas de
+              Nova. Collée juste sous le Starter 1,99€/mois pour comparer les
+              deux d'un coup d'œil (constat terrain : afficher les deux prix
+              1,99€ côte à côte convertit mieux que Starter seul). */}
+          <div className="relative rounded-2xl px-5 py-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+            <div className="flex items-start justify-between mb-3">
+              <div className="min-w-0 pr-3">
+                <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>
+                  {isFr ? 'Juste mon résultat' : 'Just my result'}
+                </p>
+                <p className="text-[11px] text-stone-500 mt-0.5" style={{ lineHeight: 1.5 }}>
+                  {isFr ? 'Une seule fois, à vie · pas de coach, pas d\'abonnement' : 'Once, for life · no coach, no subscription'}
+                </p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <span className="font-display text-xl text-stone-900" style={{ fontWeight: 800 }}>1,99 €</span>
+              </div>
+            </div>
+            {isInApp && inAppOneTimeUrl ? (
+              <a
+                href={inAppOneTimeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'onetime', via: 'anchor' })}
+                className="block w-full py-3 rounded-full font-semibold text-[13px] text-center transition-all active:scale-[0.98]"
+                style={{ border: '1px solid var(--ink)', color: 'var(--ink)', background: 'transparent', textDecoration: 'none' }}
+              >
+                {isFr ? 'Débloquer mon résultat, 1,99 €' : 'Unlock my result, €1.99'}
+              </a>
+            ) : (
+              <button
+                onClick={() => doCheckout('onetime')}
+                disabled={loading}
+                className="w-full py-3 rounded-full font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ border: '1px solid var(--ink)', color: 'var(--ink)', background: 'transparent' }}
+              >
+                {loading ? '…' : isFr ? 'Débloquer mon résultat, 1,99 €' : 'Unlock my result, €1.99'}
+              </button>
+            )}
+          </div>
+
           {/* Plus — 5€/mois : profil débloqué + Coach IA personnel. Le milieu de
               gamme, mis en avant : la vraie valeur récurrente (coach ancré sur le test). */}
           <div className="relative rounded-[24px] px-5 pt-5 pb-4 overflow-hidden"
@@ -1365,7 +1404,7 @@ function SignInGate({ isFr }: { isFr: boolean }) {
 export default function PersonnaliteClient() {
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
-  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = hasProfileAccess((session?.user as { tier?: string } | undefined)?.tier);
   const { lang } = useLang();
   const [phase, setPhase] = useState<'quiz' | 'analysis' | 'gate' | 'result'>(() => {
     if (typeof window !== 'undefined') {

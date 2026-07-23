@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { hasProfileAccess } from '@/lib/plans';
 
 interface Props {
   code: string;
@@ -15,7 +16,7 @@ interface Props {
 // (même route que TypeClient.tsx).
 export default function CelebritesClient({ code, accentColor }: Props) {
   const { data: session, status } = useSession();
-  const isPremium = ['premium', 'plus', 'starter'].includes((session?.user as { tier?: string } | undefined)?.tier ?? '');
+  const isPremium = hasProfileAccess((session?.user as { tier?: string } | undefined)?.tier);
   const sessionLoading = status === 'loading';
 
   const [famousExamples, setFamousExamples] = useState<string[] | null>(null);

@@ -3,7 +3,19 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
 import { emailPremiumWelcome, emailAdminSale, sendEmail, ADMIN_NOTIF_EMAIL } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
-import { PLUS_PRICE_ID, STARTER_PRICE_ID } from '@/lib/plans';
+import { PLUS_PRICE_ID, STARTER_PRICE_ID, TIER_RANK } from '@/lib/plans';
+
+// Upsert de tier qui ne rétrograde jamais un palier existant (ex: un abonné
+// Plus qui rachète le 1,99€ one-shot par erreur reste 'plus').
+async function upsertTierNoDowngrade(email: string, targetTier: string, extra: { name?: string | null } = {}) {
+  const existing = await prisma.user.findUnique({ where: { email }, select: { tier: true } }).catch(() => null);
+  const shouldSet = !existing || (TIER_RANK[targetTier] ?? 0) >= (TIER_RANK[existing.tier] ?? 0);
+  await prisma.user.upsert({
+    where: { email },
+    create: { email, tier: targetTier, ...extra },
+    update: shouldSet ? { tier: targetTier } : {},
+  }).catch(() => {});
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -58,24 +70,19 @@ export async function POST(req: NextRequest) {
         }).catch(() => {});
       }
 
-      // ── One-time MBTI purchase → upgrade user tier ──
-      if (email && meta.oneTime === 'true' && meta.typeCode) {
-        await prisma.user.upsert({
-          where: { email },
-          create: { email, tier: 'premium' },
-          update: { tier: 'premium' },
-        }).catch(() => {});
+      // ── One-time MBTI purchase (1,99€ SANS abonnement) → 'unlocked' ──
+      // Juste le résultat, à vie, PAS de Nova (sinon on retombe dans l'ancienne
+      // faille : payer 1,99€ une fois donnait tout un abonnement premium).
+      // Le rapport complet (19,99€, meta.rapport) reste un vrai palier premium.
+      if (email && meta.oneTime === 'true' && meta.typeCode && meta.rapport !== 'true') {
+        await upsertTierNoDowngrade(email, 'unlocked');
       }
 
       // ── Subscription or rapport → upgrade user tier ──
-      // plan:'starter' (1,99€) → 'starter' ; plan:'plus' (5€) → 'plus' ; sinon 'premium'.
+      // plan:'starter' (1,99€/mois) → 'starter' ; plan:'plus' (5€) → 'plus' ; sinon 'premium'.
       if (email && (meta.annual === 'true' || session.mode === 'subscription' || meta.rapport === 'true')) {
         const tier = meta.plan === 'starter' ? 'starter' : meta.plan === 'plus' ? 'plus' : 'premium';
-        await prisma.user.upsert({
-          where: { email },
-          create: { email, tier },
-          update: { tier },
-        }).catch(() => {});
+        await upsertTierNoDowngrade(email, tier);
       }
 
       // ── Premium welcome email + suivi day 1 ──
