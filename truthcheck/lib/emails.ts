@@ -54,6 +54,26 @@ function cta(text: string, url: string) {
   </table>`;
 }
 
+// Code de connexion (OTP) — remplace le lien magique pour /login : un code à 6
+// chiffres à saisir directement sur le site. Plus fiable sur mobile/in-app
+// browser (pas de saut vers une autre appli/onglet qui casse la session).
+export function emailLoginCode(code: string) {
+  return {
+    subject: `${code} — ton code de connexion UrCecret`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Connexion sécurisée</p>
+      <h2 style="margin:0 0 20px;color:#fff;font-size:20px;font-weight:800">Voici ton code de connexion</h2>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.25);border-radius:16px;padding:28px;text-align:center;margin-bottom:24px">
+        <p style="margin:0;font-family:monospace;font-size:40px;font-weight:900;letter-spacing:0.25em;color:#fff">${code}</p>
+      </div>
+      <p style="margin:0 0 8px;color:#71717a;font-size:14px;line-height:1.7">
+        Saisis ce code sur la page de connexion UrCecret. Il expire dans <strong style="color:#d17d52">10 minutes</strong> et ne fonctionne qu'une seule fois.
+      </p>
+      <p style="margin:16px 0 0;color:#52525b;font-size:12px">Si tu n'es pas à l'origine de cette demande, ignore simplement cet email.</p>
+    `),
+  };
+}
+
 export function emailWelcome(name: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   return {

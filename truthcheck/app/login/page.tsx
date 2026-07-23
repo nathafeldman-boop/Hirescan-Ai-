@@ -11,15 +11,27 @@ function LoginContent() {
   const prefillEmail = searchParams.get('email') ?? '';
 
   const [email, setEmail] = useState(prefillEmail);
-  const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [callbackUrl, setCallbackUrl] = useState(rawCallbackUrl);
 
-  // "J'ai un code" state
+  // "Par email" — deux étapes : saisir l'email → recevoir un code à 6 chiffres → le saisir.
+  const [emailStep, setEmailStep] = useState<'enter' | 'otp'>('enter');
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  // "J'ai un code" state — codes d'accès affiliés (fonctionnalité distincte, inchangée)
   const [mode, setMode] = useState<'email' | 'code'>('email');
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState('');
   const [codeLoading, setCodeLoading] = useState(false);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const id = setInterval(() => setResendCooldown(s => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(id);
+  }, [resendCooldown]);
 
   // If returning to quiz, re-attach pending MBTI type from localStorage so quiz state survives login
   useEffect(() => {
@@ -32,13 +44,59 @@ function LoginContent() {
     } catch {}
   }, [rawCallbackUrl]);
 
-  async function handleEmail(e: React.FormEvent) {
-    e.preventDefault();
+  async function sendCode() {
     if (!email.trim()) return;
     setLoading(true);
-    await signIn('email', { email, callbackUrl, redirect: false });
-    setSent(true);
-    setLoading(false);
+    setOtpError('');
+    try {
+      const res = await fetch('/api/auth/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setOtpError(data.error ?? 'Erreur d\'envoi, réessaie.');
+        setLoading(false);
+        return;
+      }
+      setEmailStep('otp');
+      setResendCooldown(30);
+    } catch {
+      setOtpError('Erreur réseau, réessaie.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleEmail(e: React.FormEvent) {
+    e.preventDefault();
+    await sendCode();
+  }
+
+  async function handleOtp(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = otp.trim();
+    if (!trimmed) return;
+    setOtpError('');
+    setOtpLoading(true);
+    try {
+      const res = await fetch('/api/auth/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), code: trimmed, callbackUrl }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setOtpError(data.error ?? 'Code invalide.');
+        setOtpLoading(false);
+        return;
+      }
+      router.push(data.loginUrl);
+    } catch {
+      setOtpError('Erreur réseau, réessaie.');
+      setOtpLoading(false);
+    }
   }
 
   async function handleCode(e: React.FormEvent) {
@@ -78,15 +136,62 @@ function LoginContent() {
         </div>
 
         <div className="rounded-2xl p-6" style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 8px 32px rgba(0,0,0,0.06)' }}>
-          {sent ? (
-            <div className="text-center py-4">
-              <div className="text-5xl mb-4">📬</div>
-              <h2 className="text-stone-900 font-black text-xl mb-2">Vérifie tes emails !</h2>
-              <p className="text-stone-500 text-sm leading-relaxed">
-                Un lien de connexion a été envoyé à{' '}
-                <span style={{ color: '#a94e18' }} className="font-semibold">{email}</span>
-              </p>
-              <p className="text-stone-400 text-xs mt-3">Clique dessus — tes résultats seront là 🎯</p>
+          {mode === 'email' && emailStep === 'otp' ? (
+            /* Saisie du code de connexion reçu par email */
+            <div>
+              <div className="text-center mb-5">
+                <div className="text-4xl mb-3">📬</div>
+                <h2 className="text-stone-900 font-black text-lg mb-1">Ton code est arrivé</h2>
+                <p className="text-stone-500 text-sm leading-relaxed">
+                  Envoyé à <span style={{ color: '#a94e18' }} className="font-semibold">{email}</span> — valable 10 minutes.
+                </p>
+              </div>
+              <form onSubmit={handleOtp} className="space-y-3">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={otp}
+                  onChange={(e) => { setOtp(e.target.value.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }}
+                  placeholder="000000"
+                  maxLength={6}
+                  required
+                  autoFocus
+                  className="w-full rounded-xl px-4 py-3.5 text-stone-900 text-2xl placeholder-stone-300 outline-none transition-all tracking-[0.4em] font-mono text-center"
+                  style={{ background: '#f5f4f2', border: `2px solid ${otpError ? '#ef4444' : '#e7e5e0'}` }}
+                  onFocus={e => { e.currentTarget.style.borderColor = otpError ? '#ef4444' : '#a94e18'; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = otpError ? '#ef4444' : '#e7e5e0'; }}
+                />
+                {otpError && (
+                  <p className="text-red-500 text-xs text-center font-medium">{otpError}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={otpLoading || otp.length < 6}
+                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50 hover:opacity-90"
+                  style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 16px rgba(169,78,24,0.3)' }}
+                >
+                  {otpLoading ? '⏳ Vérification...' : '🔓 Me connecter →'}
+                </button>
+              </form>
+              <div className="flex items-center justify-between mt-4">
+                <button
+                  type="button"
+                  onClick={() => { setEmailStep('enter'); setOtp(''); setOtpError(''); }}
+                  className="text-xs text-stone-400 hover:text-stone-600"
+                >
+                  ← Changer d&apos;email
+                </button>
+                <button
+                  type="button"
+                  onClick={sendCode}
+                  disabled={resendCooldown > 0 || loading}
+                  className="text-xs font-semibold disabled:opacity-50"
+                  style={{ color: '#a94e18' }}
+                >
+                  {resendCooldown > 0 ? `Renvoyer (${resendCooldown}s)` : 'Renvoyer le code'}
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -126,7 +231,7 @@ function LoginContent() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setMode('code'); setSent(false); }}
+                  onClick={() => { setMode('code'); }}
                   className="flex-1 py-2.5 text-sm font-semibold transition-all"
                   style={{
                     background: mode === 'code' ? 'linear-gradient(135deg,#a94e18,#d17d52)' : 'transparent',
@@ -138,7 +243,7 @@ function LoginContent() {
               </div>
 
               {mode === 'email' ? (
-                /* Email magic link */
+                /* Email → code de connexion à 6 chiffres */
                 <form onSubmit={handleEmail} className="space-y-3">
                   <input
                     type="email"
@@ -151,17 +256,20 @@ function LoginContent() {
                     onFocus={e => { e.currentTarget.style.borderColor = '#a94e18'; }}
                     onBlur={e => { e.currentTarget.style.borderColor = '#e7e5e0'; }}
                   />
+                  {otpError && (
+                    <p className="text-red-500 text-xs text-center font-medium">{otpError}</p>
+                  )}
                   <button
                     type="submit"
                     disabled={loading}
                     className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50 hover:opacity-90"
                     style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 16px rgba(169,78,24,0.3)' }}
                   >
-                    {loading ? '⏳ Envoi...' : '✉️ Recevoir mon lien de connexion →'}
+                    {loading ? '⏳ Envoi...' : '✉️ Recevoir mon code de connexion →'}
                   </button>
                 </form>
               ) : (
-                /* Code form */
+                /* Code d'accès affilié */
                 <form onSubmit={handleCode} className="space-y-3">
                   <input
                     type="text"
