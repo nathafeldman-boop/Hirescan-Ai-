@@ -943,29 +943,36 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           </div>
         </div>
 
-        {/* ─── Quick-entry CTA — immediately below hook, above the fold on mobile ── */}
+        {/* ─── Quick-entry CTA — immediately below hook, above the fold on mobile.
+            Les deux offres à 1,99€ côte à côte dès ce premier écran (constat
+            terrain : montrer les deux convertit mieux qu'une seule). ── */}
         {!isInApp && (
           <div className="rounded-2xl px-4 py-3.5 mb-4"
                style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <span className="flex-shrink-0"><Glyph name="key" color="var(--gold)" size={22} /></span>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-bold text-stone-900 leading-snug" style={{ letterSpacing: '-0.01em' }}>
-                    {isFr ? 'Mon profil MBTI + Nova, mon coach IA' : 'My MBTI profile + Nova, my AI coach'}
-                  </p>
-                  <p className="text-[11px] text-stone-500 mt-0.5">
-                    {isFr ? 'Le prix d\'un café · résiliable en 1 clic' : 'The price of a coffee · cancel in 1 click'}
-                  </p>
-                </div>
-              </div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="flex-shrink-0"><Glyph name="key" color="var(--gold)" size={20} /></span>
+              <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>
+                {isFr ? 'Débloquer mon profil, dès 1,99 €' : 'Unlock my profile, from €1.99'}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                onClick={() => doCheckout('onetime')}
+                disabled={loading}
+                className="flex flex-col items-center rounded-xl px-2 py-3 transition-all active:scale-[0.97] disabled:opacity-60"
+                style={{ border: '1px solid var(--line)', background: 'var(--paper)' }}
+              >
+                <span className="font-display text-lg font-bold" style={{ color: 'var(--ink)' }}>{loading ? '…' : '1,99 €'}</span>
+                <span className="text-[10px] mt-1 text-stone-500 text-center leading-tight">{isFr ? 'Juste le résultat, une fois' : 'Just the result, once'}</span>
+              </button>
               <button
                 onClick={() => doCheckout('starter')}
                 disabled={loading}
-                className="flex-shrink-0 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-[0.97] disabled:opacity-60"
-                style={{ background: 'var(--ink)', color: '#FAF6EC', whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
+                className="flex flex-col items-center rounded-xl px-2 py-3 transition-all active:scale-[0.97] disabled:opacity-60"
+                style={{ background: 'var(--ink)', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
               >
-                {loading ? '…' : '1,99 €/mois'}
+                <span className="font-display text-lg font-bold" style={{ color: 'var(--gold)' }}>{loading ? '…' : '1,99 €/mois'}</span>
+                <span className="text-[10px] mt-1 text-center leading-tight" style={{ color: 'rgba(250,246,236,0.65)' }}>{isFr ? '+ Nova, ton coach IA' : '+ Nova, your AI coach'}</span>
               </button>
             </div>
             <p className="text-center text-[11px] mt-2.5 text-stone-400">
