@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Production PostHog config is committed so the GitHub Pages build inlines the
+# NEXT_PUBLIC_* values into the client bundle. Safe: this is a public client token.
+!.env.production
 
 # vercel
 .vercel
@@ -39,3 +42,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env.local
