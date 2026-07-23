@@ -1,3 +1,7 @@
+'use client';
+
+import posthog from 'posthog-js';
+
 // ─── Data layer — add new products here ────────────────────────────────────
 const products = [
   {
@@ -56,6 +60,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               className="px-3.5 py-1.5 rounded-lg bg-neutral-900 text-white text-xs font-bold hover:bg-neutral-700 transition-colors"
+              onClick={() => posthog.capture('nav_cta_clicked', { cta_label: 'Try a product' })}
             >
               Try a product →
             </a>
@@ -84,10 +89,15 @@ export default function Home() {
           <a
             href="#products"
             className="px-6 py-3 rounded-xl bg-neutral-900 text-white font-bold text-sm hover:bg-neutral-700 transition-colors"
+            onClick={() => posthog.capture('hero_cta_clicked', { cta_label: 'See our products' })}
           >
             See our products
           </a>
-          <a href="#about" className="text-sm font-semibold text-neutral-400 hover:text-neutral-700 transition-colors">
+          <a
+            href="#about"
+            className="text-sm font-semibold text-neutral-400 hover:text-neutral-700 transition-colors"
+            onClick={() => posthog.capture('hero_about_link_clicked', { cta_label: 'About the studio' })}
+          >
             About the studio →
           </a>
         </div>
@@ -125,6 +135,11 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="group bg-white rounded-2xl border border-neutral-200 p-6 hover:border-neutral-300 hover:shadow-md transition-all duration-200 flex flex-col"
                 style={{ borderTop: `3px solid ${p.accentColor}` }}
+                onClick={() => posthog.capture('product_card_clicked', {
+                  product_slug: p.slug,
+                  product_name: p.name,
+                  product_status: p.status,
+                })}
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="text-3xl">{p.emoji}</span>
@@ -189,7 +204,13 @@ export default function Home() {
           <span>© {new Date().getFullYear()} Smartapp. All rights reserved.</span>
           <div className="flex items-center gap-5 font-medium">
             <a href="#products" className="hover:text-neutral-700 transition-colors">Products</a>
-            <a href="https://urcecret.site" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-700 transition-colors">
+            <a
+              href="https://urcecret.site"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-700 transition-colors"
+              onClick={() => posthog.capture('footer_product_link_clicked', { product_name: 'UrCecret' })}
+            >
               UrCecret
             </a>
           </div>
