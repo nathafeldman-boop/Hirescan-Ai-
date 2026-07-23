@@ -120,28 +120,61 @@ function calcCommission(conversions: Array<{ amountCents: number; commissionCent
   }, 0);
 }
 
-// ── KPI Card ─────────────────────────────────────────────────────────────────
-function KpiCard({ label, value, sub, color = '#d17d52' }: {
-  label: string; value: string | number; sub?: string; color?: string;
+// ── Palette de marque — un système de couleurs fixe (pas de teintes au hasard) ──
+// Catégoriel = ordre fixe pour les séries de graphiques (jamais recyclé/réassigné).
+// Statut = réservé aux états (succès/alerte/critique), jamais pour une "série 4".
+const PALETTE = {
+  gold: '#d17d52', goldDeep: '#a94e18', goldPale: '#e0a380',
+  sky: '#38bdf8', emerald: '#34d399', amber: '#fbbf24', violet: '#a78bfa',
+  good: '#34d399', warn: '#fbbf24', critical: '#f87171',
+  ink: '#0a0a0f', panel: 'rgba(255,255,255,0.025)', panelHover: 'rgba(255,255,255,0.045)',
+  line: 'rgba(255,255,255,0.06)', text: '#fff', textMuted: '#71717a', textFaint: '#3f3f46',
+};
+const CHART_COLORS = [PALETTE.gold, PALETTE.sky, PALETTE.emerald, PALETTE.amber, PALETTE.violet];
+const FONT_DISPLAY = 'var(--font-display), Georgia, serif';
+
+// Un seul palier par tier — couleurs distinctes, jamais réutilisées ailleurs.
+const TIER_STYLE: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  free:    { label: 'Gratuit', color: '#71717a', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.09)' },
+  starter: { label: 'Starter', color: PALETTE.sky,     bg: 'rgba(56,189,248,0.14)',  border: 'rgba(56,189,248,0.3)' },
+  plus:    { label: 'Plus',    color: PALETTE.gold,    bg: 'rgba(209,125,82,0.16)',  border: 'rgba(209,125,82,0.32)' },
+  premium: { label: 'Premium', color: PALETTE.amber,   bg: 'rgba(251,191,36,0.16)',  border: 'rgba(251,191,36,0.32)' },
+};
+
+// ── KPI Card — chiffre en avant, lisible d'un coup d'œil, tient sur mobile ──
+function KpiCard({ label, value, sub, color = PALETTE.gold, icon }: {
+  label: string; value: string | number; sub?: string; color?: string; icon?: string;
 }) {
   return (
-    <div style={{
-      background: 'rgba(255,255,255,0.025)',
-      border: '1px solid rgba(255,255,255,0.06)',
-      borderTop: `2px solid ${color}`,
-      borderRadius: 16, padding: '18px 20px',
-    }}>
-      <p style={{ fontSize: 10, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>{label}</p>
-      <p style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 4, lineHeight: 1 }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color }}>{sub}</p>}
+    <div
+      style={{
+        background: `linear-gradient(160deg, ${PALETTE.panelHover} 0%, ${PALETTE.panel} 100%)`,
+        border: `1px solid ${PALETTE.line}`,
+        borderTop: `2px solid ${color}`,
+        borderRadius: 16, padding: '18px 20px',
+        transition: 'transform .15s ease, border-color .15s ease',
+        minWidth: 0,
+      }}
+      onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+      onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        {icon && <span style={{ fontSize: 12, opacity: 0.85 }}>{icon}</span>}
+        <p style={{ fontSize: 10, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</p>
+      </div>
+      <p style={{ fontFamily: FONT_DISPLAY, fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 4, lineHeight: 1.05, fontVariantNumeric: 'tabular-nums', wordBreak: 'break-word' }}>{value}</p>
+      {sub && <p style={{ fontSize: 11, color, margin: 0 }}>{sub}</p>}
     </div>
   );
 }
 
 function TierBadge({ tier }: { tier: string }) {
-  return tier === 'premium'
-    ? <span style={{ background: 'rgba(194,97,31,0.18)', color: '#d17d52', border: '1px solid rgba(194,97,31,0.3)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>Premium</span>
-    : <span style={{ background: 'rgba(255,255,255,0.05)', color: '#52525b', border: '1px solid rgba(255,255,255,0.07)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600 }}>Gratuit</span>;
+  const s = TIER_STYLE[tier] ?? TIER_STYLE.free;
+  return (
+    <span style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}`, padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
+      {s.label}
+    </span>
+  );
 }
 
 // ── SVG Line Chart ────────────────────────────────────────────────────────────
@@ -440,60 +473,68 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
   ];
 
   const card = (content: React.ReactNode) => (
-    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, overflow: 'hidden' }}>
+    <div style={{ background: `linear-gradient(160deg, ${PALETTE.panelHover} 0%, ${PALETTE.panel} 100%)`, border: `1px solid ${PALETTE.line}`, borderRadius: 20, overflow: 'hidden' }}>
       {content}
     </div>
   );
 
   const cardP = (content: React.ReactNode) => (
-    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, padding: '20px 24px' }}>
+    <div style={{ background: `linear-gradient(160deg, ${PALETTE.panelHover} 0%, ${PALETTE.panel} 100%)`, border: `1px solid ${PALETTE.line}`, borderRadius: 20, padding: '20px 24px' }}>
       {content}
     </div>
   );
 
   const sectionTitle = (text: string, sub?: string) => (
-    <div style={{ marginBottom: 24 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: 0 }}>{text}</h1>
-      {sub && <p style={{ fontSize: 13, color: '#52525b', marginTop: 4 }}>{sub}</p>}
+    <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+      <div style={{ width: 4, borderRadius: 999, background: `linear-gradient(180deg, ${PALETTE.gold}, ${PALETTE.goldDeep})`, alignSelf: 'stretch', flexShrink: 0 }} />
+      <div>
+        <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: 26, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>{text}</h1>
+        {sub && <p style={{ fontSize: 13, color: '#52525b', marginTop: 5 }}>{sub}</p>}
+      </div>
     </div>
   );
 
-  const thStyle = { textAlign: 'left' as const, padding: '12px 20px', fontSize: 11, color: '#52525b', fontWeight: 500, textTransform: 'uppercase' as const, letterSpacing: '0.05em', borderBottom: '1px solid rgba(255,255,255,0.05)' };
+  const thStyle = { textAlign: 'left' as const, padding: '12px 20px', fontSize: 11, color: '#52525b', fontWeight: 500, textTransform: 'uppercase' as const, letterSpacing: '0.05em', borderBottom: `1px solid ${PALETTE.line}` };
   const tdStyle = { padding: '12px 20px', fontSize: 13, borderBottom: '1px solid rgba(255,255,255,0.04)' };
 
   return (
     <main style={{ minHeight: '100vh', background: '#0a0a0f', color: '#fff' }}>
+      {/* Halo doré discret en fond du header — évite le plat "slab noir" */}
+      <div aria-hidden style={{ position: 'fixed', top: -160, left: '50%', transform: 'translateX(-50%)', width: 640, height: 320, background: `radial-gradient(ellipse at center, rgba(209,125,82,0.10) 0%, transparent 70%)`, pointerEvents: 'none', zIndex: 0 }} />
+
       {/* Header */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 20, background: 'rgba(10,10,15,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontSize: 18, fontWeight: 900, textDecoration: 'none' }}>
-            <span style={{ background: 'linear-gradient(135deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
+      <header style={{ position: 'sticky', top: 0, zIndex: 20, background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(14px)', borderBottom: `1px solid ${PALETTE.line}` }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <Link href="/" style={{ fontFamily: FONT_DISPLAY, fontSize: 19, fontWeight: 700, textDecoration: 'none', fontStyle: 'italic' }}>
+            <span style={{ background: `linear-gradient(135deg,${PALETTE.gold},${PALETTE.goldPale})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
             <span style={{ color: '#fff' }}>Cecret</span>
-            <span style={{ fontSize: 11, color: '#3f3f46', fontWeight: 400, marginLeft: 8 }}>Admin</span>
+            <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: 11, color: '#3f3f46', fontWeight: 400, fontStyle: 'normal', marginLeft: 8, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>Admin</span>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {stripeStats && (
-              <span style={{ fontSize: 12, color: '#34d399', fontWeight: 600 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: PALETTE.good, fontWeight: 700, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.22)', padding: '5px 12px', borderRadius: 999 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: PALETTE.good, boxShadow: `0 0 0 3px rgba(52,211,153,0.18)` }} />
                 MRR {fmt(stripeStats.mrr)}
               </span>
             )}
             <span style={{ fontSize: 11, color: '#3f3f46' }}>↻ {lastRefresh}</span>
           </div>
         </div>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', display: 'flex', gap: 4, overflowX: 'auto' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px 10px', display: 'flex', gap: 6, overflowX: 'auto' }}>
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
-              padding: '10px 16px', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: tab === t.id ? '#d17d52' : '#52525b',
-              borderBottom: tab === t.id ? '2px solid #d17d52' : '2px solid transparent',
+              padding: '8px 14px', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', borderRadius: 999,
+              background: tab === t.id ? 'rgba(209,125,82,0.16)' : 'transparent',
+              border: tab === t.id ? `1px solid ${PALETTE.gold}40` : '1px solid transparent',
+              cursor: 'pointer',
+              color: tab === t.id ? PALETTE.gold : '#52525b',
               transition: 'all .15s',
             }}>{t.label}</button>
           ))}
         </div>
       </header>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 20px' }}>
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 1100, margin: '0 auto', padding: '32px 20px' }}>
 
         {/* ── OVERVIEW ── */}
         {tab === 'overview' && (
@@ -502,14 +543,14 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
 
             {/* Stripe KPIs */}
             {stripeStats ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
                 <KpiCard label="MRR (Stripe)" value={fmt(stripeStats.mrr)} sub="revenu mensuel récurrent" color="#34d399" />
                 <KpiCard label="Abonnés actifs" value={(stripeStats.monthlyCount + stripeStats.annualCount).toLocaleString('fr-FR')} sub={`${stripeStats.monthlyCount} mensuel · ${stripeStats.annualCount} annuel`} color="#34d399" />
                 <KpiCard label="Churn (30j)" value={stripeStats.churnedLast30} sub="abonnements résiliés" color="#f87171" />
                 <KpiCard label="CA affiliés total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} color="#fbbf24" />
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
                 <KpiCard label="MRR" value={stripeLoading ? '...' : '—'} sub="chargement Stripe" color="#34d399" />
                 <KpiCard label="Abonnés actifs" value="—" color="#34d399" />
                 <KpiCard label="Churn (30j)" value="—" color="#f87171" />
@@ -517,7 +558,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
               <KpiCard label="Total inscrits" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} color="#d17d52" />
               <KpiCard label="Premium (DB)" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} color="#e0a380" />
               <KpiCard label="Tests MBTI" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} color="#0ea5e9" />
@@ -557,7 +598,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             {topMbti.length > 0 && cardP(
               <>
                 <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Top types MBTI</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '4px 24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '4px 24px' }}>
                   {topMbti.map(([type, count]) => (
                     <HorizBar key={type} label={type.toUpperCase()} value={count} max={maxMbti}
                       color="linear-gradient(90deg,#a94e18,#d17d52)"
@@ -603,7 +644,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {sectionTitle('Activité', 'Paiements Stripe & inscriptions récentes · refresh auto 30s')}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
               {/* Stripe charges */}
               {card(
                 <>
@@ -761,7 +802,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               const totalCnt = sorted.reduce((s, [, v]) => s + v.count, 0);
               return (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
                     <KpiCard label="Sources uniques"  value={sorted.length}             color="#d17d52" />
                     <KpiCard label="Conversions trackées" value={totalCnt}              color="#d17d52" />
                     <KpiCard label="CA tracké"         value={fmt(totalRev)} sub="toutes sources" color="#fbbf24" />
@@ -888,7 +929,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               </>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
               <KpiCard label="Aujourd'hui" value={stats.newToday} color="#d17d52" />
               <KpiCard label="Cette semaine" value={stats.newThisWeek} color="#d17d52" />
               <KpiCard label="Ce mois" value={stats.newThisMonth} color="#d17d52" />
@@ -932,7 +973,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {sectionTitle('Revenus', undefined)}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
               <KpiCard label="Total cumulé"   value={fmt(stats.totalRevenueCents)}  color="#fbbf24" />
               <KpiCard label="Cette année"    value={fmt(stats.yearRevenueCents)}   color="#fbbf24" />
               <KpiCard label="Ce mois"        value={fmt(stats.monthRevenueCents)}  color="#fbbf24" />
@@ -941,14 +982,14 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             </div>
 
             {stripeStats && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
                 <KpiCard label="MRR Stripe" value={fmt(stripeStats.mrr)} sub="revenu mensuel récurrent" color="#34d399" />
                 <KpiCard label="Abonnés Stripe" value={stripeStats.monthlyCount + stripeStats.annualCount} sub={`${stripeStats.monthlyCount} mensuel · ${stripeStats.annualCount} annuel`} color="#34d399" />
                 <KpiCard label="Churn (30j)" value={stripeStats.churnedLast30} sub="résiliations récentes" color="#f87171" />
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
               <KpiCard label="Unlocks payants (total)" value={stats.paidResults}     sub="résultats débloqués"    color="#34d399" />
               <KpiCard label="Unlocks ce mois"         value={stats.paidThisMonth}   sub={`+${stats.paidToday} auj.`} color="#34d399" />
               <KpiCard label="Taux de conversion"      value={`${conversionRate}%`} sub="inscrits → premium"  color="#d17d52" />
@@ -1101,7 +1142,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               </Link>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
               <KpiCard label="Total affiliés"       value={stats.affiliates.length}                                                   color="#d17d52" />
               <KpiCard label="Total conversions"    value={stats.affiliates.reduce((s, a) => s + a.conversions.length, 0)}            color="#d17d52" />
               <KpiCard label="CA total affiliés"    value={fmt(totalAffilCA)}    sub="toutes conversions"  color="#fbbf24" />
@@ -1264,13 +1305,10 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
         {/* ── ACCESS CODES ── */}
         {tab === 'codes' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div>
-              <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: 0 }}>Codes d&apos;accès affiliés</h1>
-              <p style={{ fontSize: 13, color: '#52525b', marginTop: 4 }}>Codes à usage unique pour tester l&apos;app gratuitement</p>
-            </div>
+            {sectionTitle('Codes d\'accès affiliés', 'Codes à usage unique pour tester l\'app gratuitement')}
 
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, padding: '20px 24px' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#d17d52', marginBottom: 16 }}>Générer un nouveau code</p>
+            <div style={{ background: `linear-gradient(160deg, ${PALETTE.panelHover} 0%, ${PALETTE.panel} 100%)`, border: `1px solid ${PALETTE.line}`, borderRadius: 20, padding: '20px 24px' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: PALETTE.gold, marginBottom: 16 }}>Générer un nouveau code</p>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                 <input
                   value={newCodeNote}
@@ -1290,7 +1328,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
               )}
             </div>
 
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, overflow: 'hidden' }}>
+            <div style={{ background: `linear-gradient(160deg, ${PALETTE.panelHover} 0%, ${PALETTE.panel} 100%)`, border: `1px solid ${PALETTE.line}`, borderRadius: 20, overflow: 'hidden' }}>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead><tr>
