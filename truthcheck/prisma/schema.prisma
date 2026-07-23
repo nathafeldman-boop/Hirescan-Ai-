@@ -82,6 +82,44 @@ model User {
   emailLogs    EmailLog[]
   chatUsage    ChatUsage[]
   chatMessages ChatMessage[]
+  customQuizzes CustomQuiz[]
+}
+
+// ── Tests créés par Nova, à partager (croissance virale) ────────────────────
+// Un abonné payant demande à Nova un test sur un thème ; elle génère les
+// questions + des tranches de résultat via Mistral (JSON structuré), stockées
+// ici. Le test est ensuite jouable par N'IMPORTE QUI via /q/[id], sans compte
+// — c'est le levier viral : chaque répondant termine sur un CTA vers le vrai
+// test MBTI, avec le lien de parrainage du créateur (?invite=creatorId).
+model CustomQuiz {
+  id            String   @id @default(cuid())
+  creatorId     String
+  topic         String   // ce que l'utilisateur a demandé à Nova, ex: "mes vrais amis"
+  title         String
+  intro         String
+  // [{ text: string, options: [{ label: string, points: number }] }]
+  questions     Json
+  // [{ min: number, max: number, title: string, description: string }]
+  resultBands   Json
+  disclaimer    String   // toujours affiché — jamais un outil de diagnostic
+  responseCount Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  creator   User                 @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  responses CustomQuizResponse[]
+
+  @@index([creatorId])
+}
+
+model CustomQuizResponse {
+  id          String   @id @default(cuid())
+  quizId      String
+  totalPoints Int
+  createdAt   DateTime @default(now())
+
+  quiz CustomQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
 }
 
 // Historique du coach IA — un enregistrement par message (utilisateur ou
