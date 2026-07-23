@@ -116,6 +116,9 @@ export default function ResultsClient({ quiz }: Props) {
   const [authEmail, setAuthEmail] = useState('');
   const [authSent, setAuthSent] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+  const [authOtp, setAuthOtp] = useState('');
+  const [authOtpError, setAuthOtpError] = useState('');
+  const [authOtpLoading, setAuthOtpLoading] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const [exitCountdown, setExitCountdown] = useState(30);
   const hasSaved = useRef(false);
@@ -565,14 +568,74 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
 
             {authSent ? (
-              <div className="text-center py-4">
-                <div className="text-4xl mb-3">📬</div>
-                <h3 className="text-white font-bold text-lg mb-2">Vérifie tes emails</h3>
-                <p className="text-zinc-400 text-sm">
-                  Un lien de connexion a été envoyé à{' '}
-                  <span className="text-violet-400">{authEmail}</span>
-                </p>
-                <p className="text-zinc-600 text-xs mt-3">Clique sur le lien, puis reviens ici.</p>
+              <div>
+                <div className="text-center mb-5">
+                  <div className="text-4xl mb-3">📬</div>
+                  <h3 className="text-white font-bold text-lg mb-1">Ton code est arrivé</h3>
+                  <p className="text-zinc-400 text-sm">
+                    Envoyé à <span className="text-violet-400">{authEmail}</span> — valable 10 minutes.
+                  </p>
+                </div>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const trimmed = authOtp.trim();
+                    if (!trimmed) return;
+                    setAuthOtpError('');
+                    setAuthOtpLoading(true);
+                    try {
+                      const res = await fetch('/api/auth/verify-code', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: authEmail, code: trimmed, callbackUrl: currentUrl }),
+                      });
+                      const data = await res.json().catch(() => ({}));
+                      if (!res.ok) {
+                        setAuthOtpError(data.error ?? 'Code invalide.');
+                        setAuthOtpLoading(false);
+                        return;
+                      }
+                      try { sessionStorage.setItem('pending_checkout', '1'); } catch {}
+                      // Navigation complète (pas router.push) : la page revient sur
+                      // elle-même, il faut un vrai rechargement pour lire le cookie
+                      // de session fraîchement posé et déclencher le checkout en attente.
+                      window.location.href = data.loginUrl ?? currentUrl;
+                    } catch {
+                      setAuthOtpError('Erreur réseau, réessaie.');
+                      setAuthOtpLoading(false);
+                    }
+                  }}
+                  className="space-y-3"
+                >
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={authOtp}
+                    onChange={(e) => { setAuthOtp(e.target.value.replace(/\D/g, '').slice(0, 6)); setAuthOtpError(''); }}
+                    placeholder="000000"
+                    maxLength={6}
+                    required
+                    autoFocus
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-2xl text-center tracking-[0.4em] font-mono placeholder-zinc-700 outline-none focus:border-violet-500/60 transition-all"
+                  />
+                  {authOtpError && <p className="text-red-400 text-xs text-center font-medium">{authOtpError}</p>}
+                  <button
+                    type="submit"
+                    disabled={authOtpLoading || authOtp.length < 6}
+                    className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)' }}
+                  >
+                    {authOtpLoading ? 'Vérification...' : '🔓 Me connecter →'}
+                  </button>
+                </form>
+                <button
+                  type="button"
+                  onClick={() => { setAuthSent(false); setAuthOtp(''); setAuthOtpError(''); }}
+                  className="w-full text-center text-xs text-zinc-500 hover:text-white mt-4"
+                >
+                  ← Changer d&apos;email
+                </button>
               </div>
             ) : (
               <>
@@ -604,10 +667,24 @@ export default function ResultsClient({ quiz }: Props) {
                     e.preventDefault();
                     if (!authEmail.trim()) return;
                     setAuthLoading(true);
-                    try { sessionStorage.setItem('pending_checkout', '1'); } catch {}
-                    await signIn('email', { email: authEmail, callbackUrl: currentUrl, redirect: false });
-                    setAuthSent(true);
-                    setAuthLoading(false);
+                    try {
+                      const res = await fetch('/api/auth/send-code', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: authEmail.trim() }),
+                      });
+                      const data = await res.json().catch(() => ({}));
+                      if (!res.ok) {
+                        setAuthOtpError(data.error ?? 'Erreur d\'envoi, réessaie.');
+                        setAuthLoading(false);
+                        return;
+                      }
+                      setAuthSent(true);
+                    } catch {
+                      setAuthOtpError('Erreur réseau, réessaie.');
+                    } finally {
+                      setAuthLoading(false);
+                    }
                   }}
                   className="space-y-3"
                 >
@@ -625,7 +702,7 @@ export default function ResultsClient({ quiz }: Props) {
                     className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all disabled:opacity-50"
                     style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)' }}
                   >
-                    {authLoading ? 'Envoi...' : 'Recevoir mon lien de connexion →'}
+                    {authLoading ? 'Envoi...' : 'Recevoir mon code de connexion →'}
                   </button>
                 </form>
               </>
