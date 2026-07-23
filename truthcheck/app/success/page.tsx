@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import crypto from 'crypto';
 import { prisma } from '@/lib/db';
 import { mbtiTypes } from '@/lib/mbti-server';
+import { TIER_RANK } from '@/lib/plans';
 import SuccessTracker from './SuccessTracker';
 import SuccessUpsellButton from './SuccessUpsellButton';
 import ShareResultCard from '@/components/ShareResultCard';
@@ -30,12 +31,17 @@ async function verifyAndUnlock(sessionId: string | undefined, resultId: string |
     if (email) {
       // Tier fidèle à l'offre achetée (comme le webhook) — sinon un abonné
       // Starter 1,99€ ou Plus 5€ serait écrasé en 'premium' en arrivant ici.
+      // Le 1,99€ SANS abonnement (oneTime + typeCode, hors rapport 19,99€) ne
+      // donne que 'unlocked' (résultat seul, pas Nova) — jamais 'premium'.
       const plan = session.metadata?.plan;
-      const tier = plan === 'starter' ? 'starter' : plan === 'plus' ? 'plus' : 'premium';
+      const isOneTimeMbtiUnlock = session.mode === 'payment' && !!session.metadata?.typeCode && session.metadata?.rapport !== 'true';
+      const tier = plan === 'starter' ? 'starter' : plan === 'plus' ? 'plus' : isOneTimeMbtiUnlock ? 'unlocked' : 'premium';
+      const existing = await prisma.user.findUnique({ where: { email }, select: { tier: true } }).catch(() => null);
+      const shouldSet = !existing || (TIER_RANK[tier] ?? 0) >= (TIER_RANK[existing.tier] ?? 0);
       await prisma.user.upsert({
         where: { email },
         create: { email, name: session.customer_details?.name ?? null, tier },
-        update: { tier },
+        update: shouldSet ? { tier } : {},
       }).catch(() => {});
     }
 
