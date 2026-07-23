@@ -156,8 +156,11 @@ export default function ChatClient() {
     );
   }
 
-  // Pas de test fait → le coach ne peut pas personnaliser
-  if (hasProfile === false) {
+  // Pas de test fait → le coach ne peut pas personnaliser. Pour un abonné PAYANT
+  // (cas rare : abonnement pris sans jamais faire le test), on bloque et on
+  // invite à le passer. Pour un compte GRATUIT, on laisse essayer Nova quand
+  // même (découverte) — elle rappellera elle-même de faire le test.
+  if (hasProfile === false && !isFree) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--paper)' }}>
         <div className="mb-6"><NovaAvatar size={80} glow /></div>
@@ -172,6 +175,8 @@ export default function ChatClient() {
       </main>
     );
   }
+
+  const noTestYet = isFree && hasProfile === false;
 
   const empty = messages.length === 0;
 
@@ -193,11 +198,14 @@ export default function ChatClient() {
         </span>
       </header>
 
-      {/* Bandeau upsell — version découverte (compte gratuit) */}
+      {/* Bandeau — version découverte (compte gratuit). Avant le test : pousse
+          vers le quiz. Après le test (mais sans payer) : pousse vers l'offre. */}
       {isFree && (
-        <Link href="/pricing" className="block px-4 py-2 text-center text-[11px] font-semibold"
+        <Link href={noTestYet ? '/quiz/personnalite' : '/pricing'} className="block px-4 py-2 text-center text-[11px] font-semibold"
           style={{ background: 'var(--gold-soft)', borderBottom: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
-          ✦ Version découverte (5 messages/mois) · Nova selon TON type dès 1,99 €/mois →
+          {noTestYet
+            ? '✦ Version découverte (5 messages/mois) · Fais le test pour des réponses selon TOI →'
+            : '✦ Version découverte (5 messages/mois) · Nova selon TON type dès 1,99 €/mois →'}
         </Link>
       )}
 
@@ -211,10 +219,17 @@ export default function ChatClient() {
                 {isFree ? 'Salut, moi c\'est Nova 👋' : 'Salut, moi c\'est Nova — je connais déjà ton profil.'}
               </h2>
               <p className="text-sm mb-7 max-w-sm leading-relaxed" style={{ color: '#78716c' }}>
-                {isFree
-                  ? <>Version découverte : je te donne de vrais conseils, mais généraux. Pour des réponses selon <span style={{ color: 'var(--gold)' }}>ton type exact</span> et ton test, débloque ton profil.</>
-                  : <>Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.</>}
+                {noTestYet
+                  ? <>Tu peux m&apos;essayer avant même de faire le test : je te donne de vrais conseils, mais généraux. Fais le <Link href="/quiz/personnalite" style={{ color: 'var(--gold)', fontWeight: 700 }}>test (3 min)</Link> pour que je te parle vraiment de <span style={{ color: 'var(--gold)' }}>toi</span>.</>
+                  : isFree
+                    ? <>Version découverte : je te donne de vrais conseils, mais généraux. Pour des réponses selon <span style={{ color: 'var(--gold)' }}>ton type exact</span> et ton test, débloque ton profil.</>
+                    : <>Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.</>}
               </p>
+              {noTestYet && (
+                <Link href="/quiz/personnalite" className="ur-btn-gold px-6 py-3 text-sm mb-6 inline-flex">
+                  Faire le test (3 min) →
+                </Link>
+              )}
               <div className="w-full flex flex-col gap-2">
                 {COACH_CATEGORIES.map((c) => (
                   <div key={c.key}>
