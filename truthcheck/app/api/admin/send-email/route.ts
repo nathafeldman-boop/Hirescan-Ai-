@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'UrCecret <noreply@urcecret.site>',
+        reply_to: 'urcecretteam@gmail.com',
         to: email,
         subject: 'Ton profil MBTI t\'attend — accès simplifié 👀',
         html: `
@@ -70,6 +71,7 @@ export async function GET(req: NextRequest) {
     },
     body: JSON.stringify({
       from: 'UrCecret <noreply@urcecret.site>',
+      reply_to: 'urcecretteam@gmail.com',
       to: email,
       subject: 'Ton profil MBTI est débloqué ✨',
       html: `

@@ -537,6 +537,7 @@ export async function sendEmail(to: string, subject: string, html: string) {
     },
     body: JSON.stringify({
       from: 'UrCecret <noreply@urcecret.site>',
+      reply_to: 'urcecretteam@gmail.com',
       to,
       subject,
       html,

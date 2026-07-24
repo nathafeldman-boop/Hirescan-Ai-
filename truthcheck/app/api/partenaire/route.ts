@@ -46,6 +46,7 @@ async function sendNotification(data: {
     },
     body: JSON.stringify({
       from: 'UrCecret <noreply@urcecret.site>',
+      reply_to: 'urcecretteam@gmail.com',
       to: OWNER_EMAIL,
       subject: `🔥 Nouveau partenaire : ${data.name} (${data.platform}, ${data.followers})`,
       html,
@@ -94,6 +95,7 @@ async function sendWelcome(data: { name: string; email: string; slug: string }) 
     },
     body: JSON.stringify({
       from: 'Nathanaël — UrCecret <noreply@urcecret.site>',
+      reply_to: 'urcecretteam@gmail.com',
       to: data.email,
       subject: '🎉 Ton lien affilié UrCecret est prêt !',
       html,

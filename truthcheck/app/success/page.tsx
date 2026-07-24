@@ -95,6 +95,7 @@ async function sendMagicLink(email: string, callbackUrl: string): Promise<boolea
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'UrCecret <noreply@urcecret.site>',
+        reply_to: 'urcecretteam@gmail.com',
         to: email,
         subject: typeLabel ? `✅ Ton profil ${typeLabel} est débloqué — accède-y ici` : '✅ Ton accès UrCecret est prêt',
         html: `

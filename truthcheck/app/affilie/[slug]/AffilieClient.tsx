@@ -431,8 +431,8 @@ export default function AffilieClient({ affiliate, clicks }: { affiliate: Affili
 
         <p className="text-center text-zinc-700 text-xs mt-8 pb-4">
           Questions ?&nbsp;
-          <a href="mailto:contact@urcecret.site" className="text-zinc-500 hover:text-zinc-300 transition-colors">
-            contact@urcecret.site
+          <a href="mailto:urcecretteam@gmail.com" className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            urcecretteam@gmail.com
           </a>
         </p>
 

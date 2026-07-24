@@ -88,6 +88,7 @@ async function sendVerificationRequest({ identifier: email, url }: SendVerificat
     },
     body: JSON.stringify({
       from: 'UrCecret <noreply@urcecret.site>',
+      reply_to: 'urcecretteam@gmail.com',
       to: email,
       subject: '🔐 Ton lien de connexion UrCecret',
       html,
