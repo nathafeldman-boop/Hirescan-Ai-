@@ -11,22 +11,8 @@ import { useLang } from '@/contexts/LanguageContext';
 import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
 import { hasProfileAccess } from '@/lib/plans';
+import { detectInAppBrowser } from '@/lib/inAppBrowser';
 import Seal from '@/components/Seal';
-
-// ─── In-app browser detection ───────────────────────────────────────────────────
-function detectInAppBrowser(): boolean {
-  if (typeof window === 'undefined') return false;
-  const ua = navigator.userAgent;
-  if (/musical_ly|tiktok|bytedance|instagram|fbav|fban|snapchat|line|kakaotalk|wechat|micromessenger/i.test(ua)) return true;
-  if (/android/i.test(ua) && / wv[);]/i.test(ua)) return true;
-  if (/iphone|ipad/i.test(ua)) {
-    const hasSafariVersion = /version\/[\d.]+.*safari/i.test(ua);
-    const isChrome = /crios\//i.test(ua);
-    const isFirefox = /fxios\//i.test(ua);
-    if (!hasSafariVersion && !isChrome && !isFirefox) return true;
-  }
-  return false;
-}
 
 // ─── Short quiz: 8 questions per dimension = 32 total ───────────────────────────
 // Balanced subset: keep the first `perDim` questions of each MBTI dimension.
@@ -1388,7 +1374,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 // ─── Sign-in gate ───────────────────────────────────────────────────────────────
 // Affiché AVANT le test : on demande la connexion dès que la personne veut faire
 // le test MBTI. La connexion revient sur /quiz/personnalite → le test démarre.
-function SignInGate({ isFr }: { isFr: boolean }) {
+function SignInGate({ isFr, isInApp }: { isFr: boolean; isInApp: boolean }) {
   const [loading, setLoading] = useState(false);
   return (
     <div className="min-h-[100dvh] flex flex-col items-center justify-center px-5 py-10" style={{ background: 'var(--paper)' }}>
@@ -1406,22 +1392,41 @@ function SignInGate({ isFr }: { isFr: boolean }) {
             : 'We save your result and profile for your AI coach. 10 seconds, no password.'}
         </p>
 
-        <button
-          onClick={() => { setLoading(true); signIn('google', { callbackUrl: '/quiz/personnalite' }); }}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-3 py-4 rounded-full font-bold text-sm mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
-          style={{ background: 'var(--ink)', color: '#FAF6EC' }}
-        >
-          {loading ? '…' : (<><span className="bg-white rounded-full p-0.5"><GoogleIcon /></span>{isFr ? 'Continuer avec Google' : 'Continue with Google'}</>)}
-        </button>
+        {/* Google bloque volontairement l'OAuth dans les navigateurs embarqués
+            (TikTok, Instagram, Snapchat...) — "This browser may not be secure".
+            Sur ce trafic, le bouton Google ne mène nulle part : la plupart des
+            gens tapent dessus en premier (c'est le plus visible) et repartent
+            sans remarquer l'option par email juste en dessous. On masque donc
+            Google ici et on met le code par email en avant, seul chemin qui
+            marche réellement dans ces navigateurs. ── */}
+        {!isInApp && (
+          <button
+            onClick={() => { setLoading(true); signIn('google', { callbackUrl: '/quiz/personnalite' }); }}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-full font-bold text-sm mb-3 transition-all active:scale-[0.98] disabled:opacity-60"
+            style={{ background: 'var(--ink)', color: '#FAF6EC' }}
+          >
+            {loading ? '…' : (<><span className="bg-white rounded-full p-0.5"><GoogleIcon /></span>{isFr ? 'Continuer avec Google' : 'Continue with Google'}</>)}
+          </button>
+        )}
 
         <a
           href="/login?callbackUrl=/quiz/personnalite"
-          className="block w-full py-3.5 rounded-full font-semibold text-sm transition-all active:scale-[0.98]"
-          style={{ border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper-panel)' }}
+          className="block w-full py-4 rounded-full font-bold text-sm transition-all active:scale-[0.98]"
+          style={isInApp
+            ? { background: 'var(--ink)', color: '#FAF6EC' }
+            : { border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper-panel)', fontWeight: 600 }}
         >
           {isFr ? 'Par email ou avec un code' : 'By email or with a code'}
         </a>
+
+        {isInApp && (
+          <p className="text-[11px] text-stone-400 mt-3 leading-relaxed">
+            {isFr
+              ? 'Tu préfères Google ? Ouvre ce lien dans ton navigateur (⋯ en haut à droite → "Ouvrir dans le navigateur").'
+              : 'Prefer Google? Open this link in your browser (⋯ top right → "Open in browser").'}
+          </p>
+        )}
 
         <p className="text-[11px] text-stone-400 mt-5 leading-relaxed">
           {isFr ? 'En continuant, tu acceptes nos conditions d\'utilisation.' : 'By continuing, you accept our terms.'}
@@ -1578,7 +1583,7 @@ export default function PersonnaliteClient() {
           <div className="text-4xl animate-spin" style={{ animationDuration: '1.5s' }}>🔮</div>
         </div>
       ) : sessionStatus === 'unauthenticated' ? (
-        <SignInGate isFr={lang !== 'en'} />
+        <SignInGate isFr={lang !== 'en'} isInApp={isInApp} />
       ) : (
       <>
       {phase === 'quiz' && (
