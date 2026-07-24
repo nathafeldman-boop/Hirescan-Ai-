@@ -4,6 +4,8 @@
 // séparé — le score est juste la somme des points des options cochées,
 // comparée aux tranches renvoyées par le modèle.
 
+import { callMistral } from './chat';
+
 const MAX_QUESTIONS = 8;
 const MIN_QUESTIONS = 5;
 
@@ -48,10 +50,29 @@ RÈGLES :
 - Les "points" de chaque option vont de 0 à 3 (0 = la réponse la "moins" du trait mesuré, 3 = la "plus").
 - "resultBands" doit couvrir TOUT l'intervalle possible (de 0 à questions×3) sans trou ni chevauchement, généralement 3 à 4 tranches.
 - Ton chaleureux, bienveillant, jamais moralisateur ni jugeant — même sur un thème sensible.
-- Si le thème demandé est dangereux, haineux, illégal ou cible une personne réelle de façon malveillante, ignore-le et génère à la place un test générique et positif sur la connaissance de soi.
+- Un thème du style "qui est le/la plus [trait] du groupe" (ex : toxique, chaotique, control freak, en couple imaginaire...) est un format de jeu entre amis tout à fait normal — génère-le normalement, garde juste un ton taquin, jamais méchant, dans les descriptions de résultat.
+- Seul cas à refuser (génère alors un test générique et positif sur la connaissance de soi à la place) : le thème nomme une personne réelle précise dans l'intention de l'humilier, ou est haineux/dangereux/illégal.
 - N'utilise JAMAIS de vocabulaire médical/clinique (pas de "diagnostic", "trouble", "pathologie", "dépression clinique"...) même si le thème y fait penser — reste dans le registre "personnalité/ressenti", jamais médical.
 
 Thème demandé par l'utilisateur : "${topic.slice(0, 200)}"`;
+}
+
+// Génère un test avec 1 retry (prompt renforcé + température plus basse) si le
+// modèle a dévié du JSON attendu au 1er essai — les thèmes "fun" (ex: "qui est
+// le plus toxique du groupe") le font dévier plus souvent qu'un thème neutre,
+// et un seul essai raté sur deux ne doit pas priver l'utilisateur de son test.
+export async function generateQuiz(topic: string): Promise<GeneratedQuiz | null> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const system = attempt === 0
+      ? quizGeneratorPrompt(topic)
+      : `${quizGeneratorPrompt(topic)}\n\nRappel strict : ta réponse précédente n'était pas du JSON valide. Réponds UNIQUEMENT avec l'objet JSON demandé, sans aucun texte, markdown ou commentaire autour.`;
+    const gen = await callMistral(system, [
+      { role: 'user', content: 'Génère le test maintenant, au format JSON demandé, rien d\'autre.' },
+    ], { maxTokens: 1800, temperature: attempt === 0 ? 0.8 : 0.4 });
+    const quiz = gen.ok && gen.reply ? parseGeneratedQuiz(gen.reply) : null;
+    if (quiz) return quiz;
+  }
+  return null;
 }
 
 // Parse + valide la réponse JSON du modèle. Retourne null si invalide (le

@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { callMistral, dailyLimitFor, parisDay, parisMonth, FREE_MONTHLY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
 import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree, coachSystemPromptFreeNoTest } from '@/lib/coach';
-import { quizGeneratorPrompt, parseGeneratedQuiz } from '@/lib/customQuiz';
+import { generateQuiz } from '@/lib/customQuiz';
 import { hasPaidAccess } from '@/lib/plans';
 import type { MbtiScores } from '@/lib/mbti';
 
@@ -173,10 +173,7 @@ export async function POST(req: NextRequest) {
   let result: { ok: boolean; reply?: string; error?: string };
   if (isPremium && !imageDataUri && QUIZ_INTENT_RE.test(message)) {
     const topic = message.slice(0, 200);
-    const gen = await callMistral(quizGeneratorPrompt(topic), [
-      { role: 'user', content: 'Génère le test maintenant, au format JSON demandé, rien d\'autre.' },
-    ], { maxTokens: 1800, temperature: 0.8 });
-    const quiz = gen.ok && gen.reply ? parseGeneratedQuiz(gen.reply) : null;
+    const quiz = await generateQuiz(topic);
     const saved = quiz
       ? await prisma.customQuiz.create({
           data: {
@@ -190,9 +187,13 @@ export async function POST(req: NextRequest) {
           },
         }).catch(() => null)
       : null;
+    // Si la génération structurée échoue (thème qui a fait dévier le modèle),
+    // on le dit clairement plutôt que de laisser Nova improviser un faux test
+    // en texte libre — ça ressemblait à un vrai test mais ce n'était qu'un
+    // copier-coller, sans lien partageable derrière.
     result = saved
       ? { ok: true, reply: `✨ Ton test "${quiz!.title}" est prêt !\n\nEnvoie ce lien à qui tu veux, aucun compte n'est nécessaire pour le faire :\nhttps://urcecret.site/q/${saved.id}` }
-      : await callMistral(system, history);
+      : { ok: true, reply: "Oups, ce thème est passé de travers pour le format test (ça arrive sur des sujets un peu piquants 😅). Reformule-le un peu différemment — par exemple \"qui est le/la plus bordélique du groupe\" plutôt que \"toxique\" — et je te le fais tout de suite." };
   } else {
     result = await callMistral(system, history);
   }
