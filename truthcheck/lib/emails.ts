@@ -256,6 +256,37 @@ export function emailDay7(name: string | null, typeCode?: string | null) {
   };
 }
 
+// Relance ponctuelle (broadcast admin) vers TOUS les inscrits qui n'ont pas
+// encore débloqué leur profil — contrairement à emailDay1/3/7 (ancrés sur
+// J+1/3/7 après inscription), celle-ci est générique et marche aussi bien
+// pour quelqu'un inscrit il y a 1h que pour quelqu'un inscrit il y a 2 mois.
+// Voir /api/admin/broadcast-unlock.
+export function emailUnlockReminder(name: string | null, typeCode: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const hook = code ? HOOK_LINES[code] : null;
+  const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quiz/personnalite`;
+  return {
+    subject: code ? `${firstName}, ton profil ${code} est toujours là 🔓` : `${firstName}, ton test t'attend encore 🔮`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Encore débloquable</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">
+        ${code ? `Ton type ${code} est déterminé, mais tu ne l'as jamais vu.` : `Ton profil de personnalité t'attend.`}
+      </h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        ${hook ? `On avait identifié un truc chez toi : <em style="color:#e4e4e7">"${hook}"</em>. Ça reste vrai ?` : `Ton analyse complète — amour, carrière, face cachée — n'est qu'à un clic.`}
+      </p>
+      <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
+        Débloque ton profil complet dès <strong style="color:#fff">1,99€</strong> (une fois), ou avec Nova ton coach IA pour <strong style="color:#fff">1,99€/mois</strong>.
+      </p>
+      ${cta(code ? 'Voir mon profil →' : 'Faire mon test →', link)}
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
+        <p style="margin:0;color:#52525b;font-size:12px;text-align:center">Paiement sécurisé · Satisfait ou remboursé 7 jours</p>
+      </div>
+    `),
+  };
+}
+
 export function emailPurchaseConfirm(name: string | null, type: 'onetime' | 'monthly' | 'annual' | 'rapport', typeCode?: string) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   const isSubscription = type === 'monthly' || type === 'annual';
