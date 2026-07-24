@@ -19,6 +19,7 @@ const instrumentSans = Instrument_Sans({
   variable: '--font-sans',
 });
 import Tracker from './Tracker';
+import InAppBrowserBanner from '@/components/InAppBrowserBanner';
 import { Suspense } from 'react';
 import AffiliateTracker from '@/components/AffiliateTracker';
 import Analytics from '@/components/Analytics';
@@ -140,6 +141,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-ink text-white antialiased">
         <Providers>
           <Tracker />
+          <InAppBrowserBanner />
           <Suspense fallback={null}>
             <AffiliateTracker />
           </Suspense>
