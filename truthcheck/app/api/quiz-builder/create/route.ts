@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { hasPaidAccess } from '@/lib/plans';
-import { callMistral, dailyLimitFor, parisDay } from '@/lib/chat';
-import { quizGeneratorPrompt, parseGeneratedQuiz } from '@/lib/customQuiz';
+import { dailyLimitFor, parisDay } from '@/lib/chat';
+import { generateQuiz } from '@/lib/customQuiz';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,17 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'quota_exceeded', limit }, { status: 429 });
   }
 
-  const system = quizGeneratorPrompt(topic);
-  const result = await callMistral(system, [{ role: 'user', content: 'Génère le test maintenant, au format JSON demandé, rien d\'autre.' }], {
-    maxTokens: 1800,
-    temperature: 0.8,
-  });
-  if (!result.ok || !result.reply) {
-    if (result.error === 'not_configured') return NextResponse.json({ error: 'not_configured' }, { status: 503 });
-    return NextResponse.json({ error: 'assistant_unavailable' }, { status: 502 });
-  }
-
-  const quiz = parseGeneratedQuiz(result.reply);
+  const quiz = await generateQuiz(topic);
   if (!quiz) {
     // On ne décompte pas le quota si la génération a échoué — l'utilisateur
     // n'a rien reçu, ce ne serait pas honnête de lui prendre un message.
