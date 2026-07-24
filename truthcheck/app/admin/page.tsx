@@ -1,12 +1,26 @@
 import { prisma } from '@/lib/db';
 import AdminDashboard from './AdminDashboard';
 
+const TZ = 'Europe/Paris';
+
+// Le serveur (Vercel) tourne en UTC — construire "aujourd'hui" avec les
+// composants locaux de `now` (getFullYear/getMonth/getDate) donne donc minuit
+// UTC, pas minuit à Paris. Résultat : un décalage de 1 à 2h (selon heure d'été)
+// sur "newToday" et consorts, qui peut faire apparaître un inscrit d'il y a
+// quelques minutes comme "d'hier". Calcule le vrai minuit Paris à la place.
+function parisMidnight(dateStr: string): Date {
+  const utcMid = new Date(dateStr + 'T00:00:00Z');
+  const parisHour = +new Intl.DateTimeFormat('en', { timeZone: TZ, hour: 'numeric', hour12: false }).format(utcMid);
+  return new Date(utcMid.getTime() - parisHour * 3_600_000);
+}
+
 export default async function AdminPage() {
   const now = new Date();
-  const startOfToday    = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayParis      = now.toLocaleDateString('en-CA', { timeZone: TZ }); // "2026-07-24"
+  const startOfToday    = parisMidnight(todayParis);
   const sevenDaysAgo    = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const startOfMonth    = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfYear     = new Date(now.getFullYear(), 0, 1);
+  const startOfMonth    = parisMidnight(todayParis.slice(0, 7) + '-01');
+  const startOfYear     = parisMidnight(todayParis.slice(0, 4) + '-01-01');
   const twelveMonthsAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
 
   const [

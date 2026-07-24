@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
+import { getVisitorId } from '@/lib/visitorId';
 
 export default function Tracker() {
   const pathname = usePathname();
@@ -12,7 +13,10 @@ export default function Tracker() {
       headers: { 'Content-Type': 'application/json' },
       // document.referrer = d'où vient le visiteur (google, tiktok…) — reste
       // celui de l'arrivée sur le site pendant toute la navigation SPA.
-      body: JSON.stringify({ path: pathname, referrer: document.referrer || undefined }),
+      // visitorId manquait ici : sans lui, /api/admin comptait chaque page vue
+      // comme un visiteur "unique" à part entière (voir buildSources côté
+      // dashboard), gonflant artificiellement le nombre de visiteurs par source.
+      body: JSON.stringify({ path: pathname, referrer: document.referrer || undefined, visitorId: getVisitorId() }),
     }).catch(() => {});
 
     // Parrainage : tente de rattacher le compte au parrain (cookie urs_invite).
