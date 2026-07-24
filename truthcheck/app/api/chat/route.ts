@@ -4,10 +4,17 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { callMistral, dailyLimitFor, parisDay, parisMonth, FREE_MONTHLY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
 import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree, coachSystemPromptFreeNoTest } from '@/lib/coach';
+import { quizGeneratorPrompt, parseGeneratedQuiz } from '@/lib/customQuiz';
 import { hasPaidAccess } from '@/lib/plans';
 import type { MbtiScores } from '@/lib/mbti';
 
 export const dynamic = 'force-dynamic';
+
+// Demande explicite (dans la conversation) de créer un test à partager — Nova
+// ne peut pas "promettre" un test en texte libre, donc on détecte l'intention
+// et on déclenche directement la vraie génération (même pipeline que le bouton
+// dédié /api/quiz-builder/create), plutôt que de laisser le modèle bluffer.
+const QUIZ_INTENT_RE = /\b(cr[ée]e?r?|g[ée]n[èe]re?r?|fabrique|invente)\b[\w\s'-]{0,30}\b(test|quizz?)\b/i;
 
 // Combien de messages on recharge pour l'affichage (mémoire visible).
 const DISPLAY_HISTORY = 40;
@@ -163,7 +170,32 @@ export async function POST(req: NextRequest) {
       ? coachSystemPromptFree(firstName)
       : coachSystemPromptFreeNoTest(firstName);
 
-  const result = await callMistral(system, history);
+  let result: { ok: boolean; reply?: string; error?: string };
+  if (isPremium && !imageDataUri && QUIZ_INTENT_RE.test(message)) {
+    const topic = message.slice(0, 200);
+    const gen = await callMistral(quizGeneratorPrompt(topic), [
+      { role: 'user', content: 'Génère le test maintenant, au format JSON demandé, rien d\'autre.' },
+    ], { maxTokens: 1800, temperature: 0.8 });
+    const quiz = gen.ok && gen.reply ? parseGeneratedQuiz(gen.reply) : null;
+    const saved = quiz
+      ? await prisma.customQuiz.create({
+          data: {
+            creatorId: user.id,
+            topic,
+            title: quiz.title,
+            intro: quiz.intro,
+            questions: quiz.questions as object,
+            resultBands: quiz.resultBands as object,
+            disclaimer: quiz.disclaimer,
+          },
+        }).catch(() => null)
+      : null;
+    result = saved
+      ? { ok: true, reply: `✨ Ton test "${quiz!.title}" est prêt !\n\nEnvoie ce lien à qui tu veux, aucun compte n'est nécessaire pour le faire :\nhttps://urcecret.site/q/${saved.id}` }
+      : await callMistral(system, history);
+  } else {
+    result = await callMistral(system, history);
+  }
   if (!result.ok || !result.reply) {
     if (result.error === 'not_configured') return NextResponse.json({ error: 'not_configured' }, { status: 503 });
     return NextResponse.json({ error: 'assistant_unavailable' }, { status: 502 });

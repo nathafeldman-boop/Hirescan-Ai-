@@ -8,6 +8,29 @@ import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
 interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
 
+// Rend les URL d'un message cliquables — utile pour le lien de test partageable
+// que Nova renvoie en texte brut (ex: "https://urcecret.site/q/xyz").
+const URL_RE = /(https?:\/\/[^\s]+)/g;
+function Linkified({ text }: { text: string }) {
+  // split() avec un groupe capturant alterne texte/URL — les parties d'URL
+  // tombent toujours aux index impairs, donc pas besoin de re-tester (et
+  // surtout pas avec la regex globale, dont le lastIndex est piégeux ici).
+  const parts = text.split(URL_RE);
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="underline break-all" style={{ color: 'var(--gold)' }} onClick={(e) => e.stopPropagation()}>
+            {part}
+          </a>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
 // Taille max du fichier original (avant encodage base64, qui l'agrandit ~x1.37).
 // Reste sous la limite serveur (~4,5 Mo décodés) avec de la marge.
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
@@ -364,7 +387,11 @@ export default function ChatClient() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={m.image} alt="Photo envoyée à Nova" className="w-full block" style={{ maxHeight: 260, objectFit: 'cover' }} />
                     )}
-                    {m.content && <div className={m.image ? 'px-4 py-3' : ''}>{m.content}</div>}
+                    {m.content && (
+                      <div className={m.image ? 'px-4 py-3' : ''}>
+                        {m.role === 'assistant' ? <Linkified text={m.content} /> : m.content}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
