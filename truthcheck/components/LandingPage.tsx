@@ -416,6 +416,42 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Les 15 quiz anonymes — funnel secondaire, remis en avant depuis
+          l'accueil (avant, on ne pouvait plus les trouver qu'en tapant
+          l'URL /quizzes directement). ── */}
+      <section className="relative z-10 py-14 px-6" style={{ background: 'var(--paper-panel)' }}>
+        <div className="max-w-lg mx-auto text-center">
+          <p className="ur-label text-[10px] mb-3" style={{ color: CLAY }}>100% anonyme · zéro compte requis</p>
+          <h2 className="font-display text-2xl font-black text-stone-900 mb-3">
+            15 autres vérités à découvrir
+          </h2>
+          <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: '#78716c' }}>
+            Infidélité, narcissisme, burnout, ton crush, ta relation… des quiz anonymes, résultat instantané.
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center mb-7">
+            {[
+              { slug: 'infidelite', label: '💔 Infidélité ?' },
+              { slug: 'narcissique', label: '🪞 Narcissique ?' },
+              { slug: 'relation-toxique', label: '⚠️ Toxique ?' },
+              { slug: 'burnout', label: '💤 Burnout ?' },
+              { slug: 'crush', label: '💌 Mon crush ?' },
+            ].map((q) => (
+              <Link
+                key={q.slug}
+                href={`/quiz/${q.slug}`}
+                className="px-3.5 py-2 rounded-full text-xs font-semibold transition-all hover:scale-[1.03]"
+                style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+              >
+                {q.label}
+              </Link>
+            ))}
+          </div>
+          <Link href="/quizzes" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+            Voir les 15 quiz →
+          </Link>
+        </div>
+      </section>
+
       {/* CTA de clôture — bande cosmique */}
       <section className="relative z-10 pb-14 px-6">
         <div className="relative overflow-hidden max-w-lg mx-auto rounded-3xl px-6 py-12 text-center" style={{ background: 'var(--ink)' }}>
@@ -445,6 +481,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-6 text-stone-400 text-xs">
             <Link href="/types" className="hover:text-stone-700 transition-colors">16 types</Link>
             <Link href="/quiz/personnalite" className="hover:text-stone-700 transition-colors">Test MBTI</Link>
+            <Link href="/quizzes" className="hover:text-stone-700 transition-colors">Tous les quiz</Link>
             <Link href="/mentions-legales" className="hover:text-stone-700 transition-colors">Mentions légales</Link>
             <Link href="/politique-confidentialite" className="hover:text-stone-700 transition-colors">Confidentialité</Link>
           </div>

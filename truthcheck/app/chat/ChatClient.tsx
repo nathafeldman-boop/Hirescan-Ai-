@@ -520,6 +520,14 @@ export default function ChatClient() {
                   <span className="text-lg">🧪</span> Créer un test à partager — débloque avec un abonnement
                 </Link>
               )}
+              <Link
+                href="/quizzes"
+                onClick={() => setActionsMenuOpen(false)}
+                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left"
+                style={{ color: 'var(--ink)' }}
+              >
+                <span className="text-lg">🧭</span> Découvrir les 15 autres quiz
+              </Link>
             </div>
           </div>
         )}
