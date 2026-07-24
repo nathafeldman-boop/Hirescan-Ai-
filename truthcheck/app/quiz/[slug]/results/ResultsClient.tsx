@@ -569,6 +569,17 @@ export default function ResultsClient({ quiz }: Props) {
               </p>
             </div>
 
+            {/* Rappel garanti ici, indépendant du bandeau global (peut avoir
+                été fermé plus tôt dans la session) — c'est précisément à cette
+                étape que Google échoue dans ces navigateurs. */}
+            {isInApp && (
+              <div className="rounded-xl px-4 py-3 mb-5 text-left" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <p className="text-zinc-200 text-[12px] leading-snug">
+                  📱 Pour te connecter sans souci : appuie sur <strong>⋯</strong> en haut à droite → <strong>&quot;Ouvrir dans le navigateur&quot;</strong>.
+                </p>
+              </div>
+            )}
+
             {authSent ? (
               <div>
                 <div className="text-center mb-5">
@@ -668,11 +679,7 @@ export default function ResultsClient({ quiz }: Props) {
                       <div className="flex-1 h-px bg-white/10" />
                     </div>
                   </>
-                ) : (
-                  <p className="text-center text-zinc-500 text-xs mb-4 leading-relaxed">
-                    Tu préfères Google ? Ouvre ce lien dans ton navigateur (⋯ en haut à droite → &quot;Ouvrir dans le navigateur&quot;).
-                  </p>
-                )}
+                ) : null}
 
                 <form
                   onSubmit={async (e) => {

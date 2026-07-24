@@ -97,10 +97,11 @@ function ProgressBar({ current, total, label }: { current: number; total: number
 
 // ─── Quiz screen ────────────────────────────────────────────────────────────────
 
-function QuizScreen({ onComplete, questions, t }: {
+function QuizScreen({ onComplete, questions, t, lang }: {
   onComplete: (answers: Answers) => void;
   questions: MbtiQuestion[];
   t: QuizT;
+  lang: string;
 }) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -238,6 +239,15 @@ function QuizScreen({ onComplete, questions, t }: {
           );
         })}
       </div>
+
+      {/* Rappel discret que Nova existe pendant le test — nouvel onglet pour
+          ne pas perdre la progression du quiz en cours. */}
+      <p className="text-center text-[12px] mt-8" style={{ color: '#a8a29e' }}>
+        {lang === 'en' ? '🔮 A question meanwhile? ' : '🔮 Une question en attendant ? '}
+        <a href="/chat" target="_blank" rel="noopener noreferrer" className="font-semibold" style={{ color: 'var(--gold)' }}>
+          {lang === 'en' ? 'Chat with Nova' : 'Discute avec Nova'}
+        </a>
+      </p>
       </div>
     </div>
   );
@@ -1392,6 +1402,20 @@ function SignInGate({ isFr, isInApp }: { isFr: boolean; isInApp: boolean }) {
             : 'We save your result and profile for your AI coach. 10 seconds, no password.'}
         </p>
 
+        {/* Rappel garanti à l'étape de connexion, indépendant du bandeau global
+            (celui-ci peut avoir été fermé plus tôt dans la session sur une autre
+            page) — c'est précisément ici que Google échoue, donc l'avertissement
+            doit être sûr de s'afficher, pas dépendant d'un état déjà fermé. */}
+        {isInApp && (
+          <div className="rounded-xl px-4 py-3 mb-5 text-left" style={{ background: '#131110' }}>
+            <p className="text-[12px] leading-snug" style={{ color: '#FAF6EC' }}>
+              {isFr
+                ? <>📱 Pour te connecter sans souci : appuie sur <strong>⋯</strong> en haut à droite → <strong>&quot;Ouvrir dans le navigateur&quot;</strong>.</>
+                : <>📱 For a smooth sign-in: tap <strong>⋯</strong> top right → <strong>&quot;Open in browser&quot;</strong>.</>}
+            </p>
+          </div>
+        )}
+
         {/* Google bloque volontairement l'OAuth dans les navigateurs embarqués
             (TikTok, Instagram, Snapchat...) — "This browser may not be secure".
             Sur ce trafic, le bouton Google ne mène nulle part : la plupart des
@@ -1419,14 +1443,6 @@ function SignInGate({ isFr, isInApp }: { isFr: boolean; isInApp: boolean }) {
         >
           {isFr ? 'Par email ou avec un code' : 'By email or with a code'}
         </a>
-
-        {isInApp && (
-          <p className="text-[11px] text-stone-400 mt-3 leading-relaxed">
-            {isFr
-              ? 'Tu préfères Google ? Ouvre ce lien dans ton navigateur (⋯ en haut à droite → "Ouvrir dans le navigateur").'
-              : 'Prefer Google? Open this link in your browser (⋯ top right → "Open in browser").'}
-          </p>
-        )}
 
         <p className="text-[11px] text-stone-400 mt-5 leading-relaxed">
           {isFr ? 'En continuant, tu acceptes nos conditions d\'utilisation.' : 'By continuing, you accept our terms.'}
@@ -1587,7 +1603,7 @@ export default function PersonnaliteClient() {
       ) : (
       <>
       {phase === 'quiz' && (
-        <QuizScreen onComplete={handleComplete} questions={questions} t={t} />
+        <QuizScreen onComplete={handleComplete} questions={questions} t={t} lang={lang} />
       )}
       {phase === 'analysis' && (
         <AnalysisScreen onDone={handleAnalysisDone} t={t} />

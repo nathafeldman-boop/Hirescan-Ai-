@@ -137,6 +137,17 @@ function LoginContent() {
           <p className="text-stone-500 text-sm">Tes résultats t&apos;attendent 🔓</p>
         </div>
 
+        {/* Rappel garanti ici, indépendant du bandeau global (peut avoir été
+            fermé plus tôt dans la session sur une autre page) — c'est
+            précisément à cette étape que Google échoue dans ces navigateurs. */}
+        {isInApp && (
+          <div className="rounded-xl px-4 py-3 mb-5 text-left" style={{ background: '#131110' }}>
+            <p className="text-[12px] leading-snug" style={{ color: '#FAF6EC' }}>
+              📱 Pour te connecter sans souci : appuie sur <strong>⋯</strong> en haut à droite → <strong>&quot;Ouvrir dans le navigateur&quot;</strong>.
+            </p>
+          </div>
+        )}
+
         <div className="rounded-2xl p-6" style={{ background: 'white', border: '1px solid #e7e5e0', boxShadow: '0 8px 32px rgba(0,0,0,0.06)' }}>
           {mode === 'email' && emailStep === 'otp' ? (
             /* Saisie du code de connexion reçu par email */
@@ -222,11 +233,7 @@ function LoginContent() {
                     <div className="flex-1 h-px bg-stone-200" />
                   </div>
                 </>
-              ) : (
-                <p className="text-center text-stone-400 text-xs mb-4 leading-relaxed">
-                  Tu préfères Google ? Ouvre ce lien dans ton navigateur (⋯ en haut à droite → &quot;Ouvrir dans le navigateur&quot;).
-                </p>
-              )}
+              ) : null}
 
               {/* Mode toggle */}
               <div className="flex rounded-xl overflow-hidden mb-4" style={{ border: '2px solid #e7e5e0' }}>
