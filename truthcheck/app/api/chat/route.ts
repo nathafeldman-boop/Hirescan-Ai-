@@ -228,3 +228,12 @@ export async function POST(req: NextRequest) {
   const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1)) + creditsLeft;
   return NextResponse.json({ reply: result.reply, remaining, limit });
 }
+
+// ── DELETE : efface l'historique de conversation (pas le quota, pas le profil) ──
+export async function DELETE() {
+  const session = await getServerSession(authOptions);
+  const uid = (session?.user as { id?: string } | undefined)?.id;
+  if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
+  await prisma.chatMessage.deleteMany({ where: { userId: uid } }).catch(() => null);
+  return NextResponse.json({ ok: true });
+}

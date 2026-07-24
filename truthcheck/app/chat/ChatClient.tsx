@@ -55,6 +55,7 @@ export default function ChatClient() {
   const [openCat, setOpenCat] = useState<string | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null); // data URI en attente d'envoi
   const [imageError, setImageError] = useState<string | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false); // menu "+" au-dessus de la barre de saisie
 
   // ── Créateur de test partageable (réservé aux abonnés) ──
   const [quizBuilderOpen, setQuizBuilderOpen] = useState(false);
@@ -151,6 +152,7 @@ export default function ChatClient() {
     if ((!content && !image) || loading || quotaHit) return;
     setNotice(null);
     setOpenCat(null);
+    setActionsMenuOpen(false);
     const prev = messages;
     setMessages([...prev, { role: 'user', content, ...(image ? { image } : {}) }]);
     setInput('');
@@ -211,6 +213,16 @@ export default function ChatClient() {
       setQuizCreating(false);
     }
   }, [quizTopic, quizCreating]);
+
+  // Efface tout l'historique de conversation affiché (pas le quota, pas le profil) —
+  // pour repartir d'une page blanche avec Nova.
+  const clearHistory = useCallback(async () => {
+    if (messages.length === 0) return;
+    if (!window.confirm('Effacer tout ton historique avec Nova ? Cette action est irréversible.')) return;
+    try { await fetch('/api/chat', { method: 'DELETE' }); } catch {}
+    setMessages([]);
+    setNotice(null);
+  }, [messages.length]);
 
   const shareQuizLink = useCallback(async (id: string, title: string) => {
     const url = `${window.location.origin}/q/${id}`;
@@ -283,9 +295,20 @@ export default function ChatClient() {
           <span className="font-display text-sm font-bold text-stone-900">Nova{mbtiType ? ` · ${mbtiType}` : ''}</span>
           <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#4ADE80' }} aria-label="en ligne" />
         </div>
-        <span className="text-[11px] tabular-nums" style={{ color: '#a8a29e' }}>
-          {remaining !== null && limit !== null ? `${remaining}/${limit}` : ''}
-        </span>
+        <div className="flex items-center gap-2.5">
+          <span className="text-[11px] tabular-nums" style={{ color: '#a8a29e' }}>
+            {remaining !== null && limit !== null ? `${remaining}/${limit}` : ''}
+          </span>
+          <button
+            type="button"
+            onClick={clearHistory}
+            disabled={messages.length === 0}
+            aria-label="Effacer l'historique"
+            title="Effacer l'historique"
+            className="w-6 h-6 flex items-center justify-center text-sm disabled:opacity-30"
+            style={{ color: '#a8a29e' }}
+          >🗑️</button>
+        </div>
       </header>
 
       {/* Bandeau — version découverte (compte gratuit). Avant le test : pousse
@@ -472,6 +495,35 @@ export default function ChatClient() {
         )}
         {imageError && <p className="max-w-2xl mx-auto px-4 pt-2 text-[11px]" style={{ color: '#dc2626' }}>{imageError}</p>}
 
+        {/* Menu "+" — tout ce que Nova sait faire, pas seulement discuter.
+            Toujours accessible (pas juste sur l'écran vide) pour que les gens
+            qui découvrent le chat tombent dessus aussi. */}
+        {actionsMenuOpen && (
+          <div className="max-w-2xl mx-auto px-4 pb-2">
+            <div className="rounded-2xl p-1.5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+              {!isFree ? (
+                <button
+                  type="button"
+                  onClick={() => { setActionsMenuOpen(false); setQuizBuilderOpen(true); }}
+                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition-all"
+                  style={{ color: 'var(--ink)' }}
+                >
+                  <span className="text-lg">🧪</span> Créer un test à partager avec tes amis
+                </button>
+              ) : (
+                <Link
+                  href="/pricing"
+                  onClick={() => setActionsMenuOpen(false)}
+                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left"
+                  style={{ color: '#a8a29e' }}
+                >
+                  <span className="text-lg">🧪</span> Créer un test à partager — débloque avec un abonnement
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
         <form onSubmit={(e) => { e.preventDefault(); void send(input); }} className="max-w-2xl mx-auto px-4 py-3 flex items-end gap-2">
           <input
             ref={fileInputRef}
@@ -482,7 +534,15 @@ export default function ChatClient() {
           />
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => setActionsMenuOpen((v) => !v)}
+            disabled={quotaHit}
+            aria-label="Ce que Nova sait faire"
+            className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-xl font-bold disabled:opacity-40 transition-transform"
+            style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)', transform: actionsMenuOpen ? 'rotate(45deg)' : 'none' }}
+          >+</button>
+          <button
+            type="button"
+            onClick={() => { setActionsMenuOpen(false); fileInputRef.current?.click(); }}
             disabled={quotaHit}
             aria-label="Envoyer une photo à Nova"
             className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-lg disabled:opacity-40"
