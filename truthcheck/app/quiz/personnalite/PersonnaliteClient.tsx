@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession, signIn } from 'next-auth/react';
 import { mbtiQuestions, computeMbtiType, computeMbtiProfile, MbtiQuestion } from '@/lib/mbti';
@@ -1066,6 +1067,30 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         </p>
 
         <CountdownTimer isFr={isFr} />
+
+        {/* ─── Pas encore convaincu(e) ? Fais goûter Nova AVANT de redemander
+            une carte bancaire — désamorce l'hésitation de ceux qui ont scrollé
+            sans craquer sur les boutons rapides plus haut. Vers le chat gratuit
+            (5 messages/mois, sans le test) — pas de nouvelle mécanique, juste
+            un pont vers ce qui existe déjà. ── */}
+        <div className="rounded-2xl px-5 py-4 mb-4 text-center" style={{ background: 'var(--paper-panel)', border: '1px dashed var(--gold-line)' }}>
+          <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>
+            {isFr ? 'Pas encore convaincu(e) ?' : 'Not convinced yet?'}
+          </p>
+          <p className="text-[13px] text-stone-600 mb-3.5" style={{ lineHeight: 1.5 }}>
+            {isFr
+              ? 'Discute d\'abord avec Nova, notre coach IA — gratuit, 5 messages offerts par mois, sans engagement.'
+              : 'Chat with Nova, our AI coach, first — free, 5 messages a month on us, no commitment.'}
+          </p>
+          <Link
+            href="/chat"
+            onClick={() => diagLog('paywall_try_nova_click', {})}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all active:scale-[0.97]"
+            style={{ border: '1px solid var(--gold-line)', color: 'var(--gold)' }}
+          >
+            <Glyph name="spark" color="var(--gold)" size={16} /> {isFr ? 'Tester Nova gratuitement' : 'Try Nova for free'}
+          </Link>
+        </div>
 
         {/* ── Offres — visibles pour TOUT LE MONDE, y compris in-app TikTok.
             C'est le funnel qui a généré 100 % des ventes réelles : les liens
