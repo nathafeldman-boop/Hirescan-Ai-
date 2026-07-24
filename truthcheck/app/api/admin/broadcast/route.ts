@@ -29,7 +29,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function build(name: string | null, to: string) {
   const { subject, html } = emailCoachAnnounce(name);
-  return { from: 'UrCecret <noreply@urcecret.site>', to, subject, html };
+  return { from: 'UrCecret <noreply@urcecret.site>', reply_to: 'urcecretteam@gmail.com', to, subject, html };
 }
 
 export async function GET(req: NextRequest) {

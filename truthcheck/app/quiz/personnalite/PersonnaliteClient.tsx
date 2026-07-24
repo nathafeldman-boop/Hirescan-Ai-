@@ -635,7 +635,7 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
     },
     {
       q: `Satisfait ou remboursé?`,
-      a: `Oui, 7 jours, aucune question posée. Envoie un email à support@urcecret.site et tu es remboursé(e) sous 24h.`,
+      a: `Oui, 7 jours, aucune question posée. Envoie un email à urcecretteam@gmail.com et tu es remboursé(e) sous 24h.`,
     },
     {
       q: `Mes données sont-elles protégées?`,
@@ -648,7 +648,7 @@ function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
     },
     {
       q: `Money-back guarantee?`,
-      a: `Yes, 7 days, no questions asked. Email support@urcecret.site and you'll be refunded within 24h.`,
+      a: `Yes, 7 days, no questions asked. Email urcecretteam@gmail.com and you'll be refunded within 24h.`,
     },
     {
       q: `Is my data protected?`,
