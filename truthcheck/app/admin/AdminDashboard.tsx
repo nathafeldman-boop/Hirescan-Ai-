@@ -162,8 +162,46 @@ const TIER_STYLE: Record<string, { label: string; color: string; bg: string; bor
 
 // ── KPI tile — number first, label second (normal case, no tracked-uppercase
 // eyebrow), tabular figures so columns of tiles line up. ─────────────────────
-function KpiCard({ label, value, sub, subColor, icon }: {
+// Mini-courbe inline dans une case KPI — signature App Store Connect / Play
+// Console. Construite uniquement à partir d'une série déjà calculée ailleurs
+// (ex: usersByMonth), jamais estimée.
+function Sparkline({ values, color }: { values: number[]; color: string }) {
+  const w = 100, h = 26;
+  const max = Math.max(...values, 1);
+  const pts = values.map((v, i) => {
+    const x = values.length > 1 ? (i / (values.length - 1)) * w : w / 2;
+    const y = h - (v / max) * h;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const path = 'M' + pts.join(' L');
+  const area = `${path} L${w},${h} L0,${h} Z`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" style={{ display: 'block', marginTop: 10 }}>
+      <path d={area} fill={color} opacity={0.14} />
+      <path d={path} fill="none" stroke={color} strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// Badge de variation (▲/▼ + %) dérivé des deux derniers points d'une série
+// déjà calculée (ex: ce mois vs le mois dernier) — jamais une estimation.
+function DeltaBadge({ series }: { series: number[] }) {
+  if (series.length < 2) return null;
+  const curr = series[series.length - 1];
+  const prev = series[series.length - 2];
+  if (prev === 0) return null;
+  const diff = Math.round(((curr - prev) / prev) * 100);
+  const positive = diff >= 0;
+  return (
+    <span style={{ fontSize: 12.5, fontWeight: 700, color: positive ? C.good : C.critical, marginLeft: 8 }}>
+      {positive ? '▲' : '▼'} {Math.abs(diff)}%
+    </span>
+  );
+}
+
+function KpiCard({ label, value, sub, subColor, icon, trend, trendColor, deltaSeries }: {
   label: string; value: string | number; sub?: string; subColor?: string; icon?: string;
+  trend?: number[]; trendColor?: string; deltaSeries?: number[];
 }) {
   return (
     <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: '16px 18px', minWidth: 0 }}>
@@ -171,8 +209,12 @@ function KpiCard({ label, value, sub, subColor, icon }: {
         {icon && <span style={{ fontSize: 13 }}>{icon}</span>}
         <p style={{ fontSize: 13, color: C.muted, fontWeight: 500, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</p>
       </div>
-      <p style={{ fontFamily: FONT, fontSize: 28, fontWeight: 700, color: C.ink, marginBottom: 4, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em', wordBreak: 'break-word' }}>{value}</p>
+      <p style={{ fontFamily: FONT, fontSize: 28, fontWeight: 700, color: C.ink, marginBottom: 4, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em', wordBreak: 'break-word' }}>
+        {value}
+        {deltaSeries && <DeltaBadge series={deltaSeries} />}
+      </p>
       {sub && <p style={{ fontSize: 12.5, color: subColor ?? C.muted, margin: 0 }}>{sub}</p>}
+      {trend && <Sparkline values={trend} color={trendColor ?? C.primary} />}
     </div>
   );
 }
@@ -599,9 +641,9 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
             )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
-              <KpiCard label="Total inscrits" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} />
-              <KpiCard label="Premium (DB)" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} />
-              <KpiCard label="Tests MBTI" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} />
+              <KpiCard label="Total inscrits" value={stats.totalUsers.toLocaleString('fr-FR')} sub={`+${stats.newThisMonth} ce mois`} trend={usersSeries} deltaSeries={usersSeries} />
+              <KpiCard label="Premium (DB)" value={stats.premiumUsers} sub={`${conversionRate}% conversion`} trend={premiumSeries} deltaSeries={premiumSeries} />
+              <KpiCard label="Tests MBTI" value={(stats.byQuiz['personnalite']?.count ?? 0).toLocaleString('fr-FR')} sub={`${stats.totalResults.toLocaleString('fr-FR')} quiz total`} trend={quizSeries} deltaSeries={quizSeries} />
               <KpiCard label="Vues de page" value={stats.totalPageViews.toLocaleString('fr-FR')} sub="total cumulé" />
             </div>
 
