@@ -23,20 +23,25 @@ export default async function AdminPage() {
   const startOfYear     = parisMidnight(todayParis.slice(0, 4) + '-01-01');
   const twelveMonthsAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
 
+  // "Payant" = tout palier récurrent (starter/plus/premium) — avant ce fix, ne
+  // comptait que tier==='premium' et ratait Starter/Plus (ajoutés depuis, voir
+  // lib/plans.ts), affichant un taux de conversion et un nombre de clients trop bas.
+  const PAID_TIERS = ['starter', 'plus', 'premium'];
+
   const [
     totalUsers, premiumUsers, newToday, newThisWeek, newThisMonth,
     recentUsers, allUsersForMonth, premiumUsersForMonth,
     totalResults, paidResults, paidToday, paidThisMonth, quizGrouped,
     quizResultsForMonth,
     mbtiUsers,
-    allConversions, affiliates, affiliateClickViews,
+    allConversions, allRealConversions, affiliates, affiliateClickViews,
     totalPageViews,
     recentConversions,
     recentSignups,
     recentViewsForSources,
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.user.count({ where: { tier: 'premium' } }),
+    prisma.user.count({ where: { tier: { in: PAID_TIERS } } }),
     prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
     prisma.user.count({ where: { createdAt: { gte: startOfMonth } } }),
@@ -45,7 +50,7 @@ export default async function AdminPage() {
       select: { id: true, email: true, name: true, tier: true, createdAt: true, _count: { select: { quizResults: true } } },
     }),
     prisma.user.findMany({ where: { createdAt: { gte: twelveMonthsAgo } }, select: { createdAt: true } }),
-    prisma.user.findMany({ where: { tier: 'premium', createdAt: { gte: twelveMonthsAgo } }, select: { createdAt: true } }),
+    prisma.user.findMany({ where: { tier: { in: PAID_TIERS }, createdAt: { gte: twelveMonthsAgo } }, select: { createdAt: true } }),
     prisma.quizResult.count(),
     prisma.quizResult.count({ where: { paid: true } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
@@ -54,6 +59,12 @@ export default async function AdminPage() {
     prisma.quizResult.findMany({ where: { createdAt: { gte: twelveMonthsAgo } }, select: { createdAt: true, paid: true } }),
     prisma.user.findMany({ where: { mbtiType: { not: null } }, select: { mbtiType: true } }),
     prisma.affiliateConversion.findMany({ select: { amountCents: true, commissionCents: true, createdAt: true, affiliateId: true } }),
+    // Conversion (pas AffiliateConversion) : le vrai livre de comptes — une ligne
+    // par paiement Stripe réussi, affilié ou non. AffiliateConversion n'existe QUE
+    // pour les ventes venues d'un lien d'affilié (voir /api/webhook) ; l'utiliser
+    // pour le CA total affichait 0 € dès que les ventes du mois venaient du
+    // trafic direct/TikTok plutôt que d'un affilié.
+    prisma.conversion.findMany({ select: { amountCents: true, createdAt: true } }),
     prisma.affiliate.findMany({ include: { conversions: { orderBy: { createdAt: 'desc' } } }, orderBy: { createdAt: 'desc' } }),
     prisma.pageView.findMany({ where: { path: { startsWith: '/__aff/' } }, select: { path: true } }),
     prisma.pageView.count(),
@@ -146,12 +157,13 @@ export default async function AdminPage() {
     affiliateClicks[slug] = (affiliateClicks[slug] ?? 0) + 1;
   });
 
-  // Revenue totals
-  const totalRevenueCents  = allConversions.reduce((s, c) => s + c.amountCents, 0);
-  const todayRevenueCents  = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
-  const monthRevenueCents  = allConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
-  const yearRevenueCents   = allConversions.filter(c => new Date(c.createdAt) >= startOfYear).reduce((s, c)  => s + c.amountCents, 0);
-  const weekRevenueCents   = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
+  // Revenue totals — vrai CA total (tous paiements, affiliés ou non), pas
+  // seulement les ventes affiliées. Voir commentaire sur la requête Conversion.
+  const totalRevenueCents  = allRealConversions.reduce((s, c) => s + c.amountCents, 0);
+  const todayRevenueCents  = allRealConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
+  const monthRevenueCents  = allRealConversions.filter(c => new Date(c.createdAt) >= startOfMonth).reduce((s, c) => s + c.amountCents, 0);
+  const yearRevenueCents   = allRealConversions.filter(c => new Date(c.createdAt) >= startOfYear).reduce((s, c)  => s + c.amountCents, 0);
+  const weekRevenueCents   = allRealConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
 
   const recentConvsMapped = recentConversions.map(c => ({
     id: c.id,

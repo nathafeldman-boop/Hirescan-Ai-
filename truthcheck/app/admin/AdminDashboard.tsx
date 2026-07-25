@@ -587,14 +587,14 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                 <KpiCard label="MRR (Stripe)" value={fmt(stripeStats.mrr)} sub="revenu mensuel récurrent" subColor={C.good} />
                 <KpiCard label="Abonnés actifs" value={(stripeStats.monthlyCount + stripeStats.annualCount).toLocaleString('fr-FR')} sub={`${stripeStats.monthlyCount} mensuel · ${stripeStats.annualCount} annuel`} />
                 <KpiCard label="Churn (30j)" value={stripeStats.churnedLast30} sub="abonnements résiliés" subColor={C.critical} />
-                <KpiCard label="CA affiliés total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} />
+                <KpiCard label="CA total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} />
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
                 <KpiCard label="MRR" value={stripeLoading ? '...' : '—'} sub="chargement Stripe" />
                 <KpiCard label="Abonnés actifs" value="—" />
                 <KpiCard label="Churn (30j)" value="—" />
-                <KpiCard label="CA affiliés total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} />
+                <KpiCard label="CA total" value={fmt(stats.totalRevenueCents)} sub={`${fmt(stats.monthRevenueCents)} ce mois`} />
               </div>
             )}
 
