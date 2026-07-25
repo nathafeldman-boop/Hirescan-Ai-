@@ -48,16 +48,15 @@ const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 // ── Suggestions Nova — visibles sans écrire, cliquables, jamais un cul-de-sac.
 // "analyze" et "quiz" ouvrent les vraies features structurées (réservées aux
-// abonnés). "link" mène vers un vrai écran dédié (ex. Journal). "chat" envoie
-// un vrai premier message à Nova qui exploite déjà tout ce qu'elle sait
-// (profil MBTI) — utile et honnête tant que "Compatibilité" n'a pas encore
-// son propre écran dédié (Phase 2). ──────────────────────────────────────────
+// abonnés). "link" mène vers un vrai écran dédié (Journal, Compatibilité,
+// Profil avancé). "chat" envoie un vrai premier message à Nova qui exploite
+// déjà tout ce qu'elle sait (profil MBTI). ─────────────────────────────────
 const NOVA_SUGGESTIONS: { emoji: string; label: string; kind: 'analyze' | 'quiz' | 'chat' | 'link'; prompt?: string; href?: string }[] = [
   { emoji: '🧠', label: 'Analyser une conversation', kind: 'analyze' },
   { emoji: '📖', label: 'Journal émotionnel', kind: 'link', href: '/journal' },
-  { emoji: '✨', label: 'Me connaître davantage', kind: 'chat', prompt: 'Dis-moi ce que mon profil dit vraiment de moi, en profondeur — mes schémas, mes angles morts, ce que je ne vois pas moi-même.' },
+  { emoji: '✨', label: 'Analyse avancée', kind: 'link', href: '/profil-avance' },
   { emoji: '👥', label: 'Créer un test entre amis', kind: 'quiz' },
-  { emoji: '❤️', label: 'Compatibilité', kind: 'chat', prompt: 'Aide-moi à comprendre ma compatibilité avec quelqu\'un — qu\'est-ce qui compte vraiment selon mon profil ?' },
+  { emoji: '❤️', label: 'Compatibilité', kind: 'link', href: '/compat' },
 ];
 
 export default function ChatClient() {
@@ -672,16 +671,19 @@ export default function ChatClient() {
               </Link>
 
               {([
-                { emoji: '👥', label: 'Compatibilité avec un ami' },
-                { emoji: '✨', label: 'Analyse de personnalité avancée' },
+                { emoji: '👥', label: 'Compatibilité avec un ami', href: '/compat' },
+                { emoji: '✨', label: 'Analyse de personnalité avancée', href: '/profil-avance' },
               ] as const).map((a) => (
-                <div key={a.label} className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold" style={{ color: '#c4bfb3' }}>
-                  <span className="text-lg" style={{ opacity: 0.5 }}>{a.emoji}</span>
+                <Link
+                  key={a.label}
+                  href={a.href}
+                  onClick={() => setActionsMenuOpen(false)}
+                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left"
+                  style={{ color: 'var(--ink)' }}
+                >
+                  <span className="text-lg">{a.emoji}</span>
                   <span className="flex-1">{a.label}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: '#a8a29e' }}>
-                    Bientôt
-                  </span>
-                </div>
+                </Link>
               ))}
 
               <div className="my-1 border-t" style={{ borderColor: 'var(--line)' }} />

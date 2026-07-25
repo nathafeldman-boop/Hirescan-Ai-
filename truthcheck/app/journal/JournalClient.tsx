@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import AppTabBar from '@/components/AppTabBar';
 
-type Entry = { day: string; mood: number; note: string | null };
+type Entry = { day: string; mood: number; energy: number; stress: number; note: string | null };
 
 const MOODS = [
   { value: 1, emoji: '😞', label: 'Difficile' },
@@ -11,6 +11,22 @@ const MOODS = [
   { value: 3, emoji: '😐', label: 'Neutre' },
   { value: 4, emoji: '🙂', label: 'Bien' },
   { value: 5, emoji: '😄', label: 'Super' },
+] as const;
+
+const ENERGY_LEVELS = [
+  { value: 1, emoji: '🥱', label: 'Épuisé' },
+  { value: 2, emoji: '😴', label: 'Faible' },
+  { value: 3, emoji: '🙂', label: 'Correcte' },
+  { value: 4, emoji: '💪', label: 'Bonne' },
+  { value: 5, emoji: '⚡', label: 'Au top' },
+] as const;
+
+const STRESS_LEVELS = [
+  { value: 1, emoji: '😌', label: 'Zen' },
+  { value: 2, emoji: '🙂', label: 'Calme' },
+  { value: 3, emoji: '😐', label: 'Neutre' },
+  { value: 4, emoji: '😬', label: 'Tendu' },
+  { value: 5, emoji: '🤯', label: 'Sous tension' },
 ] as const;
 
 function moodEmoji(mood: number): string {
@@ -39,6 +55,36 @@ function buildGrid(month: string): (number | null)[] {
   return cells;
 }
 
+// Sélecteur compact à 5 niveaux — réutilisé pour humeur / énergie / stress.
+function LevelPicker({
+  levels, selected, onSelect, disabled,
+}: {
+  levels: readonly { value: number; emoji: string; label: string }[];
+  selected: number | null;
+  onSelect: (v: number) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-5 gap-2">
+      {levels.map((l) => (
+        <button
+          key={l.value}
+          onClick={() => onSelect(l.value)}
+          disabled={disabled}
+          className="flex flex-col items-center gap-1 py-2.5 rounded-2xl transition-all active:scale-95 disabled:opacity-50"
+          style={{
+            background: selected === l.value ? 'var(--gold-soft)' : 'var(--paper)',
+            border: `1px solid ${selected === l.value ? 'var(--gold-line)' : 'var(--line)'}`,
+          }}
+        >
+          <span className="text-xl leading-none">{l.emoji}</span>
+          <span className="text-[8px] font-semibold text-center leading-tight" style={{ color: '#6b6055' }}>{l.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function JournalClient({ firstName }: { firstName: string | null }) {
   const [loading, setLoading] = useState(true);
   const [month, setMonth] = useState<string | null>(null);
@@ -48,7 +94,14 @@ export default function JournalClient({ firstName }: { firstName: string | null 
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState('');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [selectedEnergy, setSelectedEnergy] = useState<number | null>(null);
+  const [selectedStress, setSelectedStress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [insights, setInsights] = useState<string[] | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [insightsError, setInsightsError] = useState<string | null>(null);
+  const [insightsNeeded, setInsightsNeeded] = useState<{ count: number; needed: number } | null>(null);
 
   const load = (m?: string) => {
     setLoading(true);
@@ -84,15 +137,15 @@ export default function JournalClient({ firstName }: { firstName: string | null 
     [entries, today],
   );
 
-  async function saveMood(mood: number) {
-    setSelectedMood(mood);
+  async function saveEntry() {
+    if (!selectedMood || !selectedEnergy || !selectedStress) return;
     setSaving(true);
     setError(null);
     try {
       const res = await fetch('/api/journal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood, note: note.trim() || undefined }),
+        body: JSON.stringify({ mood: selectedMood, energy: selectedEnergy, stress: selectedStress, note: note.trim() || undefined }),
       });
       if (!res.ok) throw new Error();
       const d = await res.json();
@@ -103,9 +156,25 @@ export default function JournalClient({ firstName }: { firstName: string | null 
       setHasAny(true);
     } catch {
       setError("L'enregistrement a échoué. Réessaie.");
-      setSelectedMood(null);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function loadInsights() {
+    setInsightsLoading(true);
+    setInsightsError(null);
+    setInsightsNeeded(null);
+    try {
+      const res = await fetch('/api/journal/insights');
+      const d = await res.json();
+      if (!res.ok) throw new Error();
+      if (d.ok) setInsights(d.insights);
+      else setInsightsNeeded({ count: d.count ?? 0, needed: d.needed ?? 3 });
+    } catch {
+      setInsightsError('Nova n\'a pas réussi à analyser ton journal. Réessaie dans un instant.');
+    } finally {
+      setInsightsLoading(false);
     }
   }
 
@@ -155,36 +224,39 @@ export default function JournalClient({ firstName }: { firstName: string | null 
           </p>
 
           {todayEntry ? (
-            <div className="flex items-start gap-3">
-              <span className="text-4xl leading-none">{moodEmoji(todayEntry.mood)}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold" style={{ color: 'var(--ink)' }}>
-                  {MOODS.find((m) => m.value === todayEntry.mood)?.label}
-                </p>
-                {todayEntry.note && (
-                  <p className="text-sm mt-1 leading-relaxed" style={{ color: '#6b6055' }}>&ldquo;{todayEntry.note}&rdquo;</p>
-                )}
-                <p className="text-xs mt-2" style={{ color: 'var(--gold)' }}>Déjà noté aujourd&apos;hui ✓</p>
+            <div>
+              <div className="flex items-center gap-4 mb-3">
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-3xl leading-none">{moodEmoji(todayEntry.mood)}</span>
+                  <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Humeur</span>
+                </div>
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-3xl leading-none">{ENERGY_LEVELS.find((l) => l.value === todayEntry.energy)?.emoji}</span>
+                  <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Énergie</span>
+                </div>
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-3xl leading-none">{STRESS_LEVELS.find((l) => l.value === todayEntry.stress)?.emoji}</span>
+                  <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Stress</span>
+                </div>
               </div>
+              {todayEntry.note && (
+                <p className="text-sm mb-2 leading-relaxed" style={{ color: '#6b6055' }}>&ldquo;{todayEntry.note}&rdquo;</p>
+              )}
+              <p className="text-xs" style={{ color: 'var(--gold)' }}>Déjà noté aujourd&apos;hui ✓</p>
             </div>
           ) : (
-            <>
-              <div className="grid grid-cols-5 gap-2 mb-4">
-                {MOODS.map((m) => (
-                  <button
-                    key={m.value}
-                    onClick={() => saveMood(m.value)}
-                    disabled={saving}
-                    className="flex flex-col items-center gap-1 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-50"
-                    style={{
-                      background: selectedMood === m.value ? 'var(--gold-soft)' : 'var(--paper)',
-                      border: `1px solid ${selectedMood === m.value ? 'var(--gold-line)' : 'var(--line)'}`,
-                    }}
-                  >
-                    <span className="text-2xl leading-none">{m.emoji}</span>
-                    <span className="text-[9px] font-semibold" style={{ color: '#6b6055' }}>{m.label}</span>
-                  </button>
-                ))}
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Humeur</p>
+                <LevelPicker levels={MOODS} selected={selectedMood} onSelect={setSelectedMood} disabled={saving} />
+              </div>
+              <div>
+                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Énergie</p>
+                <LevelPicker levels={ENERGY_LEVELS} selected={selectedEnergy} onSelect={setSelectedEnergy} disabled={saving} />
+              </div>
+              <div>
+                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Stress</p>
+                <LevelPicker levels={STRESS_LEVELS} selected={selectedStress} onSelect={setSelectedStress} disabled={saving} />
               </div>
               <textarea
                 value={note}
@@ -195,13 +267,55 @@ export default function JournalClient({ firstName }: { firstName: string | null 
                 className="w-full text-sm rounded-xl px-3 py-2 resize-none outline-none"
                 style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
               />
-            </>
+              <button
+                onClick={saveEntry}
+                disabled={saving || !selectedMood || !selectedEnergy || !selectedStress}
+                className="ur-btn-gold w-full py-3 text-sm disabled:opacity-40"
+              >
+                {saving ? 'Enregistrement…' : 'Enregistrer mon jour →'}
+              </button>
+            </div>
           )}
         </div>
 
         {error && (
           <p className="text-xs text-center" style={{ color: '#c2611f' }}>{error}</p>
         )}
+
+        {/* Analyse Nova — tendances repérées dans le journal, générées à la demande */}
+        <div className="rounded-3xl p-5" style={{ background: 'var(--ink)' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">🤖</span>
+            <p className="text-sm font-black" style={{ color: '#FAF6EC' }}>Analyse de Nova</p>
+          </div>
+
+          {insights ? (
+            <div className="space-y-2 mb-3">
+              {insights.map((ins, i) => (
+                <p key={i} className="text-sm leading-relaxed" style={{ color: 'rgba(250,246,236,0.85)' }}>✦ {ins}</p>
+              ))}
+            </div>
+          ) : insightsNeeded ? (
+            <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
+              Encore {Math.max(0, insightsNeeded.needed - insightsNeeded.count)} jour(s) à noter avant que Nova puisse repérer des tendances.
+            </p>
+          ) : (
+            <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
+              Nova peut repérer des tendances dans ton humeur, ton énergie et ton stress au fil du temps.
+            </p>
+          )}
+
+          {insightsError && <p className="text-xs mb-3" style={{ color: '#e8a94d' }}>{insightsError}</p>}
+
+          <button
+            onClick={loadInsights}
+            disabled={insightsLoading}
+            className="w-full py-2.5 rounded-xl text-sm font-bold disabled:opacity-50"
+            style={{ background: 'rgba(232,169,77,0.12)', border: '1px solid rgba(232,169,77,0.25)', color: '#e8a94d' }}
+          >
+            {insightsLoading ? 'Nova réfléchit…' : insights ? 'Rafraîchir l\'analyse' : 'Voir mes tendances'}
+          </button>
+        </div>
 
         {/* Calendrier émotionnel */}
         {month && (
@@ -258,9 +372,13 @@ export default function JournalClient({ firstName }: { firstName: string | null 
                 <div key={e.day} className="rounded-2xl p-4 flex items-start gap-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
                   <span className="text-2xl leading-none">{moodEmoji(e.mood)}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold" style={{ color: 'var(--ink)' }}>
-                      {new Date(e.day + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs font-bold" style={{ color: 'var(--ink)' }}>
+                        {new Date(e.day + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                      </p>
+                      <span className="text-xs" title="Énergie">{ENERGY_LEVELS.find((l) => l.value === e.energy)?.emoji}</span>
+                      <span className="text-xs" title="Stress">{STRESS_LEVELS.find((l) => l.value === e.stress)?.emoji}</span>
+                    </div>
                     {e.note && <p className="text-sm mt-1 leading-relaxed" style={{ color: '#6b6055' }}>&ldquo;{e.note}&rdquo;</p>}
                   </div>
                 </div>
