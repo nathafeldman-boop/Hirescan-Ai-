@@ -82,3 +82,59 @@ export async function generateJournalInsights(entries: JournalEntryForInsights[]
   }
   return null;
 }
+
+// ── Résumé narratif d'une période (semaine/mois) ────────────────────────────
+// Différent des "tendances" (liste de puces courtes) : un vrai petit texte de
+// synthèse, comme un ami qui résume ta semaine — voir "résumer une période"
+// dans la demande produit.
+export function journalPeriodSummaryPrompt(entries: JournalEntryForInsights[], periodLabel: string): string {
+  return `Tu es Nova, le coach IA d'UrCecret. Voici le journal émotionnel d'un utilisateur sur ${periodLabel} (humeur/énergie/stress sur 5, note libre optionnelle) :
+
+${formatEntriesForPrompt(entries)}
+
+Réponds UNIQUEMENT avec un objet JSON valide, RIEN d'autre (pas de markdown, pas de phrase avant/après), au format EXACT suivant :
+
+{
+  "summary": "3-4 phrases qui résument ${periodLabel} comme le ferait une amie qui a suivi son journal — évolution de l'humeur, moments marquants s'ils ressortent des notes, ton chaleureux"
+}
+
+RÈGLES :
+- Base-toi UNIQUEMENT sur les données fournies.
+- Ton chaleureux, jamais clinique ni moralisateur.
+- N'utilise JAMAIS de vocabulaire médical/clinique.`;
+}
+
+export function parseJournalPeriodSummary(raw: string): string | null {
+  let jsonText = raw.trim();
+  const fenced = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced) jsonText = fenced[1].trim();
+
+  let data: unknown;
+  try {
+    data = JSON.parse(jsonText);
+  } catch {
+    return null;
+  }
+  if (!data || typeof data !== 'object') return null;
+  const d = data as Record<string, unknown>;
+  const summary = typeof d.summary === 'string' && d.summary.trim() ? d.summary.trim().slice(0, 700) : null;
+  return summary;
+}
+
+export async function generateJournalPeriodSummary(
+  entries: JournalEntryForInsights[],
+  periodLabel: string,
+): Promise<string | null> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let system = journalPeriodSummaryPrompt(entries, periodLabel);
+    if (attempt > 0) {
+      system += '\n\nRappel strict : ta réponse précédente n\'était pas du JSON valide. Réponds UNIQUEMENT avec l\'objet JSON demandé, sans aucun texte, markdown ou commentaire autour.';
+    }
+    const gen = await callMistral(system, [
+      { role: 'user', content: 'Génère le résumé maintenant, au format JSON demandé, rien d\'autre.' },
+    ], { maxTokens: 500, temperature: attempt === 0 ? 0.6 : 0.3 });
+    const parsed = gen.ok && gen.reply ? parseJournalPeriodSummary(gen.reply) : null;
+    if (parsed) return parsed;
+  }
+  return null;
+}

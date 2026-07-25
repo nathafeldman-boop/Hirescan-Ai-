@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import AppTabBar from '@/components/AppTabBar';
 
-type Entry = { day: string; mood: number; energy: number; stress: number; note: string | null };
+type Entry = { day: string; mood: number; energy: number; stress: number; emotion: string | null; note: string | null };
+type JournalAccess = { trendInsights: boolean; inTrial: boolean; trialDaysLeft: number };
 
 const MOODS = [
   { value: 1, emoji: '😞', label: 'Difficile' },
@@ -28,6 +30,8 @@ const STRESS_LEVELS = [
   { value: 4, emoji: '😬', label: 'Tendu' },
   { value: 5, emoji: '🤯', label: 'Sous tension' },
 ] as const;
+
+const EMOTIONS = ['😊 Joie', '😌 Sérénité', '🙏 Gratitude', '🥰 Amour', '😲 Surprise', '😠 Colère', '😢 Tristesse', '😰 Anxiété'] as const;
 
 function moodEmoji(mood: number): string {
   return MOODS.find((m) => m.value === mood)?.emoji ?? '·';
@@ -85,7 +89,162 @@ function LevelPicker({
   );
 }
 
-export default function JournalClient({ firstName }: { firstName: string | null }) {
+function EmotionPicker({ selected, onSelect, disabled }: { selected: string | null; onSelect: (v: string) => void; disabled: boolean }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {EMOTIONS.map((e) => (
+        <button
+          key={e}
+          onClick={() => onSelect(e)}
+          disabled={disabled}
+          className="px-3 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-50"
+          style={{
+            background: selected === e ? 'var(--gold-soft)' : 'var(--paper)',
+            border: `1px solid ${selected === e ? 'var(--gold-line)' : 'var(--line)'}`,
+            color: 'var(--ink)',
+          }}
+        >
+          {e}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+interface SavedPayload { mood: number; energy: number; stress: number; emotion?: string; note?: string }
+
+// ── Onboarding : première visite du Journal ─────────────────────────────────
+// Un pas à la fois, façon quiz éclair — jamais l'impression d'un long
+// formulaire. Les 3 dernières questions (marquant/heureux/dérangé) sont
+// combinées dans la note de l'entrée du jour : pas de nouveau modèle de
+// données, juste une saisie plus riche pour ce premier jour.
+function OnboardingFlow({ onSubmit, saving }: { onSubmit: (p: SavedPayload) => void; saving: boolean }) {
+  const [step, setStep] = useState(0);
+  const [mood, setMood] = useState<number | null>(null);
+  const [energy, setEnergy] = useState<number | null>(null);
+  const [stress, setStress] = useState<number | null>(null);
+  const [emotion, setEmotion] = useState<string | null>(null);
+  const [highlight, setHighlight] = useState('');
+  const [happy, setHappy] = useState('');
+  const [bother, setBother] = useState('');
+
+  const advance = () => setStep((s) => s + 1);
+
+  function finish() {
+    const noteLines: string[] = [];
+    if (highlight.trim()) noteLines.push(`Ce qui a marqué sa journée : ${highlight.trim()}`);
+    if (happy.trim()) noteLines.push(`Ce qui l'a rendu(e) heureux(se) : ${happy.trim()}`);
+    if (bother.trim()) noteLines.push(`Ce qui l'a dérangé(e) : ${bother.trim()}`);
+    onSubmit({
+      mood: mood!,
+      energy: energy!,
+      stress: stress!,
+      emotion: emotion ?? undefined,
+      note: noteLines.length ? noteLines.join('\n') : undefined,
+    });
+  }
+
+  const STEPS = 7;
+  const progress = (step + 1) / STEPS;
+
+  return (
+    <div className="rounded-3xl p-6" style={{ background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)' }}>
+      <div className="flex items-center gap-1.5 mb-5">
+        {Array.from({ length: STEPS }).map((_, i) => (
+          <div key={i} className="flex-1 h-1.5 rounded-full transition-all" style={{ background: i <= step ? 'var(--gold)' : 'var(--line)' }} />
+        ))}
+      </div>
+
+      {step === 0 && (
+        <>
+          <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Bienvenue dans ton Journal 📖</p>
+          <p className="text-sm mb-5 leading-relaxed" style={{ color: '#6b6055' }}>
+            6 questions rapides pour que Nova commence à te connaître — moins d&apos;une minute.
+          </p>
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Comment te sens-tu aujourd&apos;hui ?</p>
+          <LevelPicker levels={MOODS} selected={mood} onSelect={(v) => { setMood(v); advance(); }} disabled={saving} />
+        </>
+      )}
+
+      {step === 1 && (
+        <>
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Quel est ton niveau d&apos;énergie ?</p>
+          <LevelPicker levels={ENERGY_LEVELS} selected={energy} onSelect={(v) => { setEnergy(v); advance(); }} disabled={saving} />
+        </>
+      )}
+
+      {step === 2 && (
+        <>
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Ton niveau de stress ?</p>
+          <LevelPicker levels={STRESS_LEVELS} selected={stress} onSelect={(v) => { setStress(v); advance(); }} disabled={saving} />
+        </>
+      )}
+
+      {step === 3 && (
+        <>
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Une émotion qui domine aujourd&apos;hui ?</p>
+          <EmotionPicker selected={emotion} onSelect={(v) => { setEmotion(v); advance(); }} disabled={saving} />
+          <button onClick={advance} disabled={saving} className="w-full mt-4 py-2.5 text-xs font-semibold" style={{ color: '#a8a29e' }}>
+            Passer →
+          </button>
+        </>
+      )}
+
+      {step === 4 && (
+        <>
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce qui a marqué ta journée ?</p>
+          <textarea
+            value={highlight}
+            onChange={(e) => setHighlight(e.target.value.slice(0, 200))}
+            rows={2}
+            placeholder="Un événement, une rencontre, une pensée…"
+            className="w-full text-sm rounded-xl px-3 py-2.5 resize-none outline-none mb-3"
+            style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+          />
+          <button onClick={advance} disabled={saving} className="ur-btn-gold w-full py-3 text-sm">Continuer →</button>
+        </>
+      )}
+
+      {step === 5 && (
+        <>
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce qui t&apos;a rendu heureux ?</p>
+          <textarea
+            value={happy}
+            onChange={(e) => setHappy(e.target.value.slice(0, 200))}
+            rows={2}
+            placeholder="Optionnel…"
+            className="w-full text-sm rounded-xl px-3 py-2.5 resize-none outline-none mb-3"
+            style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+          />
+          <button onClick={advance} disabled={saving} className="ur-btn-gold w-full py-3 text-sm">Continuer →</button>
+        </>
+      )}
+
+      {step === 6 && (
+        <>
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce qui t&apos;a dérangé ?</p>
+          <textarea
+            value={bother}
+            onChange={(e) => setBother(e.target.value.slice(0, 200))}
+            rows={2}
+            placeholder="Optionnel…"
+            className="w-full text-sm rounded-xl px-3 py-2.5 resize-none outline-none mb-3"
+            style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+          />
+          <button onClick={finish} disabled={saving} className="ur-btn-gold w-full py-3 text-sm disabled:opacity-50">
+            {saving ? 'Enregistrement…' : 'Terminer mon premier jour →'}
+          </button>
+        </>
+      )}
+
+      <p className="text-[10px] text-center mt-4" style={{ color: '#a8a29e' }}>
+        {Math.round(progress * 100)}% — presque fini
+      </p>
+    </div>
+  );
+}
+
+export default function JournalClient({ firstName, access }: { firstName: string | null; access: JournalAccess }) {
   const [loading, setLoading] = useState(true);
   const [month, setMonth] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
@@ -96,12 +255,17 @@ export default function JournalClient({ firstName }: { firstName: string | null 
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedEnergy, setSelectedEnergy] = useState<number | null>(null);
   const [selectedStress, setSelectedStress] = useState<number | null>(null);
+  const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reflection, setReflection] = useState<string | null>(null);
 
   const [insights, setInsights] = useState<string[] | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [insightsError, setInsightsError] = useState<string | null>(null);
   const [insightsNeeded, setInsightsNeeded] = useState<{ count: number; needed: number } | null>(null);
+
+  const [periodSummary, setPeriodSummary] = useState<string | null>(null);
+  const [periodLoading, setPeriodLoading] = useState<'week' | 'month' | null>(null);
 
   const load = (m?: string) => {
     setLoading(true);
@@ -137,15 +301,14 @@ export default function JournalClient({ firstName }: { firstName: string | null 
     [entries, today],
   );
 
-  async function saveEntry() {
-    if (!selectedMood || !selectedEnergy || !selectedStress) return;
+  async function persistEntry(payload: SavedPayload) {
     setSaving(true);
     setError(null);
     try {
       const res = await fetch('/api/journal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood: selectedMood, energy: selectedEnergy, stress: selectedStress, note: note.trim() || undefined }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
       const d = await res.json();
@@ -154,11 +317,20 @@ export default function JournalClient({ firstName }: { firstName: string | null 
         return [...rest, d.entry];
       });
       setHasAny(true);
+      setReflection(d.reflection ?? null);
     } catch {
       setError("L'enregistrement a échoué. Réessaie.");
     } finally {
       setSaving(false);
     }
+  }
+
+  async function saveEntry() {
+    if (!selectedMood || !selectedEnergy || !selectedStress) return;
+    await persistEntry({
+      mood: selectedMood, energy: selectedEnergy, stress: selectedStress,
+      emotion: selectedEmotion ?? undefined, note: note.trim() || undefined,
+    });
   }
 
   async function loadInsights() {
@@ -168,6 +340,7 @@ export default function JournalClient({ firstName }: { firstName: string | null 
     try {
       const res = await fetch('/api/journal/insights');
       const d = await res.json();
+      if (res.status === 402) { setInsightsError('__gated__'); return; }
       if (!res.ok) throw new Error();
       if (d.ok) setInsights(d.insights);
       else setInsightsNeeded({ count: d.count ?? 0, needed: d.needed ?? 3 });
@@ -178,6 +351,22 @@ export default function JournalClient({ firstName }: { firstName: string | null 
     }
   }
 
+  async function loadPeriodSummary(period: 'week' | 'month') {
+    setPeriodLoading(period);
+    setInsightsError(null);
+    try {
+      const res = await fetch(`/api/journal/insights?period=${period}`);
+      const d = await res.json();
+      if (res.status === 402) { setInsightsError('__gated__'); return; }
+      if (!res.ok || !d.ok) throw new Error();
+      setPeriodSummary(d.summary);
+    } catch {
+      setInsightsError('Nova n\'a pas réussi à résumer cette période. Réessaie dans un instant.');
+    } finally {
+      setPeriodLoading(null);
+    }
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ background: 'var(--paper)' }}>
@@ -185,6 +374,8 @@ export default function JournalClient({ firstName }: { firstName: string | null 
       </main>
     );
   }
+
+  const showOnboarding = !hasAny && !todayEntry;
 
   return (
     <main className="min-h-screen pb-28" style={{ background: 'var(--paper)' }}>
@@ -202,119 +393,167 @@ export default function JournalClient({ firstName }: { firstName: string | null 
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
 
-        {!hasAny && (
-          <div
-            className="rounded-3xl p-6 text-center"
-            style={{ background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)' }}
-          >
-            <div className="text-4xl mb-3">📖</div>
-            <p className="font-display text-lg font-black mb-1.5" style={{ color: 'var(--ink)' }}>
-              Ton journal émotionnel t&apos;attend
+        {showOnboarding ? (
+          <OnboardingFlow onSubmit={persistEntry} saving={saving} />
+        ) : (
+          /* Entrée du jour */
+          <div className="rounded-3xl p-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+            <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#6b6055' }}>
+              {todayEntry ? "Aujourd'hui" : "Comment te sens-tu aujourd'hui ?"}
             </p>
-            <p className="text-sm leading-relaxed" style={{ color: '#6b6055' }}>
-              Commence ton premier jour pour permettre à Nova de mieux te connaître.
-            </p>
+
+            {todayEntry ? (
+              <div>
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="text-3xl leading-none">{moodEmoji(todayEntry.mood)}</span>
+                    <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Humeur</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="text-3xl leading-none">{ENERGY_LEVELS.find((l) => l.value === todayEntry.energy)?.emoji}</span>
+                    <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Énergie</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="text-3xl leading-none">{STRESS_LEVELS.find((l) => l.value === todayEntry.stress)?.emoji}</span>
+                    <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Stress</span>
+                  </div>
+                  {todayEntry.emotion && (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <span className="text-xl leading-none">{todayEntry.emotion.split(' ')[0]}</span>
+                      <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Émotion</span>
+                    </div>
+                  )}
+                </div>
+                {todayEntry.note && (
+                  <p className="text-sm mb-2 leading-relaxed whitespace-pre-line" style={{ color: '#6b6055' }}>&ldquo;{todayEntry.note}&rdquo;</p>
+                )}
+                {reflection && (
+                  <p className="text-xs mb-2 leading-relaxed" style={{ color: 'var(--gold)' }}>✦ {reflection}</p>
+                )}
+                <p className="text-xs" style={{ color: 'var(--gold)' }}>Déjà noté aujourd&apos;hui ✓</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Humeur</p>
+                  <LevelPicker levels={MOODS} selected={selectedMood} onSelect={setSelectedMood} disabled={saving} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Énergie</p>
+                  <LevelPicker levels={ENERGY_LEVELS} selected={selectedEnergy} onSelect={setSelectedEnergy} disabled={saving} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Stress</p>
+                  <LevelPicker levels={STRESS_LEVELS} selected={selectedStress} onSelect={setSelectedStress} disabled={saving} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Émotion <span style={{ color: '#a8a29e', fontWeight: 400 }}>(optionnel)</span></p>
+                  <EmotionPicker selected={selectedEmotion} onSelect={(v) => setSelectedEmotion(v === selectedEmotion ? null : v)} disabled={saving} />
+                </div>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value.slice(0, 500))}
+                  disabled={saving}
+                  placeholder="Ajoute une note (optionnel)…"
+                  rows={2}
+                  className="w-full text-sm rounded-xl px-3 py-2 resize-none outline-none"
+                  style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+                />
+                <button
+                  onClick={saveEntry}
+                  disabled={saving || !selectedMood || !selectedEnergy || !selectedStress}
+                  className="ur-btn-gold w-full py-3 text-sm disabled:opacity-40"
+                >
+                  {saving ? 'Enregistrement…' : 'Enregistrer mon jour →'}
+                </button>
+              </div>
+            )}
           </div>
         )}
-
-        {/* Entrée du jour */}
-        <div className="rounded-3xl p-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-          <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#6b6055' }}>
-            {todayEntry ? "Aujourd'hui" : "Comment te sens-tu aujourd'hui ?"}
-          </p>
-
-          {todayEntry ? (
-            <div>
-              <div className="flex items-center gap-4 mb-3">
-                <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-3xl leading-none">{moodEmoji(todayEntry.mood)}</span>
-                  <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Humeur</span>
-                </div>
-                <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-3xl leading-none">{ENERGY_LEVELS.find((l) => l.value === todayEntry.energy)?.emoji}</span>
-                  <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Énergie</span>
-                </div>
-                <div className="flex flex-col items-center gap-0.5">
-                  <span className="text-3xl leading-none">{STRESS_LEVELS.find((l) => l.value === todayEntry.stress)?.emoji}</span>
-                  <span className="text-[9px] font-semibold" style={{ color: '#a8a29e' }}>Stress</span>
-                </div>
-              </div>
-              {todayEntry.note && (
-                <p className="text-sm mb-2 leading-relaxed" style={{ color: '#6b6055' }}>&ldquo;{todayEntry.note}&rdquo;</p>
-              )}
-              <p className="text-xs" style={{ color: 'var(--gold)' }}>Déjà noté aujourd&apos;hui ✓</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Humeur</p>
-                <LevelPicker levels={MOODS} selected={selectedMood} onSelect={setSelectedMood} disabled={saving} />
-              </div>
-              <div>
-                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Énergie</p>
-                <LevelPicker levels={ENERGY_LEVELS} selected={selectedEnergy} onSelect={setSelectedEnergy} disabled={saving} />
-              </div>
-              <div>
-                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Stress</p>
-                <LevelPicker levels={STRESS_LEVELS} selected={selectedStress} onSelect={setSelectedStress} disabled={saving} />
-              </div>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value.slice(0, 500))}
-                disabled={saving}
-                placeholder="Ajoute une note (optionnel)…"
-                rows={2}
-                className="w-full text-sm rounded-xl px-3 py-2 resize-none outline-none"
-                style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
-              />
-              <button
-                onClick={saveEntry}
-                disabled={saving || !selectedMood || !selectedEnergy || !selectedStress}
-                className="ur-btn-gold w-full py-3 text-sm disabled:opacity-40"
-              >
-                {saving ? 'Enregistrement…' : 'Enregistrer mon jour →'}
-              </button>
-            </div>
-          )}
-        </div>
 
         {error && (
           <p className="text-xs text-center" style={{ color: '#c2611f' }}>{error}</p>
         )}
 
-        {/* Analyse Nova — tendances repérées dans le journal, générées à la demande */}
+        {/* Analyse Nova — tendances + résumé de période, réservés aux abonnés
+            ou à la période d'essai découverte (voir lib/journalAccess.ts). */}
         <div className="rounded-3xl p-5" style={{ background: 'var(--ink)' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">🤖</span>
-            <p className="text-sm font-black" style={{ color: '#FAF6EC' }}>Analyse de Nova</p>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🤖</span>
+              <p className="text-sm font-black" style={{ color: '#FAF6EC' }}>Analyse de Nova</p>
+            </div>
+            {access.inTrial && (
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,169,77,0.15)', color: '#e8a94d' }}>
+                Essai · {access.trialDaysLeft}j restants
+              </span>
+            )}
           </div>
 
-          {insights ? (
-            <div className="space-y-2 mb-3">
-              {insights.map((ins, i) => (
-                <p key={i} className="text-sm leading-relaxed" style={{ color: 'rgba(250,246,236,0.85)' }}>✦ {ins}</p>
-              ))}
-            </div>
-          ) : insightsNeeded ? (
-            <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-              Encore {Math.max(0, insightsNeeded.needed - insightsNeeded.count)} jour(s) à noter avant que Nova puisse repérer des tendances.
-            </p>
+          {!access.trendInsights ? (
+            <>
+              <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
+                Débloque les tendances et les résumés de période de Nova avec un abonnement.
+              </p>
+              <Link href="/pricing" className="ur-btn-gold w-full py-2.5 text-sm inline-flex items-center justify-center">
+                Débloquer Nova →
+              </Link>
+            </>
           ) : (
-            <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-              Nova peut repérer des tendances dans ton humeur, ton énergie et ton stress au fil du temps.
-            </p>
+            <>
+              {insights && (
+                <div className="space-y-2 mb-3">
+                  {insights.map((ins, i) => (
+                    <p key={i} className="text-sm leading-relaxed" style={{ color: 'rgba(250,246,236,0.85)' }}>✦ {ins}</p>
+                  ))}
+                </div>
+              )}
+              {periodSummary && (
+                <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.85)' }}>{periodSummary}</p>
+              )}
+              {!insights && !periodSummary && insightsNeeded && (
+                <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
+                  Encore {Math.max(0, insightsNeeded.needed - insightsNeeded.count)} jour(s) à noter avant que Nova puisse analyser ton journal.
+                </p>
+              )}
+              {!insights && !periodSummary && !insightsNeeded && (
+                <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
+                  Nova peut repérer des tendances et résumer une période de ton journal.
+                </p>
+              )}
+
+              {insightsError && insightsError !== '__gated__' && (
+                <p className="text-xs mb-3" style={{ color: '#e8a94d' }}>{insightsError}</p>
+              )}
+
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={loadInsights}
+                  disabled={insightsLoading || !!periodLoading}
+                  className="py-2.5 rounded-xl text-xs font-bold disabled:opacity-50"
+                  style={{ background: 'rgba(232,169,77,0.12)', border: '1px solid rgba(232,169,77,0.25)', color: '#e8a94d' }}
+                >
+                  {insightsLoading ? '…' : 'Tendances'}
+                </button>
+                <button
+                  onClick={() => loadPeriodSummary('week')}
+                  disabled={insightsLoading || !!periodLoading}
+                  className="py-2.5 rounded-xl text-xs font-bold disabled:opacity-50"
+                  style={{ background: 'rgba(232,169,77,0.12)', border: '1px solid rgba(232,169,77,0.25)', color: '#e8a94d' }}
+                >
+                  {periodLoading === 'week' ? '…' : 'Ma semaine'}
+                </button>
+                <button
+                  onClick={() => loadPeriodSummary('month')}
+                  disabled={insightsLoading || !!periodLoading}
+                  className="py-2.5 rounded-xl text-xs font-bold disabled:opacity-50"
+                  style={{ background: 'rgba(232,169,77,0.12)', border: '1px solid rgba(232,169,77,0.25)', color: '#e8a94d' }}
+                >
+                  {periodLoading === 'month' ? '…' : 'Mon mois'}
+                </button>
+              </div>
+            </>
           )}
-
-          {insightsError && <p className="text-xs mb-3" style={{ color: '#e8a94d' }}>{insightsError}</p>}
-
-          <button
-            onClick={loadInsights}
-            disabled={insightsLoading}
-            className="w-full py-2.5 rounded-xl text-sm font-bold disabled:opacity-50"
-            style={{ background: 'rgba(232,169,77,0.12)', border: '1px solid rgba(232,169,77,0.25)', color: '#e8a94d' }}
-          >
-            {insightsLoading ? 'Nova réfléchit…' : insights ? 'Rafraîchir l\'analyse' : 'Voir mes tendances'}
-          </button>
         </div>
 
         {/* Calendrier émotionnel */}
@@ -378,8 +617,9 @@ export default function JournalClient({ firstName }: { firstName: string | null 
                       </p>
                       <span className="text-xs" title="Énergie">{ENERGY_LEVELS.find((l) => l.value === e.energy)?.emoji}</span>
                       <span className="text-xs" title="Stress">{STRESS_LEVELS.find((l) => l.value === e.stress)?.emoji}</span>
+                      {e.emotion && <span className="text-xs" title="Émotion">{e.emotion.split(' ')[0]}</span>}
                     </div>
-                    {e.note && <p className="text-sm mt-1 leading-relaxed" style={{ color: '#6b6055' }}>&ldquo;{e.note}&rdquo;</p>}
+                    {e.note && <p className="text-sm mt-1 leading-relaxed whitespace-pre-line" style={{ color: '#6b6055' }}>&ldquo;{e.note}&rdquo;</p>}
                   </div>
                 </div>
               ))}
