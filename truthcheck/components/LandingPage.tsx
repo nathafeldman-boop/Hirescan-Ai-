@@ -276,6 +276,92 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ═══ 3 grandes possibilités — additif au switch du hero (on ne le
+          retire pas, il reste la promesse immédiate en haut de page). Ici,
+          on montre la profondeur du produit : ce n'est pas qu'un test.
+          Journal = démonstration visuelle uniquement, jamais du vrai contenu
+          utilisateur (l'utilisateur n'a pas encore de compte à ce stade). ═══ */}
+      <section className="relative z-10 pt-4 pb-14 px-6">
+        <div className="max-w-lg mx-auto">
+          <p className="ur-label text-[10px] text-center mb-3" style={{ color: CLAY }}>Une application, pas juste un test</p>
+          <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-10">
+            UrCecret, c&apos;est 3 façons de te comprendre
+          </h2>
+
+          <div className="space-y-5">
+
+            {/* 🧠 Test MBTI */}
+            <div className="hero-up rounded-3xl p-6" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+              <div className="text-3xl mb-4">🧠</div>
+              <h3 className="font-display text-lg font-black text-stone-900 mb-1.5">Test MBTI</h3>
+              <p className="text-sm mb-5" style={{ color: '#78716c', lineHeight: 1.6 }}>
+                Découvre ta personnalité et comprends ton fonctionnement.
+              </p>
+              <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-6 py-3 text-sm">
+                Faire mon test →
+              </Link>
+            </div>
+
+            {/* 🤖 Nova */}
+            <div className="hero-up rounded-3xl p-6" style={{ background: 'var(--ink)' }}>
+              <div className="text-3xl mb-4">🤖</div>
+              <h3 className="font-display text-lg font-black mb-1.5" style={{ color: '#FAF6EC' }}>Nova</h3>
+              <p className="text-sm mb-5" style={{ color: 'rgba(250,246,236,0.55)', lineHeight: 1.6 }}>
+                Ton IA personnelle qui apprend à te connaître.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {['Analyse une conversation', 'Comprend tes émotions', 'Crée des tests personnalisés', 'Répond à tes questions'].map((e) => (
+                  <span key={e} className="text-[11px] font-semibold px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#FAF6EC' }}>
+                    {e}
+                  </span>
+                ))}
+              </div>
+              <Link href="/chat" className="ur-btn-gold inline-flex px-6 py-3 text-sm">
+                Découvrir Nova →
+              </Link>
+            </div>
+
+            {/* 📖 Journal émotionnel */}
+            <div className="hero-up rounded-3xl p-6" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+              <div className="text-3xl mb-4">📖</div>
+              <h3 className="font-display text-lg font-black text-stone-900 mb-1.5">Journal émotionnel</h3>
+              <p className="text-sm mb-5" style={{ color: '#78716c', lineHeight: 1.6 }}>
+                Note ton humeur et découvre ton évolution.
+              </p>
+
+              {/* Aperçu — démonstration, pas de vraies données utilisateur */}
+              <div className="rounded-2xl p-4 mb-6" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
+                <div className="grid grid-cols-7 gap-1.5 mb-2">
+                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
+                    <span key={i} className="text-center text-[9px] font-bold" style={{ color: '#a8a29e' }}>{d}</span>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-1.5">
+                  {[null, null, '🙂', '😄', null, '😐', null,
+                    '😄', '🙂', null, null, '😞', '🙂', '😄',
+                    null, '😄', '🙂', '🙂', null, null, '😐',
+                    '🙂', null, '😄', '😄', '🙂', null, null].map((e, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square rounded-md flex items-center justify-center text-xs"
+                      style={{ background: e ? 'var(--gold-soft)' : 'var(--paper-panel)', border: '1px solid var(--line)' }}
+                    >
+                      {e ?? ''}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-center mt-3" style={{ color: '#a8a29e' }}>Aperçu · exemple</p>
+              </div>
+
+              <Link href="/journal" className="ur-btn-gold inline-flex px-6 py-3 text-sm">
+                Commencer mon journal →
+              </Link>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ── Pourquoi c'est différent — rangées éditoriales, pas des cartes ── */}
       <section className="relative z-10 pb-12 px-6">
         <div className="max-w-lg mx-auto">

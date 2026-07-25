@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
 import NovaAvatar from '@/components/NovaAvatar';
+import AppTabBar from '@/components/AppTabBar';
 import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
 interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
@@ -48,12 +49,13 @@ const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 // ── Suggestions Nova — visibles sans écrire, cliquables, jamais un cul-de-sac.
 // "analyze" et "quiz" ouvrent les vraies features structurées (réservées aux
-// abonnés). "chat" envoie un vrai premier message à Nova qui exploite déjà
-// tout ce qu'elle sait (profil MBTI) — utile et honnête même si "Journal" et
-// "Compatibilité" n'ont pas encore leur propre écran dédié (Phase 2). ──────────
-const NOVA_SUGGESTIONS: { emoji: string; label: string; kind: 'analyze' | 'quiz' | 'chat'; prompt?: string }[] = [
+// abonnés). "link" mène vers un vrai écran dédié (ex. Journal). "chat" envoie
+// un vrai premier message à Nova qui exploite déjà tout ce qu'elle sait
+// (profil MBTI) — utile et honnête tant que "Compatibilité" n'a pas encore
+// son propre écran dédié (Phase 2). ──────────────────────────────────────────
+const NOVA_SUGGESTIONS: { emoji: string; label: string; kind: 'analyze' | 'quiz' | 'chat' | 'link'; prompt?: string; href?: string }[] = [
   { emoji: '🧠', label: 'Analyser une conversation', kind: 'analyze' },
-  { emoji: '📖', label: 'Journal émotionnel', kind: 'chat', prompt: 'Comment s\'est passée ma journée ? Aide-moi à faire le point sur comment je me sens en ce moment.' },
+  { emoji: '📖', label: 'Journal émotionnel', kind: 'link', href: '/journal' },
   { emoji: '✨', label: 'Me connaître davantage', kind: 'chat', prompt: 'Dis-moi ce que mon profil dit vraiment de moi, en profondeur — mes schémas, mes angles morts, ce que je ne vois pas moi-même.' },
   { emoji: '👥', label: 'Créer un test entre amis', kind: 'quiz' },
   { emoji: '❤️', label: 'Compatibilité', kind: 'chat', prompt: 'Aide-moi à comprendre ma compatibilité avec quelqu\'un — qu\'est-ce qui compte vraiment selon mon profil ?' },
@@ -386,7 +388,7 @@ export default function ChatClient() {
   const empty = messages.length === 0;
 
   return (
-    <main className="min-h-screen flex flex-col" style={{ background: 'var(--paper)' }}>
+    <main className="min-h-screen flex flex-col" style={{ background: 'var(--paper)', paddingBottom: 64 }}>
       {/* Header */}
       <header className="sticky top-0 z-20 flex items-center justify-between px-4 py-3"
         style={{ background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
@@ -461,16 +463,31 @@ export default function ChatClient() {
                       {gated && <span className="text-[10px]" style={{ color: 'var(--gold)' }}>🔒 Abonnés</span>}
                     </>
                   );
-                  return gated ? (
-                    <Link
-                      key={s.label}
-                      href="/pricing"
-                      className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
-                      style={{ background: 'var(--paper-panel)', border: '1px dashed var(--line)' }}
-                    >
-                      {content}
-                    </Link>
-                  ) : (
+                  if (gated) {
+                    return (
+                      <Link
+                        key={s.label}
+                        href="/pricing"
+                        className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                        style={{ background: 'var(--paper-panel)', border: '1px dashed var(--line)' }}
+                      >
+                        {content}
+                      </Link>
+                    );
+                  }
+                  if (s.kind === 'link' && s.href) {
+                    return (
+                      <Link
+                        key={s.label}
+                        href={s.href}
+                        className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                        style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
+                      >
+                        {content}
+                      </Link>
+                    );
+                  }
+                  return (
                     <button
                       key={s.label}
                       onClick={() => handleSuggestion(s)}
@@ -645,8 +662,17 @@ export default function ChatClient() {
                 <span className="flex-1">Analyser une conversation{isFree ? ' — débloque avec un abonnement' : ''}</span>
               </button>
 
+              <Link
+                href="/journal"
+                onClick={() => setActionsMenuOpen(false)}
+                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left"
+                style={{ color: 'var(--ink)' }}
+              >
+                <span className="text-lg">📖</span>
+                <span className="flex-1">Journal émotionnel</span>
+              </Link>
+
               {([
-                { emoji: '📖', label: 'Journal émotionnel' },
                 { emoji: '👥', label: 'Compatibilité avec un ami' },
                 { emoji: '✨', label: 'Analyse de personnalité avancée' },
               ] as const).map((a) => (
@@ -928,6 +954,8 @@ export default function ChatClient() {
           </div>
         </div>
       )}
+
+      <AppTabBar />
     </main>
   );
 }

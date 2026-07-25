@@ -84,6 +84,28 @@ model User {
   chatMessages ChatMessage[]
   customQuizzes CustomQuiz[]
   conversationAnalyses ConversationAnalysis[]
+  journalEntries JournalEntry[]
+}
+
+// ── Journal émotionnel ───────────────────────────────────────────────────────
+// Une entrée par jour (clé unique userId+day, upsert). Volontairement PAS
+// réservé aux abonnés — c'est un levier d'engagement quotidien à la Duolingo,
+// utile justement pour faire revenir un compte gratuit avant même de payer.
+// mood : échelle 1-5 (😞😕😐🙂😄). Alimentera la mémoire long terme de Nova
+// plus tard (pas encore branché — voir ConversationAnalysis, même logique).
+model JournalEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  day       String   // "YYYY-MM-DD" (fuseau Europe/Paris)
+  mood      Int      // 1 (😞) à 5 (😄)
+  note      String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@index([userId])
 }
 
 // ── Analyse de conversation par Nova (feature phare, pensée pour être virale) ──
