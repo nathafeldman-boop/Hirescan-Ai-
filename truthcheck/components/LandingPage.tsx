@@ -60,7 +60,7 @@ export default function LandingPage() {
   const [stickyVisible, setStickyVisible] = useState(false);
   // Switch immédiatement visible en haut du hero — le nouveau visiteur doit
   // comprendre en un coup d'œil qu'UrCecret, ce n'est plus QUE le test MBTI.
-  const [heroTab, setHeroTab] = useState<'mbti' | 'nova'>('mbti');
+  const [heroTab, setHeroTab] = useState<'mbti' | 'nova' | 'journal'>('mbti');
 
   useEffect(() => {
     const onScroll = () => {
@@ -149,6 +149,13 @@ export default function LandingPage() {
               >
                 🤖 Nova
               </button>
+              <button
+                onClick={() => setHeroTab('journal')}
+                className="px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap"
+                style={heroTab === 'journal' ? { background: 'var(--ink)', color: '#FAF6EC' } : { color: '#78716c' }}
+              >
+                📖 Journal
+              </button>
             </div>
           </div>
 
@@ -215,7 +222,7 @@ export default function LandingPage() {
                 ))}
               </div>
             </>
-          ) : (
+          ) : heroTab === 'nova' ? (
             <>
               <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
                 Ton coach IA personnel
@@ -264,6 +271,71 @@ export default function LandingPage() {
                   { value: '24/7', label: 'Toujours dispo' },
                   { value: '100%', label: 'Selon TON profil' },
                   { value: '5', label: 'Messages offerts' },
+                ].map((s) => (
+                  <div key={s.label}>
+                    <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
+                    <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
+                Ton compagnon quotidien
+              </p>
+
+              <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
+                Une app qui te connaît{' '}
+                <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
+                  jour après jour
+                  <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden>
+                    <path d="M3 7C48 3 130 2.5 197 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
+                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
+                  </svg>
+                </em>
+                .
+              </h1>
+
+              <p className="hero-up text-[15px] max-w-sm mx-auto mb-6 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
+                Note ton humeur, ton énergie, ton stress — Nova repère tes tendances et t&apos;aide à mieux te comprendre au fil du temps.
+              </p>
+
+              {/* Aperçu — démonstration, pas de vraies données utilisateur */}
+              <div className="hero-up max-w-[220px] mx-auto mb-8 rounded-2xl p-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', animationDelay: '.2s' }}>
+                <div className="grid grid-cols-7 gap-1">
+                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
+                    <span key={i} className="text-center text-[8px] font-bold" style={{ color: '#a8a29e' }}>{d}</span>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-1 mt-1">
+                  {[null, null, '🙂', '😄', null, '😐', null,
+                    '😄', '🙂', null, null, '😞', '🙂', '😄'].map((e, i) => (
+                    <div key={i} className="aspect-square rounded flex items-center justify-center text-[10px]" style={{ background: e ? 'var(--gold-soft)' : 'var(--paper)', border: '1px solid var(--line)' }}>
+                      {e ?? ''}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="hero-up" style={{ animationDelay: '.24s' }}>
+                <Link
+                  href="/journal"
+                  className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
+                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}
+                >
+                  Commencer mon journal →
+                </Link>
+              </div>
+              <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
+                Gratuit, calendrier illimité.
+              </p>
+
+              <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
+                {[
+                  { value: '1 min', label: 'Par jour' },
+                  { value: '4', label: 'Signaux suivis' },
+                  { value: '100%', label: 'Gratuit' },
                 ].map((s) => (
                   <div key={s.label}>
                     <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
