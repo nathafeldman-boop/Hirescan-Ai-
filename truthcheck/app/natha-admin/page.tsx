@@ -37,7 +37,6 @@ export default async function NathaAdminPage() {
   const startOfMonth = parisMidnight(monthParis);
   const sevenDaysAgo = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
   const fourteenAgo  = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-  const startOfYear  = new Date(now.getFullYear(), 0, 1);
 
   const [
     totalUsers, premiumUsers, newToday, newThisWeek, newLastWeek,
@@ -47,8 +46,11 @@ export default async function NathaAdminPage() {
     topPages, recentUsers, affiliates, quizResults, allConversions,
   ] = await Promise.all([
     prisma.user.count(),
-    // Exclude synthetic access-code testers (@urcecret.app) from real client counts
-    prisma.user.count({ where: { tier: 'premium', NOT: { email: { endsWith: '@urcecret.app' } } } }),
+    // Exclude synthetic access-code testers (@urcecret.app) from real client counts.
+    // "Premium" ici = tout palier payant récurrent (starter/plus/premium) — avant ce
+    // fix, ne comptait que tier==='premium' et ratait tous les abonnés Starter/Plus
+    // introduits depuis (voir lib/plans.ts).
+    prisma.user.count({ where: { tier: { in: ['starter', 'plus', 'premium'] }, NOT: { email: { endsWith: '@urcecret.app' } } } }),
     prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
     prisma.user.count({ where: { createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
@@ -70,7 +72,11 @@ export default async function NathaAdminPage() {
       return aff.map((a, i) => ({ ...a, clicks: clicks[i] }));
     }),
     prisma.quizResult.findMany({ select: { quizSlug: true, paid: true } }),
-    prisma.affiliateConversion.findMany({ select: { amountCents: true, createdAt: true } }),
+    // Conversion (pas AffiliateConversion) : le vrai livre de comptes, une ligne
+    // par paiement Stripe réussi, affilié ou non. AffiliateConversion n'existe
+    // QUE pour les ventes venues d'un lien d'affilié (voir /api/webhook) — l'utiliser
+    // ici affichait 0 € dès que les ventes du mois venaient du trafic direct/TikTok.
+    prisma.conversion.findMany({ select: { amountCents: true, createdAt: true } }),
   ]);
 
   // Quiz drop-off funnel (MBTI personnalite)
@@ -118,12 +124,21 @@ export default async function NathaAdminPage() {
   const revenueTotal = allConversions.reduce((s, c) => s + c.amountCents, 0);
 
   // ── MRR réel ──────────────────────────────────────────────────────────────
-  // Seulement les abonnements récurrents (mensuel + annuel). On EXCLUT :
+  // Tous les paliers récurrents : starter (1,99€/mo), plus (5€/mo), premium
+  // mensuel (9,99€/mo) ou annuel (29,99€/an). On EXCLUT :
   //  • les codes de test (jamais de Conversion)
-  //  • les achats uniques à 1,99 € (productType = 'onetime')
-  // Et on ne compte que les abonnés encore actifs (tier premium, pas résiliés).
+  //  • les achats uniques (productType = 'onetime' / 'rapport' / 'fusion')
+  // Et on ne compte que les abonnés encore actifs (tier non résilié). Avant ce
+  // fix, le filtre ne reconnaissait que 'monthly'/'annual' et le palier 'premium'
+  // — Starter et Plus (ajoutés depuis) tombaient tous les deux à 0.
+  const PLAN_RATE_CENTS: Record<string, number> = {
+    starter: 199,
+    plus: 500,
+    monthly: 999,
+    annual: Math.round(2999 / 12),
+  };
   const subConversions = await prisma.conversion.findMany({
-    where: { productType: { in: ['monthly', 'annual'] } },
+    where: { productType: { in: ['starter', 'plus', 'monthly', 'annual'] } },
     select: { email: true, productType: true, createdAt: true },
     orderBy: { createdAt: 'desc' },
   });
@@ -133,15 +148,20 @@ export default async function NathaAdminPage() {
   }
   const subEmails = Array.from(planByEmail.keys());
   const activeSubs = subEmails.length
-    ? await prisma.user.findMany({ where: { email: { in: subEmails }, tier: 'premium' }, select: { email: true } })
+    ? await prisma.user.findMany({ where: { email: { in: subEmails }, tier: { in: ['starter', 'plus', 'premium'] } }, select: { email: true } })
     : [];
-  let monthlySubs = 0, annualSubs = 0;
+  const planCounts: Record<string, number> = { starter: 0, plus: 0, monthly: 0, annual: 0 };
   for (const u of activeSubs) {
-    if (planByEmail.get(u.email ?? '') === 'annual') annualSubs++;
-    else monthlySubs++;
+    const plan = planByEmail.get(u.email ?? '') ?? 'monthly';
+    planCounts[plan] = (planCounts[plan] ?? 0) + 1;
   }
-  const subscriberCount = monthlySubs + annualSubs;
-  const MRR = monthlySubs * 999 + annualSubs * Math.round(2999 / 12);
+  const subscriberCount = activeSubs.length;
+  const MRR = Object.entries(planCounts).reduce((sum, [plan, n]) => sum + n * (PLAN_RATE_CENTS[plan] ?? 0), 0);
+  const planLabel: Record<string, string> = { starter: 'starter', plus: 'plus', monthly: 'mensuel', annual: 'annuel' };
+  const planBreakdown = Object.entries(planCounts)
+    .filter(([, n]) => n > 0)
+    .map(([plan, n]) => `${n} ${planLabel[plan]}`)
+    .join(' + ');
 
   const byQuiz: Record<string, { total: number; paid: number }> = {};
   for (const r of quizResults) {
@@ -149,50 +169,54 @@ export default async function NathaAdminPage() {
     byQuiz[r.quizSlug].total++;
     if (r.paid) byQuiz[r.quizSlug].paid++;
   }
-  const quizSorted = Object.entries(byQuiz).sort((a, b) => b[1].total - a[1].total);
+  void byQuiz; // conservé pour usage futur (détail par quiz) — pas affiché sur cette page
 
   function arrow(current: number, previous: number) {
     if (previous === 0) return current > 0 ? '↑' : '';
     return current >= previous ? '↑' : '↓';
   }
   function trendColor(current: number, previous: number) {
-    if (previous === 0) return current > 0 ? '#4ade80' : '#71717a';
-    return current >= previous ? '#4ade80' : '#f87171';
+    if (previous === 0) return current > 0 ? C.good : C.muted;
+    return current >= previous ? C.good : C.critical;
   }
 
+  // ── Design system — identique à /admin : cockpit App Store Connect / Play
+  // Console (surface claire, un seul accent bleu, sémantique restreinte), pas
+  // l'identité "oracle" ink/gold/serif du site public. Voir PRODUCT.md. ──────
   const C = {
-    bg: '#09090b',
-    surface: '#111113',
-    border: '#1f1f23',
-    text: '#f4f4f5',
-    muted: '#71717a',
-    green: '#4ade80',
-    blue: '#38bdf8',
-    purple: '#d17d52',
-    pink: '#e0a380',
-    orange: '#fb923c',
-    yellow: '#fbbf24',
-    red: '#f87171',
+    bg: '#f5f5f7',
+    surface: '#ffffff',
+    surfaceGood: 'rgba(26,158,70,0.06)',
+    border: '#d2d2d7',
+    borderSoft: '#e8e8ed',
+    text: '#1d1d1f',
+    muted: '#6e6e73',
+    faint: '#98989d',
+    primary: '#0071e3',
+    good: '#1a9e46',
+    goodBorder: 'rgba(26,158,70,0.25)',
+    warn: '#c26a00',
+    critical: '#d70015',
+    violet: '#af52de',
   };
 
   const block = (bg: string, border: string): React.CSSProperties => ({
     background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: '18px 20px',
   });
 
-  const label: React.CSSProperties = { color: C.muted, fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8, margin: 0 };
-  const bigNum: React.CSSProperties = { color: C.text, fontSize: 28, fontWeight: 900, margin: '6px 0 0', lineHeight: 1 };
-  const sub: React.CSSProperties = { color: C.muted, fontSize: 12, margin: '4px 0 0' };
+  const label: React.CSSProperties = { color: C.muted, fontSize: 13, fontWeight: 500, margin: 0 };
+  const bigNum: React.CSSProperties = { color: C.text, fontSize: 27, fontWeight: 700, margin: '8px 0 0', lineHeight: 1.1, letterSpacing: '-0.01em', fontVariantNumeric: 'tabular-nums' };
+  const sub: React.CSSProperties = { color: C.muted, fontSize: 12.5, margin: '4px 0 0' };
+  const sectionHeading: React.CSSProperties = { color: C.text, fontSize: 15, fontWeight: 700, marginBottom: 12, marginTop: 0 };
 
   return (
-    <div style={{ background: C.bg, minHeight: '100vh', color: C.text, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ background: C.bg, minHeight: '100vh', color: C.text, fontFamily: 'var(--font-sans), -apple-system, system-ui, sans-serif' }}>
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px 80px' }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 36 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 900, margin: 0, letterSpacing: -1 }}>
-            <span style={{ background: 'linear-gradient(90deg,#d17d52,#e0a380)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Ur</span>
-            <span style={{ color: '#fff' }}>Cecret</span>
-            <span style={{ color: C.muted, fontWeight: 400, fontSize: 16, marginLeft: 12 }}>— tableau de bord</span>
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, letterSpacing: '-0.01em', color: C.text }}>
+            UrCecret<span style={{ color: C.muted, fontWeight: 400, fontSize: 15, marginLeft: 10 }}>— tableau de bord</span>
           </h1>
           <p style={{ color: C.muted, fontSize: 13, margin: '6px 0 0' }}>
             {now.toLocaleDateString('fr-FR', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long' })} à {now.toLocaleTimeString('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' })}
@@ -200,8 +224,8 @@ export default async function NathaAdminPage() {
         </div>
 
         {/* ── SECTION 1 : Ce qui s'est passé aujourd'hui ── */}
-        <p style={{ color: C.purple, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Aujourd'hui</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
+        <p style={sectionHeading}>Aujourd&apos;hui</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 28 }}>
 
           <div style={block(C.surface, C.border)}>
             <p style={label}>Personnes venues</p>
@@ -210,7 +234,7 @@ export default async function NathaAdminPage() {
           </div>
 
           <div style={block(C.surface, C.border)}>
-            <p style={label}>Sur la page d'accueil</p>
+            <p style={label}>Sur la page d&apos;accueil</p>
             <p style={bigNum}>{landingToday}</p>
             <p style={sub}>ont vu la landing</p>
           </div>
@@ -224,14 +248,14 @@ export default async function NathaAdminPage() {
           <div style={block(C.surface, C.border)}>
             <p style={label}>Achats payants</p>
             <p style={bigNum}>{paidToday}</p>
-            <p style={{ ...sub, color: paidToday > 0 ? C.green : C.muted }}>{paidToday > 0 ? `${euros(paidToday * 199)} encaissés` : 'aucun encore'}</p>
+            <p style={{ ...sub, color: paidToday > 0 ? C.good : C.muted }}>{paidToday > 0 ? `${euros(paidToday * 199)} encaissés` : 'aucun encore'}</p>
           </div>
 
         </div>
 
         {/* ── SECTION 2 : Cette semaine vs semaine dernière ── */}
-        <p style={{ color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Cette semaine vs semaine dernière</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
+        <p style={sectionHeading}>Cette semaine vs semaine dernière</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 28 }}>
 
           {[
             { label: 'Visiteurs', current: visitsWeek, previous: visitsLastWeek, unit: '' },
@@ -243,33 +267,33 @@ export default async function NathaAdminPage() {
               <p style={{ ...bigNum, color: trendColor(current, previous) }}>
                 {arrow(current, previous)} {current}{unit}
               </p>
-              <p style={sub}>était {previous}{unit} la sem. d'avant</p>
+              <p style={sub}>était {previous}{unit} la sem. d&apos;avant</p>
             </div>
           ))}
 
           <div style={block(C.surface, C.border)}>
             <p style={label}>Argent entré</p>
-            <p style={{ ...bigNum, color: revenueWeek > 0 ? C.green : C.text }}>{euros(revenueWeek)}</p>
+            <p style={{ ...bigNum, color: revenueWeek > 0 ? C.good : C.text }}>{euros(revenueWeek)}</p>
             <p style={sub}>cette semaine (affiliés)</p>
           </div>
 
         </div>
 
         {/* ── SECTION 3 : Argent ── */}
-        <p style={{ color: C.green, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Argent</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
+        <p style={sectionHeading}>Argent</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 28 }}>
 
-          <div style={{ ...block('rgba(74,222,128,0.06)', 'rgba(74,222,128,0.2)'), gridColumn: '1 / -1' }}>
+          <div style={{ ...block(C.surfaceGood, C.goodBorder), gridColumn: '1 / -1' }}>
             <p style={label}>Revenus mensuels estimés (MRR)</p>
-            <p style={{ ...bigNum, fontSize: 36, color: C.green }}>{euros(MRR)}</p>
+            <p style={{ ...bigNum, fontSize: 34, color: C.good }}>{euros(MRR)}</p>
             <p style={sub}>
               {subscriberCount} abonné{subscriberCount > 1 ? 's' : ''} récurrent{subscriberCount > 1 ? 's' : ''}
-              {subscriberCount > 0 ? ` · ${monthlySubs} mensuel${monthlySubs > 1 ? 's' : ''} + ${annualSubs} annuel${annualSubs > 1 ? 's' : ''}` : ' (hors codes test & achats 1,99 €)'}
+              {subscriberCount > 0 ? ` · ${planBreakdown}` : ' (hors codes test & achats one-shot)'}
             </p>
           </div>
 
           <div style={block(C.surface, C.border)}>
-            <p style={label}>Aujourd'hui</p>
+            <p style={label}>Aujourd&apos;hui</p>
             <p style={bigNum}>{euros(revenueToday)}</p>
           </div>
           <div style={block(C.surface, C.border)}>
@@ -284,8 +308,8 @@ export default async function NathaAdminPage() {
         </div>
 
         {/* ── SECTION 4 : Clients ── */}
-        <p style={{ color: C.pink, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Clients</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
+        <p style={sectionHeading}>Clients</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 28 }}>
 
           <div style={block(C.surface, C.border)}>
             <p style={label}>Inscrits au total</p>
@@ -294,7 +318,7 @@ export default async function NathaAdminPage() {
           </div>
           <div style={block(C.surface, C.border)}>
             <p style={label}>Clients premium</p>
-            <p style={{ ...bigNum, color: C.pink }}>{premiumUsers}</p>
+            <p style={{ ...bigNum, color: C.primary }}>{premiumUsers}</p>
             <p style={sub}>{pct(premiumUsers, totalUsers)} des inscrits · hors codes test</p>
           </div>
           <div style={block(C.surface, C.border)}>
@@ -311,13 +335,13 @@ export default async function NathaAdminPage() {
         </div>
 
         {/* ── SECTION 5 : Affiliés ── */}
-        <p style={{ color: C.yellow, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Tes affiliés</p>
+        <p style={sectionHeading}>Tes affiliés</p>
         {affiliates.length === 0 ? (
-          <div style={{ ...block(C.surface, C.border), marginBottom: 32, color: C.muted, fontSize: 14 }}>
-            Aucun affilié pour l'instant.
+          <div style={{ ...block(C.surface, C.border), marginBottom: 28, color: C.muted, fontSize: 14 }}>
+            Aucun affilié pour l&apos;instant.
           </div>
         ) : (
-          <div style={{ marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {affiliates.map(a => {
               const ca = a.conversions.reduce((s, c) => s + c.amountCents, 0);
               const commission = a.conversions.reduce((s, c) => s + c.commissionCents, 0);
@@ -330,25 +354,25 @@ export default async function NathaAdminPage() {
                   <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ ...label, marginBottom: 2 }}>Clics</p>
-                      <p style={{ color: C.blue, fontWeight: 900, fontSize: 20, margin: 0 }}>{a.clicks}</p>
+                      <p style={{ color: C.primary, fontWeight: 700, fontSize: 19, margin: 0 }}>{a.clicks}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ ...label, marginBottom: 2 }}>Tx conv.</p>
-                      <p style={{ color: C.purple, fontWeight: 900, fontSize: 20, margin: 0 }}>
+                      <p style={{ color: C.violet, fontWeight: 700, fontSize: 19, margin: 0 }}>
                         {a.clicks > 0 ? `${((a.conversions.length / a.clicks) * 100).toFixed(1)}%` : '—'}
                       </p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ ...label, marginBottom: 2 }}>Ventes</p>
-                      <p style={{ color: C.text, fontWeight: 900, fontSize: 20, margin: 0 }}>{a.conversions.length}</p>
+                      <p style={{ color: C.text, fontWeight: 700, fontSize: 19, margin: 0 }}>{a.conversions.length}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ ...label, marginBottom: 2 }}>CA généré</p>
-                      <p style={{ color: C.yellow, fontWeight: 900, fontSize: 20, margin: 0 }}>{euros(ca)}</p>
+                      <p style={{ color: C.warn, fontWeight: 700, fontSize: 19, margin: 0 }}>{euros(ca)}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ ...label, marginBottom: 2 }}>À payer</p>
-                      <p style={{ color: C.pink, fontWeight: 900, fontSize: 20, margin: 0 }}>{euros(commission)}</p>
+                      <p style={{ color: C.good, fontWeight: 700, fontSize: 19, margin: 0 }}>{euros(commission)}</p>
                     </div>
                   </div>
                 </div>
@@ -358,18 +382,18 @@ export default async function NathaAdminPage() {
         )}
 
         {/* ── SECTION 7 : Funnel drop-off MBTI ── */}
-        <p style={{ color: C.pink, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Funnel MBTI — où les gens lâchent</p>
-        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
+        <p style={sectionHeading}>Funnel MBTI — où les gens lâchent</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
           {fStart === 0 && <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>Pas encore de données (tracking actif depuis ce soir).</p>}
           {fStart > 0 && (() => {
             const steps = [
-              { label: 'Démarré le quiz', n: fStart, color: C.blue },
-              { label: 'Q25 atteinte', n: fQ25, color: C.purple },
-              { label: 'Q50 atteinte', n: fQ50, color: C.yellow },
-              { label: 'Q75 atteinte', n: fQ75, color: C.orange },
-              { label: 'Quiz terminé (100)', n: fComplete, color: C.green },
-              { label: 'Paywall vu', n: fPaywall, color: C.pink },
-              { label: 'Paiement cliqué', n: fCheckout, color: C.green },
+              { label: 'Démarré le quiz', n: fStart, color: C.primary },
+              { label: 'Q25 atteinte', n: fQ25, color: C.violet },
+              { label: 'Q50 atteinte', n: fQ50, color: C.warn },
+              { label: 'Q75 atteinte', n: fQ75, color: '#ff9500' },
+              { label: 'Quiz terminé (100)', n: fComplete, color: C.good },
+              { label: 'Paywall vu', n: fPaywall, color: '#5e5ce6' },
+              { label: 'Paiement cliqué', n: fCheckout, color: C.good },
             ];
             const maxN = steps[0].n || 1;
             return steps.map((s, i) => {
@@ -377,15 +401,15 @@ export default async function NathaAdminPage() {
               const dropVsNext = i < steps.length - 1 && s.n > 0 && steps[i + 1].n > 0
                 ? Math.round(((s.n - steps[i + 1].n) / s.n) * 100) : null;
               return (
-                <div key={s.label} style={{ padding: '10px 0', borderBottom: i < steps.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                <div key={s.label} style={{ padding: '10px 0', borderBottom: i < steps.length - 1 ? `1px solid ${C.borderSoft}` : 'none' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
-                    <span style={{ color: C.muted, fontSize: 12, width: 22, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ color: C.faint, fontSize: 12, width: 22, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
                     <span style={{ flex: 1, color: C.text, fontSize: 13, fontWeight: 600 }}>{s.label}</span>
-                    <span style={{ color: s.color, fontSize: 15, fontWeight: 900, minWidth: 30, textAlign: 'right' }}>{s.n}</span>
+                    <span style={{ color: s.color, fontSize: 15, fontWeight: 700, minWidth: 30, textAlign: 'right' }}>{s.n}</span>
                     <span style={{ color: C.muted, fontSize: 12, width: 44, textAlign: 'right' }}>{pctVal}%</span>
-                    {dropVsNext !== null && <span style={{ color: C.red, fontSize: 11, fontWeight: 700, width: 52, textAlign: 'right' }}>−{dropVsNext}%</span>}
+                    {dropVsNext !== null && <span style={{ color: C.critical, fontSize: 11, fontWeight: 700, width: 52, textAlign: 'right' }}>−{dropVsNext}%</span>}
                   </div>
-                  <div style={{ marginLeft: 32, height: 5, borderRadius: 3, background: C.border, overflow: 'hidden' }}>
+                  <div style={{ marginLeft: 32, height: 5, borderRadius: 3, background: C.borderSoft, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${pctVal}%`, background: s.color, borderRadius: 3, transition: 'width 0.4s' }} />
                   </div>
                 </div>
@@ -395,37 +419,37 @@ export default async function NathaAdminPage() {
         </div>
 
         {/* ── SECTION 8 : Pages les plus vues ── */}
-        <p style={{ color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Pages les plus vues</p>
-        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
+        <p style={sectionHeading}>Pages les plus vues</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
           {topPages.map((p, i) => (
-            <div key={p.path} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < topPages.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-              <span style={{ color: C.muted, fontSize: 13, width: 20, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+            <div key={p.path} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < topPages.length - 1 ? `1px solid ${C.borderSoft}` : 'none' }}>
+              <span style={{ color: C.faint, fontSize: 13, width: 20, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
               <span style={{ flex: 1, color: C.text, fontSize: 13, fontFamily: 'monospace' }}>{p.path}</span>
-              <span style={{ color: C.blue, fontSize: 14, fontWeight: 700 }}>{p._count.path}</span>
+              <span style={{ color: C.primary, fontSize: 14, fontWeight: 700 }}>{p._count.path}</span>
             </div>
           ))}
           {topPages.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucune visite encore.</p>}
         </div>
 
         {/* ── SECTION 8 : Derniers inscrits ── */}
-        <p style={{ color: C.purple, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Derniers inscrits</p>
-        <div style={{ ...block(C.surface, C.border), marginBottom: 32 }}>
-          {recentUsers.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun inscrit pour l'instant.</p>}
+        <p style={sectionHeading}>Derniers inscrits</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
+          {recentUsers.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun inscrit pour l&apos;instant.</p>}
           {recentUsers.map((u, i) => (
-            <div key={u.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentUsers.length - 1 ? `1px solid ${C.border}` : 'none', flexWrap: 'wrap' }}>
+            <div key={u.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentUsers.length - 1 ? `1px solid ${C.borderSoft}` : 'none', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ color: C.text, fontSize: 14, fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {u.name ?? u.email ?? 'Anonyme'}
                 </p>
-                <p style={{ color: C.muted, fontSize: 11, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ color: C.muted, fontSize: 11.5, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {u.email} · {new Date(u.createdAt).toLocaleDateString('fr-FR')}
                 </p>
               </div>
               <span style={{
-                padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                background: u.tier === 'premium' ? 'rgba(209,125,82,0.15)' : 'rgba(255,255,255,0.05)',
-                color: u.tier === 'premium' ? C.purple : C.muted,
-                border: `1px solid ${u.tier === 'premium' ? 'rgba(209,125,82,0.3)' : C.border}`,
+                padding: '3px 10px', borderRadius: 999, fontSize: 11.5, fontWeight: 600,
+                background: u.tier === 'premium' ? 'rgba(0,113,227,0.08)' : '#f0f0f2',
+                color: u.tier === 'premium' ? C.primary : C.muted,
+                border: `1px solid ${u.tier === 'premium' ? 'rgba(0,113,227,0.25)' : C.borderSoft}`,
                 flexShrink: 0,
               }}>
                 {u.tier === 'premium' ? 'Premium' : 'Gratuit'}
@@ -435,28 +459,28 @@ export default async function NathaAdminPage() {
         </div>
 
         {/* ── SECTION 9 : Diagnostic TikTok funnel (7 derniers jours) ── */}
-        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>Diagnostic funnel TikTok — 7 derniers jours</p>
+        <p style={sectionHeading}>Diagnostic funnel TikTok — 7 derniers jours</p>
         <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
           {diagData.map((d, i) => (
-            <div key={d.step} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < diagData.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-              <span style={{ flex: 1, color: d.count > 0 ? C.text : C.muted, fontSize: 13, fontFamily: 'monospace' }}>
+            <div key={d.step} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < diagData.length - 1 ? `1px solid ${C.borderSoft}` : 'none' }}>
+              <span style={{ flex: 1, color: d.count > 0 ? C.text : C.faint, fontSize: 13, fontFamily: 'monospace' }}>
                 {'/__diag/' + d.step}
               </span>
               <span style={{
-                color: d.count > 0 ? C.orange : C.muted,
+                color: d.count > 0 ? C.warn : C.faint,
                 fontSize: 14, fontWeight: 700, minWidth: 32, textAlign: 'right',
               }}>
                 {d.count}
               </span>
             </div>
           ))}
-          <p style={{ color: C.muted, fontSize: 11, marginTop: 12, marginBottom: 0 }}>
-            Ces compteurs apparaissent dès qu'un utilisateur atteint l'étape correspondante. Zéro = l'étape n'a pas été atteinte.
+          <p style={{ color: C.faint, fontSize: 11.5, marginTop: 12, marginBottom: 0 }}>
+            Ces compteurs apparaissent dès qu&apos;un utilisateur atteint l&apos;étape correspondante. Zéro = l&apos;étape n&apos;a pas été atteinte.
           </p>
         </div>
 
         {/* ── SECTION 10 : Codes d'accès ── */}
-        <p style={{ color: C.orange, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12, marginTop: 28 }}>Codes d&apos;accès</p>
+        <p style={{ ...sectionHeading, marginTop: 28 }}>Codes d&apos;accès</p>
         <div style={{ ...block(C.surface, C.border), marginBottom: 0 }}>
           <AccessCodeWidget initial={recentCodes} />
         </div>
