@@ -17,7 +17,13 @@ const CLAIM_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const uid = (session?.user as { id?: string } | undefined)?.id;
-  if (!uid) return NextResponse.json({ ok: false }, { status: 401 });
+  // 200 (pas 401) : ce n'est pas une erreur d'auth, c'est l'état normal d'un
+  // visiteur anonyme — Tracker.tsx appelle cette route à CHAQUE navigation,
+  // connecté ou non. Un 401 ici ne casse rien fonctionnellement (déjà
+  // retenté à la prochaine page), mais logge une "Failed to load resource"
+  // rouge dans la console de TOUT visiteur anonyme, sur TOUTE page. `reason`
+  // remplace le code de statut pour dire à Tracker.tsx de réessayer plus tard.
+  if (!uid) return NextResponse.json({ ok: false, reason: 'unauthenticated' });
 
   const inviterId = req.cookies.get('urs_invite')?.value;
   // Réponse qui efface le cookie une fois traité (succès OU no-op définitif).
