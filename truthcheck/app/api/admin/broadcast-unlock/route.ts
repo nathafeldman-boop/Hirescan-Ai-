@@ -53,9 +53,33 @@ export async function GET(req: NextRequest) {
   });
   const recipients = users.filter((u): u is { id: string; email: string; name: string | null; mbtiType: string | null } => !!u.email);
 
-  // ── Mode dry : compter sans envoyer ──
+  // ── Mode dry : compter, avec le détail par étape du filtre pour comprendre
+  // un total à 0 (déjà tous relancés ? personne en tier free ? emails
+  // synthétiques ?) sans avoir besoin d'un accès direct à la base.
   if (searchParams.get('dry')) {
-    return NextResponse.json({ ok: true, mode: 'dry', recipients: recipients.length });
+    const [totalUsers, freeTier, freeWithEmail, freeWithEmailReal, byTier, alreadyLogged] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { tier: 'free' } }),
+      prisma.user.count({ where: { tier: 'free', email: { not: null } } }),
+      prisma.user.count({ where: { tier: 'free', email: { not: null }, NOT: { email: { endsWith: '@urcecret.app' } } } }),
+      prisma.user.groupBy({ by: ['tier'], _count: true }),
+      prisma.user.count({
+        where: { tier: 'free', email: { not: null }, NOT: { email: { endsWith: '@urcecret.app' } }, emailLogs: { some: { type: EMAIL_LOG_TYPE } } },
+      }),
+    ]);
+    return NextResponse.json({
+      ok: true,
+      mode: 'dry',
+      recipients: recipients.length,
+      diagnostic: {
+        totalUsers,
+        byTier,
+        freeTier,
+        freeWithEmail,
+        freeWithEmailExcludingSynthetic: freeWithEmailReal,
+        alreadyReceivedThisCampaign: alreadyLogged,
+      },
+    });
   }
 
   // ── Mode test : envoi à une seule adresse ──
