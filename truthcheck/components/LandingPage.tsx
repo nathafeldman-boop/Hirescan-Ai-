@@ -54,37 +54,13 @@ const MBTI_LETTERS = [
 
 const CLAY = 'var(--gold)';
 
-function InAppBanner({ onClose }: { onClose: () => void }) {
-  const copyLink = async () => {
-    try { await navigator.clipboard.writeText(window.location.href); } catch {}
-  };
-  return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 rounded-2xl px-4 py-3 flex items-center gap-3"
-      style={{ background: 'var(--ink)', border: '1px solid var(--line-ink)' }}>
-      <p className="flex-1 text-white text-xs leading-snug" style={{ fontFamily: 'var(--font-sans)' }}>
-        Pour voir tes résultats, <strong>ouvre dans ton navigateur</strong> (⋯ puis Ouvrir dans le navigateur)
-      </p>
-      <button onClick={copyLink} className="flex-shrink-0 text-[10px] font-bold px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(224,163,128,0.22)', color: '#e0a380' }}>
-        Copier
-      </button>
-      <button onClick={onClose} className="flex-shrink-0 text-stone-400 text-sm leading-none">✕</button>
-    </div>
-  );
-}
-
-function isInAppBrowser(ua: string): boolean {
-  const isAndroidWebView = /Android/.test(ua) && /\bwv\b/.test(ua);
-  const isIOSWebView = /iP(hone|ad|od)/.test(ua) && /AppleWebKit/.test(ua) && !/Safari/.test(ua);
-  const isSocialApp = /FBAN|FBAV|Instagram|TikTok|BytedanceWebview|MicroMessenger|Snapchat|musical_ly|trill|ZhiLiao/.test(ua);
-  return isAndroidWebView || isIOSWebView || isSocialApp;
-}
-
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [inApp, setInApp] = useState(false);
-  const [bannerDismissed, setBannerDismissed] = useState(false);
   const [fromTiktok, setFromTiktok] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
+  // Switch immédiatement visible en haut du hero — le nouveau visiteur doit
+  // comprendre en un coup d'œil qu'UrCecret, ce n'est plus QUE le test MBTI.
+  const [heroTab, setHeroTab] = useState<'mbti' | 'nova'>('mbti');
 
   useEffect(() => {
     const onScroll = () => {
@@ -97,7 +73,6 @@ export default function LandingPage() {
 
   useEffect(() => {
     const ua = navigator.userAgent || '';
-    if (isInAppBrowser(ua)) setInApp(true);
     const p = new URLSearchParams(window.location.search);
     const isTiktokUA = /TikTok|BytedanceWebview|musical_ly|trill/i.test(ua);
     setFromTiktok(p.get('utm_source') === 'tiktok' || p.get('utm_medium') === 'paid' || isTiktokUA);
@@ -105,9 +80,6 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden relative" style={{ background: 'var(--paper)', color: 'var(--ink)' }}>
-      {/* InAppBanner intentionnellement retiré de la landing — le banner est géré sur la page de résultats uniquement pour ne pas bloquer le traffic ads TikTok/Instagram */}
-      {false && inApp && !bannerDismissed && <InAppBanner onClose={() => setBannerDismissed(true)} />}
-
       {/* Paper grain — handcrafted texture */}
       <div className="grain-overlay" />
 
@@ -159,23 +131,98 @@ export default function LandingPage() {
             <Seal size={72} spin />
           </div>
 
-          <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
-            {fromTiktok ? 'Vu sur TikTok' : 'Test de personnalité'}
-          </p>
+          {/* Switch immédiatement visible — un nouveau visiteur doit comprendre
+              en un coup d'œil qu'UrCecret, ce n'est plus QUE le test MBTI. */}
+          <div className="hero-up flex justify-center mb-6" style={{ animationDelay: '.02s' }}>
+            <div className="inline-flex p-1 rounded-full" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+              <button
+                onClick={() => setHeroTab('mbti')}
+                className="px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap"
+                style={heroTab === 'mbti' ? { background: 'var(--ink)', color: '#FAF6EC' } : { color: '#78716c' }}
+              >
+                🧠 Test MBTI
+              </button>
+              <button
+                onClick={() => setHeroTab('nova')}
+                className="px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap"
+                style={heroTab === 'nova' ? { background: 'var(--ink)', color: '#FAF6EC' } : { color: '#78716c' }}
+              >
+                🤖 Nova
+              </button>
+            </div>
+          </div>
 
-          <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
-            {fromTiktok ? (
-              <>Tu réagis différemment{' '}
-                <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
-                  des autres
-                  <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden>
-                    <path d="M3 7C48 3 130 2.5 197 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
-                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
-                  </svg>
-                </em>
-                . Voilà pourquoi.</>
-            ) : (
-              <>Quel est{' '}
+          {heroTab === 'mbti' ? (
+            <>
+              <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
+                {fromTiktok ? 'Vu sur TikTok' : 'Test de personnalité'}
+              </p>
+
+              <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
+                {fromTiktok ? (
+                  <>Tu réagis différemment{' '}
+                    <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
+                      des autres
+                      <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden>
+                        <path d="M3 7C48 3 130 2.5 197 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
+                              style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
+                      </svg>
+                    </em>
+                    . Voilà pourquoi.</>
+                ) : (
+                  <>Quel est{' '}
+                    <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
+                      vraiment
+                      <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 150 10" fill="none" preserveAspectRatio="none" aria-hidden>
+                        <path d="M3 7C36 3 100 2.5 147 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
+                              style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
+                      </svg>
+                    </em>
+                    {' '}ton type de personnalité&nbsp;?</>
+                )}
+              </h1>
+
+              <p className="hero-up text-[15px] max-w-sm mx-auto mb-9 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
+                {fromTiktok
+                  ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
+                  : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
+              </p>
+
+              <div className="hero-up" style={{ animationDelay: '.22s' }}>
+                <Link
+                  href="/quiz/personnalite"
+                  className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
+                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}
+                >
+                  Découvrir mon type →
+                </Link>
+              </div>
+              <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
+                Gratuit, résultat immédiat, sans inscription.
+              </p>
+
+              {/* Faits vérifiables, pas de stats inventées */}
+              <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
+                {[
+                  { value: '16', label: 'Profils distincts' },
+                  { value: '12', label: 'Questions' },
+                  { value: '3 min', label: 'Résultat' },
+                ].map((s) => (
+                  <div key={s.label}>
+                    <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
+                    <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
+                Ton coach IA personnel
+              </p>
+
+              <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
+                Une IA qui te connaît{' '}
                 <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
                   vraiment
                   <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 150 10" fill="none" preserveAspectRatio="none" aria-hidden>
@@ -183,42 +230,49 @@ export default function LandingPage() {
                           style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
                   </svg>
                 </em>
-                {' '}ton type de personnalité&nbsp;?</>
-            )}
-          </h1>
+                , pas des banalités.
+              </h1>
 
-          <p className="hero-up text-[15px] max-w-sm mx-auto mb-9 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
-            {fromTiktok
-              ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
-              : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
-          </p>
+              <p className="hero-up text-[15px] max-w-sm mx-auto mb-6 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
+                Nova analyse tes conversations, répond selon TON profil de personnalité, et t&apos;aide à comprendre tes relations — pas un chatbot générique.
+              </p>
 
-          <div className="hero-up" style={{ animationDelay: '.22s' }}>
-            <Link
-              href="/quiz/personnalite"
-              className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
-              style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-            >
-              Découvrir mon type →
-            </Link>
-          </div>
-          <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
-            Gratuit, résultat immédiat, sans inscription.
-          </p>
-
-          {/* Faits vérifiables, pas de stats inventées */}
-          <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
-            {[
-              { value: '16', label: 'Profils distincts' },
-              { value: '12', label: 'Questions' },
-              { value: '3 min', label: 'Résultat' },
-            ].map((s) => (
-              <div key={s.label}>
-                <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
-                <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
+              {/* Exemples visibles sans écrire — compréhension en moins de 10s */}
+              <div className="hero-up flex flex-wrap justify-center gap-2 mb-8 max-w-sm mx-auto" style={{ animationDelay: '.2s' }}>
+                {['💬 Analyse cette conversation', '🧠 Aide-moi à comprendre mon MBTI', '👥 Crée un test entre amis'].map((t) => (
+                  <span key={t} className="text-[12px] font-semibold px-3 py-1.5 rounded-full" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}>
+                    {t}
+                  </span>
+                ))}
               </div>
-            ))}
-          </div>
+
+              <div className="hero-up" style={{ animationDelay: '.24s' }}>
+                <Link
+                  href="/chat"
+                  className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
+                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}
+                >
+                  Discuter avec Nova →
+                </Link>
+              </div>
+              <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
+                5 messages gratuits, sans engagement.
+              </p>
+
+              <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
+                {[
+                  { value: '24/7', label: 'Toujours dispo' },
+                  { value: '100%', label: 'Selon TON profil' },
+                  { value: '5', label: 'Messages offerts' },
+                ].map((s) => (
+                  <div key={s.label}>
+                    <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
+                    <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
 

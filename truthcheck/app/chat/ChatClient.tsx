@@ -46,6 +46,19 @@ function Linkified({ text }: { text: string }) {
 // Reste sous la limite serveur (~4,5 Mo décodés) avec de la marge.
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
+// ── Suggestions Nova — visibles sans écrire, cliquables, jamais un cul-de-sac.
+// "analyze" et "quiz" ouvrent les vraies features structurées (réservées aux
+// abonnés). "chat" envoie un vrai premier message à Nova qui exploite déjà
+// tout ce qu'elle sait (profil MBTI) — utile et honnête même si "Journal" et
+// "Compatibilité" n'ont pas encore leur propre écran dédié (Phase 2). ──────────
+const NOVA_SUGGESTIONS: { emoji: string; label: string; kind: 'analyze' | 'quiz' | 'chat'; prompt?: string }[] = [
+  { emoji: '🧠', label: 'Analyser une conversation', kind: 'analyze' },
+  { emoji: '📖', label: 'Journal émotionnel', kind: 'chat', prompt: 'Comment s\'est passée ma journée ? Aide-moi à faire le point sur comment je me sens en ce moment.' },
+  { emoji: '✨', label: 'Me connaître davantage', kind: 'chat', prompt: 'Dis-moi ce que mon profil dit vraiment de moi, en profondeur — mes schémas, mes angles morts, ce que je ne vois pas moi-même.' },
+  { emoji: '👥', label: 'Créer un test entre amis', kind: 'quiz' },
+  { emoji: '❤️', label: 'Compatibilité', kind: 'chat', prompt: 'Aide-moi à comprendre ma compatibilité avec quelqu\'un — qu\'est-ce qui compte vraiment selon mon profil ?' },
+];
+
 export default function ChatClient() {
   const { data: session, status } = useSession();
   const tier = (session?.user as { tier?: string } | undefined)?.tier ?? 'free';
@@ -295,6 +308,15 @@ export default function ChatClient() {
     setAnalysisError(null);
   }, []);
 
+  // Clic sur une suggestion Nova — jamais un cul-de-sac : ouvre la vraie
+  // feature structurée (analyse / test), ou envoie un vrai premier message
+  // exploitable par le coach (journal / compatibilité / approfondir).
+  const handleSuggestion = useCallback((s: typeof NOVA_SUGGESTIONS[number]) => {
+    if (s.kind === 'analyze') { setAnalysisOpen(true); return; }
+    if (s.kind === 'quiz') { setQuizBuilderOpen(true); return; }
+    if (s.prompt) void send(s.prompt);
+  }, [send]);
+
   // Efface tout l'historique de conversation affiché (pas le quota, pas le profil) —
   // pour repartir d'une page blanche avec Nova.
   const clearHistory = useCallback(async () => {
@@ -424,7 +446,45 @@ export default function ChatClient() {
                   Faire le test (3 min) →
                 </Link>
               )}
-              <div className="w-full flex flex-col gap-2">
+
+              {/* Suggestions Nova — visibles sans écrire, chaque carte est
+                  cliquable et mène à un vrai résultat (jamais un cul-de-sac). */}
+              <div className="w-full grid grid-cols-2 gap-2.5 mb-2">
+                {NOVA_SUGGESTIONS.map((s) => {
+                  const gated = isFree && (s.kind === 'analyze' || s.kind === 'quiz');
+                  const content = (
+                    <>
+                      <span className="text-2xl">{s.emoji}</span>
+                      <span className="text-xs font-semibold leading-snug" style={{ color: gated ? '#a8a29e' : 'var(--ink)' }}>
+                        {s.label}
+                      </span>
+                      {gated && <span className="text-[10px]" style={{ color: 'var(--gold)' }}>🔒 Abonnés</span>}
+                    </>
+                  );
+                  return gated ? (
+                    <Link
+                      key={s.label}
+                      href="/pricing"
+                      className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                      style={{ background: 'var(--paper-panel)', border: '1px dashed var(--line)' }}
+                    >
+                      {content}
+                    </Link>
+                  ) : (
+                    <button
+                      key={s.label}
+                      onClick={() => handleSuggestion(s)}
+                      className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                      style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
+                    >
+                      {content}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="w-full flex flex-col gap-2 mt-4">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-left" style={{ color: '#a8a29e' }}>Ou parle-moi de…</p>
                 {COACH_CATEGORIES.map((c) => (
                   <div key={c.key}>
                     <button
@@ -452,26 +512,6 @@ export default function ChatClient() {
                   </div>
                 ))}
               </div>
-
-              {/* Créateur de test partageable — réservé aux abonnés, argument
-                  de conversion supplémentaire pour les comptes gratuits. */}
-              {!isFree ? (
-                <button
-                  onClick={() => setQuizBuilderOpen(true)}
-                  className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
-                  style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}
-                >
-                  🧪 Créer un test à partager avec tes amis
-                </button>
-              ) : (
-                <Link
-                  href="/pricing"
-                  className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs font-semibold transition-all"
-                  style={{ background: 'var(--paper-panel)', border: '1px dashed var(--line)', color: '#a8a29e' }}
-                >
-                  🧪 Créer tes propres tests à partager — débloque avec un abonnement
-                </Link>
-              )}
             </div>
           ) : (
             <div className="space-y-4">
