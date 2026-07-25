@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { parisDay } from '@/lib/chat';
-import { simpleReflection } from '@/lib/journalReflection';
+import { dailyReaction } from '@/lib/journalReflection';
+import { JOURNAL_TAG_KEYS } from '@/lib/journalTags';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,14 @@ export const dynamic = 'force-dynamic';
 // schema.prisma) : c'est un levier d'engagement quotidien ouvert à tous les
 // comptes, gratuit ou payant.
 
+// Taille max de la photo (data URI base64, ~1Mo de photo réelle une fois
+// décodée) — reste raisonnable pour une colonne Postgres @db.Text.
+const MAX_PHOTO_DATA_URI_LENGTH = 1_500_000;
+
 // ── GET : historique (mois demandé, défaut = mois en cours) + entrée du jour ──
+// `allEntries` (jour/humeur/énergie/stress/tags, sans note/photo) sert au
+// calcul des stats (série, évolution, meilleure/pire semaine, radar) qui
+// peuvent chevaucher plusieurs mois — payload volontairement léger.
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const uid = (session?.user as { id?: string } | undefined)?.id;
@@ -21,10 +29,15 @@ export async function GET(req: NextRequest) {
   const today = parisDay();
   const month = /^\d{4}-\d{2}$/.test(monthParam ?? '') ? monthParam! : today.slice(0, 7);
 
-  const [monthEntries, totalCount] = await Promise.all([
+  const [monthEntries, allEntries, totalCount] = await Promise.all([
     prisma.journalEntry.findMany({
       where: { userId: uid, day: { startsWith: month } },
-      select: { day: true, mood: true, energy: true, stress: true, emotion: true, note: true },
+      select: { day: true, mood: true, energy: true, stress: true, emotion: true, tags: true, note: true },
+      orderBy: { day: 'asc' },
+    }),
+    prisma.journalEntry.findMany({
+      where: { userId: uid },
+      select: { day: true, mood: true, energy: true, stress: true, tags: true },
       orderBy: { day: 'asc' },
     }),
     prisma.journalEntry.count({ where: { userId: uid } }),
@@ -34,6 +47,7 @@ export async function GET(req: NextRequest) {
     month,
     today,
     entries: monthEntries,
+    allEntries,
     hasAny: totalCount > 0,
     totalCount,
   });
@@ -45,7 +59,10 @@ export async function POST(req: NextRequest) {
   const uid = (session?.user as { id?: string } | undefined)?.id;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  const body = await req.json().catch(() => null) as { mood?: number; energy?: number; stress?: number; emotion?: string; note?: string } | null;
+  const body = await req.json().catch(() => null) as {
+    mood?: number; energy?: number; stress?: number; emotion?: string;
+    tags?: string[]; photo?: string; note?: string;
+  } | null;
   const mood = Number(body?.mood);
   const energy = body?.energy !== undefined ? Number(body.energy) : 3;
   const stress = body?.stress !== undefined ? Number(body.stress) : 3;
@@ -60,16 +77,44 @@ export async function POST(req: NextRequest) {
   // réponses ("ce qui a marqué / rendu heureux / dérangé") dans cette note.
   const note = typeof body?.note === 'string' ? body.note.trim().slice(0, 800) : undefined;
 
+  const tags = Array.isArray(body?.tags)
+    ? [...new Set(body.tags.filter((t): t is string => typeof t === 'string' && JOURNAL_TAG_KEYS.includes(t)))].slice(0, 7)
+    : undefined;
+
+  let photo: string | undefined;
+  if (typeof body?.photo === 'string' && body.photo) {
+    if (!/^data:image\/(jpe?g|png|webp);base64,/i.test(body.photo)) {
+      return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+    }
+    if (body.photo.length > MAX_PHOTO_DATA_URI_LENGTH) {
+      return NextResponse.json({ error: 'photo_too_large' }, { status: 413 });
+    }
+    photo = body.photo;
+  }
+
   const day = parisDay();
-  const entry = await prisma.journalEntry.upsert({
-    where: { userId_day: { userId: uid, day } },
-    create: { userId: uid, day, mood, energy, stress, emotion, note },
-    update: { mood, energy, stress, emotion, note },
-  });
+  const yesterday = new Date(day + 'T12:00:00');
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = yesterday.toISOString().slice(0, 10);
+
+  const [entry, yesterdayEntry] = await Promise.all([
+    prisma.journalEntry.upsert({
+      where: { userId_day: { userId: uid, day } },
+      create: { userId: uid, day, mood, energy, stress, emotion, tags, photo, note },
+      update: { mood, energy, stress, emotion, tags, photo, note },
+    }),
+    prisma.journalEntry.findUnique({
+      where: { userId_day: { userId: uid, day: yesterdayKey } },
+      select: { mood: true, energy: true, stress: true },
+    }),
+  ]);
 
   return NextResponse.json({
     ok: true,
-    entry: { day: entry.day, mood: entry.mood, energy: entry.energy, stress: entry.stress, emotion: entry.emotion, note: entry.note },
-    reflection: simpleReflection(entry.mood, entry.energy, entry.stress),
+    entry: {
+      day: entry.day, mood: entry.mood, energy: entry.energy, stress: entry.stress,
+      emotion: entry.emotion, tags: entry.tags, photo: entry.photo, note: entry.note,
+    },
+    reflection: dailyReaction(entry, yesterdayEntry),
   });
 }

@@ -107,6 +107,8 @@ model JournalEntry {
   energy    Int      @default(3) // 1 (à plat) à 5 (pleine forme)
   stress    Int      @default(3) // 1 (zen) à 5 (sous tension)
   emotion   String?  // tag court, ex "Joie", "Gratitude", "Anxiété"
+  tags      Json?    // string[] — vie perso, ex ["Travail","Amis"] (lib/journalTags.ts)
+  photo     String?  @db.Text // data URI base64, capée côté API (voir MAX_PHOTO_DATA_URI_LENGTH)
   note      String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
