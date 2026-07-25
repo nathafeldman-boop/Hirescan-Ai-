@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
+import AppTabBar from '@/components/AppTabBar';
 
 interface Props {
   user: {
@@ -49,7 +50,7 @@ export default function DashboardClient({ user }: Props) {
   const firstName = user.name?.split(' ')[0] ?? 'toi';
 
   return (
-    <main className="min-h-screen" style={{ background: theme.bg }}>
+    <main className="min-h-screen pb-20" style={{ background: theme.bg }}>
 
       {/* Premium atmosphere — ember glow particles */}
       {isPremium && (
@@ -225,6 +226,8 @@ export default function DashboardClient({ user }: Props) {
         )}
 
       </div>
+
+      <AppTabBar dark={isPremium} />
     </main>
   );
 }
