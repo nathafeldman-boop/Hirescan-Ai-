@@ -8,6 +8,17 @@ import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
 interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
 
+interface ConversationAnalysisResult {
+  personality: string;
+  attachmentStyle: string;
+  manipulationFlags: string;
+  greenFlags: string[];
+  redFlags: string[];
+  compatibility: string;
+  emotionalLanguage: string;
+  advice: string;
+}
+
 // Rend les URL d'un message cliquables — utile pour le lien de test partageable
 // que Nova renvoie en texte brut (ex: "https://urcecret.site/q/xyz").
 const URL_RE = /(https?:\/\/[^\s]+)/g;
@@ -65,21 +76,46 @@ export default function ChatClient() {
   const [quizResult, setQuizResult] = useState<{ id: string; title: string; intro: string } | null>(null);
   const [quizLinkCopied, setQuizLinkCopied] = useState(false);
 
+  // ── Analyse de conversation (feature phare, réservée aux abonnés) ──
+  const [analysisOpen, setAnalysisOpen] = useState(false);
+  const [analysisText, setAnalysisText] = useState('');
+  const [analysisImage, setAnalysisImage] = useState<string | null>(null);
+  const [analysisImageError, setAnalysisImageError] = useState<string | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<ConversationAnalysisResult | null>(null);
+  const [analysisShared, setAnalysisShared] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const analysisFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Lecture d'un fichier image → data URI, factorisé pour être réutilisé par
+  // le chat normal ET la capture d'écran de l'analyse de conversation.
+  const readImageFile = useCallback((
+    file: File | null,
+    onError: (msg: string | null) => void,
+    onLoaded: (dataUri: string) => void,
+  ) => {
+    onError(null);
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { onError('Ce fichier n\'est pas une image.'); return; }
+    if (file.size > MAX_IMAGE_BYTES) { onError('Photo trop lourde (max 4 Mo) — réessaie avec une image plus légère.'); return; }
+    const reader = new FileReader();
+    reader.onload = () => { if (typeof reader.result === 'string') onLoaded(reader.result); };
+    reader.onerror = () => onError('Impossible de lire cette photo, réessaie.');
+    reader.readAsDataURL(file);
+  }, []);
 
   // Choix d'une photo (galerie ou appareil photo mobile) → aperçu avant envoi.
   const pickImage = useCallback((file: File | null) => {
-    setImageError(null);
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { setImageError('Ce fichier n\'est pas une image.'); return; }
-    if (file.size > MAX_IMAGE_BYTES) { setImageError('Photo trop lourde (max 4 Mo) — réessaie avec une image plus légère.'); return; }
-    const reader = new FileReader();
-    reader.onload = () => { if (typeof reader.result === 'string') setPendingImage(reader.result); };
-    reader.onerror = () => setImageError('Impossible de lire cette photo, réessaie.');
-    reader.readAsDataURL(file);
-  }, []);
+    readImageFile(file, setImageError, setPendingImage);
+  }, [readImageFile]);
+
+  const pickAnalysisImage = useCallback((file: File | null) => {
+    readImageFile(file, setAnalysisImageError, setAnalysisImage);
+  }, [readImageFile]);
 
   // Ouverture "déjà lancée" depuis un résultat : le coach démarre par une
   // lecture personnalisée. Le message d'amorce est envoyé mais NON affiché —
@@ -213,6 +249,51 @@ export default function ChatClient() {
       setQuizCreating(false);
     }
   }, [quizTopic, quizCreating]);
+
+  // Analyse une conversation collée et/ou une capture d'écran — consomme 1
+  // message du même quota que le chat (voir /api/conversation-analysis/create).
+  const runAnalysis = useCallback(async () => {
+    const text = analysisText.trim();
+    if ((!text && !analysisImage) || analysisLoading) return;
+    setAnalysisError(null);
+    setAnalysisLoading(true);
+    try {
+      const res = await fetch('/api/conversation-analysis/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, ...(analysisImage ? { imageBase64: analysisImage } : {}) }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 402) { setAnalysisError('Cette fonctionnalité est réservée aux abonnés.'); return; }
+      if (res.status === 429) { setAnalysisError('Tu as utilisé tous tes messages du jour — réessaie demain.'); return; }
+      if (res.status === 413) { setAnalysisError('Cette capture est trop lourde, réessaie avec une image plus légère.'); return; }
+      if (!res.ok) { setAnalysisError('L\'analyse a échoué, réessaie (peut-être avec un peu plus de contexte).'); return; }
+      setAnalysisResult(data.result);
+      if (typeof data.remaining === 'number') setRemaining(data.remaining);
+      if (typeof data.limit === 'number') setLimit(data.limit);
+    } catch {
+      setAnalysisError('Erreur réseau, réessaie.');
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }, [analysisText, analysisImage, analysisLoading]);
+
+  const shareAnalysis = useCallback(async () => {
+    const text = 'Je viens de faire analyser une conversation par Nova sur UrCecret 👀 tu devrais essayer sur la tienne';
+    const url = `${window.location.origin}/chat`;
+    try {
+      if (navigator.share) { await navigator.share({ title: 'UrCecret', text, url }); return; }
+    } catch { /* partage annulé */ }
+    try { await navigator.clipboard.writeText(`${text}\n${url}`); setAnalysisShared(true); setTimeout(() => setAnalysisShared(false), 2500); } catch {}
+  }, []);
+
+  const closeAnalysis = useCallback(() => {
+    setAnalysisOpen(false);
+    setAnalysisResult(null);
+    setAnalysisText('');
+    setAnalysisImage(null);
+    setAnalysisError(null);
+  }, []);
 
   // Efface tout l'historique de conversation affiché (pas le quota, pas le profil) —
   // pour repartir d'une page blanche avec Nova.
@@ -497,29 +578,48 @@ export default function ChatClient() {
 
         {/* Menu "+" — tout ce que Nova sait faire, pas seulement discuter.
             Toujours accessible (pas juste sur l'écran vide) pour que les gens
-            qui découvrent le chat tombent dessus aussi. */}
+            qui découvrent le chat tombent dessus aussi. Architecture pensée
+            pour grandir : chaque action est un item de ACTIONS, actif ou non
+            (badge "Bientôt") — ajouter une future feature = un item de plus,
+            pas une refonte du menu. */}
         {actionsMenuOpen && (
           <div className="max-w-2xl mx-auto px-4 pb-2">
             <div className="rounded-2xl p-1.5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-              {!isFree ? (
-                <button
-                  type="button"
-                  onClick={() => { setActionsMenuOpen(false); setQuizBuilderOpen(true); }}
-                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition-all"
-                  style={{ color: 'var(--ink)' }}
-                >
-                  <span className="text-lg">🧪</span> Créer un test à partager avec tes amis
-                </button>
-              ) : (
-                <Link
-                  href="/pricing"
-                  onClick={() => setActionsMenuOpen(false)}
-                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left"
-                  style={{ color: '#a8a29e' }}
-                >
-                  <span className="text-lg">🧪</span> Créer un test à partager — débloque avec un abonnement
-                </Link>
-              )}
+              <button
+                type="button"
+                onClick={() => { setActionsMenuOpen(false); if (!isFree) setQuizBuilderOpen(true); }}
+                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition-all"
+                style={{ color: isFree ? '#a8a29e' : 'var(--ink)' }}
+              >
+                <span className="text-lg">🧠</span>
+                <span className="flex-1">Créer un test{isFree ? ' — débloque avec un abonnement' : ''}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setActionsMenuOpen(false); if (!isFree) setAnalysisOpen(true); }}
+                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition-all"
+                style={{ color: isFree ? '#a8a29e' : 'var(--ink)' }}
+              >
+                <span className="text-lg">💬</span>
+                <span className="flex-1">Analyser une conversation{isFree ? ' — débloque avec un abonnement' : ''}</span>
+              </button>
+
+              {([
+                { emoji: '📖', label: 'Journal émotionnel' },
+                { emoji: '👥', label: 'Compatibilité avec un ami' },
+                { emoji: '✨', label: 'Analyse de personnalité avancée' },
+              ] as const).map((a) => (
+                <div key={a.label} className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold" style={{ color: '#c4bfb3' }}>
+                  <span className="text-lg" style={{ opacity: 0.5 }}>{a.emoji}</span>
+                  <span className="flex-1">{a.label}</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: '#a8a29e' }}>
+                    Bientôt
+                  </span>
+                </div>
+              ))}
+
+              <div className="my-1 border-t" style={{ borderColor: 'var(--line)' }} />
               <Link
                 href="/quizzes"
                 onClick={() => setActionsMenuOpen(false)}
@@ -629,6 +729,155 @@ export default function ChatClient() {
                 <button
                   onClick={() => setQuizBuilderOpen(false)}
                   disabled={quizCreating}
+                  className="w-full py-2.5 text-xs disabled:opacity-50"
+                  style={{ color: '#a8a29e' }}
+                >
+                  Annuler
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Analyse de conversation — overlay. Feature phare : texte collé et/ou
+          capture d'écran, résultat pensé pour être montré (TikTok). */}
+      {analysisOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) closeAnalysis(); }}
+        >
+          <div className="w-full max-w-sm rounded-2xl p-6 overflow-y-auto" style={{ background: 'var(--paper)', border: '1px solid var(--line)', maxHeight: '88vh' }}>
+            {analysisResult ? (
+              <div>
+                <div className="text-center mb-5">
+                  <div className="mb-3"><NovaAvatar size={52} glow /></div>
+                  <p className="ur-label text-[10px] mb-1" style={{ color: 'var(--gold)' }}>Analyse de Nova</p>
+                  <h3 className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>Ce que révèle cette conversation</h3>
+                </div>
+
+                <div className="flex flex-col gap-3 mb-5">
+                  {[
+                    { label: '🧠 Personnalité', text: analysisResult.personality },
+                    { label: '🔗 Style d\'attachement', text: analysisResult.attachmentStyle },
+                    { label: '⚠️ Manipulation ?', text: analysisResult.manipulationFlags },
+                  ].map((s) => (
+                    <div key={s.label} className="rounded-xl px-4 py-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+                      <p className="text-[11px] font-bold mb-1" style={{ color: 'var(--gold)' }}>{s.label}</p>
+                      <p className="text-xs leading-relaxed" style={{ color: 'var(--ink)' }}>{s.text}</p>
+                    </div>
+                  ))}
+
+                  {analysisResult.greenFlags.length > 0 && (
+                    <div className="rounded-xl px-4 py-3" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)' }}>
+                      <p className="text-[11px] font-bold mb-1.5" style={{ color: '#16a34a' }}>✅ Green flags</p>
+                      <ul className="flex flex-col gap-1">
+                        {analysisResult.greenFlags.map((f, i) => (
+                          <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--ink)' }}>• {f}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {analysisResult.redFlags.length > 0 && (
+                    <div className="rounded-xl px-4 py-3" style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.25)' }}>
+                      <p className="text-[11px] font-bold mb-1.5" style={{ color: '#dc2626' }}>🚩 Red flags</p>
+                      <ul className="flex flex-col gap-1">
+                        {analysisResult.redFlags.map((f, i) => (
+                          <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--ink)' }}>• {f}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {[
+                    { label: '💞 Compatibilité', text: analysisResult.compatibility },
+                    { label: '🗣️ Langage émotionnel', text: analysisResult.emotionalLanguage },
+                  ].map((s) => (
+                    <div key={s.label} className="rounded-xl px-4 py-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+                      <p className="text-[11px] font-bold mb-1" style={{ color: 'var(--gold)' }}>{s.label}</p>
+                      <p className="text-xs leading-relaxed" style={{ color: 'var(--ink)' }}>{s.text}</p>
+                    </div>
+                  ))}
+
+                  <div className="rounded-xl px-4 py-3" style={{ background: 'var(--ink)' }}>
+                    <p className="text-[11px] font-bold mb-1" style={{ color: 'var(--gold)' }}>💡 Conseil de Nova</p>
+                    <p className="text-xs leading-relaxed" style={{ color: '#FAF6EC' }}>{analysisResult.advice}</p>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-center mb-4 leading-relaxed" style={{ color: '#a8a29e' }}>
+                  Généré automatiquement, à visée ludique — pas un diagnostic. En cas de doute réel sur une relation, parle à un professionnel.
+                </p>
+
+                <button onClick={shareAnalysis} className="ur-btn-gold w-full py-3 text-sm mb-2">
+                  {analysisShared ? '✅ Copié — envoie-le !' : '📤 Partager'}
+                </button>
+                <button onClick={closeAnalysis} className="w-full py-2.5 text-xs" style={{ color: '#a8a29e' }}>
+                  Fermer
+                </button>
+              </div>
+            ) : (
+              <div>
+                <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Nova analyse pour toi</p>
+                <h3 className="font-display text-lg font-black mb-2" style={{ color: 'var(--ink)' }}>Colle une conversation</h3>
+                <p className="text-xs mb-4 leading-relaxed" style={{ color: '#78716c' }}>
+                  Texte collé, capture d&apos;écran, ou les deux — Nova regarde la personnalité, le style d&apos;attachement, les green/red flags et te donne un vrai conseil.
+                </p>
+                <textarea
+                  value={analysisText}
+                  onChange={(e) => setAnalysisText(e.target.value)}
+                  rows={5}
+                  placeholder="Colle ici les messages à analyser…"
+                  disabled={analysisLoading}
+                  className="w-full resize-none rounded-xl px-3.5 py-3 text-sm outline-none mb-3 disabled:opacity-50"
+                  style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}
+                />
+
+                <input
+                  ref={analysisFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => { pickAnalysisImage(e.target.files?.[0] ?? null); e.target.value = ''; }}
+                />
+                {analysisImage ? (
+                  <div className="relative inline-block mb-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={analysisImage} alt="Capture à analyser" className="rounded-xl" style={{ height: 72, width: 72, objectFit: 'cover', border: '1px solid var(--line)' }} />
+                    <button
+                      type="button"
+                      onClick={() => setAnalysisImage(null)}
+                      aria-label="Retirer la capture"
+                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
+                      style={{ background: 'var(--ink)', color: '#FAF6EC' }}
+                    >✕</button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => analysisFileInputRef.current?.click()}
+                    disabled={analysisLoading}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold mb-3 disabled:opacity-50"
+                    style={{ border: '1px dashed var(--line)', color: '#78716c' }}
+                  >
+                    📷 Ajouter une capture d&apos;écran
+                  </button>
+                )}
+                {analysisImageError && <p className="text-[11px] mb-3 text-center" style={{ color: '#dc2626' }}>{analysisImageError}</p>}
+                {analysisError && <p className="text-xs mb-3 text-center" style={{ color: '#dc2626' }}>{analysisError}</p>}
+
+                <button
+                  onClick={runAnalysis}
+                  disabled={analysisLoading || (!analysisText.trim() && !analysisImage)}
+                  className="ur-btn-gold w-full py-3 text-sm mb-2 disabled:opacity-50"
+                >
+                  {analysisLoading ? 'Nova analyse…' : 'Analyser →'}
+                </button>
+                <button
+                  onClick={closeAnalysis}
+                  disabled={analysisLoading}
                   className="w-full py-2.5 text-xs disabled:opacity-50"
                   style={{ color: '#a8a29e' }}
                 >

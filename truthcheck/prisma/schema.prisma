@@ -83,6 +83,31 @@ model User {
   chatUsage    ChatUsage[]
   chatMessages ChatMessage[]
   customQuizzes CustomQuiz[]
+  conversationAnalyses ConversationAnalysis[]
+}
+
+// ── Analyse de conversation par Nova (feature phare, pensée pour être virale) ──
+// L'utilisateur colle une conversation (texte) et/ou une capture d'écran ;
+// Nova l'analyse en JSON structuré. Une ligne par analyse, jamais réécrite —
+// sert d'historique consultable et de brique pour la mémoire long terme
+// (Phase 2 : injecter un résumé des dernières analyses dans le contexte coach).
+model ConversationAnalysis {
+  id                String   @id @default(cuid())
+  userId            String
+  inputPreview      String   // début du texte collé, ou "[Capture d'écran]"
+  personality       String   @db.Text
+  attachmentStyle   String   @db.Text
+  manipulationFlags String   @db.Text
+  greenFlags        Json     // string[]
+  redFlags          Json     // string[]
+  compatibility     String   @db.Text
+  emotionalLanguage String   @db.Text
+  advice            String   @db.Text
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ── Tests créés par Nova, à partager (croissance virale) ────────────────────
