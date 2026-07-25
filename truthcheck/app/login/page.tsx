@@ -2,12 +2,11 @@
 
 import { signIn } from 'next-auth/react';
 import { useState, Suspense, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { detectInAppBrowser } from '@/lib/inAppBrowser';
 
 function LoginContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const rawCallbackUrl = searchParams.get('callbackUrl') ?? '/quiz/personnalite';
   const prefillEmail = searchParams.get('email') ?? '';
 
@@ -94,7 +93,15 @@ function LoginContent() {
         setOtpLoading(false);
         return;
       }
-      router.push(data.loginUrl);
+      // Navigation complète (PAS router.push) : la session vient d'être posée
+      // via un cookie Set-Cookie sur cette réponse fetch. Certains navigateurs
+      // in-app (webview TikTok notamment) ne garantissent ce cookie qu'à la
+      // prochaine vraie navigation — un router.push (transition client, sans
+      // rechargement) partait parfois AVANT que le cookie soit disponible,
+      // la page suivante ne voyait alors aucune session et repartait vers
+      // /login → boucle de connexion infinie, sans façon de s'en sortir en
+      // in-app browser (pas de bouton "recharger" comme sur un vrai navigateur).
+      window.location.href = data.loginUrl;
     } catch {
       setOtpError('Erreur réseau, réessaie.');
       setOtpLoading(false);
@@ -119,7 +126,10 @@ function LoginContent() {
         setCodeLoading(false);
         return;
       }
-      router.push(data.loginUrl);
+      // Même raison que dans handleOtp() ci-dessus : navigation complète pour
+      // garantir que le cookie de session vient d'être reconnu (in-app
+      // browsers), pas un router.push qui boucle sur /login.
+      window.location.href = data.loginUrl;
     } catch {
       setCodeError('Erreur réseau, réessaie.');
       setCodeLoading(false);
