@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
 import NovaAvatar from '@/components/NovaAvatar';
-import AppTabBar from '@/components/AppTabBar';
 import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
 interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
@@ -388,7 +387,7 @@ export default function ChatClient() {
   const empty = messages.length === 0;
 
   return (
-    <main className="min-h-screen flex flex-col" style={{ background: 'var(--paper)', paddingBottom: 64 }}>
+    <main className="min-h-screen flex flex-col" style={{ background: 'var(--paper)' }}>
       {/* Header */}
       <header className="sticky top-0 z-20 flex items-center justify-between px-4 py-3"
         style={{ background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
@@ -954,8 +953,6 @@ export default function ChatClient() {
           </div>
         </div>
       )}
-
-      <AppTabBar />
     </main>
   );
 }
