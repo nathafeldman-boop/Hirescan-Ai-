@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import UserMenu from './UserMenu';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import Seal from './Seal';
@@ -9,6 +9,10 @@ import TypeEmblem from './TypeEmblem';
 import ReviewsMarquee from './ReviewsMarquee';
 import CosmicBackdrop from './CosmicBackdrop';
 import CardCarousel from './CardCarousel';
+import PhoneMockup from './PhoneMockup';
+import MbtiDemoScreen from './landing-demos/MbtiDemoScreen';
+import NovaDemoScreen from './landing-demos/NovaDemoScreen';
+import JournalDemoScreen from './landing-demos/JournalDemoScreen';
 
 const GROUPS = [
   {
@@ -54,18 +58,43 @@ const MBTI_LETTERS = [
 
 const CLAY = 'var(--gold)';
 
+// CTA de la bannière sticky mobile — reflète la section "3 façons de te
+// comprendre" actuellement au centre de l'écran, pour ne jamais pousser vers
+// le test MBTI pendant que le visiteur regarde la section Nova ou Journal.
+const STICKY_CTA = {
+  mbti: { label: 'Découvrir mon type →', href: '/quiz/personnalite' },
+  nova: { label: 'Découvrir Nova →', href: '/chat' },
+  journal: { label: 'Commencer mon journal →', href: '/journal' },
+} as const;
+
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [fromTiktok, setFromTiktok] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
+  const [activeFeature, setActiveFeature] = useState<keyof typeof STICKY_CTA | null>(null);
   // Switch immédiatement visible en haut du hero — le nouveau visiteur doit
   // comprendre en un coup d'œil qu'UrCecret, ce n'est plus QUE le test MBTI.
   const [heroTab, setHeroTab] = useState<'mbti' | 'nova' | 'journal'>('mbti');
 
+  const mbtiSectionRef = useRef<HTMLElement>(null);
+  const novaSectionRef = useRef<HTMLElement>(null);
+  const journalSectionRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
+    const sections: [keyof typeof STICKY_CTA, React.RefObject<HTMLElement>][] = [
+      ['mbti', mbtiSectionRef], ['nova', novaSectionRef], ['journal', journalSectionRef],
+    ];
     const onScroll = () => {
       setScrolled(window.scrollY > 20);
       setStickyVisible(window.scrollY > 320);
+      const centerY = window.innerHeight / 2;
+      const hit = sections.find(([, ref]) => {
+        const el = ref.current;
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.top <= centerY && r.bottom >= centerY;
+      });
+      setActiveFeature(hit ? hit[0] : null);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -348,91 +377,91 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ 3 grandes possibilités — additif au switch du hero (on ne le
-          retire pas, il reste la promesse immédiate en haut de page). Ici,
-          on montre la profondeur du produit : ce n'est pas qu'un test.
-          Journal = démonstration visuelle uniquement, jamais du vrai contenu
-          utilisateur (l'utilisateur n'a pas encore de compte à ce stade). ═══ */}
-      <section className="relative z-10 pt-4 pb-14 px-6">
-        <div className="max-w-lg mx-auto">
-          <p className="ur-label text-[10px] text-center mb-3" style={{ color: CLAY }}>Une application, pas juste un test</p>
-          <h2 className="font-display text-2xl font-black text-stone-900 text-center mb-10">
-            UrCecret, c&apos;est 3 façons de te comprendre
-          </h2>
+      {/* ═══ 3 façons de te comprendre — additif au switch du hero (on ne le
+          retire pas). Chaque feature a maintenant sa PROPRE section, avec son
+          propre décor animé et son mockup téléphone qui rejoue un "gameplay"
+          scripté (aucune vraie donnée, aucun compte requis) — pas 3 fois la
+          même carte. Toutes les démos sont dans components/landing-demos/. ═══ */}
+      <p className="ur-label text-[10px] text-center pt-6" style={{ color: CLAY }}>Une application, pas juste un test</p>
+      <h2 className="font-display text-2xl font-black text-stone-900 text-center mt-2 px-6">
+        UrCecret, c&apos;est 3 façons de te comprendre
+      </h2>
 
-          <div className="space-y-5">
-
-            {/* 🧠 Test MBTI */}
-            <div className="hero-up rounded-3xl p-6" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-              <div className="text-3xl mb-4">🧠</div>
-              <h3 className="font-display text-lg font-black text-stone-900 mb-1.5">Test MBTI</h3>
-              <p className="text-sm mb-5" style={{ color: '#78716c', lineHeight: 1.6 }}>
-                Découvre ta personnalité et comprends ton fonctionnement.
-              </p>
-              <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-6 py-3 text-sm">
-                Faire mon test →
-              </Link>
-            </div>
-
-            {/* 🤖 Nova */}
-            <div className="hero-up rounded-3xl p-6" style={{ background: 'var(--ink)' }}>
-              <div className="text-3xl mb-4">🤖</div>
-              <h3 className="font-display text-lg font-black mb-1.5" style={{ color: '#FAF6EC' }}>Nova</h3>
-              <p className="text-sm mb-5" style={{ color: 'rgba(250,246,236,0.55)', lineHeight: 1.6 }}>
-                Ton IA personnelle qui apprend à te connaître.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {['Analyse une conversation', 'Comprend tes émotions', 'Crée des tests personnalisés', 'Répond à tes questions'].map((e) => (
-                  <span key={e} className="text-[11px] font-semibold px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#FAF6EC' }}>
-                    {e}
-                  </span>
-                ))}
-              </div>
-              <Link href="/chat" className="ur-btn-gold inline-flex px-6 py-3 text-sm">
-                Découvrir Nova →
-              </Link>
-            </div>
-
-            {/* 📖 Journal émotionnel */}
-            <div className="hero-up rounded-3xl p-6" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-              <div className="text-3xl mb-4">📖</div>
-              <h3 className="font-display text-lg font-black text-stone-900 mb-1.5">Journal émotionnel</h3>
-              <p className="text-sm mb-5" style={{ color: '#78716c', lineHeight: 1.6 }}>
-                Note ton humeur et découvre ton évolution.
-              </p>
-
-              {/* Aperçu — démonstration, pas de vraies données utilisateur */}
-              <div className="rounded-2xl p-4 mb-6" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
-                <div className="grid grid-cols-7 gap-1.5 mb-2">
-                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
-                    <span key={i} className="text-center text-[9px] font-bold" style={{ color: '#a8a29e' }}>{d}</span>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7 gap-1.5">
-                  {[null, null, '🙂', '😄', null, '😐', null,
-                    '😄', '🙂', null, null, '😞', '🙂', '😄',
-                    null, '😄', '🙂', '🙂', null, null, '😐',
-                    '🙂', null, '😄', '😄', '🙂', null, null].map((e, i) => (
-                    <div
-                      key={i}
-                      className="aspect-square rounded-md flex items-center justify-center text-xs"
-                      style={{ background: e ? 'var(--gold-soft)' : 'var(--paper-panel)', border: '1px solid var(--line)' }}
-                    >
-                      {e ?? ''}
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[10px] text-center mt-3" style={{ color: '#a8a29e' }}>Aperçu · exemple</p>
-              </div>
-
-              <Link href="/journal" className="ur-btn-gold inline-flex px-6 py-3 text-sm">
-                Commencer mon journal →
-              </Link>
-            </div>
-
+      {/* ── 🧠 Test MBTI — glow doré qui respire ── */}
+      <section ref={mbtiSectionRef} className="relative z-10 py-14 px-6 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="landing-decor-anim absolute left-1/2 top-1/3 -translate-x-1/2 w-72 h-72 rounded-full blur-3xl" style={{ background: 'var(--gold)', opacity: 0.12, animation: 'pulseGlow 5s ease-in-out infinite' }} />
+        </div>
+        <div className="relative max-w-lg mx-auto text-center">
+          <p className="ur-label text-[10px] mb-3" style={{ color: CLAY }}>🧠 Test de personnalité</p>
+          <h3 className="font-display text-2xl font-black text-stone-900 mb-3">Découvre qui tu es, vraiment</h3>
+          <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: '#78716c', lineHeight: 1.6 }}>
+            Basé sur les 8 fonctions cognitives de Carl Jung. Réponds honnêtement, Nova s&apos;occupe du reste.
+          </p>
+          <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite' }}>
+            <PhoneMockup><MbtiDemoScreen /></PhoneMockup>
           </div>
+          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+            Faire mon test →
+          </Link>
         </div>
       </section>
+
+      {/* ── 🤖 Nova — fond encre, décor cosmique ── */}
+      <section ref={novaSectionRef} className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--ink)' }}>
+        <CosmicBackdrop />
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="landing-decor-anim absolute right-8 top-10 w-56 h-56 rounded-full blur-3xl" style={{ background: 'var(--gold)', opacity: 0.1, animation: 'floatBlob 8s ease-in-out infinite' }} />
+        </div>
+        <div className="relative max-w-lg mx-auto text-center">
+          <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>🤖 Ton IA personnelle</p>
+          <h3 className="font-display text-2xl font-black mb-3" style={{ color: '#FAF6EC' }}>Une IA qui apprend à te connaître</h3>
+          <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)', lineHeight: 1.6 }}>
+            Analyse une conversation, comprend tes émotions, crée des tests personnalisés, répond à tes questions.
+          </p>
+          <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .3s' }}>
+            <PhoneMockup dark><NovaDemoScreen /></PhoneMockup>
+          </div>
+          <Link href="/chat" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+            Découvrir Nova →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── 📖 Journal émotionnel — chaleureux, particules flottantes ── */}
+      <section ref={journalSectionRef} className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--paper-panel)' }}>
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {[
+            { l: '12%', t: '15%', e: '😄', d: '0s' }, { l: '80%', t: '20%', e: '🙂', d: '1.4s' },
+            { l: '25%', t: '70%', e: '😊', d: '.7s' }, { l: '70%', t: '65%', e: '✦', d: '2.1s' },
+          ].map((p, i) => (
+            <span key={i} className="landing-decor-anim absolute text-xl opacity-20" style={{ left: p.l, top: p.t, animation: `floatUp 7s ease-in-out ${p.d} infinite` }}>{p.e}</span>
+          ))}
+        </div>
+        <div className="relative max-w-lg mx-auto text-center">
+          <p className="ur-label text-[10px] mb-3" style={{ color: CLAY }}>📖 Journal émotionnel</p>
+          <h3 className="font-display text-2xl font-black text-stone-900 mb-3">Note ton humeur, découvre ton évolution</h3>
+          <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: '#78716c', lineHeight: 1.6 }}>
+            Un calendrier qui se remplit chaque jour, et Nova qui repère tes tendances au fil du temps.
+          </p>
+          <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .6s' }}>
+            <PhoneMockup><JournalDemoScreen /></PhoneMockup>
+          </div>
+          <Link href="/journal" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+            Commencer mon journal →
+          </Link>
+        </div>
+      </section>
+
+      <style>{`
+        @keyframes pulseGlow { 0%, 100% { opacity:.1; transform:translate(-50%,0) scale(1) } 50% { opacity:.2; transform:translate(-50%,0) scale(1.15) } }
+        @keyframes floatBlob { 0%, 100% { transform:translateY(0) } 50% { transform:translateY(20px) } }
+        @keyframes floatUp { 0%, 100% { transform:translateY(0); opacity:.15 } 50% { transform:translateY(-14px); opacity:.3 } }
+        @keyframes demoFloat { 0%, 100% { transform:translateY(0) } 50% { transform:translateY(-8px) } }
+        @media (prefers-reduced-motion: reduce) {
+          .landing-decor-anim { animation: none !important; }
+        }
+      `}</style>
 
       {/* ── Pourquoi c'est différent — rangées éditoriales, pas des cartes ── */}
       <section className="relative z-10 pb-12 px-6">
@@ -701,21 +730,27 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Sticky mobile CTA — visible after 320px scroll, hidden on desktop */}
-      {stickyVisible && (
-        <div
-          className="fixed bottom-0 left-0 right-0 z-40 sm:hidden"
-          style={{ padding: '12px 92px 28px 16px', background: 'linear-gradient(to top, var(--paper) 65%, transparent)' }}
-        >
-          <Link
-            href="/quiz/personnalite"
-            className="block w-full text-center py-4 rounded-full font-bold text-base transition-all active:scale-[0.98]"
-            style={{ background: 'var(--gold)', color: '#FAF6EC' }}
+      {/* Sticky mobile CTA — visible after 320px scroll, hidden on desktop.
+          Reflète la section actuellement au centre de l'écran (voir
+          activeFeature) pour ne jamais pousser vers le mauvais CTA pendant
+          que le visiteur regarde Nova ou le Journal. */}
+      {stickyVisible && (() => {
+        const cta = activeFeature ? STICKY_CTA[activeFeature] : STICKY_CTA.mbti;
+        return (
+          <div
+            className="fixed bottom-0 left-0 right-0 z-40 sm:hidden"
+            style={{ padding: '12px 92px 28px 16px', background: 'linear-gradient(to top, var(--paper) 65%, transparent)' }}
           >
-            Découvrir mon type →
-          </Link>
-        </div>
-      )}
+            <Link
+              href={cta.href}
+              className="block w-full text-center py-4 rounded-full font-bold text-base transition-all active:scale-[0.98]"
+              style={{ background: 'var(--gold)', color: '#FAF6EC' }}
+            >
+              {cta.label}
+            </Link>
+          </div>
+        );
+      })()}
     </main>
   );
 }
