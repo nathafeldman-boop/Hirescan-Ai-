@@ -90,11 +90,15 @@ model User {
 }
 
 // ── Journal émotionnel ───────────────────────────────────────────────────────
-// Une entrée par jour (clé unique userId+day, upsert). Volontairement PAS
-// réservé aux abonnés — c'est un levier d'engagement quotidien à la Duolingo,
-// utile justement pour faire revenir un compte gratuit avant même de payer.
+// Une entrée par jour (clé unique userId+day, upsert). La SAISIE reste
+// volontairement PAS réservée aux abonnés — c'est un levier d'engagement
+// quotidien à la Duolingo, utile justement pour faire revenir un compte
+// gratuit avant même de payer. C'est l'ANALYSE Nova (tendances, résumés de
+// période — voir lib/journalAccess.ts) qui est premium / en essai découverte.
 // mood/energy/stress : échelle 1-5 chacun. energy/stress ont un défaut (3 =
 // neutre) pour rester compatibles avec les lignes créées avant leur ajout.
+// emotion : tag libre optionnel (ex "Joie", "Anxiété") en plus de la note —
+// nullable, ajouté après coup, aucune ligne existante à migrer.
 model JournalEntry {
   id        String   @id @default(cuid())
   userId    String
@@ -102,6 +106,7 @@ model JournalEntry {
   mood      Int      // 1 (😞) à 5 (😄)
   energy    Int      @default(3) // 1 (à plat) à 5 (pleine forme)
   stress    Int      @default(3) // 1 (zen) à 5 (sous tension)
+  emotion   String?  // tag court, ex "Joie", "Gratitude", "Anxiété"
   note      String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

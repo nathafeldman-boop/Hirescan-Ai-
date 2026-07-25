@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
 import NovaAvatar from '@/components/NovaAvatar';
+import AppTabBar from '@/components/AppTabBar';
 import { COACH_CATEGORIES } from '@/lib/coachCategories';
 
 interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
@@ -377,6 +378,7 @@ export default function ChatClient() {
           Passer le test →
         </Link>
         <Link href="/" className="mt-5 text-xs" style={{ color: '#a8a29e' }}>← Retour à l&apos;accueil</Link>
+        <AppTabBar />
       </main>
     );
   }
@@ -386,9 +388,15 @@ export default function ChatClient() {
   const empty = messages.length === 0;
 
   return (
-    <main className="min-h-screen flex flex-col" style={{ background: 'var(--paper)' }}>
+    <main className="chat-shell flex flex-col" style={{ background: 'var(--paper)' }}>
+      {/* 100dvh (avec repli 100vh) : la colonne flex tient EXACTEMENT dans le
+          viewport visible, barre d'adresse mobile comprise — condition pour
+          que la zone de messages (flex-1) scrolle seule et que l'input + la
+          barre de navigation restent toujours visibles en bas, sans jamais
+          se chevaucher (voir AppTabBar mode="static"). */}
+      <style>{`.chat-shell { height: 100vh; height: 100dvh; }`}</style>
       {/* Header */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-4 py-3"
+      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3"
         style={{ background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
         <Link href="/" className="text-xs flex items-center gap-1.5" style={{ color: '#78716c' }}>
           <span>←</span> Accueil
@@ -426,7 +434,7 @@ export default function ChatClient() {
       )}
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-4 py-6">
           {empty ? (
             <div className="flex flex-col items-center text-center pt-6">
@@ -611,8 +619,10 @@ export default function ChatClient() {
         </div>
       </div>
 
-      {/* Input bar */}
-      <div className="sticky bottom-0" style={{ background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
+      {/* Input bar — élément normal du flux (pas sticky/fixed) : la colonne
+          flex fait exactement 100dvh, donc il reste toujours visible juste
+          au-dessus d'AppTabBar, sans jamais la chevaucher. */}
+      <div className="flex-shrink-0" style={{ background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
         {/* Aperçu de la photo en attente d'envoi */}
         {pendingImage && (
           <div className="max-w-2xl mx-auto px-4 pt-3">
@@ -955,6 +965,8 @@ export default function ChatClient() {
           </div>
         </div>
       )}
+
+      <AppTabBar mode="static" />
     </main>
   );
 }

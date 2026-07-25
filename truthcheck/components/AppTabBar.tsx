@@ -16,7 +16,12 @@ const TABS = [
 
 // dark : variante pour les pages au thème sombre (ex. dashboard premium) — même
 // structure, juste des couleurs de fond/texte inversées pour ne pas jurer.
-export default function AppTabBar({ dark = false }: { dark?: boolean }) {
+// mode : 'fixed' (défaut) épingle la barre en bas du viewport — parfait pour
+// une page qui scrolle normalement (Journal, Moi). 'static' la rend comme un
+// simple élément de flux, à placer en dernier enfant d'une colonne flex en
+// h-[100dvh] — nécessaire sur /chat, où un input déjà collé en bas du flex
+// entrerait sinon en collision avec une barre fixe (voir ChatClient.tsx).
+export default function AppTabBar({ dark = false, mode = 'fixed' }: { dark?: boolean; mode?: 'fixed' | 'static' }) {
   const pathname = usePathname();
   const bg = dark ? 'rgba(10,7,5,0.92)' : 'rgba(242,236,222,0.94)';
   const border = dark ? 'rgba(255,255,255,0.08)' : 'var(--line)';
@@ -25,7 +30,7 @@ export default function AppTabBar({ dark = false }: { dark?: boolean }) {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40"
+      className={mode === 'fixed' ? 'fixed bottom-0 left-0 right-0 z-40 flex-shrink-0' : 'flex-shrink-0'}
       style={{ background: bg, backdropFilter: 'blur(16px)', borderTop: `1px solid ${border}`, paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="max-w-lg mx-auto grid grid-cols-4">
