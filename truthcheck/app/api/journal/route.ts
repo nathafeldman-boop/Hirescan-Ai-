@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   const [monthEntries, totalCount] = await Promise.all([
     prisma.journalEntry.findMany({
       where: { userId: uid, day: { startsWith: month } },
-      select: { day: true, mood: true, note: true },
+      select: { day: true, mood: true, energy: true, stress: true, note: true },
       orderBy: { day: 'asc' },
     }),
     prisma.journalEntry.count({ where: { userId: uid } }),
@@ -44,9 +44,14 @@ export async function POST(req: NextRequest) {
   const uid = (session?.user as { id?: string } | undefined)?.id;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  const body = await req.json().catch(() => null) as { mood?: number; note?: string } | null;
+  const body = await req.json().catch(() => null) as { mood?: number; energy?: number; stress?: number; note?: string } | null;
   const mood = Number(body?.mood);
+  const energy = body?.energy !== undefined ? Number(body.energy) : 3;
+  const stress = body?.stress !== undefined ? Number(body.stress) : 3;
   if (!Number.isInteger(mood) || mood < 1 || mood > 5) {
+    return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+  }
+  if (!Number.isInteger(energy) || energy < 1 || energy > 5 || !Number.isInteger(stress) || stress < 1 || stress > 5) {
     return NextResponse.json({ error: 'bad_request' }, { status: 400 });
   }
   const note = typeof body?.note === 'string' ? body.note.trim().slice(0, 500) : undefined;
@@ -54,9 +59,12 @@ export async function POST(req: NextRequest) {
   const day = parisDay();
   const entry = await prisma.journalEntry.upsert({
     where: { userId_day: { userId: uid, day } },
-    create: { userId: uid, day, mood, note },
-    update: { mood, note },
+    create: { userId: uid, day, mood, energy, stress, note },
+    update: { mood, energy, stress, note },
   });
 
-  return NextResponse.json({ ok: true, entry: { day: entry.day, mood: entry.mood, note: entry.note } });
+  return NextResponse.json({
+    ok: true,
+    entry: { day: entry.day, mood: entry.mood, energy: entry.energy, stress: entry.stress, note: entry.note },
+  });
 }

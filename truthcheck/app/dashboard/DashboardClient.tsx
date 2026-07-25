@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
+import { hasPaidAccess } from '@/lib/plans';
 import AppTabBar from '@/components/AppTabBar';
 
 interface Props {
@@ -46,6 +47,10 @@ const LIGHT = {
 export default function DashboardClient({ user }: Props) {
   const isPremium = user.tier === 'premium' || user.tier === 'pro' || user.tier === 'plus';
   const theme = isPremium ? DARK : LIGHT;
+  // Distinct de isPremium (qui ne pilote que le THÈME clair/sombre) : un abonné
+  // 'starter' a déjà accès à Nova mais n'est pas en thème sombre — le badge
+  // "Abonnés" doit suivre le vrai accès, pas le thème visuel.
+  const isPaidNova = hasPaidAccess(user.tier);
   const type = user.mbtiType ? mbtiTypes[user.mbtiType] : null;
   const firstName = user.name?.split(' ')[0] ?? 'toi';
 
@@ -185,6 +190,32 @@ export default function DashboardClient({ user }: Props) {
             </div>
             <p className="text-sm font-bold" style={{ color: theme.text }}>Les 16 types</p>
             <p className="text-xs mt-0.5 leading-snug" style={{ color: theme.muted }}>Explorer tous les profils</p>
+          </Link>
+
+          <Link
+            href="/profil-avance"
+            className="rounded-2xl p-4 transition-all hover:scale-[1.02]"
+            style={{ background: theme.card, border: `1px solid ${theme.cardBorder}` }}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-2xl">🧠</span>
+              {!isPaidNova && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: theme.accentBg, color: theme.accent }}>Abonnés</span>}
+            </div>
+            <p className="text-sm font-bold" style={{ color: theme.text }}>Analyse avancée</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: theme.muted }}>Plus loin que le MBTI</p>
+          </Link>
+
+          <Link
+            href="/compat"
+            className="rounded-2xl p-4 transition-all hover:scale-[1.02]"
+            style={{ background: theme.card, border: `1px solid ${theme.cardBorder}` }}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-2xl">👥</span>
+              {!isPaidNova && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: theme.accentBg, color: theme.accent }}>Abonnés</span>}
+            </div>
+            <p className="text-sm font-bold" style={{ color: theme.text }}>Compatibilité</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: theme.muted }}>Toi &amp; un proche</p>
           </Link>
         </div>
 

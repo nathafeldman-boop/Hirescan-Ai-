@@ -85,19 +85,23 @@ model User {
   customQuizzes CustomQuiz[]
   conversationAnalyses ConversationAnalysis[]
   journalEntries JournalEntry[]
+  compatibilityChecks CompatibilityCheck[]
+  advancedAnalysis AdvancedAnalysis?
 }
 
 // ── Journal émotionnel ───────────────────────────────────────────────────────
 // Une entrée par jour (clé unique userId+day, upsert). Volontairement PAS
 // réservé aux abonnés — c'est un levier d'engagement quotidien à la Duolingo,
 // utile justement pour faire revenir un compte gratuit avant même de payer.
-// mood : échelle 1-5 (😞😕😐🙂😄). Alimentera la mémoire long terme de Nova
-// plus tard (pas encore branché — voir ConversationAnalysis, même logique).
+// mood/energy/stress : échelle 1-5 chacun. energy/stress ont un défaut (3 =
+// neutre) pour rester compatibles avec les lignes créées avant leur ajout.
 model JournalEntry {
   id        String   @id @default(cuid())
   userId    String
   day       String   // "YYYY-MM-DD" (fuseau Europe/Paris)
   mood      Int      // 1 (😞) à 5 (😄)
+  energy    Int      @default(3) // 1 (à plat) à 5 (pleine forme)
+  stress    Int      @default(3) // 1 (zen) à 5 (sous tension)
   note      String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -106,6 +110,52 @@ model JournalEntry {
 
   @@unique([userId, day])
   @@index([userId])
+}
+
+// ── Compatibilité avec un ami / partenaire / membre de la famille ───────────
+// L'utilisateur décrit une personne de son entourage via un court
+// questionnaire de perception (ce n'est PAS le vrai test MBTI de cette
+// personne — elle n'a pas de compte). Nova compare ce profil perçu au profil
+// MBTI de l'utilisateur et génère un résultat pensé pour être partagé
+// (réseaux sociaux) — voir /compat/[id], page publique en lecture seule.
+model CompatibilityCheck {
+  id           String   @id @default(cuid())
+  userId       String
+  personName   String
+  relationType String   // 'ami' | 'couple' | 'famille'
+  answers      Json     // { questionId: string, choiceLabel: string }[] — réponses perçues sur l'autre
+  commonPoints Json     // string[]
+  differences  Json     // string[]
+  strengths    Json     // string[]
+  watchPoints  Json     // string[]
+  summary      String   @db.Text
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ── Analyse de personnalité avancée ─────────────────────────────────────────
+// Va plus loin que le simple MBTI : combine le type MBTI, les scores par
+// axe, les dernières analyses de conversation et le journal émotionnel pour
+// donner l'impression que Nova connaît vraiment l'utilisateur. Un seul
+// enregistrement par utilisateur (userId unique) : régénérer REMPLACE
+// l'ancien, ce n'est pas un historique — c'est "le profil actuel de Nova sur
+// toi", qui s'affine avec le temps.
+model AdvancedAnalysis {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  strengths           Json     // string[]
+  weaknesses          Json     // string[]
+  communicationStyle  String   @db.Text
+  conflictStyle        String   @db.Text
+  idealEnvironment     String   @db.Text
+  advice               Json     // string[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ── Analyse de conversation par Nova (feature phare, pensée pour être virale) ──
