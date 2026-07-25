@@ -5,9 +5,20 @@
 
 export type Tier = 'free' | 'starter' | 'plus' | 'premium';
 
-// Quotas de messages PAR JOUR selon l'abonnement.
-// starter (1,99€) = 5 · plus (5€) = 30 · premium = 50.
-// Le palier GRATUIT n'est pas journalier : 5 messages PAR MOIS (découverte).
+// ── Grille de quotas, un seul endroit à modifier ────────────────────────────
+// Toute nouvelle feature consommant le quota Nova (chat, créateur de test,
+// analyse de conversation, et les prochaines : journal, compatibilité...)
+// DOIT lire ces mêmes constantes plutôt que d'inventer sa propre limite —
+// un "message" a un sens unique et cohérent dans toute l'app.
+//
+// Correspondance avec le langage produit ("Free / Premium 1 / 2 / Max") :
+//   free    = Free       — 5 messages PAR MOIS (découverte, pas de test complet)
+//   starter = Premium 1  — 5 messages/jour  (1,99€/mois)
+//   plus    = Premium 2  — 30 messages/jour (5€/mois)
+//   premium = Premium Max — 50 messages/jour (9,99€/mois ou 29,99€/an)
+// Les noms internes (starter/plus/premium) restent inchangés — ce sont ceux
+// utilisés par Stripe/webhook/DB ; les renommer serait un risque inutile pour
+// un simple changement d'étiquette côté produit.
 export const DAILY_LIMITS: Record<Exclude<Tier, 'free'>, number> = {
   starter: 5,
   plus: 30,
