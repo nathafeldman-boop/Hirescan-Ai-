@@ -426,52 +426,6 @@ function InAppBrowserOverlay() {
 
 // ─── Countdown timer ─────────────────────────────────────────────────────────────
 
-function CountdownTimer({ isFr }: { isFr: boolean }) {
-  // 48-hour offer window from first visit — persists across sessions (stronger
-  // urgency than a 15-min timer that obviously resets on every reload).
-  const DURATION = 48 * 60 * 60;
-  const [seconds, setSeconds] = useState(() => {
-    try {
-      const end = localStorage.getItem('_urs_offer_end');
-      if (end) {
-        const rem = Math.round((parseInt(end) - Date.now()) / 1000);
-        if (rem > 0 && rem <= DURATION) return rem;
-      }
-    } catch {}
-    const endTs = Date.now() + DURATION * 1000;
-    try { localStorage.setItem('_urs_offer_end', endTs.toString()); } catch {}
-    return DURATION;
-  });
-
-  useEffect(() => {
-    if (seconds <= 0) return;
-    const id = setInterval(() => setSeconds(s => (s <= 1 ? 0 : s - 1)), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  if (seconds <= 0) return (
-    <div className="flex items-center justify-center gap-1.5 mb-3">
-      <span className="ur-label inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px]"
-            style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
-        {isFr ? 'Offre de lancement, prix réduit actif' : 'Launch offer, reduced price active'}
-      </span>
-    </div>
-  );
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = (seconds % 60).toString().padStart(2, '0');
-  const label = h > 0 ? `${h}h ${m.toString().padStart(2, '0')}min` : `${m}:${s}`;
-
-  return (
-    <div className="flex items-center justify-center gap-1.5 mb-3">
-      <span className="ur-label inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px]"
-            style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
-        {isFr ? `Offre de lancement, expire dans ${label}` : `Launch offer, expires in ${label}`}
-      </span>
-    </div>
-  );
-}
-
 // ─── Per-type emotional hook (curiosity gap — #1 conversion lever) ──────────────
 const HOOK_LINES: Record<string, string> = {
   INTJ: 'Pourquoi tu sembles froid(e) alors que tu ressens tout en profondeur',
@@ -491,15 +445,6 @@ const HOOK_LINES: Record<string, string> = {
   ESTP: 'Pourquoi tu t\'ennuies dès que la relation devient sécurisante',
   ESFP: 'Pourquoi tu as besoin d\'attention pour te sentir vraiment aimé(e)',
 };
-
-// Realistic unlock counts per type (proportional to MBTI rarity × user base)
-const TYPE_COUNTS: Record<string, number> = {
-  ISFJ: 2847, ISTJ: 2631, ESFJ: 2418, ESTJ: 2193,
-  ENFP: 1847, ESFP: 1923, ISFP: 1762, ISTP: 1247,
-  INFP: 1138, ESTP: 1089, ENFJ: 931, ENTJ: 923,
-  INTJ: 768, INTP: 831, INFJ: 634, ENTP: 912,
-};
-
 
 // Glyphes maison — trait 1.5px, grille 24. Remplacent les emojis d'interface.
 function Glyph({ name, color = '#131110', size = 20 }: {
@@ -526,216 +471,6 @@ function Glyph({ name, color = '#131110', size = 20 }: {
   }
 }
 
-// Type-specific micro-testimonials — reference the type's exact pain point hook
-const TYPE_REVIEWS: Record<string, { name: string; age: number; quote: string }> = {
-  INTJ: { name: 'Thomas', age: 29, quote: "Je pensais me connaître. La partie amour m'a complètement contredit. Effrayant de précision." },
-  INTP: { name: 'Julien', age: 25, quote: '"Pourquoi tu procrastines malgré ton intelligence" — j\'ai lu ça 3 fois. C\'est exactement moi.' },
-  ENTJ: { name: 'Alexandre', age: 31, quote: 'La section "face cachée" sur l\'image d\'autorité... je l\'ai envoyé à toute mon équipe.' },
-  ENTP: { name: 'Maxime', age: 27, quote: "L'ennui chronique enfin expliqué. Les compatibilités sont d'une précision ridicule." },
-  INFJ: { name: 'Sophie', age: 24, quote: 'Je me suis reconnue mot pour mot dans la partie "angles morts". J\'en ai eu les larmes aux yeux.' },
-  INFP: { name: 'Emma', age: 22, quote: '"Tu te sens incompris même par ceux qui t\'aiment" — comment ils savent ça?' },
-  ENFJ: { name: 'Camille', age: 26, quote: "Le chapitre sur le sacrifice de soi m'a obligée à mettre pause et à réfléchir." },
-  ENFP: { name: 'Léa', age: 23, quote: 'Ma mère a lu le chapitre carrière et dit "enfin quelqu\'un qui t\'explique mieux que moi".' },
-  ISTJ: { name: 'Pierre', age: 34, quote: "La section amour était inconfortable. Pas parce que c'était faux — exactement parce que c'était trop juste." },
-  ISFJ: { name: 'Marie', age: 28, quote: '"Tu dis oui quand tu veux dire non" — j\'ai ri et pleuré en même temps. Exactement moi.' },
-  ESTJ: { name: 'Nicolas', age: 32, quote: "La partie sur comment je suis perçu vs ce que je veux — ça explique tous mes conflits au travail." },
-  ESFJ: { name: 'Laura', age: 25, quote: "La partie \"Face cachée\" dit que je prends en charge les émotions de tout le monde sauf les miennes. J'ai dû m'arrêter." },
-  ISTP: { name: 'Antoine', age: 27, quote: "Premier test perso qui ne me sonne pas creux. La section attachement est un peu trop vraie." },
-  ISFP: { name: 'Chloé', age: 21, quote: "Je montrais jamais ce que je créais. Après le chapitre créativité — j'ai posté." },
-  ESTP: { name: 'Kevin', age: 26, quote: "L'ennui en relation sécurisante... c'est exactement mon pattern. Je l'avais jamais nommé." },
-  ESFP: { name: 'Sarah', age: 24, quote: "Le chapitre amour parle du besoin de validation. Inconfortable à lire — parce que trop vrai." },
-};
-
-// ─── Paywall email capture (abandon recovery) ───────────────────────────────────
-// For users not ready to pay: capture the email so we can send their welcome +
-// follow-up. POSTs to /api/save-email which fires a welcome email per new lead.
-// onCaptured: called with the email after save — parent can immediately offer checkout.
-function PaywallEmailCapture({ typeCode, isFr, onCaptured }: {
-  typeCode: string;
-  isFr: boolean;
-  onCaptured?: (email: string) => void;
-}) {
-  const [email, setEmail] = useState('');
-  const [state, setState] = useState<'idle' | 'loading' | 'done'>('idle');
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.includes('@') || !email.includes('.')) return;
-    setState('loading');
-    try {
-      await fetch('/api/save-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), typeCode }),
-      });
-    } catch {}
-    setState('done');
-  };
-
-  if (state === 'done') {
-    return (
-      <div className="rounded-2xl p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-        <p className="text-sm font-bold text-stone-800 mb-1">{isFr ? 'Profil sauvegardé !' : 'Profile saved!'}</p>
-        <p className="text-xs text-stone-500 mb-3">
-          {isFr ? 'Vérifie ta boîte, ou débloque tout de suite.' : 'Check your inbox, or unlock right now.'}
-        </p>
-        <button
-          onClick={() => onCaptured?.(email.trim())}
-          className="w-full py-3 rounded-full font-black text-sm active:scale-[0.98] transition-all"
-          style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-        >
-          {isFr ? `Débloquer mon profil + Nova, 1,99 €/mois` : `Unlock my profile + Nova, €1.99/mo`}
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="rounded-2xl p-4 mt-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-      <p className="text-sm font-bold text-stone-800 mb-1">
-        {isFr ? `Pas encore décidé ? Garde ton profil` : `Not ready yet? Save your profile`}
-      </p>
-      <p className="text-xs text-stone-500 mb-3">
-        {isFr ? 'On te garde une place, gratuit, sans spam. Tu pourras le débloquer quand tu veux.' : 'We\'ll hold your spot, no spam. Unlock whenever you want.'}
-      </p>
-      <form onSubmit={submit} className="flex gap-2">
-        <input
-          type="email"
-          inputMode="email"
-          placeholder={isFr ? 'ton@email.com' : 'your@email.com'}
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="flex-1 min-w-0 px-3 py-2.5 rounded-full text-sm outline-none"
-          style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}
-        />
-        <button
-          type="submit"
-          disabled={state === 'loading'}
-          className="px-4 py-2.5 rounded-full font-bold text-sm flex-shrink-0 disabled:opacity-60"
-          style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-        >
-          {state === 'loading' ? '…' : '→'}
-        </button>
-      </form>
-    </div>
-  );
-}
-
-// ─── FAQ — removes objections before they kill the sale ─────────────────────
-function PaywallFAQ({ typeCode, isFr }: { typeCode: string; isFr: boolean }) {
-  const [open, setOpen] = useState<number | null>(null);
-
-  const items = isFr ? [
-    {
-      q: `Quelle est la différence entre les deux offres à 1,99 €?`,
-      a: `"Juste mon résultat" (1,99 € une seule fois) débloque ton profil complet à vie, sans abonnement ni coach. "Ton profil + ton coach" (1,99 €/mois) débloque le même profil ET Nova, ton coach IA qui connaît ton type — 5 messages par jour. Résiliable en 1 clic à tout moment, sans engagement.`,
-    },
-    {
-      q: `Satisfait ou remboursé?`,
-      a: `Oui, 7 jours, aucune question posée. Envoie un email à urcecretteam@gmail.com et tu es remboursé(e) sous 24h.`,
-    },
-    {
-      q: `Mes données sont-elles protégées?`,
-      a: `Le paiement est traité à 100 % par Stripe — nous ne stockons aucune donnée bancaire. Tes réponses au quiz restent strictement anonymes.`,
-    },
-  ] : [
-    {
-      q: `What's the difference between the two €1.99 offers?`,
-      a: `"Just my result" (€1.99 once) unlocks your full profile for life, no subscription, no coach. "My profile + my coach" (€1.99/mo) unlocks the same profile AND Nova, your AI coach who knows your type — 5 messages a day. Cancel in 1 click anytime, no commitment.`,
-    },
-    {
-      q: `Money-back guarantee?`,
-      a: `Yes, 7 days, no questions asked. Email urcecretteam@gmail.com and you'll be refunded within 24h.`,
-    },
-    {
-      q: `Is my data protected?`,
-      a: `Payment is 100% processed by Stripe — we never store card data. Your quiz answers remain strictly anonymous.`,
-    },
-  ];
-
-  return (
-    <div className="mt-6">
-      <p className="ur-label text-[10px] mb-3 text-center" style={{ color: 'var(--ink)', opacity: 0.5 }}>
-        {isFr ? 'Questions fréquentes' : 'FAQ'}
-      </p>
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--line)', background: 'var(--paper-panel)' }}>
-        {items.map((item, i) => (
-          <div key={i} className={i < items.length - 1 ? 'border-b border-stone-100' : ''}>
-            <button
-              onClick={() => setOpen(open === i ? null : i)}
-              className="w-full text-left px-4 py-3.5 flex items-center justify-between gap-3"
-            >
-              <p className="text-xs font-bold text-stone-800 leading-snug">{item.q}</p>
-              <span
-                className="flex-shrink-0 text-stone-400 text-sm"
-                style={{ display: 'inline-block', transition: 'transform 0.2s', transform: open === i ? 'rotate(180deg)' : 'none' }}
-              >
-                ▾
-              </span>
-            </button>
-            {open === i && (
-              <div className="px-4 pb-4 -mt-1">
-                <p className="text-[12px] text-stone-600 leading-relaxed">{item.a}</p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Exit intent modal (mobile back button) ───────────────────────────────────
-function ExitIntentModal({ typeCode, isFr, onCheckout, onClose }: {
-  typeCode: string;
-  isFr: boolean;
-  onCheckout: () => void;
-  onClose: () => void;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center"
-      style={{ background: 'rgba(0,0,0,0.62)', backdropFilter: 'blur(4px)' }}
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-sm rounded-t-3xl px-5 pt-6 pb-10"
-        style={{ background: 'var(--paper)', animation: 'exitModalUp 0.32s cubic-bezier(0.22,1,0.36,1)' }}
-        onClick={e => e.stopPropagation()}
-      >
-        <style>{`@keyframes exitModalUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
-        <div className="w-10 h-1 rounded-full mx-auto mb-5" style={{ background: 'var(--line)' }} />
-        <div className="text-center mb-5">
-          <div className="flex justify-center mb-3"><Seal size={44} color="var(--gold)" /></div>
-          <h3 className="font-display text-xl leading-tight mb-2" style={{ color: 'var(--ink)', fontWeight: 700 }}>
-            {isFr
-              ? `Ton profil s'efface dans 24h`
-              : `Your profile expires in 24h`}
-          </h3>
-          <p className="text-sm text-stone-500 leading-snug">
-            {isFr
-              ? `Une fois parti(e), ton profil sera archivé. Débloque-le maintenant, une fois, pour toujours.`
-              : `Once you leave, your profile gets archived. Unlock it now, once, forever.`}
-          </p>
-        </div>
-        <button
-          onClick={() => { onClose(); onCheckout(); }}
-          className="w-full py-4 rounded-full font-black text-sm mb-3 active:scale-[0.98] transition-all"
-          style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-        >
-          {isFr ? `Débloquer maintenant, 1,99 €/mois` : `Unlock now, €1.99/mo`}
-        </button>
-        <button
-          onClick={onClose}
-          className="w-full py-2.5 text-xs text-stone-400 text-center active:opacity-70"
-        >
-          {isFr ? 'Non merci, je préfère partir' : "No thanks, I'll leave"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // ─── Share my type — viral loop ────────────────────────────────────────────
 // Le partage du type se fait uniquement après paiement, sur /success
 // (MbtiShareCard). Le retirer d'ici évite de révéler le résultat gratuitement
@@ -755,57 +490,11 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   // Using an <a href> instead of window.location.href lets TikTok open Stripe in Safari
   // where the post-payment redirect back to /success works correctly.
   const [inAppPayUrl, setInAppPayUrl] = useState<string | null>(null);
-  const [inAppMonthlyUrl, setInAppMonthlyUrl] = useState<string | null>(null);
-  const [inAppPlusUrl, setInAppPlusUrl] = useState<string | null>(null);
   const [inAppOneTimeUrl, setInAppOneTimeUrl] = useState<string | null>(null);
-  const [stickyBar, setStickyBar] = useState(false);
-  const [exitModal, setExitModal] = useState(false);
-  const exitShown = useRef(false);
-  const [liveCount] = useState(() => {
-    const base: Record<string, number> = {
-      ISFJ: 7, ISTJ: 6, ESFJ: 8, ESTJ: 5, ENFP: 9, ESFP: 6,
-      ISFP: 5, ISTP: 4, INFP: 4, ESTP: 3, ENFJ: 4, ENTJ: 3,
-      INTJ: 3, INTP: 3, INFJ: 2, ENTP: 3,
-    };
-    return (base[typeCode] ?? 3) + Math.floor(Math.random() * 3);
-  });
 
   useEffect(() => {
     track('paywall_view', { quiz: 'personnalite' });
     diagLog('paywall_mounted', { typeCode, hasEmail: !!userEmail });
-    // Don't shove the paywall in their face on a timer — especially on TikTok.
-    // Let them READ the free profile first (that's what creates the value/desire),
-    // then surface the sticky bar once they've scrolled through the content.
-    let shown = false;
-    const show = () => { if (!shown) { shown = true; setStickyBar(true); } };
-    const onScroll = () => {
-      const reached = window.scrollY + window.innerHeight;
-      const total = document.documentElement.scrollHeight;
-      // In-app (TikTok): wait until they've consumed ~60% of the free content.
-      // Web: a bit earlier at ~45%.
-      const threshold = isInApp ? 0.6 : 0.45;
-      if (total > 0 && reached / total >= threshold) show();
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    // Long fallback so it still appears for users who don't scroll at all.
-    const t = setTimeout(show, isInApp ? 24000 : 12000);
-    return () => { window.removeEventListener('scroll', onScroll); clearTimeout(t); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Intercept browser back button — show exit intent modal instead of navigating away.
-  // Pushes a fake history entry on mount so the first back press triggers our handler.
-  useEffect(() => {
-    window.history.pushState({ paywall: true }, '');
-    const onPop = () => {
-      if (!exitShown.current) {
-        exitShown.current = true;
-        setExitModal(true);
-        window.history.pushState({ paywall: true }, '');
-      }
-    };
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -878,14 +567,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
     }).then(r => r.json()).then(d => { if (d.url) setInAppPayUrl(d.url); }).catch(() => {});
     fetch('/api/checkout', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...base }),
-    }).then(r => r.json()).then(d => { if (d.url) setInAppMonthlyUrl(d.url); }).catch(() => {});
-    fetch('/api/checkout', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...base, plus: true }),
-    }).then(r => r.json()).then(d => { if (d.url) setInAppPlusUrl(d.url); }).catch(() => {});
-    fetch('/api/checkout', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...base, oneTime: true }),
     }).then(r => r.json()).then(d => { if (d.url) setInAppOneTimeUrl(d.url); }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -894,14 +575,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: 'var(--paper)', animation: 'paywallReveal 0.45s ease' }}>
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
-      {exitModal && (
-        <ExitIntentModal
-          typeCode={typeCode}
-          isFr={isFr}
-          onCheckout={() => doCheckout('starter')}
-          onClose={() => setExitModal(false)}
-        />
-      )}
       <div className="w-full max-w-sm">
 
         {/* ─── L'oracle voilé — RIEN du résultat n'est révélé avant paiement.
@@ -939,44 +612,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </p>
           </div>
         </div>
-
-        {/* ─── Quick-entry CTA — immediately below hook, above the fold on mobile.
-            Les deux offres à 1,99€ côte à côte dès ce premier écran (constat
-            terrain : montrer les deux convertit mieux qu'une seule). ── */}
-        {!isInApp && (
-          <div className="rounded-2xl px-4 py-3.5 mb-4"
-               style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="flex-shrink-0"><Glyph name="key" color="var(--gold)" size={20} /></span>
-              <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>
-                {isFr ? 'Débloquer mon profil, dès 1,99 €' : 'Unlock my profile, from €1.99'}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                onClick={() => doCheckout('onetime')}
-                disabled={loading}
-                className="flex flex-col items-center rounded-xl px-2 py-3 transition-all active:scale-[0.97] disabled:opacity-60"
-                style={{ border: '1px solid var(--line)', background: 'var(--paper)' }}
-              >
-                <span className="font-display text-lg font-bold" style={{ color: 'var(--ink)' }}>{loading ? '…' : '1,99 €'}</span>
-                <span className="text-[10px] mt-1 text-stone-500 text-center leading-tight">{isFr ? 'Juste le résultat, une fois' : 'Just the result, once'}</span>
-              </button>
-              <button
-                onClick={() => doCheckout('starter')}
-                disabled={loading}
-                className="flex flex-col items-center rounded-xl px-2 py-3 transition-all active:scale-[0.97] disabled:opacity-60"
-                style={{ background: 'var(--ink)', boxShadow: '0 6px 18px rgba(19,17,16,0.22)' }}
-              >
-                <span className="font-display text-lg font-bold" style={{ color: 'var(--gold)' }}>{loading ? '…' : '1,99 €/mois'}</span>
-                <span className="text-[10px] mt-1 text-center leading-tight" style={{ color: 'rgba(250,246,236,0.65)' }}>{isFr ? '+ Nova, ton coach IA' : '+ Nova, your AI coach'}</span>
-              </button>
-            </div>
-            <p className="text-center text-[11px] mt-2.5 text-stone-400">
-              {isFr ? 'Remboursé 7 jours, sans question.' : '7-day refund, no questions asked.'}
-            </p>
-          </div>
-        )}
 
         {/* ─── Les portes fermées — titres seulement + teaser générique.
             Rien du vrai contenu du profil n'est montré avant le paiement. ── */}
@@ -1052,40 +687,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               ? <>Un bilan de personnalité chez un praticien coûte 150 € ou plus.<br /><span className="font-semibold text-stone-800">Ton profil complet + un coach : 1,99 €/mois, résiliable en 1 clic.</span></>
               : <>A personality assessment with a practitioner costs €150+.<br /><span className="font-semibold text-stone-800">Your full profile + a coach: €1.99/mo, cancel anytime.</span></>}
           </p>
-        </div>
-
-        <p className="text-center text-[11px] text-stone-500 mb-1">
-          {TYPE_COUNTS[typeCode] ?? 847} {isFr ? `personnes ont débloqué leur profil ce mois` : `people unlocked their profile this month`}
-        </p>
-        <p className="text-center text-[11px] text-stone-400 mb-3">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 align-middle animate-pulse" />
-          {liveCount} {isFr ? 'personnes consultent ce profil en ce moment' : 'people viewing this profile right now'}
-        </p>
-
-        <CountdownTimer isFr={isFr} />
-
-        {/* ─── Pas encore convaincu(e) ? Fais goûter Nova AVANT de redemander
-            une carte bancaire — désamorce l'hésitation de ceux qui ont scrollé
-            sans craquer sur les boutons rapides plus haut. Vers le chat gratuit
-            (5 messages/mois, sans le test) — pas de nouvelle mécanique, juste
-            un pont vers ce qui existe déjà. ── */}
-        <div className="rounded-2xl px-5 py-4 mb-4 text-center" style={{ background: 'var(--paper-panel)', border: '1px dashed var(--gold-line)' }}>
-          <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>
-            {isFr ? 'Pas encore convaincu(e) ?' : 'Not convinced yet?'}
-          </p>
-          <p className="text-[13px] text-stone-600 mb-3.5" style={{ lineHeight: 1.5 }}>
-            {isFr
-              ? 'Discute d\'abord avec Nova, notre coach IA — gratuit, 5 messages offerts par mois, sans engagement.'
-              : 'Chat with Nova, our AI coach, first — free, 5 messages a month on us, no commitment.'}
-          </p>
-          <Link
-            href="/chat"
-            onClick={() => diagLog('paywall_try_nova_click', {})}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all active:scale-[0.97]"
-            style={{ border: '1px solid var(--gold-line)', color: 'var(--gold)' }}
-          >
-            <Glyph name="spark" color="var(--gold)" size={16} /> {isFr ? 'Tester Nova gratuitement' : 'Try Nova for free'}
-          </Link>
         </div>
 
         {/* ── Offres — visibles pour TOUT LE MONDE, y compris in-app TikTok.
@@ -1198,107 +799,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             )}
           </div>
 
-          {/* Plus — 5€/mois : profil débloqué + Coach IA personnel. Le milieu de
-              gamme, mis en avant : la vraie valeur récurrente (coach ancré sur le test). */}
-          <div className="relative rounded-[24px] px-5 pt-5 pb-4 overflow-hidden"
-               style={{ background: 'var(--paper-panel)', border: '1.5px solid var(--gold)' }}>
-            <span className="absolute top-0 right-4 -translate-y-1/2 px-2.5 py-1 rounded-full text-[9px] font-black tracking-widest"
-                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
-              {isFr ? 'LE PLUS CHOISI' : 'MOST POPULAR'}
-            </span>
-            <div className="flex items-start justify-between mb-3">
-              <div className="min-w-0 pr-3">
-                <p className="text-[14px] font-black text-stone-900" style={{ letterSpacing: '-0.01em' }}>
-                  {isFr ? 'Plus — ton profil + ton Coach IA' : 'Plus — your profile + your AI Coach'}
-                </p>
-                <p className="text-[11px] text-stone-500 mt-0.5" style={{ lineHeight: 1.5 }}>
-                  {isFr ? 'Ton profil complet débloqué, puis un coach qui te connaît déjà' : 'Your full profile unlocked, then a coach who already knows you'}
-                </p>
-              </div>
-              <div className="text-right flex-shrink-0">
-                <span className="font-display text-2xl text-stone-900" style={{ fontWeight: 800 }}>5 €</span>
-                <span className="text-[11px] text-stone-400"> {isFr ? '/mois' : '/mo'}</span>
-              </div>
-            </div>
-            <ul className="space-y-2 mb-4">
-              {(isFr ? [
-                'Ton profil MBTI complet débloqué',
-                'Ton Coach IA personnel, 30 messages/jour',
-                'Il connaît ton type et te répond d\'après ton test',
-                'Résiliable en 1 clic, sans engagement',
-              ] : [
-                'Your complete MBTI profile unlocked',
-                'Your personal AI Coach, 30 messages/day',
-                'It knows your type and answers based on your test',
-                'Cancel in 1 click, no commitment',
-              ]).map(b => (
-                <li key={b} className="flex items-start gap-2.5 text-[12.5px] text-stone-700" style={{ lineHeight: 1.5 }}>
-                  <span className="flex-shrink-0 mt-0.5 font-bold" style={{ color: 'var(--gold)' }}>✓</span>{b}
-                </li>
-              ))}
-            </ul>
-            {isInApp && inAppPlusUrl ? (
-              <a
-                href={inAppPlusUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'plus', via: 'anchor' })}
-                className="block w-full py-3.5 rounded-full font-bold text-[14px] text-center transition-all active:scale-[0.98]"
-                style={{ background: 'var(--gold)', color: 'var(--ink)', textDecoration: 'none' }}
-              >
-                {isFr ? 'Débloquer + mon Coach IA, 5 €/mois' : 'Unlock + my AI Coach, €5/mo'}
-              </a>
-            ) : (
-              <button
-                onClick={() => doCheckout('plus')}
-                disabled={loading}
-                className="w-full py-3.5 rounded-full font-bold text-[14px] transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-              >
-                {loading ? '…' : isFr ? 'Débloquer + mon Coach IA, 5 €/mois' : 'Unlock + my AI Coach, €5/mo'}
-              </button>
-            )}
-          </div>
-
-          {/* Secondary: Monthly subscription — panneau papier, plat */}
-          <div className="rounded-2xl px-5 py-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <p className="text-[13px] font-bold text-stone-900" style={{ letterSpacing: '-0.01em' }}>
-                  {isFr ? 'Accès illimité, sans engagement' : 'Unlimited access, no commitment'}
-                </p>
-                <p className="text-[11px] text-stone-500 mt-0.5" style={{ lineHeight: 1.5 }}>
-                  {isFr ? 'Les 16 profils, tous les quiz, le mode duo' : 'All 16 profiles, every quiz, duo mode'}
-                </p>
-              </div>
-              <div className="text-right ml-3 flex-shrink-0">
-                <span className="text-[11px] text-stone-300 line-through block">29,99 €</span>
-                <span className="font-display text-lg text-stone-900" style={{ fontWeight: 700 }}>9,99 €</span>
-                <span className="text-[11px] text-stone-400"> {isFr ? '/mois' : '/mo'}</span>
-              </div>
-            </div>
-            {isInApp && inAppMonthlyUrl ? (
-              <a
-                href={inAppMonthlyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => diagLog(userEmail ? 'checkout_with_email' : 'checkout_no_email', { intent: 'monthly', via: 'anchor' })}
-                className="block w-full py-3 rounded-full font-semibold text-[13px] text-center transition-all active:scale-[0.98]"
-                style={{ border: '1px solid var(--ink)', color: 'var(--ink)', background: 'transparent', textDecoration: 'none' }}
-              >
-                {isFr ? "Choisir l'abonnement" : 'Choose subscription'}
-              </a>
-            ) : (
-              <button
-                onClick={() => doCheckout('monthly')}
-                disabled={loading}
-                className="w-full py-3 rounded-full font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ border: '1px solid var(--ink)', color: 'var(--ink)', background: 'transparent' }}
-              >
-                {loading ? '…' : isFr ? "Choisir l'abonnement" : 'Choose subscription'}
-              </button>
-            )}
-          </div>
         </div>
         )}
 
@@ -1311,72 +811,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           </p>
         </div>
 
-        {/* Micro-reviews — type-specific top review + 2 generic */}
-        <div className="mt-5 space-y-2">
-          {TYPE_REVIEWS[typeCode] && isFr && (
-            <div className="rounded-2xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-              <span style={{ color: 'var(--gold)' }} className="text-xs flex-shrink-0 mt-0.5">★★★★★</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-stone-700 leading-snug italic">&ldquo;{TYPE_REVIEWS[typeCode].quote}&rdquo;</p>
-                <p className="text-[10px] text-stone-400 mt-0.5">{TYPE_REVIEWS[typeCode].name}, {TYPE_REVIEWS[typeCode].age} ans</p>
-              </div>
-            </div>
-          )}
-          {(isFr ? [
-            { name: 'Lucas, 28 ans', text: '"Je me suis enfin compris. La partie amour est effrayante de précision."' },
-            { name: 'Camille, 22 ans', text: '"J\'ai montré le chapitre amour à ma copine. Elle était choquée."' },
-          ] : [
-            { name: 'Marie, 24', text: '"I cried. Every line was exactly me."' },
-            { name: 'Lucas, 28', text: '"I finally understood myself. The love section is frighteningly accurate."' },
-            { name: 'Camille, 22', text: '"I showed the love chapter to my partner. She was shocked."' },
-          ]).map(r => (
-            <div key={r.name} className="rounded-2xl px-4 py-3 flex gap-2.5 items-start" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-              <span style={{ color: 'var(--gold)' }} className="text-xs flex-shrink-0 mt-0.5">★★★★★</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-stone-700 leading-snug italic">{r.text}</p>
-                <p className="text-[10px] text-stone-400 mt-0.5">{r.name}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* FAQ — pre-empts the top objections (subscription fear, refund policy) */}
-        <PaywallFAQ typeCode={typeCode} isFr={isFr} />
-
-        {/* Abandon recovery — in-place email capture (works in TikTok webview too,
-            no Safari hop needed) → sends the targeted "profil prêt" email.
-            onCaptured: immediately offers 1,99€ checkout after email save (warm lead). */}
-        <PaywallEmailCapture
-          typeCode={typeCode}
-          isFr={isFr}
-          onCaptured={(capturedEmail) => doCheckout('starter', capturedEmail)}
-        />
-
       </div>
-
-      {/* Sticky bar — appears after 15s for users still on page (shows lowest price to convert hesitants) */}
-      {stickyBar && !loading && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 px-3 py-3" style={{ background: 'var(--paper-panel)', borderTop: '1px solid var(--gold-line)', boxShadow: '0 -4px 24px rgba(0,0,0,0.10)' }}>
-          <div className="max-w-sm mx-auto flex items-center gap-3">
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-black text-stone-900 leading-snug">
-                {isFr ? `Ton profil + Nova, 1,99 €/mois` : `Your profile + Nova, €1.99/mo`}
-              </p>
-              <p className="text-[10px] text-stone-500 mt-0.5">
-                {isFr ? 'Résiliable en 1 clic · 7 j remboursé' : 'Cancel in 1 click · 7-day refund'}
-              </p>
-            </div>
-            <button
-              onClick={() => { setStickyBar(false); doCheckout('starter'); }}
-              className="flex-shrink-0 px-4 py-2.5 rounded-full font-black text-xs whitespace-nowrap transition-all active:scale-[0.97]"
-              style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-            >
-              {isFr ? '1,99 €/mois →' : '€1.99/mo →'}
-            </button>
-            <button onClick={() => setStickyBar(false)} className="text-stone-400 text-base p-1 leading-none flex-shrink-0">✕</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
