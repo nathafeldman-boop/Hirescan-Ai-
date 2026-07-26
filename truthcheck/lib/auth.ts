@@ -123,6 +123,14 @@ export const authOptions: NextAuthOptions = {
     async createUser({ user }) {
       await onUserCreated({ id: user.id, email: user.email, name: user.name });
     },
+    // Ne couvre QUE les connexions qui passent par le flux NextAuth natif
+    // (Google OAuth ici) — l'email OTP et les codes d'accès créent leur
+    // session directement via Prisma (voir /api/auth/verify-code et
+    // /api/auth/redeem-code) et loggent SIGNED_IN eux-mêmes.
+    async signIn({ user }) {
+      const { logEvent, EVENTS } = await import('./trackEvent');
+      await logEvent(user.id, EVENTS.SIGNED_IN, { method: 'google' });
+    },
   },
   callbacks: {
     async session({ session, user }) {

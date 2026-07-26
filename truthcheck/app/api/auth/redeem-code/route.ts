@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { randomBytes } from 'crypto';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
   await prisma.session.create({
     data: { sessionToken, userId: user.id, expires },
   });
+  await logEvent(user.id, EVENTS.SIGNED_IN, { method: 'access_code' });
 
   // Match NextAuth's cookie naming: secure prefix on https deployments.
   const useSecure = (process.env.NEXTAUTH_URL ?? '').startsWith('https://')

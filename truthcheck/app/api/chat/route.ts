@@ -6,6 +6,7 @@ import { callMistral, dailyLimitFor, parisDay, parisMonth, FREE_MONTHLY_LIMIT, M
 import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree, coachSystemPromptFreeNoTest } from '@/lib/coach';
 import { generateQuiz } from '@/lib/customQuiz';
 import { hasPaidAccess } from '@/lib/plans';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 import type { MbtiScores } from '@/lib/mbti';
 
 export const dynamic = 'force-dynamic';
@@ -226,6 +227,7 @@ export async function POST(req: NextRequest) {
   }
 
   const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1)) + creditsLeft;
+  await logEvent(user.id, EVENTS.NOVA_MESSAGE_SENT);
   return NextResponse.json({ reply: result.reply, remaining, limit });
 }
 
