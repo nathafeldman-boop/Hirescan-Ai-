@@ -6,6 +6,7 @@ import { hasPaidAccess } from '@/lib/plans';
 import { dailyLimitFor, parisDay } from '@/lib/chat';
 import { generateAdvancedAnalysis, summarizeJournalForAnalysis } from '@/lib/advancedAnalysis';
 import type { MbtiScores } from '@/lib/mbti';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,6 +114,8 @@ export async function POST() {
     data: { count: { increment: 1 } },
   }).catch(() => null);
   const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1));
+
+  await logEvent(user.id, EVENTS.PROFIL_AVANCE_GENERATED);
 
   return NextResponse.json({
     ok: true,

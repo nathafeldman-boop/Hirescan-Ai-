@@ -72,6 +72,12 @@ model User {
   referralRewarded Boolean @default(false)
   chatBonusCredits Int     @default(0)
   chatBonusDaily   Int     @default(0)
+  // Dernière activité authentifiée connue (posée par /api/track à chaque
+  // navigation d'un utilisateur connecté — voir AppEvent pour le détail
+  // événement par événement). Seule source fiable de "dernière connexion" :
+  // avant ce champ, "actif" ne pouvait être QUE déduit indirectement via
+  // ChatUsage/JournalEntry (imprécis, ratait toute simple visite de page).
+  lastActiveAt  DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -87,6 +93,26 @@ model User {
   journalEntries JournalEntry[]
   compatibilityChecks CompatibilityCheck[]
   advancedAnalysis AdvancedAnalysis?
+  appEvents    AppEvent[]
+}
+
+// ── Journal d'événements produit ─────────────────────────────────────────────
+// Un événement horodaté par action utilisateur significative (connexion,
+// message Nova envoyé, entrée de journal enregistrée, test terminé...) — voir
+// lib/trackEvent.ts pour l'écriture et la liste des noms d'événements. Sert
+// aux funnels et à la rétention D1/D7/D30 dans /natha-admin/insights, bien
+// plus précis que les proxys déduits des tables métier après coup.
+model AppEvent {
+  id         String   @id @default(cuid())
+  userId     String?
+  event      String
+  properties Json?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([event, createdAt])
 }
 
 // ── Journal émotionnel ───────────────────────────────────────────────────────

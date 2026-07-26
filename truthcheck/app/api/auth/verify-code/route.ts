@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '@/lib/db';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
   const sessionExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 jours
 
   await prisma.session.create({ data: { sessionToken, userId: user.id, expires: sessionExpires } });
+  await logEvent(user.id, EVENTS.SIGNED_IN, { method: 'email_code' });
 
   const useSecure = (process.env.NEXTAUTH_URL ?? '').startsWith('https://') || process.env.NODE_ENV === 'production';
   const cookieName = useSecure ? '__Secure-next-auth.session-token' : 'next-auth.session-token';

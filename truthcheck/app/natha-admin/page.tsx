@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import AccessCodeWidget from './AccessCodeWidget';
 
@@ -492,7 +493,12 @@ export default async function NathaAdminPage() {
             voir distinctUsersByDay). Répond à "combien reviennent chaque
             jour", "combien utilisent Nova / ont un journal", et "qui revient
             pour les deux". ── */}
-        <p style={sectionHeading}>Rétention & engagement</p>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+          <p style={sectionHeading}>Rétention & engagement</p>
+          <Link href="/natha-admin/insights" style={{ color: C.primary, fontSize: 13, fontWeight: 600, textDecoration: 'none', marginBottom: 12 }}>
+            Voir l&apos;analyse détaillée →
+          </Link>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 10 }}>
 
           <div style={block(C.surfaceGood, C.goodBorder)}>

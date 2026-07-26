@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { ALL_MBTI_TYPES } from '@/lib/mbti';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -31,6 +32,8 @@ export async function POST(req: NextRequest) {
       ...(validScores ? { mbtiScores: scores as object } : {}),
     },
   });
+
+  await logEvent(session.user.id, EVENTS.TEST_COMPLETED, { mbtiType: mbtiType.toUpperCase() });
 
   return NextResponse.json({ ok: true });
 }

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { hasPaidAccess } from '@/lib/plans';
 import { dailyLimitFor, parisDay } from '@/lib/chat';
 import { generateQuiz } from '@/lib/customQuiz';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,8 @@ export async function POST(req: NextRequest) {
     data: { count: { increment: 1 } },
   }).catch(() => null);
   const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1));
+
+  await logEvent(user.id, EVENTS.QUIZ_CREATED);
 
   return NextResponse.json({
     ok: true,

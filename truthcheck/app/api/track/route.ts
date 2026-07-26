@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
@@ -52,6 +54,15 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  await prisma.pageView.create({ data: { path, visitorId: cleanVisitorId, source, referrer: refHost } }).catch(() => {});
+  // Dernière activité connue — seule source fiable de "compte actif" (voir
+  // User.lastActiveAt). getServerSession ne touche la base QUE si un cookie de
+  // session est présent, donc coût quasi nul pour les visiteurs anonymes.
+  const session = await getServerSession(authOptions).catch(() => null);
+  const uid = (session?.user as { id?: string } | undefined)?.id;
+
+  await Promise.all([
+    prisma.pageView.create({ data: { path, visitorId: cleanVisitorId, source, referrer: refHost } }).catch(() => {}),
+    uid ? prisma.user.update({ where: { id: uid }, data: { lastActiveAt: new Date() } }).catch(() => {}) : Promise.resolve(),
+  ]);
   return NextResponse.json({ ok: true });
 }

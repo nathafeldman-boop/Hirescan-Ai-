@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { hasPaidAccess } from '@/lib/plans';
 import { dailyLimitFor, parisDay } from '@/lib/chat';
 import { generateFriendCompat, COMPAT_QUESTIONS, RELATION_TYPES, type RelationType } from '@/lib/friendCompat';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,6 +82,8 @@ export async function POST(req: NextRequest) {
     data: { count: { increment: 1 } },
   }).catch(() => null);
   const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1));
+
+  await logEvent(user.id, EVENTS.COMPAT_CREATED);
 
   return NextResponse.json({ ok: true, id: saved.id, remaining, limit });
 }

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { parisDay } from '@/lib/chat';
 import { dailyReaction } from '@/lib/journalReflection';
 import { JOURNAL_TAG_KEYS } from '@/lib/journalTags';
+import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
@@ -97,6 +98,10 @@ export async function POST(req: NextRequest) {
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayKey = yesterday.toISOString().slice(0, 10);
 
+  // Compté AVANT l'upsert : seul moyen de savoir si c'est la toute première
+  // entrée du compte (upsert ne dit pas s'il a pris la branche create/update).
+  const wasFirstEver = (await prisma.journalEntry.count({ where: { userId: uid } })) === 0;
+
   const [entry, yesterdayEntry] = await Promise.all([
     prisma.journalEntry.upsert({
       where: { userId_day: { userId: uid, day } },
@@ -108,6 +113,9 @@ export async function POST(req: NextRequest) {
       select: { mood: true, energy: true, stress: true },
     }),
   ]);
+
+  await logEvent(uid, EVENTS.JOURNAL_ENTRY_SAVED);
+  if (wasFirstEver) await logEvent(uid, EVENTS.JOURNAL_STARTED);
 
   return NextResponse.json({
     ok: true,
