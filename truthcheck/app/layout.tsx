@@ -23,7 +23,7 @@ import InAppBrowserBanner from '@/components/InAppBrowserBanner';
 import { Suspense } from 'react';
 import AffiliateTracker from '@/components/AffiliateTracker';
 import Analytics from '@/components/Analytics';
-import ChatFab from '@/components/ChatFab';
+import GlobalTabBar from '@/components/GlobalTabBar';
 
 const BASE = 'https://urcecret.site';
 
@@ -150,7 +150,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Suspense>
           {children}
           <Suspense fallback={null}>
-            <ChatFab />
+            <GlobalTabBar />
           </Suspense>
         </Providers>
       </body>

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import UserMenu from './UserMenu';
 import { mbtiTypesFree as mbtiTypes } from '@/lib/mbti-free';
 import Seal from './Seal';
@@ -58,40 +58,15 @@ const MBTI_LETTERS = [
 
 const CLAY = 'var(--gold)';
 
-// CTA de la bannière sticky mobile — reflète la section "3 façons de te
-// comprendre" actuellement au centre de l'écran, pour ne jamais pousser vers
-// le test MBTI pendant que le visiteur regarde la section Nova ou Journal.
-const STICKY_CTA = {
-  mbti: { label: 'Découvrir mon type →', href: '/quiz/personnalite' },
-  nova: { label: 'Découvrir Nova →', href: '/chat' },
-  journal: { label: 'Commencer mon journal →', href: '/journal' },
-} as const;
-
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [stickyVisible, setStickyVisible] = useState(false);
-  const [activeFeature, setActiveFeature] = useState<keyof typeof STICKY_CTA | null>(null);
 
-  const mbtiSectionRef = useRef<HTMLElement>(null);
-  const novaSectionRef = useRef<HTMLElement>(null);
-  const journalSectionRef = useRef<HTMLElement>(null);
-
+  // Le bandeau CTA sticky mobile a été retiré : la barre globale Home/Moi
+  // (voir GlobalTabBar) occupe maintenant tout le bas de l'écran en
+  // permanence, empiler les deux aurait recréé le fouillis qu'on vient de
+  // nettoyer (voir HIDE_ON dans GlobalTabBar.tsx).
   useEffect(() => {
-    const sections: [keyof typeof STICKY_CTA, React.RefObject<HTMLElement>][] = [
-      ['mbti', mbtiSectionRef], ['nova', novaSectionRef], ['journal', journalSectionRef],
-    ];
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20);
-      setStickyVisible(window.scrollY > 320);
-      const centerY = window.innerHeight / 2;
-      const hit = sections.find(([, ref]) => {
-        const el = ref.current;
-        if (!el) return false;
-        const r = el.getBoundingClientRect();
-        return r.top <= centerY && r.bottom >= centerY;
-      });
-      setActiveFeature(hit ? hit[0] : null);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -115,8 +90,8 @@ export default function LandingPage() {
             UrCecret
           </span>
           <div className="flex items-center gap-3">
-            {/* Le chatbot est désormais la boule flottante en bas à droite
-                (composant ChatFab, global). Le bouton "Commencer" envoie
+            {/* L'accès à Nova passe par la barre globale en bas d'écran
+                (composant GlobalTabBar). Le bouton "Commencer" envoie
                 maintenant vers le hub de découverte, pas direct sur le test —
                 voir /decouverte (nouvelle étape du funnel). */}
             <UserMenu />
@@ -211,7 +186,7 @@ export default function LandingPage() {
       </h2>
 
       {/* ── 🧠 Test MBTI — glow doré qui respire ── */}
-      <section ref={mbtiSectionRef} className="relative z-10 py-14 px-6 overflow-hidden">
+      <section className="relative z-10 py-14 px-6 overflow-hidden">
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div className="landing-decor-anim absolute left-1/2 top-1/3 -translate-x-1/2 w-72 h-72 rounded-full blur-3xl" style={{ background: 'var(--gold)', opacity: 0.12, animation: 'pulseGlow 5s ease-in-out infinite' }} />
         </div>
@@ -231,7 +206,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── 🤖 Nova — fond encre, décor cosmique ── */}
-      <section ref={novaSectionRef} className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--ink)' }}>
+      <section className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--ink)' }}>
         <CosmicBackdrop />
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div className="landing-decor-anim absolute right-8 top-10 w-56 h-56 rounded-full blur-3xl" style={{ background: 'var(--gold)', opacity: 0.1, animation: 'floatBlob 8s ease-in-out infinite' }} />
@@ -252,7 +227,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── 📖 Journal émotionnel — chaleureux, particules flottantes ── */}
-      <section ref={journalSectionRef} className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--paper-panel)' }}>
+      <section className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--paper-panel)' }}>
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           {[
             { l: '12%', t: '15%', e: '😄', d: '0s' }, { l: '80%', t: '20%', e: '🙂', d: '1.4s' },
@@ -552,28 +527,6 @@ export default function LandingPage() {
           <p className="text-stone-400 text-xs">© {new Date().getFullYear()} UrCecret</p>
         </div>
       </footer>
-
-      {/* Sticky mobile CTA — visible after 320px scroll, hidden on desktop.
-          Reflète la section actuellement au centre de l'écran (voir
-          activeFeature) pour ne jamais pousser vers le mauvais CTA pendant
-          que le visiteur regarde Nova ou le Journal. */}
-      {stickyVisible && (() => {
-        const cta = activeFeature ? STICKY_CTA[activeFeature] : STICKY_CTA.mbti;
-        return (
-          <div
-            className="fixed bottom-0 left-0 right-0 z-40 sm:hidden"
-            style={{ padding: '12px 92px 28px 16px', background: 'linear-gradient(to top, var(--paper) 65%, transparent)' }}
-          >
-            <Link
-              href={cta.href}
-              className="block w-full text-center py-4 rounded-full font-bold text-base transition-all active:scale-[0.98]"
-              style={{ background: 'var(--gold)', color: '#FAF6EC' }}
-            >
-              {cta.label}
-            </Link>
-          </div>
-        );
-      })()}
     </main>
   );
 }
