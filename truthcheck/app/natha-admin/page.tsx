@@ -81,6 +81,33 @@ function DeltaBadge({ today, yesterday }: { today: number; yesterday: number }) 
   );
 }
 
+// Regroupe des lignes {userId, day} en nombre d'UTILISATEURS DISTINCTS par
+// jour (pas un simple compte de lignes) — sert au graphe "actifs par jour".
+// `day` est déjà une chaîne "YYYY-MM-DD" fuseau Paris (ChatUsage/JournalEntry
+// la stockent nativement ; ConversationAnalysis doit être convertie avant).
+function distinctUsersByDay(rows: { userId: string; day: string }[], days: number, todayYMD: string): number[] {
+  const byDay: Record<string, Set<string>> = {};
+  for (const r of rows) {
+    if (!byDay[r.day]) byDay[r.day] = new Set();
+    byDay[r.day].add(r.userId);
+  }
+  const base = new Date(todayYMD + 'T00:00:00Z');
+  const out: number[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const key = new Date(base.getTime() - i * 86_400_000).toISOString().slice(0, 10);
+    out.push(byDay[key]?.size ?? 0);
+  }
+  return out;
+}
+
+// Utilisateurs distincts actifs depuis `sinceYMD` inclus (comparaison lexico
+// valide car "YYYY-MM-DD" trie comme des dates).
+function distinctUsersSince(rows: { userId: string; day: string }[], sinceYMD: string): number {
+  const set = new Set<string>();
+  for (const r of rows) if (r.day >= sinceYMD) set.add(r.userId);
+  return set.size;
+}
+
 export default async function NathaAdminPage() {
   const now = new Date();
   const todayParis  = now.toLocaleDateString('en-CA', { timeZone: TZ }); // "2026-06-12"
@@ -90,6 +117,8 @@ export default async function NathaAdminPage() {
   const startOfMonth = parisMidnight(monthParis);
   const sevenDaysAgo = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
   const fourteenAgo  = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const sevenAgoYMD    = sevenDaysAgo.toLocaleDateString('en-CA', { timeZone: TZ });
+  const fourteenAgoYMD = fourteenAgo.toLocaleDateString('en-CA', { timeZone: TZ });
 
   const [
     totalUsers, premiumUsers, newToday, newThisWeek, newLastWeek,
@@ -185,6 +214,56 @@ export default async function NathaAdminPage() {
     take: 20,
     select: { id: true, code: true, note: true, used: true, usedByEmail: true },
   });
+
+  // ── Rétention & engagement (Nova + Journal) ────────────────────────────────
+  // "Actif" = a utilisé Nova (ChatUsage>0), écrit dans son Journal, OU fait
+  // analyser une conversation ce jour-là — le seul signal d'activité qui
+  // existe aujourd'hui (pas de colonne "dernière connexion" sur User).
+  const [chatUsageRows, journalDayRows, convAnalysisRows, novaUserRows, journalUserRows] = await Promise.all([
+    prisma.chatUsage.findMany({ where: { day: { gte: fourteenAgoYMD }, count: { gt: 0 } }, select: { userId: true, day: true } }),
+    prisma.journalEntry.findMany({ where: { day: { gte: fourteenAgoYMD } }, select: { userId: true, day: true } }),
+    prisma.conversationAnalysis.findMany({ where: { createdAt: { gte: fourteenAgo } }, select: { userId: true, createdAt: true } }),
+    prisma.chatMessage.findMany({ distinct: ['userId'], select: { userId: true } }),
+    prisma.journalEntry.findMany({ distinct: ['userId'], select: { userId: true } }),
+  ]);
+  const activityRows14d = [
+    ...chatUsageRows,
+    ...journalDayRows,
+    ...convAnalysisRows.map(r => ({ userId: r.userId, day: r.createdAt.toLocaleDateString('en-CA', { timeZone: TZ }) })),
+  ];
+  const activeSpark14d = distinctUsersByDay(activityRows14d, 14, todayParis);
+  const activeToday     = distinctUsersSince(activityRows14d, todayParis);
+  const activeThisWeek  = distinctUsersSince(activityRows14d, sevenAgoYMD);
+
+  const novaUserIds    = new Set(novaUserRows.map(r => r.userId));
+  const journalUserIds = new Set(journalUserRows.map(r => r.userId));
+  const novaTotal    = novaUserIds.size;
+  const journalTotal = journalUserIds.size;
+  const bothIds = [...novaUserIds].filter(id => journalUserIds.has(id));
+
+  // Détail des gens qui reviennent pour LES DEUX (ta demande : "qui a testé
+  // Nova ET le calendrier") — dernière activité de chaque côté, triés par le
+  // plus récent des deux, plafonné à 30 lignes (curiosité manuelle, pas une
+  // liste paginée).
+  const [lastNovaByUser, lastJournalByUser, bothUsers] = bothIds.length
+    ? await Promise.all([
+        prisma.chatMessage.groupBy({ by: ['userId'], where: { userId: { in: bothIds } }, _max: { createdAt: true } }),
+        prisma.journalEntry.groupBy({ by: ['userId'], where: { userId: { in: bothIds } }, _max: { day: true } }),
+        prisma.user.findMany({ where: { id: { in: bothIds } }, select: { id: true, email: true, name: true, tier: true } }),
+      ])
+    : [[], [], []];
+  const lastNovaMap = new Map(lastNovaByUser.map(r => [r.userId, r._max.createdAt]));
+  const lastJournalMap = new Map(lastJournalByUser.map(r => [r.userId, r._max.day]));
+  const returningUsers = bothUsers
+    .map(u => {
+      const lastNova = lastNovaMap.get(u.id) ?? null;
+      const lastJournalDay = lastJournalMap.get(u.id) ?? null;
+      const lastNovaYMD = lastNova ? lastNova.toLocaleDateString('en-CA', { timeZone: TZ }) : null;
+      const mostRecent = [lastNovaYMD, lastJournalDay].filter(Boolean).sort().pop() ?? '';
+      return { ...u, lastNovaYMD, lastJournalDay, mostRecent };
+    })
+    .sort((a, b) => (a.mostRecent < b.mostRecent ? 1 : -1))
+    .slice(0, 30);
 
   const revenueToday = allConversions.filter(c => new Date(c.createdAt) >= startOfToday).reduce((s, c) => s + c.amountCents, 0);
   const revenueWeek  = allConversions.filter(c => new Date(c.createdAt) >= sevenDaysAgo).reduce((s, c) => s + c.amountCents, 0);
@@ -405,6 +484,89 @@ export default async function NathaAdminPage() {
             <p style={sub}>sur {landingTotal} vus la home</p>
           </div>
 
+        </div>
+
+        {/* ── SECTION 4bis : Rétention & engagement (Nova + Journal) ──────────
+            "Actif" = a utilisé Nova, écrit dans son Journal, ou fait analyser
+            une conversation ce jour-là (seul signal d'activité disponible —
+            voir distinctUsersByDay). Répond à "combien reviennent chaque
+            jour", "combien utilisent Nova / ont un journal", et "qui revient
+            pour les deux". ── */}
+        <p style={sectionHeading}>Rétention & engagement</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 10 }}>
+
+          <div style={block(C.surfaceGood, C.goodBorder)}>
+            <p style={label}>Actifs aujourd&apos;hui</p>
+            <p style={{ ...bigNum, color: C.good }}>{activeToday}</p>
+            <p style={sub}>Nova, Journal ou analyse</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Actifs cette semaine</p>
+            <p style={bigNum}>{activeThisWeek}</p>
+            <p style={sub}>utilisateurs distincts, 7j</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Utilisent Nova</p>
+            <p style={{ ...bigNum, color: C.primary }}>{novaTotal}</p>
+            <p style={sub}>{pct(novaTotal, totalUsers)} des inscrits</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Ont un journal</p>
+            <p style={{ ...bigNum, color: C.violet }}>{journalTotal}</p>
+            <p style={sub}>{pct(journalTotal, totalUsers)} des inscrits</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Nova + Journal</p>
+            <p style={bigNum}>{bothIds.length}</p>
+            <p style={sub}>utilisent les deux</p>
+          </div>
+
+        </div>
+
+        <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
+          <p style={label}>Utilisateurs actifs par jour</p>
+          <Sparkline values={activeSpark14d} color={C.good} />
+          <p style={{ color: C.faint, fontSize: 11, margin: '8px 0 0' }}>Courbe = 14 derniers jours</p>
+        </div>
+
+        <p style={{ ...sectionHeading, fontSize: 13, color: C.muted, fontWeight: 600, marginTop: 4 }}>
+          Reviennent pour Nova ET le Journal ({bothIds.length})
+        </p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
+          {returningUsers.length === 0 && (
+            <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>
+              Personne n&apos;a encore utilisé Nova et le Journal tous les deux.
+            </p>
+          )}
+          {returningUsers.map((u, i) => (
+            <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < returningUsers.length - 1 ? `1px solid ${C.borderSoft}` : 'none', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ color: C.text, fontSize: 14, fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {u.name ?? u.email ?? 'Anonyme'}
+                </p>
+                <p style={{ color: C.muted, fontSize: 11.5, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {u.email}
+                </p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ ...label, marginBottom: 2, fontSize: 11 }}>Dernier Nova</p>
+                <p style={{ color: C.primary, fontSize: 12.5, fontWeight: 600, margin: 0 }}>{u.lastNovaYMD ?? '—'}</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ ...label, marginBottom: 2, fontSize: 11 }}>Dernier Journal</p>
+                <p style={{ color: C.violet, fontSize: 12.5, fontWeight: 600, margin: 0 }}>{u.lastJournalDay ?? '—'}</p>
+              </div>
+              <span style={{
+                padding: '3px 10px', borderRadius: 999, fontSize: 11.5, fontWeight: 600,
+                background: u.tier !== 'free' ? 'rgba(0,113,227,0.08)' : '#f0f0f2',
+                color: u.tier !== 'free' ? C.primary : C.muted,
+                border: `1px solid ${u.tier !== 'free' ? 'rgba(0,113,227,0.25)' : C.borderSoft}`,
+                flexShrink: 0,
+              }}>
+                {u.tier !== 'free' ? u.tier : 'Gratuit'}
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* ── SECTION 5 : Affiliés ── */}
