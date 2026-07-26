@@ -69,12 +69,8 @@ const STICKY_CTA = {
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [fromTiktok, setFromTiktok] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
   const [activeFeature, setActiveFeature] = useState<keyof typeof STICKY_CTA | null>(null);
-  // Switch immédiatement visible en haut du hero — le nouveau visiteur doit
-  // comprendre en un coup d'œil qu'UrCecret, ce n'est plus QUE le test MBTI.
-  const [heroTab, setHeroTab] = useState<'mbti' | 'nova' | 'journal'>('mbti');
 
   const mbtiSectionRef = useRef<HTMLElement>(null);
   const novaSectionRef = useRef<HTMLElement>(null);
@@ -100,13 +96,6 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    const ua = navigator.userAgent || '';
-    const p = new URLSearchParams(window.location.search);
-    const isTiktokUA = /TikTok|BytedanceWebview|musical_ly|trill/i.test(ua);
-    setFromTiktok(p.get('utm_source') === 'tiktok' || p.get('utm_medium') === 'paid' || isTiktokUA);
-  }, []);
-
   return (
     <main className="min-h-screen overflow-x-hidden relative" style={{ background: 'var(--paper)', color: 'var(--ink)' }}>
       {/* Paper grain — handcrafted texture */}
@@ -127,10 +116,12 @@ export default function LandingPage() {
           </span>
           <div className="flex items-center gap-3">
             {/* Le chatbot est désormais la boule flottante en bas à droite
-                (composant ChatFab, global) — la nav reste focalisée sur le test. */}
+                (composant ChatFab, global). Le bouton "Commencer" envoie
+                maintenant vers le hub de découverte, pas direct sur le test —
+                voir /decouverte (nouvelle étape du funnel). */}
             <UserMenu />
             <Link
-              href="/quiz/personnalite"
+              href="/decouverte"
               className="text-sm font-bold px-5 py-2.5 rounded-full transition-all duration-300 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
               style={{ background: 'var(--ink)', color: '#FAF6EC' }}
             >
@@ -160,220 +151,52 @@ export default function LandingPage() {
             <Seal size={72} spin />
           </div>
 
-          {/* Switch immédiatement visible — un nouveau visiteur doit comprendre
-              en un coup d'œil qu'UrCecret, ce n'est plus QUE le test MBTI. */}
-          <div className="hero-up flex justify-center mb-6" style={{ animationDelay: '.02s' }}>
-            <div className="inline-flex p-1 rounded-full" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
-              <button
-                onClick={() => setHeroTab('mbti')}
-                className="px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap"
-                style={heroTab === 'mbti' ? { background: 'var(--ink)', color: '#FAF6EC' } : { color: '#78716c' }}
-              >
-                🧠 Test MBTI
-              </button>
-              <button
-                onClick={() => setHeroTab('nova')}
-                className="px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap"
-                style={heroTab === 'nova' ? { background: 'var(--ink)', color: '#FAF6EC' } : { color: '#78716c' }}
-              >
-                🤖 Nova
-              </button>
-              <button
-                onClick={() => setHeroTab('journal')}
-                className="px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap"
-                style={heroTab === 'journal' ? { background: 'var(--ink)', color: '#FAF6EC' } : { color: '#78716c' }}
-              >
-                📖 Journal
-              </button>
-            </div>
+          <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
+            Découverte de soi · IA
+          </p>
+
+          <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
+            Apprends à{' '}
+            <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
+              mieux te connaître
+              <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 220 10" fill="none" preserveAspectRatio="none" aria-hidden>
+                <path d="M3 7C52 3 145 2.5 217 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
+                      style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
+              </svg>
+            </em>
+            .
+          </h1>
+
+          <p className="hero-up text-[15px] max-w-sm mx-auto mb-9 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
+            Découvre ta personnalité, comprends tes émotions et apprends à mieux te comprendre grâce à l&apos;intelligence artificielle.
+          </p>
+
+          <div className="hero-up" style={{ animationDelay: '.22s' }}>
+            <Link
+              href="/decouverte"
+              className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
+              style={{ background: 'var(--gold)', color: 'var(--ink)' }}
+            >
+              Commencer gratuitement →
+            </Link>
           </div>
+          <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
+            Gratuit, résultat immédiat, sans inscription.
+          </p>
 
-          {heroTab === 'mbti' ? (
-            <>
-              <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
-                {fromTiktok ? 'Vu sur TikTok' : 'Test de personnalité'}
-              </p>
-
-              <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
-                {fromTiktok ? (
-                  <>Tu réagis différemment{' '}
-                    <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
-                      des autres
-                      <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden>
-                        <path d="M3 7C48 3 130 2.5 197 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
-                              style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
-                      </svg>
-                    </em>
-                    . Voilà pourquoi.</>
-                ) : (
-                  <>Quel est{' '}
-                    <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
-                      vraiment
-                      <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 150 10" fill="none" preserveAspectRatio="none" aria-hidden>
-                        <path d="M3 7C36 3 100 2.5 147 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
-                              style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
-                      </svg>
-                    </em>
-                    {' '}ton type de personnalité&nbsp;?</>
-                )}
-              </h1>
-
-              <p className="hero-up text-[15px] max-w-sm mx-auto mb-9 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
-                {fromTiktok
-                  ? 'Ton type MBTI explique comment ton cerveau traite le monde. 16 profils distincts basés sur Jung. Résultat en moins de 3 minutes.'
-                  : 'Basé sur les 8 fonctions cognitives de Carl Jung. 16 profils distincts. Ton analyse complète en moins de 3 minutes.'}
-              </p>
-
-              <div className="hero-up" style={{ animationDelay: '.22s' }}>
-                <Link
-                  href="/quiz/personnalite"
-                  className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
-                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-                >
-                  Découvrir mon type →
-                </Link>
+          {/* Faits vérifiables, pas de stats inventées */}
+          <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
+            {[
+              { value: '16', label: 'Profils distincts' },
+              { value: '24/7', label: 'Coach IA' },
+              { value: '3 min', label: 'Premier résultat' },
+            ].map((s) => (
+              <div key={s.label}>
+                <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
+                <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
               </div>
-              <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
-                Gratuit, résultat immédiat, sans inscription.
-              </p>
-
-              {/* Faits vérifiables, pas de stats inventées */}
-              <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
-                {[
-                  { value: '16', label: 'Profils distincts' },
-                  { value: '12', label: 'Questions' },
-                  { value: '3 min', label: 'Résultat' },
-                ].map((s) => (
-                  <div key={s.label}>
-                    <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
-                    <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : heroTab === 'nova' ? (
-            <>
-              <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
-                Ton coach IA personnel
-              </p>
-
-              <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
-                Une IA qui te connaît{' '}
-                <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
-                  vraiment
-                  <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 150 10" fill="none" preserveAspectRatio="none" aria-hidden>
-                    <path d="M3 7C36 3 100 2.5 147 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
-                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
-                  </svg>
-                </em>
-                , pas des banalités.
-              </h1>
-
-              <p className="hero-up text-[15px] max-w-sm mx-auto mb-6 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
-                Nova analyse tes conversations, répond selon TON profil de personnalité, et t&apos;aide à comprendre tes relations — pas un chatbot générique.
-              </p>
-
-              {/* Exemples visibles sans écrire — compréhension en moins de 10s */}
-              <div className="hero-up flex flex-wrap justify-center gap-2 mb-8 max-w-sm mx-auto" style={{ animationDelay: '.2s' }}>
-                {['💬 Analyse cette conversation', '🧠 Aide-moi à comprendre mon MBTI', '👥 Crée un test entre amis'].map((t) => (
-                  <span key={t} className="text-[12px] font-semibold px-3 py-1.5 rounded-full" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-
-              <div className="hero-up" style={{ animationDelay: '.24s' }}>
-                <Link
-                  href="/chat"
-                  className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
-                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-                >
-                  Discuter avec Nova →
-                </Link>
-              </div>
-              <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
-                5 messages gratuits, sans engagement.
-              </p>
-
-              <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
-                {[
-                  { value: '24/7', label: 'Toujours dispo' },
-                  { value: '100%', label: 'Selon TON profil' },
-                  { value: '5', label: 'Messages offerts' },
-                ].map((s) => (
-                  <div key={s.label}>
-                    <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
-                    <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="hero-up ur-label text-[11px] mb-5" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
-                Ton compagnon quotidien
-              </p>
-
-              <h1 className="hero-up font-display mb-6" style={{ color: 'var(--ink)', fontSize: 'clamp(2.1rem, 8.6vw, 3.5rem)', lineHeight: 1.08, fontWeight: 700, letterSpacing: '-0.01em', wordBreak: 'break-word', animationDelay: '.1s' }}>
-                Une app qui te connaît{' '}
-                <em className="relative inline-block" style={{ color: 'var(--gold)' }}>
-                  jour après jour
-                  <svg className="absolute left-0 -bottom-1.5 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none" aria-hidden>
-                    <path d="M3 7C48 3 130 2.5 197 5.5" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round"
-                          style={{ strokeDasharray: 300, strokeDashoffset: 300, animation: 'heroDraw 1s ease .6s forwards' }} />
-                  </svg>
-                </em>
-                .
-              </h1>
-
-              <p className="hero-up text-[15px] max-w-sm mx-auto mb-6 text-stone-500" style={{ lineHeight: 1.65, animationDelay: '.16s' }}>
-                Note ton humeur, ton énergie, ton stress — Nova repère tes tendances et t&apos;aide à mieux te comprendre au fil du temps.
-              </p>
-
-              {/* Aperçu — démonstration, pas de vraies données utilisateur */}
-              <div className="hero-up max-w-[220px] mx-auto mb-8 rounded-2xl p-3" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', animationDelay: '.2s' }}>
-                <div className="grid grid-cols-7 gap-1">
-                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
-                    <span key={i} className="text-center text-[8px] font-bold" style={{ color: '#a8a29e' }}>{d}</span>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7 gap-1 mt-1">
-                  {[null, null, '🙂', '😄', null, '😐', null,
-                    '😄', '🙂', null, null, '😞', '🙂', '😄'].map((e, i) => (
-                    <div key={i} className="aspect-square rounded flex items-center justify-center text-[10px]" style={{ background: e ? 'var(--gold-soft)' : 'var(--paper)', border: '1px solid var(--line)' }}>
-                      {e ?? ''}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="hero-up" style={{ animationDelay: '.24s' }}>
-                <Link
-                  href="/journal"
-                  className="inline-flex items-center gap-2 px-9 py-4 rounded-full font-bold text-base active:scale-[0.98] transition-transform whitespace-nowrap"
-                  style={{ background: 'var(--gold)', color: 'var(--ink)' }}
-                >
-                  Commencer mon journal →
-                </Link>
-              </div>
-              <p className="hero-up text-xs mt-4 text-stone-400" style={{ animationDelay: '.28s' }}>
-                Gratuit, calendrier illimité.
-              </p>
-
-              <div className="hero-up flex items-center justify-center gap-8 mt-10 pt-7" style={{ borderTop: '1px solid var(--line)', animationDelay: '.34s' }}>
-                {[
-                  { value: '1 min', label: 'Par jour' },
-                  { value: '4', label: 'Signaux suivis' },
-                  { value: '100%', label: 'Gratuit' },
-                ].map((s) => (
-                  <div key={s.label}>
-                    <div className="font-display text-xl" style={{ color: 'var(--ink)', fontWeight: 700 }}>{s.value}</div>
-                    <div className="text-[11px] mt-1 text-stone-400">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+            ))}
+          </div>
         </div>
       </section>
 
