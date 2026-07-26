@@ -287,6 +287,51 @@ export function emailUnlockReminder(name: string | null, typeCode: string | null
   };
 }
 
+// Relance "reviens + abonne-toi" — vers tous les inscrits SANS abonnement actif
+// (tier free ou unlocked, donc pas encore d'accès Nova). Contrairement à
+// emailUnlockReminder (axée sur "voir ton profil pour 1,99€ une fois"), celle-ci
+// pousse l'usage régulier (Nova, Journal) ET l'abonnement Starter comme porte
+// d'entrée. Voir /api/admin/broadcast-winback.
+export function emailWinBack(name: string | null, typeCode: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const hook = code ? HOOK_LINES[code] : null;
+  const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quiz/personnalite`;
+  return {
+    subject: `${firstName}, Nova et ton profil t'attendent toujours 🔮`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Ça fait un moment</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">
+        ${hook ? `On avait vu juste chez toi : "${hook}"` : 'Ton profil de personnalité est toujours là.'}
+      </h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        Depuis ton inscription, on a ajouté <strong style="color:#fff">Nova</strong> (ton coach IA personnel) et un <strong style="color:#fff">Journal émotionnel</strong> qui suit ton évolution jour après jour. Les gens qui reviennent régulièrement disent que ça change vraiment leur façon de se comprendre.
+      </p>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:18px 20px;margin-bottom:24px">
+        <p style="margin:0 0 10px;color:#c2611f;font-size:13px;font-weight:700">Ce que tu peux faire dès maintenant :</p>
+        <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2">
+          <li>🔮 Poser une vraie question à Nova, ton coach IA</li>
+          <li>📓 Noter ton humeur du jour dans ton Journal émotionnel</li>
+          <li>💬 Faire analyser une conversation qui te trotte dans la tête</li>
+        </ul>
+      </div>
+      <p style="margin:0 0 8px;color:#71717a;font-size:15px;line-height:1.7">
+        Tout ça débloqué dès <strong style="color:#fff">1,99€/mois</strong> (offre Starter). Résiliable en un clic, sans engagement.
+      </p>
+      ${cta('Débloquer mon accès →', link)}
+      <p style="margin:4px 0 0;text-align:center;color:#71717a;font-size:13px">Déjà abonné ?</p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding:10px 0 4px">
+          <a href="${BASE}/chat" style="display:inline-block;background:transparent;border:1px solid rgba(209,125,82,0.5);color:#d17d52;text-decoration:none;font-weight:700;font-size:14px;padding:12px 30px;border-radius:12px">Parler à Nova maintenant →</a>
+        </td></tr>
+      </table>
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
+        <p style="margin:0;color:#52525b;font-size:12px;text-align:center">Paiement sécurisé · Satisfait ou remboursé 7 jours</p>
+      </div>
+    `),
+  };
+}
+
 export function emailPurchaseConfirm(name: string | null, type: 'onetime' | 'monthly' | 'annual' | 'rapport', typeCode?: string) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   const isSubscription = type === 'monthly' || type === 'annual';
