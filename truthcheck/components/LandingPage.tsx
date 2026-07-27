@@ -107,7 +107,10 @@ export default function LandingPage() {
       </nav>
 
       {/* ═══ HERO — le sceau se révèle, la promesse d'une lecture mystique.
-          Fond papier beige (demande explicite) : textes en encre. ═══ */}
+          Fond papier beige (demande explicite) : textes en encre. Une photo
+          d'ouverture (chemin dans la lumière dorée — écho visuel du voyage de
+          découverte de soi) s'efface en fondu vers le papier avant le titre,
+          pour ne jamais abîmer la lisibilité du texte en dessous. ═══ */}
       <section className="relative overflow-hidden text-center" style={{ background: 'var(--paper)' }}>
         <style>{`
           @keyframes heroUp { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:translateY(0) } }
@@ -119,6 +122,16 @@ export default function LandingPage() {
             .hero-up, .hero-seal { opacity:1; animation:none }
           }
         `}</style>
+
+        <div className="absolute inset-x-0 top-0" style={{ height: 460 }} aria-hidden>
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: "url('/landing-hero-bg.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 25%',
+          }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(21,18,31,0.12) 0%, var(--paper) 90%)' }} />
+        </div>
 
         <div className="relative max-w-xl mx-auto px-6 pt-24 pb-16">
 

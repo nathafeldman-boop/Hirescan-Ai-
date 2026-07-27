@@ -14,11 +14,14 @@ const APP_TABS = [
   { href: '/dashboard', emoji: '✨', label: 'Moi' },
 ] as const;
 
-// Variante minimale pour les pages publiques/marketing (landing, hub de
-// découverte...) — voir GlobalTabBar.tsx, qui remplace l'ancienne boule
-// flottante « assistant IA » par une vraie barre, cohérente avec le reste de l'app.
+// Variante minimale pour les pages publiques/marketing (hub de découverte,
+// types, quiz...) — voir GlobalTabBar.tsx, qui remplace l'ancienne boule
+// flottante « assistant IA » par une vraie barre, cohérente avec le reste de
+// l'app. "Home" pointe vers le hub /decouverte (l'endroit central où choisir
+// Nova, le journal, etc.) — PAS vers la landing, qui n'affiche jamais cette
+// barre (voir HIDE_ON dans GlobalTabBar.tsx).
 const PUBLIC_TABS = [
-  { href: '/', emoji: '🏠', label: 'Home' },
+  { href: '/decouverte', emoji: '🏠', label: 'Home' },
   { href: '/dashboard', emoji: '✨', label: 'Moi' },
 ] as const;
 
