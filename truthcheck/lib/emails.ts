@@ -332,6 +332,38 @@ export function emailWinBack(name: string | null, typeCode: string | null) {
   };
 }
 
+// Relance automatique de emailWinBack — envoyée 4 jours plus tard, UNIQUEMENT
+// à ceux qui ne sont jamais revenus sur l'app depuis (voir /api/cron/email-sequence,
+// qui compare lastActiveAt à la date d'envoi du premier email). Plus courte,
+// plus directe, met en avant ce qui a changé depuis pour ne pas répéter mot
+// pour mot la première relance. Dernier email sur ce sujet — pas de 3e relance.
+export function emailWinBackFollowup(name: string | null, typeCode: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  const code = typeCode?.toUpperCase() ?? null;
+  const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quiz/personnalite`;
+  return {
+    subject: `${firstName}, dernier mot avant qu'on arrête d'écrire à ce sujet`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Dernière relance</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">On t'a écrit il y a quelques jours. Toujours rien ?</h2>
+      <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
+        Pas de souci si ce n'est pas le moment — mais depuis, on a ajouté deux trucs qui n'existaient pas encore :
+      </p>
+      <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:18px 20px;margin-bottom:24px">
+        <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2">
+          <li>🎁 Un bilan visuel de ta semaine dans le Journal — à partager si tu veux</li>
+          <li>📈 L'historique de ton type de personnalité, pour voir comment il évolue dans le temps</li>
+        </ul>
+      </div>
+      <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
+        Deux minutes suffisent pour voir si ça vaut le coup. Après cet email, promis, on n'insiste plus sur ce sujet.
+      </p>
+      ${cta('Y jeter un œil →', link)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Starter reste à 1,99€/mois, résiliable en un clic.</p>
+    `),
+  };
+}
+
 export function emailPurchaseConfirm(name: string | null, type: 'onetime' | 'monthly' | 'annual' | 'rapport', typeCode?: string) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   const isSubscription = type === 'monthly' || type === 'annual';
