@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Que veux-tu découvrir sur toi ? | UrCecret',
   description: 'Test de personnalité, coach IA, journal émotionnel, analyse de relations, quiz — choisis ton expérience et commence à mieux te connaître.',
   alternates: { canonical: 'https://urcecret.site/decouverte' },
+  robots: { index: false, follow: false }, // hub applicatif privé (compte requis)
 };
 
 // Le hub est la nouvelle étape du funnel entre la landing et les
