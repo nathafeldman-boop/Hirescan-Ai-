@@ -14,7 +14,7 @@ import { dailyReaction } from '@/lib/journalReflection';
 import type { JournalEntryLite } from '@/lib/journalTypes';
 
 type Entry = JournalEntryLite;
-type JournalAccess = { trendInsights: boolean; inTrial: boolean; trialDaysLeft: number };
+type JournalAccess = { trendInsights: boolean; history: boolean; inTrial: boolean; trialDaysLeft: number };
 
 // Mois affiché : "YYYY-MM" → libellé "juillet 2026"
 function monthLabel(month: string): string {
@@ -459,10 +459,19 @@ export default function JournalClient({ firstName, access }: { firstName: string
               style={{ background: 'linear-gradient(160deg, var(--paper-panel), var(--paper))', border: '1px solid var(--line)', boxShadow: '0 8px 28px rgba(21,18,31,0.06)' }}
             >
               <div className="flex items-center justify-between mb-4">
-                <button onClick={() => load(shiftMonth(month, -1))} className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90" style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}>‹</button>
+                {access.history ? (
+                  <button onClick={() => load(shiftMonth(month, -1))} className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90" style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}>‹</button>
+                ) : (
+                  <Link href="/pricing" className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90" style={{ background: 'var(--paper)', border: '1px solid var(--gold-line)', color: 'var(--gold)' }} title="Débloquer l'historique du calendrier">🔒</Link>
+                )}
                 <p className="text-sm font-bold capitalize" style={{ color: 'var(--ink)' }}>{monthLabel(month)}</p>
                 <button onClick={() => canGoNext && load(shiftMonth(month, 1))} disabled={!canGoNext} className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90 disabled:opacity-30" style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }}>›</button>
               </div>
+              {!access.history && (
+                <p className="text-[10px] text-center mb-2" style={{ color: '#a8a29e' }}>
+                  Mois précédents réservés aux abonnés — <Link href="/pricing" className="font-bold" style={{ color: 'var(--gold)' }}>débloquer →</Link>
+                </p>
+              )}
 
               <div className="grid grid-cols-7 gap-1.5 mb-2">
                 {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
@@ -525,30 +534,49 @@ export default function JournalClient({ firstName, access }: { firstName: string
               </div>
             )}
 
-            {/* Stats détaillées — gratuit, déterministe */}
+            {/* Stats détaillées — série/moyenne gratuites, recul multi-semaines réservé */}
             <div className="rounded-3xl p-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
               <p className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: '#6b6055' }}>Tes statistiques</p>
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {[
                   { label: 'Jours remplis', value: totalCount },
                   { label: 'Série actuelle', value: streak ?? 0 },
-                  { label: 'Meilleure semaine', value: bestWeek ? `${bestWeek.avgMood}/5` : '—' },
-                  { label: 'Semaine difficile', value: worstWeek ? `${worstWeek.avgMood}/5` : '—' },
                 ].map((s) => (
                   <div key={s.label} className="rounded-xl px-3.5 py-3" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
                     <p className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>{s.value}</p>
                     <p className="text-[10px] mt-0.5" style={{ color: '#a8a29e' }}>{s.label}</p>
                   </div>
                 ))}
+                {access.history ? (
+                  <>
+                    <div className="rounded-xl px-3.5 py-3" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
+                      <p className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>{bestWeek ? `${bestWeek.avgMood}/5` : '—'}</p>
+                      <p className="text-[10px] mt-0.5" style={{ color: '#a8a29e' }}>Meilleure semaine</p>
+                    </div>
+                    <div className="rounded-xl px-3.5 py-3" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
+                      <p className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>{worstWeek ? `${worstWeek.avgMood}/5` : '—'}</p>
+                      <p className="text-[10px] mt-0.5" style={{ color: '#a8a29e' }}>Semaine difficile</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="col-span-2 rounded-xl px-3.5 py-3 flex items-center justify-between gap-3" style={{ background: 'var(--paper)', border: '1px dashed var(--gold-line)' }}>
+                    <p className="text-[11px] leading-snug" style={{ color: '#6b6055' }}>🔒 Meilleure/pire semaine, radar émotionnel & heatmap réservés aux abonnés.</p>
+                    <Link href="/pricing" className="ur-btn-gold text-[11px] px-3 py-2 whitespace-nowrap flex-shrink-0">Débloquer</Link>
+                  </div>
+                )}
               </div>
 
-              <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#6b6055' }}>Radar émotionnel</p>
-              <div className="flex justify-center mb-5">
-                <EmotionRadar points={radarPoints} />
-              </div>
+              {access.history && (
+                <>
+                  <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#6b6055' }}>Radar émotionnel</p>
+                  <div className="flex justify-center mb-5">
+                    <EmotionRadar points={radarPoints} />
+                  </div>
 
-              <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#6b6055' }}>Heatmap (12 dernières semaines)</p>
-              {today && <MoodHeatmap entries={allEntries} today={today} />}
+                  <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: '#6b6055' }}>Heatmap (12 dernières semaines)</p>
+                  {today && <MoodHeatmap entries={allEntries} today={today} />}
+                </>
+              )}
             </div>
 
             {/* Analyse Nova — tendances + résumé de période, gated (voir lib/journalAccess.ts) */}

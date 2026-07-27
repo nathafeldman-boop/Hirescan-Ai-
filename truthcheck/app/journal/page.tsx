@@ -29,7 +29,7 @@ export default async function JournalPage() {
   return (
     <JournalClient
       firstName={user.name?.split(' ')[0] ?? null}
-      access={{ trendInsights: access.trendInsights, inTrial: access.inTrial, trialDaysLeft: access.trialDaysLeft }}
+      access={{ trendInsights: access.trendInsights, history: access.history, inTrial: access.inTrial, trialDaysLeft: access.trialDaysLeft }}
     />
   );
 }
