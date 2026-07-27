@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
-import { describeVisit, describeAppEvent, groupSessions, type VisitEvent } from '@/lib/userActivity';
+import { describeVisit, describeAppEvent, describeOrigin, groupSessions, type VisitEvent } from '@/lib/userActivity';
 
 export const metadata: Metadata = {
   title: 'Fiche utilisateur',
@@ -54,7 +54,7 @@ export default async function UserActivityPage({ params }: { params: { id: strin
   }
 
   const [pageViews, appEvents, journalEntries, quizResults, compatChecks, customQuizzes, convAnalyses, mbtiHistory, advancedAnalysis, chatUsageRows] = await Promise.all([
-    prisma.pageView.findMany({ where: { userId: uid }, select: { path: true, createdAt: true }, orderBy: { createdAt: 'asc' } }),
+    prisma.pageView.findMany({ where: { userId: uid }, select: { path: true, createdAt: true, source: true }, orderBy: { createdAt: 'asc' } }),
     prisma.appEvent.findMany({ where: { userId: uid }, select: { event: true, createdAt: true, properties: true }, orderBy: { createdAt: 'asc' } }),
     prisma.journalEntry.findMany({ where: { userId: uid }, select: { day: true }, orderBy: { day: 'desc' } }),
     prisma.quizResult.findMany({ where: { userId: uid }, select: { quizSlug: true, score: true, paid: true, createdAt: true }, orderBy: { createdAt: 'desc' } }),
@@ -80,6 +80,12 @@ export default async function UserActivityPage({ params }: { params: { id: strin
 
   const novaMessageCount = appEvents.filter((e) => e.event === 'nova_message_sent').length;
   const novaMessagesTotal = Math.max(novaMessageCount, chatUsageRows.reduce((s, r) => s + r.count, 0));
+
+  // ── Origine (affilié vs extérieur) — la toute première visite connue de ce
+  // compte, avant même son inscription. Non disponible pour les comptes créés
+  // avant que PageView ne sache lier une visite à un utilisateur.
+  const firstSourced = pageViews.find((p) => p.source);
+  const origin = describeOrigin(firstSourced?.source ?? null);
 
   // ── Statut du test : terminé (avec le type), abandonné à une question
   // précise (dernier /__quiz/drop/qN connu), ou jamais commencé.
@@ -121,6 +127,15 @@ export default async function UserActivityPage({ params }: { params: { id: strin
 
         {/* ── KPIs ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10, marginBottom: 28 }}>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Origine</p>
+            <p style={{
+              ...bigNum, fontSize: 15,
+              color: origin.kind === 'affiliate' ? C.violet : origin.kind === 'external' ? C.primary : C.faint,
+            }}>
+              {origin.label}
+            </p>
+          </div>
           <div style={block(C.surface, C.border)}>
             <p style={label}>Dernière activité</p>
             <p style={{ ...bigNum, fontSize: 18 }}>{user.lastActiveAt ? fmtDate(user.lastActiveAt) : '—'}</p>

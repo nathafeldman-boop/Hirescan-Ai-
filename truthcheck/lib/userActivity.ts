@@ -23,6 +23,26 @@ const PAGE_LABELS: Record<string, string> = {
   '/tests': 'Guides relationnels',
 };
 
+// Origine du compte — "affilié" vs "extérieur", tout simplement. `source` vient
+// déjà de /api/track (aff:<slug> | utm_source | hôte du referrer | direct),
+// calculé au moment de la toute première visite — on prend juste la PLUS
+// ANCIENNE ligne PageView de ce compte pour connaître son premier contact.
+export interface Origin { kind: 'affiliate' | 'external' | 'unknown'; label: string }
+
+export function describeOrigin(source: string | null | undefined): Origin {
+  if (!source) return { kind: 'unknown', label: 'Inconnue (inscrit avant ce suivi)' };
+  if (source.startsWith('aff:')) return { kind: 'affiliate', label: `Affilié — ${source.slice(4)}` };
+  const EXTERNAL_LABELS: Record<string, string> = {
+    direct: 'Extérieur — direct (lien tapé/enregistré)',
+    google: 'Extérieur — recherche Google',
+    tiktok: 'Extérieur — TikTok',
+    instagram: 'Extérieur — Instagram',
+    snapchat: 'Extérieur — Snapchat',
+    bing: 'Extérieur — Bing',
+  };
+  return { kind: 'external', label: EXTERNAL_LABELS[source] ?? `Extérieur — ${source}` };
+}
+
 export interface VisitEvent {
   at: Date;
   kind: 'page' | 'quiz-progress' | 'quiz-drop' | 'event' | 'diag';
