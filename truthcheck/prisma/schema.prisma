@@ -95,6 +95,7 @@ model User {
   advancedAnalysis AdvancedAnalysis?
   appEvents    AppEvent[]
   mbtiTestHistory MbtiTestHistory[]
+  pageViews    PageView[]
 }
 
 // ── Historique des tests MBTI ────────────────────────────────────────────────
@@ -382,15 +383,23 @@ model PageView {
   // étapes du funnel en visiteurs uniques, pas en événements bruts. Nullable
   // pour rester compatible avec les lignes existantes créées avant ce champ.
   visitorId String?
-  // Attribution : d'où vient la visite. `source` = étiquette compacte calculée
-  // (aff:<slug> | utm_source | hôte du referrer | direct), `referrer` = hôte brut.
-  // Nullable pour les lignes créées avant ces champs.
+  // Compte authentifié à l'instant de la visite (posé par /api/track quand une
+  // session existe) — nullable car anonyme la plupart du temps, et absent sur
+  // toutes les lignes créées avant ce champ. C'est ce qui permet de relier tout
+  // ce que /api/track capture déjà (navigation, progression du quiz via
+  // /__quiz/qN et /__quiz/drop/qN, /__evt/paywall_view, /__evt/checkout_click…)
+  // à UNE personne précise plutôt qu'à un visiteur anonyme — voir la fiche
+  // détaillée dans /natha-admin/user/[id].
+  userId    String?
   source    String?
   referrer  String?
   createdAt DateTime @default(now())
 
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   @@index([path])
   @@index([createdAt])
+  @@index([userId])
   @@index([visitorId])
 }
 

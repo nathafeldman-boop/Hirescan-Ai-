@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
   const uid = (session?.user as { id?: string } | undefined)?.id;
 
   await Promise.all([
-    prisma.pageView.create({ data: { path, visitorId: cleanVisitorId, source, referrer: refHost } }).catch(() => {}),
+    prisma.pageView.create({ data: { path, visitorId: cleanVisitorId, userId: uid, source, referrer: refHost } }).catch(() => {}),
     uid ? prisma.user.update({ where: { id: uid }, data: { lastActiveAt: new Date() } }).catch(() => {}) : Promise.resolve(),
   ]);
   return NextResponse.json({ ok: true });
