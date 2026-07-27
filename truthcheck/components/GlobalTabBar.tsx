@@ -15,9 +15,14 @@ import AppTabBar from './AppTabBar';
 //  - les écrans où une barre de nav gênerait (quiz en cours, tunnel de paiement).
 const HIDE_ON = ['/chat', '/journal', '/dashboard', '/compat', '/profil-avance', '/success', '/quiz/personnalite', '/quiz/'];
 
+// Pages internes (tableau de bord admin) : Test/Nova/Journal n'ont aucun sens
+// ici, on ne garde que Home + Moi.
+const MINIMAL_ON = ['/natha-admin', '/uc-board-n4th4'];
+
 export default function GlobalTabBar() {
   const pathname = usePathname() ?? '';
   if (pathname === '/') return null;
+  if (MINIMAL_ON.some((p) => pathname === p || pathname.startsWith(p))) return <AppTabBar minimal />;
   if (HIDE_ON.some((p) => pathname === p || pathname.startsWith(p))) return null;
 
   return <AppTabBar />;
