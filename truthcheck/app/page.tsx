@@ -5,19 +5,20 @@ const BASE = 'https://urcecret.site';
 
 export const metadata: Metadata = {
   title: 'Test MBTI Gratuit — 16 Types de Personnalité | UrCecret',
-  description: 'Découvre ton type MBTI en 24 questions · 15 quiz anonymes sur l\'infidélité, l\'amour et tes amis. Gratuit, instantané, sans inscription.',
+  description: 'Découvre ton type MBTI, discute avec ton coach IA et suis ton évolution émotionnelle · quiz anonymes sur l\'amour et l\'amitié. Gratuit, sans inscription.',
   keywords: [
     'UrCecret', 'urcecret', 'urcecret.site',
     'test MBTI', 'MBTI gratuit', 'test de personnalité gratuit', '16 types personnalité',
     'test personnalité MBTI', 'type MBTI', 'MBTI français', 'personnalité INFJ',
     'personnalité ENFP', 'personnalité INTJ', 'personnalité INTP', 'quel est mon type MBTI',
+    'coach IA personnalité', 'journal émotionnel', 'chatbot MBTI',
     'quiz infidélité', 'quiz vérité', 'quiz anonyme', 'quiz couple', 'quiz amour',
     'test personnalité', 'profil psychologique', 'quiz personnalité', '16 personnalités MBTI',
   ],
   alternates: { canonical: BASE },
   openGraph: {
     title: 'UrCecret — Test MBTI Gratuit & Quiz Vérité Anonymes',
-    description: 'Découvre ton type MBTI en 24 questions + 15 quiz anonymes sur l\'infidélité, l\'amour et tes amis. Gratuit, instantané, sans inscription.',
+    description: 'Découvre ton type MBTI, discute avec ton coach IA et suis ton évolution émotionnelle · quiz anonymes sur l\'amour et l\'amitié. Gratuit, sans inscription.',
     url: BASE,
     siteName: 'UrCecret',
     locale: 'fr_FR',
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'UrCecret — Test MBTI Gratuit & Quiz Vérité',
-    description: 'Type MBTI + quiz infidélité, amour, amis. Anonyme, instantané, gratuit.',
+    description: 'Type MBTI, coach IA, journal émotionnel + quiz amour et amitié. Anonyme, gratuit.',
     images: ['/api/og'],
   },
 };
@@ -42,7 +43,7 @@ const landingSchema = {
   about: {
     '@type': 'Thing',
     name: 'Test de personnalité MBTI',
-    description: 'Test MBTI gratuit : 16 types de personnalité en français, résultat instantané.',
+    description: 'Test MBTI gratuit, coach IA et journal émotionnel pour mieux te connaître, en français.',
   },
   mainEntity: {
     '@type': 'Quiz',
@@ -87,6 +88,11 @@ const homeFaqSchema = {
       '@type': 'Question',
       name: 'Combien de temps dure le test MBTI ?',
       acceptedAnswer: { '@type': 'Answer', text: 'Le test MBTI d\'UrCecret dure environ 3 minutes. Il comprend 24 questions sur tes préférences et comportements naturels pour déterminer ton type de personnalité parmi les 16 profils.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Est-ce qu\'UrCecret propose autre chose que le test MBTI ?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Oui. En plus du test MBTI gratuit, UrCecret propose Nova, un coach IA pour approfondir ta personnalité, un journal émotionnel pour suivre tes ressentis au quotidien, une analyse de compatibilité amoureuse et des quiz sur tes relations.' },
     },
   ],
 };

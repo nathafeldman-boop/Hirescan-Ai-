@@ -149,7 +149,7 @@ export default async function NathaAdminPage() {
     prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { path: '/' } }),
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 8 }),
-    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { email: true, name: true, tier: true, createdAt: true } }),
+    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { id: true, email: true, name: true, tier: true, createdAt: true } }),
     prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }).then(async (aff) => {
       const clicks = await Promise.all(aff.map(a => prisma.pageView.count({ where: { path: `/__aff/${a.slug}` } })));
       return aff.map((a, i) => ({ ...a, clicks: clicks[i] }));
@@ -545,7 +545,7 @@ export default async function NathaAdminPage() {
             </p>
           )}
           {returningUsers.map((u, i) => (
-            <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < returningUsers.length - 1 ? `1px solid ${C.borderSoft}` : 'none', flexWrap: 'wrap' }}>
+            <Link key={u.id} href={`/natha-admin/user/${u.id}`} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < returningUsers.length - 1 ? `1px solid ${C.borderSoft}` : 'none', flexWrap: 'wrap', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ color: C.text, fontSize: 14, fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {u.name ?? u.email ?? 'Anonyme'}
@@ -571,7 +571,7 @@ export default async function NathaAdminPage() {
               }}>
                 {u.tier !== 'free' ? u.tier : 'Gratuit'}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -677,7 +677,7 @@ export default async function NathaAdminPage() {
         <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
           {recentUsers.length === 0 && <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Aucun inscrit pour l&apos;instant.</p>}
           {recentUsers.map((u, i) => (
-            <div key={u.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentUsers.length - 1 ? `1px solid ${C.borderSoft}` : 'none', flexWrap: 'wrap' }}>
+            <Link key={u.id} href={`/natha-admin/user/${u.id}`} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < recentUsers.length - 1 ? `1px solid ${C.borderSoft}` : 'none', flexWrap: 'wrap', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ color: C.text, fontSize: 14, fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {u.name ?? u.email ?? 'Anonyme'}
@@ -695,7 +695,8 @@ export default async function NathaAdminPage() {
               }}>
                 {u.tier === 'premium' ? 'Premium' : 'Gratuit'}
               </span>
-            </div>
+              <span style={{ color: C.primary, fontSize: 12, flexShrink: 0 }}>Voir tout →</span>
+            </Link>
           ))}
         </div>
 

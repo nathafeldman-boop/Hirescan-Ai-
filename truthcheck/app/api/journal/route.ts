@@ -5,13 +5,15 @@ import { prisma } from '@/lib/db';
 import { parisDay } from '@/lib/chat';
 import { dailyReaction } from '@/lib/journalReflection';
 import { JOURNAL_TAG_KEYS } from '@/lib/journalTags';
+import { journalAccessFor } from '@/lib/journalAccess';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
-// Journal émotionnel — volontairement PAS gated derrière un abonnement (voir
+// Journal émotionnel — la SAISIE du jour est volontairement PAS gated (voir
 // schema.prisma) : c'est un levier d'engagement quotidien ouvert à tous les
-// comptes, gratuit ou payant.
+// comptes, gratuit ou payant. En revanche, regarder en arrière (mois passés,
+// stats sur plusieurs semaines) est réservé — voir lib/journalAccess.ts.
 
 // Taille max de la photo (data URI base64, ~1Mo de photo réelle une fois
 // décodée) — reste raisonnable pour une colonne Postgres @db.Text.
@@ -19,16 +21,29 @@ const MAX_PHOTO_DATA_URI_LENGTH = 1_500_000;
 
 // ── GET : historique (mois demandé, défaut = mois en cours) + entrée du jour ──
 // `allEntries` (jour/humeur/énergie/stress/tags, sans note/photo) sert au
-// calcul des stats (série, évolution, meilleure/pire semaine, radar) qui
-// peuvent chevaucher plusieurs mois — payload volontairement léger.
+// calcul des stats série/moyenne/évolution — gratuites, voir lib/journalStats.ts
+// — donc jamais restreinte : couper l'historique casserait la série pour tout
+// le monde à chaque changement de mois. Ce qui EST gated, c'est `entries` (le
+// détail — note, photo — d'un mois autre que le mois en cours) : au-delà, un
+// appel direct à l'API doit buter sur le même mur que le calendrier à l'écran.
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const uid = (session?.user as { id?: string } | undefined)?.id;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  const monthParam = req.nextUrl.searchParams.get('month'); // "YYYY-MM"
+  const user = await prisma.user.findUnique({ where: { id: uid }, select: { tier: true, createdAt: true } });
+  if (!user) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
+
+  const access = journalAccessFor(user.tier, user.createdAt);
   const today = parisDay();
-  const month = /^\d{4}-\d{2}$/.test(monthParam ?? '') ? monthParam! : today.slice(0, 7);
+  const currentMonth = today.slice(0, 7);
+
+  const monthParam = req.nextUrl.searchParams.get('month'); // "YYYY-MM"
+  const requestedMonth = /^\d{4}-\d{2}$/.test(monthParam ?? '') ? monthParam! : currentMonth;
+  if (requestedMonth !== currentMonth && !access.history) {
+    return NextResponse.json({ error: 'payment_required', trialDaysLeft: access.trialDaysLeft }, { status: 402 });
+  }
+  const month = requestedMonth;
 
   const [monthEntries, allEntries, totalCount] = await Promise.all([
     prisma.journalEntry.findMany({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { emailDay1, emailDay3, emailDay7, emailSuiviDay, emailRetentionM1, emailRetentionM3, emailRetentionM5, sendEmail } from '@/lib/emails';
+import { emailDay1, emailDay3, emailDay7, emailSuiviDay, emailRetentionM1, emailRetentionM3, emailRetentionM5, emailWinBackFollowup, sendEmail } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
 
 export const dynamic = 'force-dynamic';
@@ -138,6 +138,51 @@ export async function GET(req: NextRequest) {
         sent++;
       } catch (e) {
         console.error(`Retention ${step.type} failed for ${userEmail}:`, e);
+        errors++;
+      }
+    }
+  }
+
+  // ── Relance auto post-winback — J+4, uniquement si jamais revenu sur l'app ──
+  // Ancrée sur le log 'winback_subscribe' posé par /api/admin/broadcast-winback
+  // (donc ne cible que ceux qui ont VRAIMENT reçu cette campagne, pas tous les
+  // comptes gratuits). "Jamais revenu" = lastActiveAt pas plus récent que
+  // l'envoi du premier email — l'ouverture de l'email lui-même n'est pas
+  // trackée, mais revenir sur l'app est un signal plus fiable de toute façon.
+  // Un seul envoi par compte pour toujours (EmailLog @@unique([userId, type])).
+  const WINBACK_FOLLOWUP_DAYS = 4;
+  const WINBACK_FOLLOWUP_TYPE = 'winback_followup';
+  {
+    const anchorStart = new Date(now.getTime() - (WINBACK_FOLLOWUP_DAYS + 1) * 86400 * 1000);
+    const anchorEnd   = new Date(now.getTime() - WINBACK_FOLLOWUP_DAYS * 86400 * 1000);
+
+    const winbackLogs = await prisma.emailLog.findMany({
+      where: {
+        type: 'winback_subscribe',
+        sentAt: { gte: anchorStart, lte: anchorEnd },
+        user: {
+          tier: 'free',
+          emailLogs: { none: { type: WINBACK_FOLLOWUP_TYPE } },
+        },
+      },
+      select: {
+        userId: true,
+        sentAt: true,
+        user: { select: { email: true, name: true, mbtiType: true, lastActiveAt: true } },
+      },
+    });
+
+    for (const log of winbackLogs) {
+      const { email: userEmail, name, mbtiType, lastActiveAt } = log.user;
+      if (!userEmail) continue;
+      if (lastActiveAt && lastActiveAt > log.sentAt) continue; // déjà revenu depuis — inutile d'insister
+      try {
+        const { subject, html } = emailWinBackFollowup(name, mbtiType);
+        await sendEmail(userEmail, subject, html);
+        await prisma.emailLog.create({ data: { userId: log.userId, type: WINBACK_FOLLOWUP_TYPE } });
+        sent++;
+      } catch (e) {
+        console.error(`Winback followup failed for ${userEmail}:`, e);
         errors++;
       }
     }

@@ -115,6 +115,32 @@ export function tagFrequency(entries: StatsEntry[]): { key: string; label: strin
   return JOURNAL_TAGS.map((t) => ({ key: t.key, label: t.label, emoji: t.emoji, value: (counts.get(t.key) ?? 0) / max }));
 }
 
+export interface MoodAlert { emoji: string; text: string }
+
+// Alerte proactive — compare les 3 derniers jours notés aux 4 précédents pour
+// repérer un vrai changement (stress qui monte, humeur qui baisse ou qui
+// remonte nettement). 100% déterministe, pas d'appel IA. Le CONTENU (texte)
+// est réservé aux abonnés (voir JournalClient.tsx qui affiche une version
+// floutée "Nova a repéré quelque chose" aux comptes gratuits) — la détection
+// elle-même tourne pour tout le monde puisque `allEntries` est déjà dispo
+// côté client (voir app/api/journal/route.ts).
+export function detectMoodAlert(entries: StatsEntry[]): MoodAlert | null {
+  if (entries.length < 6) return null;
+  const sorted = [...entries].sort((a, b) => (a.day < b.day ? -1 : 1));
+  const recent = sorted.slice(-3);
+  const prior = sorted.slice(-7, -3);
+  if (recent.length < 3 || prior.length < 3) return null;
+
+  const avg = (key: 'mood' | 'stress', list: StatsEntry[]) => list.reduce((s, e) => s + e[key], 0) / list.length;
+  const stressDelta = avg('stress', recent) - avg('stress', prior);
+  const moodDelta = avg('mood', recent) - avg('mood', prior);
+
+  if (stressDelta >= 0.8) return { emoji: '⚠️', text: 'Ton stress est en hausse depuis quelques jours.' };
+  if (moodDelta <= -0.8) return { emoji: '💭', text: 'Ton humeur est en baisse depuis quelques jours.' };
+  if (moodDelta >= 0.8) return { emoji: '✨', text: 'Belle dynamique : ton humeur est en nette hausse !' };
+  return null;
+}
+
 // Corrélation simple humeur/tag — 100% déterministe (pas d'IA). Repère un tag
 // dont les jours associés ont une humeur nettement au-dessus de la moyenne
 // des jours SANS ce tag, avec assez de données pour que ce soit honnête.

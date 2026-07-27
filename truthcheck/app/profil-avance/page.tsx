@@ -1,9 +1,17 @@
+import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { hasPaidAccess } from '@/lib/plans';
 import ProfilAvanceClient from './ProfilAvanceClient';
+
+export const metadata: Metadata = {
+  title: 'Profil avancé | UrCecret',
+  description: 'Analyse détaillée de ta personnalité : fonctions cognitives, forces et axes de développement.',
+  alternates: { canonical: 'https://urcecret.site/profil-avance' },
+  robots: { index: false, follow: false }, // page applicative privée (compte requis)
+};
 
 export default async function ProfilAvancePage() {
   const session = await getServerSession(authOptions);

@@ -1,9 +1,17 @@
+import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { journalAccessFor } from '@/lib/journalAccess';
 import JournalClient from './JournalClient';
+
+export const metadata: Metadata = {
+  title: 'Journal émotionnel | UrCecret',
+  description: 'Suis tes émotions au quotidien et découvre tes tendances grâce à l\'IA.',
+  alternates: { canonical: 'https://urcecret.site/journal' },
+  robots: { index: false, follow: false }, // page applicative privée (compte requis)
+};
 
 export default async function JournalPage() {
   const session = await getServerSession(authOptions);
@@ -21,7 +29,7 @@ export default async function JournalPage() {
   return (
     <JournalClient
       firstName={user.name?.split(' ')[0] ?? null}
-      access={{ trendInsights: access.trendInsights, inTrial: access.inTrial, trialDaysLeft: access.trialDaysLeft }}
+      access={{ trendInsights: access.trendInsights, history: access.history, inTrial: access.inTrial, trialDaysLeft: access.trialDaysLeft }}
     />
   );
 }
