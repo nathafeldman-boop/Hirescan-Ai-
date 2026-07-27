@@ -24,16 +24,25 @@ export async function POST(req: NextRequest) {
       return s && typeof s.letter === 'string' && typeof s.pct === 'number';
     });
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: {
-      mbtiType: mbtiType.toUpperCase(),
-      mbtiTestCount: { increment: 1 },
-      ...(validScores ? { mbtiScores: scores as object } : {}),
-    },
-  });
+  const type = mbtiType.toUpperCase();
 
-  await logEvent(session.user.id, EVENTS.TEST_COMPLETED, { mbtiType: mbtiType.toUpperCase() });
+  await Promise.all([
+    prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        mbtiType: type,
+        mbtiTestCount: { increment: 1 },
+        ...(validScores ? { mbtiScores: scores as object } : {}),
+      },
+    }),
+    // Snapshot pour l'historique d'évolution (voir MbtiTestHistory) — jamais
+    // écrasé, contrairement à User.mbtiType/mbtiScores.
+    prisma.mbtiTestHistory.create({
+      data: { userId: session.user.id, type, ...(validScores ? { scores: scores as object } : {}) },
+    }),
+  ]);
+
+  await logEvent(session.user.id, EVENTS.TEST_COMPLETED, { mbtiType: type });
 
   return NextResponse.json({ ok: true });
 }

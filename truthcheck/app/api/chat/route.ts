@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { callMistral, dailyLimitFor, parisDay, parisMonth, FREE_MONTHLY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
 import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree, coachSystemPromptFreeNoTest } from '@/lib/coach';
+import { summarizeJournalForAnalysis } from '@/lib/advancedAnalysis';
 import { generateQuiz } from '@/lib/customQuiz';
 import { hasPaidAccess } from '@/lib/plans';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
@@ -162,11 +163,24 @@ export async function POST(req: NextRequest) {
 
   const scores = (dbUser.mbtiScores as unknown as MbtiScores | null) ?? null;
   const firstName = dbUser.name?.split(' ')[0] ?? null;
-  // Payant → coach ancré sur le test complet. Gratuit + test fait → coach bridé
-  // (générique, aucun type transmis). Gratuit + test PAS fait → coach découverte
-  // (rappelle de faire le test à chaque réponse).
+  // Nova qui "connaît" le journal — réservé aux abonnés, comme le reste du
+  // coaching personnalisé. Requête légère (14 derniers jours, pas de note/
+  // photo) : même fonction de résumé que le Profil avancé, pour rester
+  // cohérent entre les deux features et ne pas dupliquer la logique.
+  const journalEntries = isPremium
+    ? await prisma.journalEntry.findMany({
+        where: { userId: user.id },
+        select: { day: true, mood: true, energy: true, stress: true },
+        orderBy: { day: 'desc' },
+        take: 14,
+      }).catch(() => [])
+    : [];
+  const journalSummary = summarizeJournalForAnalysis(journalEntries);
+  // Payant → coach ancré sur le test complet (+ journal s'il y en a assez).
+  // Gratuit + test fait → coach bridé (générique, aucun type transmis).
+  // Gratuit + test PAS fait → coach découverte (rappelle de faire le test).
   const system = isPremium
-    ? coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType as string, scores))
+    ? coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType as string, scores, journalSummary))
     : dbUser.mbtiType
       ? coachSystemPromptFree(firstName)
       : coachSystemPromptFreeNoTest(firstName);

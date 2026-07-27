@@ -56,7 +56,12 @@ function relationLine(sc: MbtiScores): string {
 }
 
 // Construit le bloc de profil compact injecté dans le system prompt.
-export function buildCoachContext(mbtiType: string, scores: MbtiScores | null): string {
+// `journalSummary` (optionnel) : résumé déterministe des derniers jours du
+// Journal émotionnel (voir lib/advancedAnalysis.ts::summarizeJournalForAnalysis)
+// — réservé aux abonnés, voir app/api/chat/route.ts. C'est ce qui permet à
+// Nova de dire "je vois que tu as noté du stress cette semaine" plutôt que de
+// rester au niveau générique du test MBTI.
+export function buildCoachContext(mbtiType: string, scores: MbtiScores | null, journalSummary?: string | null): string {
   const t = mbtiTypes[mbtiType];
   if (!t) return '';
 
@@ -78,6 +83,7 @@ export function buildCoachContext(mbtiType: string, scores: MbtiScores | null): 
   if (t.strengths?.length) lines.push(`• Forces : ${t.strengths.slice(0, 2).join(' ; ')}`);
   if (t.weaknesses?.length) lines.push(`• Angles morts / peurs : ${t.weaknesses.slice(0, 2).join(' ; ')}`);
   if (t.growth) lines.push(`• Axe de progression : ${t.growth.slice(0, 160)}`);
+  if (journalSummary) lines.push(`• Son journal émotionnel récent : ${journalSummary}`);
 
   return lines.join('\n');
 }
@@ -128,6 +134,7 @@ RÈGLES ABSOLUES :
 - Tutoie. Réponses courtes et concrètes (2-3 paragraphes max), orientées action.
 - Si on t'envoie une photo, regarde-la vraiment et réagis dessus naturellement (en la reliant à son profil si pertinent) — jamais "je ne peux pas voir les images".
 - Tu es la CONTINUITÉ de son test, pas un chatbot générique : chaque réponse doit sembler impossible à obtenir sans avoir fait CE test précis.
+- Si son profil mentionne son journal émotionnel récent, appuie-toi dessus explicitement quand c'est pertinent ("je vois que ton stress est en hausse cette semaine…") — c'est ce qui doit lui donner l'impression que tu la/le suis vraiment au jour le jour, pas juste au moment du test.
 - Tu n'es pas thérapeute. Face à une détresse psychologique réelle, montre de l'empathie et oriente vers un professionnel de santé.
 - S'il te manque une info sur sa situation, pose-lui une question plutôt que de supposer.`;
 }

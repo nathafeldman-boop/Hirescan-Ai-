@@ -14,6 +14,60 @@ interface Analysis {
   updatedAt: string;
 }
 
+interface HistoryEntry { type: string; createdAt: string }
+
+// Évolution du type MBTI dans le temps — chaque retest est sauvegardé (voir
+// MbtiTestHistory), contrairement à User.mbtiType qui n'en garde que le
+// dernier. Repère aussi les changements de type entre deux tests consécutifs,
+// le genre de détail qui donne envie de revenir voir "comment j'ai évolué".
+function MbtiEvolution() {
+  const [loading, setLoading] = useState(true);
+  const [count, setCount] = useState(0);
+  const [history, setHistory] = useState<HistoryEntry[] | null>(null);
+
+  useEffect(() => {
+    fetch('/api/mbti-history')
+      .then((r) => r.json())
+      .then((d) => { setCount(d.count ?? 0); setHistory(d.locked ? null : (d.history ?? null)); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading || count <= 1) return null;
+
+  return (
+    <div className="rounded-3xl p-5" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+      <p className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: '#6b6055' }}>Évolution de ton type</p>
+      {!history ? (
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm leading-relaxed" style={{ color: '#6b6055' }}>Tu as passé le test {count} fois — débloque l&apos;historique pour voir comment ton profil a changé.</p>
+          <Link href="/pricing" className="ur-btn-gold text-xs px-3 py-2 whitespace-nowrap flex-shrink-0">Débloquer</Link>
+        </div>
+      ) : (
+        <div className="relative pl-4 space-y-3">
+          <div className="absolute left-[7px] top-1 bottom-1 w-px" style={{ background: 'var(--line)' }} />
+          {history.map((h, i) => {
+            const prev = history[i + 1]; // ordre desc : l'élément suivant est le test précédent
+            const changed = prev && prev.type !== h.type;
+            return (
+              <div key={h.createdAt} className="relative">
+                <div className="absolute -left-4 top-1.5 w-2.5 h-2.5 rounded-full" style={{ background: 'var(--gold)' }} />
+                <p className="text-sm" style={{ color: 'var(--ink)' }}>
+                  <span className="font-bold">{h.type}</span>{' '}
+                  <span style={{ color: '#a8a29e' }}>· {new Date(h.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                </p>
+                {changed && (
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--gold)' }}>✦ Changement depuis {prev.type}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolean; hasTest: boolean }) {
   const [loading, setLoading] = useState(true);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -54,7 +108,7 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
         <div className="text-4xl mb-4">🧠</div>
         <h1 className="font-display text-2xl font-black mb-2" style={{ color: 'var(--ink)' }}>Analyse de personnalité avancée</h1>
         <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: '#78716c' }}>
-          Une analyse plus profonde que le simple MBTI, qui s&apos;affine avec le temps — réservée aux abonnés Nova.
+          Une analyse plus profonde que le simple MBTI, l&apos;évolution de ton type dans le temps, et un rapport complet à télécharger — réservés aux abonnés Nova.
         </p>
         <Link href="/pricing" className="ur-btn-gold px-7 py-3.5 text-sm">
           Débloquer Nova →
@@ -102,6 +156,8 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
 
+        <MbtiEvolution />
+
         {!analysis ? (
           <div className="rounded-3xl p-6 text-center" style={{ background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)' }}>
             <div className="text-4xl mb-3">🧠</div>
@@ -125,6 +181,14 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
                 {generating ? 'Nova réfléchit…' : 'Régénérer ↻'}
               </button>
             </div>
+
+            <Link href="/profil-avance/rapport" className="flex items-center justify-between rounded-2xl px-4 py-4 transition-all active:scale-[0.98]" style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
+              <div>
+                <p className="text-sm font-bold" style={{ color: '#FAF6EC' }}>📄 Ton rapport complet</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(250,246,236,0.55)' }}>Portrait, analyse Nova — prêt à télécharger en PDF</p>
+              </div>
+              <span style={{ color: 'var(--gold)' }}>→</span>
+            </Link>
 
             <div className="rounded-2xl px-4 py-4" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)' }}>
               <p className="text-[11px] font-bold mb-2" style={{ color: '#16a34a' }}>💪 Forces principales</p>

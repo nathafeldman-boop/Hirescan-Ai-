@@ -8,7 +8,7 @@ import { EmotionRadar, MoodHeatmap } from './JournalCharts';
 import { MOODS, ENERGY_LEVELS, STRESS_LEVELS, EMOTIONS, moodEmoji } from '@/lib/journalScales';
 import {
   computeStreak, averageMoodOutOf10, moodEvolutionPct, bestAndWorstWeek, tagFrequency, tagCorrelationInsight,
-  type StatsEntry,
+  detectMoodAlert, type StatsEntry,
 } from '@/lib/journalStats';
 import { dailyReaction } from '@/lib/journalReflection';
 import type { JournalEntryLite } from '@/lib/journalTypes';
@@ -268,6 +268,7 @@ export default function JournalClient({ firstName, access }: { firstName: string
   const [insightsNeeded, setInsightsNeeded] = useState<{ count: number; needed: number } | null>(null);
   const [periodSummary, setPeriodSummary] = useState<string | null>(null);
   const [periodLoading, setPeriodLoading] = useState<'week' | 'month' | null>(null);
+  const [wrappedOpen, setWrappedOpen] = useState<'week' | 'month' | null>(null);
 
   const load = (m?: string) => {
     setLoading(true);
@@ -314,6 +315,19 @@ export default function JournalClient({ firstName, access }: { firstName: string
   const correlation = useMemo(() => tagCorrelationInsight(allEntries), [allEntries]);
   const { best: bestWeek, worst: worstWeek } = useMemo(() => bestAndWorstWeek(allEntries), [allEntries]);
   const radarPoints = useMemo(() => tagFrequency(allEntries), [allEntries]);
+  const moodAlert = useMemo(() => detectMoodAlert(allEntries), [allEntries]);
+  const topTag = useMemo(() => {
+    const top = [...radarPoints].sort((a, b) => b.value - a.value)[0];
+    return top && top.value > 0 ? top : null;
+  }, [radarPoints]);
+  const wrappedImageUrl = useMemo(() => {
+    if (!wrappedOpen) return '';
+    const params = new URLSearchParams({ period: wrappedOpen, streak: String(streak ?? 0), mood: String(avgMood ?? '—') });
+    if (firstName) params.set('name', firstName);
+    if (evolution !== null) params.set('evolution', String(evolution));
+    if (topTag) { params.set('tagEmoji', topTag.emoji); params.set('tagLabel', topTag.label); }
+    return `/api/journal/wrapped-image?${params.toString()}`;
+  }, [wrappedOpen, streak, avgMood, evolution, topTag, firstName]);
 
   async function persistEntry(payload: SavedPayload) {
     setSaving(true);
@@ -419,6 +433,26 @@ export default function JournalClient({ firstName, access }: { firstName: string
                 </p>
               </div>
             </div>
+
+            {/* Alerte proactive — détection déterministe, contenu réservé aux abonnés */}
+            {moodAlert && (
+              <div className="rounded-2xl p-4 flex items-center gap-3" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
+                <span className="text-xl leading-none flex-shrink-0">{access.history ? moodAlert.emoji : '🔒'}</span>
+                <div className="flex-1 min-w-0">
+                  {access.history ? (
+                    <>
+                      <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>{moodAlert.text}</p>
+                      <Link href="/chat" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>En parler à Nova →</Link>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Nova a repéré quelque chose dans tes dernières entrées.</p>
+                      <Link href="/pricing" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>Débloquer pour voir →</Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Aujourd'hui — un tap ouvre la fiche du jour */}
             <button
@@ -579,6 +613,25 @@ export default function JournalClient({ firstName, access }: { firstName: string
               )}
             </div>
 
+            {/* Bilan Wrapped — résumé visuel partageable, même palier que l'historique */}
+            <div className="rounded-3xl p-5" style={{ background: 'linear-gradient(135deg, var(--ink), #2a1f0a)' }}>
+              <p className="text-sm font-black mb-1" style={{ color: '#FAF6EC' }}>🎁 Ton bilan</p>
+              {access.history ? (
+                <>
+                  <p className="text-xs mb-3" style={{ color: 'rgba(250,246,236,0.55)' }}>Un résumé visuel de ta période, prêt à partager.</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button onClick={() => setWrappedOpen('week')} className="py-2.5 rounded-xl text-xs font-bold" style={{ background: 'rgba(232,169,77,0.12)', border: '1px solid rgba(232,169,77,0.25)', color: '#e8a94d' }}>Ma semaine</button>
+                    <button onClick={() => setWrappedOpen('month')} className="py-2.5 rounded-xl text-xs font-bold" style={{ background: 'rgba(232,169,77,0.12)', border: '1px solid rgba(232,169,77,0.25)', color: '#e8a94d' }}>Mon mois</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs mb-3" style={{ color: 'rgba(250,246,236,0.55)' }}>Débloque un résumé visuel de ta semaine ou de ton mois, à partager où tu veux.</p>
+                  <Link href="/pricing" className="ur-btn-gold w-full py-2.5 text-sm inline-flex items-center justify-center">Débloquer →</Link>
+                </>
+              )}
+            </div>
+
             {/* Analyse Nova — tendances + résumé de période, gated (voir lib/journalAccess.ts) */}
             <div className="rounded-3xl p-5" style={{ background: 'var(--ink)' }}>
               <div className="flex items-center justify-between mb-3">
@@ -650,6 +703,47 @@ export default function JournalClient({ firstName, access }: { firstName: string
           onClose={() => setOpenDay(null)}
           onSaved={handleSheetSaved}
         />
+      )}
+
+      {wrappedOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(21,18,31,0.85)', backdropFilter: 'blur(8px)' }} onClick={() => setWrappedOpen(null)}>
+          <div
+            className="relative w-full max-w-xs rounded-3xl overflow-hidden"
+            style={{ background: 'linear-gradient(160deg, #15121F 0%, #1F1B2E 55%, #15121F 100%)', border: '1px solid rgba(201,162,39,0.25)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={() => setWrappedOpen(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>✕</button>
+            <div className="p-8 pt-14 flex flex-col items-center text-center">
+              <p className="text-[11px] uppercase tracking-widest mb-1" style={{ color: 'rgba(250,246,236,0.5)' }}>Bilan de {wrappedOpen === 'month' ? 'ton mois' : 'ta semaine'}</p>
+              <p className="font-display text-lg font-black mb-6" style={{ color: '#FAF6EC' }}>{firstName ? `Salut ${firstName} ✦` : '✦'}</p>
+              <div className="w-full flex flex-col gap-3 mb-6">
+                <div className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,162,39,0.2)' }}>
+                  <span className="text-2xl">🔥</span>
+                  <div className="text-left"><p className="text-xl font-black" style={{ color: '#FAF6EC' }}>{streak ?? 0}</p><p className="text-[10px]" style={{ color: 'rgba(250,246,236,0.5)' }}>jours de série</p></div>
+                </div>
+                <div className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,162,39,0.2)' }}>
+                  <span className="text-2xl">❤️</span>
+                  <div className="text-left"><p className="text-xl font-black" style={{ color: '#FAF6EC' }}>{avgMood ?? '—'}/10</p><p className="text-[10px]" style={{ color: 'rgba(250,246,236,0.5)' }}>bonheur moyen</p></div>
+                </div>
+                {evolution !== null && (
+                  <div className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,162,39,0.2)' }}>
+                    <span className="text-2xl">📈</span>
+                    <div className="text-left"><p className="text-xl font-black" style={{ color: '#FAF6EC' }}>{evolution}%</p><p className="text-[10px]" style={{ color: 'rgba(250,246,236,0.5)' }}>évolution</p></div>
+                  </div>
+                )}
+                {topTag && (
+                  <div className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,162,39,0.2)' }}>
+                    <span className="text-2xl">{topTag.emoji}</span>
+                    <div className="text-left"><p className="text-sm font-black" style={{ color: '#FAF6EC' }}>{topTag.label}</p><p className="text-[10px]" style={{ color: 'rgba(250,246,236,0.5)' }}>ton thème dominant</p></div>
+                  </div>
+                )}
+              </div>
+              <a href={wrappedImageUrl} download target="_blank" rel="noopener noreferrer" className="ur-btn-gold w-full py-3 text-sm inline-flex items-center justify-center">
+                Télécharger l&apos;image →
+              </a>
+            </div>
+          </div>
+        </div>
       )}
 
       <AppTabBar />

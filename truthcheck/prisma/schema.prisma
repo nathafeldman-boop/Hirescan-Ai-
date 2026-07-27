@@ -94,6 +94,25 @@ model User {
   compatibilityChecks CompatibilityCheck[]
   advancedAnalysis AdvancedAnalysis?
   appEvents    AppEvent[]
+  mbtiTestHistory MbtiTestHistory[]
+}
+
+// ── Historique des tests MBTI ────────────────────────────────────────────────
+// Un snapshot à CHAQUE test complété (voir app/api/user/save-mbti/route.ts) —
+// User.mbtiType/mbtiScores ne gardent que le DERNIER résultat, donc sans cette
+// table impossible de voir comment le profil évolue en repassant le test.
+// Feature premium (lib/journalAccess.ts a le même palier pour "regarder en
+// arrière" — voir /api/mbti-history) : gratuit = dernier résultat seulement.
+model MbtiTestHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  scores    Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ── Journal d'événements produit ─────────────────────────────────────────────
