@@ -3,25 +3,19 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-// Navigation principale de l'app, une fois connecté — mobile-first, ajoutée
-// SOUS le contenu existant de chaque page (jamais en remplacement d'une
-// navigation déjà là) pour ne rien casser. Une seule source de vérité pour
-// les 4 sections : ajouter un onglet plus tard = une ligne de plus ici.
-const APP_TABS = [
+// Navigation principale de l'app — mobile-first, ajoutée SOUS le contenu
+// existant de chaque page (jamais en remplacement d'une navigation déjà là)
+// pour ne rien casser. Une seule source de vérité pour les 5 onglets :
+// ajouter un onglet plus tard = une ligne de plus ici. "Home" renvoie vers
+// le hub /decouverte (l'endroit central où choisir Nova, le journal, etc.),
+// pas vers la landing — voir GlobalTabBar.tsx pour où cette même barre
+// remplace l'ancienne boule flottante « assistant IA » sur les pages qui
+// n'ont pas déjà cette barre intégrée.
+const TABS = [
+  { href: '/decouverte', emoji: '🏠', label: 'Home' },
   { href: '/quiz/personnalite', emoji: '🧠', label: 'Test' },
   { href: '/chat', emoji: '🤖', label: 'Nova' },
   { href: '/journal', emoji: '📖', label: 'Journal' },
-  { href: '/dashboard', emoji: '✨', label: 'Moi' },
-] as const;
-
-// Variante minimale pour les pages publiques/marketing (hub de découverte,
-// types, quiz...) — voir GlobalTabBar.tsx, qui remplace l'ancienne boule
-// flottante « assistant IA » par une vraie barre, cohérente avec le reste de
-// l'app. "Home" pointe vers le hub /decouverte (l'endroit central où choisir
-// Nova, le journal, etc.) — PAS vers la landing, qui n'affiche jamais cette
-// barre (voir HIDE_ON dans GlobalTabBar.tsx).
-const PUBLIC_TABS = [
-  { href: '/decouverte', emoji: '🏠', label: 'Home' },
   { href: '/dashboard', emoji: '✨', label: 'Moi' },
 ] as const;
 
@@ -32,15 +26,12 @@ const PUBLIC_TABS = [
 // simple élément de flux, à placer en dernier enfant d'une colonne flex en
 // h-[100dvh] — nécessaire sur /chat, où un input déjà collé en bas du flex
 // entrerait sinon en collision avec une barre fixe (voir ChatClient.tsx).
-// variant : 'app' (défaut, 4 onglets) ou 'public' (Home + Moi, pages non
-// connectées type landing/hub — voir GlobalTabBar.tsx).
-export default function AppTabBar({ dark = false, mode = 'fixed', variant = 'app' }: { dark?: boolean; mode?: 'fixed' | 'static'; variant?: 'app' | 'public' }) {
+export default function AppTabBar({ dark = false, mode = 'fixed' }: { dark?: boolean; mode?: 'fixed' | 'static' }) {
   const pathname = usePathname();
   const bg = dark ? 'rgba(10,7,5,0.92)' : 'rgba(242,236,222,0.94)';
   const border = dark ? 'rgba(255,255,255,0.08)' : 'var(--line)';
   const idleColor = dark ? '#6b6055' : '#a8a29e';
   const activeColor = dark ? '#e8a94d' : 'var(--gold)';
-  const TABS = variant === 'public' ? PUBLIC_TABS : APP_TABS;
 
   return (
     <nav
