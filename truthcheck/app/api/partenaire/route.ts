@@ -78,7 +78,7 @@ async function sendWelcome(data: { name: string; email: string; slug: string }) 
           <li>Mentionne "test MBTI gratuit" → fort taux de clic</li>
           <li>Montre ton propre résultat dans la vidéo</li>
           <li>Format TikTok/Reel : 15-30 sec avec résultat en thumbnail</li>
-          <li>Commission : <strong style="color:#34d399">80%</strong> sur chaque vente (1,99€ → 1,59€ pour toi)</li>
+          <li>Commission : <strong style="color:#34d399">70%</strong> sur chaque vente (1,99€ → 1,39€ pour toi)</li>
           <li>Après 2 mois consécutifs, la commission passe à <strong style="color:#a78bfa">30%</strong></li>
         </ul>
       </div>
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
   }
 
   const affiliate = await prisma.affiliate.create({
-    data: { name, slug, email, commissionPct: 80 },
+    data: { name, slug, email, commissionPct: 70 },
   });
 
   await Promise.allSettled([
