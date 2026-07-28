@@ -79,9 +79,22 @@ export default function DecouverteClient() {
         }
       `}</style>
 
+      {/* Photo de fond derrière la nav + l'en-tête — fondu vers le papier avant
+          les cartes, texte clair (photo sombre, contrairement à celle de la
+          landing) pour rester lisible sur toute la zone. */}
+      <div className="absolute inset-x-0 top-0 z-0" style={{ height: 640 }} aria-hidden>
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: "url('/decouverte-hero-bg.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 30%',
+        }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(21,18,31,0.45) 0%, rgba(21,18,31,0.55) 45%, var(--paper) 92%)' }} />
+      </div>
+
       {/* Nav minimale — pas de distraction, on est déjà dans le funnel */}
       <nav className="relative z-10 max-w-2xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="text-lg font-display italic" style={{ color: 'var(--ink)', fontWeight: 700 }}>
+        <Link href="/" className="text-lg font-display italic" style={{ color: '#FAF6EC', fontWeight: 700 }}>
           UrCecret
         </Link>
       </nav>
@@ -91,15 +104,15 @@ export default function DecouverteClient() {
         {/* En-tête */}
         <div className="text-center mb-11">
           <div className="hub-up flex justify-center mb-5">
-            <Seal size={56} spin />
+            <Seal size={56} spin color="#FAF6EC" />
           </div>
           <p className="hub-up ur-label text-[11px] mb-4" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
             Ton exploration commence ici
           </p>
-          <h1 className="hub-up font-display mb-4" style={{ color: 'var(--ink)', fontSize: 'clamp(1.9rem, 7vw, 2.75rem)', lineHeight: 1.12, fontWeight: 700, letterSpacing: '-0.01em', animationDelay: '.1s' }}>
+          <h1 className="hub-up font-display mb-4" style={{ color: '#FAF6EC', fontSize: 'clamp(1.9rem, 7vw, 2.75rem)', lineHeight: 1.12, fontWeight: 700, letterSpacing: '-0.01em', animationDelay: '.1s' }}>
             Que veux-tu découvrir sur toi&nbsp;?
           </h1>
-          <p className="hub-up text-[15px] max-w-sm mx-auto text-stone-500" style={{ lineHeight: 1.6, animationDelay: '.16s' }}>
+          <p className="hub-up text-[15px] max-w-sm mx-auto" style={{ lineHeight: 1.6, animationDelay: '.16s', color: 'rgba(250,246,236,0.72)' }}>
             Choisis ton expérience et commence ton exploration.
           </p>
         </div>
