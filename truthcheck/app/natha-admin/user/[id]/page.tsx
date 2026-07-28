@@ -152,7 +152,7 @@ export default async function UserActivityPage({ params }: { params: { id: strin
             <p style={sub}>{user.mbtiTestCount} test(s) passé(s)</p>
           </div>
           <div style={block(C.surface, C.border)}>
-            <p style={label}>Messages à Nova</p>
+            <p style={label}>Messages à Elio</p>
             <p style={bigNum}>{novaMessagesTotal}</p>
             <p style={sub}>jamais le contenu, juste le nombre</p>
           </div>

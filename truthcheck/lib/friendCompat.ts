@@ -3,7 +3,7 @@
 // TYPES MBTI abstraits, pour les pages SEO /compatibilite/[pair]). Ici,
 // l'utilisateur répond à un court questionnaire de PERCEPTION sur une
 // personne réelle de son entourage (elle n'a pas de compte, pas de vrai test
-// MBTI) — Nova compare ce profil perçu au sien et génère un résultat
+// MBTI) — Elio compare ce profil perçu au sien et génère un résultat
 // structuré, dans le même esprit que lib/conversationAnalysis.ts.
 
 import { callMistral } from './chat';
@@ -33,7 +33,7 @@ export function friendCompatPrompt(
   answers: { question: string; choice: string }[],
 ): string {
   const answersText = answers.map((a) => `- ${a.question} → ${a.choice}`).join('\n');
-  return `Tu es Nova, le coach IA d'UrCecret. Un utilisateur analyse ${RELATION_LABEL[relationType]} avec "${personName}". Voici son propre type MBTI (s'il est connu) : ${ownMbtiType ?? 'inconnu'}. Voici comment il perçoit "${personName}" au quotidien (questionnaire de perception, pas un vrai test passé par cette personne) :
+  return `Tu es Elio, le compagnon de développement personnel d'UrCecret. Un utilisateur analyse ${RELATION_LABEL[relationType]} avec "${personName}". Voici son propre type MBTI (s'il est connu) : ${ownMbtiType ?? 'inconnu'}. Voici comment il perçoit "${personName}" au quotidien (questionnaire de perception, pas un vrai test passé par cette personne) :
 ${answersText}
 
 Réponds UNIQUEMENT avec un objet JSON valide, RIEN d'autre (pas de markdown, pas de phrase avant/après), au format EXACT suivant :

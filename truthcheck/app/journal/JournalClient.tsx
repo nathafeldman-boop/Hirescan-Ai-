@@ -159,7 +159,7 @@ function OnboardingFlow({ onSubmit, saving }: { onSubmit: (p: SavedPayload) => v
         <>
           <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Bienvenue dans ton Journal 📖</p>
           <p className="text-sm mb-5 leading-relaxed" style={{ color: '#6b6055' }}>
-            6 questions rapides pour que Nova commence à te connaître — moins d&apos;une minute.
+            6 questions rapides pour qu&apos;Elio commence à te connaître — moins d&apos;une minute.
           </p>
           <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Comment te sens-tu aujourd&apos;hui ?</p>
           <LevelPicker levels={MOODS} selected={mood} onSelect={(v) => { setMood(v); advance(); }} disabled={saving} />
@@ -366,7 +366,7 @@ export default function JournalClient({ firstName, access }: { firstName: string
       if (d.ok) setInsights(d.insights);
       else setInsightsNeeded({ count: d.count ?? 0, needed: d.needed ?? 3 });
     } catch {
-      setInsightsError('Nova n\'a pas réussi à analyser ton journal. Réessaie dans un instant.');
+      setInsightsError('Elio n\'a pas réussi à analyser ton journal. Réessaie dans un instant.');
     } finally {
       setInsightsLoading(false);
     }
@@ -382,7 +382,7 @@ export default function JournalClient({ firstName, access }: { firstName: string
       if (!res.ok || !d.ok) throw new Error();
       setPeriodSummary(d.summary);
     } catch {
-      setInsightsError('Nova n\'a pas réussi à résumer cette période. Réessaie dans un instant.');
+      setInsightsError('Elio n\'a pas réussi à résumer cette période. Réessaie dans un instant.');
     } finally {
       setPeriodLoading(null);
     }
@@ -442,11 +442,11 @@ export default function JournalClient({ firstName, access }: { firstName: string
                   {access.history ? (
                     <>
                       <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>{moodAlert.text}</p>
-                      <Link href="/chat" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>En parler à Nova →</Link>
+                      <Link href="/chat" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>En parler à Elio →</Link>
                     </>
                   ) : (
                     <>
-                      <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Nova a repéré quelque chose dans tes dernières entrées.</p>
+                      <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Elio a repéré quelque chose dans tes dernières entrées.</p>
                       <Link href="/pricing" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>Débloquer pour voir →</Link>
                     </>
                   )}
@@ -632,12 +632,12 @@ export default function JournalClient({ firstName, access }: { firstName: string
               )}
             </div>
 
-            {/* Analyse Nova — tendances + résumé de période, gated (voir lib/journalAccess.ts) */}
+            {/* Analyse Elio — tendances + résumé de période, gated (voir lib/journalAccess.ts) */}
             <div className="rounded-3xl p-5" style={{ background: 'var(--ink)' }}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🤖</span>
-                  <p className="text-sm font-black" style={{ color: '#FAF6EC' }}>Analyse de Nova</p>
+                  <p className="text-sm font-black" style={{ color: '#FAF6EC' }}>Analyse d&apos;Elio</p>
                 </div>
                 {access.inTrial && (
                   <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,169,77,0.15)', color: '#e8a94d' }}>
@@ -649,10 +649,10 @@ export default function JournalClient({ firstName, access }: { firstName: string
               {!access.trendInsights ? (
                 <>
                   <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-                    Débloque les tendances et les résumés de période de Nova avec un abonnement.
+                    Débloque les tendances et les résumés de période d&apos;Elio avec un abonnement.
                   </p>
                   <Link href="/pricing" className="ur-btn-gold w-full py-2.5 text-sm inline-flex items-center justify-center">
-                    Débloquer Nova →
+                    Débloquer Elio →
                   </Link>
                 </>
               ) : (
@@ -665,12 +665,12 @@ export default function JournalClient({ firstName, access }: { firstName: string
                   {periodSummary && <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.85)' }}>{periodSummary}</p>}
                   {!insights && !periodSummary && insightsNeeded && (
                     <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-                      Encore {Math.max(0, insightsNeeded.needed - insightsNeeded.count)} jour(s) à noter avant que Nova puisse analyser ton journal.
+                      Encore {Math.max(0, insightsNeeded.needed - insightsNeeded.count)} jour(s) à noter avant qu&apos;Elio puisse analyser ton journal.
                     </p>
                   )}
                   {!insights && !periodSummary && !insightsNeeded && (
                     <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-                      Nova peut repérer des tendances et résumer une période de ton journal.
+                      Elio peut repérer des tendances et résumer une période de ton journal.
                     </p>
                   )}
                   {insightsError && insightsError !== '__gated__' && <p className="text-xs mb-3" style={{ color: '#e8a94d' }}>{insightsError}</p>}

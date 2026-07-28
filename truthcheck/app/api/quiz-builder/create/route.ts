@@ -9,10 +9,10 @@ import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
-// Génère un mini-test partageable (Nova, via Mistral) sur un thème demandé
+// Génère un mini-test partageable (Elio, via Mistral) sur un thème demandé
 // par l'utilisateur. Réservé aux abonnés payants (starter/plus/premium) — un
-// vrai argument de conversion : "avec Nova tu peux créer TES tests à envoyer
-// à tes amis". Consomme 1 message du quota Nova déjà en place (même compteur,
+// vrai argument de conversion : "avec Elio tu peux créer TES tests à envoyer
+// à tes amis". Consomme 1 message du quota Elio déjà en place (même compteur,
 // pas de nouveau système de limite à maintenir).
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   const topic = (body?.topic ?? '').trim().slice(0, 200);
   if (!topic) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
-  // Même quota journalier que le chat Nova — une génération de test = 1 message.
+  // Même quota journalier que le chat Elio — une génération de test = 1 message.
   const day = parisDay();
   const limit = dailyLimitFor(user.tier);
   const usage = await prisma.chatUsage.upsert({

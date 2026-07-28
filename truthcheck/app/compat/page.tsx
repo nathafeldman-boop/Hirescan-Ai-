@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 // Le score de compatibilité (gratuit, déterministe) est ouvert à tout le
-// monde — seule l'analyse approfondie de Nova, plus loin dans le parcours,
+// monde — seule l'analyse approfondie d'Elio, plus loin dans le parcours,
 // reste payante. Voir /api/compat.
 export default async function CompatPage() {
   const session = await getServerSession(authOptions);

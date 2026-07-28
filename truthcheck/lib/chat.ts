@@ -6,7 +6,7 @@
 export type Tier = 'free' | 'starter' | 'plus' | 'premium';
 
 // ── Grille de quotas, un seul endroit à modifier ────────────────────────────
-// Toute nouvelle feature consommant le quota Nova (chat, créateur de test,
+// Toute nouvelle feature consommant le quota Elio (chat, créateur de test,
 // analyse de conversation, et les prochaines : journal, compatibilité...)
 // DOIT lire ces mêmes constantes plutôt que d'inventer sa propre limite —
 // un "message" a un sens unique et cohérent dans toute l'app.

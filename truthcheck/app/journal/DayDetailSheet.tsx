@@ -227,7 +227,7 @@ export default function DayDetailSheet({
                     animation: reveal ? 'dsRevealIn .5s cubic-bezier(.34,1.56,.64,1) .1s backwards' : undefined,
                   }}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: 'var(--gold)' }}>✦ Nova</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: 'var(--gold)' }}>✦ Elio</p>
                   <p className="text-sm leading-relaxed" style={{ color: '#FAF6EC' }}>{reactionText}</p>
                 </div>
               )}

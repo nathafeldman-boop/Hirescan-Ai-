@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       }
 
       // ── One-time MBTI purchase (1,99€ SANS abonnement) → 'unlocked' ──
-      // Juste le résultat, à vie, PAS de Nova (sinon on retombe dans l'ancienne
+      // Juste le résultat, à vie, PAS d'Elio (sinon on retombe dans l'ancienne
       // faille : payer 1,99€ une fois donnait tout un abonnement premium).
       // Le rapport complet (19,99€, meta.rapport) reste un vrai palier premium.
       if (email && meta.oneTime === 'true' && meta.typeCode && meta.rapport !== 'true') {

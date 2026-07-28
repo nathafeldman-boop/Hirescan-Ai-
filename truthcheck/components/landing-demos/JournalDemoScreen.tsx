@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 // Grille démo (28 cases, 4 semaines) — index → emoji d'humeur pour les
 // journées "remplies". Purement illustratif (voir demande produit : jamais de
 // vraies données). Les cases se remplissent une par une puis un insight de
-// Nova apparaît — le "gameplay" du Journal, rejoué en boucle.
+// Elio apparaît — le "gameplay" du Journal, rejoué en boucle.
 const FILLED: Record<number, string> = {
   2: '🙂', 3: '😄', 5: '😐',
   7: '😄', 8: '🙂', 11: '😞', 12: '🙂', 13: '😄',
@@ -66,7 +66,7 @@ export default function JournalDemoScreen() {
 
       {showInsight && (
         <div className="rounded-xl px-3.5 py-3" style={{ background: 'var(--ink)', animation: 'demoInsightIn .4s cubic-bezier(.34,1.56,.64,1)' }}>
-          <p className="text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--gold)' }}>✦ Nova</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--gold)' }}>✦ Elio</p>
           <p className="text-[11px] leading-snug" style={{ color: '#FAF6EC' }}>{INSIGHT_TEXT}</p>
         </div>
       )}

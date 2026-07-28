@@ -1,4 +1,4 @@
-// ── Tests créés par Nova, à partager ─────────────────────────────────────────
+// ── Tests créés par Elio, à partager ─────────────────────────────────────────
 // Génère un mini-quiz (questions à choix + tranches de résultat) via Mistral,
 // en JSON structuré. Un peu de code, rien de fou : pas de moteur de scoring
 // séparé — le score est juste la somme des points des options cochées,

@@ -95,18 +95,18 @@ export function emailWelcome(name: string | null) {
   };
 }
 
-// Broadcast — annonce à tous les inscrits : Nova, le Coach IA personnel + l'offre
+// Broadcast — annonce à tous les inscrits : Elio, le compagnon personnel + l'offre
 // Starter 1,99€/mois (entrée la plus accessible). Ré-engagement honnête (pas de
 // fausse urgence), centré sur la nouvelle valeur.
 export function emailCoachAnnounce(name: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   return {
-    subject: `${firstName}, ton Coach IA personnel est arrivé 🔮`,
+    subject: `${firstName}, ton compagnon personnel est arrivé 🔮`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#c2611f;font-size:12px;text-transform:uppercase;letter-spacing:1px">✦ Nouveau sur UrCecret</p>
-      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Nova, un coach qui te connaît déjà grâce à ton test.</h2>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Elio, un compagnon qui te connaît déjà grâce à ton test.</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        Hey ${firstName}, on vient de lancer quelque chose qu'on voulait te montrer : <strong style="color:#fff">Nova</strong>, ton Coach IA personnel. Elle n'est pas générique — elle connaît ton type MBTI et te répond d'après <em>ton</em> profil, pas des banalités.
+        Hey ${firstName}, on vient de lancer quelque chose qu'on voulait te montrer : <strong style="color:#fff">Elio</strong>, ton compagnon de développement personnel. Il n'est pas générique — il connaît ton type MBTI et te répond d'après <em>ton</em> profil, pas des banalités.
       </p>
       <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:18px 20px;margin-bottom:24px">
         <p style="margin:0 0 10px;color:#c2611f;font-size:13px;font-weight:700">Ce que tu peux enfin lui demander :</p>
@@ -118,13 +118,13 @@ export function emailCoachAnnounce(name: string | null) {
         </ul>
       </div>
       <p style="margin:0 0 8px;color:#71717a;font-size:15px;line-height:1.7">
-        Tout ça dès <strong style="color:#fff">1,99 €/mois</strong> : ton profil complet débloqué + Nova (5 messages/jour). Résiliable en 1 clic, sans engagement.
+        Tout ça dès <strong style="color:#fff">1,99 €/mois</strong> : ton profil complet débloqué + Elio (5 messages/jour). Résiliable en 1 clic, sans engagement.
       </p>
-      ${cta('Découvrir Nova →', `${BASE}/quiz/personnalite`)}
+      ${cta('Découvrir Elio →', `${BASE}/quiz/personnalite`)}
       <p style="margin:4px 0 0;text-align:center;color:#71717a;font-size:13px">Déjà fait ton test ?</p>
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr><td align="center" style="padding:10px 0 4px">
-          <a href="${BASE}/chat" style="display:inline-block;background:transparent;border:1px solid rgba(209,125,82,0.5);color:#d17d52;text-decoration:none;font-weight:700;font-size:14px;padding:12px 30px;border-radius:12px">Parler à Nova maintenant →</a>
+          <a href="${BASE}/chat" style="display:inline-block;background:transparent;border:1px solid rgba(209,125,82,0.5);color:#d17d52;text-decoration:none;font-weight:700;font-size:14px;padding:12px 30px;border-radius:12px">Parler à Elio maintenant →</a>
         </td></tr>
       </table>
       <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
@@ -277,7 +277,7 @@ export function emailUnlockReminder(name: string | null, typeCode: string | null
         ${hook ? `On avait identifié un truc chez toi : <em style="color:#e4e4e7">"${hook}"</em>. Ça reste vrai ?` : `Ton analyse complète — amour, carrière, face cachée — n'est qu'à un clic.`}
       </p>
       <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
-        Débloque ton profil complet dès <strong style="color:#fff">1,99€</strong> (une fois), ou avec Nova ton coach IA pour <strong style="color:#fff">1,99€/mois</strong>.
+        Débloque ton profil complet dès <strong style="color:#fff">1,99€</strong> (une fois), ou avec Elio ton compagnon personnel pour <strong style="color:#fff">1,99€/mois</strong>.
       </p>
       ${cta(code ? 'Voir mon profil →' : 'Faire mon test →', link)}
       <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
@@ -288,9 +288,9 @@ export function emailUnlockReminder(name: string | null, typeCode: string | null
 }
 
 // Relance "reviens + abonne-toi" — vers tous les inscrits SANS abonnement actif
-// (tier free ou unlocked, donc pas encore d'accès Nova). Contrairement à
+// (tier free ou unlocked, donc pas encore d'accès Elio). Contrairement à
 // emailUnlockReminder (axée sur "voir ton profil pour 1,99€ une fois"), celle-ci
-// pousse l'usage régulier (Nova, Journal) ET l'abonnement Starter comme porte
+// pousse l'usage régulier (Elio, Journal) ET l'abonnement Starter comme porte
 // d'entrée. Voir /api/admin/broadcast-winback.
 export function emailWinBack(name: string | null, typeCode: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
@@ -298,19 +298,19 @@ export function emailWinBack(name: string | null, typeCode: string | null) {
   const hook = code ? HOOK_LINES[code] : null;
   const link = code ? `${BASE}/quiz/personnalite?pending=${code}` : `${BASE}/quiz/personnalite`;
   return {
-    subject: `${firstName}, Nova et ton profil t'attendent toujours 🔮`,
+    subject: `${firstName}, Elio et ton profil t'attendent toujours 🔮`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Ça fait un moment</p>
       <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">
         ${hook ? `On avait vu juste chez toi : "${hook}"` : 'Ton profil de personnalité est toujours là.'}
       </h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        Depuis ton inscription, on a ajouté <strong style="color:#fff">Nova</strong> (ton coach IA personnel) et un <strong style="color:#fff">Journal émotionnel</strong> qui suit ton évolution jour après jour. Les gens qui reviennent régulièrement disent que ça change vraiment leur façon de se comprendre.
+        Depuis ton inscription, on a ajouté <strong style="color:#fff">Elio</strong> (ton compagnon personnel) et un <strong style="color:#fff">Journal émotionnel</strong> qui suit ton évolution jour après jour. Les gens qui reviennent régulièrement disent que ça change vraiment leur façon de se comprendre.
       </p>
       <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:18px 20px;margin-bottom:24px">
         <p style="margin:0 0 10px;color:#c2611f;font-size:13px;font-weight:700">Ce que tu peux faire dès maintenant :</p>
         <ul style="margin:0;padding-left:18px;color:#e4e4e7;font-size:14px;line-height:2">
-          <li>🔮 Poser une vraie question à Nova, ton coach IA</li>
+          <li>🔮 Poser une vraie question à Elio, ton compagnon personnel</li>
           <li>📓 Noter ton humeur du jour dans ton Journal émotionnel</li>
           <li>💬 Faire analyser une conversation qui te trotte dans la tête</li>
         </ul>
@@ -322,7 +322,7 @@ export function emailWinBack(name: string | null, typeCode: string | null) {
       <p style="margin:4px 0 0;text-align:center;color:#71717a;font-size:13px">Déjà abonné ?</p>
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr><td align="center" style="padding:10px 0 4px">
-          <a href="${BASE}/chat" style="display:inline-block;background:transparent;border:1px solid rgba(209,125,82,0.5);color:#d17d52;text-decoration:none;font-weight:700;font-size:14px;padding:12px 30px;border-radius:12px">Parler à Nova maintenant →</a>
+          <a href="${BASE}/chat" style="display:inline-block;background:transparent;border:1px solid rgba(209,125,82,0.5);color:#d17d52;text-decoration:none;font-weight:700;font-size:14px;padding:12px 30px;border-radius:12px">Parler à Elio maintenant →</a>
         </td></tr>
       </table>
       <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;margin-top:16px">
@@ -579,7 +579,7 @@ export function emailRetentionM1(name: string | null, typeCode: string | null) {
   const code = typeCode?.toUpperCase() ?? null;
   const hook = code ? HOOK_LINES[code] : null;
   return {
-    subject: `${firstName}, ça fait 1 mois — voilà ce que tu peux faire avec Nova`,
+    subject: `${firstName}, ça fait 1 mois — voilà ce que tu peux faire avec Elio`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">1 mois avec UrCecret</p>
       <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Tu as un coach qui te connaît. La plupart des gens l'oublient.</h2>
@@ -591,7 +591,7 @@ export function emailRetentionM1(name: string | null, typeCode: string | null) {
           Pose-lui la vraie question du moment : une décision qui traîne, une relation qui coince, un choix de carrière. C'est fait pour ça — pas juste pour le jour où tu as payé.
         </p>
       </div>
-      ${cta('Parler à Nova maintenant →', `${BASE}/chat`)}
+      ${cta('Parler à Elio maintenant →', `${BASE}/chat`)}
       <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Une question, un souci avec ton abonnement ? Réponds à cet email.</p>
     `),
   };
@@ -606,11 +606,11 @@ export function emailRetentionM3(name: string | null, typeCode: string | null) {
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">3 mois avec UrCecret</p>
       <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">3 mois, c'est assez pour tester si ça marche vraiment.</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        Sois honnête avec toi-même : depuis ton test, tu as pris au moins une décision — au travail, en amour, ou avec toi-même — en te disant "ça, c'est mon profil qui parle". Si oui, Nova peut aller plus loin. Si non, c'est le moment de vraiment l'utiliser, pas de l'oublier.
+        Sois honnête avec toi-même : depuis ton test, tu as pris au moins une décision — au travail, en amour, ou avec toi-même — en te disant "ça, c'est mon profil qui parle". Si oui, Elio peut aller plus loin. Si non, c'est le moment de vraiment l'utiliser, pas de l'oublier.
       </p>
       <div style="background:rgba(169,78,24,0.08);border:1px solid rgba(169,78,24,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">
         <p style="margin:0 0 8px;color:#c2611f;font-size:13px;font-weight:700">Un truc que peu de gens font :</p>
-        <p style="margin:0;color:#a1a1aa;font-size:14px;line-height:1.7">Invite un(e) ami(e) à faire le test avec ton lien perso (dans /chat) — s'il débloque son profil, tu gagnes des messages Nova en plus, à vie.</p>
+        <p style="margin:0;color:#a1a1aa;font-size:14px;line-height:1.7">Invite un(e) ami(e) à faire le test avec ton lien perso (dans /chat) — s'il débloque son profil, tu gagnes des messages Elio en plus, à vie.</p>
       </div>
       ${cta('Voir mon lien de parrainage →', `${BASE}/chat`)}
       <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Envie d'économiser sur ton abonnement ? <a href="${BASE}/pricing" style="color:#71717a">Regarde l'offre annuelle</a>.</p>
@@ -622,15 +622,15 @@ export function emailRetentionM5(name: string | null, typeCode: string | null) {
   const firstName = name?.split(' ')[0] ?? 'toi';
   const code = typeCode?.toUpperCase() ?? null;
   return {
-    subject: `${firstName}, 5 mois avec Nova — le bilan`,
+    subject: `${firstName}, 5 mois avec Elio — le bilan`,
     html: wrap(`
       <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">5 mois avec UrCecret</p>
       <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">On ne va pas te vendre autre chose. Juste te demander un truc.</h2>
       <p style="margin:0 0 20px;color:#71717a;font-size:15px;line-height:1.7">
-        5 mois, c'est long. Si Nova${code ? ` et ton profil ${code}` : ''} t'ont vraiment aidé, réponds à cet email et dis-nous comment — ça compte plus que n'importe quelle pub qu'on pourrait faire.
+        5 mois, c'est long. Si Elio${code ? ` et ton profil ${code}` : ''} t'ont vraiment aidé, réponds à cet email et dis-nous comment — ça compte plus que n'importe quelle pub qu'on pourrait faire.
         Et si ça fait un moment que tu n'as pas ouvert le chat, c'est peut-être le signe qu'il faut y retourner : une bonne question suffit pour que ça reparte.
       </p>
-      ${cta('Retourner parler à Nova →', `${BASE}/chat`)}
+      ${cta('Retourner parler à Elio →', `${BASE}/chat`)}
       <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Envie d'économiser sur ton abonnement ? <a href="${BASE}/pricing" style="color:#71717a">Regarde l'offre annuelle</a> · <a href="${BASE}/dashboard" style="color:#52525b">Gérer mon abonnement</a></p>
     `),
   };

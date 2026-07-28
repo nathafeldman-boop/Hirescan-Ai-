@@ -16,7 +16,7 @@ const CARDS = [
   {
     href: '/chat',
     emoji: '✨',
-    title: 'Parle avec Nova',
+    title: 'Parle avec Elio',
     kicker: 'Coach IA',
     desc: 'Ton IA personnelle pour mieux réfléchir et mieux te comprendre.',
     accent: 'var(--fam-nt)',

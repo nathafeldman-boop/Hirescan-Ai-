@@ -1,9 +1,9 @@
-// ── Tendances du journal émotionnel, vues par Nova ──────────────────────────
-// À partir des dernières entrées (humeur/énergie/stress/note), Nova repère 2 à
+// ── Tendances du journal émotionnel, vues par Elio ──────────────────────────
+// À partir des dernières entrées (humeur/énergie/stress/note), Elio repère 2 à
 // 4 tendances concrètes ("tu sembles plus positif les jours où...", "ton
 // énergie baisse en fin de semaine"...) — jamais un résumé générique, toujours
 // ancré dans les données réelles fournies. Même logique que les autres
-// générateurs Nova : prompt JSON strict + parseur qui ne fait confiance à rien.
+// générateurs Elio : prompt JSON strict + parseur qui ne fait confiance à rien.
 
 import { callMistral } from './chat';
 
@@ -28,7 +28,7 @@ function formatEntriesForPrompt(entries: JournalEntryForInsights[]): string {
 }
 
 export function journalInsightsPrompt(entries: JournalEntryForInsights[]): string {
-  return `Tu es Nova, le coach IA d'UrCecret. Voici le journal émotionnel récent d'un utilisateur (humeur/énergie/stress notés chaque jour sur 5, note libre optionnelle) :
+  return `Tu es Elio, le compagnon de développement personnel d'UrCecret. Voici le journal émotionnel récent d'un utilisateur (humeur/énergie/stress notés chaque jour sur 5, note libre optionnelle) :
 
 ${formatEntriesForPrompt(entries)}
 
@@ -88,7 +88,7 @@ export async function generateJournalInsights(entries: JournalEntryForInsights[]
 // synthèse, comme un ami qui résume ta semaine — voir "résumer une période"
 // dans la demande produit.
 export function journalPeriodSummaryPrompt(entries: JournalEntryForInsights[], periodLabel: string): string {
-  return `Tu es Nova, le coach IA d'UrCecret. Voici le journal émotionnel d'un utilisateur sur ${periodLabel} (humeur/énergie/stress sur 5, note libre optionnelle) :
+  return `Tu es Elio, le compagnon de développement personnel d'UrCecret. Voici le journal émotionnel d'un utilisateur sur ${periodLabel} (humeur/énergie/stress sur 5, note libre optionnelle) :
 
 ${formatEntriesForPrompt(entries)}
 

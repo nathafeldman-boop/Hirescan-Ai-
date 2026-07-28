@@ -9,25 +9,25 @@ import Seal from '@/components/Seal';
 
 const FREE_PERKS = [
   'Ton type MBTI de base (les 4 lettres)',
-  'Nova en version découverte — 5 messages par mois',
+  'Elio en version découverte — 3 messages par jour',
   'Quiz relationnels — résultats partiels',
 ];
 
 const STARTER_PERKS = [
   'Ton profil MBTI complet : amour, carrière, face cachée',
-  'Nova, ton coach IA perso — 5 messages par jour',
+  'Elio, ton compagnon de développement personnel — 5 messages par jour',
   'Résiliable en 1 clic, sans engagement',
 ];
 
 // Échelle CROISSANTE : chaque palier ajoute au précédent (pas de répétitions).
 const PLUS_PERKS = [
-  'Nova passe à 30 messages par jour (au lieu de 5)',
+  'Elio passe à 30 messages par jour (au lieu de 5)',
   'Les 15 quiz secrets débloqués (couple, amitié, manipulation…)',
   'Les 16 types MBTI en détail',
 ];
 
 const PREMIUM_PERKS = [
-  'Nova passe à 50 messages par jour',
+  'Elio passe à 50 messages par jour',
   'Suivi personnalisé sur 15 jours (un conseil + exercice chaque jour)',
   'Tous les futurs quiz inclus, à vie',
 ];
@@ -136,7 +136,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Plan Starter — 1,99€/mois : l'entrée MRR (profil + Nova) */}
+        {/* Plan Starter — 1,99€/mois : l'entrée MRR (profil + Elio) */}
         <div className="ur-panel-ink p-5 mb-4">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="min-w-0">

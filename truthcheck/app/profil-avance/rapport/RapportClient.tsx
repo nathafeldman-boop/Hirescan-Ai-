@@ -96,9 +96,9 @@ export default function RapportClient({
           </div>
         </section>
 
-        {/* Analyse Nova */}
+        {/* Analyse Elio */}
         <div className="mb-8 pt-8" style={{ borderTop: '1px solid var(--line)' }}>
-          <p className="ur-label text-[11px] mb-5 text-center" style={{ color: 'var(--gold)' }}>Analyse approfondie par Nova</p>
+          <p className="ur-label text-[11px] mb-5 text-center" style={{ color: 'var(--gold)' }}>Analyse approfondie par Elio</p>
 
           <div className="rounded-2xl px-4 py-4 mb-4" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)' }}>
             <p className="text-[11px] font-bold mb-2" style={{ color: '#16a34a' }}>💪 Forces principales</p>
@@ -151,7 +151,7 @@ export default function RapportClient({
         )}
 
         <p className="text-center text-[11px] mt-10 pt-6" style={{ color: '#a8a29e', borderTop: '1px solid var(--line)' }}>
-          urcecret.site · Rapport personnel, généré par Nova
+          urcecret.site · Rapport personnel, généré par Elio
         </p>
       </div>
     </main>

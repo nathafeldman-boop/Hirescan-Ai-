@@ -2,7 +2,7 @@
 // Va plus loin que le simple résultat MBTI : combine le profil de test
 // (via buildCoachContext, déjà utilisé par le coach) avec les signaux
 // disponibles en plus — dernières analyses de conversation, tendances du
-// journal émotionnel — pour donner l'impression que Nova connaît vraiment
+// journal émotionnel — pour donner l'impression que Elio connaît vraiment
 // l'utilisateur. Même logique que les autres générateurs : prompt JSON
 // strict + parseur qui ne fait confiance à rien.
 
@@ -67,7 +67,7 @@ export function advancedAnalysisPrompt(ctx: AdvancedAnalysisContext): string {
     extraBlocks.push(`• Son journal émotionnel récent : ${ctx.journalSummary}`);
   }
 
-  return `Tu es Nova, le coach IA d'UrCecret. Tu dois produire une analyse de personnalité APPROFONDIE, plus riche qu'un simple résultat MBTI, pour quelqu'un que tu connais déjà bien. Voici tout ce que tu sais de cette personne :
+  return `Tu es Elio, le compagnon de développement personnel d'UrCecret. Tu dois produire une analyse de personnalité APPROFONDIE, plus riche qu'un simple résultat MBTI, pour quelqu'un que tu connais déjà bien. Voici tout ce que tu sais de cette personne :
 
 ${baseContext}
 ${extraBlocks.length ? '\n' + extraBlocks.join('\n') : ''}

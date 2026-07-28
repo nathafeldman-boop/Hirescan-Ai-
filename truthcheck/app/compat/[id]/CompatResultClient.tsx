@@ -23,7 +23,7 @@ export default function CompatResultClient({ personName, relationType, score, he
 
   async function share() {
     const url = window.location.href;
-    const text = `Ma compatibilité avec ${personName} : ${score}% (vu par Nova sur UrCecret) 👀`;
+    const text = `Ma compatibilité avec ${personName} : ${score}% (vu par Elio sur UrCecret) 👀`;
     try {
       if (navigator.share) { await navigator.share({ title: 'UrCecret', text, url }); return; }
     } catch { /* partage annulé */ }
@@ -101,7 +101,7 @@ export default function CompatResultClient({ personName, relationType, score, he
           <div className="rounded-2xl p-5 mb-5" style={{ background: 'var(--ink)' }}>
             <p className="text-sm font-bold mb-2" style={{ color: '#FAF6EC' }}>Tu as vu votre score. Voici ce qui se passe vraiment entre vous deux.</p>
             <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(250,246,236,0.6)' }}>
-              Nova peut détailler vos points communs, vos différences, les vraies forces de cette relation et les points d&apos;attention à garder en tête.
+              Elio peut détailler vos points communs, vos différences, les vraies forces de cette relation et les points d&apos;attention à garder en tête.
             </p>
             <Link href="/pricing" className="ur-btn-gold w-full py-3 text-sm inline-flex items-center justify-center">
               Voir l&apos;analyse complète →

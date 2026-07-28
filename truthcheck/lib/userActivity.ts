@@ -10,7 +10,7 @@ const PAGE_LABELS: Record<string, string> = {
   '/decouverte': 'Hub de découverte',
   '/quiz/personnalite': 'Test de personnalité MBTI',
   '/quizzes': 'Liste des quiz',
-  '/chat': 'Nova (coach IA)',
+  '/chat': 'Elio (compagnon)',
   '/journal': 'Journal émotionnel',
   '/dashboard': 'Mon profil',
   '/compat': 'Compatibilité amoureuse',
@@ -50,7 +50,7 @@ export interface VisitEvent {
 }
 
 // Un seul chemin brut → un événement lisible, jamais l'inverse (pas de contenu
-// exposé — juste "quoi" et "quand", jamais le détail d'un message Nova, etc.)
+// exposé — juste "quoi" et "quand", jamais le détail d'un message Elio, etc.)
 export function describeVisit(path: string, at: Date): VisitEvent {
   const dropMatch = path.match(/^\/__quiz\/drop\/q(\d+)$/);
   if (dropMatch) {
@@ -87,11 +87,13 @@ export function describeVisit(path: string, at: Date): VisitEvent {
 }
 
 // Les 9 jalons du registre fermé (lib/trackEvent.ts) → une phrase lisible.
-// Jamais le contenu (ex. le texte échangé avec Nova) — juste l'action et le
+// Jamais le contenu (ex. le texte échangé avec Elio) — juste l'action et le
 // moment, exactement ce qui a été demandé ("pas quelle question, c'est trop indiscret").
+// Le nom de la clé ('nova_message_sent') reste inchangé pour la continuité des
+// données déjà écrites — seul le libellé affiché change (Elio → Elio).
 const APP_EVENT_LABELS: Record<string, string> = {
   signed_in: 'S\'est connecté(e)',
-  nova_message_sent: 'A envoyé un message à Nova',
+  nova_message_sent: 'A envoyé un message à Elio',
   journal_entry_saved: 'A rempli son Journal du jour',
   journal_started: 'A commencé son Journal (1ère fois)',
   conversation_analyzed: 'A fait analyser une conversation',

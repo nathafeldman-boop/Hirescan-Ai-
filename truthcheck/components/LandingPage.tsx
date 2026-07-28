@@ -11,7 +11,7 @@ import CosmicBackdrop from './CosmicBackdrop';
 import CardCarousel from './CardCarousel';
 import PhoneMockup from './PhoneMockup';
 import MbtiDemoScreen from './landing-demos/MbtiDemoScreen';
-import NovaDemoScreen from './landing-demos/NovaDemoScreen';
+import ElioDemoScreen from './landing-demos/ElioDemoScreen';
 import JournalDemoScreen from './landing-demos/JournalDemoScreen';
 
 const GROUPS = [
@@ -90,7 +90,7 @@ export default function LandingPage() {
             UrCecret
           </span>
           <div className="flex items-center gap-3">
-            {/* L'accès à Nova passe par la barre globale en bas d'écran
+            {/* L'accès à Elio passe par la barre globale en bas d'écran
                 (composant GlobalTabBar). Le bouton "Commencer" envoie
                 maintenant vers le hub de découverte, pas direct sur le test —
                 voir /decouverte (nouvelle étape du funnel). */}
@@ -207,7 +207,7 @@ export default function LandingPage() {
           <p className="ur-label text-[10px] mb-3" style={{ color: CLAY }}>🧠 Test de personnalité</p>
           <h3 className="font-display text-2xl font-black text-stone-900 mb-3">Découvre qui tu es, vraiment</h3>
           <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: '#78716c', lineHeight: 1.6 }}>
-            Basé sur les 8 fonctions cognitives de Carl Jung. Réponds honnêtement, Nova s&apos;occupe du reste.
+            Basé sur les 8 fonctions cognitives de Carl Jung. Réponds honnêtement, Elio s&apos;occupe du reste.
           </p>
           <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite' }}>
             <PhoneMockup><MbtiDemoScreen /></PhoneMockup>
@@ -218,7 +218,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 🤖 Nova — fond encre, décor cosmique ── */}
+      {/* ── 🤖 Elio — fond encre, décor cosmique ── */}
       <section className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--ink)' }}>
         <CosmicBackdrop />
         <div className="pointer-events-none absolute inset-0" aria-hidden>
@@ -231,10 +231,10 @@ export default function LandingPage() {
             Analyse une conversation, comprend tes émotions, crée des tests personnalisés, répond à tes questions.
           </p>
           <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .3s' }}>
-            <PhoneMockup dark><NovaDemoScreen /></PhoneMockup>
+            <PhoneMockup dark><ElioDemoScreen /></PhoneMockup>
           </div>
           <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
-            Découvrir Nova →
+            Découvrir Elio →
           </Link>
         </div>
       </section>
@@ -253,7 +253,7 @@ export default function LandingPage() {
           <p className="ur-label text-[10px] mb-3" style={{ color: CLAY }}>📖 Journal émotionnel</p>
           <h3 className="font-display text-2xl font-black text-stone-900 mb-3">Note ton humeur, découvre ton évolution</h3>
           <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: '#78716c', lineHeight: 1.6 }}>
-            Un calendrier qui se remplit chaque jour, et Nova qui repère tes tendances au fil du temps.
+            Un calendrier qui se remplit chaque jour, et Elio qui repère tes tendances au fil du temps.
           </p>
           <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .6s' }}>
             <PhoneMockup><JournalDemoScreen /></PhoneMockup>

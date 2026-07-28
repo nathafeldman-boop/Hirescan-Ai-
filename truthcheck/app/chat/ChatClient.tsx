@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
-import NovaAvatar from '@/components/NovaAvatar';
+import ElioAvatar from '@/components/ElioAvatar';
 import AppTabBar from '@/components/AppTabBar';
 import { COACH_CATEGORIES } from '@/lib/coachCategories';
+import ElioMessage from '@/components/ElioMessage';
 
 interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
 
@@ -20,39 +21,16 @@ interface ConversationAnalysisResult {
   advice: string;
 }
 
-// Rend les URL d'un message cliquables — utile pour le lien de test partageable
-// que Nova renvoie en texte brut (ex: "https://urcecret.site/q/xyz").
-const URL_RE = /(https?:\/\/[^\s]+)/g;
-function Linkified({ text }: { text: string }) {
-  // split() avec un groupe capturant alterne texte/URL — les parties d'URL
-  // tombent toujours aux index impairs, donc pas besoin de re-tester (et
-  // surtout pas avec la regex globale, dont le lastIndex est piégeux ici).
-  const parts = text.split(URL_RE);
-  return (
-    <>
-      {parts.map((part, i) =>
-        i % 2 === 1 ? (
-          <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="underline break-all" style={{ color: 'var(--gold)' }} onClick={(e) => e.stopPropagation()}>
-            {part}
-          </a>
-        ) : (
-          <span key={i}>{part}</span>
-        )
-      )}
-    </>
-  );
-}
-
 // Taille max du fichier original (avant encodage base64, qui l'agrandit ~x1.37).
 // Reste sous la limite serveur (~4,5 Mo décodés) avec de la marge.
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
-// ── Suggestions Nova — visibles sans écrire, cliquables, jamais un cul-de-sac.
+// ── Suggestions Elio — visibles sans écrire, cliquables, jamais un cul-de-sac.
 // "analyze" et "quiz" ouvrent les vraies features structurées (réservées aux
 // abonnés). "link" mène vers un vrai écran dédié (Journal, Compatibilité,
-// Profil avancé). "chat" envoie un vrai premier message à Nova qui exploite
-// déjà tout ce qu'elle sait (profil MBTI). ─────────────────────────────────
-const NOVA_SUGGESTIONS: { emoji: string; label: string; kind: 'analyze' | 'quiz' | 'chat' | 'link'; prompt?: string; href?: string }[] = [
+// Profil avancé). "chat" envoie un vrai premier message à Elio qui exploite
+// déjà tout ce qu'il sait (profil MBTI). ─────────────────────────────────
+const ELIO_SUGGESTIONS: { emoji: string; label: string; kind: 'analyze' | 'quiz' | 'chat' | 'link'; prompt?: string; href?: string }[] = [
   { emoji: '🧠', label: 'Analyser une conversation', kind: 'analyze' },
   { emoji: '📖', label: 'Journal émotionnel', kind: 'link', href: '/journal' },
   { emoji: '✨', label: 'Analyse avancée', kind: 'link', href: '/profil-avance' },
@@ -222,7 +200,7 @@ export default function ChatClient() {
         return;
       }
       if (res.status === 413) { setNotice('Cette photo est trop lourde, réessaie avec une image plus légère.'); setMessages(prev); return; }
-      if (res.status === 503) { setNotice('Ton coach arrive très bientôt — il n\'est pas encore activé.'); setMessages(prev); return; }
+      if (res.status === 503) { setNotice('Elio arrive très bientôt — il n\'est pas encore activé.'); setMessages(prev); return; }
       if (!res.ok) { setNotice('Ton coach est momentanément indisponible. Réessaie dans un instant.'); setMessages(prev); return; }
       const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number };
       if (data.needsTest) { setHasProfile(false); setMessages(prev); return; }
@@ -237,7 +215,7 @@ export default function ChatClient() {
     }
   }, [messages, loading, quotaHit, pendingImage]);
 
-  // Demande à Nova de générer un mini-test partageable sur un thème donné —
+  // Demande à Elio de générer un mini-test partageable sur un thème donné —
   // consomme 1 message du même quota que le chat (voir /api/quiz-builder/create).
   const createQuiz = useCallback(async () => {
     const topic = quizTopic.trim();
@@ -293,7 +271,7 @@ export default function ChatClient() {
   }, [analysisText, analysisImage, analysisLoading]);
 
   const shareAnalysis = useCallback(async () => {
-    const text = 'Je viens de faire analyser une conversation par Nova sur UrCecret 👀 tu devrais essayer sur la tienne';
+    const text = 'Je viens de faire analyser une conversation par Elio sur UrCecret 👀 tu devrais essayer sur la tienne';
     const url = `${window.location.origin}/chat`;
     try {
       if (navigator.share) { await navigator.share({ title: 'UrCecret', text, url }); return; }
@@ -309,20 +287,20 @@ export default function ChatClient() {
     setAnalysisError(null);
   }, []);
 
-  // Clic sur une suggestion Nova — jamais un cul-de-sac : ouvre la vraie
+  // Clic sur une suggestion Elio — jamais un cul-de-sac : ouvre la vraie
   // feature structurée (analyse / test), ou envoie un vrai premier message
   // exploitable par le coach (journal / compatibilité / approfondir).
-  const handleSuggestion = useCallback((s: typeof NOVA_SUGGESTIONS[number]) => {
+  const handleSuggestion = useCallback((s: typeof ELIO_SUGGESTIONS[number]) => {
     if (s.kind === 'analyze') { setAnalysisOpen(true); return; }
     if (s.kind === 'quiz') { setQuizBuilderOpen(true); return; }
     if (s.prompt) void send(s.prompt);
   }, [send]);
 
   // Efface tout l'historique de conversation affiché (pas le quota, pas le profil) —
-  // pour repartir d'une page blanche avec Nova.
+  // pour repartir d'une page blanche avec Elio.
   const clearHistory = useCallback(async () => {
     if (messages.length === 0) return;
-    if (!window.confirm('Effacer tout ton historique avec Nova ? Cette action est irréversible.')) return;
+    if (!window.confirm('Effacer tout ton historique avec Elio ? Cette action est irréversible.')) return;
     try { await fetch('/api/chat', { method: 'DELETE' }); } catch {}
     setMessages([]);
     setNotice(null);
@@ -349,10 +327,11 @@ export default function ChatClient() {
   if (!session?.user) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--paper)' }}>
-        <div className="mb-6"><NovaAvatar size={80} glow /></div>
-        <h1 className="font-display text-2xl font-black text-stone-900 mb-2">Nova, ton coach personnel</h1>
+        <div className="mb-6"><ElioAvatar size={80} glow /></div>
+        <p className="ur-label text-[11px] mb-3" style={{ color: 'var(--gold)' }}>Je suis Elio</p>
+        <h1 className="font-display text-2xl font-black text-stone-900 mb-2">Un espace pour mieux te comprendre</h1>
         <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: '#78716c' }}>
-          Elle te connaît déjà grâce à ton test. Connecte-toi pour lui parler.
+          Je suis là pour t&apos;aider à mieux comprendre qui tu es, tes émotions et ta façon de fonctionner. Je te connais déjà grâce à ton test — connecte-toi pour qu&apos;on parle.
         </p>
         <button onClick={() => signIn(undefined, { callbackUrl: '/chat' })} className="ur-btn-gold px-7 py-3.5 text-sm">
           Se connecter →
@@ -364,15 +343,15 @@ export default function ChatClient() {
 
   // Pas de test fait → le coach ne peut pas personnaliser. Pour un abonné PAYANT
   // (cas rare : abonnement pris sans jamais faire le test), on bloque et on
-  // invite à le passer. Pour un compte GRATUIT, on laisse essayer Nova quand
-  // même (découverte) — elle rappellera elle-même de faire le test.
+  // invite à le passer. Pour un compte GRATUIT, on laisse essayer Elio quand
+  // même (découverte) — il rappellera lui-même de faire le test.
   if (hasProfile === false && !isFree) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--paper)' }}>
-        <div className="mb-6"><NovaAvatar size={80} glow /></div>
+        <div className="mb-6"><ElioAvatar size={80} glow /></div>
         <h1 className="font-display text-2xl font-black text-stone-900 mb-2">D&apos;abord, ton test</h1>
         <p className="text-sm mb-8 max-w-sm leading-relaxed" style={{ color: '#78716c' }}>
-          Nova s&apos;appuie sur ton profil de personnalité pour te répondre. Fais le test (3 min) et elle saura exactement qui tu es.
+          Elio s&apos;appuie sur ton profil de personnalité pour te répondre. Fais le test (3 min) et il saura exactement qui tu es.
         </p>
         <Link href="/quiz/personnalite" className="ur-btn-gold px-7 py-3.5 text-sm">
           Passer le test →
@@ -388,22 +367,41 @@ export default function ChatClient() {
   const empty = messages.length === 0;
 
   return (
-    <main className="chat-shell flex flex-col" style={{ background: 'var(--paper)' }}>
+    <main className="chat-shell flex flex-col relative" style={{ background: 'var(--paper)' }}>
       {/* 100dvh (avec repli 100vh) : la colonne flex tient EXACTEMENT dans le
           viewport visible, barre d'adresse mobile comprise — condition pour
           que la zone de messages (flex-1) scrolle seule et que l'input + la
           barre de navigation restent toujours visibles en bas, sans jamais
           se chevaucher (voir AppTabBar mode="static"). */}
-      <style>{`.chat-shell { height: 100vh; height: 100dvh; }`}</style>
+      <style>{`
+        .chat-shell { height: 100vh; height: 100dvh; }
+        /* Fond animé léger — 3 halos très doux qui dérivent lentement.
+           transform+opacity uniquement (GPU), jamais de mise en page recalculée. */
+        @keyframes elioDrift1 { 0%,100% { transform: translate(-8%, -6%) scale(1); } 50% { transform: translate(6%, 4%) scale(1.12); } }
+        @keyframes elioDrift2 { 0%,100% { transform: translate(10%, 6%) scale(1); } 50% { transform: translate(-6%, -8%) scale(1.08); } }
+        @keyframes elioDrift3 { 0%,100% { opacity: 0.5; } 50% { opacity: 0.85; } }
+        .chat-bg-blob { position: absolute; border-radius: 50%; filter: blur(60px); will-change: transform; }
+        @media (prefers-reduced-motion: no-preference) {
+          .chat-bg-blob-1 { animation: elioDrift1 26s ease-in-out infinite; }
+          .chat-bg-blob-2 { animation: elioDrift2 32s ease-in-out infinite; }
+          .chat-bg-blob-3 { animation: elioDrift3 14s ease-in-out infinite; }
+        }
+      `}</style>
+      {/* Fond animé — violet doux / bleu nuit / doré, très discret, purement
+          décoratif (aria-hidden, pointer-events-none) derrière tout le contenu. */}
+      <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }} aria-hidden>
+        <div className="chat-bg-blob chat-bg-blob-1" style={{ top: '-10%', left: '-10%', width: '60%', height: '40%', background: 'var(--fam-nf)', opacity: 0.10 }} />
+        <div className="chat-bg-blob chat-bg-blob-2" style={{ bottom: '-15%', right: '-10%', width: '55%', height: '45%', background: 'var(--fam-nt)', opacity: 0.10 }} />
+        <div className="chat-bg-blob chat-bg-blob-3" style={{ top: '30%', right: '10%', width: '35%', height: '30%', background: 'var(--gold)', opacity: 0.08 }} />
+      </div>
       {/* Header */}
-      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3"
-        style={{ background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
+      <header className="relative flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ zIndex: 1, background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
         <Link href="/" className="text-xs flex items-center gap-1.5" style={{ color: '#78716c' }}>
           <span>←</span> Accueil
         </Link>
         <div className="flex items-center gap-2">
-          <NovaAvatar size={26} />
-          <span className="font-display text-sm font-bold text-stone-900">Nova{mbtiType ? ` · ${mbtiType}` : ''}</span>
+          <ElioAvatar size={26} speaking={loading} />
+          <span className="font-display text-sm font-bold text-stone-900">Elio{mbtiType ? ` · ${mbtiType}` : ''}</span>
           <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#4ADE80' }} aria-label="en ligne" />
         </div>
         <div className="flex items-center gap-2.5">
@@ -425,40 +423,49 @@ export default function ChatClient() {
       {/* Bandeau — version découverte (compte gratuit). Avant le test : pousse
           vers le quiz. Après le test (mais sans payer) : pousse vers l'offre. */}
       {isFree && (
-        <Link href={noTestYet ? '/quiz/personnalite' : '/pricing'} className="block px-4 py-2 text-center text-[11px] font-semibold"
-          style={{ background: 'var(--gold-soft)', borderBottom: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
+        <Link href={noTestYet ? '/quiz/personnalite' : '/pricing'} className="relative block px-4 py-2 text-center text-[11px] font-semibold"
+          style={{ zIndex: 1, background: 'var(--gold-soft)', borderBottom: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
           {noTestYet
-            ? '✦ Version découverte (5 messages/mois) · Fais le test pour des réponses selon TOI →'
-            : '✦ Version découverte (5 messages/mois) · Nova selon TON type dès 1,99 €/mois →'}
+            ? '✦ Version découverte (3 messages/jour) · Fais le test pour des réponses selon TOI →'
+            : '✦ Version découverte (3 messages/jour) · Elio selon TON type dès 1,99 €/mois →'}
         </Link>
       )}
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
+      <div ref={scrollRef} className="relative flex-1 min-h-0 overflow-y-auto" style={{ zIndex: 1 }}>
         <div className="max-w-2xl mx-auto px-4 py-6">
           {empty ? (
-            <div className="flex flex-col items-center text-center pt-6">
-              <div className="mb-5"><NovaAvatar size={92} glow /></div>
-              <h2 className="font-display text-xl font-black text-stone-900 mb-2">
-                {isFree ? 'Salut, moi c\'est Nova 👋' : 'Salut, moi c\'est Nova — je connais déjà ton profil.'}
-              </h2>
-              <p className="text-sm mb-7 max-w-sm leading-relaxed" style={{ color: '#78716c' }}>
-                {noTestYet
-                  ? <>Tu peux m&apos;essayer avant même de faire le test : je te donne de vrais conseils, mais généraux. Fais le <Link href="/quiz/personnalite" style={{ color: 'var(--gold)', fontWeight: 700 }}>test (3 min)</Link> pour que je te parle vraiment de <span style={{ color: 'var(--gold)' }}>toi</span>.</>
-                  : isFree
-                    ? <>Version découverte : je te donne de vrais conseils, mais généraux. Pour des réponses selon <span style={{ color: 'var(--gold)' }}>ton type exact</span> et ton test, débloque ton profil.</>
-                    : <>Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.</>}
-              </p>
-              {noTestYet && (
-                <Link href="/quiz/personnalite" className="ur-btn-gold px-6 py-3 text-sm mb-6 inline-flex">
-                  Faire le test (3 min) →
-                </Link>
-              )}
+            <div className="flex flex-col pt-6">
+              {/* En-tête aligné à gauche — l'avatar accompagne le texte au
+                  lieu de trôner seul au centre, comme dans les interfaces
+                  conversationnelles modernes (le compagnon est "à côté de
+                  toi", pas au-dessus). */}
+              <div className="flex items-start gap-4 mb-6 text-left">
+                <div className="flex-shrink-0"><ElioAvatar size={64} glow /></div>
+                <div className="flex-1 min-w-0 pt-1.5">
+                  <p className="ur-label text-[10px] mb-1.5" style={{ color: 'var(--gold)' }}>Ton compagnon de développement personnel</p>
+                  <h2 className="font-display text-xl font-black text-stone-900 mb-2">
+                    {isFree ? 'Salut, moi c\'est Elio 👋' : 'Salut, moi c\'est Elio — je connais déjà ton profil.'}
+                  </h2>
+                  <p className="text-sm leading-relaxed" style={{ color: '#78716c' }}>
+                    {noTestYet
+                      ? <>Tu peux m&apos;essayer avant même de faire le test : je te donne de vrais conseils, mais généraux. Fais le <Link href="/quiz/personnalite" style={{ color: 'var(--gold)', fontWeight: 700 }}>test (3 min)</Link> pour que je te parle vraiment de <span style={{ color: 'var(--gold)' }}>toi</span>.</>
+                      : isFree
+                        ? <>Version découverte : je te donne de vrais conseils, mais généraux. Pour des réponses selon <span style={{ color: 'var(--gold)' }}>ton type exact</span> et ton test, débloque ton profil.</>
+                        : <>Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.</>}
+                  </p>
+                  {noTestYet && (
+                    <Link href="/quiz/personnalite" className="ur-btn-gold px-6 py-3 text-sm mt-4 inline-flex">
+                      Faire le test (3 min) →
+                    </Link>
+                  )}
+                </div>
+              </div>
 
-              {/* Suggestions Nova — visibles sans écrire, chaque carte est
+              {/* Suggestions Elio — visibles sans écrire, chaque carte est
                   cliquable et mène à un vrai résultat (jamais un cul-de-sac). */}
               <div className="w-full grid grid-cols-2 gap-2.5 mb-2">
-                {NOVA_SUGGESTIONS.map((s) => {
+                {ELIO_SUGGESTIONS.map((s) => {
                   const gated = isFree && (s.kind === 'analyze' || s.kind === 'quiz');
                   const content = (
                     <>
@@ -474,7 +481,7 @@ export default function ChatClient() {
                       <Link
                         key={s.label}
                         href="/pricing"
-                        className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                        className="elio-hover-lift flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
                         style={{ background: 'var(--paper-panel)', border: '1px dashed var(--line)' }}
                       >
                         {content}
@@ -486,7 +493,7 @@ export default function ChatClient() {
                       <Link
                         key={s.label}
                         href={s.href}
-                        className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                        className="elio-hover-lift flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
                         style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
                       >
                         {content}
@@ -497,7 +504,7 @@ export default function ChatClient() {
                     <button
                       key={s.label}
                       onClick={() => handleSuggestion(s)}
-                      className="flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                      className="elio-hover-lift flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
                       style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
                     >
                       {content}
@@ -512,7 +519,7 @@ export default function ChatClient() {
                   <div key={c.key}>
                     <button
                       onClick={() => setOpenCat(openCat === c.key ? null : c.key)}
-                      className="ur-panel w-full flex items-center justify-between px-4 py-3 text-sm transition-all"
+                      className="elio-hover-lift ur-panel w-full flex items-center justify-between px-4 py-3 text-sm transition-all"
                       style={{ color: 'var(--ink)' }}
                     >
                       <span className="flex items-center gap-2.5"><span className="text-base">{c.emoji}</span>{c.label}</span>
@@ -524,7 +531,7 @@ export default function ChatClient() {
                           <button
                             key={p}
                             onClick={() => send(p)}
-                            className="text-left text-sm px-4 py-2.5 rounded-xl transition-all hover:scale-[1.01]"
+                            className="elio-hover-lift text-left text-sm px-4 py-2.5 rounded-xl transition-all hover:scale-[1.01]"
                             style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--ink)' }}
                           >
                             {p}
@@ -540,23 +547,23 @@ export default function ChatClient() {
             <div className="space-y-4">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start items-end gap-2'}`}>
-                  {/* Avatar de Nova uniquement sur le dernier message d'une suite (comme WhatsApp) */}
+                  {/* Avatar de Elio uniquement sur le dernier message d'une suite (comme WhatsApp) */}
                   {m.role === 'assistant' && (
                     <div className="flex-shrink-0 mb-0.5" style={{ width: 28 }}>
-                      {(i === messages.length - 1 || messages[i + 1]?.role === 'user') && <NovaAvatar size={28} />}
+                      {(i === messages.length - 1 || messages[i + 1]?.role === 'user') && <ElioAvatar size={28} />}
                     </div>
                   )}
-                  <div className={`max-w-[85%] rounded-2xl overflow-hidden text-sm leading-relaxed whitespace-pre-line ${m.role === 'user' ? '' : 'ur-panel'} ${m.image ? '' : 'px-4 py-3'}`}
+                  <div className={`max-w-[85%] rounded-2xl overflow-hidden text-sm leading-relaxed ${m.role === 'user' ? 'whitespace-pre-line' : 'elio-bubble'} ${m.role === 'user' ? '' : 'ur-panel'} ${m.image ? '' : 'px-4 py-3'}`}
                     style={m.role === 'user'
                       ? { background: 'var(--gold-soft)', border: '1px solid var(--gold-line)', color: 'var(--ink)' }
                       : { color: 'var(--ink)' }}>
                     {m.image && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.image} alt="Photo envoyée à Nova" className="w-full block" style={{ maxHeight: 260, objectFit: 'cover' }} />
+                      <img src={m.image} alt="Photo envoyée à Elio" className="w-full block" style={{ maxHeight: 260, objectFit: 'cover' }} />
                     )}
                     {m.content && (
                       <div className={m.image ? 'px-4 py-3' : ''}>
-                        {m.role === 'assistant' ? <Linkified text={m.content} /> : m.content}
+                        {m.role === 'assistant' ? <ElioMessage text={m.content} /> : m.content}
                       </div>
                     )}
                   </div>
@@ -564,12 +571,12 @@ export default function ChatClient() {
               ))}
               {loading && (
                 <div className="flex justify-start items-end gap-2">
-                  <div className="flex-shrink-0 mb-0.5"><NovaAvatar size={28} /></div>
-                  <div className="ur-panel rounded-2xl px-4 py-3 flex gap-1.5 items-center">
-                    <span className="text-[11px] mr-1" style={{ color: '#a8a29e' }}>Nova écrit</span>
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)' }} />
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)', animationDelay: '0.2s' }} />
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)', animationDelay: '0.4s' }} />
+                  <div className="flex-shrink-0 mb-0.5"><ElioAvatar size={28} speaking /></div>
+                  <div className="ur-panel rounded-2xl px-4 py-3 flex gap-2 items-center">
+                    <span className="text-[11px] mr-0.5" style={{ color: '#a8a29e' }}>Elio réfléchit</span>
+                    <span className="elio-typing-dot" style={{ background: 'var(--gold)' }} />
+                    <span className="elio-typing-dot" style={{ background: 'var(--gold)', animationDelay: '0.15s' }} />
+                    <span className="elio-typing-dot" style={{ background: 'var(--gold)', animationDelay: '0.3s' }} />
                   </div>
                 </div>
               )}
@@ -581,14 +588,14 @@ export default function ChatClient() {
           {quotaHit && (
             <div className="mt-6 rounded-2xl p-5 text-center" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
               <p className="text-sm font-bold text-stone-900 mb-1">
-                {isFree ? `Tu as utilisé tes ${limit ?? ''} messages découverte du mois` : `Tu as utilisé tes ${limit ?? ''} messages du jour`}
+                {isFree ? `Tu as utilisé tes ${limit ?? ''} messages découverte du jour` : `Tu as utilisé tes ${limit ?? ''} messages du jour`}
               </p>
               <p className="text-xs mb-4" style={{ color: '#78716c' }}>
                 {isFree
-                  ? 'Dès 1,99 €/mois : ton profil complet + Nova tous les jours (5 messages/jour).'
+                  ? 'Dès 1,99 €/mois : ton profil complet + Elio, 5 messages/jour. Ton quota gratuit revient demain (minuit, heure de Paris).'
                   : 'Ton quota se réinitialise demain (minuit, heure de Paris).'}
               </p>
-              {isFree && <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Débloquer Nova — dès 1,99 €/mois →</Link>}
+              {isFree && <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Débloquer Elio — dès 1,99 €/mois →</Link>}
 
               {/* Parrainage : +3 messages / invité inscrit, +3 par jour si l'invité paie */}
               {inviteCode && (
@@ -622,7 +629,7 @@ export default function ChatClient() {
       {/* Input bar — élément normal du flux (pas sticky/fixed) : la colonne
           flex fait exactement 100dvh, donc il reste toujours visible juste
           au-dessus d'AppTabBar, sans jamais la chevaucher. */}
-      <div className="flex-shrink-0" style={{ background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
+      <div className="relative flex-shrink-0" style={{ zIndex: 1, background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
         {/* Aperçu de la photo en attente d'envoi */}
         {pendingImage && (
           <div className="max-w-2xl mx-auto px-4 pt-3">
@@ -641,7 +648,7 @@ export default function ChatClient() {
         )}
         {imageError && <p className="max-w-2xl mx-auto px-4 pt-2 text-[11px]" style={{ color: '#dc2626' }}>{imageError}</p>}
 
-        {/* Menu "+" — tout ce que Nova sait faire, pas seulement discuter.
+        {/* Menu "+" — tout ce que Elio sait faire, pas seulement discuter.
             Toujours accessible (pas juste sur l'écran vide) pour que les gens
             qui découvrent le chat tombent dessus aussi. Architecture pensée
             pour grandir : chaque action est un item de ACTIONS, actif ou non
@@ -721,16 +728,16 @@ export default function ChatClient() {
             type="button"
             onClick={() => setActionsMenuOpen((v) => !v)}
             disabled={quotaHit}
-            aria-label="Ce que Nova sait faire"
-            className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-xl font-bold disabled:opacity-40 transition-transform"
+            aria-label="Ce que Elio sait faire"
+            className="elio-hover-lift flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-xl font-bold disabled:opacity-40 transition-transform"
             style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)', transform: actionsMenuOpen ? 'rotate(45deg)' : 'none' }}
           >+</button>
           <button
             type="button"
             onClick={() => { setActionsMenuOpen(false); fileInputRef.current?.click(); }}
             disabled={quotaHit}
-            aria-label="Envoyer une photo à Nova"
-            className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-lg disabled:opacity-40"
+            aria-label="Envoyer une photo à Elio"
+            className="elio-hover-lift flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-lg disabled:opacity-40"
             style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)' }}
           >📷</button>
           <textarea
@@ -738,16 +745,16 @@ export default function ChatClient() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(input); } }}
             rows={1}
-            placeholder={quotaHit ? 'Quota du jour atteint' : pendingImage ? 'Ajoute un message (facultatif)…' : 'Écris à Nova…'}
+            placeholder={quotaHit ? 'Quota du jour atteint' : pendingImage ? 'Ajoute un message (facultatif)…' : 'Écris à Elio…'}
             disabled={quotaHit}
-            className="flex-1 resize-none rounded-2xl px-4 py-3 text-sm outline-none disabled:opacity-50"
+            className="elio-input flex-1 resize-none rounded-2xl px-4 py-3 text-sm outline-none disabled:opacity-50"
             style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', color: 'var(--ink)', maxHeight: 140 }}
           />
           <button type="submit" disabled={loading || quotaHit || (!input.trim() && !pendingImage)} aria-label="Envoyer"
-            className="ur-btn-gold flex-shrink-0 w-11 h-11 !p-0 text-lg disabled:opacity-40">↑</button>
+            className="ur-btn-gold elio-hover-lift flex-shrink-0 w-11 h-11 !p-0 text-lg disabled:opacity-40">↑</button>
         </form>
         <p className="text-center text-[10px] pb-2" style={{ color: '#a8a29e' }}>
-          Nova s&apos;appuie sur ton test. Ce n&apos;est pas un avis médical.
+          Elio s&apos;appuie sur ton test. Ce n&apos;est pas un avis médical.
         </p>
       </div>
 
@@ -761,7 +768,7 @@ export default function ChatClient() {
           <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
             {quizResult ? (
               <div className="text-center">
-                <div className="mb-4"><NovaAvatar size={56} glow /></div>
+                <div className="mb-4"><ElioAvatar size={56} glow /></div>
                 <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Ton test est prêt !</p>
                 <h3 className="font-display text-lg font-black mb-2" style={{ color: 'var(--ink)' }}>{quizResult.title}</h3>
                 <p className="text-xs mb-5 leading-relaxed" style={{ color: '#78716c' }}>{quizResult.intro}</p>
@@ -781,7 +788,7 @@ export default function ChatClient() {
               </div>
             ) : (
               <div>
-                <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Nova crée un test pour toi</p>
+                <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Elio crée un test pour toi</p>
                 <h3 className="font-display text-lg font-black mb-2" style={{ color: 'var(--ink)' }}>Sur quel thème ?</h3>
                 <p className="text-xs mb-4 leading-relaxed" style={{ color: '#78716c' }}>
                   Ex : « mes vrais amis », « suis-je fait pour l&apos;entrepreneuriat », « mon rapport au stress »…
@@ -801,7 +808,7 @@ export default function ChatClient() {
                   disabled={quizCreating || !quizTopic.trim()}
                   className="ur-btn-gold w-full py-3 text-sm mb-2 disabled:opacity-50"
                 >
-                  {quizCreating ? 'Nova réfléchit…' : 'Créer mon test →'}
+                  {quizCreating ? 'Elio réfléchit…' : 'Créer mon test →'}
                 </button>
                 <button
                   onClick={() => setQuizBuilderOpen(false)}
@@ -829,8 +836,8 @@ export default function ChatClient() {
             {analysisResult ? (
               <div>
                 <div className="text-center mb-5">
-                  <div className="mb-3"><NovaAvatar size={52} glow /></div>
-                  <p className="ur-label text-[10px] mb-1" style={{ color: 'var(--gold)' }}>Analyse de Nova</p>
+                  <div className="mb-3"><ElioAvatar size={52} glow /></div>
+                  <p className="ur-label text-[10px] mb-1" style={{ color: 'var(--gold)' }}>Analyse de Elio</p>
                   <h3 className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>Ce que révèle cette conversation</h3>
                 </div>
 
@@ -879,7 +886,7 @@ export default function ChatClient() {
                   ))}
 
                   <div className="rounded-xl px-4 py-3" style={{ background: 'var(--ink)' }}>
-                    <p className="text-[11px] font-bold mb-1" style={{ color: 'var(--gold)' }}>💡 Conseil de Nova</p>
+                    <p className="text-[11px] font-bold mb-1" style={{ color: 'var(--gold)' }}>💡 Conseil de Elio</p>
                     <p className="text-xs leading-relaxed" style={{ color: '#FAF6EC' }}>{analysisResult.advice}</p>
                   </div>
                 </div>
@@ -897,10 +904,10 @@ export default function ChatClient() {
               </div>
             ) : (
               <div>
-                <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Nova analyse pour toi</p>
+                <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Elio analyse pour toi</p>
                 <h3 className="font-display text-lg font-black mb-2" style={{ color: 'var(--ink)' }}>Colle une conversation</h3>
                 <p className="text-xs mb-4 leading-relaxed" style={{ color: '#78716c' }}>
-                  Texte collé, capture d&apos;écran, ou les deux — Nova regarde la personnalité, le style d&apos;attachement, les green/red flags et te donne un vrai conseil.
+                  Texte collé, capture d&apos;écran, ou les deux — Elio regarde la personnalité, le style d&apos;attachement, les green/red flags et te donne un vrai conseil.
                 </p>
                 <textarea
                   value={analysisText}
@@ -950,7 +957,7 @@ export default function ChatClient() {
                   disabled={analysisLoading || (!analysisText.trim() && !analysisImage)}
                   className="ur-btn-gold w-full py-3 text-sm mb-2 disabled:opacity-50"
                 >
-                  {analysisLoading ? 'Nova analyse…' : 'Analyser →'}
+                  {analysisLoading ? 'Elio analyse…' : 'Analyser →'}
                 </button>
                 <button
                   onClick={closeAnalysis}
@@ -966,7 +973,7 @@ export default function ChatClient() {
         </div>
       )}
 
-      <AppTabBar mode="static" />
+      <div className="relative" style={{ zIndex: 1 }}><AppTabBar mode="static" /></div>
     </main>
   );
 }

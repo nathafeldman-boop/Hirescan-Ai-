@@ -8,10 +8,10 @@ export const maxDuration = 60;
 const ADMIN_SECRET = process.env.ADMIN_SECRET ?? 'urcecret-admin-natha-2024';
 
 // Envoi groupé à TOUS les inscrits qui n'ont PAS d'abonnement actif (tier free
-// ou unlocked — donc pas d'accès Nova) pour les faire revenir ET les pousser
+// ou unlocked — donc pas d'accès Elio) pour les faire revenir ET les pousser
 // vers l'abonnement Starter. Contrairement à broadcast-unlock (axée sur "voir
 // ton profil"), celle-ci cible un public plus large (inclut aussi les
-// 'unlocked' qui ont déjà payé une fois mais n'ont pas Nova) avec un message
+// 'unlocked' qui ont déjà payé une fois mais n'ont pas Elio) avec un message
 // centré sur l'usage régulier + l'abonnement.
 // Déduplication : chaque envoi est loggué (EmailLog type 'winback_subscribe') →
 // relancer la campagne ne renvoie QU'AUX inscrits qui ne l'ont pas encore reçue.

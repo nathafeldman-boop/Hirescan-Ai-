@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ url: annualSession.url });
     }
 
-    // ── Abonnement "starter" — 1,99€/mois (profil MBTI + Nova 5 messages/jour) ──
+    // ── Abonnement "starter" — 1,99€/mois (profil MBTI + Elio 5 messages/jour) ──
     // Remplace l'ancien 1,99€ one-shot sur le paywall MBTI → chaque vente = MRR.
     if (starter) {
       const starterSession = await stripe.checkout.sessions.create({

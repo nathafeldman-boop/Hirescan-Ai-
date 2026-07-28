@@ -12,7 +12,7 @@ import type { MbtiScores } from '@/lib/mbti';
 
 export const dynamic = 'force-dynamic';
 
-// Demande explicite (dans la conversation) de créer un test à partager — Nova
+// Demande explicite (dans la conversation) de créer un test à partager — Elio
 // ne peut pas "promettre" un test en texte libre, donc on détecte l'intention
 // et on déclenche directement la vraie génération (même pipeline que le bouton
 // dédié /api/quiz-builder/create), plutôt que de laisser le modèle bluffer.
@@ -21,7 +21,7 @@ const QUIZ_INTENT_RE = /\b(cr[ée]e?r?|g[ée]n[èe]re?r?|fabrique|invente)\b[\w\
 // Combien de messages on recharge pour l'affichage (mémoire visible).
 const DISPLAY_HISTORY = 40;
 
-// Photo envoyée à Nova (vision, mistral-small-latest) : data URI base64, taille
+// Photo envoyée à Elio (vision, mistral-small-latest) : data URI base64, taille
 // plafonnée pour rester raisonnable en coût/latence (~4,5 Mo décodés).
 const MAX_IMAGE_DATA_URI_LENGTH = 6_000_000;
 
@@ -32,7 +32,7 @@ export async function GET() {
   const tier = (session?.user as { tier?: string } | undefined)?.tier;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  // Tout abonné payant (starter/plus/premium) = Nova personnalisée ; gratuit = bridée.
+  // Tout abonné payant (starter/plus/premium) = Elio personnalisé ; gratuit = bridé.
   const isPremium = hasPaidAccess(tier);
   const user = await prisma.user.findUnique({
     where: { id: uid },
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
   }
   message = message.slice(0, 4000);
 
-  // Photo optionnelle (Nova vision) — data URI envoyée par le client.
+  // Photo optionnelle (Elio vision) — data URI envoyée par le client.
   const rawImage = typeof body?.imageBase64 === 'string' ? body.imageBase64 : '';
   let imageDataUri: string | null = null;
   if (rawImage) {
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
   if (!dbUser) return NextResponse.json({ error: 'assistant_unavailable' }, { status: 502 });
   // Un abonné PAYANT paie justement pour le coach personnalisé selon SON test —
   // sans profil, on l'invite à le passer d'abord. Un compte GRATUIT, lui, peut
-  // essayer Nova sans avoir fait le test (découverte) : elle répond en général
+  // essayer Elio sans avoir fait le test (découverte) : il répond en général
   // et rappelle à chaque réponse de faire le test (voir coachSystemPromptFreeNoTest).
   if (isPremium && !dbUser.mbtiType) {
     return NextResponse.json({ needsTest: true }, { status: 200 });
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
 
   const scores = (dbUser.mbtiScores as unknown as MbtiScores | null) ?? null;
   const firstName = dbUser.name?.split(' ')[0] ?? null;
-  // Nova qui "connaît" le journal — réservé aux abonnés, comme le reste du
+  // Elio qui "connaît" le journal — réservé aux abonnés, comme le reste du
   // coaching personnalisé. Requête légère (14 derniers jours, pas de note/
   // photo) : même fonction de résumé que le Profil avancé, pour rester
   // cohérent entre les deux features et ne pas dupliquer la logique.
@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
         }).catch(() => null)
       : null;
     // Si la génération structurée échoue (thème qui a fait dévier le modèle),
-    // on le dit clairement plutôt que de laisser Nova improviser un faux test
+    // on le dit clairement plutôt que de laisser Elio improviser un faux test
     // en texte libre — ça ressemblait à un vrai test mais ce n'était qu'un
     // copier-coller, sans lien partageable derrière.
     result = saved

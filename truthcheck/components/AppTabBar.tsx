@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation';
 // Navigation principale de l'app — mobile-first, ajoutée SOUS le contenu
 // existant de chaque page (jamais en remplacement d'une navigation déjà là)
 // pour ne rien casser. Volontairement réduite à Home + Moi partout (Test/
-// Nova/Journal ont été retirés de la barre persistante — on y accède via les
+// Elio/Journal ont été retirés de la barre persistante — on y accède via les
 // cartes du Hub) : "Home" renvoie vers /decouverte (l'endroit central où
-// choisir Nova, le journal, etc.), pas vers la landing — voir GlobalTabBar.tsx
+// choisir Elio, le journal, etc.), pas vers la landing — voir GlobalTabBar.tsx
 // pour où cette même barre remplace l'ancienne boule flottante « assistant IA »
 // sur les pages qui n'ont pas déjà cette barre intégrée.
 const TABS = [
@@ -42,7 +42,7 @@ export default function AppTabBar({ dark = false, mode = 'fixed' }: { dark?: boo
             <Link
               key={t.href}
               href={t.href}
-              className="flex flex-col items-center gap-0.5 py-2.5 transition-all active:scale-95"
+              className="elio-hover-lift flex flex-col items-center gap-0.5 py-2.5 transition-all active:scale-95"
               style={{ color: active ? activeColor : idleColor }}
             >
               <span className="text-xl leading-none" style={{ opacity: active ? 1 : 0.7, transform: active ? 'scale(1.08)' : 'none', transition: 'transform .15s' }}>

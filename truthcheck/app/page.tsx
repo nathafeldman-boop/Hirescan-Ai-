@@ -92,7 +92,7 @@ const homeFaqSchema = {
     {
       '@type': 'Question',
       name: 'Est-ce qu\'UrCecret propose autre chose que le test MBTI ?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Oui. En plus du test MBTI gratuit, UrCecret propose Nova, un coach IA pour approfondir ta personnalité, un journal émotionnel pour suivre tes ressentis au quotidien, une analyse de compatibilité amoureuse et des quiz sur tes relations.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Oui. En plus du test MBTI gratuit, UrCecret propose Elio, ton compagnon de développement personnel, pour approfondir ta personnalité, un journal émotionnel pour suivre tes ressentis au quotidien, une analyse de compatibilité amoureuse et des quiz sur tes relations.' },
     },
   ],
 };

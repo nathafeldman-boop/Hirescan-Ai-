@@ -31,7 +31,7 @@ function pct(a: number, b: number) {
 // à étendre ici si un nouvel événement est ajouté là-bas.
 const EVENT_LABELS: Record<string, string> = {
   [EVENTS.SIGNED_IN]: 'Connexions',
-  [EVENTS.NOVA_MESSAGE_SENT]: 'Messages envoyés à Nova',
+  [EVENTS.NOVA_MESSAGE_SENT]: 'Messages envoyés à Elio',
   [EVENTS.JOURNAL_ENTRY_SAVED]: 'Entrées de journal enregistrées',
   [EVENTS.JOURNAL_STARTED]: 'Premier journal jamais rempli',
   [EVENTS.CONVERSATION_ANALYZED]: 'Analyses de conversation',
@@ -197,7 +197,7 @@ export default async function InsightsPage() {
           </div>
         </div>
         <p style={{ color: C.faint, fontSize: 11, marginTop: -18, marginBottom: 28 }}>
-          &quot;Actif&quot; = une navigation authentifiée sur le site (posé à chaque page vue, voir /api/track) — plus précis qu&apos;un simple usage de Nova/Journal.
+          &quot;Actif&quot; = une navigation authentifiée sur le site (posé à chaque page vue, voir /api/track) — plus précis qu&apos;un simple usage d&apos;Elio/Journal.
         </p>
 
         {/* ── Rétention D1/D7/D30 ── */}

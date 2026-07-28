@@ -90,8 +90,8 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
       const res = await fetch('/api/profil-avance', { method: 'POST' });
       const d = await res.json();
       if (!res.ok) {
-        if (res.status === 429) setError('Tu as atteint ta limite de messages Nova pour aujourd\'hui.');
-        else setError('Nova n\'a pas réussi à générer ton analyse. Réessaie dans un instant.');
+        if (res.status === 429) setError('Tu as atteint ta limite de messages Elio pour aujourd\'hui.');
+        else setError('Elio n\'a pas réussi à générer ton analyse. Réessaie dans un instant.');
         return;
       }
       setAnalysis(d.analysis);
@@ -108,12 +108,12 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
         <div className="text-4xl mb-4">🧠</div>
         <h1 className="font-display text-2xl font-black mb-2" style={{ color: 'var(--ink)' }}>Analyse de personnalité avancée</h1>
         <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: '#78716c' }}>
-          Une analyse plus profonde que le simple MBTI, l&apos;évolution de ton type dans le temps, et un rapport complet à télécharger — réservés aux abonnés Nova.
+          Une analyse plus profonde que le simple MBTI, l&apos;évolution de ton type dans le temps, et un rapport complet à télécharger — réservés aux abonnés Elio.
         </p>
         <Link href="/pricing" className="ur-btn-gold px-7 py-3.5 text-sm">
-          Débloquer Nova →
+          Débloquer Elio →
         </Link>
-        <Link href="/chat" className="mt-5 text-xs" style={{ color: '#a8a29e' }}>← Retour à Nova</Link>
+        <Link href="/chat" className="mt-5 text-xs" style={{ color: '#a8a29e' }}>← Retour à Elio</Link>
         <AppTabBar />
       </main>
     );
@@ -125,7 +125,7 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
         <div className="text-4xl mb-4">🧭</div>
         <h1 className="font-display text-2xl font-black mb-2" style={{ color: 'var(--ink)' }}>D&apos;abord, ton test</h1>
         <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: '#78716c' }}>
-          Nova a besoin de ton résultat MBTI pour construire ton analyse avancée.
+          Elio a besoin de ton résultat MBTI pour construire ton analyse avancée.
         </p>
         <Link href="/quiz/personnalite" className="ur-btn-gold px-7 py-3.5 text-sm">
           Faire le test (3 min) →
@@ -165,10 +165,10 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
               Va plus loin que le MBTI
             </p>
             <p className="text-sm mb-5 leading-relaxed" style={{ color: '#6b6055' }}>
-              Nova combine ton test, tes conversations analysées et ton journal émotionnel pour construire un vrai portrait de toi.
+              Elio combine ton test, tes conversations analysées et ton journal émotionnel pour construire un vrai portrait de toi.
             </p>
             <button onClick={generate} disabled={generating} className="ur-btn-gold px-6 py-3 text-sm disabled:opacity-50">
-              {generating ? 'Nova réfléchit…' : 'Générer mon analyse →'}
+              {generating ? 'Elio réfléchit…' : 'Générer mon analyse →'}
             </button>
           </div>
         ) : (
@@ -178,14 +178,14 @@ export default function ProfilAvanceClient({ isPaid, hasTest }: { isPaid: boolea
                 Mis à jour le {new Date(analysis.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
               </p>
               <button onClick={generate} disabled={generating} className="text-xs font-semibold disabled:opacity-50" style={{ color: 'var(--gold)' }}>
-                {generating ? 'Nova réfléchit…' : 'Régénérer ↻'}
+                {generating ? 'Elio réfléchit…' : 'Régénérer ↻'}
               </button>
             </div>
 
             <Link href="/profil-avance/rapport" className="flex items-center justify-between rounded-2xl px-4 py-4 transition-all active:scale-[0.98]" style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
               <div>
                 <p className="text-sm font-bold" style={{ color: '#FAF6EC' }}>📄 Ton rapport complet</p>
-                <p className="text-xs mt-0.5" style={{ color: 'rgba(250,246,236,0.55)' }}>Portrait, analyse Nova — prêt à télécharger en PDF</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(250,246,236,0.55)' }}>Portrait, analyse Elio — prêt à télécharger en PDF</p>
               </div>
               <span style={{ color: 'var(--gold)' }}>→</span>
             </Link>

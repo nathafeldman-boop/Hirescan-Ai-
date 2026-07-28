@@ -32,7 +32,7 @@ async function verifyAndUnlock(sessionId: string | undefined, resultId: string |
       // Tier fidèle à l'offre achetée (comme le webhook) — sinon un abonné
       // Starter 1,99€ ou Plus 5€ serait écrasé en 'premium' en arrivant ici.
       // Le 1,99€ SANS abonnement (oneTime + typeCode, hors rapport 19,99€) ne
-      // donne que 'unlocked' (résultat seul, pas Nova) — jamais 'premium'.
+      // donne que 'unlocked' (résultat seul, pas Elio) — jamais 'premium'.
       const plan = session.metadata?.plan;
       const isOneTimeMbtiUnlock = session.mode === 'payment' && !!session.metadata?.typeCode && session.metadata?.rapport !== 'true';
       const tier = plan === 'starter' ? 'starter' : plan === 'plus' ? 'plus' : isOneTimeMbtiUnlock ? 'unlocked' : 'premium';

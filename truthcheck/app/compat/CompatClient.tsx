@@ -32,8 +32,8 @@ export default function CompatClient() {
       const data = await res.json();
       if (!res.ok) {
         if (res.status === 402) { setError('Cette fonctionnalité est réservée aux abonnés.'); }
-        else if (res.status === 429) { setError('Tu as atteint ta limite de messages Nova pour aujourd\'hui.'); }
-        else { setError('Nova n\'a pas réussi à générer le résultat. Réessaie dans un instant.'); }
+        else if (res.status === 429) { setError('Tu as atteint ta limite de messages Elio pour aujourd\'hui.'); }
+        else { setError('Elio n\'a pas réussi à générer le résultat. Réessaie dans un instant.'); }
         setStep('questions');
         return;
       }
@@ -59,7 +59,7 @@ export default function CompatClient() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--paper)' }}>
         <div className="w-10 h-10 rounded-full animate-spin mb-4" style={{ border: '3px solid var(--gold-line)', borderTopColor: 'var(--gold)' }} />
-        <p className="text-sm" style={{ color: '#78716c' }}>Nova compare vos profils…</p>
+        <p className="text-sm" style={{ color: '#78716c' }}>Elio compare vos profils…</p>
       </main>
     );
   }
@@ -110,7 +110,7 @@ export default function CompatClient() {
         <div className="text-4xl mb-4">👥</div>
         <h1 className="font-display text-2xl font-black mb-2" style={{ color: 'var(--ink)' }}>Compatibilité</h1>
         <p className="text-sm mb-8 max-w-xs mx-auto leading-relaxed" style={{ color: '#78716c' }}>
-          Réponds à quelques questions sur cette personne — Nova compare vos profils et te dit ce qui vous rapproche.
+          Réponds à quelques questions sur cette personne — Elio compare vos profils et te dit ce qui vous rapproche.
         </p>
 
         <div className="text-left mb-6">
