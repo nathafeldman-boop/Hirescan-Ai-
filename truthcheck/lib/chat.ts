@@ -12,19 +12,26 @@ export type Tier = 'free' | 'starter' | 'plus' | 'premium';
 // un "message" a un sens unique et cohérent dans toute l'app.
 //
 // Correspondance avec le langage produit ("Free / Premium 1 / 2 / Max") :
-//   free    = Free       — 5 messages PAR MOIS (découverte, pas de test complet)
+//   free    = Free       — 3 messages PAR JOUR (générique, sans le profil complet)
 //   starter = Premium 1  — 5 messages/jour  (1,99€/mois)
 //   plus    = Premium 2  — 30 messages/jour (5€/mois)
 //   premium = Premium Max — 50 messages/jour (9,99€/mois ou 29,99€/an)
 // Les noms internes (starter/plus/premium) restent inchangés — ce sont ceux
 // utilisés par Stripe/webhook/DB ; les renommer serait un risque inutile pour
 // un simple changement d'étiquette côté produit.
+//
+// FREE_DAILY_LIMIT était FREE_MONTHLY_LIMIT (5/MOIS) — un chiffre qui
+// contredisait frontalement la promesse "coach disponible 24/7" : personne ne
+// construit d'attachement à une relation qu'on ne peut toucher que 5 fois par
+// mois. Passer sur une base quotidienne (même modeste) laisse le temps à la
+// relation de s'installer AVANT toute question d'abonnement — voir la
+// réflexion produit du 28/07 sur la rétention avant la conversion.
 export const DAILY_LIMITS: Record<Exclude<Tier, 'free'>, number> = {
   starter: 5,
   plus: 30,
   premium: 50,
 };
-export const FREE_MONTHLY_LIMIT = 5;
+export const FREE_DAILY_LIMIT = 3;
 
 export function dailyLimitFor(tier: string | undefined): number {
   return DAILY_LIMITS[(tier as Exclude<Tier, 'free'>)] ?? DAILY_LIMITS.starter;
@@ -36,11 +43,6 @@ export function parisDay(now: Date = new Date()): string {
   return now.toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' }); // ex: 2026-07-17
 }
 
-// Mois courant à Paris, "YYYY-MM" — clé de quota du palier gratuit (5/mois).
-// Réutilise la même table ChatUsage (le champ `day` stocke la clé, jour ou mois).
-export function parisMonth(now: Date = new Date()): string {
-  return parisDay(now).slice(0, 7); // ex: 2026-07
-}
 
 // Modèle Mistral économique — adapté à un assistant conversationnel court.
 // mistral-small = bon rapport qualité/prix. On plafonne les tokens de réponse

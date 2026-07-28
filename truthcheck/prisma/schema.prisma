@@ -177,11 +177,17 @@ model CompatibilityCheck {
   personName   String
   relationType String   // 'ami' | 'couple' | 'famille'
   answers      Json     // { questionId: string, choiceLabel: string }[] — réponses perçues sur l'autre
-  commonPoints Json     // string[]
-  differences  Json     // string[]
-  strengths    Json     // string[]
-  watchPoints  Json     // string[]
-  summary      String   @db.Text
+  // Score + headline : déterministes, calculés pour TOUT LE MONDE (gratuit
+  // compris) sans appel IA — voir lib/friendCompatScore.ts. C'est ce que les
+  // comptes gratuits voient. Le reste (généré par Nova, coûte un message du
+  // quota) reste nullable : absent tant que le compte n'est pas payant.
+  score        Int
+  headline     String?  @db.Text
+  commonPoints Json?    // string[]
+  differences  Json?    // string[]
+  strengths    Json?    // string[]
+  watchPoints  Json?    // string[]
+  summary      String?  @db.Text
   createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
