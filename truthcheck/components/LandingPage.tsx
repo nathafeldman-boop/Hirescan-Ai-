@@ -212,7 +212,7 @@ export default function LandingPage() {
           <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite' }}>
             <PhoneMockup><MbtiDemoScreen /></PhoneMockup>
           </div>
-          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+          <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
             Faire mon test →
           </Link>
         </div>
@@ -233,7 +233,7 @@ export default function LandingPage() {
           <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .3s' }}>
             <PhoneMockup dark><NovaDemoScreen /></PhoneMockup>
           </div>
-          <Link href="/chat" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+          <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
             Découvrir Nova →
           </Link>
         </div>
@@ -258,7 +258,7 @@ export default function LandingPage() {
           <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .6s' }}>
             <PhoneMockup><JournalDemoScreen /></PhoneMockup>
           </div>
-          <Link href="/journal" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+          <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
             Commencer mon journal →
           </Link>
         </div>
@@ -311,10 +311,10 @@ export default function LandingPage() {
               </p>
               <div className="space-y-2">
                 {[
-                  { href: '/quiz/personnalite', tag: 'NT', q: 'Analytique (INTJ · INTP · ENTJ · ENTP)', sub: 'Stratèges, rationnels, orientés systèmes' },
-                  { href: '/quiz/personnalite', tag: 'NF', q: 'Diplomate (INFJ · INFP · ENFJ · ENFP)',  sub: 'Empathiques, idéalistes, axés relations' },
-                  { href: '/quiz/personnalite', tag: 'SJ', q: 'Sentinelle (ISTJ · ISFJ · ESTJ · ESFJ)', sub: 'Organisés, fiables, attachés aux structures' },
-                  { href: '/quiz/personnalite', tag: 'SP', q: 'Explorateur (ISTP · ISFP · ESTP · ESFP)', sub: 'Adaptables, pragmatiques, orientés action' },
+                  { href: '/decouverte', tag: 'NT', q: 'Analytique (INTJ · INTP · ENTJ · ENTP)', sub: 'Stratèges, rationnels, orientés systèmes' },
+                  { href: '/decouverte', tag: 'NF', q: 'Diplomate (INFJ · INFP · ENFJ · ENFP)',  sub: 'Empathiques, idéalistes, axés relations' },
+                  { href: '/decouverte', tag: 'SJ', q: 'Sentinelle (ISTJ · ISFJ · ESTJ · ESFJ)', sub: 'Organisés, fiables, attachés aux structures' },
+                  { href: '/decouverte', tag: 'SP', q: 'Explorateur (ISTP · ISFP · ESTP · ESFP)', sub: 'Adaptables, pragmatiques, orientés action' },
                 ].map((q) => (
                   <Link
                     key={q.q}
@@ -336,7 +336,7 @@ export default function LandingPage() {
                   </Link>
                 ))}
               </div>
-              <Link href="/quiz/personnalite" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
+              <Link href="/decouverte" className="block text-center mt-4 text-xs font-semibold transition-colors" style={{ color: CLAY }}>
                 Faire le test complet →
               </Link>
             </>
@@ -352,7 +352,7 @@ export default function LandingPage() {
         <div className="max-w-lg mx-auto text-center">
           <h2 className="font-display text-2xl font-black text-stone-900 mb-2">Ils ont osé se regarder en face.</h2>
           <p className="text-stone-500 text-sm mb-6 max-w-xs mx-auto">À ton tour. 3 minutes, et tu sais enfin pourquoi tu fonctionnes comme ça.</p>
-          <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-8 py-4 text-base">
+          <Link href="/decouverte" className="ur-btn-gold inline-flex px-8 py-4 text-base">
             Découvrir qui je suis vraiment →
           </Link>
           <p className="text-xs text-stone-400 mt-3">Gratuit · sans inscription · résultat immédiat</p>
@@ -375,7 +375,7 @@ export default function LandingPage() {
           <p className="text-[11px] mt-4" style={{ color: 'rgba(250,246,236,0.4)' }}>
             Glisse pour découvrir d&apos;autres cartes
           </p>
-          <Link href="/quiz/personnalite" className="inline-block mt-3 text-sm font-bold" style={{ color: 'var(--gold)' }}>
+          <Link href="/decouverte" className="inline-block mt-3 text-sm font-bold" style={{ color: 'var(--gold)' }}>
             Obtenir ma carte →
           </Link>
         </div>
@@ -434,7 +434,7 @@ export default function LandingPage() {
             <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
               Tu viens de voir les 16 profils. Lequel es-tu vraiment ? Tu le sais dans 3 minutes.
             </p>
-            <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-8 py-4 text-base">
+            <Link href="/decouverte" className="ur-btn-gold inline-flex px-8 py-4 text-base">
               Révéler mon type →
             </Link>
           </div>
@@ -498,7 +498,7 @@ export default function LandingPage() {
               </Link>
             ))}
           </div>
-          <Link href="/quizzes" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
+          <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
             Voir les 15 quiz →
           </Link>
         </div>
@@ -516,7 +516,7 @@ export default function LandingPage() {
             <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)' }}>
               Ton type, ta carte, et un coach qui te connaît déjà — gratuit pour commencer.
             </p>
-            <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-9 py-4 text-base">
+            <Link href="/decouverte" className="ur-btn-gold inline-flex px-9 py-4 text-base">
               Faire le test maintenant →
             </Link>
             <p className="text-xs mt-3" style={{ color: 'rgba(250,246,236,0.38)' }}>3 minutes · résultat immédiat · sans inscription</p>
