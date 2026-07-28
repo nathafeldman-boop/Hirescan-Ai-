@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppTabBar from '@/components/AppTabBar';
 import { RELATION_TYPES, COMPAT_QUESTIONS, type RelationType } from '@/lib/friendCompatQuestions';
 
 type Step = 'intro' | 'questions' | 'loading';
 
-export default function CompatClient({ isPaid }: { isPaid: boolean }) {
+export default function CompatClient() {
   const router = useRouter();
   const [step, setStep] = useState<Step>('intro');
   const [personName, setPersonName] = useState('');
@@ -54,23 +53,6 @@ export default function CompatClient({ isPaid }: { isPaid: boolean }) {
     } else {
       setTimeout(() => void submit(next), 180);
     }
-  }
-
-  if (!isPaid) {
-    return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center pb-24" style={{ background: 'var(--paper)' }}>
-        <div className="text-4xl mb-4">👥</div>
-        <h1 className="font-display text-2xl font-black mb-2" style={{ color: 'var(--ink)' }}>Compatibilité avec un ami</h1>
-        <p className="text-sm mb-8 max-w-xs leading-relaxed" style={{ color: '#78716c' }}>
-          Compare ton profil à celui d&apos;un ami, ton/ta partenaire ou un membre de ta famille — réservé aux abonnés Nova.
-        </p>
-        <Link href="/pricing" className="ur-btn-gold px-7 py-3.5 text-sm">
-          Débloquer Nova →
-        </Link>
-        <Link href="/chat" className="mt-5 text-xs" style={{ color: '#a8a29e' }}>← Retour à Nova</Link>
-        <AppTabBar />
-      </main>
-    );
   }
 
   if (step === 'loading') {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { callMistral, dailyLimitFor, parisDay, parisMonth, FREE_MONTHLY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
+import { callMistral, dailyLimitFor, parisDay, FREE_DAILY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
 import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree, coachSystemPromptFreeNoTest } from '@/lib/coach';
 import { summarizeJournalForAnalysis } from '@/lib/advancedAnalysis';
 import { generateQuiz } from '@/lib/customQuiz';
@@ -38,12 +38,12 @@ export async function GET() {
     where: { id: uid },
     select: { mbtiType: true, chatBonusCredits: true, chatBonusDaily: true },
   }).catch(() => null);
-  // Gratuit : quota MENSUEL (5/mois, clé "YYYY-MM"). Payant : quota journalier.
-  const day = isPremium ? parisDay() : parisMonth();
+  // Quota journalier pour tout le monde, gratuit compris (voir lib/chat.ts).
+  const day = parisDay();
   const usage = await prisma.chatUsage.findUnique({ where: { userId_day: { userId: uid, day } } }).catch(() => null);
   // Quota = base (palier) + bonus permanent parrainage. Les crédits
   // one-off s'ajoutent au "restant" affiché (ils prennent le relais après le quota).
-  const limit = (isPremium ? dailyLimitFor(tier) : FREE_MONTHLY_LIMIT) + (user?.chatBonusDaily ?? 0);
+  const limit = (isPremium ? dailyLimitFor(tier) : FREE_DAILY_LIMIT) + (user?.chatBonusDaily ?? 0);
   // Compte gratuit → coach bridé : on ne renvoie NI le type (header) NI l'historique
   // (qui pourrait contenir un ancien message révélant le type). Le résultat payant
   // reste derrière le paiement ; le coach fonctionne mais en version découverte.
@@ -118,10 +118,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ needsTest: true }, { status: 200 });
   }
 
-  // Quota : payant = journalier (palier + bonus permanent) ; gratuit = 5/MOIS.
-  // Au-delà, les crédits one-off (parrainage) prennent le relais, un par message.
-  const limit = (isPremium ? dailyLimitFor(user.tier) : FREE_MONTHLY_LIMIT) + (dbUser.chatBonusDaily ?? 0);
-  const day = isPremium ? parisDay() : parisMonth();
+  // Quota journalier pour tout le monde (palier payant, ou FREE_DAILY_LIMIT
+  // pour un compte gratuit) + bonus permanent parrainage. Au-delà, les
+  // crédits one-off (parrainage) prennent le relais, un par message.
+  const limit = (isPremium ? dailyLimitFor(user.tier) : FREE_DAILY_LIMIT) + (dbUser.chatBonusDaily ?? 0);
+  const day = parisDay();
   const usage = await prisma.chatUsage.upsert({
     where: { userId_day: { userId: user.id, day } },
     create: { userId: user.id, day, count: 0 },

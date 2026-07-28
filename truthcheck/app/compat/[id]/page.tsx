@@ -11,7 +11,7 @@ async function getResult(id: string) {
   const check = await prisma.compatibilityCheck.findUnique({
     where: { id },
     select: {
-      id: true, personName: true, relationType: true,
+      id: true, personName: true, relationType: true, score: true, headline: true,
       commonPoints: true, differences: true, strengths: true, watchPoints: true, summary: true,
     },
   }).catch(() => null);
@@ -21,11 +21,12 @@ async function getResult(id: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const r = await getResult(params.id);
   if (!r) return { title: 'Résultat introuvable — UrCecret' };
+  const description = r.summary ?? r.headline ?? `${r.score}% de compatibilité`;
   return {
     title: `Compatibilité avec ${r.personName} — UrCecret`,
-    description: r.summary,
+    description,
     robots: { index: false, follow: false },
-    openGraph: { title: `Compatibilité avec ${r.personName}`, description: r.summary, type: 'website' },
+    openGraph: { title: `Compatibilité avec ${r.personName}`, description, type: 'website' },
   };
 }
 
@@ -37,10 +38,12 @@ export default async function CompatResultPage({ params }: Props) {
     <CompatResultClient
       personName={r.personName}
       relationType={r.relationType as 'ami' | 'couple' | 'famille'}
-      commonPoints={r.commonPoints as unknown as string[]}
-      differences={r.differences as unknown as string[]}
-      strengths={r.strengths as unknown as string[]}
-      watchPoints={r.watchPoints as unknown as string[]}
+      score={r.score}
+      headline={r.headline}
+      commonPoints={r.commonPoints as unknown as string[] | null}
+      differences={r.differences as unknown as string[] | null}
+      strengths={r.strengths as unknown as string[] | null}
+      watchPoints={r.watchPoints as unknown as string[] | null}
       summary={r.summary}
     />
   );

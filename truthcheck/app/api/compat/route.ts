@@ -5,20 +5,22 @@ import { prisma } from '@/lib/db';
 import { hasPaidAccess } from '@/lib/plans';
 import { dailyLimitFor, parisDay } from '@/lib/chat';
 import { generateFriendCompat, COMPAT_QUESTIONS, RELATION_TYPES, type RelationType } from '@/lib/friendCompat';
+import { computeCompatScore } from '@/lib/friendCompatScore';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
+import type { MbtiScores } from '@/lib/mbti';
 
 export const dynamic = 'force-dynamic';
 
-// Compatibilité avec un ami/couple/famille — feature sociale, réservée aux
-// abonnés payants (même quota Nova que l'analyse de conversation / le
-// créateur de test : 1 génération = 1 message du quota du jour).
+// Compatibilité avec un ami/couple/famille — le SCORE (déterministe, gratuit,
+// voir lib/friendCompatScore.ts) est ouvert à tout le monde : la saisie et le
+// premier résultat ne doivent jamais être un mur. Seule l'analyse approfondie
+// de Nova (commonPoints/differences/strengths/watchPoints/summary) reste
+// payante, et consomme le quota du jour comme les autres features Nova.
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const user = session?.user as { id?: string; tier?: string; mbtiType?: string } | undefined;
   if (!user?.id) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
-  if (!hasPaidAccess(user.tier)) {
-    return NextResponse.json({ error: 'payment_required' }, { status: 402 });
-  }
+  const isPaid = hasPaidAccess(user.tier);
 
   const body = await req.json().catch(() => null) as {
     personName?: string;
@@ -45,22 +47,39 @@ export async function POST(req: NextRequest) {
     answersToStore.push({ questionId: q.id, choiceLabel: choice });
   }
 
-  const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { mbtiType: true } });
+  const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { mbtiType: true, mbtiScores: true } });
 
-  const day = parisDay();
-  const limit = dailyLimitFor(user.tier);
-  const usage = await prisma.chatUsage.upsert({
-    where: { userId_day: { userId: user.id, day } },
-    create: { userId: user.id, day, count: 0 },
-    update: {},
-  }).catch(() => null);
-  if ((usage?.count ?? 0) >= limit) {
-    return NextResponse.json({ error: 'quota_exceeded', limit }, { status: 429 });
-  }
+  // Score + headline : gratuits, déterministes, jamais bloqués par un quota.
+  const { score, headline } = computeCompatScore((dbUser?.mbtiScores as unknown as MbtiScores | null) ?? null, body.answers);
 
-  const result = await generateFriendCompat(relationType, personName, dbUser?.mbtiType ?? null, answersForPrompt);
-  if (!result) {
-    return NextResponse.json({ error: 'generation_failed' }, { status: 502 });
+  // Le score gratuit ci-dessus est déjà acquis quoi qu'il arrive. L'analyse
+  // approfondie de Nova s'ajoute PAR-DESSUS si le compte est payant ET a
+  // encore du quota — mais un quota épuisé ou un échec de génération ne doit
+  // jamais faire perdre le score gratuit qu'un compte gratuit aurait, lui,
+  // obtenu sans condition.
+  let deep: Awaited<ReturnType<typeof generateFriendCompat>> = null;
+  let remaining: number | undefined;
+  let limit: number | undefined;
+
+  if (isPaid) {
+    const day = parisDay();
+    limit = dailyLimitFor(user.tier);
+    const usage = await prisma.chatUsage.upsert({
+      where: { userId_day: { userId: user.id, day } },
+      create: { userId: user.id, day, count: 0 },
+      update: {},
+    }).catch(() => null);
+
+    if ((usage?.count ?? 0) < limit) {
+      deep = await generateFriendCompat(relationType, personName, dbUser?.mbtiType ?? null, answersForPrompt);
+      if (deep) {
+        const updated = await prisma.chatUsage.update({
+          where: { userId_day: { userId: user.id, day } },
+          data: { count: { increment: 1 } },
+        }).catch(() => null);
+        remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1));
+      }
+    }
   }
 
   const saved = await prisma.compatibilityCheck.create({
@@ -69,21 +88,19 @@ export async function POST(req: NextRequest) {
       personName,
       relationType,
       answers: answersToStore,
-      commonPoints: result.commonPoints,
-      differences: result.differences,
-      strengths: result.strengths,
-      watchPoints: result.watchPoints,
-      summary: result.summary,
+      score,
+      headline,
+      ...(deep ? {
+        commonPoints: deep.commonPoints,
+        differences: deep.differences,
+        strengths: deep.strengths,
+        watchPoints: deep.watchPoints,
+        summary: deep.summary,
+      } : {}),
     },
   });
 
-  const updated = await prisma.chatUsage.update({
-    where: { userId_day: { userId: user.id, day } },
-    data: { count: { increment: 1 } },
-  }).catch(() => null);
-  const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1));
-
-  await logEvent(user.id, EVENTS.COMPAT_CREATED);
+  await logEvent(user.id, EVENTS.COMPAT_CREATED, { paid: isPaid });
 
   return NextResponse.json({ ok: true, id: saved.id, remaining, limit });
 }
