@@ -50,11 +50,11 @@ export default function PartenairePage() {
                 Programme partenaires
               </div>
               <h1 style={{ fontSize: 40, fontWeight: 900, margin: '0 0 16px', lineHeight: 1.1 }}>
-                Gagne <span style={{ color: '#d17d52' }}>80%</span> de commission<br />
+                Gagne <span style={{ color: '#d17d52' }}>70%</span> de commission<br />
                 sur chaque vente
               </h1>
               <p style={{ color: '#71717a', fontSize: 16, margin: '0 0 12px', lineHeight: 1.6 }}>
-                Partage ton lien UrCecret à ton audience. Chaque résultat débloqué te rapporte <strong style={{ color: '#fff' }}>1,59€</strong> automatiquement.
+                Partage ton lien UrCecret à ton audience. Chaque résultat débloqué te rapporte <strong style={{ color: '#fff' }}>1,39€</strong> automatiquement.
               </p>
               <p style={{ color: '#52525b', fontSize: 13, margin: '0 0 32px', lineHeight: 1.6 }}>
                 Commission sur vente uniquement (pas mensuel) · Après 2 mois consécutifs : <strong style={{ color: '#d17d52' }}>30%</strong>
@@ -63,7 +63,7 @@ export default function PartenairePage() {
               {/* Stats */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 48 }}>
                 {[
-                  { v: '80%', l: 'Commission mois 1-2' },
+                  { v: '70%', l: 'Commission mois 1-2' },
                   { v: '30j', l: 'Durée du cookie' },
                   { v: '0€', l: 'Pour commencer' },
                 ].map(({ v, l }) => (

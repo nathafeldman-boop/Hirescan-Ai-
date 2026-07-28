@@ -108,14 +108,14 @@ function keyToLabel(key: string) {
   return new Date(key + '-01').toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '');
 }
 
-// 80% commission for first 30 days of an affiliate's activity, 30% after
+// 70% commission for first 30 days of an affiliate's activity, 30% after
 function calcCommission(conversions: Array<{ amountCents: number; commissionCents: number; createdAt: string }>): number {
   if (!conversions.length) return 0;
   const sorted = [...conversions].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   const firstDate = new Date(sorted[0].createdAt);
   const cutoff = new Date(firstDate.getTime() + 30 * 24 * 60 * 60 * 1000);
   return sorted.reduce((sum, c) => {
-    const rate = new Date(c.createdAt) <= cutoff ? 0.80 : 0.30;
+    const rate = new Date(c.createdAt) <= cutoff ? 0.70 : 0.30;
     return sum + Math.round(c.amountCents * rate);
   }, 0);
 }
@@ -1306,7 +1306,7 @@ export default function AdminDashboard({ stats }: { stats: Stats }) {
                       {expandedAffiliate === a.id && (
                         <div style={{ background: C.surfaceAlt, borderBottom: `1px solid ${C.borderSoft}`, padding: '16px 20px 20px 64px' }}>
                           <p style={{ fontSize: 12, color: C.primary, fontWeight: 600, marginBottom: 12 }}>
-                            Règle commission : 80% premiers 30j · 30% ensuite
+                            Règle commission : 70% premiers 30j · 30% ensuite
                           </p>
                           {a.conversions.length === 0 ? (
                             <p style={{ color: C.faint, fontSize: 13 }}>Aucune conversion</p>
