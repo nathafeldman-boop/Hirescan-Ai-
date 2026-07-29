@@ -203,7 +203,10 @@ model CompatibilityCheck {
   // compris) sans appel IA — voir lib/friendCompatScore.ts. C'est ce que les
   // comptes gratuits voient. Le reste (généré par Elio, coûte un message du
   // quota) reste nullable : absent tant que le compte n'est pas payant.
-  score        Int
+  // default(0) uniquement pour permettre le backfill de la poignée de lignes
+  // créées avant l'ajout de ce champ (voir commentaire ci-dessus) — le code
+  // (app/api/compat/route.ts) fournit toujours un vrai score au create().
+  score        Int      @default(0)
   headline     String?  @db.Text
   commonPoints Json?    // string[]
   differences  Json?    // string[]
