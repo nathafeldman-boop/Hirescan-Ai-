@@ -39,6 +39,8 @@ const EVENT_LABELS: Record<string, string> = {
   [EVENTS.COMPAT_CREATED]: 'Compatibilités créées',
   [EVENTS.PROFIL_AVANCE_GENERATED]: 'Profils avancés générés',
   [EVENTS.QUIZ_CREATED]: 'Tests créés (partage)',
+  [EVENTS.ONBOARDING_COMPLETED]: 'Questionnaires d\'accueil complétés',
+  [EVENTS.QUEST_COMPLETED]: 'Quêtes complétées',
 };
 
 export default async function InsightsPage() {

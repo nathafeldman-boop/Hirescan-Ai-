@@ -8,6 +8,7 @@ import { summarizeJournalForAnalysis } from '@/lib/advancedAnalysis';
 import { generateQuiz } from '@/lib/customQuiz';
 import { hasPaidAccess } from '@/lib/plans';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
+import { checkAndRecordQuestCompletions } from '@/lib/quests';
 import type { MbtiScores } from '@/lib/mbti';
 
 export const dynamic = 'force-dynamic';
@@ -243,7 +244,8 @@ export async function POST(req: NextRequest) {
 
   const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1)) + creditsLeft;
   await logEvent(user.id, EVENTS.NOVA_MESSAGE_SENT);
-  return NextResponse.json({ reply: result.reply, remaining, limit });
+  const newlyCompletedQuests = await checkAndRecordQuestCompletions(user.id);
+  return NextResponse.json({ reply: result.reply, remaining, limit, newlyCompletedQuests });
 }
 
 // ── DELETE : efface l'historique de conversation (pas le quota, pas le profil) ──

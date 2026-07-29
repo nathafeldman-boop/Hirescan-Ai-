@@ -487,6 +487,9 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
   const [loading, setLoading] = useState(false);
+  // "Continuer gratuitement" n'envoie plus tout de suite ailleurs — on montre
+  // d'abord "Pas de problème" + un vrai choix, jamais une sortie sèche.
+  const [declinedPremium, setDeclinedPremium] = useState(false);
   // Pre-fetched Stripe URLs for in-app browsers (TikTok etc.)
   // Using an <a href> instead of window.location.href lets TikTok open Stripe in Safari
   // where the post-payment redirect back to /success works correctly.
@@ -604,24 +607,49 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         {/* ─── L'embranchement — le paywall n'est plus une impasse. Deux choix
             très visibles, tout de suite, avant même de dérouler le détail de
-            l'offre plus bas : débloquer maintenant, ou continuer gratuitement
-            (droit vers Elio, jamais vers un mur ni vers le hub). ── */}
-        <div className="flex flex-col gap-2.5 mb-6">
-          <button
-            onClick={() => doCheckout('starter')}
-            disabled={loading}
-            className="ur-btn-gold w-full py-4 text-[15px] disabled:opacity-60"
-          >
-            {loading ? '…' : isFr ? '👉 Débloquer mon profil complet' : '👉 Unlock my full profile'}
-          </button>
-          <Link
-            href="/chat?from=paywall"
-            className="w-full py-3.5 rounded-full text-center text-sm font-semibold transition-all active:scale-[0.98]"
-            style={{ border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper-panel)' }}
-          >
-            {isFr ? '👉 Continuer gratuitement' : '👉 Continue for free'}
-          </Link>
-        </div>
+            l'offre plus bas : débloquer maintenant, ou continuer gratuitement.
+            "Continuer gratuitement" n'envoie plus directement ailleurs — voir
+            declinedPremium juste en dessous : jamais de sortie sèche. ── */}
+        {declinedPremium ? (
+          <div className="rounded-2xl px-5 py-5 mb-6 text-center" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+            <p className="font-display text-base font-bold mb-4" style={{ color: 'var(--ink)' }}>
+              {isFr ? 'Pas de problème ❤️' : 'No worries ❤️'}
+              <br />
+              <span className="text-sm font-normal" style={{ color: '#78716c' }}>
+                {isFr ? 'Tu peux continuer gratuitement et continuer à apprendre à mieux te connaître.' : 'You can keep going for free and keep learning about yourself.'}
+              </span>
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <Link href="/chat?from=paywall" className="ur-btn-gold w-full py-3.5 text-sm">
+                {isFr ? 'Continuer avec les fonctionnalités gratuites →' : 'Continue with the free features →'}
+              </Link>
+              <Link
+                href="/quetes"
+                className="w-full py-3 rounded-full text-center text-sm font-semibold transition-all active:scale-[0.98]"
+                style={{ border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper)' }}
+              >
+                {isFr ? 'Découvrir mes prochaines quêtes →' : 'Discover my next quests →'}
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2.5 mb-6">
+            <button
+              onClick={() => doCheckout('starter')}
+              disabled={loading}
+              className="ur-btn-gold w-full py-4 text-[15px] disabled:opacity-60"
+            >
+              {loading ? '…' : isFr ? '👉 Débloquer mon profil complet' : '👉 Unlock my full profile'}
+            </button>
+            <button
+              onClick={() => setDeclinedPremium(true)}
+              className="w-full py-3.5 rounded-full text-center text-sm font-semibold transition-all active:scale-[0.98]"
+              style={{ border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper-panel)' }}
+            >
+              {isFr ? '👉 Continuer gratuitement' : '👉 Continue for free'}
+            </button>
+          </div>
+        )}
 
         {/* ─── L'oracle voilé — RIEN du résultat n'est révélé avant paiement.
             Ni le code, ni le nom, ni la famille : le sceau tourne, encore
@@ -858,17 +886,22 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         </div>
 
         {/* ─── Rétention — refuser le paywall ne doit jamais être une sortie
-            de l'app. Envoie direct dans la conversation avec Elio (pas le
-            Hub) — voir le message d'accueil proactif dans ChatClient.tsx
-            quand on arrive via ?from=paywall. ── */}
-        <div className="mt-7 pt-5 text-center" style={{ borderTop: '1px solid var(--line)' }}>
-          <p className="text-[12.5px] mb-2" style={{ color: '#a8a29e', lineHeight: 1.5 }}>
-            {isFr ? 'Pas prêt à continuer maintenant ?' : 'Not ready to continue right now?'}
-          </p>
-          <Link href="/chat?from=paywall" className="text-[12.5px] font-semibold" style={{ color: 'var(--gold)' }}>
-            {isFr ? '👉 Continuer gratuitement avec Elio →' : '👉 Continue for free with Elio →'}
-          </Link>
-        </div>
+            de l'app. Même mécanisme que le bouton du haut (declinedPremium) :
+            "Pas de problème" + un vrai choix, jamais une sortie sèche. ── */}
+        {!declinedPremium && (
+          <div className="mt-7 pt-5 text-center" style={{ borderTop: '1px solid var(--line)' }}>
+            <p className="text-[12.5px] mb-2" style={{ color: '#a8a29e', lineHeight: 1.5 }}>
+              {isFr ? 'Pas prêt à continuer maintenant ?' : 'Not ready to continue right now?'}
+            </p>
+            <button
+              onClick={() => { setDeclinedPremium(true); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {} }}
+              className="text-[12.5px] font-semibold"
+              style={{ color: 'var(--gold)' }}
+            >
+              {isFr ? '👉 Continuer gratuitement →' : '👉 Continue for free →'}
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

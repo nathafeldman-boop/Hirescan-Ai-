@@ -7,6 +7,7 @@ import { dailyReaction } from '@/lib/journalReflection';
 import { JOURNAL_TAG_KEYS } from '@/lib/journalTags';
 import { journalAccessFor } from '@/lib/journalAccess';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
+import { checkAndRecordQuestCompletions } from '@/lib/quests';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,6 +132,7 @@ export async function POST(req: NextRequest) {
 
   await logEvent(uid, EVENTS.JOURNAL_ENTRY_SAVED);
   if (wasFirstEver) await logEvent(uid, EVENTS.JOURNAL_STARTED);
+  const newlyCompletedQuests = await checkAndRecordQuestCompletions(uid);
 
   return NextResponse.json({
     ok: true,
@@ -139,5 +141,6 @@ export async function POST(req: NextRequest) {
       emotion: entry.emotion, tags: entry.tags, photo: entry.photo, note: entry.note,
     },
     reflection: dailyReaction(entry, yesterdayEntry),
+    newlyCompletedQuests,
   });
 }

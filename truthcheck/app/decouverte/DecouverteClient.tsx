@@ -5,6 +5,15 @@ import Seal from '@/components/Seal';
 
 const CARDS = [
   {
+    href: '/quetes',
+    emoji: '🏆',
+    title: 'Suis ta progression',
+    kicker: 'Mes quêtes',
+    desc: 'Débloque des messages, des badges et de nouvelles quêtes au fil de ton parcours.',
+    accent: 'var(--gold)',
+    accentSoft: 'var(--gold-soft)',
+  },
+  {
     href: '/quiz/personnalite',
     emoji: '🧠',
     title: 'Découvre qui tu es vraiment',
@@ -136,7 +145,7 @@ export default function DecouverteClient({ firstName, hasProfile }: { firstName:
                 <p className="text-[12.5px] mt-1" style={{ color: '#8a7d5c', lineHeight: 1.5 }}>Découvre ton fonctionnement profond en terminant ta quête.</p>
               </div>
             </div>
-            <Link href="/quete" className="hub-card block w-full py-2.5 rounded-full text-center text-sm font-bold" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
+            <Link href="/quetes" className="hub-card block w-full py-2.5 rounded-full text-center text-sm font-bold" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
               Compléter mon profil
             </Link>
           </div>

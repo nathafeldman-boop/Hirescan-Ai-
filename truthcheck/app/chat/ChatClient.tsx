@@ -7,6 +7,7 @@ import ElioAvatar from '@/components/ElioAvatar';
 import AppTabBar from '@/components/AppTabBar';
 import { COACH_CATEGORIES } from '@/lib/coachCategories';
 import ElioMessage from '@/components/ElioMessage';
+import QuestCelebration, { type QuestCelebrationItem } from '@/components/QuestCelebration';
 
 interface Msg { role: 'user' | 'assistant'; content: string; image?: string }
 
@@ -56,6 +57,7 @@ export default function ChatClient() {
   const [loading, setLoading] = useState(false);
   const [booting, setBooting] = useState(true);
   const [remaining, setRemaining] = useState<number | null>(null);
+  const [newlyCompletedQuests, setNewlyCompletedQuests] = useState<QuestCelebrationItem[]>([]);
   const [limit, setLimit] = useState<number | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [quotaHit, setQuotaHit] = useState(false);
@@ -221,12 +223,15 @@ export default function ChatClient() {
       if (res.status === 413) { setNotice('Cette photo est trop lourde, réessaie avec une image plus légère.'); setMessages(prev); return; }
       if (res.status === 503) { setNotice('Elio arrive très bientôt — il n\'est pas encore activé.'); setMessages(prev); return; }
       if (!res.ok) { setNotice('Ton coach est momentanément indisponible. Réessaie dans un instant.'); setMessages(prev); return; }
-      const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number };
+      const data = await res.json() as { reply?: string; needsTest?: boolean; remaining?: number; limit?: number; newlyCompletedQuests?: QuestCelebrationItem[] };
       if (data.needsTest) { setHasProfile(false); setMessages(prev); return; }
       setMessages([...prev, { role: 'user', content, ...(image ? { image } : {}) }, { role: 'assistant', content: data.reply ?? '' }]);
       if (typeof data.remaining === 'number') setRemaining(data.remaining);
       if (typeof data.limit === 'number') setLimit(data.limit);
       if ((data.remaining ?? 1) <= 0) setQuotaHit(true);
+      if (Array.isArray(data.newlyCompletedQuests) && data.newlyCompletedQuests.length > 0) {
+        setNewlyCompletedQuests(data.newlyCompletedQuests);
+      }
     } catch {
       setNotice('Erreur réseau. Réessaie.'); setMessages(prev);
     } finally {
@@ -1027,6 +1032,8 @@ export default function ChatClient() {
           </div>
         </div>
       )}
+
+      <QuestCelebration quests={newlyCompletedQuests} onClose={() => setNewlyCompletedQuests([])} />
 
       <div className="relative" style={{ zIndex: 1 }}><AppTabBar mode="static" /></div>
     </main>
