@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AppTabBar from '@/components/AppTabBar';
 import DayDetailSheet from './DayDetailSheet';
@@ -224,6 +225,38 @@ function OnboardingFlow({ onSubmit, saving }: { onSubmit: (p: SavedPayload) => v
   );
 }
 
+// ── Rappel quotidien — proposé UNE fois, juste après la toute première entrée ──
+// Volontairement un seul choix binaire (pas de créneau à choisir) : la
+// friction tue l'habitude à ce stade. Le rappel part par email à 20h, heure
+// de Paris (voir app/api/cron/journal-reminder/route.ts) — activable/
+// désactivable ensuite depuis le Journal (voir le bouton 🔔 dans l'en-tête).
+function ReminderPrompt({ onDone }: { onDone: () => void }) {
+  const [saving, setSaving] = useState(false);
+
+  async function activate() {
+    setSaving(true);
+    try { await fetch('/api/notifications/reminder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: true }) }); }
+    catch {}
+    finally { onDone(); }
+  }
+
+  return (
+    <div className="rounded-3xl p-6 text-center" style={{ background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)', animation: 'jCardIn .4s cubic-bezier(.22,1,.36,1)' }}>
+      <span className="text-3xl leading-none">🔔</span>
+      <p className="font-display text-lg font-black mt-3 mb-1" style={{ color: 'var(--ink)' }}>Ton premier jour est noté</p>
+      <p className="text-sm mb-5 leading-relaxed" style={{ color: '#6b6055' }}>
+        Un petit rappel chaque soir à 20h : <em>« Ton moment pour faire le point sur toi. »</em>
+      </p>
+      <button onClick={activate} disabled={saving} className="ur-btn-gold w-full py-3 text-sm mb-2 disabled:opacity-50">
+        {saving ? 'Activation…' : 'Activer le rappel (20h) →'}
+      </button>
+      <button onClick={onDone} disabled={saving} className="w-full py-2.5 text-xs font-semibold" style={{ color: '#a8a29e' }}>
+        Plus tard
+      </button>
+    </div>
+  );
+}
+
 // Carte de stat animée — entrée en fondu/translation décalée par index, gros
 // chiffre qui "compte" jusqu'à sa valeur. Le moment "dashboard" pensé pour
 // être filmé (voir demande produit "TikTok first").
@@ -250,8 +283,12 @@ function StatCard({ icon, label, value, suffix, delay, accent }: { icon: string;
   );
 }
 
-export default function JournalClient({ firstName, access }: { firstName: string | null; access: JournalAccess }) {
+export default function JournalClient({ firstName, access, wantsDailyReminder }: { firstName: string | null; access: JournalAccess; wantsDailyReminder: boolean }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [showReminderPrompt, setShowReminderPrompt] = useState(false);
+  const [reminderOn, setReminderOn] = useState(wantsDailyReminder);
+  const [reminderToggling, setReminderToggling] = useState(false);
   const [month, setMonth] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -330,6 +367,7 @@ export default function JournalClient({ firstName, access }: { firstName: string
   }, [wrappedOpen, streak, avgMood, evolution, topTag, firstName]);
 
   async function persistEntry(payload: SavedPayload) {
+    const isFirstEver = !hasAny;
     setSaving(true);
     setError(null);
     try {
@@ -340,11 +378,29 @@ export default function JournalClient({ firstName, access }: { firstName: string
       });
       if (!res.ok) throw new Error();
       await res.json();
-      load(month ?? undefined);
+      await load(month ?? undefined);
+      // Première entrée jamais créée par ce compte : au lieu de retomber
+      // directement sur le dashboard, on propose le rappel quotidien puis on
+      // renvoie vers le Hub — "ensuite seulement" (voir le funnel décrit dans
+      // app/decouverte/DecouverteClient.tsx).
+      if (isFirstEver) setShowReminderPrompt(true);
     } catch {
       setError("L'enregistrement a échoué. Réessaie.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function toggleReminder() {
+    const next = !reminderOn;
+    setReminderOn(next);
+    setReminderToggling(true);
+    try {
+      await fetch('/api/notifications/reminder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: next }) });
+    } catch {
+      setReminderOn(!next); // rollback si l'appel échoue
+    } finally {
+      setReminderToggling(false);
     }
   }
 
@@ -408,13 +464,29 @@ export default function JournalClient({ firstName, access }: { firstName: string
       <header className="sticky top-0 z-30 px-4 h-14 flex items-center" style={{ background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
         <div className="max-w-lg mx-auto w-full flex items-center justify-between">
           <span className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>📖 Journal</span>
-          <span className="text-xs" style={{ color: 'var(--gold)' }}>{firstName ? `Salut ${firstName}` : ''}</span>
+          <div className="flex items-center gap-3">
+            {!showOnboarding && !showReminderPrompt && (
+              <button
+                onClick={toggleReminder}
+                disabled={reminderToggling}
+                title={reminderOn ? 'Rappel quotidien activé (20h)' : 'Activer un rappel quotidien'}
+                aria-label={reminderOn ? 'Désactiver le rappel quotidien' : 'Activer le rappel quotidien'}
+                className="w-7 h-7 flex items-center justify-center text-sm rounded-full transition-all disabled:opacity-50"
+                style={{ background: reminderOn ? 'var(--gold-soft)' : 'transparent', border: reminderOn ? '1px solid var(--gold-line)' : '1px solid transparent' }}
+              >
+                {reminderOn ? '🔔' : '🔕'}
+              </button>
+            )}
+            <span className="text-xs" style={{ color: 'var(--gold)' }}>{firstName ? `Salut ${firstName}` : ''}</span>
+          </div>
         </div>
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
 
-        {showOnboarding ? (
+        {showReminderPrompt ? (
+          <ReminderPrompt onDone={() => { setShowReminderPrompt(false); router.push('/decouverte'); }} />
+        ) : showOnboarding ? (
           <OnboardingFlow onSubmit={persistEntry} saving={saving} />
         ) : (
           <>

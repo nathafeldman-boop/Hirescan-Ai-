@@ -636,6 +636,25 @@ export function emailRetentionM5(name: string | null, typeCode: string | null) {
   };
 }
 
+// Rappel quotidien Journal — envoyé à 20h (heure de Paris) aux comptes qui
+// l'ont activé et n'ont pas encore noté leur journée (voir
+// app/api/cron/journal-reminder/route.ts). Volontairement court : ce n'est
+// pas une relance produit, juste le rendez-vous du soir qu'on a promis.
+export function emailDailyReminder(name: string | null) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  return {
+    subject: 'Ton moment pour faire le point sur toi 🌙',
+    html: wrap(`
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">${firstName}, deux minutes pour toi ce soir ?</h2>
+      <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
+        Comment s'est passée ta journée ? Note ton humeur, ce qui t'a marqué — Elio en tire des tendances au fil des jours.
+      </p>
+      ${cta('Ouvrir mon Journal →', `${BASE}/journal`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Tu ne veux plus recevoir ce rappel ? Désactive-le en un tap dans ton Journal (icône 🔔).</p>
+    `),
+  };
+}
+
 export async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

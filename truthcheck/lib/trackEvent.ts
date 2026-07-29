@@ -18,6 +18,8 @@ export const EVENTS = {
   COMPAT_CREATED: 'compat_created',
   PROFIL_AVANCE_GENERATED: 'profil_avance_generated',
   QUIZ_CREATED: 'quiz_created',
+  ONBOARDING_COMPLETED: 'onboarding_completed',
+  DAILY_REMINDER_OPTED_IN: 'daily_reminder_opted_in',
 } as const;
 
 export type EventName = typeof EVENTS[keyof typeof EVENTS];

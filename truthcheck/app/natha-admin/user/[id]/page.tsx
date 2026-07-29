@@ -41,7 +41,10 @@ export default async function UserActivityPage({ params }: { params: { id: strin
 
   const user = await prisma.user.findUnique({
     where: { id: uid },
-    select: { id: true, name: true, email: true, tier: true, mbtiType: true, mbtiTestCount: true, createdAt: true, lastActiveAt: true },
+    select: {
+      id: true, name: true, email: true, tier: true, mbtiType: true, mbtiTestCount: true, createdAt: true, lastActiveAt: true,
+      ageRange: true, gender: true, onboardingReason: true, onboardingFocus: true, onboardingCompletedAt: true,
+    },
   });
 
   if (!user) {
@@ -178,6 +181,44 @@ export default async function UserActivityPage({ params }: { params: { id: strin
             <p style={label}>Quiz créés</p>
             <p style={bigNum}>{customQuizzes}</p>
           </div>
+        </div>
+
+        {/* ── Questionnaire d'accueil (page /bienvenue) ──
+            But produit du questionnaire : comprendre l'INTENTION réelle des
+            inscrits, voir lib/onboardingFunnel.ts pour les listes d'options. */}
+        <p style={sectionHeading}>Profil & intentions (questionnaire d&apos;accueil)</p>
+        <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
+          {user.onboardingCompletedAt ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 14 }}>
+              <div>
+                <p style={label}>Âge</p>
+                <p style={{ ...bigNum, fontSize: 16 }}>{user.ageRange ?? '—'}</p>
+              </div>
+              <div>
+                <p style={label}>Genre</p>
+                <p style={{ ...bigNum, fontSize: 16 }}>{user.gender ?? '—'}</p>
+              </div>
+              <div style={{ gridColumn: 'span 2' }}>
+                <p style={label}>Pourquoi il/elle est venu(e)</p>
+                <p style={{ ...bigNum, fontSize: 15 }}>{user.onboardingReason ?? '—'}</p>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={label}>Ce qu&apos;il/elle veut améliorer</p>
+                <p style={{ margin: '8px 0 0', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {(Array.isArray(user.onboardingFocus) ? user.onboardingFocus as string[] : []).length > 0
+                    ? (user.onboardingFocus as string[]).map((f) => (
+                        <span key={f} style={{ fontSize: 12.5, fontWeight: 600, padding: '4px 10px', borderRadius: 999, background: C.bg, border: `1px solid ${C.borderSoft}`, color: C.text }}>{f}</span>
+                      ))
+                    : <span style={{ color: C.faint, fontSize: 13 }}>—</span>}
+                </p>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={sub}>Répondu le {fmtDate(user.onboardingCompletedAt)} à {fmtTime(user.onboardingCompletedAt)}</p>
+              </div>
+            </div>
+          ) : (
+            <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>Pas encore répondu au questionnaire d&apos;accueil.</p>
+          )}
         </div>
 
         {mbtiHistory.length > 1 && (

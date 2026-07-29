@@ -117,7 +117,15 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
     error: '/login',
-    newUser: '/quiz/personnalite',
+    // Premier compte JAMAIS créé (adapter Prisma) → le questionnaire d'accueil
+    // d'abord, jamais directement le test — voir app/bienvenue et le funnel
+    // décrit dans app/decouverte/DecouverteClient.tsx. Les comptes déjà
+    // existants (donc déjà passés par /bienvenue ou créés avant cette
+    // fonctionnalité) ne repassent PAS par ici : voir le callback `redirect`
+    // ci-dessous pour leur destination par défaut, et le flux OTP
+    // (app/api/auth/verify-code/route.ts) qui applique la même règle via
+    // lib/onboardingFunnel.ts pour les connexions par code email.
+    newUser: '/bienvenue',
   },
   events: {
     async createUser({ user }) {
@@ -149,10 +157,15 @@ export const authOptions: NextAuthOptions = {
       } else if (url.startsWith(baseUrl)) {
         path = url.slice(baseUrl.length) || '/';
       } else {
-        return `${baseUrl}/quiz/personnalite`;
+        return `${baseUrl}/decouverte`;
       }
-      // Root path (landing page) or empty → always send to quiz, never strand the user there
-      if (path === '/' || path === '') return `${baseUrl}/quiz/personnalite`;
+      // Root path (landing page) or empty → send to the Hub, never strand the
+      // user there. Brand-new accounts get overridden to /bienvenue anyway
+      // by `pages.newUser` above (NextAuth handles that priority natively) —
+      // this branch is really about RETURNING users signing in with no
+      // specific destination, for whom the Hub is now "home" (it also nudges
+      // anyone missing a profile, see DecouverteClient's quest banner).
+      if (path === '/' || path === '') return `${baseUrl}/decouverte`;
       return `${baseUrl}${path}`;
     },
   },

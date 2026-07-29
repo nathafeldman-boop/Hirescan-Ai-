@@ -81,6 +81,29 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // ── Questionnaire d'accueil (page /bienvenue, juste après l'inscription) ──
+  // But produit : donner l'impression dès la 1ère minute que l'app est faite
+  // pour CETTE personne, et remonter l'intention réelle dans l'admin (voir
+  // /natha-admin/user/[id]) — pas d'usage dans la personnalisation d'Elio
+  // pour l'instant (lib/coach.ts reste basé sur le MBTI), purement produit/CRM.
+  // onboardingCompletedAt : marqueur "a répondu au questionnaire" — sert aussi
+  // de garde pour ne jamais le réafficher (voir app/bienvenue/page.tsx) et,
+  // pour les comptes email OTP, à décider s'il faut y renvoyer un utilisateur
+  // déjà existant (voir lib/onboardingFunnel.ts).
+  ageRange              String?   // tranche, ex. "18-24" — jamais un âge exact (moins de friction, moins sensible)
+  gender                String?
+  onboardingReason      String?   // pourquoi cette personne vient sur UrCecret (raison principale, choix unique)
+  onboardingFocus       Json?     // ce qu'elle veut améliorer dans sa vie (string[], choix multiple)
+  onboardingCompletedAt DateTime?
+
+  // ── Rappel quotidien (Journal) ──
+  // MVP volontairement basé sur l'email (infra déjà éprouvée, voir
+  // app/api/cron/journal-reminder/route.ts) plutôt que sur une vraie
+  // notification push navigateur : aucune infra push (VAPID/service worker)
+  // n'existait avant cette feature, et un envoi email est vérifiable de bout
+  // en bout dès aujourd'hui. À remplacer par du push si besoin plus tard.
+  wantsDailyReminder Boolean @default(false)
+
   accounts     Account[]
   sessions     Session[]
   quizResults  QuizResult[]

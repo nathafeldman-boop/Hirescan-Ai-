@@ -577,6 +577,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <div className="w-full max-w-sm">
 
+        {/* ─── Pont émotionnel entre "je viens de finir le test" et "le
+            paywall arrive" — jamais présenté comme un simple blocage. ── */}
+        <p className="text-center text-[13px] mb-5" style={{ color: '#78716c', lineHeight: 1.5 }}>
+          {isFr
+            ? <>Tu viens de découvrir une partie de toi. <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Continue ton exploration.</span></>
+            : <>You just discovered a part of yourself. <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Keep exploring.</span></>}
+        </p>
+
         {/* ─── L'oracle voilé — RIEN du résultat n'est révélé avant paiement.
             Ni le code, ni le nom, ni la famille : le sceau tourne, encore
             fermé. Le type complet n'apparaît qu'après paiement (/success). ── */}
@@ -809,6 +817,18 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <p className="text-center text-[11px] font-semibold" style={{ color: '#1f7a4d' }}>
             {isFr ? '✓ Satisfait ou remboursé sous 7 jours' : '✓ 7-day money-back guarantee'}
           </p>
+        </div>
+
+        {/* ─── Rétention — refuser le paywall ne doit jamais être une sortie
+            de l'app. Toujours proposer de continuer gratuitement (voir Hub,
+            qui garde la quête "profil incomplet" active). ── */}
+        <div className="mt-7 pt-5 text-center" style={{ borderTop: '1px solid var(--line)' }}>
+          <p className="text-[12.5px] mb-2" style={{ color: '#a8a29e', lineHeight: 1.5 }}>
+            {isFr ? 'Pas prêt à continuer maintenant ?' : 'Not ready to continue right now?'}
+          </p>
+          <Link href="/decouverte" className="text-[12.5px] font-semibold" style={{ color: 'var(--gold)' }}>
+            {isFr ? 'Continue gratuitement ton exploration depuis le hub →' : 'Keep exploring for free from the hub →'}
+          </Link>
         </div>
 
       </div>

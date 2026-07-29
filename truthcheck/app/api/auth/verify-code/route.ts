@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { prisma } from '@/lib/db';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
+import { resolvePostAuthDestination } from '@/lib/onboardingFunnel';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,11 +42,13 @@ export async function POST(req: NextRequest) {
   await prisma.verificationToken.delete({ where: { identifier_token: { identifier: email, token: hashedToken } } }).catch(() => {});
 
   // Trouve ou crée le compte (comme le ferait NextAuth lors d'un premier sign-in par email).
+  const existing = await prisma.user.findUnique({ where: { email }, select: { onboardingCompletedAt: true } });
   const user = await prisma.user.upsert({
     where: { email },
     create: { email, emailVerified: new Date() },
     update: { emailVerified: new Date() },
   });
+  const needsOnboarding = !existing || !existing.onboardingCompletedAt;
 
   // Crée directement une session NextAuth (strategy "database") + pose le cookie —
   // même mécanisme que /api/auth/redeem-code : on gère nous-mêmes la vérification
@@ -60,7 +63,7 @@ export async function POST(req: NextRequest) {
   const useSecure = (process.env.NEXTAUTH_URL ?? '').startsWith('https://') || process.env.NODE_ENV === 'production';
   const cookieName = useSecure ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
 
-  const callbackUrl = body.callbackUrl ?? '/quiz/personnalite';
+  const callbackUrl = resolvePostAuthDestination(needsOnboarding, body.callbackUrl ?? '/quiz/personnalite');
   const res = NextResponse.json({ ok: true, loginUrl: callbackUrl });
   res.cookies.set(cookieName, sessionToken, {
     httpOnly: true,

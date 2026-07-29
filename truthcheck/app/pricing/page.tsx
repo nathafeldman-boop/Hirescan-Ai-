@@ -7,29 +7,37 @@ import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Seal from '@/components/Seal';
 
+// ── Logique émotionnelle, pas une liste de fonctionnalités ──────────────────
+// Personne n'achète "30 messages par jour" — les gens achètent la résolution
+// d'une frustration ("je veux mieux me comprendre mais je ne sais pas
+// avancer seul"). Chaque palier garde un repère concret (nombre de messages,
+// contenus débloqués) mais TOUJOURS au service d'une phrase qui se sent,
+// jamais en tête de liste. Le gratuit ne révèle jamais les 4 lettres du MBTI
+// (voir ResultTeaser dans PersonnaliteClient.tsx) — ne jamais le laisser
+// entendre ici, même en passant.
 const FREE_PERKS = [
-  'Ton type MBTI de base (les 4 lettres)',
+  'Une première exploration de ta personnalité',
+  'Ton Journal émotionnel, en illimité',
   'Elio en version découverte — 3 messages par jour',
-  'Quiz relationnels — résultats partiels',
 ];
 
 const STARTER_PERKS = [
-  'Ton profil MBTI complet : amour, carrière, face cachée',
-  'Elio, ton compagnon de développement personnel — 5 messages par jour',
+  'Ton profil complet dévoilé : amour, carrière, ta face cachée',
+  'Elio devient ton compagnon quotidien — présent 5 fois par jour',
   'Résiliable en 1 clic, sans engagement',
 ];
 
 // Échelle CROISSANTE : chaque palier ajoute au précédent (pas de répétitions).
 const PLUS_PERKS = [
-  'Elio passe à 30 messages par jour (au lieu de 5)',
-  'Les 15 quiz secrets débloqués (couple, amitié, manipulation…)',
-  'Les 16 types MBTI en détail',
+  'Elio te répond en tenant compte de ton Journal, pas juste de ton profil',
+  'Des analyses plus profondes de toi et de tes relations',
+  'Présent toute la journée — 30 messages par jour (au lieu de 5)',
 ];
 
 const PREMIUM_PERKS = [
-  'Elio passe à 50 messages par jour',
-  'Suivi personnalisé sur 15 jours (un conseil + exercice chaque jour)',
-  'Tous les futurs quiz inclus, à vie',
+  'Un accompagnement quotidien pendant 15 jours : un conseil + un exercice chaque jour',
+  'Toutes les évolutions futures d\'UrCecret incluses, à vie',
+  'Elio disponible sans compter — 50 messages par jour',
 ];
 
 function CheckoutButton({ label, annual, plus, starter, userEmail, variant }: {
@@ -111,7 +119,10 @@ export default function PricingPage() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4"><Seal size={48} /></div>
           <p className="ur-label text-[10px] mb-2" style={{ color: 'var(--gold)' }}>Abonnements</p>
-          <h1 className="font-display text-3xl font-black text-white">Connais-toi vraiment</h1>
+          <h1 className="font-display text-3xl font-black text-white mb-3">Connais-toi vraiment</h1>
+          <p className="text-stone-500 text-sm max-w-xs mx-auto" style={{ lineHeight: 1.6 }}>
+            Chaque palier n&apos;est pas « plus de fonctionnalités » — c&apos;est la suite logique de ton exploration.
+          </p>
         </div>
 
         {/* Plan gratuit */}
@@ -119,7 +130,7 @@ export default function PricingPage() {
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="min-w-0">
               <p className="font-bold text-white">Gratuit</p>
-              <p className="text-stone-500 text-sm">Pour découvrir</p>
+              <p className="text-stone-500 text-sm">Je découvre qui je suis</p>
             </div>
             <Price amount="0 €" unit="pour toujours" />
           </div>
@@ -141,7 +152,7 @@ export default function PricingPage() {
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="min-w-0">
               <p className="font-bold text-white">Starter · mensuel</p>
-              <p className="text-stone-500 text-sm">Ton profil + ton coach, prix d’un café</p>
+              <p className="text-stone-500 text-sm">Commence ton exploration personnelle</p>
             </div>
             <Price amount="1,99 €" unit="par mois" />
           </div>
@@ -162,7 +173,7 @@ export default function PricingPage() {
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="min-w-0">
               <p className="font-bold text-white">Plus · mensuel</p>
-              <p className="text-stone-500 text-sm">L’essentiel + le chatbot</p>
+              <p className="text-stone-500 text-sm">Ton accompagnement quotidien</p>
             </div>
             <Price amount="5 €" unit="par mois" />
           </div>
@@ -189,15 +200,16 @@ export default function PricingPage() {
           <div className="flex items-start justify-between gap-4 mb-1 mt-1">
             <div className="min-w-0">
               <p className="font-black text-white">Accès illimité · 1 an</p>
-              <p className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>soit 0,08 €/jour</p>
+              <p className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>Construis une vraie habitude de développement personnel</p>
             </div>
             <Price amount="29,99 €" unit="par an" />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 flex items-center gap-2">
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--gold-soft)', color: 'var(--gold)', border: '1px solid var(--gold-line)' }}>
               −75% · 2,50 €/mois
             </span>
+            <span className="text-[11px] text-stone-500">soit 0,08 €/jour</span>
           </div>
 
           <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--gold)' }}>Tout Plus, et en plus :</p>
@@ -218,10 +230,13 @@ export default function PricingPage() {
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="min-w-0">
               <p className="font-bold text-white">Mensuel · sans engagement</p>
-              <p className="text-stone-500 text-sm">Même accès · annule quand tu veux</p>
+              <p className="text-stone-500 text-sm">Pour tester sans engagement</p>
             </div>
             <Price amount="9,99 €" unit="par mois" />
           </div>
+          <p className="text-[12.5px] text-stone-500 mb-4" style={{ lineHeight: 1.5 }}>
+            Le même accès complet que l&apos;offre annuelle, au mois — annule quand tu veux.
+          </p>
           <CheckoutButton label="Choisir le mensuel — 9,99 €" userEmail={userEmail} variant="outline" />
         </div>
 
