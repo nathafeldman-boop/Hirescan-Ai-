@@ -40,6 +40,18 @@ export function middleware(request: NextRequest) {
       sameSite: 'lax',
       httpOnly: true,
     });
+    // Fenêtre courte dédiée au ré-injection self-healing ci-dessous (voir
+    // commentaire) — séparée du cookie d'attribution 30 jours pour ne PAS
+    // re-coller ?ref= dans la barre d'adresse à chaque visite pendant un
+    // mois entier (ça arrivait avant : un utilisateur revenant sur le site
+    // des semaines après un clic affilié se voyait systématiquement
+    // redirigé vers /?ref=..., y compris pour partager le lien du site).
+    response.cookies.set('urs_ref_handoff', ref.toLowerCase(), {
+      maxAge: 60 * 15,
+      path: '/',
+      sameSite: 'lax',
+      httpOnly: true,
+    });
   } else {
     // ── Self-healing attribution across the TikTok in-app → real browser handoff ──
     // The httpOnly cookie set in the TikTok WebView does NOT transfer to Safari/Chrome
@@ -47,7 +59,9 @@ export function middleware(request: NextRequest) {
     // have a ref cookie but this URL lost its ?ref= param, re-inject it into the URL.
     // This keeps the ref attached to whatever page the user opens in their real browser,
     // which then re-sets the cookie there + captures it in localStorage on the quiz page.
-    const existingRef = request.cookies.get('urs_ref')?.value;
+    // Gated on the SHORT-lived handoff cookie (15 min), not the 30-day attribution
+    // cookie — the handoff itself only ever happens seconds after the original click.
+    const existingRef = request.cookies.get('urs_ref_handoff')?.value;
     const isFunnelPage = ['/', '/commencer'].includes(request.nextUrl.pathname)
       || request.nextUrl.pathname.startsWith('/quiz/');
     if (existingRef && /^[a-z0-9_-]{2,32}$/i.test(existingRef) && isFunnelPage) {
