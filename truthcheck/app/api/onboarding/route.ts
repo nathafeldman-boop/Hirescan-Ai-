@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
-import { AGE_RANGES, GENDERS, ONBOARDING_REASONS, ONBOARDING_FOCUS_OPTIONS } from '@/lib/onboardingFunnel';
+import { AGE_RANGES, GENDERS, ONBOARDING_GOALS } from '@/lib/onboardingFunnel';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,16 +17,13 @@ export async function POST(req: NextRequest) {
   const uid = (session?.user as { id?: string } | undefined)?.id;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  let body: { name?: string; ageRange?: string; gender?: string; reason?: string; focus?: string[] };
+  let body: { name?: string; ageRange?: string; gender?: string; goal?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid_body' }, { status: 400 }); }
 
   const name = (body.name ?? '').trim().slice(0, 60) || undefined;
   const ageRange = AGE_RANGES.includes(body.ageRange as typeof AGE_RANGES[number]) ? body.ageRange : undefined;
   const gender = GENDERS.includes(body.gender as typeof GENDERS[number]) ? body.gender : undefined;
-  const reason = ONBOARDING_REASONS.includes(body.reason as typeof ONBOARDING_REASONS[number]) ? body.reason : undefined;
-  const focus = Array.isArray(body.focus)
-    ? body.focus.filter((f): f is string => ONBOARDING_FOCUS_OPTIONS.includes(f as typeof ONBOARDING_FOCUS_OPTIONS[number])).slice(0, 6)
-    : [];
+  const goal = ONBOARDING_GOALS.includes(body.goal as typeof ONBOARDING_GOALS[number]) ? body.goal : undefined;
 
   await prisma.user.update({
     where: { id: uid },
@@ -34,13 +31,12 @@ export async function POST(req: NextRequest) {
       ...(name ? { name } : {}),
       ageRange,
       gender,
-      onboardingReason: reason,
-      onboardingFocus: focus,
+      onboardingGoal: goal,
       onboardingCompletedAt: new Date(),
     },
   });
 
-  await logEvent(uid, EVENTS.ONBOARDING_COMPLETED, { ageRange, gender, reason, focus });
+  await logEvent(uid, EVENTS.ONBOARDING_COMPLETED, { ageRange, gender, goal });
 
   return NextResponse.json({ ok: true });
 }

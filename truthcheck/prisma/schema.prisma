@@ -92,8 +92,7 @@ model User {
   // déjà existant (voir lib/onboardingFunnel.ts).
   ageRange              String?   // tranche, ex. "18-24" — jamais un âge exact (moins de friction, moins sensible)
   gender                String?
-  onboardingReason      String?   // pourquoi cette personne vient sur UrCecret (raison principale, choix unique)
-  onboardingFocus       Json?     // ce qu'elle veut améliorer dans sa vie (string[], choix multiple)
+  onboardingGoal        String?   // objectif principal, choix unique — voir lib/onboardingFunnel.ts::ONBOARDING_GOALS
   onboardingCompletedAt DateTime?
 
   // ── Rappel quotidien (Journal) ──

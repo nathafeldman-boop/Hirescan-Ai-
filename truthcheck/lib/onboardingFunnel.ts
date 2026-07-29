@@ -6,21 +6,16 @@ export const AGE_RANGES = ['-18', '18-24', '25-34', '35-44', '45+'] as const;
 
 export const GENDERS = ['Femme', 'Homme', 'Autre', 'Je préfère ne pas dire'] as const;
 
-export const ONBOARDING_REASONS = [
+// Objectif principal — UNE seule question, choix unique (pas de "raison" +
+// "focus" séparés : ça allongeait le questionnaire pour un gain marginal).
+export const ONBOARDING_GOALS = [
   'Mieux me comprendre',
-  'Gérer mes émotions',
+  'Reprendre confiance en moi',
+  'Gérer mon stress',
+  'Mieux comprendre mes émotions',
   'Améliorer mes relations',
-  'Avancer dans ma vie pro ou mes études',
-  'Par curiosité',
-] as const;
-
-export const ONBOARDING_FOCUS_OPTIONS = [
-  'Confiance en moi',
-  'Gestion du stress',
-  'Communication',
-  'Relations amoureuses',
-  'Motivation & discipline',
-  'Mieux dormir, plus d’énergie',
+  'Retrouver de la motivation',
+  'Apprendre à mieux me connaître',
 ] as const;
 
 // ── Où envoyer quelqu'un juste après une connexion réussie ──────────────────

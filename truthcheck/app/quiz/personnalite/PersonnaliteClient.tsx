@@ -12,6 +12,7 @@ import { ui } from '@/lib/i18n/ui';
 import { track } from '@/lib/analytics';
 import { hasProfileAccess } from '@/lib/plans';
 import { detectInAppBrowser } from '@/lib/inAppBrowser';
+import { teaserLines } from '@/lib/mbtiTeaser';
 import Seal from '@/components/Seal';
 
 // ─── Short quiz: 8 questions per dimension = 32 total ───────────────────────────
@@ -577,6 +578,15 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <div className="w-full max-w-sm">
 
+        {/* ─── Sortie visible dès le premier écran — jamais un mur, voir la
+            philosophie du funnel (refuser doit rester sans friction). Une
+            2e sortie existe aussi en bas de page une fois qu'on a lu l'offre. ── */}
+        <div className="flex justify-end mb-3">
+          <Link href="/decouverte" className="text-[11.5px] font-semibold" style={{ color: '#a8a29e' }}>
+            {isFr ? 'Plus tard, retour au hub' : 'Later, back to hub'}
+          </Link>
+        </div>
+
         {/* ─── Pont émotionnel entre "je viens de finir le test" et "le
             paywall arrive" — jamais présenté comme un simple blocage. ── */}
         <p className="text-center text-[13px] mb-5" style={{ color: '#78716c', lineHeight: 1.5 }}>
@@ -584,6 +594,22 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             ? <>Tu viens de découvrir une partie de toi. <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Continue ton exploration.</span></>
             : <>You just discovered a part of yourself. <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Keep exploring.</span></>}
         </p>
+
+        {/* ─── Aperçu frustrant — trois vérités qui sonnent déjà juste, sans
+            jamais révéler le code à 4 lettres (voir lib/mbtiTeaser.ts). C'est
+            ce qui doit donner envie de débloquer, pas une liste de features. ── */}
+        <div className="rounded-2xl px-5 py-4 mb-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
+          {teaserLines(typeCode, isFr ? 'fr' : 'en').map((line, i) => (
+            <div key={i} className={`flex items-start gap-2.5${i < 2 ? ' mb-2.5' : ''}`}>
+              <span className="flex-shrink-0 font-bold" style={{ color: '#1f7a4d' }}>✔</span>
+              <p className="text-[13.5px]" style={{ color: 'var(--ink)', lineHeight: 1.5 }}>{line}</p>
+            </div>
+          ))}
+          <div className="ur-rule my-3" />
+          <p className="text-[12.5px] font-semibold text-center" style={{ color: '#78716c' }}>
+            {isFr ? 'Mais ton profil complet reste verrouillé.' : 'But your full profile stays locked.'}
+          </p>
+        </div>
 
         {/* ─── L'oracle voilé — RIEN du résultat n'est révélé avant paiement.
             Ni le code, ni le nom, ni la famille : le sceau tourne, encore

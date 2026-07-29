@@ -40,3 +40,18 @@ export function compareToYesterday(today: ReflectionEntry, yesterday: Reflection
 export function dailyReaction(today: ReflectionEntry, yesterday: ReflectionEntry | null): string {
   return compareToYesterday(today, yesterday) ?? simpleReflection(today.mood, today.energy, today.stress);
 }
+
+// ── Réponse d'Elio à la toute première entrée d'un compte ───────────────────
+// C'est LE moment charnière du nouveau funnel : avant même de parler profil
+// ou abonnement, l'utilisateur doit sentir qu'on l'a entendu. Déterministe et
+// par palier d'humeur (pas de lecture du texte de la note — voir le
+// commentaire en tête de fichier sur l'instantanéité), mais le ton change
+// vraiment selon comment la personne se sent, pas une formule générique.
+export function firstEntryReply(mood: number, firstName: string | null): string {
+  const name = firstName ? `, ${firstName}` : '';
+  if (mood >= 5) return `J'aime commencer sur une note aussi positive${name}. Je vais apprendre à te connaître, jour après jour — merci de m'avoir dit ça.`;
+  if (mood === 4) return `Merci de me l'avoir partagé${name}. C'est un bon point de départ — je suis là pour la suite, chaque jour.`;
+  if (mood === 3) return `Merci${name}. Une journée neutre, c'est déjà une vraie réponse — c'est exactement ce dont j'ai besoin pour commencer à te connaître.`;
+  if (mood === 2) return `Merci de me le dire${name} — même dans les journées moins faciles, je suis là. On continue ensemble, un jour à la fois.`;
+  return `Je suis désolé que ce soit difficile aujourd'hui${name}. Merci de me l'avoir confié — c'est déjà beaucoup. Je serai là chaque jour, à cette même heure.`;
+}

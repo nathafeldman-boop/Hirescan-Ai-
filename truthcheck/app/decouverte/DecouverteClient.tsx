@@ -7,8 +7,8 @@ const CARDS = [
   {
     href: '/quiz/personnalite',
     emoji: '🧠',
-    title: 'Découvre ton profil',
-    kicker: 'Test personnalité',
+    title: 'Découvre qui tu es vraiment',
+    kicker: 'Quête de découverte',
     desc: 'Comprends ta personnalité, tes forces et ta manière de fonctionner.',
     accent: 'var(--gold)',
     accentSoft: 'var(--gold-soft)',
@@ -125,19 +125,21 @@ export default function DecouverteClient({ firstName, hasProfile }: { firstName:
             voir app/quete/. Disparaît d'elle-même dès que le profil MBTI
             existe (voir app/decouverte/page.tsx). */}
         {!hasProfile && (
-          <Link
-            href="/quete"
-            className="hub-up hub-card group relative block rounded-[24px] px-5 py-4 mb-3.5 overflow-hidden"
+          <div
+            className="hub-up rounded-[24px] px-5 py-4 mb-3.5"
             style={{ animationDelay: '.18s', background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)' }}
           >
-            <div className="relative flex items-center gap-4">
+            <div className="flex items-start gap-3.5 mb-3.5">
               <span className="text-2xl flex-shrink-0">🛑</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Ton profil n&apos;est pas encore complet</p>
-                <p className="text-[12.5px] mt-0.5" style={{ color: '#8a7d5c' }}>Apprends à mieux te connaître →</p>
+                <p className="text-[12.5px] mt-1" style={{ color: '#8a7d5c', lineHeight: 1.5 }}>Découvre ton fonctionnement profond en terminant ta quête.</p>
               </div>
             </div>
-          </Link>
+            <Link href="/quete" className="hub-card block w-full py-2.5 rounded-full text-center text-sm font-bold" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
+              Compléter mon profil
+            </Link>
+          </div>
         )}
 
         {/* Les 5 cartes */}

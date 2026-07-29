@@ -43,7 +43,7 @@ export default async function UserActivityPage({ params }: { params: { id: strin
     where: { id: uid },
     select: {
       id: true, name: true, email: true, tier: true, mbtiType: true, mbtiTestCount: true, createdAt: true, lastActiveAt: true,
-      ageRange: true, gender: true, onboardingReason: true, onboardingFocus: true, onboardingCompletedAt: true,
+      ageRange: true, gender: true, onboardingGoal: true, onboardingCompletedAt: true,
     },
   });
 
@@ -198,19 +198,9 @@ export default async function UserActivityPage({ params }: { params: { id: strin
                 <p style={label}>Genre</p>
                 <p style={{ ...bigNum, fontSize: 16 }}>{user.gender ?? '—'}</p>
               </div>
-              <div style={{ gridColumn: 'span 2' }}>
-                <p style={label}>Pourquoi il/elle est venu(e)</p>
-                <p style={{ ...bigNum, fontSize: 15 }}>{user.onboardingReason ?? '—'}</p>
-              </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <p style={label}>Ce qu&apos;il/elle veut améliorer</p>
-                <p style={{ margin: '8px 0 0', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {(Array.isArray(user.onboardingFocus) ? user.onboardingFocus as string[] : []).length > 0
-                    ? (user.onboardingFocus as string[]).map((f) => (
-                        <span key={f} style={{ fontSize: 12.5, fontWeight: 600, padding: '4px 10px', borderRadius: 999, background: C.bg, border: `1px solid ${C.borderSoft}`, color: C.text }}>{f}</span>
-                      ))
-                    : <span style={{ color: C.faint, fontSize: 13 }}>—</span>}
-                </p>
+                <p style={label}>Objectif principal</p>
+                <p style={{ ...bigNum, fontSize: 15 }}>{user.onboardingGoal ?? '—'}</p>
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
                 <p style={sub}>Répondu le {fmtDate(user.onboardingCompletedAt)} à {fmtTime(user.onboardingCompletedAt)}</p>

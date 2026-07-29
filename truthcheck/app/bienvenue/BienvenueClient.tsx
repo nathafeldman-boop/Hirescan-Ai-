@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ElioAvatar from '@/components/ElioAvatar';
-import { AGE_RANGES, GENDERS, ONBOARDING_REASONS, ONBOARDING_FOCUS_OPTIONS } from '@/lib/onboardingFunnel';
+import { AGE_RANGES, GENDERS, ONBOARDING_GOALS } from '@/lib/onboardingFunnel';
 
-const STEPS = 5;
+const STEPS = 4;
 
 // Sélecteur en chips — repris du pattern déjà utilisé pour le premier Journal
 // (voir OnboardingFlow dans app/journal/JournalClient.tsx), pour que l'accueil
@@ -34,24 +34,24 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
   const [name, setName] = useState(prefillName ?? '');
   const [ageRange, setAgeRange] = useState<string | null>(null);
   const [gender, setGender] = useState<string | null>(null);
-  const [reason, setReason] = useState<string | null>(null);
-  const [focus, setFocus] = useState<string[]>([]);
+  const [goal, setGoal] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const advance = () => setStep((s) => s + 1);
-  const toggleFocus = (v: string) => setFocus((prev) => (prev.includes(v) ? prev.filter((f) => f !== v) : [...prev, v]));
 
-  async function finish() {
+  async function finish(selectedGoal: string) {
     setSaving(true);
     setError(null);
     try {
       const res = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim() || undefined, ageRange, gender, reason, focus }),
+        body: JSON.stringify({ name: name.trim() || undefined, ageRange, gender, goal: selectedGoal }),
       });
       if (!res.ok) throw new Error();
+      // Direct vers le Journal — jamais le Hub ici : la première expérience
+      // doit être "je note comment je me sens", pas un écran de choix.
       router.push('/journal');
     } catch {
       setError('Une erreur est survenue, réessaie.');
@@ -110,7 +110,7 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
 
           {step === 2 && (
             <>
-              <p className="font-display text-lg font-black mb-4" style={{ color: 'var(--ink)' }}>Ton genre ?</p>
+              <p className="font-display text-lg font-black mb-4" style={{ color: 'var(--ink)' }}>Ton sexe ?</p>
               <div className="flex flex-col gap-2">
                 {GENDERS.map((g) => (
                   <Chip key={g} label={g} selected={gender === g} onClick={() => { setGender(g); advance(); }} />
@@ -121,29 +121,15 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
 
           {step === 3 && (
             <>
-              <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Pourquoi tu viens sur UrCecret ?</p>
+              <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Quel est ton objectif principal ?</p>
               <p className="text-sm mb-4 leading-relaxed" style={{ color: '#6b6055' }}>Il n&apos;y a pas de mauvaise réponse.</p>
-              <div className="flex flex-col gap-2">
-                {ONBOARDING_REASONS.map((r) => (
-                  <Chip key={r} label={r} selected={reason === r} onClick={() => { setReason(r); advance(); }} />
+              <div className="flex flex-col gap-2 mb-3">
+                {ONBOARDING_GOALS.map((g) => (
+                  <Chip key={g} label={g} selected={goal === g} onClick={() => { setGoal(g); finish(g); }} />
                 ))}
               </div>
-            </>
-          )}
-
-          {step === 4 && (
-            <>
-              <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce que tu veux améliorer ?</p>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#6b6055' }}>Choisis-en autant que tu veux.</p>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {ONBOARDING_FOCUS_OPTIONS.map((f) => (
-                  <Chip key={f} label={f} selected={focus.includes(f)} onClick={() => toggleFocus(f)} />
-                ))}
-              </div>
-              {error && <p className="text-xs text-center mb-3" style={{ color: '#dc2626' }}>{error}</p>}
-              <button onClick={finish} disabled={saving} className="ur-btn-gold w-full py-3 text-sm disabled:opacity-50">
-                {saving ? 'Un instant…' : 'C\'est parti →'}
-              </button>
+              {saving && <p className="text-xs text-center" style={{ color: '#a8a29e' }}>Un instant…</p>}
+              {error && <p className="text-xs text-center" style={{ color: '#dc2626' }}>{error}</p>}
             </>
           )}
 
