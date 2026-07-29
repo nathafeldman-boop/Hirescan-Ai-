@@ -43,14 +43,6 @@ export function parisDay(now: Date = new Date()): string {
   return now.toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' }); // ex: 2026-07-17
 }
 
-// Heure courante au fuseau Europe/Paris (0-23) — utilisé par le cron du
-// rappel Journal (voir app/api/cron/journal-reminder/route.ts), qui tourne
-// toutes les heures en UTC mais ne doit envoyer qu'à 20h locale. Calculer
-// l'heure via Intl plutôt qu'un offset fixe évite tout décalage l'été/l'hiver.
-export function parisHour(now: Date = new Date()): number {
-  return Number(now.toLocaleString('en-US', { timeZone: 'Europe/Paris', hour: 'numeric', hour12: false }));
-}
-
 
 // Modèle Mistral économique — adapté à un assistant conversationnel court.
 // mistral-small = bon rapport qualité/prix. On plafonne les tokens de réponse
