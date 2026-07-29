@@ -119,11 +119,14 @@ export default function DecouverteClient({ firstName, hasProfile }: { firstName:
 
         {/* Quête "profil incomplet" — le test personnalité n'est plus une
             étape obligatoire avant le hub, donc on la remet en avant ICI,
-            sous forme d'invitation plutôt que de mur. Disparaît d'elle-même
-            dès que le profil MBTI existe (voir app/decouverte/page.tsx). */}
+            sous forme d'invitation plutôt que de mur. Le tap n'envoie plus
+            directement au quiz : ça ouvre /quete, un écran qui pose
+            l'intention ("apprends à mieux te connaître") avant l'action —
+            voir app/quete/. Disparaît d'elle-même dès que le profil MBTI
+            existe (voir app/decouverte/page.tsx). */}
         {!hasProfile && (
           <Link
-            href="/quiz/personnalite"
+            href="/quete"
             className="hub-up hub-card group relative block rounded-[24px] px-5 py-4 mb-3.5 overflow-hidden"
             style={{ animationDelay: '.18s', background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)' }}
           >
