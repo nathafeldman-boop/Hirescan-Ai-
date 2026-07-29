@@ -655,6 +655,22 @@ export function emailDailyReminder(name: string | null) {
   };
 }
 
+export function emailQuestReminder(name: string | null, pendingCount: number) {
+  const firstName = name?.split(' ')[0] ?? 'toi';
+  return {
+    subject: `${firstName}, ton profil n'est pas encore terminé`,
+    html: wrap(`
+      <p style="margin:0 0 6px;color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px">Tes quêtes</p>
+      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;font-weight:800">Il te reste ${pendingCount} quête${pendingCount > 1 ? 's' : ''} pour mieux te connaître</h2>
+      <p style="margin:0 0 24px;color:#71717a;font-size:15px;line-height:1.7">
+        Tu as commencé ton parcours sur UrCecret, mais tu n'es pas encore allé(e) au bout. Chaque quête débloque un peu plus de toi-même — ce serait dommage de s'arrêter là.
+      </p>
+      ${cta('Reprendre mes quêtes →', `${BASE}/quetes`)}
+      <p style="margin:12px 0 0;color:#52525b;font-size:12px;text-align:center">Pas de pression — à ton rythme, quand tu veux.</p>
+    `),
+  };
+}
+
 export async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
