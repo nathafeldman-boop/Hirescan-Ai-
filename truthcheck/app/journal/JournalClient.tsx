@@ -6,12 +6,13 @@ import Link from 'next/link';
 import AppTabBar from '@/components/AppTabBar';
 import DayDetailSheet from './DayDetailSheet';
 import { EmotionRadar, MoodHeatmap } from './JournalCharts';
-import { MOODS, ENERGY_LEVELS, STRESS_LEVELS, EMOTIONS, moodEmoji } from '@/lib/journalScales';
+import { MOODS, moodEmoji } from '@/lib/journalScales';
 import {
   computeStreak, averageMoodOutOf10, moodEvolutionPct, bestAndWorstWeek, tagFrequency, tagCorrelationInsight,
   detectMoodAlert, type StatsEntry,
 } from '@/lib/journalStats';
-import { dailyReaction } from '@/lib/journalReflection';
+import { dailyReaction, firstEntryReply } from '@/lib/journalReflection';
+import ElioAvatar from '@/components/ElioAvatar';
 import type { JournalEntryLite } from '@/lib/journalTypes';
 
 type Entry = JournalEntryLite;
@@ -93,59 +94,24 @@ function LevelPicker({
   );
 }
 
-function EmotionPicker({ selected, onSelect, disabled }: { selected: string | null; onSelect: (v: string) => void; disabled: boolean }) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {EMOTIONS.map((e) => (
-        <button
-          key={e}
-          onClick={() => onSelect(e)}
-          disabled={disabled}
-          className="px-3 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 disabled:opacity-50"
-          style={{
-            background: selected === e ? 'var(--gold-soft)' : 'var(--paper)',
-            border: `1px solid ${selected === e ? 'var(--gold-line)' : 'var(--line)'}`,
-            color: 'var(--ink)',
-          }}
-        >
-          {e}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 interface SavedPayload { mood: number; energy: number; stress: number; emotion?: string; note?: string }
 
 // ── Onboarding : première visite du Journal ─────────────────────────────────
-// Un pas à la fois, façon quiz éclair — jamais l'impression d'un long
-// formulaire. Les 3 dernières questions (marquant/heureux/dérangé) sont
-// combinées dans la note de l'entrée du jour.
+// Volontairement réduit à DEUX gestes (humeur + une phrase) — "même une
+// seule phrase suffit". L'énergie/le stress prennent la valeur neutre par
+// défaut du schéma (voir schema.prisma) plutôt que d'être demandés ici ; le
+// détail plus riche (émotion, tags, photo) reste éditable ensuite via
+// DayDetailSheet, jamais perdu, juste plus tard.
 function OnboardingFlow({ onSubmit, saving }: { onSubmit: (p: SavedPayload) => void; saving: boolean }) {
   const [step, setStep] = useState(0);
   const [mood, setMood] = useState<number | null>(null);
-  const [energy, setEnergy] = useState<number | null>(null);
-  const [stress, setStress] = useState<number | null>(null);
-  const [emotion, setEmotion] = useState<string | null>(null);
-  const [highlight, setHighlight] = useState('');
-  const [happy, setHappy] = useState('');
-  const [bother, setBother] = useState('');
-
-  const advance = () => setStep((s) => s + 1);
+  const [note, setNote] = useState('');
 
   function finish() {
-    const noteLines: string[] = [];
-    if (highlight.trim()) noteLines.push(`Ce qui a marqué sa journée : ${highlight.trim()}`);
-    if (happy.trim()) noteLines.push(`Ce qui l'a rendu(e) heureux(se) : ${happy.trim()}`);
-    if (bother.trim()) noteLines.push(`Ce qui l'a dérangé(e) : ${bother.trim()}`);
-    onSubmit({
-      mood: mood!, energy: energy!, stress: stress!,
-      emotion: emotion ?? undefined,
-      note: noteLines.length ? noteLines.join('\n') : undefined,
-    });
+    onSubmit({ mood: mood!, energy: 3, stress: 3, note: note.trim() || undefined });
   }
 
-  const STEPS = 7;
+  const STEPS = 2;
   const progress = (step + 1) / STEPS;
 
   return (
@@ -160,67 +126,44 @@ function OnboardingFlow({ onSubmit, saving }: { onSubmit: (p: SavedPayload) => v
         <>
           <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Bienvenue dans ton Journal 📖</p>
           <p className="text-sm mb-5 leading-relaxed" style={{ color: '#6b6055' }}>
-            6 questions rapides pour qu&apos;Elio commence à te connaître — moins d&apos;une minute.
+            Comment tu te sens aujourd&apos;hui ? Même une seule phrase suffit.
           </p>
           <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Comment te sens-tu aujourd&apos;hui ?</p>
-          <LevelPicker levels={MOODS} selected={mood} onSelect={(v) => { setMood(v); advance(); }} disabled={saving} />
+          <LevelPicker levels={MOODS} selected={mood} onSelect={(v) => { setMood(v); setStep(1); }} disabled={saving} />
         </>
       )}
       {step === 1 && (
         <>
-          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Quel est ton niveau d&apos;énergie ?</p>
-          <LevelPicker levels={ENERGY_LEVELS} selected={energy} onSelect={(v) => { setEnergy(v); advance(); }} disabled={saving} />
-        </>
-      )}
-      {step === 2 && (
-        <>
-          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Ton niveau de stress ?</p>
-          <LevelPicker levels={STRESS_LEVELS} selected={stress} onSelect={(v) => { setStress(v); advance(); }} disabled={saving} />
-        </>
-      )}
-      {step === 3 && (
-        <>
-          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Une émotion qui domine aujourd&apos;hui ?</p>
-          <EmotionPicker selected={emotion} onSelect={(v) => { setEmotion(v); advance(); }} disabled={saving} />
-          <button onClick={advance} disabled={saving} className="w-full mt-4 py-2.5 text-xs font-semibold" style={{ color: '#a8a29e' }}>
-            Passer →
-          </button>
-        </>
-      )}
-      {step === 4 && (
-        <>
-          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce qui a marqué ta journée ?</p>
-          <textarea value={highlight} onChange={(e) => setHighlight(e.target.value.slice(0, 200))} rows={2}
-            placeholder="Un événement, une rencontre, une pensée…"
-            className="w-full text-sm rounded-xl px-3 py-2.5 resize-none outline-none mb-3"
-            style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }} />
-          <button onClick={advance} disabled={saving} className="ur-btn-gold w-full py-3 text-sm">Continuer →</button>
-        </>
-      )}
-      {step === 5 && (
-        <>
-          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce qui t&apos;a rendu heureux ?</p>
-          <textarea value={happy} onChange={(e) => setHappy(e.target.value.slice(0, 200))} rows={2}
-            placeholder="Optionnel…"
-            className="w-full text-sm rounded-xl px-3 py-2.5 resize-none outline-none mb-3"
-            style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }} />
-          <button onClick={advance} disabled={saving} className="ur-btn-gold w-full py-3 text-sm">Continuer →</button>
-        </>
-      )}
-      {step === 6 && (
-        <>
-          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce qui t&apos;a dérangé ?</p>
-          <textarea value={bother} onChange={(e) => setBother(e.target.value.slice(0, 200))} rows={2}
-            placeholder="Optionnel…"
+          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Tu veux en dire un peu plus ?</p>
+          <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 800))} rows={3}
+            placeholder="Un mot, une phrase, ce que tu veux — ou rien du tout."
             className="w-full text-sm rounded-xl px-3 py-2.5 resize-none outline-none mb-3"
             style={{ background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)' }} />
           <button onClick={finish} disabled={saving} className="ur-btn-gold w-full py-3 text-sm disabled:opacity-50">
-            {saving ? 'Enregistrement…' : 'Terminer mon premier jour →'}
+            {saving ? 'Un instant…' : 'Envoyer à Elio →'}
           </button>
         </>
       )}
 
-      <p className="text-[10px] text-center mt-4" style={{ color: '#a8a29e' }}>{Math.round(progress * 100)}% — presque fini</p>
+      <p className="text-[10px] text-center mt-4" style={{ color: '#a8a29e' }}>{Math.round(progress * 100)}%</p>
+    </div>
+  );
+}
+
+// ── Réponse d'Elio à la toute première entrée — LE moment qui doit faire
+// penser "cette appli me comprend", avant même de parler d'abonnement. Voir
+// lib/journalReflection.ts::firstEntryReply (déterministe, jamais un appel
+// IA ici — la réponse doit être instantanée).
+function ElioFirstReplyStep({ message, onContinue }: { message: string; onContinue: () => void }) {
+  return (
+    <div className="rounded-3xl p-6" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)', animation: 'jCardIn .4s cubic-bezier(.22,1,.36,1)' }}>
+      <div className="flex items-start gap-3 mb-5">
+        <div className="flex-shrink-0"><ElioAvatar size={36} speaking /></div>
+        <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm px-4 py-3" style={{ background: 'var(--paper)', border: '1px solid var(--line)' }}>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--ink)' }}>{message}</p>
+        </div>
+      </div>
+      <button onClick={onContinue} className="ur-btn-gold w-full py-3 text-sm">Continuer →</button>
     </div>
   );
 }
@@ -287,6 +230,7 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [showReminderPrompt, setShowReminderPrompt] = useState(false);
+  const [firstReplyMessage, setFirstReplyMessage] = useState<string | null>(null);
   const [reminderOn, setReminderOn] = useState(wantsDailyReminder);
   const [reminderToggling, setReminderToggling] = useState(false);
   const [month, setMonth] = useState<string | null>(null);
@@ -379,11 +323,11 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
       if (!res.ok) throw new Error();
       await res.json();
       await load(month ?? undefined);
-      // Première entrée jamais créée par ce compte : au lieu de retomber
-      // directement sur le dashboard, on propose le rappel quotidien puis on
-      // renvoie vers le Hub — "ensuite seulement" (voir le funnel décrit dans
-      // app/decouverte/DecouverteClient.tsx).
-      if (isFirstEver) setShowReminderPrompt(true);
+      // Première entrée jamais créée par ce compte : Elio répond d'abord
+      // (voir ElioFirstReplyStep) — LE moment de connexion émotionnelle —
+      // puis on propose le rappel quotidien, puis seulement on renvoie vers
+      // le Hub (voir le funnel décrit dans DecouverteClient.tsx).
+      if (isFirstEver) setFirstReplyMessage(firstEntryReply(payload.mood, firstName));
     } catch {
       setError("L'enregistrement a échoué. Réessaie.");
     } finally {
@@ -465,7 +409,7 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
         <div className="max-w-lg mx-auto w-full flex items-center justify-between">
           <span className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>📖 Journal</span>
           <div className="flex items-center gap-3">
-            {!showOnboarding && !showReminderPrompt && (
+            {!showOnboarding && !showReminderPrompt && !firstReplyMessage && (
               <button
                 onClick={toggleReminder}
                 disabled={reminderToggling}
@@ -484,7 +428,9 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
 
-        {showReminderPrompt ? (
+        {firstReplyMessage ? (
+          <ElioFirstReplyStep message={firstReplyMessage} onContinue={() => { setFirstReplyMessage(null); setShowReminderPrompt(true); }} />
+        ) : showReminderPrompt ? (
           <ReminderPrompt onDone={() => { setShowReminderPrompt(false); router.push('/decouverte'); }} />
         ) : showOnboarding ? (
           <OnboardingFlow onSubmit={persistEntry} saving={saving} />

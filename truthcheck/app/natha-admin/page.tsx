@@ -149,7 +149,7 @@ export default async function NathaAdminPage() {
     prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { path: '/' } }),
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 8 }),
-    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { id: true, email: true, name: true, tier: true, createdAt: true, onboardingReason: true } }),
+    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { id: true, email: true, name: true, tier: true, createdAt: true, onboardingGoal: true } }),
     prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }).then(async (aff) => {
       const clicks = await Promise.all(aff.map(a => prisma.pageView.count({ where: { path: `/__aff/${a.slug}` } })));
       return aff.map((a, i) => ({ ...a, clicks: clicks[i] }));
@@ -684,7 +684,7 @@ export default async function NathaAdminPage() {
                 </p>
                 <p style={{ color: C.muted, fontSize: 11.5, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {u.email} · {new Date(u.createdAt).toLocaleDateString('fr-FR')}
-                  {u.onboardingReason ? ` · "${u.onboardingReason}"` : ''}
+                  {u.onboardingGoal ? ` · "${u.onboardingGoal}"` : ''}
                 </p>
               </div>
               <span style={{
