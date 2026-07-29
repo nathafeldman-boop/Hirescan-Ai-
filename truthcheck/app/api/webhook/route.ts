@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { emailPremiumWelcome, emailAdminSale, sendEmail, ADMIN_NOTIF_EMAIL } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
 import { PLUS_PRICE_ID, STARTER_PRICE_ID, TIER_RANK } from '@/lib/plans';
+import { checkAndRecordQuestCompletions } from '@/lib/quests';
 
 // Upsert de tier qui ne rétrograde jamais un palier existant (ex: un abonné
 // Plus qui rachète le 1,99€ one-shot par erreur reste 'plus').
@@ -106,6 +107,10 @@ export async function POST(req: NextRequest) {
               await sendEmail(email, subject, html);
               await prisma.emailLog.create({ data: { userId: user.id, type: 'premium_welcome' } });
             }
+            // Un upgrade de palier peut d'un coup rendre "vraies" des quêtes
+            // Premium déjà accomplies en amont (ex: profil MBTI déjà fait) —
+            // voir requiresPremium dans lib/quests.ts.
+            await checkAndRecordQuestCompletions(user.id);
           }
         } catch (e) {
           console.error('Premium welcome email error:', e);

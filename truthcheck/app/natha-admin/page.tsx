@@ -495,9 +495,14 @@ export default async function NathaAdminPage() {
             pour les deux". ── */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
           <p style={sectionHeading}>Rétention & engagement</p>
-          <Link href="/natha-admin/insights" style={{ color: C.primary, fontSize: 13, fontWeight: 600, textDecoration: 'none', marginBottom: 12 }}>
-            Voir l&apos;analyse détaillée →
-          </Link>
+          <span style={{ display: 'flex', gap: 16 }}>
+            <Link href="/natha-admin/quetes" style={{ color: C.primary, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+              Voir les quêtes →
+            </Link>
+            <Link href="/natha-admin/insights" style={{ color: C.primary, fontSize: 13, fontWeight: 600, textDecoration: 'none', marginBottom: 12 }}>
+              Voir l&apos;analyse détaillée →
+            </Link>
+          </span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 10 }}>
 

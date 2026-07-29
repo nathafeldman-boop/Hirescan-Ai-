@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { ALL_MBTI_TYPES } from '@/lib/mbti';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
+import { checkAndRecordQuestCompletions } from '@/lib/quests';
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
   ]);
 
   await logEvent(session.user.id, EVENTS.TEST_COMPLETED, { mbtiType: type });
+  await checkAndRecordQuestCompletions(session.user.id);
 
   return NextResponse.json({ ok: true });
 }

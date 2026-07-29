@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
+import { checkAndRecordQuestCompletions } from '@/lib/quests';
 import { AGE_RANGES, GENDERS, ONBOARDING_GOALS } from '@/lib/onboardingFunnel';
 
 export const dynamic = 'force-dynamic';
@@ -37,6 +38,10 @@ export async function POST(req: NextRequest) {
   });
 
   await logEvent(uid, EVENTS.ONBOARDING_COMPLETED, { ageRange, gender, goal });
+  // Pas de célébration ici — l'utilisateur enchaîne tout de suite sur le
+  // Journal, ce n'est pas le moment d'interrompre. Elle apparaîtra comme
+  // badge déjà acquis à la prochaine visite de /quetes.
+  await checkAndRecordQuestCompletions(uid);
 
   return NextResponse.json({ ok: true });
 }

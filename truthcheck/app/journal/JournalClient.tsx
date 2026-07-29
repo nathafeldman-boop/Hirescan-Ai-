@@ -13,6 +13,7 @@ import {
 } from '@/lib/journalStats';
 import { dailyReaction, firstEntryReply } from '@/lib/journalReflection';
 import ElioAvatar from '@/components/ElioAvatar';
+import QuestCelebration, { type QuestCelebrationItem } from '@/components/QuestCelebration';
 import type { JournalEntryLite } from '@/lib/journalTypes';
 
 type Entry = JournalEntryLite;
@@ -309,6 +310,7 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
   const [loading, setLoading] = useState(true);
   const [showReminderPrompt, setShowReminderPrompt] = useState(false);
   const [firstReplyMessage, setFirstReplyMessage] = useState<string | null>(null);
+  const [newlyCompletedQuests, setNewlyCompletedQuests] = useState<QuestCelebrationItem[]>([]);
   const [reminderOn, setReminderOn] = useState(wantsDailyReminder);
   const [reminderToggling, setReminderToggling] = useState(false);
   const [month, setMonth] = useState<string | null>(null);
@@ -399,13 +401,19 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
-      await res.json();
+      const d = await res.json();
       await load(month ?? undefined);
       // Première entrée jamais créée par ce compte : Elio répond d'abord
       // (voir ElioFirstReplyStep) — LE moment de connexion émotionnelle —
       // puis on propose le rappel quotidien, puis seulement on renvoie vers
-      // le Hub (voir le funnel décrit dans DecouverteClient.tsx).
-      if (isFirstEver) setFirstReplyMessage(firstEntryReply(payload.mood, firstName));
+      // le Hub (voir le funnel décrit dans DecouverteClient.tsx). Jamais
+      // EMPILER ça avec la célébration de quête (ex. "premier journal") —
+      // un seul moment fort à la fois.
+      if (isFirstEver) {
+        setFirstReplyMessage(firstEntryReply(payload.mood, firstName));
+      } else if (Array.isArray(d?.newlyCompletedQuests) && d.newlyCompletedQuests.length > 0) {
+        setNewlyCompletedQuests(d.newlyCompletedQuests);
+      }
     } catch {
       setError("L'enregistrement a échoué. Réessaie.");
     } finally {
@@ -841,6 +849,8 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
           </div>
         </div>
       )}
+
+      <QuestCelebration quests={newlyCompletedQuests} onClose={() => setNewlyCompletedQuests([])} />
 
       <AppTabBar />
     </main>

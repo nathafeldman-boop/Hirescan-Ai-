@@ -118,6 +118,49 @@ model User {
   appEvents    AppEvent[]
   mbtiTestHistory MbtiTestHistory[]
   pageViews    PageView[]
+  questCompletions QuestCompletion[]
+  generatedQuests  GeneratedQuest[]
+}
+
+// ── Quêtes ────────────────────────────────────────────────────────────────
+// Le catalogue des quêtes (titre, description, condition de complétion) vit en
+// CODE (lib/quests.ts), pas en base — c'est du contenu éditorial qui bouge
+// souvent, pas des données utilisateur. Cette table ne stocke QUE le fait
+// "userId a rempli questKey à telle date" : source de vérité unique pour (a)
+// figer une quête complétée même si le signal sous-jacent change plus tard
+// (ex. une série de 7 jours qui se casse ensuite ne doit pas "décompléter" la
+// quête), (b) dater le moment exact pour la célébration et les stats admin.
+model QuestCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  questKey    String   // clé du catalogue, ex. "journal_streak_7"
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questKey])
+  @@index([userId])
+  @@index([questKey])
+}
+
+// ── Quêtes générées par Elio ──────────────────────────────────────────────
+// Quand un compte a complété tout le catalogue disponible pour son palier,
+// Elio en génère de nouvelles, personnalisées (objectif du questionnaire
+// d'accueil + thèmes récents du Journal) — voir lib/questGenerator.ts. Table
+// séparée de QuestCompletion car ces quêtes n'existent que pour CE compte
+// (pas de clé de catalogue partagée) et portent leur propre texte.
+model GeneratedQuest {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  description String    @db.Text
+  emoji       String?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ── Historique des tests MBTI ────────────────────────────────────────────────
