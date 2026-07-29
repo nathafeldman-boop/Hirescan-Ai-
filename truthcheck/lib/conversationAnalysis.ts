@@ -1,6 +1,6 @@
-// ── Analyse de conversation par Nova ─────────────────────────────────────────
+// ── Analyse de conversation par Elio ─────────────────────────────────────────
 // Feature phare (voir demande produit) : l'utilisateur colle une conversation
-// et/ou envoie une capture d'écran, Nova l'analyse en JSON structuré via
+// et/ou envoie une capture d'écran, Elio l'analyse en JSON structuré via
 // Mistral (texte + vision, même modèle que le coach — voir lib/chat.ts).
 // Même logique que lib/customQuiz.ts : un prompt qui force un format JSON
 // strict, un parseur qui valide avant de faire confiance à quoi que ce soit.
@@ -22,7 +22,7 @@ const SAFETY_NOTE =
   "Cette analyse est générée automatiquement à visée ludique et de réflexion personnelle — ce n'est PAS un diagnostic psychologique. En cas de doute réel sur une relation (emprise, violence), parle à un professionnel ou une association spécialisée.";
 
 export function conversationAnalysisPrompt(): string {
-  return `Tu es Nova, le coach IA d'UrCecret. On te montre un extrait de conversation (texte collé et/ou capture d'écran) entre l'utilisateur et une autre personne (ami, date, ex, partenaire...). Analyse cette conversation et réponds UNIQUEMENT avec un objet JSON valide, RIEN d'autre (pas de markdown, pas de phrase avant/après), au format EXACT suivant :
+  return `Tu es Elio, le compagnon de développement personnel d'UrCecret. On te montre un extrait de conversation (texte collé et/ou capture d'écran) entre l'utilisateur et une autre personne (ami, date, ex, partenaire...). Analyse cette conversation et réponds UNIQUEMENT avec un objet JSON valide, RIEN d'autre (pas de markdown, pas de phrase avant/après), au format EXACT suivant :
 
 {
   "personality": "2-3 phrases sur la personnalité probable de L'AUTRE personne d'après son style d'écriture (ton, vocabulaire, rythme des réponses)",

@@ -6,7 +6,7 @@
 export type Tier = 'free' | 'starter' | 'plus' | 'premium';
 
 // ── Grille de quotas, un seul endroit à modifier ────────────────────────────
-// Toute nouvelle feature consommant le quota Nova (chat, créateur de test,
+// Toute nouvelle feature consommant le quota Elio (chat, créateur de test,
 // analyse de conversation, et les prochaines : journal, compatibilité...)
 // DOIT lire ces mêmes constantes plutôt que d'inventer sa propre limite —
 // un "message" a un sens unique et cohérent dans toute l'app.
@@ -41,6 +41,14 @@ export function dailyLimitFor(tier: string | undefined): number {
 // quota. Le quota se réinitialise à minuit, heure de Paris.
 export function parisDay(now: Date = new Date()): string {
   return now.toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' }); // ex: 2026-07-17
+}
+
+// Heure courante au fuseau Europe/Paris (0-23) — utilisé par le cron du
+// rappel Journal (voir app/api/cron/journal-reminder/route.ts), qui tourne
+// toutes les heures en UTC mais ne doit envoyer qu'à 20h locale. Calculer
+// l'heure via Intl plutôt qu'un offset fixe évite tout décalage l'été/l'hiver.
+export function parisHour(now: Date = new Date()): number {
+  return Number(now.toLocaleString('en-US', { timeZone: 'Europe/Paris', hour: 'numeric', hour12: false }));
 }
 
 

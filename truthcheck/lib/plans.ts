@@ -1,12 +1,12 @@
 // ── Abonnements UrCecret ─────────────────────────────────────────────────────
 // Un seul endroit qui décrit les paliers.
 //
-//  - free     : gratuit — test MBTI + Nova découverte (5 messages PAR MOIS)
+//  - free     : gratuit — test MBTI + Elio découverte (5 messages PAR MOIS)
 //  - unlocked : 1,99€ UNE FOIS (pas un abonnement) → juste le résultat MBTI
-//               débloqué à vie. PAS de Nova personnalisée (sinon un achat à
+//               débloqué à vie. PAS de Elio personnalisée (sinon un achat à
 //               1,99€ vaudrait autant qu'un abonnement — voir historique :
 //               c'était exactement le bug corrigé en introduisant Starter).
-//  - starter  : abonnement 1,99€/mois → profil MBTI débloqué + Nova (5 msg/jour)
+//  - starter  : abonnement 1,99€/mois → profil MBTI débloqué + Elio (5 msg/jour)
 //  - plus     : abonnement 5€/mois → MBTI débloqué + Coach IA (30 messages/jour)
 //  - premium  : abonnements 9,99€/mois ou 29,99€/an → MBTI débloqué + Coach (50/jour)
 //
@@ -29,7 +29,7 @@ export function hasPremiumAccess(tier?: string | null): boolean {
   return tier === 'plus' || tier === 'premium';
 }
 
-// Nova personnalisée : réservée aux ABONNEMENTS (starter/plus/premium). Un
+// Elio personnalisée : réservée aux ABONNEMENTS (starter/plus/premium). Un
 // déblocage ponctuel ('unlocked', 1,99€ one-shot) n'y donne PAS accès.
 export function hasPaidAccess(tier?: string | null): boolean {
   return tier === 'starter' || tier === 'plus' || tier === 'premium';
@@ -38,7 +38,7 @@ export function hasPaidAccess(tier?: string | null): boolean {
 // Accès au PROFIL MBTI complet (résultat, 16 types, célébrités…) : tout
 // abonné payant, OU un déblocage ponctuel 'unlocked'. Plus large que
 // hasPaidAccess — c'est justement ce qui distingue "voir mon résultat" de
-// "avoir Nova".
+// "avoir Elio".
 export function hasProfileAccess(tier?: string | null): boolean {
   return tier === 'unlocked' || hasPaidAccess(tier);
 }

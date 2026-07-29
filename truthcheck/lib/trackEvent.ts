@@ -1,7 +1,9 @@
 // ── Journal d'événements produit ─────────────────────────────────────────────
 // Un seul point d'écriture pour AppEvent — jamais bloquant : un événement qui
 // échoue à s'écrire ne doit JAMAIS faire échouer la vraie action (envoyer un
-// message à Nova, sauver une entrée de journal...). Toujours en fire-and-forget.
+// message à Elio, sauver une entrée de journal...). Toujours en fire-and-forget.
+// (Les clés d'événements ci-dessous, ex. NOVA_MESSAGE_SENT, restent inchangées
+// pour la continuité des données déjà écrites — seul le nom affiché change.)
 //
 // Noms d'événements — liste fermée, à étendre ici en premier avant d'appeler
 // logEvent ailleurs, pour que /natha-admin/insights sache toujours quoi
@@ -16,6 +18,8 @@ export const EVENTS = {
   COMPAT_CREATED: 'compat_created',
   PROFIL_AVANCE_GENERATED: 'profil_avance_generated',
   QUIZ_CREATED: 'quiz_created',
+  ONBOARDING_COMPLETED: 'onboarding_completed',
+  DAILY_REMINDER_OPTED_IN: 'daily_reminder_opted_in',
 } as const;
 
 export type EventName = typeof EVENTS[keyof typeof EVENTS];

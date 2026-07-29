@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 const MIN_ENTRIES = 3;
 const MAX_ENTRIES = 30;
 
-// Tendances + résumé de période Nova sur le journal — générés à la demande
+// Tendances + résumé de période Elio sur le journal — générés à la demande
 // (bouton), pas à chaque chargement de page. La SAISIE du journal reste
 // gratuite ; CETTE analyse (tendances multi-jours, résumé de période) est
 // réservée aux abonnés ou à la période d'essai découverte — voir

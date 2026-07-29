@@ -2,13 +2,13 @@
 // Un seul endroit qui décrit qui a accès à quoi — un changement de règle
 // (durée d'essai, quelle feature devient premium) se fait ICI, pas éparpillé
 // dans les routes API. La SAISIE du jour (humeur/énergie/stress/note/photo)
-// reste toujours gratuite : c'est l'ANALYSE (Nova + recul sur l'historique)
+// reste toujours gratuite : c'est l'ANALYSE (Elio + recul sur l'historique)
 // qui a un palier.
 //
 //  - simpleReflection : 1 phrase déterministe après chaque entrée (gratuit,
 //    toujours) — voir lib/journalReflection.ts.
-//  - trendInsights     : tendances multi-jours détectées par Nova (IA).
-//  - periodSummary     : résumé Nova d'une période (semaine/mois).
+//  - trendInsights     : tendances multi-jours détectées par Elio (IA).
+//  - periodSummary     : résumé Elio d'une période (semaine/mois).
 //  - history           : navigation du calendrier au-delà du mois en cours +
 //                         meilleure/pire semaine, radar émotionnel, heatmap
 //                         (tout ce qui demande plusieurs semaines de recul).

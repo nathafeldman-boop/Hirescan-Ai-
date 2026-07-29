@@ -50,7 +50,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     disclaimer: quiz.disclaimer,
     // Lien de parrainage du créateur — même mécanisme que le chat (voir
     // /api/referral/claim) : si le répondant s'inscrit puis paie 2€+, le
-    // créateur du test gagne +3 messages Nova/jour à vie.
+    // créateur du test gagne +3 messages Elio/jour à vie.
     creatorInviteId: quiz.creatorId,
   });
 }

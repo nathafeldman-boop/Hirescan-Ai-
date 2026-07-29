@@ -48,7 +48,7 @@ export default function DashboardClient({ user }: Props) {
   const isPremium = user.tier === 'premium' || user.tier === 'pro' || user.tier === 'plus';
   const theme = isPremium ? DARK : LIGHT;
   // Distinct de isPremium (qui ne pilote que le THÈME clair/sombre) : un abonné
-  // 'starter' a déjà accès à Nova mais n'est pas en thème sombre — le badge
+  // 'starter' a déjà accès à Elio mais n'est pas en thème sombre — le badge
   // "Abonnés" doit suivre le vrai accès, pas le thème visuel.
   const isPaidNova = hasPaidAccess(user.tier);
   const type = user.mbtiType ? mbtiTypes[user.mbtiType] : null;

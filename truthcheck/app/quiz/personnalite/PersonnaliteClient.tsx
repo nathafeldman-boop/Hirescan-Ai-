@@ -240,12 +240,12 @@ function QuizScreen({ onComplete, questions, t, lang }: {
         })}
       </div>
 
-      {/* Rappel discret que Nova existe pendant le test — nouvel onglet pour
+      {/* Rappel discret qu'Elio existe pendant le test — nouvel onglet pour
           ne pas perdre la progression du quiz en cours. */}
       <p className="text-center text-[12px] mt-8" style={{ color: '#a8a29e' }}>
         {lang === 'en' ? '🔮 A question meanwhile? ' : '🔮 Une question en attendant ? '}
         <a href="/chat" target="_blank" rel="noopener noreferrer" className="font-semibold" style={{ color: 'var(--gold)' }}>
-          {lang === 'en' ? 'Chat with Nova' : 'Discute avec Nova'}
+          {lang === 'en' ? 'Chat with Elio' : 'Discute avec Elio'}
         </a>
       </p>
       </div>
@@ -577,6 +577,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <div className="w-full max-w-sm">
 
+        {/* ─── Pont émotionnel entre "je viens de finir le test" et "le
+            paywall arrive" — jamais présenté comme un simple blocage. ── */}
+        <p className="text-center text-[13px] mb-5" style={{ color: '#78716c', lineHeight: 1.5 }}>
+          {isFr
+            ? <>Tu viens de découvrir une partie de toi. <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Continue ton exploration.</span></>
+            : <>You just discovered a part of yourself. <span style={{ color: 'var(--ink)', fontWeight: 700 }}>Keep exploring.</span></>}
+        </p>
+
         {/* ─── L'oracle voilé — RIEN du résultat n'est révélé avant paiement.
             Ni le code, ni le nom, ni la famille : le sceau tourne, encore
             fermé. Le type complet n'apparaît qu'après paiement (/success). ── */}
@@ -697,7 +705,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
 
         <div className="space-y-3 mt-4">
 
-          {/* HERO: Starter 1,99€/mois — profil + Nova. Encre profonde, prix en or. */}
+          {/* HERO: Starter 1,99€/mois — profil + Elio. Encre profonde, prix en or. */}
           <div className="relative rounded-[28px] px-5 pt-6 pb-5 overflow-hidden" style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
             <div aria-hidden className="absolute pointer-events-none" style={{ top: -30, right: -30, opacity: 0.12 }}>
               <Seal size={140} />
@@ -719,11 +727,11 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             <ul className="space-y-2.5 mb-5 relative">
               {(isFr ? [
                 `Ton profil complet : amour, carrière, face cachée`,
-                'Nova, ton coach IA perso : 5 messages par jour',
+                'Elio, ton compagnon de développement personnel : 5 messages par jour',
                 'Accès immédiat, annulable à tout moment',
               ] : [
                 `Your complete profile: love, career, shadow side`,
-                'Nova, your personal AI coach: 5 messages a day',
+                'Elio, your personal growth companion: 5 messages a day',
                 'Instant access, cancel anytime',
               ]).map(b => (
                 <li key={b} className="flex items-start gap-2.5 text-[13px]" style={{ color: 'rgba(250,246,236,0.85)', lineHeight: 1.5 }}>
@@ -741,7 +749,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="relative block w-full py-4 rounded-full font-bold text-[15px] text-center active:scale-[0.98] transition-transform"
                 style={{ background: 'var(--gold)', color: 'var(--ink)', textDecoration: 'none' }}
               >
-                {isFr ? `Débloquer mon profil + Nova, 1,99 €/mois` : `Unlock my profile + Nova, €1.99/mo`}
+                {isFr ? `Débloquer mon profil + Elio, 1,99 €/mois` : `Unlock my profile + Elio, €1.99/mo`}
               </a>
             ) : (
               <button
@@ -750,7 +758,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
                 className="relative w-full py-4 rounded-full font-bold text-[15px] transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ background: 'var(--gold)', color: 'var(--ink)' }}
               >
-                {loading ? '…' : isFr ? `Débloquer mon profil + Nova, 1,99 €/mois` : `Unlock my profile + Nova, €1.99/mo`}
+                {loading ? '…' : isFr ? `Débloquer mon profil + Elio, 1,99 €/mois` : `Unlock my profile + Elio, €1.99/mo`}
               </button>
             )}
             <p className="text-center text-[11px] mt-2.5 relative" style={{ color: 'rgba(250,246,236,0.45)' }}>
@@ -758,8 +766,8 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             </p>
           </div>
 
-          {/* One-shot 1,99€ SANS abonnement — juste le résultat, à vie, pas de
-              Nova. Collée juste sous le Starter 1,99€/mois pour comparer les
+          {/* One-shot 1,99€ SANS abonnement — juste le résultat, à vie, pas
+              d'Elio. Collée juste sous le Starter 1,99€/mois pour comparer les
               deux d'un coup d'œil (constat terrain : afficher les deux prix
               1,99€ côte à côte convertit mieux que Starter seul). */}
           <div className="relative rounded-2xl px-5 py-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
@@ -809,6 +817,18 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <p className="text-center text-[11px] font-semibold" style={{ color: '#1f7a4d' }}>
             {isFr ? '✓ Satisfait ou remboursé sous 7 jours' : '✓ 7-day money-back guarantee'}
           </p>
+        </div>
+
+        {/* ─── Rétention — refuser le paywall ne doit jamais être une sortie
+            de l'app. Toujours proposer de continuer gratuitement (voir Hub,
+            qui garde la quête "profil incomplet" active). ── */}
+        <div className="mt-7 pt-5 text-center" style={{ borderTop: '1px solid var(--line)' }}>
+          <p className="text-[12.5px] mb-2" style={{ color: '#a8a29e', lineHeight: 1.5 }}>
+            {isFr ? 'Pas prêt à continuer maintenant ?' : 'Not ready to continue right now?'}
+          </p>
+          <Link href="/decouverte" className="text-[12.5px] font-semibold" style={{ color: 'var(--gold)' }}>
+            {isFr ? 'Continue gratuitement ton exploration depuis le hub →' : 'Keep exploring for free from the hub →'}
+          </Link>
         </div>
 
       </div>

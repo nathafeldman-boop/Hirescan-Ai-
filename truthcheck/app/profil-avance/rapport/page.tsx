@@ -16,10 +16,10 @@ export const metadata: Metadata = {
 };
 
 // Rapport téléchargeable — recompose en un seul document ce qui est déjà
-// généré ailleurs (le test MBTI + l'analyse avancée de Nova) plutôt que de
+// généré ailleurs (le test MBTI + l'analyse avancée d'Elio) plutôt que de
 // dupliquer la génération. Si l'un des deux manque, on renvoie vers
 // /profil-avance qui sait déjà présenter le bon écran (faire le test /
-// générer l'analyse / débloquer Nova).
+// générer l'analyse / débloquer Elio).
 export default async function RapportPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect('/login?callbackUrl=/profil-avance/rapport');

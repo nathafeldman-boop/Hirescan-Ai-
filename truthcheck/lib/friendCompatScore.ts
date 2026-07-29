@@ -1,7 +1,7 @@
 // ── Score de compatibilité — gratuit, déterministe, sans appel IA ───────────
 // C'est la valeur que voit TOUT LE MONDE, abonné ou pas (voir /api/compat) :
 // un vrai pourcentage + une phrase concrète, pas une promesse vague. L'analyse
-// approfondie de Nova (commonPoints/differences/strengths/watchPoints/summary)
+// approfondie de Elio (commonPoints/differences/strengths/watchPoints/summary)
 // reste, elle, réservée aux abonnés — voir lib/friendCompat.ts.
 //
 // Seules 3 des 8 questions (social/decisions/organisation) se traduisent

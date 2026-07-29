@@ -81,6 +81,29 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // ── Questionnaire d'accueil (page /bienvenue, juste après l'inscription) ──
+  // But produit : donner l'impression dès la 1ère minute que l'app est faite
+  // pour CETTE personne, et remonter l'intention réelle dans l'admin (voir
+  // /natha-admin/user/[id]) — pas d'usage dans la personnalisation d'Elio
+  // pour l'instant (lib/coach.ts reste basé sur le MBTI), purement produit/CRM.
+  // onboardingCompletedAt : marqueur "a répondu au questionnaire" — sert aussi
+  // de garde pour ne jamais le réafficher (voir app/bienvenue/page.tsx) et,
+  // pour les comptes email OTP, à décider s'il faut y renvoyer un utilisateur
+  // déjà existant (voir lib/onboardingFunnel.ts).
+  ageRange              String?   // tranche, ex. "18-24" — jamais un âge exact (moins de friction, moins sensible)
+  gender                String?
+  onboardingReason      String?   // pourquoi cette personne vient sur UrCecret (raison principale, choix unique)
+  onboardingFocus       Json?     // ce qu'elle veut améliorer dans sa vie (string[], choix multiple)
+  onboardingCompletedAt DateTime?
+
+  // ── Rappel quotidien (Journal) ──
+  // MVP volontairement basé sur l'email (infra déjà éprouvée, voir
+  // app/api/cron/journal-reminder/route.ts) plutôt que sur une vraie
+  // notification push navigateur : aucune infra push (VAPID/service worker)
+  // n'existait avant cette feature, et un envoi email est vérifiable de bout
+  // en bout dès aujourd'hui. À remplacer par du push si besoin plus tard.
+  wantsDailyReminder Boolean @default(false)
+
   accounts     Account[]
   sessions     Session[]
   quizResults  QuizResult[]
@@ -118,7 +141,7 @@ model MbtiTestHistory {
 
 // ── Journal d'événements produit ─────────────────────────────────────────────
 // Un événement horodaté par action utilisateur significative (connexion,
-// message Nova envoyé, entrée de journal enregistrée, test terminé...) — voir
+// message Elio envoyé, entrée de journal enregistrée, test terminé...) — voir
 // lib/trackEvent.ts pour l'écriture et la liste des noms d'événements. Sert
 // aux funnels et à la rétention D1/D7/D30 dans /natha-admin/insights, bien
 // plus précis que les proxys déduits des tables métier après coup.
@@ -139,7 +162,7 @@ model AppEvent {
 // Une entrée par jour (clé unique userId+day, upsert). La SAISIE reste
 // volontairement PAS réservée aux abonnés — c'est un levier d'engagement
 // quotidien à la Duolingo, utile justement pour faire revenir un compte
-// gratuit avant même de payer. C'est l'ANALYSE Nova (tendances, résumés de
+// gratuit avant même de payer. C'est l'ANALYSE Elio (tendances, résumés de
 // période — voir lib/journalAccess.ts) qui est premium / en essai découverte.
 // mood/energy/stress : échelle 1-5 chacun. energy/stress ont un défaut (3 =
 // neutre) pour rester compatibles avec les lignes créées avant leur ajout.
@@ -168,7 +191,7 @@ model JournalEntry {
 // ── Compatibilité avec un ami / partenaire / membre de la famille ───────────
 // L'utilisateur décrit une personne de son entourage via un court
 // questionnaire de perception (ce n'est PAS le vrai test MBTI de cette
-// personne — elle n'a pas de compte). Nova compare ce profil perçu au profil
+// personne — elle n'a pas de compte). Elio compare ce profil perçu au profil
 // MBTI de l'utilisateur et génère un résultat pensé pour être partagé
 // (réseaux sociaux) — voir /compat/[id], page publique en lecture seule.
 model CompatibilityCheck {
@@ -179,7 +202,7 @@ model CompatibilityCheck {
   answers      Json     // { questionId: string, choiceLabel: string }[] — réponses perçues sur l'autre
   // Score + headline : déterministes, calculés pour TOUT LE MONDE (gratuit
   // compris) sans appel IA — voir lib/friendCompatScore.ts. C'est ce que les
-  // comptes gratuits voient. Le reste (généré par Nova, coûte un message du
+  // comptes gratuits voient. Le reste (généré par Elio, coûte un message du
   // quota) reste nullable : absent tant que le compte n'est pas payant.
   score        Int
   headline     String?  @db.Text
@@ -198,9 +221,9 @@ model CompatibilityCheck {
 // ── Analyse de personnalité avancée ─────────────────────────────────────────
 // Va plus loin que le simple MBTI : combine le type MBTI, les scores par
 // axe, les dernières analyses de conversation et le journal émotionnel pour
-// donner l'impression que Nova connaît vraiment l'utilisateur. Un seul
+// donner l'impression qu'Elio connaît vraiment l'utilisateur. Un seul
 // enregistrement par utilisateur (userId unique) : régénérer REMPLACE
-// l'ancien, ce n'est pas un historique — c'est "le profil actuel de Nova sur
+// l'ancien, ce n'est pas un historique — c'est "le profil actuel d'Elio sur
 // toi", qui s'affine avec le temps.
 model AdvancedAnalysis {
   id                  String   @id @default(cuid())
@@ -217,9 +240,9 @@ model AdvancedAnalysis {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// ── Analyse de conversation par Nova (feature phare, pensée pour être virale) ──
+// ── Analyse de conversation par Elio (feature phare, pensée pour être virale) ──
 // L'utilisateur colle une conversation (texte) et/ou une capture d'écran ;
-// Nova l'analyse en JSON structuré. Une ligne par analyse, jamais réécrite —
+// Elio l'analyse en JSON structuré. Une ligne par analyse, jamais réécrite —
 // sert d'historique consultable et de brique pour la mémoire long terme
 // (Phase 2 : injecter un résumé des dernières analyses dans le contexte coach).
 model ConversationAnalysis {
@@ -241,8 +264,8 @@ model ConversationAnalysis {
   @@index([userId])
 }
 
-// ── Tests créés par Nova, à partager (croissance virale) ────────────────────
-// Un abonné payant demande à Nova un test sur un thème ; elle génère les
+// ── Tests créés par Elio, à partager (croissance virale) ────────────────────
+// Un abonné payant demande à Elio un test sur un thème ; il génère les
 // questions + des tranches de résultat via Mistral (JSON structuré), stockées
 // ici. Le test est ensuite jouable par N'IMPORTE QUI via /q/[id], sans compte
 // — c'est le levier viral : chaque répondant termine sur un CTA vers le vrai
@@ -250,7 +273,7 @@ model ConversationAnalysis {
 model CustomQuiz {
   id            String   @id @default(cuid())
   creatorId     String
-  topic         String   // ce que l'utilisateur a demandé à Nova, ex: "mes vrais amis"
+  topic         String   // ce que l'utilisateur a demandé à Elio, ex: "mes vrais amis"
   title         String
   intro         String
   // [{ text: string, options: [{ label: string, points: number }] }]

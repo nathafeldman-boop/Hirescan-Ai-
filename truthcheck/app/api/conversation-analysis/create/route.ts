@@ -9,13 +9,13 @@ import { logEvent, EVENTS } from '@/lib/trackEvent';
 
 export const dynamic = 'force-dynamic';
 
-// Même limite que la photo envoyée à Nova en chat (voir /api/chat) — data URI
+// Même limite que la photo envoyée à Elio en chat (voir /api/chat) — data URI
 // décodée reste sous ~4,5 Mo.
 const MAX_IMAGE_DATA_URI_LENGTH = 6_000_000;
 
 // Analyse de conversation (texte collé et/ou capture d'écran) — feature phare,
 // réservée aux abonnés payants (starter/plus/premium), même quota que le chat
-// Nova (1 analyse = 1 message, pas de nouveau système de limite à maintenir).
+// Elio (1 analyse = 1 message, pas de nouveau système de limite à maintenir).
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const user = session?.user as { id?: string; tier?: string } | undefined;
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
   if (!text && !imageDataUri) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
-  // Même quota journalier que le chat Nova.
+  // Même quota journalier que le chat Elio.
   const day = parisDay();
   const limit = dailyLimitFor(user.tier);
   const usage = await prisma.chatUsage.upsert({

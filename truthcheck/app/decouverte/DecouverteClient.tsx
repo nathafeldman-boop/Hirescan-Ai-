@@ -16,7 +16,7 @@ const CARDS = [
   {
     href: '/chat',
     emoji: '✨',
-    title: 'Parle avec Nova',
+    title: 'Parle avec Elio',
     kicker: 'Coach IA',
     desc: 'Ton IA personnelle pour mieux réfléchir et mieux te comprendre.',
     accent: 'var(--fam-nt)',
@@ -51,7 +51,7 @@ const CARDS = [
   },
 ] as const;
 
-export default function DecouverteClient() {
+export default function DecouverteClient({ firstName, hasProfile }: { firstName: string | null; hasProfile: boolean }) {
   return (
     <main className="min-h-screen relative overflow-x-hidden" style={{ background: 'var(--paper)', color: 'var(--ink)' }}>
       <div className="grain-overlay" />
@@ -107,7 +107,7 @@ export default function DecouverteClient() {
             <Seal size={56} spin color="#FAF6EC" />
           </div>
           <p className="hub-up ur-label text-[11px] mb-4" style={{ color: 'var(--gold)', animationDelay: '.05s' }}>
-            Ton exploration commence ici
+            {firstName ? `Ton espace, ${firstName}` : 'Ton exploration commence ici'}
           </p>
           <h1 className="hub-up font-display mb-4" style={{ color: '#FAF6EC', fontSize: 'clamp(1.9rem, 7vw, 2.75rem)', lineHeight: 1.12, fontWeight: 700, letterSpacing: '-0.01em', animationDelay: '.1s' }}>
             Que veux-tu découvrir sur toi&nbsp;?
@@ -116,6 +116,26 @@ export default function DecouverteClient() {
             Choisis ton expérience et commence ton exploration.
           </p>
         </div>
+
+        {/* Quête "profil incomplet" — le test personnalité n'est plus une
+            étape obligatoire avant le hub, donc on la remet en avant ICI,
+            sous forme d'invitation plutôt que de mur. Disparaît d'elle-même
+            dès que le profil MBTI existe (voir app/decouverte/page.tsx). */}
+        {!hasProfile && (
+          <Link
+            href="/quiz/personnalite"
+            className="hub-up hub-card group relative block rounded-[24px] px-5 py-4 mb-3.5 overflow-hidden"
+            style={{ animationDelay: '.18s', background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)' }}
+          >
+            <div className="relative flex items-center gap-4">
+              <span className="text-2xl flex-shrink-0">🛑</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Ton profil n&apos;est pas encore complet</p>
+                <p className="text-[12.5px] mt-0.5" style={{ color: '#8a7d5c' }}>Apprends à mieux te connaître →</p>
+              </div>
+            </div>
+          </Link>
+        )}
 
         {/* Les 5 cartes */}
         <div className="flex flex-col gap-3.5">

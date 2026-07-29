@@ -1,6 +1,6 @@
 // ── Statistiques déterministes du Journal ───────────────────────────────────
 // Tout ce qui peut se calculer à partir des données brutes (pas besoin de
-// Nova/IA) : série, moyenne, évolution, meilleure/pire semaine, fréquence des
+// Elio/IA) : série, moyenne, évolution, meilleure/pire semaine, fréquence des
 // tags. Gratuit pour tous — voir lib/journalAccess.ts pour ce qui, lui, reste
 // réservé (tendances/résumés générés par IA). Fonctions pures, testables,
 // importables côté client comme serveur.
@@ -121,7 +121,7 @@ export interface MoodAlert { emoji: string; text: string }
 // repérer un vrai changement (stress qui monte, humeur qui baisse ou qui
 // remonte nettement). 100% déterministe, pas d'appel IA. Le CONTENU (texte)
 // est réservé aux abonnés (voir JournalClient.tsx qui affiche une version
-// floutée "Nova a repéré quelque chose" aux comptes gratuits) — la détection
+// floutée "Elio a repéré quelque chose" aux comptes gratuits) — la détection
 // elle-même tourne pour tout le monde puisque `allEntries` est déjà dispo
 // côté client (voir app/api/journal/route.ts).
 export function detectMoodAlert(entries: StatsEntry[]): MoodAlert | null {

@@ -1139,30 +1139,30 @@ export default function ResultsClient({ quiz }: Props) {
             </div>
           </div>
 
-          {/* Nova cross-sell — connecte ce résultat au coach IA, pas juste au
-              test MBTI. Les abonnés (isPremium) ont déjà Nova : lien direct.
-              Les autres n'ont pas payé CE rapport, mais Nova reste utilisable
+          {/* Elio cross-sell — connecte ce résultat au coach IA, pas juste au
+              test MBTI. Les abonnés (isPremium) ont déjà Elio : lien direct.
+              Les autres n'ont pas payé CE rapport, mais Elio reste utilisable
               gratuitement en mode découverte (voir /api/chat) — même logique
-              que le paywall MBTI ("pas encore convaincu(e) ? teste Nova"). ── */}
+              que le paywall MBTI ("pas encore convaincu(e) ? teste Elio"). ── */}
           <div
             className="mt-4 rounded-2xl overflow-hidden border"
             style={{ background: 'linear-gradient(135deg, rgba(194,97,31,0.10), rgba(209,125,82,0.08))', borderColor: 'rgba(194,97,31,0.25)' }}
           >
             <div className="p-5">
               <p className="text-white font-black text-sm leading-snug mb-1">
-                {isPremium ? '💬 Discute de ce résultat avec Nova' : 'Pas encore convaincu(e) ?'}
+                {isPremium ? '💬 Discute de ce résultat avec Elio' : 'Pas encore convaincu(e) ?'}
               </p>
               <p className="text-zinc-500 text-xs mb-3 leading-relaxed">
                 {isPremium
                   ? 'Ton coach IA — pose-lui une vraie question sur ce que ce résultat dit de toi.'
-                  : 'Discute d\'abord avec Nova, notre coach IA — gratuit, 5 messages offerts par mois.'}
+                  : 'Discute d\'abord avec Elio, ton compagnon de développement personnel — gratuit, 5 messages offerts par mois.'}
               </p>
               <Link
                 href="/chat"
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-[0.98]"
                 style={{ background: 'linear-gradient(135deg, #c2611f, #d17d52)', boxShadow: '0 4px 16px rgba(194,97,31,0.35)' }}
               >
-                {isPremium ? '💬 Parler à Nova →' : '✨ Tester Nova gratuitement →'}
+                {isPremium ? '💬 Parler à Elio →' : '✨ Tester Elio gratuitement →'}
               </Link>
             </div>
           </div>

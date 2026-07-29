@@ -149,7 +149,7 @@ export default async function NathaAdminPage() {
     prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { path: '/' } }),
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 8 }),
-    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { id: true, email: true, name: true, tier: true, createdAt: true } }),
+    prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { id: true, email: true, name: true, tier: true, createdAt: true, onboardingReason: true } }),
     prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }).then(async (aff) => {
       const clicks = await Promise.all(aff.map(a => prisma.pageView.count({ where: { path: `/__aff/${a.slug}` } })));
       return aff.map((a, i) => ({ ...a, clicks: clicks[i] }));
@@ -216,8 +216,8 @@ export default async function NathaAdminPage() {
     select: { id: true, code: true, note: true, used: true, usedByEmail: true },
   });
 
-  // ── Rétention & engagement (Nova + Journal) ────────────────────────────────
-  // "Actif" = a utilisé Nova (ChatUsage>0), écrit dans son Journal, OU fait
+  // ── Rétention & engagement (Elio + Journal) ────────────────────────────────
+  // "Actif" = a utilisé Elio (ChatUsage>0), écrit dans son Journal, OU fait
   // analyser une conversation ce jour-là — le seul signal d'activité qui
   // existe aujourd'hui (pas de colonne "dernière connexion" sur User).
   const [chatUsageRows, journalDayRows, convAnalysisRows, novaUserRows, journalUserRows] = await Promise.all([
@@ -243,7 +243,7 @@ export default async function NathaAdminPage() {
   const bothIds = [...novaUserIds].filter(id => journalUserIds.has(id));
 
   // Détail des gens qui reviennent pour LES DEUX (ta demande : "qui a testé
-  // Nova ET le calendrier") — dernière activité de chaque côté, triés par le
+  // Elio ET le calendrier") — dernière activité de chaque côté, triés par le
   // plus récent des deux, plafonné à 30 lignes (curiosité manuelle, pas une
   // liste paginée).
   const [lastNovaByUser, lastJournalByUser, bothUsers] = bothIds.length
@@ -487,11 +487,11 @@ export default async function NathaAdminPage() {
 
         </div>
 
-        {/* ── SECTION 4bis : Rétention & engagement (Nova + Journal) ──────────
-            "Actif" = a utilisé Nova, écrit dans son Journal, ou fait analyser
+        {/* ── SECTION 4bis : Rétention & engagement (Elio + Journal) ──────────
+            "Actif" = a utilisé Elio, écrit dans son Journal, ou fait analyser
             une conversation ce jour-là (seul signal d'activité disponible —
             voir distinctUsersByDay). Répond à "combien reviennent chaque
-            jour", "combien utilisent Nova / ont un journal", et "qui revient
+            jour", "combien utilisent Elio / ont un journal", et "qui revient
             pour les deux". ── */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
           <p style={sectionHeading}>Rétention & engagement</p>
@@ -504,7 +504,7 @@ export default async function NathaAdminPage() {
           <div style={block(C.surfaceGood, C.goodBorder)}>
             <p style={label}>Actifs aujourd&apos;hui</p>
             <p style={{ ...bigNum, color: C.good }}>{activeToday}</p>
-            <p style={sub}>Nova, Journal ou analyse</p>
+            <p style={sub}>Elio, Journal ou analyse</p>
           </div>
           <div style={block(C.surface, C.border)}>
             <p style={label}>Actifs cette semaine</p>
@@ -512,7 +512,7 @@ export default async function NathaAdminPage() {
             <p style={sub}>utilisateurs distincts, 7j</p>
           </div>
           <div style={block(C.surface, C.border)}>
-            <p style={label}>Utilisent Nova</p>
+            <p style={label}>Utilisent Elio</p>
             <p style={{ ...bigNum, color: C.primary }}>{novaTotal}</p>
             <p style={sub}>{pct(novaTotal, totalUsers)} des inscrits</p>
           </div>
@@ -522,7 +522,7 @@ export default async function NathaAdminPage() {
             <p style={sub}>{pct(journalTotal, totalUsers)} des inscrits</p>
           </div>
           <div style={block(C.surface, C.border)}>
-            <p style={label}>Nova + Journal</p>
+            <p style={label}>Elio + Journal</p>
             <p style={bigNum}>{bothIds.length}</p>
             <p style={sub}>utilisent les deux</p>
           </div>
@@ -536,12 +536,12 @@ export default async function NathaAdminPage() {
         </div>
 
         <p style={{ ...sectionHeading, fontSize: 13, color: C.muted, fontWeight: 600, marginTop: 4 }}>
-          Reviennent pour Nova ET le Journal ({bothIds.length})
+          Reviennent pour Elio ET le Journal ({bothIds.length})
         </p>
         <div style={{ ...block(C.surface, C.border), marginBottom: 28 }}>
           {returningUsers.length === 0 && (
             <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>
-              Personne n&apos;a encore utilisé Nova et le Journal tous les deux.
+              Personne n&apos;a encore utilisé Elio et le Journal tous les deux.
             </p>
           )}
           {returningUsers.map((u, i) => (
@@ -555,7 +555,7 @@ export default async function NathaAdminPage() {
                 </p>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ ...label, marginBottom: 2, fontSize: 11 }}>Dernier Nova</p>
+                <p style={{ ...label, marginBottom: 2, fontSize: 11 }}>Dernier Elio</p>
                 <p style={{ color: C.primary, fontSize: 12.5, fontWeight: 600, margin: 0 }}>{u.lastNovaYMD ?? '—'}</p>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -684,6 +684,7 @@ export default async function NathaAdminPage() {
                 </p>
                 <p style={{ color: C.muted, fontSize: 11.5, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {u.email} · {new Date(u.createdAt).toLocaleDateString('fr-FR')}
+                  {u.onboardingReason ? ` · "${u.onboardingReason}"` : ''}
                 </p>
               </div>
               <span style={{

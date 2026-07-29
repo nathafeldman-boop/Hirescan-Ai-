@@ -14,8 +14,8 @@ export const dynamic = 'force-dynamic';
 // Compatibilité avec un ami/couple/famille — le SCORE (déterministe, gratuit,
 // voir lib/friendCompatScore.ts) est ouvert à tout le monde : la saisie et le
 // premier résultat ne doivent jamais être un mur. Seule l'analyse approfondie
-// de Nova (commonPoints/differences/strengths/watchPoints/summary) reste
-// payante, et consomme le quota du jour comme les autres features Nova.
+// d'Elio (commonPoints/differences/strengths/watchPoints/summary) reste
+// payante, et consomme le quota du jour comme les autres features Elio.
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const user = session?.user as { id?: string; tier?: string; mbtiType?: string } | undefined;
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   const { score, headline } = computeCompatScore((dbUser?.mbtiScores as unknown as MbtiScores | null) ?? null, body.answers);
 
   // Le score gratuit ci-dessus est déjà acquis quoi qu'il arrive. L'analyse
-  // approfondie de Nova s'ajoute PAR-DESSUS si le compte est payant ET a
+  // approfondie d'Elio s'ajoute PAR-DESSUS si le compte est payant ET a
   // encore du quota — mais un quota épuisé ou un échec de génération ne doit
   // jamais faire perdre le score gratuit qu'un compte gratuit aurait, lui,
   // obtenu sans condition.

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 import DecouverteClient from './DecouverteClient';
 
 export const metadata: Metadata = {
@@ -14,10 +15,23 @@ export const metadata: Metadata = {
 // Le hub est la nouvelle étape du funnel entre la landing et les
 // fonctionnalités — on demande la connexion ICI plutôt que de laisser chaque
 // carte rediriger séparément vers /login (compat/journal le font déjà, mais
-// Nova/quiz non) : un seul mur de connexion, avant de choisir l'expérience.
+// Elio/quiz non) : un seul mur de connexion, avant de choisir l'expérience.
+// Depuis le funnel /bienvenue → /journal, c'est aussi le premier écran
+// "maison" qu'un nouvel inscrit voit après avoir déjà donné un peu de lui —
+// d'où le prénom + la quête "profil incomplet" (voir DecouverteClient).
 export default async function DecouvertePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect('/login?callbackUrl=/decouverte');
 
-  return <DecouverteClient />;
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { name: true, mbtiType: true },
+  });
+
+  return (
+    <DecouverteClient
+      firstName={user?.name?.split(' ')[0] ?? null}
+      hasProfile={!!user?.mbtiType}
+    />
+  );
 }

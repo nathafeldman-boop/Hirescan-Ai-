@@ -28,7 +28,7 @@ person (the founder) to read business data quickly.
 UrCecret (urcecret.site) is a French MBTI personality-test SaaS: a free 16-type
 test funnels into a paywalled full profile (one-time or subscription unlock),
 15 free anonymous "vérité" quizzes (infidélité, narcissisme, burnout...) as a
-secondary funnel, and Nova, an AI coach (Mistral-powered) grounded in the
+secondary funnel, and Elio, an AI coach (Mistral-powered) grounded in the
 user's own test result, sold as the retention/subscription hook.
 
 The admin dashboard's purpose: let the founder see, at a glance and without
@@ -41,7 +41,7 @@ today is good or bad, and why."
 
 - **Public site**: mystique, warm, a little dramatic ("L'Oracle" identity —
   ink black + gold seal, serif display type, tarot/oracle motifs), earned
-  intimacy ("Nova already knows you"), never clinical or medical-sounding.
+  intimacy ("Elio already knows you"), never clinical or medical-sounding.
 - **Admin dashboard** (this task): the opposite register on purpose — no
   mystique needed here, no ink-and-gold theatrics. This is a cockpit, not a
   showroom. Calm, information-dense, fast to scan, confident. Think

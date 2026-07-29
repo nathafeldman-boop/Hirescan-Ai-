@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AppTabBar from '@/components/AppTabBar';
 import DayDetailSheet from './DayDetailSheet';
@@ -159,7 +160,7 @@ function OnboardingFlow({ onSubmit, saving }: { onSubmit: (p: SavedPayload) => v
         <>
           <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Bienvenue dans ton Journal 📖</p>
           <p className="text-sm mb-5 leading-relaxed" style={{ color: '#6b6055' }}>
-            6 questions rapides pour que Nova commence à te connaître — moins d&apos;une minute.
+            6 questions rapides pour qu&apos;Elio commence à te connaître — moins d&apos;une minute.
           </p>
           <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Comment te sens-tu aujourd&apos;hui ?</p>
           <LevelPicker levels={MOODS} selected={mood} onSelect={(v) => { setMood(v); advance(); }} disabled={saving} />
@@ -224,6 +225,38 @@ function OnboardingFlow({ onSubmit, saving }: { onSubmit: (p: SavedPayload) => v
   );
 }
 
+// ── Rappel quotidien — proposé UNE fois, juste après la toute première entrée ──
+// Volontairement un seul choix binaire (pas de créneau à choisir) : la
+// friction tue l'habitude à ce stade. Le rappel part par email à 20h, heure
+// de Paris (voir app/api/cron/journal-reminder/route.ts) — activable/
+// désactivable ensuite depuis le Journal (voir le bouton 🔔 dans l'en-tête).
+function ReminderPrompt({ onDone }: { onDone: () => void }) {
+  const [saving, setSaving] = useState(false);
+
+  async function activate() {
+    setSaving(true);
+    try { await fetch('/api/notifications/reminder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: true }) }); }
+    catch {}
+    finally { onDone(); }
+  }
+
+  return (
+    <div className="rounded-3xl p-6 text-center" style={{ background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)', animation: 'jCardIn .4s cubic-bezier(.22,1,.36,1)' }}>
+      <span className="text-3xl leading-none">🔔</span>
+      <p className="font-display text-lg font-black mt-3 mb-1" style={{ color: 'var(--ink)' }}>Ton premier jour est noté</p>
+      <p className="text-sm mb-5 leading-relaxed" style={{ color: '#6b6055' }}>
+        Un petit rappel chaque soir à 20h : <em>« Ton moment pour faire le point sur toi. »</em>
+      </p>
+      <button onClick={activate} disabled={saving} className="ur-btn-gold w-full py-3 text-sm mb-2 disabled:opacity-50">
+        {saving ? 'Activation…' : 'Activer le rappel (20h) →'}
+      </button>
+      <button onClick={onDone} disabled={saving} className="w-full py-2.5 text-xs font-semibold" style={{ color: '#a8a29e' }}>
+        Plus tard
+      </button>
+    </div>
+  );
+}
+
 // Carte de stat animée — entrée en fondu/translation décalée par index, gros
 // chiffre qui "compte" jusqu'à sa valeur. Le moment "dashboard" pensé pour
 // être filmé (voir demande produit "TikTok first").
@@ -250,8 +283,12 @@ function StatCard({ icon, label, value, suffix, delay, accent }: { icon: string;
   );
 }
 
-export default function JournalClient({ firstName, access }: { firstName: string | null; access: JournalAccess }) {
+export default function JournalClient({ firstName, access, wantsDailyReminder }: { firstName: string | null; access: JournalAccess; wantsDailyReminder: boolean }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [showReminderPrompt, setShowReminderPrompt] = useState(false);
+  const [reminderOn, setReminderOn] = useState(wantsDailyReminder);
+  const [reminderToggling, setReminderToggling] = useState(false);
   const [month, setMonth] = useState<string | null>(null);
   const [today, setToday] = useState<string | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -330,6 +367,7 @@ export default function JournalClient({ firstName, access }: { firstName: string
   }, [wrappedOpen, streak, avgMood, evolution, topTag, firstName]);
 
   async function persistEntry(payload: SavedPayload) {
+    const isFirstEver = !hasAny;
     setSaving(true);
     setError(null);
     try {
@@ -340,11 +378,29 @@ export default function JournalClient({ firstName, access }: { firstName: string
       });
       if (!res.ok) throw new Error();
       await res.json();
-      load(month ?? undefined);
+      await load(month ?? undefined);
+      // Première entrée jamais créée par ce compte : au lieu de retomber
+      // directement sur le dashboard, on propose le rappel quotidien puis on
+      // renvoie vers le Hub — "ensuite seulement" (voir le funnel décrit dans
+      // app/decouverte/DecouverteClient.tsx).
+      if (isFirstEver) setShowReminderPrompt(true);
     } catch {
       setError("L'enregistrement a échoué. Réessaie.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function toggleReminder() {
+    const next = !reminderOn;
+    setReminderOn(next);
+    setReminderToggling(true);
+    try {
+      await fetch('/api/notifications/reminder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: next }) });
+    } catch {
+      setReminderOn(!next); // rollback si l'appel échoue
+    } finally {
+      setReminderToggling(false);
     }
   }
 
@@ -366,7 +422,7 @@ export default function JournalClient({ firstName, access }: { firstName: string
       if (d.ok) setInsights(d.insights);
       else setInsightsNeeded({ count: d.count ?? 0, needed: d.needed ?? 3 });
     } catch {
-      setInsightsError('Nova n\'a pas réussi à analyser ton journal. Réessaie dans un instant.');
+      setInsightsError('Elio n\'a pas réussi à analyser ton journal. Réessaie dans un instant.');
     } finally {
       setInsightsLoading(false);
     }
@@ -382,7 +438,7 @@ export default function JournalClient({ firstName, access }: { firstName: string
       if (!res.ok || !d.ok) throw new Error();
       setPeriodSummary(d.summary);
     } catch {
-      setInsightsError('Nova n\'a pas réussi à résumer cette période. Réessaie dans un instant.');
+      setInsightsError('Elio n\'a pas réussi à résumer cette période. Réessaie dans un instant.');
     } finally {
       setPeriodLoading(null);
     }
@@ -408,13 +464,29 @@ export default function JournalClient({ firstName, access }: { firstName: string
       <header className="sticky top-0 z-30 px-4 h-14 flex items-center" style={{ background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
         <div className="max-w-lg mx-auto w-full flex items-center justify-between">
           <span className="font-display text-lg font-black" style={{ color: 'var(--ink)' }}>📖 Journal</span>
-          <span className="text-xs" style={{ color: 'var(--gold)' }}>{firstName ? `Salut ${firstName}` : ''}</span>
+          <div className="flex items-center gap-3">
+            {!showOnboarding && !showReminderPrompt && (
+              <button
+                onClick={toggleReminder}
+                disabled={reminderToggling}
+                title={reminderOn ? 'Rappel quotidien activé (20h)' : 'Activer un rappel quotidien'}
+                aria-label={reminderOn ? 'Désactiver le rappel quotidien' : 'Activer le rappel quotidien'}
+                className="w-7 h-7 flex items-center justify-center text-sm rounded-full transition-all disabled:opacity-50"
+                style={{ background: reminderOn ? 'var(--gold-soft)' : 'transparent', border: reminderOn ? '1px solid var(--gold-line)' : '1px solid transparent' }}
+              >
+                {reminderOn ? '🔔' : '🔕'}
+              </button>
+            )}
+            <span className="text-xs" style={{ color: 'var(--gold)' }}>{firstName ? `Salut ${firstName}` : ''}</span>
+          </div>
         </div>
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
 
-        {showOnboarding ? (
+        {showReminderPrompt ? (
+          <ReminderPrompt onDone={() => { setShowReminderPrompt(false); router.push('/decouverte'); }} />
+        ) : showOnboarding ? (
           <OnboardingFlow onSubmit={persistEntry} saving={saving} />
         ) : (
           <>
@@ -442,11 +514,11 @@ export default function JournalClient({ firstName, access }: { firstName: string
                   {access.history ? (
                     <>
                       <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>{moodAlert.text}</p>
-                      <Link href="/chat" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>En parler à Nova →</Link>
+                      <Link href="/chat" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>En parler à Elio →</Link>
                     </>
                   ) : (
                     <>
-                      <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Nova a repéré quelque chose dans tes dernières entrées.</p>
+                      <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Elio a repéré quelque chose dans tes dernières entrées.</p>
                       <Link href="/pricing" className="text-xs font-bold mt-0.5 inline-block" style={{ color: 'var(--gold)' }}>Débloquer pour voir →</Link>
                     </>
                   )}
@@ -632,12 +704,12 @@ export default function JournalClient({ firstName, access }: { firstName: string
               )}
             </div>
 
-            {/* Analyse Nova — tendances + résumé de période, gated (voir lib/journalAccess.ts) */}
+            {/* Analyse Elio — tendances + résumé de période, gated (voir lib/journalAccess.ts) */}
             <div className="rounded-3xl p-5" style={{ background: 'var(--ink)' }}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🤖</span>
-                  <p className="text-sm font-black" style={{ color: '#FAF6EC' }}>Analyse de Nova</p>
+                  <p className="text-sm font-black" style={{ color: '#FAF6EC' }}>Analyse d&apos;Elio</p>
                 </div>
                 {access.inTrial && (
                   <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,169,77,0.15)', color: '#e8a94d' }}>
@@ -649,10 +721,10 @@ export default function JournalClient({ firstName, access }: { firstName: string
               {!access.trendInsights ? (
                 <>
                   <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-                    Débloque les tendances et les résumés de période de Nova avec un abonnement.
+                    Débloque les tendances et les résumés de période d&apos;Elio avec un abonnement.
                   </p>
                   <Link href="/pricing" className="ur-btn-gold w-full py-2.5 text-sm inline-flex items-center justify-center">
-                    Débloquer Nova →
+                    Débloquer Elio →
                   </Link>
                 </>
               ) : (
@@ -665,12 +737,12 @@ export default function JournalClient({ firstName, access }: { firstName: string
                   {periodSummary && <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.85)' }}>{periodSummary}</p>}
                   {!insights && !periodSummary && insightsNeeded && (
                     <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-                      Encore {Math.max(0, insightsNeeded.needed - insightsNeeded.count)} jour(s) à noter avant que Nova puisse analyser ton journal.
+                      Encore {Math.max(0, insightsNeeded.needed - insightsNeeded.count)} jour(s) à noter avant qu&apos;Elio puisse analyser ton journal.
                     </p>
                   )}
                   {!insights && !periodSummary && !insightsNeeded && (
                     <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(250,246,236,0.55)' }}>
-                      Nova peut repérer des tendances et résumer une période de ton journal.
+                      Elio peut repérer des tendances et résumer une période de ton journal.
                     </p>
                   )}
                   {insightsError && insightsError !== '__gated__' && <p className="text-xs mb-3" style={{ color: '#e8a94d' }}>{insightsError}</p>}

@@ -1,6 +1,6 @@
-// ── Réflexion de Nova après chaque entrée du journal ─────────────────────────
+// ── Réflexion de Elio après chaque entrée du journal ─────────────────────────
 // Volontairement DÉTERMINISTE (pas d'appel Mistral) : c'est le moment qui doit
-// être INSTANTANÉ (pas de "Nova réfléchit…" après avoir tapé "Enregistrer") —
+// être INSTANTANÉ (pas de "Elio réfléchit…" après avoir tapé "Enregistrer") —
 // et c'est la partie "premières analyses simples" du palier gratuit, voir
 // lib/journalAccess.ts pour la partie IA (tendances/résumés), elle réservée
 // aux abonnés/essai. Fonctions pures, importables côté client comme serveur.

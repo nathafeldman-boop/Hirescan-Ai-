@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 // Analyse de personnalité avancée — un seul enregistrement par utilisateur
 // (upsert), régénéré à la demande. Réservée aux abonnés payants, comme les
-// autres features Nova structurées (analyse de conversation, tests, compat).
+// autres features Elio structurées (analyse de conversation, tests, compat).
 
 export async function GET() {
   const session = await getServerSession(authOptions);
