@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import QueteClient from './QueteClient';
 
 export const metadata: Metadata = {
@@ -18,6 +19,9 @@ export const metadata: Metadata = {
 export default async function QuetePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect('/login?callbackUrl=/quete');
+
+  const pendingStep = await resolveFunnelStep(session.user.id);
+  if (pendingStep) redirect(funnelStepPath(pendingStep));
 
   const [user, journalCount, compatCount] = await Promise.all([
     prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, mbtiType: true } }),

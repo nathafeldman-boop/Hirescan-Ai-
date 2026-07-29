@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
+import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import PersonnaliteClient from './PersonnaliteClient';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -111,7 +115,18 @@ const faqSchema = {
   ],
 };
 
-export default function PersonnalitePage() {
+export default async function PersonnalitePage() {
+  // Le test reste accessible SANS compte (promesse marketing "gratuit, sans
+  // inscription" — voir les FAQ/schema ci-dessus) : on ne gate donc QUE les
+  // comptes déjà connectés dont le parcours de démarrage (questionnaire +
+  // premier Journal) n'est pas terminé — voir lib/funnelGate.ts. Le MBTI ne
+  // doit jamais être l'endroit où on atterrit automatiquement.
+  const session = await getServerSession(authOptions);
+  if (session?.user?.id) {
+    const pendingStep = await resolveFunnelStep(session.user.id);
+    if (pendingStep) redirect(funnelStepPath(pendingStep));
+  }
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(quizSchema) }} />
