@@ -226,8 +226,8 @@ export async function POST(req: NextRequest) {
       // Notification renouvellement UNIQUEMENT (billing_reason 'subscription_cycle').
       // Le 1er paiement d'un abonnement est déjà notifié via checkout.session.completed.
       if (invoice.billing_reason === 'subscription_cycle') {
+        const amount = invoice.amount_paid ?? 0;
         try {
-          const amount = invoice.amount_paid ?? 0;
           const { subject, html } = emailAdminSale({
             productType: isPlus ? 'plus' : isStarter ? 'starter' : amount >= 2500 ? 'annual' : 'monthly',
             amountCents: amount,
@@ -237,6 +237,25 @@ export async function POST(req: NextRequest) {
           await sendEmail(ADMIN_NOTIF_EMAIL, subject, html);
         } catch (e) {
           console.error('Admin renewal notif error:', e);
+        }
+
+        // ── LTV : le 1er paiement d'un abonnement est déjà tracé dans
+        // Conversion via checkout.session.completed — sans cette ligne, tous
+        // les renouvellements suivants (le vrai calcul de "combien ce compte
+        // m'a rapporté au total") disparaissaient silencieusement. `invoice.id`
+        // (jamais un `cs_...` de session checkout) sert de clé unique ici,
+        // aucun risque de collision avec les lignes de premier paiement.
+        if (customerEmail) {
+          await prisma.conversion.upsert({
+            where: { stripeSessionId: invoice.id },
+            create: {
+              stripeSessionId: invoice.id,
+              email: customerEmail,
+              amountCents: amount,
+              productType: isPlus ? 'plus_renewal' : isStarter ? 'starter_renewal' : 'renewal',
+            },
+            update: {},
+          }).catch(() => {});
         }
       }
     }
