@@ -103,6 +103,12 @@ model User {
   // en bout dès aujourd'hui. À remplacer par du push si besoin plus tard.
   wantsDailyReminder Boolean @default(false)
 
+  // Dernière visite de /quetes — sert uniquement à savoir si une quête
+  // générée ou débloquée depuis est "nouvelle" (badge sur le hub /decouverte
+  // et dans les emails de relance), jamais utilisé pour la complétion
+  // elle-même (voir lib/quests.ts).
+  questsLastViewedAt DateTime?
+
   accounts     Account[]
   sessions     Session[]
   quizResults  QuizResult[]

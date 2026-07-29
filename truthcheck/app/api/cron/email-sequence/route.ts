@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { emailDay1, emailDay3, emailDay7, emailSuiviDay, emailRetentionM1, emailRetentionM3, emailRetentionM5, emailWinBackFollowup, sendEmail } from '@/lib/emails';
+import { emailDay1, emailDay3, emailDay7, emailSuiviDay, emailRetentionM1, emailRetentionM3, emailRetentionM5, emailWinBackFollowup, emailQuestReminder, sendEmail } from '@/lib/emails';
 import { getSuivi } from '@/lib/suivi';
+import { QUEST_CATALOG } from '@/lib/quests';
 
 export const dynamic = 'force-dynamic';
 
@@ -183,6 +184,47 @@ export async function GET(req: NextRequest) {
         sent++;
       } catch (e) {
         console.error(`Winback followup failed for ${userEmail}:`, e);
+        errors++;
+      }
+    }
+  }
+
+  // ── Relance quêtes inachevées — J+5, un seul envoi (comme day1/3/7, jamais
+  // répété : voir EmailLog @@unique([userId, type])). Ne compte que les
+  // quêtes gratuites (requiresPremium: false) — jamais relancer un compte
+  // gratuit sur une quête qu'il ne peut pas terminer sans payer, ce serait
+  // trompeur. Objectif produit : ramener les comptes qui ont commencé (Journal,
+  // Elio, test...) mais pas terminé leur parcours de découverte.
+  {
+    const day = 5;
+    const windowStart = new Date(now.getTime() - (day + 1) * 86400 * 1000);
+    const windowEnd = new Date(now.getTime() - day * 86400 * 1000);
+    const freeQuestKeys = QUEST_CATALOG.filter((q) => !q.requiresPremium).map((q) => q.key);
+
+    const candidates = await prisma.user.findMany({
+      where: {
+        email: { not: null },
+        tier: 'free',
+        createdAt: { gte: windowStart, lte: windowEnd },
+        emailLogs: { none: { type: 'quest_reminder' } },
+      },
+      select: { id: true, email: true, name: true },
+    });
+
+    for (const user of candidates) {
+      if (!user.email) continue;
+      try {
+        const completions = await prisma.questCompletion.findMany({ where: { userId: user.id, questKey: { in: freeQuestKeys } }, select: { questKey: true } });
+        const completedKeys = new Set(completions.map((c) => c.questKey));
+        const pendingCount = freeQuestKeys.filter((k) => !completedKeys.has(k)).length;
+        if (pendingCount === 0) continue; // a déjà tout terminé, relance inutile
+
+        const { subject, html } = emailQuestReminder(user.name, pendingCount);
+        await sendEmail(user.email, subject, html);
+        await prisma.emailLog.create({ data: { userId: user.id, type: 'quest_reminder' } });
+        sent++;
+      } catch (e) {
+        console.error(`quest_reminder failed for ${user.email}:`, e);
         errors++;
       }
     }

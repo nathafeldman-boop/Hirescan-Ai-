@@ -46,6 +46,7 @@ export default async function QuetesPage() {
     emoji: q.emoji,
     rewardLabel: q.rewardLabel,
     requiresPremium: !!q.requiresPremium,
+    href: q.href ?? null,
     completed: completedKeys.has(q.key),
     completedAt: completedAtByKey.get(q.key) ?? null,
   }));
@@ -57,6 +58,11 @@ export default async function QuetesPage() {
   const visibleQuests = quests;
   const accessibleQuests = quests.filter((q) => !q.requiresPremium || isPremium);
   const allCatalogDone = accessibleQuests.length > 0 && accessibleQuests.every((q) => q.completed);
+
+  // Marque le hub comme "vu" — fait disparaître le badge "nouveau" affiché sur
+  // /decouverte pour les quêtes générées apparues depuis la dernière visite.
+  // Jamais bloquant : une erreur ici ne doit pas casser l'affichage du hub.
+  await prisma.user.update({ where: { id: session.user.id }, data: { questsLastViewedAt: new Date() } }).catch(() => {});
 
   return (
     <QuetesClient

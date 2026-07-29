@@ -13,6 +13,7 @@ interface Quest {
   emoji: string;
   rewardLabel: string;
   requiresPremium: boolean;
+  href: string | null;
   completed: boolean;
   completedAt: string | null;
 }
@@ -31,17 +32,17 @@ const CATEGORY_META: Record<Quest['category'], { title: string; subtitle: string
   premium: { title: 'Premium', subtitle: 'Le parcours complet, jamais fini' },
 };
 
+// Une quête cliquable ramène directement là où l'action se fait (Journal,
+// Elio, test...) plutôt que de laisser l'utilisateur chercher où aller — voir
+// lib/quests.ts::href. Verrouillée → clique vers /pricing (même logique :
+// toujours une action, jamais une impasse). Terminée ou sans destination
+// (quêtes d'ancienneté 30/60/90 jours) → reste une carte statique.
 function QuestCard({ q, isPremium }: { q: Quest; isPremium: boolean }) {
   const locked = q.requiresPremium && !isPremium && !q.completed;
-  return (
-    <div
-      className="flex items-start gap-3.5 rounded-2xl px-4 py-3.5"
-      style={{
-        background: q.completed ? 'var(--gold-soft)' : locked ? 'var(--paper)' : 'var(--paper-panel)',
-        border: `1px ${locked ? 'dashed' : 'solid'} ${q.completed ? 'var(--gold-line)' : 'var(--line)'}`,
-        opacity: locked ? 0.7 : 1,
-      }}
-    >
+  const destination = q.completed ? null : locked ? '/pricing' : q.href;
+
+  const content = (
+    <>
       <span className="text-2xl flex-shrink-0">{q.completed ? '✅' : locked ? '🔒' : q.emoji}</span>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-bold" style={{ color: 'var(--ink)' }}>{q.title}</p>
@@ -50,6 +51,31 @@ function QuestCard({ q, isPremium }: { q: Quest; isPremium: boolean }) {
           {q.completed ? 'Terminée' : locked ? 'Réservée aux abonnés' : q.rewardLabel}
         </p>
       </div>
+      {destination && (
+        <svg className="w-4 h-4 flex-shrink-0 mt-1 opacity-40" style={{ color: 'var(--gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+        </svg>
+      )}
+    </>
+  );
+
+  const style = {
+    background: q.completed ? 'var(--gold-soft)' : locked ? 'var(--paper)' : 'var(--paper-panel)',
+    border: `1px ${locked ? 'dashed' : 'solid'} ${q.completed ? 'var(--gold-line)' : 'var(--line)'}`,
+    opacity: locked ? 0.7 : 1,
+  };
+
+  if (destination) {
+    return (
+      <Link href={destination} className="elio-hover-lift flex items-start gap-3.5 rounded-2xl px-4 py-3.5" style={style}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-3.5 rounded-2xl px-4 py-3.5" style={style}>
+      {content}
     </div>
   );
 }
@@ -200,7 +226,7 @@ export default function QuetesClient({
 
           {doneGenerated.length > 0 && (
             <div className="flex flex-col gap-2 mb-3">
-              {doneGenerated.map((g) => <QuestCard key={g.id} q={{ key: g.id, category: 'discovery', title: g.title, description: g.description, emoji: g.emoji, rewardLabel: '', requiresPremium: false, completed: true, completedAt: null }} isPremium={isPremium} />)}
+              {doneGenerated.map((g) => <QuestCard key={g.id} q={{ key: g.id, category: 'discovery', title: g.title, description: g.description, emoji: g.emoji, rewardLabel: '', requiresPremium: false, href: null, completed: true, completedAt: null }} isPremium={isPremium} />)}
             </div>
           )}
 

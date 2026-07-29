@@ -40,6 +40,7 @@ export interface QuestDef {
   rewardLabel: string;
   rewardCredits?: number; // chatBonusCredits accordés à la complétion (voir lib/plans.ts / referral)
   requiresPremium?: boolean; // affichée verrouillée + CTA /pricing tant que non payant
+  href?: string; // destination pour agir sur la quête — absent = quête d'ancienneté, non actionnable (ex: premium_30_days)
   check: (s: QuestStats) => boolean;
 }
 
@@ -53,6 +54,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '📝',
     rewardLabel: '+1 message Elio',
     rewardCredits: 1,
+    href: '/decouverte',
     check: (s) => !!s.onboardingCompletedAt,
   },
   {
@@ -63,6 +65,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '📖',
     rewardLabel: '+2 messages Elio',
     rewardCredits: 2,
+    href: '/journal',
     check: (s) => s.journalCount >= 1,
   },
   {
@@ -73,6 +76,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '💬',
     rewardLabel: '+1 message Elio',
     rewardCredits: 1,
+    href: '/chat',
     check: (s) => s.userMessageCount >= 1,
   },
   {
@@ -82,6 +86,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     description: 'Faire le test et voir apparaître ton type.',
     emoji: '🧠',
     rewardLabel: 'Badge débloqué',
+    href: '/quiz/personnalite',
     check: (s) => !!s.mbtiType,
   },
   {
@@ -91,6 +96,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     description: 'Recevoir une première réponse d\'Elio.',
     emoji: '✨',
     rewardLabel: 'Badge débloqué',
+    href: '/chat',
     check: (s) => s.assistantMessageCount >= 1,
   },
   {
@@ -100,6 +106,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     description: 'Compatibilité, conversation ou profil avancé — une première vraie analyse.',
     emoji: '🔍',
     rewardLabel: 'Badge débloqué',
+    href: '/compat',
     check: (s) => s.compatCount >= 1 || s.convAnalysesCount >= 1 || s.advancedAnalysisExists,
   },
 
@@ -112,6 +119,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '🔥',
     rewardLabel: '+3 messages Elio',
     rewardCredits: 3,
+    href: '/journal',
     check: (s) => s.journalStreak >= 3,
   },
   {
@@ -122,6 +130,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '🔥',
     rewardLabel: '+5 messages Elio',
     rewardCredits: 5,
+    href: '/journal',
     check: (s) => s.journalStreak >= 7,
   },
   {
@@ -132,6 +141,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '🔥',
     rewardLabel: '+8 messages Elio',
     rewardCredits: 8,
+    href: '/journal',
     check: (s) => s.journalStreak >= 15,
   },
   {
@@ -141,6 +151,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     description: 'Nommer ce que tu ressens, cinq jours différents.',
     emoji: '🎭',
     rewardLabel: 'Badge débloqué',
+    href: '/journal',
     check: (s) => s.journalEmotionTaggedCount >= 5,
   },
   {
@@ -150,6 +161,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     description: 'Dix jours de journal — assez de matière pour un vrai bilan.',
     emoji: '📊',
     rewardLabel: 'Badge débloqué',
+    href: '/journal',
     check: (s) => s.journalCount >= 10,
   },
 
@@ -162,6 +174,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '🔓',
     rewardLabel: 'Badge débloqué',
     requiresPremium: true,
+    href: '/profil-avance',
     check: (s) => hasProfileAccess(s.tier),
   },
   {
@@ -172,6 +185,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '❤️',
     rewardLabel: 'Badge débloqué',
     requiresPremium: true,
+    href: '/compat',
     check: (s) => s.compatCount >= 1 && hasPremiumAccess(s.tier),
   },
   {
@@ -182,6 +196,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '💪',
     rewardLabel: 'Badge débloqué',
     requiresPremium: true,
+    href: '/profil-avance',
     check: (s) => s.advancedAnalysisExists,
   },
   {
@@ -192,6 +207,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '🧩',
     rewardLabel: 'Badge débloqué',
     requiresPremium: true,
+    href: '/chat',
     check: (s) => s.convAnalysesCount >= 1,
   },
   {
@@ -202,6 +218,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '🌊',
     rewardLabel: 'Badge débloqué',
     requiresPremium: true,
+    href: '/chat',
     check: (s) => hasPremiumAccess(s.tier) && s.userMessageCount >= 20,
   },
 
