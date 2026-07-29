@@ -578,15 +578,6 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <div className="w-full max-w-sm">
 
-        {/* ─── Sortie visible dès le premier écran — jamais un mur, voir la
-            philosophie du funnel (refuser doit rester sans friction). Une
-            2e sortie existe aussi en bas de page une fois qu'on a lu l'offre. ── */}
-        <div className="flex justify-end mb-3">
-          <Link href="/decouverte" className="text-[11.5px] font-semibold" style={{ color: '#a8a29e' }}>
-            {isFr ? 'Plus tard, retour au hub' : 'Later, back to hub'}
-          </Link>
-        </div>
-
         {/* ─── Pont émotionnel entre "je viens de finir le test" et "le
             paywall arrive" — jamais présenté comme un simple blocage. ── */}
         <p className="text-center text-[13px] mb-5" style={{ color: '#78716c', lineHeight: 1.5 }}>
@@ -609,6 +600,27 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
           <p className="text-[12.5px] font-semibold text-center" style={{ color: '#78716c' }}>
             {isFr ? 'Mais ton profil complet reste verrouillé.' : 'But your full profile stays locked.'}
           </p>
+        </div>
+
+        {/* ─── L'embranchement — le paywall n'est plus une impasse. Deux choix
+            très visibles, tout de suite, avant même de dérouler le détail de
+            l'offre plus bas : débloquer maintenant, ou continuer gratuitement
+            (droit vers Elio, jamais vers un mur ni vers le hub). ── */}
+        <div className="flex flex-col gap-2.5 mb-6">
+          <button
+            onClick={() => doCheckout('starter')}
+            disabled={loading}
+            className="ur-btn-gold w-full py-4 text-[15px] disabled:opacity-60"
+          >
+            {loading ? '…' : isFr ? '👉 Débloquer mon profil complet' : '👉 Unlock my full profile'}
+          </button>
+          <Link
+            href="/chat?from=paywall"
+            className="w-full py-3.5 rounded-full text-center text-sm font-semibold transition-all active:scale-[0.98]"
+            style={{ border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper-panel)' }}
+          >
+            {isFr ? '👉 Continuer gratuitement' : '👉 Continue for free'}
+          </Link>
         </div>
 
         {/* ─── L'oracle voilé — RIEN du résultat n'est révélé avant paiement.
@@ -846,14 +858,15 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
         </div>
 
         {/* ─── Rétention — refuser le paywall ne doit jamais être une sortie
-            de l'app. Toujours proposer de continuer gratuitement (voir Hub,
-            qui garde la quête "profil incomplet" active). ── */}
+            de l'app. Envoie direct dans la conversation avec Elio (pas le
+            Hub) — voir le message d'accueil proactif dans ChatClient.tsx
+            quand on arrive via ?from=paywall. ── */}
         <div className="mt-7 pt-5 text-center" style={{ borderTop: '1px solid var(--line)' }}>
           <p className="text-[12.5px] mb-2" style={{ color: '#a8a29e', lineHeight: 1.5 }}>
             {isFr ? 'Pas prêt à continuer maintenant ?' : 'Not ready to continue right now?'}
           </p>
-          <Link href="/decouverte" className="text-[12.5px] font-semibold" style={{ color: 'var(--gold)' }}>
-            {isFr ? 'Continue gratuitement ton exploration depuis le hub →' : 'Keep exploring for free from the hub →'}
+          <Link href="/chat?from=paywall" className="text-[12.5px] font-semibold" style={{ color: 'var(--gold)' }}>
+            {isFr ? '👉 Continuer gratuitement avec Elio →' : '👉 Continue for free with Elio →'}
           </Link>
         </div>
 

@@ -38,6 +38,15 @@ const ELIO_SUGGESTIONS: { emoji: string; label: string; kind: 'analyze' | 'quiz'
   { emoji: '❤️', label: 'Compatibilité', kind: 'link', href: '/compat' },
 ];
 
+// Actions rapides proposées par Elio juste après un paywall décliné (voir
+// fromPaywall) — chacune envoie un vrai premier message, jamais un cul-de-sac.
+const PAYWALL_DECLINE_ACTIONS: { emoji: string; label: string; prompt: string }[] = [
+  { emoji: '💬', label: 'Parler de ce que je ressens aujourd\'hui', prompt: 'Je veux te parler de ce que je ressens aujourd\'hui.' },
+  { emoji: '🔍', label: 'Comprendre pourquoi je réagis comme ça', prompt: 'Aide-moi à comprendre pourquoi je réagis comme ça dans certaines situations.' },
+  { emoji: '🎯', label: 'Me fixer un objectif', prompt: 'Aide-moi à me fixer un objectif personnel.' },
+  { emoji: '🧭', label: 'Découvrir une fonctionnalité d\'UrCecret', prompt: 'Montre-moi ce que je peux faire avec UrCecret.' },
+];
+
 export default function ChatClient() {
   const { data: session, status } = useSession();
   const tier = (session?.user as { tier?: string } | undefined)?.tier ?? 'free';
@@ -59,6 +68,16 @@ export default function ChatClient() {
   const [pendingImage, setPendingImage] = useState<string | null>(null); // data URI en attente d'envoi
   const [imageError, setImageError] = useState<string | null>(null);
   const [actionsMenuOpen, setActionsMenuOpen] = useState(false); // menu "+" au-dessus de la barre de saisie
+
+  // Arrivée depuis le paywall MBTI après avoir choisi "Continuer gratuitement"
+  // (voir PersonnaliteClient.tsx) — Elio accueille avec un message proactif
+  // au lieu du renvoyer vers le Hub, pour que le paywall reste un embranchement,
+  // jamais une impasse. Lu depuis l'URL directement (pas useSearchParams) pour
+  // éviter d'avoir à envelopper tout le composant dans un Suspense.
+  const [fromPaywall, setFromPaywall] = useState(false);
+  useEffect(() => {
+    try { if (new URLSearchParams(window.location.search).get('from') === 'paywall') setFromPaywall(true); } catch {}
+  }, []);
 
   // ── Créateur de test partageable (réservé aux abonnés) ──
   const [quizBuilderOpen, setQuizBuilderOpen] = useState(false);
@@ -440,31 +459,67 @@ export default function ChatClient() {
                   lieu de trôner seul au centre, comme dans les interfaces
                   conversationnelles modernes (le compagnon est "à côté de
                   toi", pas au-dessus). */}
-              <div className="flex items-start gap-4 mb-6 text-left">
-                <div className="flex-shrink-0"><ElioAvatar size={64} glow /></div>
-                <div className="flex-1 min-w-0 pt-1.5">
-                  <p className="ur-label text-[10px] mb-1.5" style={{ color: 'var(--gold)' }}>Ton compagnon de développement personnel</p>
-                  <h2 className="font-display text-xl font-black text-stone-900 mb-2">
-                    {isFree ? 'Salut, moi c\'est Elio 👋' : 'Salut, moi c\'est Elio — je connais déjà ton profil.'}
-                  </h2>
-                  <p className="text-sm leading-relaxed" style={{ color: '#78716c' }}>
-                    {noTestYet
-                      ? <>Tu peux m&apos;essayer avant même de faire le test : je te donne de vrais conseils, mais généraux. Fais le <Link href="/quiz/personnalite" style={{ color: 'var(--gold)', fontWeight: 700 }}>test (3 min)</Link> pour que je te parle vraiment de <span style={{ color: 'var(--gold)' }}>toi</span>.</>
-                      : isFree
-                        ? <>Version découverte : je te donne de vrais conseils, mais généraux. Pour des réponses selon <span style={{ color: 'var(--gold)' }}>ton type exact</span> et ton test, débloque ton profil.</>
-                        : <>Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.</>}
-                  </p>
-                  {noTestYet && (
-                    <Link href="/quiz/personnalite" className="ur-btn-gold px-6 py-3 text-sm mt-4 inline-flex">
-                      Faire le test (3 min) →
-                    </Link>
-                  )}
+              {fromPaywall ? (
+                // Accueil proactif après un paywall décliné — voir
+                // PersonnaliteClient.tsx (?from=paywall). Un vrai message
+                // d'Elio, pas juste une phrase d'ambiance : le paywall devient
+                // un embranchement, jamais une impasse.
+                <div className="flex items-start gap-3 mb-6">
+                  <div className="flex-shrink-0"><ElioAvatar size={44} glow speaking /></div>
+                  <div className="flex-1 min-w-0 rounded-2xl rounded-tl-sm px-4 py-3.5 ur-panel">
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--ink)' }}>
+                      Je vois que tu n&apos;as pas encore débloqué ton profil de personnalité.<br /><br />
+                      Ce n&apos;est pas grave 😊<br /><br />
+                      On peut déjà commencer à apprendre à te connaître ensemble. Je peux t&apos;aider à comprendre tes émotions, répondre à tes questions et t&apos;accompagner au quotidien.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-start gap-4 mb-6 text-left">
+                  <div className="flex-shrink-0"><ElioAvatar size={64} glow /></div>
+                  <div className="flex-1 min-w-0 pt-1.5">
+                    <p className="ur-label text-[10px] mb-1.5" style={{ color: 'var(--gold)' }}>Ton compagnon de développement personnel</p>
+                    <h2 className="font-display text-xl font-black text-stone-900 mb-2">
+                      {isFree ? 'Salut, moi c\'est Elio 👋' : 'Salut, moi c\'est Elio — je connais déjà ton profil.'}
+                    </h2>
+                    <p className="text-sm leading-relaxed" style={{ color: '#78716c' }}>
+                      {noTestYet
+                        ? <>Tu peux m&apos;essayer avant même de faire le test : je te donne de vrais conseils, mais généraux. Fais le <Link href="/quiz/personnalite" style={{ color: 'var(--gold)', fontWeight: 700 }}>test (3 min)</Link> pour que je te parle vraiment de <span style={{ color: 'var(--gold)' }}>toi</span>.</>
+                        : isFree
+                          ? <>Version découverte : je te donne de vrais conseils, mais généraux. Pour des réponses selon <span style={{ color: 'var(--gold)' }}>ton type exact</span> et ton test, débloque ton profil.</>
+                          : <>Choisis un thème, ou écris-moi directement. Je te réponds selon <span style={{ color: 'var(--gold)' }}>ton</span> résultat, pas en généralités.</>}
+                    </p>
+                    {noTestYet && (
+                      <Link href="/quiz/personnalite" className="ur-btn-gold px-6 py-3 text-sm mt-4 inline-flex">
+                        Faire le test (3 min) →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Actions rapides d'Elio juste après un paywall décliné — voir
+                  PAYWALL_DECLINE_ACTIONS. Remplace la grille de suggestions
+                  habituelle pour cette toute première arrivée uniquement. */}
+              {fromPaywall && (
+                <div className="w-full grid grid-cols-2 gap-2.5 mb-2">
+                  {PAYWALL_DECLINE_ACTIONS.map((a) => (
+                    <button
+                      key={a.label}
+                      onClick={() => void send(a.prompt)}
+                      className="elio-hover-lift flex flex-col items-center text-center gap-1.5 px-3 py-4 rounded-2xl transition-all active:scale-[0.97]"
+                      style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}
+                    >
+                      <span className="text-2xl">{a.emoji}</span>
+                      <span className="text-xs font-semibold leading-snug" style={{ color: 'var(--ink)' }}>{a.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Suggestions Elio — visibles sans écrire, chaque carte est
                   cliquable et mène à un vrai résultat (jamais un cul-de-sac). */}
-              <div className="w-full grid grid-cols-2 gap-2.5 mb-2">
+              {!fromPaywall && <div className="w-full grid grid-cols-2 gap-2.5 mb-2">
                 {ELIO_SUGGESTIONS.map((s) => {
                   const gated = isFree && (s.kind === 'analyze' || s.kind === 'quiz');
                   const content = (
@@ -511,7 +566,7 @@ export default function ChatClient() {
                     </button>
                   );
                 })}
-              </div>
+              </div>}
 
               <div className="w-full flex flex-col gap-2 mt-4">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-left" style={{ color: '#a8a29e' }}>Ou parle-moi de…</p>
