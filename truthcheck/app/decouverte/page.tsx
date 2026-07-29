@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import DecouverteClient from './DecouverteClient';
 
 export const metadata: Metadata = {
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
 export default async function DecouvertePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect('/login?callbackUrl=/decouverte');
+
+  const pendingStep = await resolveFunnelStep(session.user.id);
+  if (pendingStep) redirect(funnelStepPath(pendingStep));
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },

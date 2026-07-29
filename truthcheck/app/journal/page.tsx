@@ -19,10 +19,15 @@ export default async function JournalPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, tier: true, createdAt: true, wantsDailyReminder: true },
+    select: { name: true, tier: true, createdAt: true, wantsDailyReminder: true, onboardingCompletedAt: true },
   });
 
   if (!user) redirect('/login');
+  // Le Journal EST l'étape "journal" du funnel — mais si le questionnaire
+  // d'accueil n'a jamais été fait (lien direct, reconnexion après abandon en
+  // cours de route…), on ne laisse jamais quelqu'un le sauter — voir
+  // lib/funnelGate.ts.
+  if (!user.onboardingCompletedAt) redirect('/bienvenue');
 
   const access = journalAccessFor(user.tier, user.createdAt);
 
