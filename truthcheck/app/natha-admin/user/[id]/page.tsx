@@ -29,6 +29,9 @@ function fmtDate(d: Date) {
 function fmtTime(d: Date) {
   return d.toLocaleTimeString('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
 }
+function euros(cents: number) {
+  return (cents / 100).toFixed(2).replace('.', ',') + ' €';
+}
 function fmtDuration(min: number) {
   if (min < 60) return `${min} min`;
   const h = Math.floor(min / 60);
@@ -56,7 +59,7 @@ export default async function UserActivityPage({ params }: { params: { id: strin
     );
   }
 
-  const [pageViews, appEvents, journalEntries, quizResults, compatChecks, customQuizzes, convAnalyses, mbtiHistory, advancedAnalysis, chatUsageRows] = await Promise.all([
+  const [pageViews, appEvents, journalEntries, quizResults, compatChecks, customQuizzes, convAnalyses, mbtiHistory, advancedAnalysis, chatUsageRows, payments] = await Promise.all([
     prisma.pageView.findMany({ where: { userId: uid }, select: { path: true, createdAt: true, source: true }, orderBy: { createdAt: 'asc' } }),
     prisma.appEvent.findMany({ where: { userId: uid }, select: { event: true, createdAt: true, properties: true }, orderBy: { createdAt: 'asc' } }),
     prisma.journalEntry.findMany({ where: { userId: uid }, select: { day: true }, orderBy: { day: 'desc' } }),
@@ -67,6 +70,13 @@ export default async function UserActivityPage({ params }: { params: { id: strin
     prisma.mbtiTestHistory.findMany({ where: { userId: uid }, select: { type: true, createdAt: true }, orderBy: { createdAt: 'desc' } }),
     prisma.advancedAnalysis.findUnique({ where: { userId: uid }, select: { updatedAt: true } }),
     prisma.chatUsage.findMany({ where: { userId: uid }, select: { day: true, count: true }, orderBy: { day: 'desc' } }),
+    // ── LTV — chaque paiement Stripe réellement encaissé par ce compte
+    // (premier achat + tous les renouvellements, voir app/api/webhook/route.ts).
+    // Lié par email (Conversion n'a pas de userId) : Stripe et NextAuth
+    // normalisent tous les deux en minuscules, la correspondance est fiable.
+    user.email
+      ? prisma.conversion.findMany({ where: { email: user.email }, select: { amountCents: true, productType: true, createdAt: true }, orderBy: { createdAt: 'asc' } })
+      : Promise.resolve([]),
   ]);
 
   // ── Timeline unifiée — pages/quiz/funnel (PageView, maintenant lié à ce
@@ -80,6 +90,23 @@ export default async function UserActivityPage({ params }: { params: { id: strin
 
   const sessions = groupSessions([...visitEvents, ...appVisitEvents].filter((e) => e.kind !== 'diag'));
   const totalMinutes = sessions.reduce((s, sess) => s + sess.durationMin, 0);
+
+  // ── LTV ── somme de tous les paiements réels de ce compte (voir la requête
+  // `payments` ci-dessus). Volontairement PAS déduit du `tier` actuel : un
+  // abonné Starter depuis 3 mois a rapporté 3×1,99€, pas juste "1,99€/mois".
+  const ltvCents = payments.reduce((s, p) => s + p.amountCents, 0);
+  const PRODUCT_TYPE_LABEL: Record<string, string> = {
+    onetime: 'Résultat seul (one-shot)',
+    starter: 'Starter — 1er paiement',
+    starter_renewal: 'Starter — renouvellement',
+    plus: 'Plus — 1er paiement',
+    plus_renewal: 'Plus — renouvellement',
+    monthly: 'Mensuel — 1er paiement',
+    renewal: 'Renouvellement',
+    annual: 'Annuel',
+    rapport: 'Rapport PDF',
+    fusion: 'Test fusionné',
+  };
 
   const novaMessageCount = appEvents.filter((e) => e.event === 'nova_message_sent').length;
   const novaMessagesTotal = Math.max(novaMessageCount, chatUsageRows.reduce((s, r) => s + r.count, 0));
@@ -121,6 +148,29 @@ export default async function UserActivityPage({ params }: { params: { id: strin
               {user.tier !== 'free' ? user.tier : 'Gratuit'}
             </span>
           </p>
+        </div>
+
+        {/* ── LTV ── ce que ce compte a VRAIMENT rapporté à ce jour, pas une
+            estimation déduite du palier actuel. S'additionne à chaque
+            renouvellement (voir app/api/webhook/route.ts). */}
+        <div style={{ ...block(C.surface, C.border), marginBottom: 20, display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+          <div>
+            <p style={label}>LTV — total encaissé</p>
+            <p style={{ ...bigNum, fontSize: 32, color: ltvCents > 0 ? C.good : C.text }}>{euros(ltvCents)}</p>
+            <p style={sub}>{payments.length === 0 ? 'Aucun paiement encore' : `${payments.length} paiement${payments.length > 1 ? 's' : ''}`}</p>
+          </div>
+          {payments.length > 0 && (
+            <div style={{ flex: 1, minWidth: 220 }}>
+              {payments.map((p, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '5px 0', borderBottom: i < payments.length - 1 ? `1px solid ${C.borderSoft}` : 'none' }}>
+                  <span style={{ fontSize: 12.5, color: C.muted }}>
+                    {fmtDate(p.createdAt)} · {PRODUCT_TYPE_LABEL[p.productType ?? ''] ?? p.productType ?? '—'}
+                  </span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: C.text }}>{euros(p.amountCents)}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <p style={{ ...sub, marginBottom: 20, fontSize: 12, color: C.faint, maxWidth: 560 }}>
