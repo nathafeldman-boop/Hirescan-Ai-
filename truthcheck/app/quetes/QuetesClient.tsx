@@ -13,6 +13,7 @@ interface Quest {
   emoji: string;
   rewardLabel: string;
   requiresPremium: boolean;
+  requiresMbti: boolean;
   href: string | null;
   completed: boolean;
   completedAt: string | null;
@@ -34,12 +35,19 @@ const CATEGORY_META: Record<Quest['category'], { title: string; subtitle: string
 
 // Une quête cliquable ramène directement là où l'action se fait (Journal,
 // Elio, test...) plutôt que de laisser l'utilisateur chercher où aller — voir
-// lib/quests.ts::href. Verrouillée → clique vers /pricing (même logique :
-// toujours une action, jamais une impasse). Terminée ou sans destination
-// (quêtes d'ancienneté 30/60/90 jours) → reste une carte statique.
-function QuestCard({ q, isPremium }: { q: Quest; isPremium: boolean }) {
-  const locked = q.requiresPremium && !isPremium && !q.completed;
-  const destination = q.completed ? null : locked ? '/pricing' : q.href;
+// lib/quests.ts::href. Verrouillée (Premium) → clique vers /pricing. Verrouillée
+// (MBTI) → clique vers /quiz/personnalite : une analyse de compatibilité n'a pas
+// de sens tant qu'Elio ne connaît pas encore ton propre profil, donc ces quêtes
+// (voir requiresMbti dans lib/quests.ts) redirigent d'abord vers le test, jamais
+// une impasse. Le verrou MBTI passe avant le verrou Premium : même un compte
+// payant doit d'abord faire son test. Terminée ou sans destination (quêtes
+// d'ancienneté 30/60/90 jours) → reste une carte statique.
+function QuestCard({ q, isPremium, hasMbti }: { q: Quest; isPremium: boolean; hasMbti: boolean }) {
+  const mbtiLocked = q.requiresMbti && !hasMbti && !q.completed;
+  const premiumLocked = !mbtiLocked && q.requiresPremium && !isPremium && !q.completed;
+  const locked = mbtiLocked || premiumLocked;
+  const destination = q.completed ? null : mbtiLocked ? '/quiz/personnalite' : premiumLocked ? '/pricing' : q.href;
+  const lockedLabel = mbtiLocked ? 'Fais d\'abord ton test de personnalité' : 'Réservée aux abonnés';
 
   const content = (
     <>
@@ -48,7 +56,7 @@ function QuestCard({ q, isPremium }: { q: Quest; isPremium: boolean }) {
         <p className="text-sm font-bold" style={{ color: 'var(--ink)' }}>{q.title}</p>
         <p className="text-[12px] mt-0.5" style={{ color: '#8a7d5c', lineHeight: 1.4 }}>{q.description}</p>
         <p className="text-[11px] font-semibold mt-1.5" style={{ color: q.completed ? '#1f7a4d' : locked ? '#a8a29e' : 'var(--gold)' }}>
-          {q.completed ? 'Terminée' : locked ? 'Réservée aux abonnés' : q.rewardLabel}
+          {q.completed ? 'Terminée' : locked ? lockedLabel : q.rewardLabel}
         </p>
       </div>
       {destination && (
@@ -81,10 +89,11 @@ function QuestCard({ q, isPremium }: { q: Quest; isPremium: boolean }) {
 }
 
 export default function QuetesClient({
-  firstName, isPremium, quests, totalCompleted, generatedQuests, canGenerate,
+  firstName, isPremium, hasMbti, quests, totalCompleted, generatedQuests, canGenerate,
 }: {
   firstName: string | null;
   isPremium: boolean;
+  hasMbti: boolean;
   quests: Quest[];
   totalCompleted: number;
   generatedQuests: GeneratedQuestItem[];
@@ -183,7 +192,7 @@ export default function QuetesClient({
                 <p className="text-[11px] font-semibold" style={{ color: '#a8a29e' }}>{doneCount}/{inCat.length}</p>
               </div>
               <div className="flex flex-col gap-2">
-                {inCat.map((q) => <QuestCard key={q.key} q={q} isPremium={isPremium} />)}
+                {inCat.map((q) => <QuestCard key={q.key} q={q} isPremium={isPremium} hasMbti={hasMbti} />)}
               </div>
               {cat === 'premium' && !isPremium && (
                 <Link href="/pricing" className="elio-hover-lift block w-full mt-2.5 py-2.5 rounded-full text-center text-xs font-bold" style={{ background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)', color: 'var(--gold)' }}>
@@ -226,7 +235,7 @@ export default function QuetesClient({
 
           {doneGenerated.length > 0 && (
             <div className="flex flex-col gap-2 mb-3">
-              {doneGenerated.map((g) => <QuestCard key={g.id} q={{ key: g.id, category: 'discovery', title: g.title, description: g.description, emoji: g.emoji, rewardLabel: '', requiresPremium: false, href: null, completed: true, completedAt: null }} isPremium={isPremium} />)}
+              {doneGenerated.map((g) => <QuestCard key={g.id} q={{ key: g.id, category: 'discovery', title: g.title, description: g.description, emoji: g.emoji, rewardLabel: '', requiresPremium: false, requiresMbti: false, href: null, completed: true, completedAt: null }} isPremium={isPremium} hasMbti={hasMbti} />)}
             </div>
           )}
 

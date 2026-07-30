@@ -29,7 +29,7 @@ export default async function QuetesPage() {
   await checkAndRecordQuestCompletions(session.user.id);
 
   const [user, stats, completions, generatedQuests] = await Promise.all([
-    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, tier: true } }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, tier: true, mbtiType: true } }),
     getQuestStats(session.user.id),
     prisma.questCompletion.findMany({ where: { userId: session.user.id }, orderBy: { completedAt: 'desc' } }),
     prisma.generatedQuest.findMany({ where: { userId: session.user.id }, orderBy: { createdAt: 'desc' } }),
@@ -46,17 +46,19 @@ export default async function QuetesPage() {
     emoji: q.emoji,
     rewardLabel: q.rewardLabel,
     requiresPremium: !!q.requiresPremium,
+    requiresMbti: !!q.requiresMbti,
     href: q.href ?? null,
     completed: completedKeys.has(q.key),
     completedAt: completedAtByKey.get(q.key) ?? null,
   }));
 
   const isPremium = hasPremiumAccess(user?.tier ?? 'free');
+  const hasMbti = !!user?.mbtiType;
   // Toutes les quêtes restent VISIBLES pour tout le monde — y compris Premium
   // pour un compte gratuit (verrouillées, avec CTA), jamais masquées : c'est
   // justement ce qui doit donner envie de passer Premium (voir QuetesClient).
   const visibleQuests = quests;
-  const accessibleQuests = quests.filter((q) => !q.requiresPremium || isPremium);
+  const accessibleQuests = quests.filter((q) => (!q.requiresPremium || isPremium) && (!q.requiresMbti || hasMbti));
   const allCatalogDone = accessibleQuests.length > 0 && accessibleQuests.every((q) => q.completed);
 
   // Marque le hub comme "vu" — fait disparaître le badge "nouveau" affiché sur
@@ -68,6 +70,7 @@ export default async function QuetesPage() {
     <QuetesClient
       firstName={user?.name?.split(' ')[0] ?? null}
       isPremium={isPremium}
+      hasMbti={hasMbti}
       quests={visibleQuests}
       totalCompleted={completions.length}
       generatedQuests={generatedQuests.map((g) => ({

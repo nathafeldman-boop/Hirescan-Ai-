@@ -39,8 +39,13 @@ export default async function DecouvertePage() {
   ]);
 
   const isPremium = hasPremiumAccess(user?.tier ?? 'free');
+  const hasMbti = !!user?.mbtiType;
   const completedKeys = new Set(completions.map((c) => c.questKey));
-  const accessibleQuests = QUEST_CATALOG.filter((q) => !q.requiresPremium || isPremium);
+  // Une quête qui exige le test MBTI n'est pas "accessible" tant qu'il n'est
+  // pas fait (voir requiresMbti dans lib/quests.ts) — sinon elle gonflerait le
+  // badge "quêtes en attente" pour un compte qui n'a pas encore fait son test,
+  // sans qu'il y ait quoi que ce soit de logique à y faire pour l'instant.
+  const accessibleQuests = QUEST_CATALOG.filter((q) => (!q.requiresPremium || isPremium) && (!q.requiresMbti || hasMbti));
   const pendingCatalogCount = accessibleQuests.filter((q) => !completedKeys.has(q.key)).length;
   const pendingGenerated = generatedQuests.filter((g) => !g.completedAt);
 
