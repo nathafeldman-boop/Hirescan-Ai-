@@ -7,26 +7,22 @@ import QuizClient from './QuizClient';
 const BASE = 'https://urcecret.site';
 
 const ALL_SLUGS = [
-  'infidelite', 'adopte', 'amoureux', 'vrais-amis', 'orientation',
-  'narcissique', 'mon-ex', 'manipule', 'rompre', 'jaloux',
-  'relation-toxique', 'crush', 'burnout', 'depression', 'vrai-amour',
+  'auto-sabotage', 'role-familial', 'amoureux', 'vrais-amis', 'intelligence-emotionnelle',
+  'narcissique', 'tourner-la-page', 'manipule', 'rompre', 'jaloux',
+  'relation-toxique', 'schema-amoureux', 'burnout', 'depression', 'vrai-amour',
   'style-attachement', 'langages-amour', 'gaslight',
 ];
 
 const faqData: Record<string, { q: string; a: string }[]> = {
-  infidelite: [
-    { q: 'Comment savoir si mon/ma partenaire me trompe ?', a: "Les signaux incluent des changements de comportement soudains, une protection accrue du téléphone, des absences inexpliquées, moins d'intimité et une distance émotionnelle. Notre quiz analyse 30 comportements précis." },
-    { q: "Quels sont les signes les plus courants d'infidélité ?", a: "Protection du téléphone, changements d'habitudes, moins d'intérêt pour le couple, nouvelles dépenses inexpliquées, attitude défensive aux questions. Notre test les évalue tous." },
-    { q: "Mon/Ma partenaire cache son téléphone — est-ce suspect ?", a: "Cacher son téléphone est un signal mais pas une preuve. Il doit être combiné avec d'autres comportements. Notre quiz analyse l'ensemble du tableau comportemental." },
-    { q: "Qu'est-ce que l'infidélité émotionnelle ?", a: "L'infidélité émotionnelle désigne une connexion affective intense avec quelqu'un d'autre, sans relation physique. Elle est souvent plus destructrice que l'infidélité physique." },
-    { q: 'Ce quiz est-il fiable pour détecter une infidélité ?', a: "Notre quiz est basé sur des comportements documentés par des psychologues. Il ne constitue pas une preuve mais un outil d'analyse objective pour évaluer si vos doutes sont justifiés." },
+  'auto-sabotage': [
+    { q: "Qu'est-ce que l'auto-sabotage, exactement ?", a: "L'auto-sabotage désigne les comportements, souvent inconscients, par lesquels on se crée soi-même des obstacles qui compliquent l'atteinte de ses propres objectifs. Les psychologues Steven Berglas et Edward Jones ont montré dès les années 1970 que ce mécanisme (\"self-handicapping\") sert à se protéger d'un échec potentiel en s'aménageant une excuse à l'avance." },
+    { q: 'Pourquoi je procrastine alors que je sais que ça va me nuire ?', a: "Les recherches du psychologue Piers Steel montrent que la procrastination n'est presque jamais un problème de gestion du temps, mais un problème de régulation émotionnelle : on repousse une tâche pour éviter l'inconfort qu'elle génère, comme la peur de l'échec ou du jugement." },
+    { q: "Peut-on vraiment sortir d'un schéma d'auto-sabotage ?", a: "Oui : ces schémas s'apprennent, généralement pour de bonnes raisons — se protéger d'une déception, d'un jugement, d'une pression — ce qui veut dire qu'ils peuvent aussi se désapprendre progressivement, en commençant par repérer le moment précis où le mécanisme s'active." },
   ],
-  adopte: [
-    { q: 'Comment savoir si je suis adopté(e) ?', a: "Plusieurs indices peuvent suggérer une adoption non divulguée : différences physiques marquées avec les parents, réactions étranges à certaines questions, documents familiaux inaccessibles. Notre quiz analyse 30 indices." },
-    { q: 'Quels signes peuvent indiquer que je suis adopté(e) ?', a: "Ne pas se reconnaître dans sa famille, avoir été élevé différemment, des zones d'ombre dans l'histoire familiale, ou une intuition persistante. Notre quiz évalue ces éléments." },
-    { q: 'Peut-on faire un test ADN pour savoir si on est adopté(e) ?', a: "Oui, un test ADN de parentalité peut confirmer une filiation biologique. Des services comme 23andMe ou MyHeritage permettent de trouver des membres de famille biologique." },
-    { q: 'Comment parler à mes parents de mes doutes ?', a: "Choisissez un moment calme, exprimez vos sentiments sans accusation, expliquez que savoir la vérité est important pour votre identité. La communication reste l'approche la plus directe." },
-    { q: 'Est-il normal de se demander si on est adopté(e) ?', a: "Oui, de nombreuses personnes se posent cette question. La curiosité sur ses origines est profondément humaine. Notre quiz aide à évaluer si vos doutes méritent d'être explorés." },
+  'role-familial': [
+    { q: 'Qu\'est-ce qu\'un "rôle familial" en psychologie ?', a: "En thérapie familiale systémique, notamment dans les travaux de Virginia Satir, on observe que chaque enfant tend à adopter inconsciemment un rôle (le héros, le médiateur, le bouc émissaire, l'enfant invisible, le boute-en-train...) pour aider la famille à maintenir un certain équilibre. Ce rôle n'est jamais choisi consciemment." },
+    { q: 'Pourquoi ces rôles se manifestent-ils encore à l\'âge adulte ?', a: "Les stratégies apprises dans l'enfance pour se sentir en sécurité ou utile deviennent souvent des réflexes automatiques qui perdurent bien après avoir quitté le foyer familial : difficulté à demander de l'aide, peur du conflit, besoin de \"mériter\" l'attention des autres." },
+    { q: 'Peut-on vraiment se libérer d\'un rôle familial appris ?', a: "Oui : un rôle appris reste un comportement, pas une identité définitive. Prendre conscience du rôle qu'on a tenu est souvent la première étape pour commencer à le desserrer en douceur, en réapprenant à exprimer ses propres besoins sans culpabilité." },
   ],
   amoureux: [
     { q: 'Comment savoir si je suis vraiment amoureux/amoureuse ?', a: "L'amour véritable se distingue par une pensée constante pour l'autre, une envie de partager sa vie, un souci sincère de son bien-être et une attraction qui va au-delà du physique." },
@@ -42,12 +38,10 @@ const faqData: Record<string, { q: string; a: string }[]> = {
     { q: "Qu'est-ce qu'une amitié toxique ?", a: "Une amitié qui vous laisse systématiquement fatigué(e), diminué(e) ou mal à l'aise — via des critiques répétées, de la manipulation ou un manque de respect persistant." },
     { q: "Est-il normal d'avoir des doutes sur ses amitiés ?", a: "Oui, questionner la qualité de ses relations amicales est sain et mature. Cela témoigne d'une conscience de soi et du respect que vous vous accordez." },
   ],
-  orientation: [
-    { q: 'Comment découvrir mon orientation sexuelle ?', a: "L'orientation se révèle progressivement à travers vos attirances émotionnelles et physiques. Une réflexion honnête sur ces attirances est un bon point de départ." },
-    { q: 'Est-il normal de ne pas savoir quelle est mon orientation ?', a: "Absolument. De nombreuses personnes questionnent leur orientation à tout âge. La sexualité est un spectre, et se poser des questions est une démarche courageuse et légitime." },
-    { q: 'Quelle est la différence entre bisexuel(le) et pansexuel(le) ?', a: "La bisexualité désigne l'attirance pour deux genres ou plus. La pansexualité désigne l'attirance indépendamment du genre. Les deux termes sont valides." },
-    { q: "Ce quiz peut-il m'aider à comprendre mon orientation ?", a: "Notre quiz n'a pas pour vocation de vous étiqueter, mais d'aider à explorer vos attirances de façon structurée et anonyme. Il peut être un point de départ pour une réflexion personnelle." },
-    { q: "L'orientation sexuelle peut-elle changer ?", a: "Oui, certaines personnes vivent une évolution de leur orientation au fil du temps. C'est un phénomène documenté. L'identité sexuelle est fluide pour beaucoup." },
+  'intelligence-emotionnelle': [
+    { q: "Qu'est-ce que l'intelligence émotionnelle exactement ?", a: "L'intelligence émotionnelle désigne la capacité à percevoir, comprendre et réguler ses propres émotions, tout en étant capable de reconnaître et d'influencer celles des autres. Le concept a été popularisé par le psychologue Daniel Goleman, autour de cinq compétences : conscience de soi, maîtrise de soi, motivation, empathie et compétences sociales." },
+    { q: "L'intelligence émotionnelle peut-elle vraiment s'améliorer ?", a: "Oui : contrairement à une idée reçue, ce n'est pas un trait de personnalité fixe mais un ensemble de compétences qui se renforcent avec la pratique. Tenir un carnet émotionnel, pratiquer la pause avant de réagir, ou s'entraîner à l'écoute active produisent des progrès mesurables en quelques semaines." },
+    { q: "Pourquoi l'intelligence émotionnelle est-elle importante au travail ?", a: "De nombreuses études l'associent à une meilleure gestion du stress, des relations professionnelles plus fluides et un leadership plus efficace. Pour Goleman, elle serait même un meilleur prédicteur de réussite professionnelle sur le long terme que le seul QI technique." },
   ],
   narcissique: [
     { q: 'Comment savoir si je suis narcissique ?', a: "Le narcissisme se caractérise par un besoin excessif d'admiration, un manque d'empathie, un sentiment de supériorité et une sensibilité extrême à la critique. Notre quiz évalue ces traits sur 30 questions." },
@@ -56,12 +50,10 @@ const faqData: Record<string, { q: string; a: string }[]> = {
     { q: 'Peut-on être un peu narcissique sans avoir une personnalité narcissique ?', a: "Oui, le narcissisme est un spectre. Avoir certains traits ne signifie pas avoir un trouble de la personnalité narcissique (TPN). Ce quiz évalue la présence et l'intensité de ces traits." },
     { q: "Qu'est-ce que la blessure narcissique ?", a: "La blessure narcissique désigne la réaction violente d'une personne narcissique face à une critique ou un rejet. Elle peut se manifester par de la colère, du mépris ou de la honte intense." },
   ],
-  'mon-ex': [
-    { q: 'Comment savoir si mon ex veut revenir ?', a: "Les signaux incluent des contacts fréquents sans raison, la nostalgie affichée, la jalousie face à vos nouvelles fréquentations, et les tentatives de se retrouver. Notre quiz analyse 30 comportements précis." },
-    { q: 'Est-ce que mon ex qui me like sur les réseaux veut revenir ?', a: "Les interactions sur les réseaux peuvent signaler un attachement mais ne prouvent pas une volonté de retour. Elles doivent être combinées à d'autres signaux pour être significatives." },
-    { q: 'Combien de temps faut-il pour qu\'un ex tourne la page ?', a: "Il n'existe pas de délai universel. Cela dépend de la durée de la relation, de la raison de la rupture et du profil de chaque personne. Certains mettent des semaines, d'autres des années." },
-    { q: 'Faut-il reprendre contact avec un ex ?', a: "Cela dépend de vos motivations. Si c'est pour clore quelque chose ou par nostalgie sincère, cela peut être pertinent. Si c'est par peur de la solitude, mieux vaut y réfléchir à deux fois." },
-    { q: 'Est-il possible de renouer avec un ex avec succès ?', a: "Oui, certains couples se reforment avec succès, surtout si les raisons de la rupture ont réellement changé. La communication honnête est essentielle pour que le retour ne reproduise pas les mêmes schémas." },
+  'tourner-la-page': [
+    { q: 'Combien de temps faut-il vraiment pour tourner la page après une rupture ?', a: "Il n'existe aucune durée universelle : la guérison dépend de la durée de la relation, de l'attachement en jeu et du soutien reçu. Ce qui compte n'est pas le nombre de mois écoulés, mais si la douleur évolue avec le temps ou si elle reste identique." },
+    { q: 'Est-ce normal de penser encore à son ex plusieurs mois après la rupture ?', a: "Oui, tout à fait normal, surtout si ces pensées deviennent moins fréquentes et moins douloureuses avec le temps. Ce qui mérite attention, c'est quand la pensée reste intacte en intensité ou s'accompagne de rumination ou de vérifications compulsives des réseaux sociaux." },
+    { q: 'Pourquoi je compare tous mes nouveaux partenaires à mon ex malgré moi ?', a: "Ce réflexe vient souvent d'un attachement encore actif : le cerveau utilise la relation passée comme référence par défaut tant qu'aucun nouveau schéma n'a pris sa place. Cela s'atténue en travaillant sur l'acceptation de la rupture." },
   ],
   manipule: [
     { q: 'Comment savoir si je suis manipulé(e) ?', a: "Les signes incluent : sentiment constant de culpabilité, doutes sur votre propre perception, isolement progressif, épuisement émotionnel après les interactions, et peur des réactions de l'autre." },
@@ -91,12 +83,10 @@ const faqData: Record<string, { q: string; a: string }[]> = {
     { q: 'Quelle est la différence entre une relation difficile et toxique ?', a: "Une relation difficile a des problèmes mais les deux partenaires se respectent et cherchent des solutions. Une relation toxique a un schéma de comportements nocifs persistants qui détruisent progressivement l'estime de soi." },
     { q: 'Que faire si je suis dans une relation toxique ?', a: "Parlez à un proche ou un professionnel, documentez les comportements, posez des limites. Si votre sécurité est en jeu, cherchez de l'aide immédiatement auprès des autorités ou d'associations spécialisées." },
   ],
-  crush: [
-    { q: 'Comment savoir si mon crush m\'aime en secret ?', a: "Les signaux incluent : regards prolongés, recherche de proximité physique, attention particulière à vos paroles, nervosité en votre présence, et efforts pour se retrouver dans le même endroit que vous." },
-    { q: 'Comment interpréter les regards de mon crush ?', a: "Un regard prolongé, un sourire accompagné d'un regard fuyant par timidité, ou des coups d'œil répétés vers vous dans un groupe sont souvent des signaux d'intérêt romantique." },
-    { q: 'Faut-il avouer ses sentiments à son crush ?', a: "Oser exprimer ses sentiments est souvent libérateur. Si vous ressentez beaucoup de signaux positifs, le risque en vaut souvent la chandelle. L'incertitude peut durer indéfiniment sans action." },
-    { q: 'Comment se comporter avec son crush ?', a: "Soyez naturel(le), montrez de l'intérêt sincère pour lui/elle, créez des occasions de passer du temps ensemble, et osez l'humour et la légèreté pour créer une connexion." },
-    { q: 'Est-ce que les amis peuvent voir l\'attirance entre deux personnes ?', a: "Oui, les observateurs extérieurs remarquent souvent des dynamiques que les personnes concernées minimisent. Si plusieurs personnes de votre entourage le suggèrent, c'est souvent significatif." },
+  'schema-amoureux': [
+    { q: 'Pourquoi je tombe toujours amoureux/amoureuse du même type de personne ?', a: "Ce phénomène s'explique en partie par la répétition compulsive, un concept freudien : le cerveau recherche inconsciemment des dynamiques familières, souvent apprises dans l'enfance, même quand elles sont douloureuses. L'attirance immédiate peut être un signal de familiarité plutôt que de compatibilité réelle." },
+    { q: "Ce test est-il la même chose qu'un test de style d'attachement ?", a: "Non. Un test de style d'attachement évalue ta façon générale de vivre la proximité et la sécurité dans une relation. Ce quiz se concentre spécifiquement sur le TYPE de personne que tu choisis de façon récurrente, et sur la dynamique précise que tu recrées à chaque fois." },
+    { q: 'Peut-on vraiment changer son schéma amoureux ?', a: "Oui. Un schéma appris peut être désappris, en plusieurs étapes : le reconnaître, comprendre son origine, puis s'exposer consciemment à des dynamiques différentes jusqu'à ce qu'elles deviennent, elles aussi, familières." },
   ],
   burnout: [
     { q: 'Comment savoir si je suis en burnout ?', a: "Le burnout se manifeste par un épuisement persistant, du cynisme envers le travail, une efficacité réduite, des symptômes physiques et une difficulté à déconnecter. Notre quiz évalue ces 5 dimensions clés." },
@@ -217,7 +207,7 @@ export default function QuizPage({ params }: PageProps) {
     ],
   };
 
-  const hasGuide = ['style-attachement', 'langages-amour', 'gaslight', 'burnout', 'depression', 'narcissique', 'infidelite', 'manipule', 'relation-toxique'].includes(quiz.slug);
+  const hasGuide = ['style-attachement', 'langages-amour', 'gaslight', 'burnout', 'depression', 'narcissique', 'manipule', 'relation-toxique'].includes(quiz.slug);
 
   return (
     <>

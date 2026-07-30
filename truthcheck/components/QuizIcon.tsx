@@ -219,18 +219,13 @@ function IconDefault({ color }: { color: string }) {
 }
 
 const ICON_MAP: Record<string, React.FC<{ color: string }>> = {
-  infidelite: IconInfidelite,
-  adopte: IconAdopte,
   amoureux: IconAmoureux,
   'vrais-amis': IconVraisAmis,
-  orientation: IconOrientation,
   narcissique: IconNarcissique,
-  'mon-ex': IconMonEx,
   manipule: IconManipule,
   rompre: IconRompre,
   jaloux: IconJaloux,
   'relation-toxique': IconRelationToxique,
-  crush: IconCrush,
   burnout: IconBurnout,
   depression: IconDepression,
   'vrai-amour': IconVraiAmour,

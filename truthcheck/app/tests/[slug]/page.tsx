@@ -199,36 +199,6 @@ const guides: Record<string, GuideData> = {
     ],
   },
 
-  'infidelite': {
-    slug: 'infidelite',
-    emoji: '💔',
-    title: 'Test Infidélité',
-    h1: 'Mon Partenaire Me Trompe-t-il/elle ? — Test Gratuit',
-    metaTitle: 'Test Infidélité Gratuit 2025 — Mon Partenaire Me Trompe ? Résultats Instantanés',
-    metaDesc: 'Analyse 30 signaux comportementaux d\'infidélité. Notre test gratuit évalue si tes doutes sont justifiés selon des critères documentés par les psychologues. Anonyme et instantané.',
-    keywords: ['test infidélité', 'mon partenaire me trompe', 'signes infidélité', 'comment savoir si je suis trompé', 'infidélité émotionnelle', 'trahison couple', 'quiz infidélité'],
-    intro: 'Les doutes sur la fidélité d\'un partenaire sont parmi les expériences émotionnelles les plus douloureuses. Vouloir des réponses est humain. Ce test analyse de façon objective les comportements que tu décris pour évaluer si les signaux que tu observes correspondent à des schémas documentés par les psychologues spécialisés dans les relations de couple. Il ne remplace pas une conversation directe, mais peut t\'aider à clarifier si tes doutes méritent d\'être explorés — ou si une autre explication est plus probable.',
-    s1Title: 'Les signaux les plus fiables d\'infidélité',
-    s1: [
-      '📱 Protection excessive du téléphone — Mise sur silencieux constant, téléphone retourné, nervosité quand tu approches, mot de passe récemment changé.',
-      '🌙 Changements d\'habitudes inexpliqués — Retours tardifs soudains, nouvelles "sorties entre amis" sans détail, attitude défensive aux questions simples.',
-      '❄️ Distance émotionnelle et physique — Baisse d\'intimité physique sans raison apparente, moins d\'intérêt pour le couple et ses projets, présence absente.',
-      '💸 Dépenses inexpliquées — Frais sur les relevés bancaires sans explication claire, cadeaux reçus dont l\'origine est floue.',
-      '🔄 Comportements de culpabilité — Gentillesse excessive soudaine et inexpliquée, cadeaux inattendus, hypersensibilité aux reproches.',
-    ],
-    s2Title: 'L\'infidélité émotionnelle : aussi grave que physique ?',
-    s2: 'L\'infidélité émotionnelle — une connexion affective profonde avec quelqu\'un d\'autre, sans relation physique — est souvent considérée par les thérapeutes de couple comme encore plus destructrice que l\'infidélité physique. Elle implique un investissement émotionnel, des secrets partagés et une intimité psychologique qui empiètent sur le couple. Notre test évalue les deux formes d\'infidélité, car les deux méritent d\'être prises au sérieux.',
-    ctaText: 'Analyser les signaux →',
-    accentColor: '#ef4444',
-    faqs: [
-      { q: 'Ce test peut-il prouver une infidélité ?', a: 'Non. Ce test évalue des signaux comportementaux selon des critères documentés. Il peut indiquer un niveau de risque mais ne constitue en aucun cas une preuve. Seule une conversation directe peut apporter une réponse certaine.' },
-      { q: 'Que faire si le test indique un fort risque d\'infidélité ?', a: 'Une conversation directe et calme, sans accusation, reste l\'approche la plus efficace. Si la communication est difficile, une thérapie de couple peut créer un espace sécurisé pour cette conversation.' },
-      { q: 'L\'instinct se trompe-t-il souvent ?', a: 'Les études montrent que les intuitions des partenaires sont statistiquement plus souvent correctes qu\'incorrectes concernant l\'infidélité. Ne pas ignorer un instinct persistant, mais ne pas agir dessus sans avoir cherché des éléments concrets.' },
-      { q: 'Une relation peut-elle se reconstruire après une infidélité ?', a: 'Oui, de nombreux couples se reconstruisent après une infidélité avec l\'aide d\'une thérapie de couple. Cela requiert une transparence totale, un travail profond sur les causes, et une décision consciente des deux partenaires.' },
-      { q: 'Est-il normal de vouloir surveiller son partenaire ?', a: 'L\'envie de vérifier est humaine quand on a des doutes, mais surveiller activement son partenaire à son insu est néfaste pour les deux. La confiance ou son absence doit être adressée directement.' },
-    ],
-  },
-
   'manipule': {
     slug: 'manipule',
     emoji: '🎭',

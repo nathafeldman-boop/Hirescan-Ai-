@@ -16,10 +16,10 @@ interface PortraitData {
 }
 
 const QUIZ_NAMES: Record<string, string> = {
-  infidelite: 'Infidélité', amoureux: 'Suis-je amoureux ?', 'vrais-amis': 'Vrais amis',
-  orientation: 'Orientation', narcissique: 'Narcissique', 'mon-ex': 'Mon ex',
+  'auto-sabotage': 'Auto-sabotage', amoureux: 'Suis-je amoureux ?', 'vrais-amis': 'Vrais amis',
+  'role-familial': 'Rôle familial', 'intelligence-emotionnelle': 'Intelligence émotionnelle', narcissique: 'Narcissique', 'tourner-la-page': 'Tourner la page',
   manipule: 'Manipulé(e) ?', rompre: 'Dois-je rompre ?', jaloux: 'Jaloux/jalouse ?',
-  'relation-toxique': 'Relation toxique', crush: 'Mon crush', burnout: 'Burnout',
+  'relation-toxique': 'Relation toxique', 'schema-amoureux': 'Mon type', burnout: 'Burnout',
   depression: 'Dépression', 'vrai-amour': 'Vrai amour', personnalite: 'Test MBTI',
 };
 

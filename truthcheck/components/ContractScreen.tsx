@@ -18,12 +18,12 @@ const PHRASES = [
 ];
 
 const HEADINGS: Record<string, string> = {
-  infidelite:   "Es-tu prêt·e à connaître la vérité ?",
+  'auto-sabotage': "Es-tu prêt·e à voir ce qui te freine vraiment ?",
   personnalite: "Es-tu prêt·e à te découvrir vraiment ?",
   amoureux:     "Es-tu prêt·e à nommer ce que tu ressens ?",
   'vrais-amis': "Es-tu prêt·e à voir qui est vraiment là pour toi ?",
-  orientation:  "Es-tu prêt·e à te comprendre tel·le que tu es ?",
-  adopte:       "Es-tu prêt·e à connaître la vérité sur ton histoire ?",
+  'intelligence-emotionnelle': "Es-tu prêt·e à te comprendre tel·le que tu es ?",
+  'role-familial': "Es-tu prêt·e à connaître la vérité sur ton histoire ?",
 };
 
 export default function ContractScreen({ quizTitle, quizSlug, accentColor, onAccept }: Props) {

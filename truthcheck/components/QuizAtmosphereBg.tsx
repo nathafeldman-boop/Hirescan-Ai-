@@ -3,18 +3,20 @@
 type Theme = 'romance' | 'psychological' | 'melancholy' | 'burnout' | 'identity' | 'default';
 
 const SLUG_THEME: Record<string, Theme> = {
-  crush: 'romance',
+  'schema-amoureux': 'romance',
   'vrai-amour': 'romance',
   amoureux: 'romance',
   narcissique: 'psychological',
   manipule: 'psychological',
   'relation-toxique': 'psychological',
-  'mon-ex': 'melancholy',
+  'auto-sabotage': 'psychological',
+  'tourner-la-page': 'melancholy',
+  'role-familial': 'melancholy',
   rompre: 'melancholy',
   depression: 'melancholy',
   burnout: 'burnout',
   jaloux: 'burnout',
-  orientation: 'identity',
+  'intelligence-emotionnelle': 'identity',
 };
 
 const THEMES: Record<Theme, { a: string; b: string; c: string; d: string }> = {

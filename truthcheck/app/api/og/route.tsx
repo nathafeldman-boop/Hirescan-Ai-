@@ -5,18 +5,18 @@ import { mbtiTypes } from '@/lib/mbti-server';
 export const runtime = 'edge';
 
 const quizMeta: Record<string, { emoji: string; title: string; accent: string }> = {
-  infidelite:        { emoji: '💔', title: 'Mon/Ma partenaire me cache quelque chose ?', accent: '#ef4444' },
-  adopte:            { emoji: '🧬', title: 'Suis-je adopté(e) ?',                         accent: '#b07d2b' },
+  'auto-sabotage':   { emoji: '🪤', title: 'Est-ce que je me sabote sans le savoir ?',     accent: '#f97316' },
+  'role-familial':   { emoji: '🎭', title: 'Quel rôle j\'ai joué dans ma famille ?',        accent: '#f59e0b' },
   amoureux:          { emoji: '💫', title: 'Suis-je vraiment amoureux/amoureuse ?',        accent: '#d17d52' },
   'vrais-amis':      { emoji: '🫂', title: 'Sont-ils mes vrais amis ?',                    accent: '#10b981' },
-  orientation:       { emoji: '🌈', title: 'Quelle est mon orientation ?',                 accent: '#c2611f' },
+  'intelligence-emotionnelle': { emoji: '🧠', title: 'Mon intelligence émotionnelle ?',    accent: '#6366f1' },
   narcissique:       { emoji: '🪞', title: 'Suis-je narcissique ?',                        accent: '#f59e0b' },
-  'mon-ex':          { emoji: '💭', title: 'Mon ex pense encore à moi ?',                  accent: '#d17d52' },
+  'tourner-la-page': { emoji: '💔', title: 'Ai-je vraiment tourné la page ?',              accent: '#fb7185' },
   manipule:          { emoji: '🎭', title: 'Suis-je manipulé(e) ?',                        accent: '#c2611f' },
   rompre:            { emoji: '💔', title: 'Dois-je rompre ?',                             accent: '#ef4444' },
   jaloux:            { emoji: '👁️', title: 'Suis-je trop jaloux/jalouse ?',               accent: '#f97316' },
   'relation-toxique':{ emoji: '☠️', title: 'Ma relation est-elle toxique ?',               accent: '#ef4444' },
-  crush:             { emoji: '💘', title: 'Mon crush ressent quelque chose ?',             accent: '#d17d52' },
+  'schema-amoureux': { emoji: '🧲', title: 'Pourquoi le même type de personne ?',           accent: '#c026d3' },
   burnout:           { emoji: '🔥', title: 'Suis-je en burnout ?',                         accent: '#f97316' },
   depression:        { emoji: '🌧️', title: 'Ai-je des signes de dépression ?',            accent: '#b07d2b' },
   'vrai-amour':      { emoji: '❤️‍🔥', title: 'C\'est de l\'amour ou de l\'attachement ?', accent: '#e11d48' },
