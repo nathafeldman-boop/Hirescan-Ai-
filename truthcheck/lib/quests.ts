@@ -40,6 +40,8 @@ export interface QuestDef {
   rewardLabel: string;
   rewardCredits?: number; // chatBonusCredits accordés à la complétion (voir lib/plans.ts / referral)
   requiresPremium?: boolean; // affichée verrouillée + CTA /pricing tant que non payant
+  requiresMbti?: boolean; // affichée verrouillée + CTA /quiz/personnalite tant que le type MBTI n'est pas connu —
+                          // une analyse de compatibilité n'a pas de sens tant qu'Elio ne sait pas qui tu es toi-même.
   href?: string; // destination pour agir sur la quête — absent = quête d'ancienneté, non actionnable (ex: premium_30_days)
   check: (s: QuestStats) => boolean;
 }
@@ -106,6 +108,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     description: 'Compatibilité, conversation ou profil avancé — une première vraie analyse.',
     emoji: '🔍',
     rewardLabel: 'Badge débloqué',
+    requiresMbti: true,
     href: '/compat',
     check: (s) => s.compatCount >= 1 || s.convAnalysesCount >= 1 || s.advancedAnalysisExists,
   },
@@ -185,6 +188,7 @@ export const QUEST_CATALOG: QuestDef[] = [
     emoji: '❤️',
     rewardLabel: 'Badge débloqué',
     requiresPremium: true,
+    requiresMbti: true,
     href: '/compat',
     check: (s) => s.compatCount >= 1 && hasPremiumAccess(s.tier),
   },
