@@ -391,6 +391,11 @@ model QuizResult {
   createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Sert les compteurs "aujourd'hui"/"7 derniers jours" du dashboard admin,
+  // interrogés en direct (voir /api/natha-admin/today) — sans cet index,
+  // ces requêtes filtrées par paid+createdAt scannaient toute la table.
+  @@index([paid, createdAt])
 }
 
 model ScreenshotAnalysis {

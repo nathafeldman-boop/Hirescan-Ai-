@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import AccessCodeWidget from './AccessCodeWidget';
+import TodayStatsLive from './TodayStatsLive';
 
 export const metadata: Metadata = {
   title: 'Mon tableau de bord',
@@ -49,7 +50,9 @@ function bucketByDay(rows: { createdAt: Date }[], days: number, todayYMD: string
 
 // Mini-courbe inline dans une case KPI — signature App Store Connect /
 // Play Console. Construite uniquement à partir de vraies données déjà
-// requêtées (bucketByDay), jamais estimée.
+// requêtées (bucketByDay), jamais estimée. Encore utilisée ici pour
+// "Utilisateurs actifs par jour" (les 4 cases "Aujourd'hui" ont leur propre
+// copie dans TodayStatsLive.tsx, rafraîchie en direct).
 function Sparkline({ values, color }: { values: number[]; color: string }) {
   const w = 100, h = 28;
   const max = Math.max(...values, 1);
@@ -65,20 +68,6 @@ function Sparkline({ values, color }: { values: number[]; color: string }) {
       <path d={area} fill={color} opacity={0.14} />
       <path d={path} fill="none" stroke={color} strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-// Badge de variation (▲/▼ + %) — utilisé pour comparer aujourd'hui à hier,
-// dérivé directement du dernier point de la série quotidienne (pas de requête
-// séparée). Rien n'est affiché si hier était à 0 (pourcentage non défini).
-function DeltaBadge({ today, yesterday }: { today: number; yesterday: number }) {
-  if (yesterday === 0) return null;
-  const diff = Math.round(((today - yesterday) / yesterday) * 100);
-  const positive = diff >= 0;
-  return (
-    <span style={{ fontSize: 12.5, fontWeight: 700, color: positive ? '#1a9e46' : '#d70015', marginLeft: 8 }}>
-      {positive ? '▲' : '▼'} {Math.abs(diff)}%
-    </span>
   );
 }
 
@@ -175,7 +164,6 @@ export default async function NathaAdminPage() {
   const landingSpark = bucketByDay(landing7dRows, 7, todayParis);
   const signupsSpark = bucketByDay(signups7dRows, 7, todayParis);
   const paidSpark     = bucketByDay(paid7dRows, 7, todayParis);
-  const yesterdayOf = (spark: number[]) => spark[spark.length - 2] ?? 0;
 
   // Quiz drop-off funnel (MBTI personnalite)
   // Note : pas de step "Q10" ici — le tracker de milestones (PersonnaliteClient.tsx)
@@ -371,40 +359,15 @@ export default async function NathaAdminPage() {
           </p>
         </div>
 
-        {/* ── SECTION 1 : Ce qui s'est passé aujourd'hui ── */}
+        {/* ── SECTION 1 : Ce qui s'est passé aujourd'hui — live, voir TodayStatsLive ── */}
         <p style={sectionHeading}>Aujourd&apos;hui</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 8 }}>
-
-          <div style={block(C.surface, C.border)}>
-            <p style={label}>Personnes venues</p>
-            <p style={bigNum}>{visitsToday}<DeltaBadge today={visitsToday} yesterday={yesterdayOf(visitsSpark)} /></p>
-            <p style={sub}>ont ouvert le site</p>
-            <Sparkline values={visitsSpark} color={C.primary} />
-          </div>
-
-          <div style={block(C.surface, C.border)}>
-            <p style={label}>Sur la page d&apos;accueil</p>
-            <p style={bigNum}>{landingToday}<DeltaBadge today={landingToday} yesterday={yesterdayOf(landingSpark)} /></p>
-            <p style={sub}>ont vu la landing</p>
-            <Sparkline values={landingSpark} color={C.violet} />
-          </div>
-
-          <div style={block(C.surface, C.border)}>
-            <p style={label}>Nouveaux inscrits</p>
-            <p style={bigNum}>{newToday}<DeltaBadge today={newToday} yesterday={yesterdayOf(signupsSpark)} /></p>
-            <p style={sub}>ont créé un compte</p>
-            <Sparkline values={signupsSpark} color={C.warn} />
-          </div>
-
-          <div style={block(C.surface, C.border)}>
-            <p style={label}>Achats payants</p>
-            <p style={bigNum}>{paidToday}<DeltaBadge today={paidToday} yesterday={yesterdayOf(paidSpark)} /></p>
-            <p style={{ ...sub, color: paidToday > 0 ? C.good : C.muted }}>{paidToday > 0 ? `${euros(paidToday * 199)} encaissés` : 'aucun encore'}</p>
-            <Sparkline values={paidSpark} color={C.good} />
-          </div>
-
-        </div>
-        <p style={{ color: C.faint, fontSize: 11, marginBottom: 28 }}>Courbe = 7 derniers jours</p>
+        <TodayStatsLive
+          initial={{
+            visitsToday, landingToday, newToday, paidToday,
+            visitsSpark, landingSpark, signupsSpark, paidSpark,
+            updatedAt: now.toISOString(),
+          }}
+        />
 
         {/* ── SECTION 2 : Cette semaine vs semaine dernière ── */}
         <p style={sectionHeading}>Cette semaine vs semaine dernière</p>
