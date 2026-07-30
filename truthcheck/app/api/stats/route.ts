@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
-const QUIZ_SLUGS = ['infidelite', 'adopte', 'amoureux', 'vrais-amis'] as const;
+const QUIZ_SLUGS = ['amoureux', 'vrais-amis'] as const;
 
 export async function GET() {
   try {

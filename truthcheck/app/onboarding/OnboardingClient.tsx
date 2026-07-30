@@ -6,19 +6,19 @@ import UrCecretAnimatedBg from '@/components/UrCecretAnimatedBg';
 import QuizIcon from '@/components/QuizIcon';
 
 const QUIZ_COLORS: Record<string, string> = {
-  infidelite: '#f43f5e',
-  adopte: '#c2611f',
+  'auto-sabotage': '#f97316',
+  'role-familial': '#f59e0b',
   amoureux: '#d17d52',
   'vrais-amis': '#06b6d4',
-  orientation: '#10b981',
+  'intelligence-emotionnelle': '#6366f1',
 };
 
 const QUIZ_CHOICES = [
-  { slug: 'infidelite',  label: 'Il/elle me cache quelque chose ?',    emoji: '💔' },
-  { slug: 'adopte',      label: 'Ma famille me dit-elle tout ?',        emoji: '🔍' },
-  { slug: 'amoureux',    label: 'C\'est vraiment de l\'amour ?',        emoji: '💫' },
-  { slug: 'vrais-amis',  label: 'Seraient-ils là si ça allait mal ?',   emoji: '🫂' },
-  { slug: 'orientation', label: 'Es-tu attiré(e) par le même sexe ?',   emoji: '🌈' },
+  { slug: 'auto-sabotage',              label: 'Je me mets des bâtons dans les roues ?', emoji: '🪤' },
+  { slug: 'role-familial',              label: 'Quel rôle j\'ai appris à jouer ?',        emoji: '🎭' },
+  { slug: 'amoureux',                   label: 'C\'est vraiment de l\'amour ?',           emoji: '💫' },
+  { slug: 'vrais-amis',                 label: 'Seraient-ils là si ça allait mal ?',      emoji: '🫂' },
+  { slug: 'intelligence-emotionnelle',  label: 'Mon intelligence émotionnelle ?',         emoji: '🧠' },
 ];
 
 interface Answers {

@@ -99,7 +99,7 @@ async function main() {
   ok(`Utilisateur créé (id: ${user.id}, tier: free)`);
 
   const quizResult = await prisma.quizResult.create({
-    data: { userId: user.id, quizSlug: 'infidelite', score: 72 },
+    data: { userId: user.id, quizSlug: 'auto-sabotage', score: 72 },
   });
   ok(`Quiz result créé (id: ${quizResult.id}, paid: false)`);
 

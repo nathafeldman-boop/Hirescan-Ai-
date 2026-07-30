@@ -11,10 +11,10 @@ const ARCHETYPES: Record<string, string> = {
 };
 
 const QUIZ_LABELS: Record<string, string> = {
-  infidelite: 'test infidélité', amoureux: 'test amoureux', 'vrais-amis': 'test amitié',
-  orientation: 'test orientation', narcissique: 'test narcissisme', 'mon-ex': 'test ex',
+  'auto-sabotage': 'test auto-sabotage', amoureux: 'test amoureux', 'vrais-amis': 'test amitié',
+  'role-familial': 'test rôle familial', 'intelligence-emotionnelle': 'test intelligence émotionnelle', narcissique: 'test narcissisme', 'tourner-la-page': 'test deuil amoureux',
   manipule: 'test manipulation', rompre: 'test rupture', jaloux: 'test jalousie',
-  'relation-toxique': 'test relation toxique', crush: 'test crush', burnout: 'test burnout',
+  'relation-toxique': 'test relation toxique', 'schema-amoureux': 'test schéma amoureux', burnout: 'test burnout',
   depression: 'test dépression', 'vrai-amour': 'test vrai amour', personnalite: 'test MBTI',
 };
 

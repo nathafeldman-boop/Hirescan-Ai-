@@ -26,7 +26,6 @@ const testList = [
   { slug: 'burnout', emoji: '💤', title: 'Test Burnout', desc: 'Épuisement professionnel : où en es-tu ? Basé sur le Maslach Burnout Inventory.', color: '#f59e0b' },
   { slug: 'depression', emoji: '🌧️', title: 'Test Dépression', desc: 'Ai-je des signes de dépression ? Évaluation basée sur les critères DSM-5.', color: '#64748b' },
   { slug: 'narcissique', emoji: '🪞', title: 'Test Narcissisme', desc: 'Traits narcissiques vs trouble de personnalité : où se situe ton profil ?', color: '#c2611f' },
-  { slug: 'infidelite', emoji: '💔', title: 'Test Infidélité', desc: 'Mon partenaire me trompe-t-il ? Analyse 30 signaux comportementaux.', color: '#ef4444' },
   { slug: 'manipule', emoji: '🎭', title: 'Test Manipulation', desc: 'Suis-je dans une relation manipulatrice ? Gaslighting, chantage émotionnel, emprise.', color: '#f97316' },
   { slug: 'relation-toxique', emoji: '⚠️', title: 'Test Relation Toxique', desc: 'Ma relation est-elle saine ou toxique ? Évalue les signes objectivement.', color: '#dc2626' },
 ];

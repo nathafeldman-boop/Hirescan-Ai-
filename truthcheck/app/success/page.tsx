@@ -311,7 +311,7 @@ export default async function SuccessPage({
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {[
-                { href: '/quiz/infidelite',      emoji: '💔', label: 'Infidélité' },
+                { href: '/quiz/auto-sabotage',   emoji: '🪤', label: 'Auto-sabotage' },
                 { href: '/quiz/amoureux',         emoji: '❤️', label: 'Suis-je amoureux ?' },
                 { href: '/quiz/manipule',         emoji: '🎭', label: 'Manipulé(e) ?' },
                 { href: '/quiz/vrais-amis',       emoji: '🤝', label: 'Vrais amis ?' },

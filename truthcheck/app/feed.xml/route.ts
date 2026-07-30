@@ -3,18 +3,18 @@ import { NextResponse } from 'next/server';
 const BASE = 'https://urcecret.site';
 
 const quizzes = [
-  { slug: 'infidelite',       title: 'Mon/Ma partenaire me trompe ?',         desc: 'Détecte les signes d\'infidélité — 30 questions anonymes pour analyser les comportements suspects dans ta relation.' },
-  { slug: 'adopte',           title: 'Suis-je adopté(e) ?',                   desc: 'Indices physiques, comportementaux et familiaux — 30 questions pour explorer ton histoire familiale.' },
+  { slug: 'auto-sabotage',    title: 'Est-ce que je me sabote sans m\'en rendre compte ?', desc: 'Procrastination, perfectionnisme, peur de réussir — 30 questions pour repérer tes schémas d\'auto-sabotage.' },
+  { slug: 'role-familial',    title: 'Quel rôle j\'ai appris à jouer dans ma famille ?', desc: 'Héros, médiateur, enfant invisible — 30 questions pour identifier le rôle que tu as adopté enfant.' },
   { slug: 'amoureux',         title: 'Suis-je amoureux/amoureuse ?',          desc: 'Les signes qui ne trompent pas — 30 questions pour savoir si ce que tu ressens est de l\'amour véritable.' },
   { slug: 'vrais-amis',       title: 'Sont-ils mes vrais amis ?',             desc: 'Analyse ta relation amicale — 30 questions pour savoir si tes amis te veulent vraiment du bien.' },
-  { slug: 'orientation',      title: 'Quelle est mon orientation ?',          desc: 'Explore ton identité — 30 questions anonymes sur ton orientation sexuelle et affective.' },
+  { slug: 'intelligence-emotionnelle', title: 'Quel est mon niveau d\'intelligence émotionnelle ?', desc: 'Basé sur le modèle de Daniel Goleman — 30 questions pour évaluer ta conscience de toi, ton empathie et tes compétences sociales.' },
   { slug: 'narcissique',      title: 'Suis-je narcissique ?',                 desc: 'Traits de personnalité et empathie — 30 questions pour évaluer si tu présentes des traits narcissiques.' },
-  { slug: 'mon-ex',           title: 'Mon ex veut-il/elle revenir ?',         desc: 'Décrypte les signaux de ton ex — 30 questions pour savoir s\'il/elle veut renouer.' },
+  { slug: 'tourner-la-page',  title: 'Ai-je vraiment tourné la page ?',       desc: 'Rumination, nostalgie, reconstruction — 30 questions pour comprendre où tu en es dans ton deuil amoureux.' },
   { slug: 'manipule',         title: 'Suis-je manipulé(e) ?',                 desc: 'Détecte la manipulation — 30 questions pour identifier si quelqu\'un te manipule émotionnellement.' },
   { slug: 'rompre',           title: 'Dois-je rompre ?',                      desc: 'Analyse la santé de ta relation — 30 questions pour t\'aider à décider si ta relation mérite d\'être poursuivie.' },
   { slug: 'jaloux',           title: 'Suis-je trop jaloux/jalouse ?',         desc: 'Évalue ton niveau de jalousie — 30 questions pour savoir si ta jalousie est saine ou problématique.' },
   { slug: 'relation-toxique', title: 'Ma relation est-elle toxique ?',         desc: 'Évalue la santé de ta relation — 30 questions pour identifier des schémas toxiques.' },
-  { slug: 'crush',            title: 'Mon crush ressent-il/elle quelque chose ?', desc: 'Décrypte les signaux de ton crush — 30 questions pour savoir s\'il/elle t\'aime secrètement.' },
+  { slug: 'schema-amoureux',  title: 'Pourquoi je tombe toujours pour le même type de personne ?', desc: 'Répétition, attachement — 30 questions pour identifier le schéma qui guide tes choix amoureux.' },
   { slug: 'burnout',          title: 'Suis-je en burnout ?',                  desc: 'Évalue ton épuisement professionnel — 30 questions pour identifier si tu es en burnout.' },
   { slug: 'depression',       title: 'Ai-je des signes de dépression ?',      desc: 'Évalue ton état mental — 30 questions pour identifier des signes qui méritent attention.' },
   { slug: 'vrai-amour',       title: 'Est-ce le vrai amour ?',                desc: 'Analyse tes sentiments — 30 questions pour savoir si tu vis un amour véritable et durable.' },

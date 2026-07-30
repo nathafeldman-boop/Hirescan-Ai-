@@ -20,29 +20,29 @@ function buildAnalysis(quiz: Quiz, score: number, tierTitle: string): string[] {
   const mid = score >= 30 && score < 60;
 
   const baseLines: Record<string, (s: number) => string[]> = {
-    infidelite: (s) => [
-      `Ton score de ${s}% indique ${s >= 70 ? 'une forte probabilité' : s >= 40 ? 'des signaux préoccupants' : 'peu de raisons d\'alarme'} concernant la fidélité de ton/ta partenaire.`,
-      `Les comportements que tu as décrits ${s >= 60 ? 'correspondent à des schémas classiques d\'infidélité documentés par les psychologues.' : 'peuvent s\'expliquer par d\'autres facteurs comme le stress ou la fatigue.'}`,
-      `${s >= 70 ? 'L\'accumulation de ces signaux est difficile à ignorer.' : s >= 40 ? 'Certains signaux méritent attention.' : 'L\'absence de signaux forts est rassurante.'}`,
-      `La communication reste l\'outil le plus puissant pour clarifier une situation comme celle-ci.`,
-      `${s >= 60 ? 'Une conversation directe, sans accusation, est fortement recommandée.' : 'Garder un œil sur l\'évolution des comportements sera utile.'}`,
-      `Les experts s\'accordent à dire que l\'instinct ressenti par le/la partenaire est rarement complètement faux.`,
-      `${s >= 70 ? 'Protège-toi émotionnellement et entoure-toi de personnes de confiance.' : 'Prends soin de toi et de ta confiance en toi.'}`,
-      `Une thérapie de couple peut aider à rétablir la confiance, quelle que soit la réalité.`,
-      `${s >= 60 ? 'Tu mérites une relation honnête et respectueuse.' : 'Une relation saine est possible avec les bons outils.'}`,
-      `Rappelle-toi : tu mérites d\'être aimé(e) et respecté(e), peu importe la conclusion.`,
+    'auto-sabotage': (s) => [
+      `Ton score de ${s}% indique ${s >= 60 ? 'un schéma d\'auto-sabotage assez présent, qui agit sur plusieurs zones de ta vie' : s >= 30 ? 'quelques réflexes de freinage ponctuels, sans qu\'ils dominent ton quotidien' : 'une tendance globalement saine à avancer vers ce que tu veux'}.`,
+      `Ce chiffre ne mesure pas ta valeur ni ta force de volonté : il mesure à quel point une partie protectrice de toi a pris l\'habitude ${s >= 60 ? 'de freiner à ta place, souvent au pire moment' : s >= 30 ? 'd\'intervenir de temps en temps, surtout quand l\'enjeu grandit' : 'de rester discrète, sans trop interférer avec tes envies'}.`,
+      `D\'après la théorie du self-handicapping (Berglas & Jones), on se crée parfois des obstacles nous-mêmes pour avoir une excuse toute prête en cas d\'échec — ${s >= 60 ? 'et ce mécanisme semble assez actif chez toi en ce moment' : s >= 30 ? 'et on en retrouve quelques traces dans tes réponses' : 'et tes réponses montrent que tu y as, pour l\'instant, assez peu recours'}.`,
+      `Le chercheur Piers Steel, l\'un des plus grands spécialistes de la procrastination, montre qu\'elle n\'est presque jamais un problème de gestion du temps : ${s >= 60 ? 'c\'est une gestion des émotions difficiles, et les tiennes semblent particulièrement sollicitées ces derniers temps' : s >= 30 ? 'c\'est une gestion des émotions difficiles, que tu sembles gérer avec des hauts et des bas' : 'c\'est une gestion des émotions difficiles, que tu sembles plutôt bien réguler pour l\'instant'}.`,
+      `${s >= 60 ? 'Le perfectionnisme paralysant et la peur de l\'échec reviennent souvent ensemble dans ce genre de profil' : s >= 30 ? 'On voit poindre, par endroits, un peu de perfectionnisme ou de peur du jugement' : 'Le perfectionnisme et la peur du jugement ne semblent pas te freiner outre mesure'} : plus la barre est haute, plus il devient tentant de ne pas s\'y frotter du tout.`,
+      `Ce qui est intéressant, c\'est que ${s >= 60 ? 'ce n\'est presque jamais la peur de l\'échec seule qui freine le plus fort : c\'est souvent la peur du succès et de ce qu\'il exigerait ensuite' : s >= 30 ? 'la peur du succès pointe parfois le bout de son nez, sans prendre toute la place' : 'la réussite ne semble pas représenter, pour toi, une menace inconsciente'}.`,
+      `Vu de l\'extérieur, quelqu\'un qui obtient un score bas continue d\'agir même dans l\'incertitude, sans attendre la garantie de réussir — c\'est ${s >= 60 ? 'exactement ce qui te manque le plus en ce moment' : s >= 30 ? 'quelque chose que tu fais déjà, par intermittence' : 'une force que tu sembles déjà posséder'}.`,
+      `Sur la durée, ${s >= 60 ? 'ce schéma peut coûter cher : des opportunités qu\'on ne saisit pas, des relations qu\'on tient à distance, une énergie épuisée à lutter contre soi-même' : s >= 30 ? 'ce genre de petits freins peut ralentir ta progression sans jamais l\'arrêter complètement' : 'garder cette dynamique t\'évite bien des détours inutiles'}.`,
+      `La bonne nouvelle, documentée par la recherche sur le sujet, c\'est que ${s >= 60 ? 'ces schémas se sont appris, ce qui veut dire qu\'ils peuvent aussi se désapprendre, un petit pas après l\'autre' : s >= 30 ? 'ces réflexes perdent de leur pouvoir dès qu\'on commence simplement à les repérer' : 'cette dynamique se renforce encore quand on continue à la nourrir consciemment'}.`,
+      `Ce quiz n\'est pas un verdict, c\'est un point de départ : ${s >= 60 ? 'tu as maintenant un nom à mettre sur ce qui te freinait dans l\'ombre, et c\'est déjà une victoire' : s >= 30 ? 'tu sais désormais où regarder en priorité pour avancer plus librement' : 'tu as la confirmation d\'une base solide sur laquelle continuer à construire'}.`,
     ],
-    adopte: (s) => [
-      `Ton score de ${s}% suggère ${s >= 60 ? 'de nombreux indices qui méritent une exploration sérieuse' : 'quelques interrogations naturelles mais peu de preuves concrètes'}.`,
-      `${s >= 60 ? 'Les éléments que tu as identifiés créent un tableau qui interroge ton histoire familiale.' : 'Il est normal de se poser des questions sur son histoire familiale.'}`,
-      `Les différences physiques et comportementales que tu décris ${s >= 50 ? 'vont au-delà de la simple variation génétique.' : 'rentrent dans la variabilité naturelle au sein d\'une même famille.'}`,
-      `Si ces questions sont importantes pour toi, un test ADN familial peut apporter des réponses définitives.`,
-      `${s >= 60 ? 'Avoir une conversation ouverte avec tes parents, si possible, reste l\'approche la plus directe.' : 'La curiosité sur ses origines est une chose tout à fait humaine.'}`,
-      `L\'adoption est une réalité pour des millions de personnes et ne change rien à qui tu es.`,
-      `Que tu sois adopté(e) ou non, ton identité t\'appartient entièrement.`,
-      `${s >= 50 ? 'Des professionnels spécialisés en histoire familiale peuvent t\'accompagner dans cette démarche.' : 'Prendre soin de ta santé mentale autour de ces questions est important.'}`,
-      `Se connaître soi-même est un voyage, pas une destination.`,
-      `Quelle que soit la vérité, tu mérites de la connaître si elle te tient à cœur.`,
+    'role-familial': (s) => [
+      `Ton score de ${s}% suggère ${s >= 60 ? 'que tu as endossé, enfant, un rôle bien plus lourd que celui d\'un simple enfant' : s >= 30 ? 'que tu as développé de solides réflexes d\'adaptation et de médiation dans ta famille' : 'que tu as globalement pu grandir sans avoir à porter un rôle d\'adulte trop tôt'}.`,
+      `${s >= 60 ? 'Ce rôle ne t\'a pas été imposé par méchanceté : il s\'est construit en silence, question après question, pour combler un vide ou apaiser une tension que personne d\'autre ne gérait' : s >= 30 ? 'Ce réflexe s\'est construit doucement, à force de sentir que certaines choses passaient mieux si tu les facilitais un peu' : 'Cette liberté ne veut pas dire que tout était simple, mais que tu n\'as pas eu à sacrifier ton enfance pour maintenir un équilibre familial'}.`,
+      `Dans tes relations aujourd\'hui, ${s >= 60 ? 'tu es probablement celui ou celle qui écoute, porte, rassure — parfois au point d\'oublier de demander la même chose en retour' : s >= 30 ? 'tu as tendance à veiller sur l\'ambiance et à t\'adapter, parfois plus que nécessaire' : 'tu arrives en général à donner et recevoir de façon assez équilibrée'}.`,
+      `Côté travail ou ambitions, ${s >= 60 ? 'ta valeur s\'est peut-être longtemps mesurée à ce que tu accomplis ou à qui tu rends service, plutôt qu\'à qui tu es simplement' : s >= 30 ? 'tu ressens parfois le besoin de bien faire pour éviter la moindre friction ou déception' : 'tu vis assez sereinement les hauts et les bas, sans qu\'ils ne remettent en cause ta valeur personnelle'}.`,
+      `Sur la question des limites, ${s >= 60 ? 'dire non reste sans doute un vrai effort, comme si refuser risquait de décevoir ou de faire retomber un équilibre fragile' : s >= 30 ? 'poser une limite demande encore un petit effort conscient, surtout avec les personnes proches' : 'tu poses tes limites assez naturellement, sans culpabilité excessive'}.`,
+      `Quant au repos ou à demander de l\'aide, ${s >= 60 ? 'l\'idée de "ne rien faire" ou de te reposer sur quelqu\'un d\'autre peut réveiller une culpabilité diffuse, comme si tu devais toujours être utile pour avoir ta place' : s >= 30 ? 'tu peux ressentir une petite gêne à recevoir sans donner quelque chose en retour' : 'tu sembles capable de recevoir de l\'aide et du repos sans que cela ne te pèse'}.`,
+      `Face au conflit, ${s >= 60 ? 'ton corps a probablement appris à l\'anticiper et à le désamorcer avant même qu\'il n\'éclate, un réflexe de vigilance qui a pu te protéger mais qui t\'épuise aussi' : s >= 30 ? 'tu préfères souvent l\'éviter ou l\'adoucir plutôt que de l\'affronter frontalement' : 'tu peux généralement l\'aborder sans que cela ne devienne une menace intérieure'}.`,
+      `Ce qui est important à comprendre : ${s >= 60 ? 'ce rôle que tu as tenu était une adaptation intelligente à ton environnement d\'enfant, pas un trait de caractère figé — et il n\'a jamais été de ta faute' : s >= 30 ? 'ces habitudes sont des ajustements appris, pas une part fixe de ta personnalité' : 'même sans avoir eu à porter un rôle lourd, chacun garde des réflexes hérités de son enfance qui méritent d\'être observés avec douceur'}.`,
+      `La bonne nouvelle, c\'est que ${s >= 60 ? 'ce que tu as appris à faire si jeune peut aussi s\'apprendre à se déposer, petit à petit, avec de la pratique et de la patience envers toi-même' : s >= 30 ? 'ce pli reste encore souple : quelques prises de conscience suffisent souvent à retrouver un bel équilibre entre prendre soin des autres et de toi-même' : 'cette base solide peut continuer à se renforcer, en restant attentif(ve) aux petits réflexes hérités malgré tout'}.`,
+      `Ton rôle familial n\'est pas une sentence : c\'est une histoire que tu peux continuer à réécrire, un peu plus chaque jour, en te laissant enfin le droit d\'exister sans avoir à jouer un rôle pour ça.`,
     ],
     amoureux: (s) => [
       `Ton score de ${s}% indique ${s >= 70 ? 'des sentiments amoureux profonds et réels' : s >= 40 ? 'des sentiments forts mais peut-être encore en développement' : 'une affection sincère mais différente de l\'amour romantique'}.`,
@@ -68,17 +68,41 @@ function buildAnalysis(quiz: Quiz, score: number, tierTitle: string): string[] {
       `La qualité des amitiés a un impact direct sur ta santé mentale et ton bonheur.`,
       `Tu mérites d\'être entouré(e) de personnes authentiques qui t\'acceptent tel(le) que tu es.`,
     ],
-    orientation: (s) => [
-      `Ton score de ${s}% suggère ${s >= 70 ? 'une forte attirance pour le même genre' : s >= 40 ? 'une orientation qui va au-delà de l\'hétérosexualité simple' : 'une orientation principalement hétérosexuelle avec quelques nuances'}.`,
-      `${s >= 60 ? 'Les réponses que tu as données pointent vers une attirance non-hétérosexuelle significative.' : 'Il est normal de se poser des questions sur son orientation.'}`,
-      `La sexualité humaine est un spectre, et il n\'existe pas de "bonne" ou "mauvaise" orientation.`,
-      `${s >= 50 ? 'Explorer son identité sexuelle demande du courage et tu mérites d\'être accompagné(e) dans ce chemin.' : 'Être curieux de sa propre identité est une démarche saine.'}`,
-      `Les communautés LGBTQ+ offrent des espaces sûrs pour partager et se sentir compris(e).`,
-      `${s >= 60 ? 'Ton bien-être passe par l\'acceptation de qui tu es vraiment.' : 'Prendre le temps de te connaître sans pression est important.'}`,
-      `Parler à un professionnel ou rejoindre des groupes de soutien peut t\'aider dans cette exploration.`,
-      `${s >= 70 ? 'Tu n\'as pas à te définir immédiatement — l\'exploration est un processus.' : 'Quelle que soit ta conclusion, elle t\'appartient.'}`,
-      `L\'acceptation de soi est la base d\'une vie épanouie, quelle que soit ton orientation.`,
-      `Tu mérites d\'être aimé(e) et accepté(e) pour ce que tu es, pleinement et sans condition.`,
+    'intelligence-emotionnelle': (s) => [
+      `Ton score de ${s}% indique ${s >= 80 ? 'une intelligence émotionnelle déjà très affirmée, portée par une bonne connaissance de toi-même' : s >= 60 ? 'une intelligence émotionnelle solide, avec une vraie marge de perfectionnement' : s >= 40 ? 'une intelligence émotionnelle en cours d\'équilibrage, entre forces et zones encore fragiles' : s >= 20 ? 'une intelligence émotionnelle qui commence tout juste à se structurer' : 'une intelligence émotionnelle encore peu explorée, mais avec un vrai potentiel de progression'}.`,
+      `${s >= 60 ? 'Ta conscience de toi-même semble être l\'un de tes points forts : tu arrives à identifier ce que tu ressens la plupart du temps' : 'Ta conscience de toi-même a probablement encore besoin d\'être affinée : les émotions te traversent parfois sans que tu aies le temps de les nommer'} — un simple carnet émotionnel tenu quelques semaines peut considérablement accélérer ce travail.`,
+      `${s >= 60 ? 'Ta capacité à te réguler sous pression semble déjà bien développée, ce qui t\'évite bien des débordements inutiles' : 'Ta régulation émotionnelle est probablement ton principal levier de progression : le temps entre ce que tu ressens et ce que tu fais peut encore s\'élargir'} — la respiration consciente ou la règle des dix minutes avant de répondre à chaud sont des outils redoutablement efficaces ici.`,
+      `${s >= 60 ? 'Ta motivation intrinsèque et ta résilience face à l\'échec sont probablement des atouts naturels chez toi' : 'Ta motivation a tendance à fluctuer fortement selon les résultats obtenus, ce qui peut freiner ta progression sur le long terme'} — reconnecter régulièrement à ton "pourquoi" profond t\'aidera à tenir le cap.`,
+      `${s >= 60 ? 'Ton empathie semble bien développée : tu perçois généralement assez finement ce que vivent les autres' : 'Ton empathie gagnerait à être davantage entraînée : les signaux émotionnels des autres t\'échappent parfois'} — la prochaine fois qu\'un proche te parle, essaie de nommer intérieurement l\'émotion qu\'il traverse avant de répondre.`,
+      `${s >= 60 ? 'Tes compétences sociales te permettent probablement de bien gérer les désaccords et d\'entraîner les autres avec toi' : 'Tes compétences sociales pourraient encore progresser, en particulier dans la gestion des conflits ou des désaccords'} — apprendre à formuler tes besoins clairement, sans agressivité ni retrait, est le levier le plus rapide ici.`,
+      `Si un domaine ressort probablement comme ta plus grande force, c\'est ${s >= 70 ? 'ta conscience de toi-même, combinée à ta capacité à rester motivé face aux obstacles' : s >= 40 ? 'ta capacité à percevoir les émotions des autres, même quand la régulation de tes propres réactions reste perfectible' : 'ta capacité à ressentir intensément, même si tu manques encore d\'outils pour canaliser cette intensité'}.`,
+      `À l\'inverse, ${s >= 70 ? 'le raffinement de tes compétences sociales dans les situations à très fort enjeu reste ta marge de progression la plus fine' : s >= 40 ? 'la gestion de tes réactions impulsives sous pression reste probablement ton chantier prioritaire' : 'nommer précisément tes émotions au moment où elles surviennent constitue ton chantier prioritaire'}.`,
+      `Un exercice simple et puissant à pratiquer cette semaine : avant de réagir à une situation qui te contrarie, compte jusqu\'à dix secondes et nomme intérieurement l\'émotion exacte que tu ressens.`,
+      `Quel que soit ton score aujourd\'hui, retiens ceci : l\'intelligence émotionnelle n\'est pas un trait figé mais une compétence qui se muscle avec la pratique — et le simple fait d\'avoir fait ce test montre déjà une vraie envie de mieux te comprendre.`,
+    ],
+    'tourner-la-page': (s) => [
+      `Ton score de ${s}% indique ${s < 30 ? 'un deuil déjà largement apaisé, où le souvenir ne pèse presque plus sur ton présent' : s < 60 ? 'un processus de deuil encore actif, entre acceptation et rechutes émotionnelles ponctuelles' : 'un attachement encore très présent, qui continue d\'influencer ton quotidien'}.`,
+      `Le deuil amoureux suit rarement une ligne droite : déni, colère, marchandage, tristesse et acceptation peuvent revenir plusieurs fois, dans le désordre, parfois le même jour.`,
+      `Ce qui distingue un chagrin sain d\'un chagrin qui s\'enkyste, ce n\'est pas l\'intensité de la douleur, mais sa capacité à évoluer avec le temps.`,
+      `La rumination — repasser sans cesse les mêmes scènes ou les mêmes questions sans jamais avancer — est le mécanisme qui, selon la recherche en psychologie, entretient le plus la tristesse au lieu de la résoudre.`,
+      `Vérifier les réseaux sociaux d\'un(e) ex active le même circuit que la recherche compulsive : chaque coup d\'œil promet un soulagement qu\'il ne procure jamais vraiment.`,
+      `Idéaliser la relation passée est une façon naturelle du cerveau d\'adoucir la perte, mais quand elle efface totalement les raisons de la rupture, elle retarde la reconstruction.`,
+      `Un attachement qui perdure n\'est pas une preuve d\'amour raté : c\'est souvent le signe d\'un lien resté "en suspens", ce que les psychologues appellent une affaire non résolue.`,
+      `Les actions concrètes qui aident réellement : limiter l\'exposition à ses réseaux, en parler à voix haute plutôt que de ruminer en silence, et se reconnecter à des activités qui n\'appartenaient qu\'à toi.`,
+      `Se sentir mieux ne veut pas dire ne plus jamais y penser : c\'est pouvoir y penser sans que ça dirige ta journée, ton sommeil ou tes choix.`,
+      `Où que tu en sois aujourd\'hui, tu gardes le pouvoir d\'orienter ce processus : chaque petit choix conscient te rapproche un peu plus de toi-même.`,
+    ],
+    'schema-amoureux': (s) => [
+      `Ton score de ${s}% indique ${s >= 70 ? 'un schéma amoureux répétitif bien installé' : s >= 40 ? 'un schéma qui commence à se dessiner clairement' : 'un mode de choix globalement sain, avec quelques réflexes familiers'}.`,
+      `${s >= 60 ? 'Ce que tu appelles "alchimie" ressemble beaucoup à un sentiment de familiarité hérité de ton histoire, pas seulement à une compatibilité réelle.' : 'Tes réponses montrent que l\'attirance immédiate ne prend pas toujours le pas sur ce qui est bon pour toi.'}`,
+      `Ce schéma n\'est ni un hasard ni un défaut de caractère : c\'est une dynamique apprise, souvent très tôt, dans une relation qui comptait pour toi.`,
+      `${s >= 60 ? 'Le rôle que tu joues le plus souvent — sauveur/sauveuse, celui/celle qui attend, celui/celle qui donne plus — n\'est probablement pas un hasard.' : 'Tu gardes une capacité précieuse à repérer les signaux qui comptent vraiment.'}`,
+      `La psychologie appelle ça la "répétition" : le cerveau recrée inconsciemment une dynamique familière, même douloureuse, parce qu\'elle est reconnaissable.`,
+      `${s >= 50 ? 'Le prix de ce schéma se paie souvent en énergie, en attente, et en relations qui demandent beaucoup pour donner peu en retour.' : 'Continuer à observer tes réactions face à la stabilité t\'aidera à consolider ce qui fonctionne déjà bien.'}`,
+      `Le signal à observer en priorité : ce moment précis où une personne stable et disponible commence, sans raison claire, à t\'ennuyer.`,
+      `${s >= 60 ? 'Ce schéma peut se transformer — pas en une nuit, mais avec de la conscience et parfois un accompagnement spécialisé sur l\'attachement.' : 'Ta vigilance actuelle est un vrai atout : continue à questionner ce qui t\'attire et pourquoi.'}`,
+      `Reconnaître un schéma ne veut pas dire se blâmer — c\'est justement ce qui permet de lui retirer son pouvoir automatique.`,
+      `Tu ne choisis pas qui t\'attire au premier regard, mais tu choisis ce que tu fais de cette attirance. C\'est là que commence le changement.`,
     ],
   };
 
@@ -137,25 +161,23 @@ export default function ResultsClient({ quiz }: Props) {
   }
 
   const PAYWALL_CONFIG: Record<string, { headline: string; subline: string; social: string }> = {
-    infidelite: {
-      headline: score >= 70
-        ? `L'analyse repère ${score >= 80 ? '4' : '3'} comportements dans tes réponses qui figurent parmi les signaux les plus fiables.`
-        : score >= 40
-        ? "Deux des réponses que tu as données ont déclenché un signal — l'analyse explique pourquoi."
-        : "L'analyse identifie précisément ce qui alimente tes doutes — et si c'est fondé.",
-      subline: score >= 60
-        ? "Ces comportements ne s'expliquent pas tous par le stress ou la fatigue. L'analyse nomme lequel est le plus révélateur dans ton cas."
-        : "Connaître la source exacte d'un doute, c'est déjà reprendre le contrôle.",
-      social: "4 127 personnes ont lu leur analyse cette semaine",
-    },
-    adopte: {
+    'auto-sabotage': {
       headline: score >= 60
-        ? "Parmi les indices que tu décris, au moins deux sortent de la variabilité familiale normale."
-        : "L'analyse distingue ce qui est banal de ce qui mérite vraiment une réponse.",
-      subline: score >= 60
-        ? "L'analyse nomme chaque indice et explique ce qu'il suggère — sans interprétation approximative."
-        : "Mettre un mot précis sur une intuition floue, c'est la première étape vers la paix de l'esprit.",
-      social: "1 389 personnes ont éclairci leur histoire cette semaine",
+        ? 'Ce que ton schéma d\'auto-sabotage cache vraiment'
+        : score >= 30
+        ? 'Le détail qui explique pourquoi tu freines à ce moment précis'
+        : 'Ce qui pourrait encore te faire trébucher, même à ce niveau',
+      subline: "Ton rapport complet détaille, question par question, où et pourquoi tu te mets des bâtons dans les roues — et surtout, comment commencer à les retirer.",
+      social: "1 214 personnes ont commencé à démêler leur schéma d'auto-sabotage cette semaine",
+    },
+    'role-familial': {
+      headline: score >= 60
+        ? 'Le rôle que tu as appris à jouer enfant a un nom — et il explique beaucoup de choses aujourd\'hui'
+        : score >= 30
+        ? 'Ton rôle familial commence à se dessiner — découvre ce qu\'il révèle vraiment de toi'
+        : 'Découvre le rôle discret que tu as peut-être joué, sans même t\'en rendre compte',
+      subline: "Ton résultat complet détaille le rôle précis que tu as adopté (héros, médiateur, enfant invisible, bouc émissaire, boute-en-train...), comment il s'est construit, et comment le desserrer en douceur.",
+      social: "5 270 personnes ont découvert leur rôle familial caché ce mois-ci",
     },
     amoureux: {
       headline: score >= 70
@@ -179,16 +201,36 @@ export default function ResultsClient({ quiz }: Props) {
         : "Savoir exactement sur qui compter, ça change la façon dont on investit dans ses relations.",
       social: "2 063 personnes ont réévalué une amitié cette semaine",
     },
-    orientation: {
+    'intelligence-emotionnelle': {
       headline: score >= 60
-        ? "Tes réponses indiquent une attirance non-hétérosexuelle significative — l'analyse la décrit avec précision."
-        : score >= 35
-        ? "L'analyse identifie la nuance exacte de ton orientation — ni tout blanc ni tout noir."
-        : "L'analyse te dit pourquoi tu te poses ces questions — et ce que tes réponses révèlent vraiment.",
-      subline: score >= 50
-        ? "Mettre un mot précis sur qui on est, c'est souvent ce qui libère."
-        : "Ton orientation t'appartient — l'analyse est là pour t'aider à la comprendre, pas à l'étiqueter.",
-      social: "1 156 personnes se sont mieux comprises cette semaine",
+        ? `Avec ${score}%, découvre quel pilier de ton intelligence émotionnelle est ton plus grand atout — et lequel mérite encore ton attention`
+        : `Avec ${score}%, découvre quel pilier de ton intelligence émotionnelle freine le plus ta progression — et comment le renforcer`,
+      subline: "Ton profil détaillé révèle, pilier par pilier, où tu excelles déjà et ce qui peut faire la plus grande différence pour toi.",
+      social: "1 847 professionnels ont découvert leur profil d'intelligence émotionnelle cette semaine",
+    },
+    'tourner-la-page': {
+      headline: score < 30
+        ? 'Découvre ce que ton profil révèle sur ta façon unique de guérir'
+        : score < 60
+        ? 'Découvre les schémas précis qui te maintiennent encore attaché(e)'
+        : 'Découvre ce que ton cœur essaie encore de te dire',
+      subline: score < 30
+        ? "Ton analyse complète détaille tes forces émotionnelles et les points de vigilance pour ne jamais régresser."
+        : score < 60
+        ? "Ton analyse complète identifie les déclencheurs exacts qui te font encore replonger, et comment les désamorcer un par un."
+        : "Ton analyse complète met des mots sur ce qui te retient, et te propose un premier pas concret pour commencer à te libérer.",
+      social: "2 847 personnes ont commencé à tourner la page cette semaine",
+    },
+    'schema-amoureux': {
+      headline: score >= 70
+        ? "L'analyse a isolé le schéma précis que tu répètes à chaque relation — et le rôle exact que tu y joues."
+        : score >= 40
+        ? "Deux réponses précises révèlent le type de personne vers lequel tu es attiré(e) sans t'en rendre compte."
+        : "L'analyse confirme que ton mode de choix est globalement sain — avec un seul réflexe hérité à surveiller.",
+      subline: score >= 60
+        ? "Ce schéma a une origine précise dans ton histoire — l'analyse la nomme, sans jugement."
+        : "Comprendre le petit réflexe qui subsiste, c'est s'assurer qu'il ne prenne jamais le dessus.",
+      social: "3 482 personnes ont identifié leur schéma amoureux cette semaine",
     },
     personnalite: {
       headline: `Ton profil contient une information que la majorité des tests MBTI ne révèlent jamais : la version de toi qui émerge sous stress, en amour ou dans le conflit.`,
@@ -206,34 +248,40 @@ export default function ResultsClient({ quiz }: Props) {
 
   // ── Teaser hooks: one real insight cut before the key conclusion ──
   const TEASER_HOOKS: Record<string, (s: number) => { intro: string; cut: string; locked: string[] }> = {
-    infidelite: (s) => ({
-      intro: s >= 70
-        ? `Parmi les comportements que tu décris, l'un d'eux est présent dans 8 cas sur 10 d'infidélité confirmée. Ce n'est pas le plus évident — c'est celui que la plupart des gens remarquent en dernier.`
-        : s >= 40
-        ? `Deux des réponses que tu as données s'écartent de ce qu'on observe dans les couples sans problème. L'une concerne la communication, l'autre…`
-        : `Tes réponses ne montrent pas les signaux classiques — mais l'analyse identifie précisément la source de ton instinct.`,
-      cut: s >= 40
-        ? `Le comportement le plus révélateur dans ton cas est lié à…`
-        : `Ce qui génère tes doutes sans raison apparente, c'est…`,
+    'auto-sabotage': (s) => ({
+      intro: s >= 60
+        ? `Une chose saute aux yeux dans tes réponses : ce n'est pas au moment de commencer que tu te freines le plus, c'est juste avant d'y arriver vraiment. Ce timing précis n'est pas un hasard.`
+        : s >= 30
+        ? `Tes réponses dessinent un schéma plus subtil qu'il n'y paraît : tu n'évites pas tout, mais certaines situations précises déclenchent chez toi un frein presque automatique. On a identifié laquelle.`
+        : `Tes réponses montrent une base solide, mais une ou deux zones restent des angles morts, là où même les profils sains gardent une vulnérabilité discrète.`,
+      cut: s >= 60
+        ? `Ce frein qui s'active pile avant la ligne d'arrivée porte un nom en psychologie…`
+        : s >= 30
+        ? `La situation précise qui te fait basculer du côté du frein, elle…`
+        : `Le seul angle mort qu'il te reste à surveiller…`,
       locked: [
-        `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
-        `🔒 Le signal #1 dans tes réponses`,
-        `🔒 Pourquoi ce comportement spécifique est significatif`,
-        `🔒 Ce que tu peux faire concrètement maintenant`,
+        `🔒 Le moment exact (avant, pendant ou après) où ton auto-sabotage s'active le plus`,
+        `🔒 Ton profil dominant parmi procrastination, perfectionnisme, peur de réussir et paralysie décisionnelle`,
+        `🔒 3 leviers concrets, adaptés à ton profil, pour désamorcer le mécanisme dès cette semaine`,
+        `🔒 La phrase exacte à te dire — et celle à arrêter de te dire — au moment où le frein s'active`,
       ],
     }),
-    adopte: (s) => ({
+    'role-familial': (s) => ({
       intro: s >= 60
-        ? `Deux des indices que tu décris sortent de la variabilité génétique normale entre membres d'une même famille. L'un concerne des traits physiques, l'autre un schéma comportemental que tu as mentionné.`
+        ? `Tu as probablement appris, très jeune, à porter des choses qui ne t'appartenaient pas encore…`
         : s >= 30
-        ? `L'analyse distingue les différences familiales normales de celles qui méritent une vraie réponse. Dans ton cas, un élément se démarque clairement des autres.`
-        : `Tes réponses penchent vers une histoire familiale cohérente — mais l'analyse explique précisément pourquoi tu te poses ces questions.`,
-      cut: `Ce qui donne le plus de poids à tes interrogations, c'est…`,
+        ? `Une partie de toi a appris à lisser, à adoucir, à sentir venir les tempêtes avant les autres…`
+        : `Tu sembles avoir grandi avec une belle liberté, mais certains détails de tes réponses racontent une autre nuance…`,
+      cut: s >= 60
+        ? `Ton résultat montre notamment pourquoi demander de l'aide te coûte autant…`
+        : s >= 30
+        ? `Ton résultat révèle comment ce réflexe de médiation influence encore tes choix relationnels aujourd'hui…`
+        : `Ton résultat pointe un petit schéma hérité que tu n'avais peut-être jamais remarqué…`,
       locked: [
-        `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
-        `🔒 L'indice le plus significatif dans ton cas`,
-        `🔒 Ce qui distingue une vraie interrogation d'une curiosité normale`,
-        `🔒 Les prochaines étapes si tu veux une réponse définitive`,
+        `🔒 Le nom précis du rôle familial que tu as développé, et son origine probable`,
+        `🔒 Comment ce rôle se rejoue aujourd'hui dans tes relations amoureuses et amicales`,
+        `🔒 La croyance intérieure qui s'est installée avec ce rôle`,
+        `🔒 Trois pistes concrètes pour commencer à déposer ce rôle sans culpabiliser`,
       ],
     }),
     amoureux: (s) => ({
@@ -268,18 +316,46 @@ export default function ResultsClient({ quiz }: Props) {
         `🔒 Ce qu'une amitié saine devrait ressembler dans ton cas`,
       ],
     }),
-    orientation: (s) => ({
+    'intelligence-emotionnelle': (s) => ({
       intro: s >= 60
-        ? `Tes réponses indiquent une attirance non-hétérosexuelle cohérente — pas une curiosité passagère. L'analyse la décrit avec précision, sans étiquette forcée.`
-        : s >= 30
-        ? `L'analyse situe ton orientation sur le spectre de façon précise. Ce n'est pas binaire — et tes réponses le confirment.`
-        : `L'analyse explique pourquoi tu te poses ces questions — et ce que tes réponses révèlent réellement sur ton orientation.`,
-      cut: `Ce que tes réponses suggèrent de plus précis sur ton orientation, c'est…`,
+        ? `Ton score de ${s}% révèle une vraie force du côté de ta conscience de toi-même — mais un des cinq piliers de Goleman ressort clairement comme ton point de vigilance…`
+        : `Ton score de ${s}% montre que tes émotions prennent parfois le dessus avant que tu aies pu les canaliser — et un pilier précis explique une grande partie de ce phénomène…`,
+      cut: `Le pilier qui explique le plus ton comportement en situation de stress est…`,
+      locked: [
+        `🔒 Ton profil détaillé sur les 5 piliers de Goleman (conscience de soi, maîtrise de soi, motivation, empathie, compétences sociales)`,
+        `🔒 Le pilier qui est aujourd'hui ta plus grande force émotionnelle`,
+        `🔒 Le pilier qui freine le plus ta progression, et pourquoi`,
+        `🔒 Un plan d'action personnalisé pour progresser sur 30 jours`,
+      ],
+    }),
+    'tourner-la-page': (s) => ({
+      intro: s < 30
+        ? `Ton résultat montre une chose rare : ta nostalgie ne se transforme presque jamais en rumination…`
+        : s < 60
+        ? `Ton résultat révèle un déclencheur précis qui réactive ta rumination plus que tout le reste…`
+        : `Ton résultat montre que ton corps porte encore cette histoire bien plus que tu ne l'admets consciemment…`,
+      cut: `et ça change tout sur la façon dont tu devrais aborder les prochaines semaines…`,
+      locked: [
+        `🔒 Le schéma exact qui active ta rumination (et comment le couper net)`,
+        `🔒 Ce que ton comportement sur les réseaux sociaux révèle vraiment`,
+        `🔒 Le lien entre ton sommeil actuel et ton attachement émotionnel`,
+        `🔒 Une action concrète adaptée à ton stade de deuil, à commencer dès aujourd'hui`,
+      ],
+    }),
+    'schema-amoureux': (s) => ({
+      intro: s >= 70
+        ? `Trois réponses que tu as données forment un schéma cohérent : un même type de partenaire revient, avec le même rôle pour toi à chaque fois.`
+        : s >= 40
+        ? `Une dynamique commence à se répéter dans tes réponses, en particulier autour de la disponibilité émotionnelle de tes partenaires.`
+        : `Tes réponses montrent un mode de choix globalement sain — mais un réflexe précis, hérité, mérite d'être repéré avant qu'il ne prenne plus de place.`,
+      cut: s >= 40
+        ? `Le type de personne que tu choisis presque systématiquement, c'est…`
+        : `Le seul réflexe hérité que tes réponses laissent voir, c'est…`,
       locked: [
         `🔒 Ton score exact : ${partialScore.replace('?', 'X')}`,
-        `🔒 La description précise de ce que tes réponses révèlent`,
-        `🔒 Ce qui confirme ou nuance cette première impression`,
-        `🔒 Des ressources adaptées à ta situation`,
+        `🔒 Le profil type de la personne vers laquelle tu es attiré(e)`,
+        `🔒 D'où vient ce schéma dans ton histoire`,
+        `🔒 Comment reconnaître (et interrompre) le pattern la prochaine fois`,
       ],
     }),
     personnalite: () => ({
@@ -896,6 +972,20 @@ export default function ResultsClient({ quiz }: Props) {
                   ))}
                 </div>
 
+                {/* Une phrase personnelle et développée, gratuite — pas un résumé
+                    générique du score. C'est `teaser.intro`, déjà écrit par quiz
+                    (voir TEASER_HOOKS ci-dessus), qui n'était jusqu'ici jamais
+                    affiché nulle part dans l'UI. Objectif produit : que même sans
+                    payer, la personne reparte avec une vraie idée sur elle-même —
+                    jamais juste une carotte vide avant le paywall. */}
+                <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(194,97,31,0.08)', border: '1px solid rgba(194,97,31,0.25)' }}>
+                  <p className="text-[10px] uppercase tracking-widest font-bold mb-2" style={{ color: '#d17d52' }}>Ce qu&apos;Elio a vu dans tes réponses</p>
+                  <p className="text-zinc-100 text-[14px] leading-relaxed italic">{teaser.intro}</p>
+                  <Link href="/chat" className="inline-flex items-center gap-1.5 mt-3 text-[12.5px] font-bold transition-colors hover:opacity-80" style={{ color: '#e0a380' }}>
+                    ✨ Continuer à explorer ça avec Elio, gratuitement →
+                  </Link>
+                </div>
+
                 {/* The analysis continues — blurred to prove there's real depth behind the unlock.
                     Note : on n'affiche QUE un texte générique ici, jamais analysis.slice(3,6) —
                     un flou CSS n'est pas une protection, ce texte resterait lisible dans le DOM
@@ -1174,7 +1264,7 @@ export default function ResultsClient({ quiz }: Props) {
               {[
                 { slug: 'narcissique', label: '🪞 Narcissique ?' },
                 { slug: 'manipule', label: '🎭 Manipulé(e) ?' },
-                { slug: 'crush', label: '💌 Mon crush ?' },
+                { slug: 'schema-amoureux', label: '🧲 Mon type ?' },
                 { slug: 'burnout', label: '💤 Burnout ?' },
                 { slug: 'rompre', label: '💔 Rompre ?' },
               ].filter(q => q.slug !== quiz.slug).slice(0, 4).map((q) => (

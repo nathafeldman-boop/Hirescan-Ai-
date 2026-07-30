@@ -482,11 +482,11 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-wrap gap-2 justify-center mb-7">
             {[
-              { slug: 'infidelite', label: '💔 Infidélité ?' },
+              { slug: 'auto-sabotage', label: '🪤 Auto-sabotage ?' },
               { slug: 'narcissique', label: '🪞 Narcissique ?' },
               { slug: 'relation-toxique', label: '⚠️ Toxique ?' },
               { slug: 'burnout', label: '💤 Burnout ?' },
-              { slug: 'crush', label: '💌 Mon crush ?' },
+              { slug: 'schema-amoureux', label: '🧲 Mon type ?' },
             ].map((q) => (
               <Link
                 key={q.slug}

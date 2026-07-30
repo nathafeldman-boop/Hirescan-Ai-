@@ -14,18 +14,18 @@ interface Props {
 }
 
 const QUIZ_HOOKS: Record<string, string> = {
-  infidelite: "Ton instinct te dit quelque chose. Voyons si tu as raison.",
-  adopte: "Certaines familles gardent des secrets. Voici comment savoir.",
+  'auto-sabotage': "Quelque chose freine tes élans depuis un moment. Voyons si c'est vraiment le hasard.",
+  'role-familial': "Et si le rôle que tu joues encore aujourd'hui avait été distribué avant même que tu saches lire ?",
   amoureux: "Amour, attachement ou habitude — la différence compte.",
   'vrais-amis': "Les vraies amitiés résistent à ce test. Les fausses aussi.",
-  orientation: "Pas de jugement ici. Juste la clarté sur ce que tu ressens vraiment.",
+  'intelligence-emotionnelle': "Tu penses bien te connaître ? 30 questions vont mettre ton intelligence émotionnelle à l'épreuve.",
   narcissique: "On pense tous ne pas l'être. La vérité est souvent plus nuancée.",
-  'mon-ex': "Il/Elle t'a quitté(e) — mais ses actes racontent autre chose.",
+  'tourner-la-page': "Ce n'est pas le temps qui referme une page — c'est ce que tu en fais.",
   manipule: "La manipulation subtile passe inaperçue. Jusqu'à ce test.",
   rompre: "Tu repousses cette question depuis trop longtemps.",
   jaloux: "La jalousie peut détruire une relation sans qu'on s'en aperçoive.",
   'relation-toxique': "Certains toxiques nous manquent quand ils partent. Ce test explique pourquoi.",
-  crush: "Ses comportements ne mentent jamais. Ses mots, si.",
+  'schema-amoureux': "Ce n'est pas le hasard qui choisit tes partenaires — c'est un schéma que tu ne vois pas encore.",
   burnout: "Ton corps te prévient avant ton esprit. L'as-tu écouté ?",
   depression: "Certains signes passent inaperçus pendant des mois. Vérifions.",
   'vrai-amour': "Il y a une différence entre aimer et être amoureux. Ce test la nomme.",
@@ -33,18 +33,18 @@ const QUIZ_HOOKS: Record<string, string> = {
 };
 
 const PARTICIPANT_COUNTS: Record<string, string> = {
-  infidelite: '8 427',
-  adopte: '2 193',
+  'auto-sabotage': '1 214',
+  'role-familial': '5 270',
   amoureux: '6 841',
   'vrais-amis': '4 612',
-  orientation: '1 856',
+  'intelligence-emotionnelle': '1 847',
   narcissique: '3 241',
-  'mon-ex': '2 748',
+  'tourner-la-page': '2 847',
   manipule: '5 129',
   rompre: '3 987',
   jaloux: '2 341',
   'relation-toxique': '4 018',
-  crush: '3 612',
+  'schema-amoureux': '3 482',
   burnout: '2 891',
   depression: '1 643',
   'vrai-amour': '2 219',
@@ -52,18 +52,18 @@ const PARTICIPANT_COUNTS: Record<string, string> = {
 };
 
 const MID_HOOK_MESSAGES: Record<string, { title: string; sub: string }> = {
-  infidelite: { title: 'Un signal se distingue…', sub: 'Certaines de tes réponses sortent de l\'ordinaire' },
-  adopte: { title: 'Des éléments intrigants…', sub: 'L\'analyse distingue le banal de ce qui mérite vraiment attention' },
+  'auto-sabotage': { title: 'Un motif commence à se dessiner…', sub: 'Certaines de tes réponses reviennent plus souvent que tu ne le penses' },
+  'role-familial': { title: 'Tu commences à voir le fil rouge ?', sub: 'Encore quelques questions pour cerner le rôle que tu as appris à tenir' },
   amoureux: { title: 'Tes émotions parlent…', sub: 'L\'analyse fait la différence entre amour, attachement et habitude' },
   'vrais-amis': { title: 'Un profil d\'amitié émerge…', sub: 'Le signal le plus révélateur commence à apparaître' },
-  orientation: { title: 'Ton profil se précise…', sub: 'L\'analyse situe ton orientation sur le spectre avec précision' },
+  'intelligence-emotionnelle': { title: 'Tu es à mi-parcours', sub: 'Les prochaines questions touchent à ta façon de gérer les autres' },
   narcissique: { title: 'Des traits émergent…', sub: 'L\'analyse distingue les tendances saines des problématiques' },
-  'mon-ex': { title: 'Un pattern se révèle…', sub: 'Les comportements que tu décris ne mentent pas' },
+  'tourner-la-page': { title: 'Ton corps ne ment jamais', sub: 'Les prochaines questions parlent de sommeil et de sensations physiques' },
   manipule: { title: 'Des mécanismes identifiés…', sub: 'L\'analyse repère les techniques invisibles à l\'œil nu' },
   rompre: { title: 'La vérité se dessine…', sub: 'Tes réponses révèlent ce que tu évites de regarder en face' },
   jaloux: { title: 'Ton seuil de jalousie…', sub: 'L\'analyse calibre ce qui est sain et ce qui ne l\'est pas' },
   'relation-toxique': { title: 'Une dynamique se dessine…', sub: 'L\'analyse identifie les patterns de ta relation' },
-  crush: { title: 'Ses signaux se clarifient…', sub: 'L\'analyse lit entre les lignes de ses comportements' },
+  'schema-amoureux': { title: 'Ton type se précise…', sub: 'L\'analyse commence à isoler le schéma qui revient à chaque fois' },
   burnout: { title: 'Ton niveau d\'épuisement…', sub: 'L\'analyse mesure ce que tu minimises peut-être' },
   depression: { title: 'Des signaux détectés…', sub: 'L\'analyse distingue fatigue passagère et quelque chose de plus profond' },
   'vrai-amour': { title: 'La profondeur de tes sentiments…', sub: 'L\'analyse nomme précisément ce que tu vis' },
@@ -71,20 +71,6 @@ const MID_HOOK_MESSAGES: Record<string, { title: string; sub: string }> = {
 };
 
 const QUIZ_SLIDES: Record<string, string[]> = {
-  infidelite: [
-    '/infidelite-bg-1.jpg',
-    '/infidelite-bg-2.jpg',
-    '/infidelite-bg-3.jpg',
-    '/infidelite-bg-4.jpg',
-    '/infidelite-bg-5.jpg',
-  ],
-  adopte: [
-    '/adopte-bg-1.jpg',
-    '/adopte-bg-2.jpg',
-    '/adopte-bg-3.jpg',
-    '/adopte-bg-4.jpg',
-    '/adopte-bg-5.jpg',
-  ],
   amoureux: [
     '/amoureux-bg-1.jpg',
     '/amoureux-bg-2.jpg',

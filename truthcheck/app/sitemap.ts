@@ -9,15 +9,15 @@ const ALL_MBTI_TYPES = [
 ];
 
 const QUIZ_SLUGS = [
-  'infidelite', 'adopte', 'amoureux', 'vrais-amis', 'orientation',
-  'narcissique', 'mon-ex', 'manipule', 'rompre', 'jaloux',
-  'relation-toxique', 'crush', 'burnout', 'depression', 'vrai-amour',
+  'auto-sabotage', 'role-familial', 'amoureux', 'vrais-amis', 'intelligence-emotionnelle',
+  'narcissique', 'tourner-la-page', 'manipule', 'rompre', 'jaloux',
+  'relation-toxique', 'schema-amoureux', 'burnout', 'depression', 'vrai-amour',
   'style-attachement', 'langages-amour', 'gaslight',
 ];
 
 const GUIDE_SLUGS = [
   'style-attachement', 'langages-amour', 'gaslight', 'burnout',
-  'depression', 'narcissique', 'infidelite', 'manipule', 'relation-toxique',
+  'depression', 'narcissique', 'manipule', 'relation-toxique',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

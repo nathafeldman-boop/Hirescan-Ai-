@@ -75,10 +75,10 @@ interface StripeStats {
 }
 
 const QUIZ_NAMES: Record<string, string> = {
-  infidelite: 'Infidélité', adopte: 'Suis-je adopté(e) ?', amoureux: 'Suis-je amoureux ?',
-  'vrais-amis': 'Vrais amis', orientation: 'Orientation', narcissique: 'Narcissique',
-  'mon-ex': 'Mon ex', manipule: 'Manipulé(e) ?', rompre: 'Dois-je rompre ?',
-  jaloux: 'Jaloux/jalouse ?', 'relation-toxique': 'Relation toxique', crush: 'Mon crush',
+  'auto-sabotage': 'Auto-sabotage', 'role-familial': 'Rôle familial', amoureux: 'Suis-je amoureux ?',
+  'vrais-amis': 'Vrais amis', 'intelligence-emotionnelle': 'Intelligence émotionnelle', narcissique: 'Narcissique',
+  'tourner-la-page': 'Tourner la page', manipule: 'Manipulé(e) ?', rompre: 'Dois-je rompre ?',
+  jaloux: 'Jaloux/jalouse ?', 'relation-toxique': 'Relation toxique', 'schema-amoureux': 'Mon type',
   burnout: 'Burnout', depression: 'Dépression', 'vrai-amour': 'Vrai amour', personnalite: 'Test MBTI',
 };
 
