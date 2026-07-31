@@ -6,6 +6,15 @@ import Seal from '@/components/Seal';
 
 const CARDS = [
   {
+    href: '/parcours',
+    emoji: '🗺️',
+    title: 'Ton Parcours de progression',
+    kicker: 'Nouveau',
+    desc: 'Une carte de niveaux, personnalisée selon ton objectif, pour avancer un peu chaque jour.',
+    accent: 'var(--gold)',
+    accentSoft: 'var(--gold-soft)',
+  },
+  {
     href: '/quetes',
     emoji: '🏆',
     title: 'Suis ta progression',

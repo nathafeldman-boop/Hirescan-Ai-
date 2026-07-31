@@ -126,6 +126,7 @@ model User {
   pageViews    PageView[]
   questCompletions QuestCompletion[]
   generatedQuests  GeneratedQuest[]
+  levelCompletions LevelCompletion[]
 }
 
 // ── Quêtes ────────────────────────────────────────────────────────────────
@@ -167,6 +168,43 @@ model GeneratedQuest {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ── Parcours de progression ──────────────────────────────────────────────────
+// Le catalogue (chemins, niveaux, mécaniques) vit en CODE (lib/paths.ts),
+// même logique éditoriale que QUEST_CATALOG. Cette table ne stocke QUE le fait
+// "userId a complété tel niveau de tel parcours" — aucun compteur mutable
+// (XP total, énergie du jour, série) n'est stocké : tout se RECALCULE à la
+// lecture à partir de ces lignes (voir lib/pathAccess.ts), même philosophie
+// que le streak du Journal (lib/journalStats.ts::computeStreak) plutôt qu'un
+// champ qui pourrait désynchroniser de la réalité.
+// day : "YYYY-MM-DD" (fuseau Europe/Paris, voir parisDay()) — sert au calcul
+// du plafond quotidien ("énergie") et de la série, en réutilisant le même
+// format que JournalEntry.day.
+// insight : le texte "ce que ça révèle sur toi" généré par Elio à la
+// complétion (lib/pathInsight.ts) — figé ici pour ne jamais le régénérer ni
+// le perdre en revisitant le niveau plus tard.
+// answer : ce que la personne a répondu/écrit dans l'exercice (texte libre,
+// choix sélectionné...) — sert à la fois de matière première pour générer
+// `insight` et de mémoire pour les niveaux qui rappellent volontairement une
+// réponse donnée plus tôt dans le même parcours (ex: "relis ce que tu avais
+// écrit au niveau 1").
+model LevelCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  pathKey     String   // clé du catalogue, ex. "confiance" — voir lib/paths.ts
+  levelIndex  Int      // position du niveau dans le parcours (0-based)
+  day         String   // "YYYY-MM-DD" (fuseau Europe/Paris)
+  xpEarned    Int      @default(0)
+  answer      String?  @db.Text
+  insight     String?  @db.Text
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pathKey, levelIndex])
+  @@index([userId])
+  @@index([userId, pathKey])
 }
 
 // ── Historique des tests MBTI ────────────────────────────────────────────────
