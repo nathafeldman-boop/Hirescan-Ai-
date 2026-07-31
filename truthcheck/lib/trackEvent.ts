@@ -21,6 +21,7 @@ export const EVENTS = {
   ONBOARDING_COMPLETED: 'onboarding_completed',
   DAILY_REMINDER_OPTED_IN: 'daily_reminder_opted_in',
   QUEST_COMPLETED: 'quest_completed',
+  PARCOURS_LEVEL_COMPLETED: 'parcours_level_completed',
 } as const;
 
 export type EventName = typeof EVENTS[keyof typeof EVENTS];
