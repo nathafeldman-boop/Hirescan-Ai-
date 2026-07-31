@@ -3,20 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Seal from '@/components/Seal';
+import ElioAvatar from '@/components/ElioAvatar';
 
 const CARDS = [
   {
-    href: '/parcours',
-    emoji: '🗺️',
-    title: 'Ton Parcours de progression',
-    kicker: 'Nouveau',
-    desc: 'Une carte de niveaux, personnalisée selon ton objectif, pour avancer un peu chaque jour.',
-    accent: 'var(--gold)',
-    accentSoft: 'var(--gold-soft)',
-  },
-  {
     href: '/quetes',
-    emoji: '🏆',
     title: 'Suis ta progression',
     kicker: 'Mes quêtes',
     desc: 'Débloque des messages, des badges et de nouvelles quêtes au fil de ton parcours.',
@@ -25,7 +16,6 @@ const CARDS = [
   },
   {
     href: '/parcours',
-    emoji: '🗺️',
     title: 'Ton Parcours de progression',
     kicker: 'Nouveau',
     desc: 'Une carte de niveaux, personnalisée selon ton objectif, pour avancer un peu chaque jour.',
@@ -34,7 +24,6 @@ const CARDS = [
   },
   {
     href: '/quiz/personnalite',
-    emoji: '🧠',
     title: 'Découvre qui tu es vraiment',
     kicker: 'Quête de découverte',
     desc: 'Comprends ta personnalité, tes forces et ta manière de fonctionner.',
@@ -43,7 +32,6 @@ const CARDS = [
   },
   {
     href: '/chat',
-    emoji: '✨',
     title: 'Parle avec Elio',
     kicker: 'Coach IA',
     desc: 'Ton IA personnelle pour mieux réfléchir et mieux te comprendre.',
@@ -52,7 +40,6 @@ const CARDS = [
   },
   {
     href: '/journal',
-    emoji: '📅',
     title: 'Comprends tes émotions',
     kicker: 'Journal émotionnel',
     desc: 'Note ton humeur, observe tes tendances et découvre tes schémas.',
@@ -61,7 +48,6 @@ const CARDS = [
   },
   {
     href: '/compat',
-    emoji: '💬',
     title: 'Analyse tes relations',
     kicker: 'Relations',
     desc: 'Comprends mieux tes conversations et ta compatibilité avec les autres.',
@@ -70,11 +56,72 @@ const CARDS = [
   },
 ] as const;
 
+// Chaque carte a sa propre identité visuelle — plus un simple emoji dans un
+// carré teinté (les 5 cartes hors "Mes quêtes" étaient auparavant
+// interchangeables, seule la couleur d'accent changeait). Le visuel reflète
+// concrètement ce que la carte propose : le chemin du Parcours, les 4
+// familles MBTI du test, Elio lui-même pour le chat, une tendance d'humeur
+// pour le Journal, deux profils qui se recoupent pour Compat.
+function CardVisual({ href }: { href: string }) {
+  const box = 'hub-card-icon flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden';
+
+  if (href === '/quetes') {
+    return <div className={box} style={{ background: 'var(--gold-soft)' }}><span className="text-3xl">🏆</span></div>;
+  }
+
+  if (href === '/parcours') {
+    return (
+      <div className={box} style={{ background: 'var(--ink)' }}>
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden>
+          <path d="M6 26 L12 19 L18 21 L26 7" stroke="var(--gold-line)" strokeWidth="2" strokeLinecap="round" strokeDasharray="1 4.5" />
+          <circle cx="6" cy="26" r="2.5" fill="var(--gold)" />
+          <circle cx="12" cy="19" r="2.5" fill="var(--gold)" opacity="0.75" />
+          <circle cx="18" cy="21" r="2" fill="rgba(250,246,236,0.5)" />
+          <circle cx="26" cy="7" r="3" fill="var(--gold)" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (href === '/quiz/personnalite') {
+    return (
+      <div className={box} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', alignItems: 'stretch', justifyItems: 'stretch', gap: 2, padding: 6, background: 'var(--paper)' }}>
+        <div className="rounded-md" style={{ background: 'var(--fam-nt)' }} />
+        <div className="rounded-md" style={{ background: 'var(--fam-nf)' }} />
+        <div className="rounded-md" style={{ background: 'var(--fam-sj)' }} />
+        <div className="rounded-md" style={{ background: 'var(--fam-sp)' }} />
+      </div>
+    );
+  }
+
+  if (href === '/chat') {
+    return <div className={box} style={{ background: 'rgba(53, 80, 107, 0.10)' }}><ElioAvatar size={38} glow /></div>;
+  }
+
+  if (href === '/journal') {
+    const heights = [10, 17, 13, 24, 19];
+    return (
+      <div className={box} style={{ background: 'rgba(122, 74, 30, 0.10)', alignItems: 'flex-end', gap: 3, paddingBottom: 10 }}>
+        {heights.map((h, i) => (
+          <div key={i} className="rounded-full" style={{ width: 4, height: h, background: i === heights.length - 1 ? 'var(--gold)' : 'var(--fam-sp)', opacity: i === heights.length - 1 ? 1 : 0.55 }} />
+        ))}
+      </div>
+    );
+  }
+
+  // /compat — deux cercles qui se recoupent, l'un plein, l'autre en contour.
+  return (
+    <div className={box} style={{ background: 'rgba(107, 63, 82, 0.10)', position: 'relative' }}>
+      <div style={{ position: 'absolute', width: 24, height: 24, borderRadius: '50%', background: 'var(--fam-nf)', opacity: 0.6, left: 12, top: 20 }} />
+      <div style={{ position: 'absolute', width: 24, height: 24, borderRadius: '50%', border: '2px solid var(--fam-nf)', left: 24, top: 20 }} />
+    </div>
+  );
+}
+
 export default function DecouverteClient({
-  firstName, hasProfile, hasNewQuests, hasPendingQuests,
+  firstName, hasNewQuests, hasPendingQuests,
 }: {
   firstName: string | null;
-  hasProfile: boolean;
   hasNewQuests: boolean;
   hasPendingQuests: boolean;
 }) {
@@ -156,31 +203,6 @@ export default function DecouverteClient({
           </p>
         </div>
 
-        {/* Quête "profil incomplet" — le test personnalité n'est plus une
-            étape obligatoire avant le hub, donc on la remet en avant ICI,
-            sous forme d'invitation plutôt que de mur. Le tap n'envoie plus
-            directement au quiz : ça ouvre /quete, un écran qui pose
-            l'intention ("apprends à mieux te connaître") avant l'action —
-            voir app/quete/. Disparaît d'elle-même dès que le profil MBTI
-            existe (voir app/decouverte/page.tsx). */}
-        {!hasProfile && (
-          <div
-            className="hub-up rounded-[24px] px-5 py-4 mb-3.5"
-            style={{ animationDelay: '.18s', background: 'var(--gold-soft)', border: '1px dashed var(--gold-line)' }}
-          >
-            <div className="flex items-start gap-3.5 mb-3.5">
-              <span className="text-2xl flex-shrink-0">🛑</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold leading-snug" style={{ color: 'var(--ink)' }}>Ton profil n&apos;est pas encore complet</p>
-                <p className="text-[12.5px] mt-1" style={{ color: '#8a7d5c', lineHeight: 1.5 }}>Découvre ton fonctionnement profond en terminant ta quête.</p>
-              </div>
-            </div>
-            <Link href="/quetes" className="hub-card block w-full py-2.5 rounded-full text-center text-sm font-bold" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
-              Compléter mon profil
-            </Link>
-          </div>
-        )}
-
         {/* Les cartes — "Mes quêtes" (toujours 1ère) a un traitement à part :
             fond plein doré (pas juste un accent), et deux cartouches
             "nouveau" / "en attente" qui reflètent l'état réel des quêtes
@@ -242,12 +264,7 @@ export default function DecouverteClient({
                 )}
 
                 <div className="relative flex items-center gap-5">
-                  <div
-                    className="hub-card-icon flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
-                    style={{ background: card.accentSoft }}
-                  >
-                    {card.emoji}
-                  </div>
+                  <CardVisual href={card.href} />
 
                   <div className="flex-1 min-w-0">
                     <p className="ur-label text-[10px] mb-1.5" style={{ color: card.accent }}>
