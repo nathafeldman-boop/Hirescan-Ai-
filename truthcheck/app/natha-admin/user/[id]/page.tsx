@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import { describeVisit, describeAppEvent, describeOrigin, groupSessions, type VisitEvent } from '@/lib/userActivity';
+import RecordConversionForm from './RecordConversionForm';
 
 export const metadata: Metadata = {
   title: 'Fiche utilisateur',
@@ -116,6 +117,7 @@ export default async function UserActivityPage({ params }: { params: { id: strin
   // avant que PageView ne sache lier une visite à un utilisateur.
   const firstSourced = pageViews.find((p) => p.source);
   const origin = describeOrigin(firstSourced?.source ?? null);
+  const originAffiliateSlug = firstSourced?.source?.startsWith('aff:') ? firstSourced.source.slice(4) : null;
 
   // ── Statut du test : terminé (avec le type), abandonné à une question
   // précise (dernier /__quiz/drop/qN connu), ou jamais commencé.
@@ -171,6 +173,7 @@ export default async function UserActivityPage({ params }: { params: { id: strin
               ))}
             </div>
           )}
+          {user.email && <RecordConversionForm email={user.email} defaultAffiliateSlug={originAffiliateSlug} />}
         </div>
 
         <p style={{ ...sub, marginBottom: 20, fontSize: 12, color: C.faint, maxWidth: 560 }}>
