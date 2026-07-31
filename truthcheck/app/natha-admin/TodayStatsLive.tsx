@@ -7,6 +7,7 @@ interface TodayStats {
   landingToday: number;
   newToday: number;
   paidToday: number;
+  onlineNow: number;
   visitsSpark: number[];
   landingSpark: number[];
   signupsSpark: number[];
@@ -132,6 +133,27 @@ export default function TodayStatsLive({ initial }: { initial: TodayStats }) {
           50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(26,158,70,0); }
         }
       `}</style>
+
+      {/* "En ligne maintenant" — visiteurs distincts (visitorId anonyme, ou
+          compte si connecté) ayant chargé une page dans les 5 dernières
+          minutes (voir /api/natha-admin/today::countOnlineNow). Sert
+          justement à voir si quelqu'un est en train de repartir puis de
+          revenir sur l'appli, pas juste le total du jour. */}
+      <div style={{ ...block, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 14, background: stats.onlineNow > 0 ? 'rgba(26,158,70,0.06)' : C.surface, border: `1px solid ${stats.onlineNow > 0 ? 'rgba(26,158,70,0.25)' : C.border}` }}>
+        <span
+          style={{
+            width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+            background: stats.onlineNow > 0 ? C.good : C.faint,
+            animation: stats.onlineNow > 0 ? 'natha-live-pulse 1.6s ease-in-out infinite' : 'none',
+          }}
+        />
+        <div>
+          <p style={{ ...bigNum, margin: 0, fontSize: 22, color: stats.onlineNow > 0 ? C.good : C.text }}>
+            {stats.onlineNow} {stats.onlineNow > 1 ? 'personnes en ligne' : 'personne en ligne'}
+          </p>
+          <p style={sub}>actives dans les 5 dernières minutes</p>
+        </div>
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 8 }}>
         <div style={block}>
