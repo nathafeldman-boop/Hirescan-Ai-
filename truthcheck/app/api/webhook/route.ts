@@ -5,6 +5,7 @@ import { emailPremiumWelcome, emailAdminSale, sendEmail, ADMIN_NOTIF_EMAIL } fro
 import { getSuivi } from '@/lib/suivi';
 import { PLUS_PRICE_ID, STARTER_PRICE_ID, TIER_RANK } from '@/lib/plans';
 import { checkAndRecordQuestCompletions } from '@/lib/quests';
+import { recordSaleConversion } from '@/lib/recordSale';
 
 // Upsert de tier qui ne rétrograde jamais un palier existant (ex: un abonné
 // Plus qui rachète le 1,99€ one-shot par erreur reste 'plus').
@@ -117,26 +118,6 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // ── Affiliate conversion tracking ──
-      if (meta.affiliateSlug && session.amount_total) {
-        const affiliate = await prisma.affiliate.findUnique({
-          where: { slug: meta.affiliateSlug },
-        }).catch(() => null);
-        if (affiliate) {
-          const commissionCents = Math.round(session.amount_total * affiliate.commissionPct / 100);
-          await prisma.affiliateConversion.upsert({
-            where: { stripeSessionId: session.id },
-            create: {
-              affiliateId: affiliate.id,
-              amountCents: session.amount_total,
-              commissionCents,
-              stripeSessionId: session.id,
-            },
-            update: {},
-          }).catch(() => {});
-        }
-      }
-
       // ── Parrainage : le filleul paie plus de 2 € → +3 messages/jour au parrain ──
       // Une seule fois par filleul (referralRewarded), plafonné à +15/jour.
       if (email && (session.amount_total ?? 0) >= 200) {
@@ -165,50 +146,11 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Type d'offre — sert à l'attribution ET à la notification vente.
-      // 'plus' (5€) est distingué du mensuel 9,99€ via metadata.plan.
-      const productType =
-          meta.annual === 'true'          ? 'annual'
-        : meta.rapport === 'true'         ? 'rapport'
-        : meta.fusionGroupId              ? 'fusion'
-        : meta.oneTime === 'true'         ? 'onetime'
-        : session.mode === 'subscription' ? (meta.plan === 'starter' ? 'starter' : meta.plan === 'plus' ? 'plus' : 'monthly')
-        : 'onetime';
-
-      // ── Notification vente → email admin, personnalisé selon l'offre ──
-      try {
-        const { subject, html } = emailAdminSale({
-          productType,
-          amountCents: session.amount_total ?? 0,
-          buyerEmail: email,
-          quizSlug: meta.quizSlug || null,
-          utmSource: meta.utmSource || null,
-          affiliateSlug: meta.affiliateSlug || null,
-          landingPath: meta.landingPath || null,
-        });
-        await sendEmail(ADMIN_NOTIF_EMAIL, subject, html);
-      } catch (e) {
-        console.error('Admin sale notif error:', e);
-      }
-
-      // ── Attribution complète — chaque paiement tracé avec sa source ──
-      await prisma.conversion.upsert({
-        where: { stripeSessionId: session.id },
-        create: {
-          stripeSessionId: session.id,
-          email:           email ?? undefined,
-          amountCents:     session.amount_total ?? 0,
-          quizSlug:        meta.quizSlug     || undefined,
-          productType,
-          utmSource:       meta.utmSource    || undefined,
-          utmMedium:       meta.utmMedium    || undefined,
-          utmCampaign:     meta.utmCampaign  || undefined,
-          utmContent:      meta.utmContent   || undefined,
-          affiliateSlug:   meta.affiliateSlug || undefined,
-          landingPath:     meta.landingPath  || undefined,
-        },
-        update: {},
-      }).catch(() => {});
+      // ── Commission affilié + notif admin + attribution (Conversion) ──
+      // Partagé avec /success (voir lib/recordSale.ts) : le webhook Stripe
+      // n'est pas le seul chemin fiable pour ces effets, donc les deux
+      // appellent la même fonction, idempotente par stripeSessionId.
+      await recordSaleConversion(session, email);
     }
 
     // ── Subscription renewal → maintient le bon palier ──
