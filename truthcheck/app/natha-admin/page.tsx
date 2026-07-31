@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import AccessCodeWidget from './AccessCodeWidget';
 import TodayStatsLive from './TodayStatsLive';
+import { describeOrigin } from '@/lib/userActivity';
 
 export const metadata: Metadata = {
   title: 'Mon tableau de bord',
@@ -98,7 +99,7 @@ function distinctUsersSince(rows: { userId: string; day: string }[], sinceYMD: s
   return set.size;
 }
 
-export default async function NathaAdminPage() {
+export default async function NathaAdminPage({ searchParams }: { searchParams?: { q?: string } }) {
   const now = new Date();
   const todayParis  = now.toLocaleDateString('en-CA', { timeZone: TZ }); // "2026-06-12"
   const monthParis  = todayParis.slice(0, 7) + '-01';                    // "2026-06-01"
@@ -150,6 +151,38 @@ export default async function NathaAdminPage() {
     // ici affichait 0 € dès que les ventes du mois venaient du trafic direct/TikTok.
     prisma.conversion.findMany({ select: { amountCents: true, createdAt: true } }),
   ]);
+
+  // ── Recherche par email/nom — un compte peut payer des jours ou des mois
+  // après son inscription (voir la question posée depuis Stripe : "il a payé
+  // aujourd'hui mais n'a pas créé de compte aujourd'hui, d'où vient-il ?"),
+  // donc il n'apparaît pas forcément dans "recentUsers" (30 derniers inscrits).
+  // Cette recherche retrouve n'importe quel compte et affiche directement son
+  // Origine (même calcul que la fiche /natha-admin/user/[id], voir
+  // lib/userActivity.ts::describeOrigin) sans clic supplémentaire.
+  const searchQuery = searchParams?.q?.trim() ?? '';
+  const searchResults = searchQuery.length >= 2
+    ? await (async () => {
+        const matches = await prisma.user.findMany({
+          where: {
+            OR: [
+              { email: { contains: searchQuery, mode: 'insensitive' } },
+              { name: { contains: searchQuery, mode: 'insensitive' } },
+            ],
+          },
+          select: { id: true, email: true, name: true, tier: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        });
+        return Promise.all(matches.map(async (u) => {
+          const sourced = await prisma.pageView.findFirst({
+            where: { userId: u.id, NOT: { source: null } },
+            orderBy: { createdAt: 'asc' },
+            select: { source: true },
+          });
+          return { ...u, origin: describeOrigin(sourced?.source ?? null) };
+        }));
+      })()
+    : [];
 
   // ── Mini-courbes 7 jours pour les cases "Aujourd'hui" (style App Store
   // Connect) — un point par jour, construit à partir des vraies lignes
@@ -358,6 +391,63 @@ export default async function NathaAdminPage() {
             {now.toLocaleDateString('fr-FR', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long' })} à {now.toLocaleTimeString('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
+
+        {/* Recherche par email/nom — retrouve n'importe quel compte, même
+            créé il y a des mois, et affiche directement son Origine sans
+            avoir à parcourir "Nouveaux inscrits" (limité aux 30 derniers). */}
+        <form action="/natha-admin" method="GET" style={{ marginBottom: 28 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              type="text"
+              name="q"
+              defaultValue={searchQuery}
+              placeholder="Chercher un compte par email ou nom…"
+              style={{
+                flex: 1, padding: '10px 14px', borderRadius: 10, border: `1px solid ${C.border}`,
+                background: C.surface, color: C.text, fontSize: 14, outline: 'none',
+              }}
+            />
+            <button type="submit" style={{
+              padding: '10px 18px', borderRadius: 10, border: 'none', background: C.text,
+              color: C.surface, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+            }}>
+              Chercher
+            </button>
+          </div>
+
+          {searchQuery.length >= 2 && (
+            <div style={{ marginTop: 14 }}>
+              {searchResults.length === 0 ? (
+                <p style={{ color: C.muted, fontSize: 13.5, margin: 0 }}>Aucun compte ne correspond à &laquo;&nbsp;{searchQuery}&nbsp;&raquo;.</p>
+              ) : (
+                <div style={{ ...block(C.surface, C.border), padding: 0 }}>
+                  {searchResults.map((u, i) => (
+                    <Link
+                      key={u.id}
+                      href={`/natha-admin/user/${u.id}`}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                        padding: '14px 18px', textDecoration: 'none', color: 'inherit',
+                        borderBottom: i < searchResults.length - 1 ? `1px solid ${C.borderSoft}` : 'none',
+                      }}
+                    >
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: 14.5, fontWeight: 600, color: C.text }}>{u.name || u.email}</p>
+                        <p style={{ margin: '2px 0 0', fontSize: 12.5, color: C.muted }}>{u.email} · {u.tier} · inscrit le {u.createdAt.toLocaleDateString('fr-FR', { timeZone: TZ })}</p>
+                      </div>
+                      <p style={{
+                        margin: 0, fontSize: 12, fontWeight: 600, flexShrink: 0, textAlign: 'right',
+                        color: u.origin.kind === 'affiliate' ? C.good : u.origin.kind === 'external' ? C.primary : C.faint,
+                      }}>
+                        {u.origin.label}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </form>
 
         {/* ── SECTION 1 : Ce qui s'est passé aujourd'hui — live, voir TodayStatsLive ── */}
         <p style={sectionHeading}>Aujourd&apos;hui</p>

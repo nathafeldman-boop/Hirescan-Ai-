@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { prisma } from '@/lib/db';
 import { mbtiTypes } from '@/lib/mbti-server';
 import { TIER_RANK } from '@/lib/plans';
+import { recordSaleConversion } from '@/lib/recordSale';
 import SuccessTracker from './SuccessTracker';
 import SuccessUpsellButton from './SuccessUpsellButton';
 import ShareResultCard from '@/components/ShareResultCard';
@@ -44,6 +45,15 @@ async function verifyAndUnlock(sessionId: string | undefined, resultId: string |
         update: shouldSet ? { tier } : {},
       }).catch(() => {});
     }
+
+    // Commission affilié + notif admin + attribution (Conversion) — voir
+    // lib/recordSale.ts : le webhook Stripe n'est pas garanti d'être appelé
+    // (c'est justement le bug trouvé le 31/07 : 0 requête reçue sur
+    // /api/webhook pendant 7 jours), donc /success (vérifié directement
+    // depuis le retour du client, toujours fiable) fait le même travail,
+    // idempotent par stripeSessionId — jamais de double comptage si le
+    // webhook finit quand même par tourner pour la même session.
+    await recordSaleConversion(session, email);
 
     let affiliateSlug: string | null = null;
     if (email) {
