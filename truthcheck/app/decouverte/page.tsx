@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 // Elio/quiz non) : un seul mur de connexion, avant de choisir l'expérience.
 // Depuis le funnel /bienvenue → /journal, c'est aussi le premier écran
 // "maison" qu'un nouvel inscrit voit après avoir déjà donné un peu de lui —
-// d'où le prénom + la quête "profil incomplet" (voir DecouverteClient).
+// d'où le prénom en en-tête (voir DecouverteClient).
 export default async function DecouvertePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect('/login?callbackUrl=/decouverte');
@@ -61,7 +61,6 @@ export default async function DecouvertePage() {
   return (
     <DecouverteClient
       firstName={user?.name?.split(' ')[0] ?? null}
-      hasProfile={!!user?.mbtiType}
       hasNewQuests={hasNewQuests}
       hasPendingQuests={hasPendingQuests}
     />
