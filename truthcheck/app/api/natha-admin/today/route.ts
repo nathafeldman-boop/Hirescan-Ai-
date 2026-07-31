@@ -36,17 +36,34 @@ function bucketByDay(rows: { createdAt: Date }[], days: number, todayYMD: string
 // tous les affiliés, tous les Conversion/QuizResult jamais créés) qui vivent
 // sur la page complète : celles-ci ne changent pas seconde par seconde et
 // n'ont aucune raison d'être ré-exécutées à chaque poll.
+// "En ligne maintenant" = visiteurs distincts (visitorId anonyme, ou userId
+// à défaut) ayant chargé une page dans les 5 dernières minutes. PageView ne
+// pousse pas de battement de cœur continu (juste à chaque navigation), donc
+// une fenêtre trop courte ferait clignoter le chiffre à 0 entre deux clics —
+// 5 min est le compromis standard pour ce genre d'indicateur "live".
+const ONLINE_WINDOW_MS = 5 * 60 * 1000;
+
+async function countOnlineNow(now: Date): Promise<number> {
+  const rows = await prisma.pageView.findMany({
+    where: { createdAt: { gte: new Date(now.getTime() - ONLINE_WINDOW_MS) } },
+    select: { visitorId: true, userId: true },
+  });
+  const distinct = new Set(rows.map((r) => r.visitorId ?? r.userId).filter((v): v is string => !!v));
+  return distinct.size;
+}
+
 export async function GET() {
   const now = new Date();
   const todayParis = now.toLocaleDateString('en-CA', { timeZone: TZ });
   const startOfToday = parisMidnight(todayParis);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const [visitsToday, landingToday, newToday, paidToday, visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
+  const [visitsToday, landingToday, newToday, paidToday, onlineNow, visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
     prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
     prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
+    countOnlineNow(now),
     prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
     prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
     prisma.user.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
@@ -58,6 +75,7 @@ export async function GET() {
     landingToday,
     newToday,
     paidToday,
+    onlineNow,
     visitsSpark: bucketByDay(visits7dRows, 7, todayParis),
     landingSpark: bucketByDay(landing7dRows, 7, todayParis),
     signupsSpark: bucketByDay(signups7dRows, 7, todayParis),

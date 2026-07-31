@@ -198,6 +198,15 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
   const signupsSpark = bucketByDay(signups7dRows, 7, todayParis);
   const paidSpark     = bucketByDay(paid7dRows, 7, todayParis);
 
+  // "En ligne maintenant" — juste la valeur au moment du rendu serveur, pour
+  // que la case ne parte pas de 0 avant le premier poll de TodayStatsLive
+  // (voir /api/natha-admin/today::countOnlineNow, même calcul).
+  const onlineNowRows = await prisma.pageView.findMany({
+    where: { createdAt: { gte: new Date(now.getTime() - 5 * 60 * 1000) } },
+    select: { visitorId: true, userId: true },
+  });
+  const onlineNow = new Set(onlineNowRows.map((r) => r.visitorId ?? r.userId).filter((v): v is string => !!v)).size;
+
   // Quiz drop-off funnel (MBTI personnalite)
   // Note : pas de step "Q10" ici — le tracker de milestones (PersonnaliteClient.tsx)
   // n'écrit jamais /__quiz/q10 (seulement q25/q50/q75, basés sur % de progression,
@@ -453,7 +462,7 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
         <p style={sectionHeading}>Aujourd&apos;hui</p>
         <TodayStatsLive
           initial={{
-            visitsToday, landingToday, newToday, paidToday,
+            visitsToday, landingToday, newToday, paidToday, onlineNow,
             visitsSpark, landingSpark, signupsSpark, paidSpark,
             updatedAt: now.toISOString(),
           }}
