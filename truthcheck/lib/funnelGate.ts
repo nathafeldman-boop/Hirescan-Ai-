@@ -30,17 +30,3 @@ export async function resolveFunnelStep(userId: string): Promise<FunnelStep | nu
 export function funnelStepPath(step: FunnelStep): string {
   return step === 'onboarding' ? '/bienvenue' : '/journal';
 }
-
-// ── Visite guidée (après le 1er Journal, avant le hub) ──────────────────────
-// Volontairement une fonction À PART de resolveFunnelStep/FunnelStep, jamais
-// fusionnée dedans : celui-ci est réutilisé tel quel par /quiz/personnalite,
-// /chat et /parcours/* — exactement les 3 pages vers lesquelles la visite
-// guidée doit envoyer les gens. Si "tour" devenait un FunnelStep au même
-// titre que "onboarding"/"journal", ces 3 pages redirigeraient IMMÉDIATEMENT
-// vers /decouverte/tour dès qu'on les visite pendant la visite — boucle
-// infinie. isTourPending n'est donc appelée QUE par les pages "récompense"
-// (/decouverte, /quetes), jamais par les 3 pages de la visite elles-mêmes.
-export async function isTourPending(userId: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { tourCompletedAt: true } });
-  return !!user && !user.tourCompletedAt;
-}

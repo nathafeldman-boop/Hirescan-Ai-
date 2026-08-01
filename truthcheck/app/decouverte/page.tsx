@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { resolveFunnelStep, funnelStepPath, isTourPending } from '@/lib/funnelGate';
+import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import { QUEST_CATALOG } from '@/lib/quests';
 import { hasPremiumAccess } from '@/lib/plans';
 import { getOrCreateTodayDailyQuest, checkAndRecordDailyQuestCompletion } from '@/lib/dailyQuest';
@@ -29,10 +29,6 @@ export default async function DecouvertePage() {
 
   const pendingStep = await resolveFunnelStep(session.user.id);
   if (pendingStep) redirect(funnelStepPath(pendingStep));
-  // Visite guidée (Elio/Test/Parcours) avant le hub — voir app/decouverte/tour
-  // et le commentaire dans lib/funnelGate.ts sur pourquoi ce n'est PAS fusionné
-  // dans resolveFunnelStep.
-  if (await isTourPending(session.user.id)) redirect('/decouverte/tour');
 
   // Récupérée d'abord seule : sa complétion (ci-dessous) dépend de son
   // actionType/day, donc pas dans le même Promise.all que le reste.
