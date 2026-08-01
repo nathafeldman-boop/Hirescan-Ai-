@@ -22,6 +22,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Séquences désactivées le 01/08 (demande explicite : économiser le quota
+  // Resend — day1/3/7 + suivi premium jours 2-15 + rétention M1/M3/M5 +
+  // relance winback + relance quêtes, potentiellement des dizaines d'envois
+  // par jour). Le cron continue de tourner (Vercel) mais ne fait plus rien ;
+  // toute la logique ci-dessous reste intacte pour une réactivation simple
+  // (repasser SEQUENCES_ENABLED à true).
+  const SEQUENCES_ENABLED = false;
+  if (!SEQUENCES_ENABLED) {
+    return NextResponse.json({ ok: true, sent: 0, errors: 0, disabled: true, timestamp: new Date().toISOString() });
+  }
+
   const now = new Date();
   let sent = 0;
   let errors = 0;

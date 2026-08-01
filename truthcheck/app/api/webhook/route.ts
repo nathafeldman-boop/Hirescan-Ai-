@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
-import { emailPremiumWelcome, emailAdminSale, sendEmail, ADMIN_NOTIF_EMAIL } from '@/lib/emails';
-import { getSuivi } from '@/lib/suivi';
 import { PLUS_PRICE_ID, STARTER_PRICE_ID, TIER_RANK } from '@/lib/plans';
 import { checkAndRecordQuestCompletions } from '@/lib/quests';
 import { recordSaleConversion } from '@/lib/recordSale';
@@ -97,17 +95,12 @@ export async function POST(req: NextRequest) {
             select: { id: true, name: true, mbtiType: true },
           });
           if (user) {
-            const alreadySent = await prisma.emailLog.findUnique({
-              where: { userId_type: { userId: user.id, type: 'premium_welcome' } },
-            });
-            if (!alreadySent) {
-              const typeCode = (meta.typeCode || user.mbtiType)?.toUpperCase() ?? null;
-              const suivi = typeCode ? getSuivi(typeCode) : null;
-              const jour1 = suivi?.jours[0] ?? null;
-              const { subject, html } = emailPremiumWelcome(user.name, typeCode, jour1);
-              await sendEmail(email, subject, html);
-              await prisma.emailLog.create({ data: { userId: user.id, type: 'premium_welcome' } });
-            }
+            // Email de bienvenue premium retiré le 01/08 (économie de quota
+            // Resend) — on garde la ligne EmailLog : elle sert d'ancre à la
+            // séquence de suivi jours 2-15 / rétention M1-M5 dans
+            // app/api/cron/email-sequence/route.ts (actuellement désactivée
+            // pour la même raison, mais l'ancre reste posée si elle revient).
+            await prisma.emailLog.create({ data: { userId: user.id, type: 'premium_welcome' } }).catch(() => {});
             // Un upgrade de palier peut d'un coup rendre "vraies" des quêtes
             // Premium déjà accomplies en amont (ex: profil MBTI déjà fait) —
             // voir requiresPremium dans lib/quests.ts.
@@ -170,21 +163,11 @@ export async function POST(req: NextRequest) {
         }).catch(() => {});
       }
 
-      // Notification renouvellement UNIQUEMENT (billing_reason 'subscription_cycle').
-      // Le 1er paiement d'un abonnement est déjà notifié via checkout.session.completed.
+      // Renouvellement (billing_reason 'subscription_cycle') — notif email
+      // admin retirée le 01/08 (économie de quota Resend), le LTV reste
+      // tracé ci-dessous via Conversion, visible dans /natha-admin.
       if (invoice.billing_reason === 'subscription_cycle') {
         const amount = invoice.amount_paid ?? 0;
-        try {
-          const { subject, html } = emailAdminSale({
-            productType: isPlus ? 'plus' : isStarter ? 'starter' : amount >= 2500 ? 'annual' : 'monthly',
-            amountCents: amount,
-            buyerEmail: customerEmail,
-            renewal: true,
-          });
-          await sendEmail(ADMIN_NOTIF_EMAIL, subject, html);
-        } catch (e) {
-          console.error('Admin renewal notif error:', e);
-        }
 
         // ── LTV : le 1er paiement d'un abonnement est déjà tracé dans
         // Conversion via checkout.session.completed — sans cette ligne, tous

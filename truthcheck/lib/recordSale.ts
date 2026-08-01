@@ -1,4 +1,4 @@
-// ── Enregistrement d'une vente (Conversion + commission affilié + notif admin) ──
+// ── Enregistrement d'une vente (Conversion + commission affilié) ──
 // Root cause d'un vrai bug trouvé le 31/07 : ce code ne vivait QUE dans le
 // webhook Stripe (app/api/webhook/route.ts) — or les logs Vercel montrent
 // ZÉRO appel à /api/webhook sur les 7 derniers jours (probablement un
@@ -17,7 +17,6 @@
 // par tourner pour la même session.
 import Stripe from 'stripe';
 import { prisma } from './db';
-import { emailAdminSale, sendEmail, ADMIN_NOTIF_EMAIL } from './emails';
 
 export function deriveProductType(meta: Record<string, string | undefined>, mode: string | null): string {
   return meta.annual === 'true' ? 'annual'
@@ -46,28 +45,9 @@ export async function recordSaleConversion(session: Stripe.Checkout.Session, ema
       }
     }
 
-    // ── Notification vente admin — seulement au premier enregistrement de
-    // cette session (le second appelant, webhook ou /success, trouve la
-    // ligne déjà créée et ne renvoie pas l'email). ──
-    const alreadyRecorded = await prisma.conversion.findUnique({ where: { stripeSessionId: session.id }, select: { id: true } }).catch(() => null);
-    if (!alreadyRecorded) {
-      try {
-        const { subject, html } = emailAdminSale({
-          productType,
-          amountCents: session.amount_total ?? 0,
-          buyerEmail: email,
-          quizSlug: meta.quizSlug || null,
-          utmSource: meta.utmSource || null,
-          affiliateSlug: meta.affiliateSlug || null,
-          landingPath: meta.landingPath || null,
-        });
-        await sendEmail(ADMIN_NOTIF_EMAIL, subject, html);
-      } catch (e) {
-        console.error('Admin sale notif error:', e);
-      }
-    }
-
     // ── Attribution complète — chaque paiement tracé avec sa source ──
+    // (notif email de vente admin retirée le 01/08 — économie de quota Resend ;
+    // le suivi reste visible dans /natha-admin via cette ligne Conversion.)
     await prisma.conversion.upsert({
       where: { stripeSessionId: session.id },
       create: {

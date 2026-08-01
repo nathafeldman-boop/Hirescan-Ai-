@@ -24,6 +24,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Désactivé le 01/08 (demande explicite : économiser le quota Resend) —
+  // le cron continue de tourner mais ne fait plus rien ; logique intacte
+  // pour une réactivation simple (repasser REMINDER_ENABLED à true).
+  const REMINDER_ENABLED = false;
+  if (!REMINDER_ENABLED) {
+    return NextResponse.json({ ok: true, candidates: 0, sent: 0, errors: 0, disabled: true });
+  }
+
   const today = parisDay();
   const candidates = await prisma.user.findMany({
     where: {

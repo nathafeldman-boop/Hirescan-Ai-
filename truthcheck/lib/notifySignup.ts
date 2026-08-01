@@ -21,37 +21,17 @@
 // contrainte unique fait échouer le second appel proprement, un seul mail
 // part.
 import { prisma } from './db';
-import { emailWelcome, sendEmail, ADMIN_NOTIF_EMAIL } from './emails';
 
+// Emails de bienvenue + notif admin désactivés le 01/08 (demande explicite :
+// économiser le quota Resend) — voir git blame pour l'ancienne version qui
+// envoyait les deux. On garde quand même la ligne EmailLog : c'est devenu la
+// source de vérité des compteurs "nouveaux comptes" du dashboard admin
+// (app/natha-admin/page.tsx, app/api/natha-admin/today/route.ts), qui lisent
+// EmailLog.sentAt comme le vrai moment d'activation d'un compte — pas
+// d'email envoyé, juste le marqueur.
 export async function notifyFirstSignIn(user: { id: string; email?: string | null; name?: string | null }): Promise<void> {
   if (!user.email) return;
-
-  try {
-    await prisma.emailLog.create({ data: { userId: user.id, type: 'welcome' } });
-  } catch {
-    // Contrainte unique userId+type déjà là → déjà notifié pour ce compte.
-    return;
-  }
-
-  try {
-    const { subject, html } = emailWelcome(user.name ?? null);
-    await sendEmail(user.email, subject, html);
-  } catch (e) {
-    console.error('Welcome email failed:', e);
-  }
-
-  try {
-    const count = await prisma.user.count();
-    await sendEmail(
-      ADMIN_NOTIF_EMAIL,
-      `🆕 Nouveau compte UrCecret : ${user.name || user.email}`,
-      `<div style="font-family:sans-serif;padding:24px;background:#09090b;color:#fff">
-        <h2 style="color:#a78bfa;margin:0 0 12px">🆕 Nouveau compte</h2>
-        <p style="color:#fff;margin:0 0 8px">${user.name ? `${user.name} (${user.email})` : user.email}</p>
-        <p style="color:#71717a;margin:0">Le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')} · ${count} utilisateurs au total${count % 30 === 0 ? ' 🎉' : ''}</p>
-      </div>`
-    );
-  } catch (e) {
-    console.error('Admin new-signup notif failed:', e);
-  }
+  await prisma.emailLog.create({ data: { userId: user.id, type: 'welcome' } }).catch(() => {
+    // Contrainte unique userId+type déjà là → déjà marqué pour ce compte.
+  });
 }

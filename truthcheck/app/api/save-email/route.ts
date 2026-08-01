@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
-import { emailWelcome, emailResultReady, sendEmail } from '@/lib/emails';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,32 +19,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
 
-  const user = await prisma.user.upsert({
+  // Capture le lead (email, éventuellement nom/type MBTI) sans envoyer
+  // d'email — retiré le 01/08 (économie de quota Resend). Ne pose PAS de
+  // ligne EmailLog(type:'welcome') ici : ce marqueur sert maintenant de
+  // source de vérité au "vrai moment d'activation" pour les compteurs
+  // admin (voir lib/notifySignup.ts) — le poser dès une simple capture
+  // anonyme referait exactement le bug déjà corrigé (compte "actif"
+  // compté le jour de la capture au lieu du jour de la vraie connexion).
+  await prisma.user.upsert({
     where: { email },
     create: { email, tier: 'free', ...(name ? { name } : {}), ...(mbtiType ? { mbtiType } : {}) },
     update: { ...(mbtiType ? { mbtiType } : {}) },
   }).catch(() => null);
-
-  // Send the welcome email once per signup — dedupe via EmailLog unique [userId,type].
-  // Fired for every captured email so each new lead gets at least one email.
-  if (user && process.env.RESEND_API_KEY) {
-    const already = await prisma.emailLog
-      .findUnique({ where: { userId_type: { userId: user.id, type: 'welcome' } } })
-      .catch(() => null);
-    if (!already) {
-      // If we know their type (paywall abandon), send the purchase-focused
-      // "your profile is ready" email; otherwise the generic welcome.
-      const { subject, html } = mbtiType
-        ? emailResultReady(user.name ?? name, mbtiType)
-        : emailWelcome(user.name ?? name);
-      try {
-        await sendEmail(email, subject, html);
-        await prisma.emailLog.create({ data: { userId: user.id, type: 'welcome' } }).catch(() => {});
-      } catch {
-        // Don't fail the capture if the email provider hiccups.
-      }
-    }
-  }
 
   return NextResponse.json({ ok: true });
 }
