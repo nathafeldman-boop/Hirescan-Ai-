@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
+import { resolveFunnelStep, funnelStepPath, isTourPending } from '@/lib/funnelGate';
 import { QUEST_CATALOG, getQuestStats, checkAndRecordQuestCompletions } from '@/lib/quests';
 import { hasPremiumAccess } from '@/lib/plans';
 import QuetesClient from './QuetesClient';
@@ -22,6 +22,7 @@ export default async function QuetesPage() {
 
   const pendingStep = await resolveFunnelStep(session.user.id);
   if (pendingStep) redirect(funnelStepPath(pendingStep));
+  if (await isTourPending(session.user.id)) redirect('/decouverte/tour');
 
   // Rattrape toute quête déjà accomplie mais jamais détectée en temps réel
   // (Compat, analyse avancée, analyse de conversation...) — voir le
