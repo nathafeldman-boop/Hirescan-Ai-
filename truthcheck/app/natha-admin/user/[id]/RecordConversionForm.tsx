@@ -7,16 +7,17 @@ const C = {
   border: '#d2d2d7', text: '#1d1d1f', muted: '#6e6e73', primary: '#0071e3', good: '#1a9e46', critical: '#d70015',
 };
 
+// Les 4 offres réelles (voir lib/plans.ts) — pas la distinction technique
+// 1er paiement / renouvellement (utile pour le MRR, pas pour rattraper une
+// vente à la main : dans ce cas-là, c'est presque toujours un 1er paiement).
+// Chaque offre porte son propre prix, auto-rempli au choix — l'erreur qui a
+// motivé ce champ (une carte "Premium — 9,99€/mois" enregistrée à 1,99€)
+// venait justement de la saisie manuelle et indépendante des deux champs.
 const PRODUCT_TYPES = [
-  { value: 'onetime', label: 'Résultat seul (1,99€)' },
-  { value: 'starter', label: 'Starter — 1er paiement' },
-  { value: 'starter_renewal', label: 'Starter — renouvellement' },
-  { value: 'plus', label: 'Plus — 1er paiement' },
-  { value: 'plus_renewal', label: 'Plus — renouvellement' },
-  { value: 'monthly', label: 'Mensuel — 1er paiement' },
-  { value: 'renewal', label: 'Mensuel — renouvellement' },
-  { value: 'annual', label: 'Annuel' },
-  { value: 'rapport', label: 'Rapport complet (19,99€)' },
+  { value: 'onetime', label: 'Résultat seul — 1,99€', priceEur: 1.99 },
+  { value: 'starter', label: 'Starter — 1,99€/mois', priceEur: 1.99 },
+  { value: 'plus', label: 'Plus — 5€/mois', priceEur: 5 },
+  { value: 'monthly', label: 'Premium — 9,99€/mois', priceEur: 9.99 },
 ];
 
 // Rattrape à la main un paiement réel jamais tracé (voir
@@ -27,12 +28,18 @@ const PRODUCT_TYPES = [
 export default function RecordConversionForm({ email, defaultAffiliateSlug }: { email: string; defaultAffiliateSlug: string | null }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [amountEur, setAmountEur] = useState('');
   const [productType, setProductType] = useState('onetime');
+  const [amountEur, setAmountEur] = useState(String(PRODUCT_TYPES[0].priceEur));
   const [affiliateSlug, setAffiliateSlug] = useState(defaultAffiliateSlug ?? '');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  function handleProductTypeChange(value: string) {
+    setProductType(value);
+    const match = PRODUCT_TYPES.find((p) => p.value === value);
+    if (match) setAmountEur(String(match.priceEur));
+  }
 
   async function submit() {
     const amount = parseFloat(amountEur.replace(',', '.'));
@@ -60,7 +67,6 @@ export default function RecordConversionForm({ email, defaultAffiliateSlug }: { 
       }
       const data = await res.json();
       setResult({ ok: true, message: data.affiliateCredited ? 'Paiement + commission affilié enregistrés.' : 'Paiement enregistré.' });
-      setAmountEur('');
       router.refresh();
     } catch {
       setResult({ ok: false, message: 'Erreur réseau.' });
@@ -86,17 +92,18 @@ export default function RecordConversionForm({ email, defaultAffiliateSlug }: { 
         Rattrapage manuel — pour un paiement Stripe réel qui n&apos;a jamais créé de ligne Conversion.
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-        <input
-          type="text" inputMode="decimal" placeholder="Montant en €" value={amountEur}
-          onChange={(e) => setAmountEur(e.target.value)}
-          style={{ width: 110, padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13.5 }}
-        />
         <select
-          value={productType} onChange={(e) => setProductType(e.target.value)}
+          value={productType} onChange={(e) => handleProductTypeChange(e.target.value)}
           style={{ padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13.5, background: '#fff' }}
         >
           {PRODUCT_TYPES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
         </select>
+        <input
+          type="text" inputMode="decimal" placeholder="Montant en €" value={amountEur}
+          onChange={(e) => setAmountEur(e.target.value)}
+          title="Auto-rempli selon l'offre choisie — modifiable si besoin"
+          style={{ width: 90, padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13.5 }}
+        />
         <input
           type="date" value={date} onChange={(e) => setDate(e.target.value)}
           style={{ padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 13.5 }}
