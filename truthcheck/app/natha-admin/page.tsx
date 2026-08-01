@@ -124,9 +124,12 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
     // fix, ne comptait que tier==='premium' et ratait tous les abonnés Starter/Plus
     // introduits depuis (voir lib/plans.ts).
     prisma.user.count({ where: { tier: { in: ['starter', 'plus', 'premium'] }, NOT: { email: { endsWith: '@urcecret.app' } } } }),
-    prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
-    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-    prisma.user.count({ where: { createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
+    // "Nouveau compte" = vraie activation (EmailLog de bienvenue, voir
+    // lib/notifySignup.ts), pas User.createdAt — voir le même commentaire
+    // dans app/api/natha-admin/today/route.ts.
+    prisma.emailLog.count({ where: { type: 'welcome', sentAt: { gte: startOfToday } } }),
+    prisma.emailLog.count({ where: { type: 'welcome', sentAt: { gte: sevenDaysAgo } } }),
+    prisma.emailLog.count({ where: { type: 'welcome', sentAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
     prisma.quizResult.count(),
     prisma.quizResult.count({ where: { paid: true } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
