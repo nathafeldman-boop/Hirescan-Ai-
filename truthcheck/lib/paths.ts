@@ -116,6 +116,17 @@ export interface PathLevelDef {
   emoji: string;
   xp: number;
   content: ExerciseContent;
+  // Parcours adaptatif : quand renseigné, title/emoji/content sont remplacés
+  // dynamiquement selon la réponse donnée par CE compte au niveau diagnostic
+  // `fromLevelIndex` (voir lib/pathBranching.ts) — ex: "d'où vient ton
+  // stress" à un niveau détermine si les niveaux suivants parlent de
+  // pression au travail, de ruminations, ou de relations. Les valeurs
+  // title/emoji/content ci-dessus servent de repli tant que la branche n'est
+  // pas encore résolue (avant que le niveau diagnostic soit répondu).
+  branch?: {
+    fromLevelIndex: number;
+    variants: Record<string, { title: string; emoji: string; content: ExerciseContent }>;
+  };
 }
 
 export interface PathDef {
@@ -330,6 +341,350 @@ const CONFIANCE_LEVELS: PathLevelDef[] = [
   },
 ];
 
+// ── Parcours "Gérer mon stress" — deuxième parcours, et premier à être
+// ADAPTATIF : à partir du niveau 4, le contenu dépend de la réponse donnée
+// au niveau 1 (diagnostic "d'où vient ton stress"), voir
+// lib/pathBranching.ts. Même longueur/rythme que "confiance" (15 niveaux,
+// 10 gratuits) mais le milieu du parcours n'est pas le même texte pour tout
+// le monde : pression au travail, ruminations, ou relations — jamais un
+// parcours générique qui irait à n'importe qui.
+const STRESS_LEVELS: PathLevelDef[] = [
+  {
+    index: 0,
+    title: 'Respire, tout de suite',
+    emoji: '🌬️',
+    xp: 10,
+    content: {
+      type: 'respiration',
+      instruction: "Avant même de comprendre d'où vient ton stress, calme le corps. 4 respirations, suis le rythme.",
+      inhaleSeconds: 4,
+      holdSeconds: 4,
+      exhaleSeconds: 6,
+      cycles: 4,
+    },
+  },
+  {
+    index: 1,
+    title: "D'où vient ton stress",
+    emoji: '🎯',
+    xp: 10,
+    content: {
+      type: 'quiz_situation',
+      scenario: "Si tu devais pointer UNE seule source à ton stress ces derniers temps, ce serait plutôt...",
+      options: [
+        { label: 'Le travail, les obligations, la charge mentale', value: 'travail' },
+        { label: 'Mes pensées qui tournent en boucle', value: 'pensees' },
+        { label: 'Mes relations avec les autres', value: 'relations' },
+      ],
+    },
+  },
+  {
+    index: 2,
+    title: 'Ce que ça fait dans le corps',
+    emoji: '🫁',
+    xp: 15,
+    content: {
+      type: 'reconnaissance_emotion',
+      situation: 'Quand le stress monte fort, qu\'est-ce que tu ressens le plus ?',
+      emotions: ['Oppression', 'Irritabilité', 'Fatigue', 'Agitation', 'Vide', 'Peur'],
+      multi: true,
+    },
+  },
+  {
+    index: 3,
+    title: 'Ce que tu fais déjà',
+    emoji: '🧰',
+    xp: 15,
+    content: {
+      type: 'reflexion',
+      question: "Qu'est-ce que tu fais déjà aujourd'hui, même un petit truc, pour tenir le coup ?",
+      placeholder: 'Une habitude, un réflexe, même imparfait...',
+      minLength: 10,
+    },
+  },
+  // ── Niveaux 4 à 9 : branchés selon le niveau 1 ──────────────────────────
+  {
+    index: 4,
+    title: 'À découvrir',
+    emoji: '🔒',
+    xp: 15,
+    content: { type: 'reflexion', question: '…', placeholder: '…', minLength: 1 },
+    branch: {
+      fromLevelIndex: 1,
+      variants: {
+        travail: {
+          title: 'Repérer la surcharge',
+          emoji: '📋',
+          content: { type: 'reflexion', question: 'Quelle tâche ou obligation pèse le plus sur toi cette semaine ?', placeholder: 'Sois précis·e, une seule chose...', minLength: 10 },
+        },
+        pensees: {
+          title: 'La pensée qui revient',
+          emoji: '🌀',
+          content: { type: 'reflexion', question: 'Quelle pensée tourne en boucle dans ta tête ces derniers jours ?', placeholder: 'Écris-la telle qu\'elle te vient...', minLength: 10 },
+        },
+        relations: {
+          title: 'La relation qui pèse',
+          emoji: '🧑‍🤝‍🧑',
+          content: { type: 'reflexion', question: 'Quelle relation te demande le plus d\'énergie ces derniers temps ?', placeholder: 'Sans juger, juste décrire...', minLength: 10 },
+        },
+      },
+    },
+  },
+  {
+    index: 5,
+    title: 'À découvrir',
+    emoji: '🔒',
+    xp: 20,
+    content: { type: 'defi_reel', challenge: '…', confirmLabel: '…' },
+    branch: {
+      fromLevelIndex: 1,
+      variants: {
+        travail: {
+          title: 'Une limite à poser',
+          emoji: '🛑',
+          content: { type: 'defi_reel', challenge: 'Aujourd\'hui : dis non à une seule sollicitation, ou reporte une tâche non-urgente, sans te justifier pendant 10 minutes.', confirmLabel: 'Je l\'ai fait' },
+        },
+        pensees: {
+          title: 'Interrompre la boucle',
+          emoji: '✋',
+          content: { type: 'defi_reel', challenge: 'La prochaine fois que la pensée revient : dis-toi "stop" à voix haute, puis change immédiatement d\'activité pendant au moins 2 minutes.', confirmLabel: 'Je l\'ai fait' },
+        },
+        relations: {
+          title: 'Un besoin à exprimer',
+          emoji: '💬',
+          content: { type: 'defi_reel', challenge: 'Dis à quelqu\'un ce dont tu as besoin, clairement — pas ce que tu ne veux pas, ce que tu VEUX.', confirmLabel: 'Je l\'ai fait' },
+        },
+      },
+    },
+  },
+  {
+    index: 6,
+    title: 'À découvrir',
+    emoji: '🔒',
+    xp: 15,
+    content: { type: 'tri_pensees', instruction: '…', categoryA: '…', categoryB: '…', items: [] },
+    branch: {
+      fromLevelIndex: 1,
+      variants: {
+        travail: {
+          title: 'Prioriser sans culpabiliser',
+          emoji: '🗂️',
+          content: {
+            type: 'tri_pensees',
+            instruction: 'Range chaque tâche selon ce qu\'elle est vraiment, pas ce qu\'elle a l\'air d\'être.',
+            categoryA: 'Urgent',
+            categoryB: 'Peut attendre',
+            items: [
+              { text: 'Répondre à un message qui n\'a rien d\'urgent', category: 'B' },
+              { text: 'Une échéance qui tombe demain', category: 'A' },
+              { text: 'Ranger sa boîte mail', category: 'B' },
+              { text: 'Un problème qui bloque quelqu\'un d\'autre en ce moment', category: 'A' },
+              { text: 'Anticiper un projet dans 3 semaines', category: 'B' },
+              { text: 'Un imprévu qui doit être géré aujourd\'hui', category: 'A' },
+            ],
+          },
+        },
+        pensees: {
+          title: 'Trier le vrai du bruit',
+          emoji: '🧺',
+          content: {
+            type: 'tri_pensees',
+            instruction: 'Range chaque pensée selon sa nature, pas selon à quel point elle te semble vraie sur le moment.',
+            categoryA: 'Un fait',
+            categoryB: 'Une peur qui parle',
+            items: [
+              { text: 'Je n\'ai pas eu de réponse, donc j\'ai fait quelque chose de mal.', category: 'B' },
+              { text: 'J\'ai un rendez-vous à 15h.', category: 'A' },
+              { text: 'Tout le monde va s\'en apercevoir.', category: 'B' },
+              { text: 'J\'ai terminé cette tâche hier.', category: 'A' },
+              { text: 'Si je me trompe une fois, c\'est fini.', category: 'B' },
+              { text: 'Il pleut aujourd\'hui.', category: 'A' },
+            ],
+          },
+        },
+        relations: {
+          title: 'Donner vs recevoir',
+          emoji: '⚖️',
+          content: {
+            type: 'tri_pensees',
+            instruction: 'Range chaque comportement selon ce qu\'il représente pour toi, honnêtement.',
+            categoryA: 'Je donne trop',
+            categoryB: 'Je m\'autorise à recevoir',
+            items: [
+              { text: 'Dire oui alors que je n\'ai pas envie', category: 'A' },
+              { text: 'Accepter de l\'aide sans culpabiliser', category: 'B' },
+              { text: 'M\'excuser pour des choses qui ne dépendent pas de moi', category: 'A' },
+              { text: 'Demander un service quand j\'en ai besoin', category: 'B' },
+              { text: 'Absorber les émotions des autres', category: 'A' },
+              { text: 'Prendre du temps rien que pour moi', category: 'B' },
+            ],
+          },
+        },
+      },
+    },
+  },
+  {
+    index: 7,
+    title: 'À découvrir',
+    emoji: '🔒',
+    xp: 20,
+    content: { type: 'cognitif', instruction: '…', thoughtPlaceholder: '…', reframePlaceholder: '…' },
+    branch: {
+      fromLevelIndex: 1,
+      variants: {
+        travail: {
+          title: 'La pensée qui met la pression',
+          emoji: '⚙️',
+          content: {
+            type: 'cognitif',
+            instruction: 'Repère la pensée qui te met le plus la pression au travail, puis reformule-la plus juste.',
+            thoughtPlaceholder: 'Ex : "Je dois tout faire parfaitement."',
+            reframePlaceholder: 'Ex : "Je peux faire du bon travail sans qu\'il soit parfait."',
+          },
+        },
+        pensees: {
+          title: 'Reformuler la pensée',
+          emoji: '🔁',
+          content: {
+            type: 'cognitif',
+            instruction: 'Reprends la pensée qui tourne en boucle (niveau précédent), et essaie de la reformuler, plus juste envers toi-même.',
+            thoughtPlaceholder: 'La pensée telle qu\'elle revient...',
+            reframePlaceholder: 'Ex : "C\'est une pensée, pas un fait."',
+          },
+        },
+        relations: {
+          title: 'La pensée qui empêche de poser une limite',
+          emoji: '🚧',
+          content: {
+            type: 'cognitif',
+            instruction: 'Repère la pensée qui t\'empêche de poser une limite dans cette relation, puis reformule-la.',
+            thoughtPlaceholder: 'Ex : "Si je dis non, je vais le/la décevoir."',
+            reframePlaceholder: 'Ex : "Poser une limite ne veut pas dire que je ne tiens pas à cette personne."',
+          },
+        },
+      },
+    },
+  },
+  {
+    index: 8,
+    title: 'À découvrir',
+    emoji: '🔒',
+    xp: 15,
+    content: { type: 'respiration', instruction: '…', inhaleSeconds: 4, holdSeconds: 4, exhaleSeconds: 6, cycles: 4 },
+    branch: {
+      fromLevelIndex: 1,
+      variants: {
+        travail: {
+          title: 'Une pause qui compte',
+          emoji: '☕',
+          content: { type: 'respiration', instruction: 'Une vraie pause de 2 minutes, sans écran. Suis le rythme.', inhaleSeconds: 4, holdSeconds: 7, exhaleSeconds: 8, cycles: 4 },
+        },
+        pensees: {
+          title: 'Couper la boucle',
+          emoji: '🧵',
+          content: { type: 'respiration', instruction: 'Quand la pensée revient trop fort, ce rythme aide à reprendre la main sur le corps avant l\'esprit.', inhaleSeconds: 4, holdSeconds: 7, exhaleSeconds: 8, cycles: 5 },
+        },
+        relations: {
+          title: 'Respirer avant de répondre',
+          emoji: '⏸️',
+          content: { type: 'respiration', instruction: 'La prochaine fois qu\'une interaction te met sous tension, prends ce temps avant de répondre.', inhaleSeconds: 4, holdSeconds: 4, exhaleSeconds: 6, cycles: 4 },
+        },
+      },
+    },
+  },
+  {
+    index: 9,
+    title: 'À découvrir',
+    emoji: '🔒',
+    xp: 20,
+    content: { type: 'affirmation', base: '…', instruction: '…' },
+    branch: {
+      fromLevelIndex: 1,
+      variants: {
+        travail: {
+          title: 'Ce que le travail ne doit pas prendre',
+          emoji: '🪞',
+          content: { type: 'affirmation', base: 'Mon travail ne définit pas ______.', instruction: 'Complète cette phrase avec ce qui est vrai pour toi, puis lis-la à voix haute.' },
+        },
+        pensees: {
+          title: 'Ce qui reste vrai',
+          emoji: '🪞',
+          content: { type: 'affirmation', base: 'Même si cette pensée revient, ______ reste vrai.', instruction: 'Complète cette phrase avec ce qui est vrai pour toi, puis lis-la à voix haute.' },
+        },
+        relations: {
+          title: 'Ce que je mérite',
+          emoji: '🪞',
+          content: { type: 'affirmation', base: 'Je mérite des relations où ______.', instruction: 'Complète cette phrase avec ce qui est vrai pour toi, puis lis-la à voix haute.' },
+        },
+      },
+    },
+  },
+  // ── Niveaux 10 à 14 : partagés, clôture du parcours ─────────────────────
+  {
+    index: 10,
+    title: 'Ta trousse à outils',
+    emoji: '🧰',
+    xp: 20,
+    content: {
+      type: 'journal_guide',
+      prompts: [
+        'Parmi les exercices précédents, lequel t\'a semblé le plus utile ?',
+        'Comment tu peux le refaire facilement la prochaine fois que le stress monte ?',
+      ],
+    },
+  },
+  {
+    index: 11,
+    title: 'Reconnaître les signaux tôt',
+    emoji: '🚨',
+    xp: 20,
+    content: {
+      type: 'reconnaissance_emotion',
+      situation: 'Quel est LE premier signal, dans ton corps ou ta tête, qui te dit que le stress commence à monter ?',
+      emotions: ['Tension dans les épaules', 'Pensées qui s\'accélèrent', 'Irritabilité', 'Envie de fuir', 'Mâchoire serrée', 'Souffle court'],
+      multi: false,
+    },
+  },
+  {
+    index: 12,
+    title: 'Ta phrase refuge',
+    emoji: '🛟',
+    xp: 20,
+    content: {
+      type: 'affirmation',
+      base: 'Quand ça monte, je me dis : ______.',
+      instruction: 'Écris une phrase courte que tu pourras te répéter la prochaine fois — puis lis-la à voix haute.',
+    },
+  },
+  {
+    index: 13,
+    title: 'Le chemin parcouru',
+    emoji: '🧭',
+    xp: 25,
+    content: {
+      type: 'reflexion',
+      question: 'Est-ce que tu gères différemment maintenant, comparé à ce que tu faisais avant ?',
+      placeholder: 'Même un petit changement compte...',
+      minLength: 10,
+      recallLevelIndex: 3,
+      recallIntro: 'Voici ce que tu avais écrit sur ce que tu faisais déjà pour tenir le coup :',
+    },
+  },
+  {
+    index: 14,
+    title: 'Ton plan anti-stress',
+    emoji: '🏁',
+    xp: 30,
+    content: {
+      type: 'journal_guide',
+      prompts: [
+        'Qu\'est-ce que tu as appris sur tes déclencheurs de stress ?',
+        'Qu\'est-ce que tu veux mettre en place cette semaine ?',
+      ],
+    },
+  },
+];
+
 export const PATH_CATALOG: PathDef[] = [
   {
     key: 'confiance',
@@ -339,6 +694,15 @@ export const PATH_CATALOG: PathDef[] = [
     emoji: '🌱',
     accentVar: '--fam-sp',
     levels: CONFIANCE_LEVELS,
+  },
+  {
+    key: 'stress',
+    onboardingGoal: 'Gérer mon stress',
+    title: 'Gérer mon stress',
+    tagline: '15 niveaux qui s\'adaptent à toi, selon d\'où vient vraiment ton stress.',
+    emoji: '🌊',
+    accentVar: '--fam-nt',
+    levels: STRESS_LEVELS,
   },
 ];
 

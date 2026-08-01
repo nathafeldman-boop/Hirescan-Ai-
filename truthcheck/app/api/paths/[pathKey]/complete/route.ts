@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { parisDay } from '@/lib/chat';
 import { getPath, getLevel, type ExerciseContent } from '@/lib/paths';
+import { resolveLevelForUser } from '@/lib/pathBranching';
 import { canCompleteLevel } from '@/lib/pathAccess';
 import { generatePathInsight } from '@/lib/pathInsight';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
@@ -96,12 +97,16 @@ export async function POST(req: NextRequest, { params }: { params: { pathKey: st
     return NextResponse.json({ ok: true, alreadyDone: true, xpEarned: existing.xpEarned, insight: existing.insight });
   }
 
-  const { prompt, answer } = extractAnswer(level.content, body);
+  // Contenu réel pour CE compte (voir lib/pathBranching.ts) — sans ça, un
+  // niveau branché serait extrait/reflété avec la question de repli
+  // ("À découvrir") au lieu de la vraie question posée à l'écran.
+  const resolvedLevel = (await resolveLevelForUser(path.key, levelIndex, uid)) ?? level;
+  const { prompt, answer } = extractAnswer(resolvedLevel.content, body);
 
   const insight = answer
     ? await generatePathInsight({
         firstName: user?.name?.split(' ')[0] ?? null,
-        levelTitle: level.title,
+        levelTitle: resolvedLevel.title,
         exercisePrompt: prompt,
         userAnswer: answer,
         mbtiType: user?.mbtiType ?? null,
