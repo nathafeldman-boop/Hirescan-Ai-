@@ -7,6 +7,7 @@ import { parisDay } from '@/lib/chat';
 import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import { getPath, getLevel } from '@/lib/paths';
 import { canCompleteLevel, dailyEnergyFor } from '@/lib/pathAccess';
+import { resolveLevelForUser } from '@/lib/pathBranching';
 import LevelPlayerClient from './LevelPlayerClient';
 
 export const metadata: Metadata = {
@@ -49,9 +50,14 @@ export default async function LevelPage({ params }: { params: { pathKey: string;
   if (!access.allowed && access.reason === 'locked_sequence') redirect(`/parcours/${path.key}`);
   if (!access.allowed && access.reason === 'requires_subscription') redirect('/pricing');
 
+  // Contenu réel de ce niveau pour CE compte — identique au niveau statique
+  // sauf si `branch` est défini (voir lib/pathBranching.ts) : dans ce cas,
+  // le vrai texte dépend de la réponse donnée au niveau diagnostic.
+  const resolvedLevel = (await resolveLevelForUser(path.key, levelIndex, session.user.id)) ?? level;
+
   let recall: { title: string; answer: string } | null = null;
-  if (level.content.type === 'reflexion' && level.content.recallLevelIndex !== undefined) {
-    const recallIdx = level.content.recallLevelIndex;
+  if (resolvedLevel.content.type === 'reflexion' && resolvedLevel.content.recallLevelIndex !== undefined) {
+    const recallIdx = resolvedLevel.content.recallLevelIndex;
     const recallCompletion = pathCompletions.find((c) => c.levelIndex === recallIdx);
     const recallLevel = getLevel(path.key, recallIdx);
     if (recallCompletion?.answer && recallLevel) {
@@ -62,7 +68,7 @@ export default async function LevelPage({ params }: { params: { pathKey: string;
   return (
     <LevelPlayerClient
       pathKey={path.key}
-      level={level}
+      level={resolvedLevel}
       totalLevels={path.levels.length}
       alreadyCompleted={!!existing}
       existingAnswer={existing?.answer ?? null}
