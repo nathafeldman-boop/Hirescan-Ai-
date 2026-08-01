@@ -3,40 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import EmailProvider, { SendVerificationRequestParams } from 'next-auth/providers/email';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from './db';
-import { emailWelcome, sendEmail } from './emails';
-
-const OWNER_EMAIL = 'nathabuisseness@gmail.com';
-
-async function onUserCreated(user: { id: string; email?: string | null; name?: string | null }) {
-  if (!user.email) return;
-
-  // Send welcome email + log it
-  try {
-    const { subject, html } = emailWelcome(user.name ?? null);
-    await sendEmail(user.email, subject, html);
-    await prisma.emailLog.create({ data: { userId: user.id, type: 'welcome' } });
-  } catch (e) {
-    console.error('Welcome email failed:', e);
-  }
-
-  // Milestone alert every 30 users
-  try {
-    const count = await prisma.user.count();
-    if (count % 30 === 0) {
-      await sendEmail(
-        OWNER_EMAIL,
-        `🎉 Milestone : ${count} utilisateurs sur UrCecret !`,
-        `<div style="font-family:sans-serif;padding:24px;background:#09090b;color:#fff">
-          <h2 style="color:#a78bfa">🚀 ${count} utilisateurs !</h2>
-          <p style="color:#71717a">Le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</p>
-          <p style="color:#fff">Dernier inscrit : <strong>${user.email}</strong></p>
-        </div>`
-      );
-    }
-  } catch (e) {
-    console.error('Milestone email failed:', e);
-  }
-}
+import { notifyFirstSignIn } from './notifySignup';
 
 async function sendVerificationRequest({ identifier: email, url }: SendVerificationRequestParams) {
   const html = `<!DOCTYPE html>
@@ -128,16 +95,23 @@ export const authOptions: NextAuthOptions = {
     newUser: '/bienvenue',
   },
   events: {
-    async createUser({ user }) {
-      await onUserCreated({ id: user.id, email: user.email, name: user.name });
-    },
     // Ne couvre QUE les connexions qui passent par le flux NextAuth natif
     // (Google OAuth ici) — l'email OTP et les codes d'accès créent leur
     // session directement via Prisma (voir /api/auth/verify-code et
-    // /api/auth/redeem-code) et loggent SIGNED_IN eux-mêmes.
+    // /api/auth/redeem-code, qui appellent notifyFirstSignIn eux-mêmes) et
+    // loggent SIGNED_IN eux-mêmes.
+    //
+    // notifyFirstSignIn tourne ICI dans `signIn` (déclenché à CHAQUE
+    // connexion Google, neuve ou pas) plutôt que dans `createUser` seul
+    // (qui ne se déclenche QUE quand l'adaptateur Prisma crée la ligne User
+    // lui-même) : un compte Google peut déjà exister en base sans jamais
+    // avoir été "activé" (ex. ligne créée d'abord par /api/save-email lors
+    // d'un quiz anonyme) — createUser ne se redéclencherait pas pour lui.
+    // Idempotent via EmailLog, donc aucun risque de double envoi.
     async signIn({ user }) {
       const { logEvent, EVENTS } = await import('./trackEvent');
       await logEvent(user.id, EVENTS.SIGNED_IN, { method: 'google' });
+      await notifyFirstSignIn({ id: user.id, email: user.email, name: user.name });
     },
   },
   callbacks: {

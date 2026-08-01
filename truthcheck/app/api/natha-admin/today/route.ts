@@ -98,12 +98,17 @@ export async function GET() {
   const [visitsToday, landingToday, newToday, paidToday, online, visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
     prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
-    prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
+    // "Nouveau compte" = vraie activation (EmailLog de bienvenue, voir
+    // lib/notifySignup.ts), pas User.createdAt : un compte peut être créé "à
+    // blanc" un autre jour (ex. capture d'email anonyme pendant un quiz via
+    // /api/save-email) puis seulement activé aujourd'hui par une vraie
+    // connexion — createdAt raterait ce cas, EmailLog.sentAt non.
+    prisma.emailLog.count({ where: { type: 'welcome', sentAt: { gte: startOfToday } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
     getOnlineNow(now),
     prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
     prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
-    prisma.user.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
+    prisma.emailLog.findMany({ where: { type: 'welcome', sentAt: { gte: sevenDaysAgo } }, select: { sentAt: true } }),
     prisma.quizResult.findMany({ where: { paid: true, createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
   ]);
 
@@ -116,7 +121,7 @@ export async function GET() {
     onlineVisitors: online.visitors,
     visitsSpark: bucketByDay(visits7dRows, 7, todayParis),
     landingSpark: bucketByDay(landing7dRows, 7, todayParis),
-    signupsSpark: bucketByDay(signups7dRows, 7, todayParis),
+    signupsSpark: bucketByDay(signups7dRows.map((r) => ({ createdAt: r.sentAt })), 7, todayParis),
     paidSpark: bucketByDay(paid7dRows, 7, todayParis),
     updatedAt: now.toISOString(),
   });

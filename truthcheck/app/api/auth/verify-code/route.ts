@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
 import { resolvePostAuthDestination } from '@/lib/onboardingFunnel';
+import { notifyFirstSignIn } from '@/lib/notifySignup';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +50,10 @@ export async function POST(req: NextRequest) {
     update: { emailVerified: new Date() },
   });
   const needsOnboarding = !existing || !existing.onboardingCompletedAt;
+  // Ce flux crée/retrouve le compte via un upsert Prisma direct — jamais via
+  // l'adaptateur NextAuth — donc jamais notifié par events.createUser (voir
+  // lib/notifySignup.ts). Idempotent (EmailLog), donc sans risque à chaque connexion.
+  await notifyFirstSignIn({ id: user.id, email: user.email, name: user.name });
 
   // Crée directement une session NextAuth (strategy "database") + pose le cookie —
   // même mécanisme que /api/auth/redeem-code : on gère nous-mêmes la vérification

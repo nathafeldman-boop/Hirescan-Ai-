@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { mbtiTypes } from '@/lib/mbti-server';
 import { TIER_RANK } from '@/lib/plans';
 import { recordSaleConversion } from '@/lib/recordSale';
+import { notifyFirstSignIn } from '@/lib/notifySignup';
 import SuccessTracker from './SuccessTracker';
 import SuccessUpsellButton from './SuccessUpsellButton';
 import ShareResultCard from '@/components/ShareResultCard';
@@ -39,11 +40,16 @@ async function verifyAndUnlock(sessionId: string | undefined, resultId: string |
       const tier = plan === 'starter' ? 'starter' : plan === 'plus' ? 'plus' : isOneTimeMbtiUnlock ? 'unlocked' : 'premium';
       const existing = await prisma.user.findUnique({ where: { email }, select: { tier: true } }).catch(() => null);
       const shouldSet = !existing || (TIER_RANK[tier] ?? 0) >= (TIER_RANK[existing.tier] ?? 0);
-      await prisma.user.upsert({
+      const upserted = await prisma.user.upsert({
         where: { email },
         create: { email, name: session.customer_details?.name ?? null, tier },
         update: shouldSet ? { tier } : {},
-      }).catch(() => {});
+      }).catch(() => null);
+      // Un paiement Stripe peut être le TOUT premier contact avec ce compte
+      // (checkout invité, jamais passé par /login) — upsert direct, jamais
+      // notifié par events.createUser (voir lib/notifySignup.ts). Idempotent
+      // (EmailLog), donc sans risque pour un abonné déjà connu.
+      if (upserted) await notifyFirstSignIn(upserted);
     }
 
     // Commission affilié + notif admin + attribution (Conversion) — voir

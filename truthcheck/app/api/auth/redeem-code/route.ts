@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { randomBytes } from 'crypto';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
+import { notifyFirstSignIn } from '@/lib/notifySignup';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +34,10 @@ export async function POST(req: NextRequest) {
     },
     update: { tier: 'premium', emailVerified: new Date() },
   });
+
+  // Comme verify-code : upsert Prisma direct, jamais notifié par
+  // events.createUser (voir lib/notifySignup.ts). Idempotent (EmailLog).
+  await notifyFirstSignIn({ id: user.id, email: user.email, name: user.name });
 
   // Mark the code used
   await prisma.accessCode.update({
