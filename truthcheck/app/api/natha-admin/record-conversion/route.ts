@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { prisma } from '@/lib/db';
+import { TIER_RANK } from '@/lib/plans';
+
+// Même mapping que app/success/page.tsx (verifyAndUnlock) — un paiement réel
+// qui n'a jamais tourné par ce chemin ne doit pas non plus laisser le compte
+// en 'free' une fois rattrapé à la main.
+function tierForProductType(productType: string): string {
+  if (productType === 'starter') return 'starter';
+  if (productType === 'plus') return 'plus';
+  if (productType === 'onetime') return 'unlocked';
+  return 'premium'; // 'monthly' et toute autre offre payante
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +50,17 @@ export async function POST(req: NextRequest) {
   const conversion = await prisma.conversion.create({
     data: { stripeSessionId, email, amountCents, productType, affiliateSlug, createdAt },
   });
+
+  // Root cause du badge "Gratuit" resté affiché après un rattrapage manuel :
+  // cette route ne touchait jamais User.tier (seul verifyAndUnlock côté
+  // /success le fait pour un paiement qui passe par le vrai flux Stripe).
+  // Upgrade-only comme /success : jamais de downgrade d'un tier déjà plus
+  // élevé (ex. un compte déjà Premium ne redescend pas en Starter).
+  const tier = tierForProductType(productType);
+  const existing = await prisma.user.findUnique({ where: { email }, select: { tier: true } });
+  if (existing && (TIER_RANK[tier] ?? 0) > (TIER_RANK[existing.tier] ?? 0)) {
+    await prisma.user.update({ where: { email }, data: { tier } });
+  }
 
   let affiliateCredited = false;
   if (affiliateSlug) {
