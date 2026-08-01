@@ -56,13 +56,15 @@ export default async function DecouvertePage() {
   // le tier, ce qui est déjà visible via le badge "quêtes en attente").
   const lastViewed = user?.questsLastViewedAt ?? new Date(0);
   const hasNewQuests = pendingGenerated.some((g) => g.createdAt > lastViewed);
-  const hasPendingQuests = pendingCatalogCount > 0 || pendingGenerated.length > 0;
+  const pendingQuestsCount = pendingCatalogCount + pendingGenerated.length;
+  const hasPendingQuests = pendingQuestsCount > 0;
 
   return (
     <DecouverteClient
       firstName={user?.name?.split(' ')[0] ?? null}
       hasNewQuests={hasNewQuests}
       hasPendingQuests={hasPendingQuests}
+      pendingQuestsCount={pendingQuestsCount}
     />
   );
 }
