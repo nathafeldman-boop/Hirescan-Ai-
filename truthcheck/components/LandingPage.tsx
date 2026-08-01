@@ -9,10 +9,7 @@ import TypeEmblem from './TypeEmblem';
 import ReviewsMarquee from './ReviewsMarquee';
 import CosmicBackdrop from './CosmicBackdrop';
 import CardCarousel from './CardCarousel';
-import PhoneMockup from './PhoneMockup';
-import MbtiDemoScreen from './landing-demos/MbtiDemoScreen';
-import ElioDemoScreen from './landing-demos/ElioDemoScreen';
-import JournalDemoScreen from './landing-demos/JournalDemoScreen';
+import FeatureCarousel from './FeatureCarousel';
 
 const GROUPS = [
   {
@@ -189,90 +186,19 @@ export default function LandingPage() {
       </section>
 
       {/* ═══ 3 façons de te comprendre — additif au switch du hero (on ne le
-          retire pas). Chaque feature a maintenant sa PROPRE section, avec son
-          propre décor animé et son mockup téléphone qui rejoue un "gameplay"
-          scripté (aucune vraie donnée, aucun compte requis) — pas 3 fois la
-          même carte. Toutes les démos sont dans components/landing-demos/. ═══ */}
+          retire pas). Les 3 démos ("gameplay" scripté, aucune vraie donnée,
+          aucun compte requis) tenaient chacune une section pleine largeur
+          empilée — regroupées en un seul carrousel horizontal pour ne pas
+          forcer 3 écrans de scroll pour les voir toutes. Toutes les démos
+          sont dans components/landing-demos/, le carrousel dans
+          components/FeatureCarousel.tsx. ═══ */}
       <p className="ur-label text-[10px] text-center pt-6" style={{ color: CLAY }}>Une application, pas juste un test</p>
-      <h2 className="font-display text-2xl font-black text-stone-900 text-center mt-2 px-6">
+      <h2 className="font-display text-2xl font-black text-stone-900 text-center mt-2 px-6 mb-6">
         UrCecret, c&apos;est 3 façons de te comprendre
       </h2>
-
-      {/* ── 🧠 Test MBTI — glow doré qui respire ── */}
-      <section className="relative z-10 py-14 px-6 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="landing-decor-anim absolute left-1/2 top-1/3 -translate-x-1/2 w-72 h-72 rounded-full blur-3xl" style={{ background: 'var(--gold)', opacity: 0.12, animation: 'pulseGlow 5s ease-in-out infinite' }} />
-        </div>
-        <div className="relative max-w-lg mx-auto text-center">
-          <p className="ur-label text-[10px] mb-3" style={{ color: CLAY }}>🧠 Test de personnalité</p>
-          <h3 className="font-display text-2xl font-black text-stone-900 mb-3">Découvre qui tu es, vraiment</h3>
-          <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: '#78716c', lineHeight: 1.6 }}>
-            Basé sur les 8 fonctions cognitives de Carl Jung. Réponds honnêtement, Elio s&apos;occupe du reste.
-          </p>
-          <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite' }}>
-            <PhoneMockup><MbtiDemoScreen /></PhoneMockup>
-          </div>
-          <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
-            Faire mon test →
-          </Link>
-        </div>
+      <section className="relative z-10 pb-14 px-6">
+        <FeatureCarousel />
       </section>
-
-      {/* ── 🤖 Elio — fond encre, décor cosmique ── */}
-      <section className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--ink)' }}>
-        <CosmicBackdrop />
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="landing-decor-anim absolute right-8 top-10 w-56 h-56 rounded-full blur-3xl" style={{ background: 'var(--gold)', opacity: 0.1, animation: 'floatBlob 8s ease-in-out infinite' }} />
-        </div>
-        <div className="relative max-w-lg mx-auto text-center">
-          <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>🤖 Ton IA personnelle</p>
-          <h3 className="font-display text-2xl font-black mb-3" style={{ color: '#FAF6EC' }}>Une IA qui apprend à te connaître</h3>
-          <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: 'rgba(250,246,236,0.55)', lineHeight: 1.6 }}>
-            Analyse une conversation, comprend tes émotions, crée des tests personnalisés, répond à tes questions.
-          </p>
-          <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .3s' }}>
-            <PhoneMockup dark><ElioDemoScreen /></PhoneMockup>
-          </div>
-          <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
-            Découvrir Elio →
-          </Link>
-        </div>
-      </section>
-
-      {/* ── 📖 Journal émotionnel — chaleureux, particules flottantes ── */}
-      <section className="relative z-10 py-14 px-6 overflow-hidden" style={{ background: 'var(--paper-panel)' }}>
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          {[
-            { l: '12%', t: '15%', e: '😄', d: '0s' }, { l: '80%', t: '20%', e: '🙂', d: '1.4s' },
-            { l: '25%', t: '70%', e: '😊', d: '.7s' }, { l: '70%', t: '65%', e: '✦', d: '2.1s' },
-          ].map((p, i) => (
-            <span key={i} className="landing-decor-anim absolute text-xl opacity-20" style={{ left: p.l, top: p.t, animation: `floatUp 7s ease-in-out ${p.d} infinite` }}>{p.e}</span>
-          ))}
-        </div>
-        <div className="relative max-w-lg mx-auto text-center">
-          <p className="ur-label text-[10px] mb-3" style={{ color: CLAY }}>📖 Journal émotionnel</p>
-          <h3 className="font-display text-2xl font-black text-stone-900 mb-3">Note ton humeur, découvre ton évolution</h3>
-          <p className="text-sm mb-7 max-w-xs mx-auto" style={{ color: '#78716c', lineHeight: 1.6 }}>
-            Un calendrier qui se remplit chaque jour, et Elio qui repère tes tendances au fil du temps.
-          </p>
-          <div className="landing-decor-anim mb-8" style={{ animation: 'demoFloat 6s ease-in-out infinite .6s' }}>
-            <PhoneMockup><JournalDemoScreen /></PhoneMockup>
-          </div>
-          <Link href="/decouverte" className="ur-btn-gold inline-flex px-7 py-3.5 text-sm">
-            Commencer mon journal →
-          </Link>
-        </div>
-      </section>
-
-      <style>{`
-        @keyframes pulseGlow { 0%, 100% { opacity:.1; transform:translate(-50%,0) scale(1) } 50% { opacity:.2; transform:translate(-50%,0) scale(1.15) } }
-        @keyframes floatBlob { 0%, 100% { transform:translateY(0) } 50% { transform:translateY(20px) } }
-        @keyframes floatUp { 0%, 100% { transform:translateY(0); opacity:.15 } 50% { transform:translateY(-14px); opacity:.3 } }
-        @keyframes demoFloat { 0%, 100% { transform:translateY(0) } 50% { transform:translateY(-8px) } }
-        @media (prefers-reduced-motion: reduce) {
-          .landing-decor-anim { animation: none !important; }
-        }
-      `}</style>
 
       {/* ── Pourquoi c'est différent — rangées éditoriales, pas des cartes ── */}
       <section className="relative z-10 pb-12 px-6">
