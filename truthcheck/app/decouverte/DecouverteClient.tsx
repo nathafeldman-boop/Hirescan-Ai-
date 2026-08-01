@@ -119,11 +119,12 @@ function CardVisual({ href }: { href: string }) {
 }
 
 export default function DecouverteClient({
-  firstName, hasNewQuests, hasPendingQuests,
+  firstName, hasNewQuests, hasPendingQuests, pendingQuestsCount,
 }: {
   firstName: string | null;
   hasNewQuests: boolean;
   hasPendingQuests: boolean;
+  pendingQuestsCount: number;
 }) {
   // Respecte prefers-reduced-motion pour l'animation "flotte" posée en style
   // inline (une media query CSS ne peut pas l'écraser, contrairement aux
@@ -156,12 +157,12 @@ export default function DecouverteClient({
         .hub-card:hover .hub-card-glow { opacity: 1; }
         @keyframes questFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         @keyframes questPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,163,74,0.45); } 70% { box-shadow: 0 0 0 10px rgba(201,163,74,0); } }
-        .quest-badge--new { animation: questPulse 2s ease-out infinite; }
+        .quest-badge--pulse { animation: questPulse 2s ease-out infinite; }
         @media (prefers-reduced-motion: reduce) {
           .hub-up { opacity: 1; animation: none; }
           .hub-card, .hub-card-icon, .hub-card-arrow { transition: none; }
           .hub-card:hover { transform: none; }
-          .quest-badge--new { animation: none; }
+          .quest-badge--pulse { animation: none; }
         }
       `}</style>
 
@@ -246,18 +247,23 @@ export default function DecouverteClient({
                   <div className="absolute top-4 right-4 flex items-center gap-1.5">
                     {hasNewQuests && (
                       <span
-                        className="quest-badge--new text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full"
+                        className="quest-badge--pulse text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full"
                         style={{ background: 'var(--gold)', color: 'var(--ink)' }}
                       >
                         Nouveau
                       </span>
                     )}
+                    {/* Volontairement PAS un ton d'alerte (rouge/⚠️) : "pas fini" se lit
+                        comme un reproche, ça donne envie de fuir, pas de cliquer. Le
+                        cadenas + le compte précis jouent sur la curiosité ("qu'est-ce
+                        qu'il y a derrière ?") plutôt que la culpabilité — même famille
+                        dorée que "Nouveau", même pulse pour capter l'œil. */}
                     {!hasNewQuests && hasPendingQuests && (
                       <span
-                        className="text-[10px] font-bold px-2 py-1 rounded-full"
-                        style={{ background: 'rgba(220,38,38,0.1)', color: '#dc2626', border: '1px solid rgba(220,38,38,0.25)' }}
+                        className="quest-badge--pulse text-[10px] font-bold px-2.5 py-1 rounded-full"
+                        style={{ background: 'var(--gold)', color: 'var(--ink)' }}
                       >
-                        ⚠️ Pas fini
+                        🔒 {pendingQuestsCount} à débloquer
                       </span>
                     )}
                   </div>
