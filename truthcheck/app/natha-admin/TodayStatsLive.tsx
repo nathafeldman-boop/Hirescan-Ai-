@@ -1,6 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+
+interface OnlineVisitor {
+  userId: string | null;
+  label: string;
+  page: string;
+}
 
 interface TodayStats {
   visitsToday: number;
@@ -8,6 +15,7 @@ interface TodayStats {
   newToday: number;
   paidToday: number;
   onlineNow: number;
+  onlineVisitors: OnlineVisitor[];
   visitsSpark: number[];
   landingSpark: number[];
   signupsSpark: number[];
@@ -134,25 +142,50 @@ export default function TodayStatsLive({ initial }: { initial: TodayStats }) {
         }
       `}</style>
 
-      {/* "En ligne maintenant" — visiteurs distincts (visitorId anonyme, ou
-          compte si connecté) ayant chargé une page dans les 5 dernières
-          minutes (voir /api/natha-admin/today::countOnlineNow). Sert
-          justement à voir si quelqu'un est en train de repartir puis de
-          revenir sur l'appli, pas juste le total du jour. */}
-      <div style={{ ...block, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 14, background: stats.onlineNow > 0 ? 'rgba(26,158,70,0.06)' : C.surface, border: `1px solid ${stats.onlineNow > 0 ? 'rgba(26,158,70,0.25)' : C.border}` }}>
-        <span
-          style={{
-            width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
-            background: stats.onlineNow > 0 ? C.good : C.faint,
-            animation: stats.onlineNow > 0 ? 'natha-live-pulse 1.6s ease-in-out infinite' : 'none',
-          }}
-        />
-        <div>
-          <p style={{ ...bigNum, margin: 0, fontSize: 22, color: stats.onlineNow > 0 ? C.good : C.text }}>
-            {stats.onlineNow} {stats.onlineNow > 1 ? 'personnes en ligne' : 'personne en ligne'}
-          </p>
-          <p style={sub}>actives dans les 5 dernières minutes</p>
+      {/* "En ligne maintenant" — pas juste combien, mais QUI : visiteurs
+          distincts (compte si connecté, sinon "Visiteur anonyme") ayant
+          chargé une page dans les 5 dernières minutes (voir
+          /api/natha-admin/today::getOnlineNow). Sert justement à voir si
+          quelqu'un est en train de repartir puis de revenir sur l'appli,
+          pas juste le total du jour. */}
+      <div style={{ ...block, marginBottom: 10, background: stats.onlineNow > 0 ? 'rgba(26,158,70,0.06)' : C.surface, border: `1px solid ${stats.onlineNow > 0 ? 'rgba(26,158,70,0.25)' : C.border}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <span
+            style={{
+              width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+              background: stats.onlineNow > 0 ? C.good : C.faint,
+              animation: stats.onlineNow > 0 ? 'natha-live-pulse 1.6s ease-in-out infinite' : 'none',
+            }}
+          />
+          <div>
+            <p style={{ ...bigNum, margin: 0, fontSize: 22, color: stats.onlineNow > 0 ? C.good : C.text }}>
+              {stats.onlineNow} {stats.onlineNow > 1 ? 'personnes en ligne' : 'personne en ligne'}
+            </p>
+            <p style={sub}>actives dans les 5 dernières minutes</p>
+          </div>
         </div>
+
+        {stats.onlineVisitors.length > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(26,158,70,0.2)' }}>
+            {stats.onlineVisitors.map((v, i) => {
+              const row = (
+                <>
+                  <span style={{ fontSize: 13.5, fontWeight: 600, color: C.text }}>{v.label}</span>
+                  <span style={{ fontSize: 12, color: C.muted }}>{v.page}</span>
+                </>
+              );
+              const rowStyle: React.CSSProperties = {
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+                padding: '5px 0',
+              };
+              return v.userId ? (
+                <Link key={i} href={`/natha-admin/user/${v.userId}`} style={{ ...rowStyle, textDecoration: 'none' }}>{row}</Link>
+              ) : (
+                <div key={i} style={rowStyle}>{row}</div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 8 }}>

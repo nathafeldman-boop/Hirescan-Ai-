@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { pageLabel } from '@/lib/userActivity';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,13 +44,49 @@ function bucketByDay(rows: { createdAt: Date }[], days: number, todayYMD: string
 // 5 min est le compromis standard pour ce genre d'indicateur "live".
 const ONLINE_WINDOW_MS = 5 * 60 * 1000;
 
-async function countOnlineNow(now: Date): Promise<number> {
+export interface OnlineVisitor {
+  userId: string | null;
+  label: string;
+  page: string;
+}
+
+// "Qui" est en ligne, pas juste "combien" — un compte connecté est identifié
+// par nom/email et pointe vers sa fiche ; un visiteur anonyme reste "Visiteur
+// anonyme" (visitorId n'est qu'un identifiant technique, jamais une identité).
+// Une ligne par visiteur distinct = sa page la PLUS RÉCENTE dans la fenêtre
+// (rows déjà triées par createdAt desc, donc le premier match par clé gagne).
+async function getOnlineNow(now: Date): Promise<{ count: number; visitors: OnlineVisitor[] }> {
   const rows = await prisma.pageView.findMany({
     where: { createdAt: { gte: new Date(now.getTime() - ONLINE_WINDOW_MS) } },
-    select: { visitorId: true, userId: true },
+    select: { visitorId: true, userId: true, path: true },
+    orderBy: { createdAt: 'desc' },
   });
-  const distinct = new Set(rows.map((r) => r.visitorId ?? r.userId).filter((v): v is string => !!v));
-  return distinct.size;
+
+  const seen = new Set<string>();
+  const latestByVisitor: { key: string; userId: string | null; path: string }[] = [];
+  for (const r of rows) {
+    const key = r.userId ?? r.visitorId;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    latestByVisitor.push({ key, userId: r.userId, path: r.path });
+  }
+
+  const userIds = latestByVisitor.map((v) => v.userId).filter((id): id is string => !!id);
+  const users = userIds.length
+    ? await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, name: true, email: true } })
+    : [];
+  const userById = new Map(users.map((u) => [u.id, u]));
+
+  const visitors: OnlineVisitor[] = latestByVisitor.map((v) => {
+    const user = v.userId ? userById.get(v.userId) : null;
+    return {
+      userId: v.userId,
+      label: user ? (user.name || user.email || 'Compte') : 'Visiteur anonyme',
+      page: pageLabel(v.path),
+    };
+  });
+
+  return { count: visitors.length, visitors };
 }
 
 export async function GET() {
@@ -58,12 +95,12 @@ export async function GET() {
   const startOfToday = parisMidnight(todayParis);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const [visitsToday, landingToday, newToday, paidToday, onlineNow, visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
+  const [visitsToday, landingToday, newToday, paidToday, online, visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
     prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
     prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
-    countOnlineNow(now),
+    getOnlineNow(now),
     prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
     prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
     prisma.user.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
@@ -75,7 +112,8 @@ export async function GET() {
     landingToday,
     newToday,
     paidToday,
-    onlineNow,
+    onlineNow: online.count,
+    onlineVisitors: online.visitors,
     visitsSpark: bucketByDay(visits7dRows, 7, todayParis),
     landingSpark: bucketByDay(landing7dRows, 7, todayParis),
     signupsSpark: bucketByDay(signups7dRows, 7, todayParis),

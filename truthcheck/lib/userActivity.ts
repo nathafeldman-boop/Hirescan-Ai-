@@ -23,6 +23,14 @@ const PAGE_LABELS: Record<string, string> = {
   '/tests': 'Guides relationnels',
 };
 
+// Label lisible d'un chemin — utilisé aussi par la liste "En ligne
+// maintenant" du dashboard (/natha-admin), pas seulement la timeline de la
+// fiche compte. Retombe sur le chemin brut plutôt que sur describeVisit()
+// (qui gère aussi les chemins synthétiques /__quiz/…, hors-sujet ici).
+export function pageLabel(path: string): string {
+  return PAGE_LABELS[path] ?? path;
+}
+
 // Origine du compte — "affilié" vs "extérieur", tout simplement. `source` vient
 // déjà de /api/track (aff:<slug> | utm_source | hôte du referrer | direct),
 // calculé au moment de la toute première visite — on prend juste la PLUS

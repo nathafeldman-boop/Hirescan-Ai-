@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import AccessCodeWidget from './AccessCodeWidget';
 import TodayStatsLive from './TodayStatsLive';
-import { describeOrigin } from '@/lib/userActivity';
+import { describeOrigin, pageLabel } from '@/lib/userActivity';
 
 export const metadata: Metadata = {
   title: 'Mon tableau de bord',
@@ -198,14 +198,37 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
   const signupsSpark = bucketByDay(signups7dRows, 7, todayParis);
   const paidSpark     = bucketByDay(paid7dRows, 7, todayParis);
 
-  // "En ligne maintenant" — juste la valeur au moment du rendu serveur, pour
-  // que la case ne parte pas de 0 avant le premier poll de TodayStatsLive
-  // (voir /api/natha-admin/today::countOnlineNow, même calcul).
+  // "En ligne maintenant" — qui, pas juste combien — juste la valeur au
+  // moment du rendu serveur, pour que la case ne parte pas de 0/vide avant
+  // le premier poll de TodayStatsLive (voir /api/natha-admin/today::getOnlineNow,
+  // même calcul).
   const onlineNowRows = await prisma.pageView.findMany({
     where: { createdAt: { gte: new Date(now.getTime() - 5 * 60 * 1000) } },
-    select: { visitorId: true, userId: true },
+    select: { visitorId: true, userId: true, path: true },
+    orderBy: { createdAt: 'desc' },
   });
-  const onlineNow = new Set(onlineNowRows.map((r) => r.visitorId ?? r.userId).filter((v): v is string => !!v)).size;
+  const onlineSeen = new Set<string>();
+  const onlineLatest: { key: string; userId: string | null; path: string }[] = [];
+  for (const r of onlineNowRows) {
+    const key = r.userId ?? r.visitorId;
+    if (!key || onlineSeen.has(key)) continue;
+    onlineSeen.add(key);
+    onlineLatest.push({ key, userId: r.userId, path: r.path });
+  }
+  const onlineUserIds = onlineLatest.map((v) => v.userId).filter((id): id is string => !!id);
+  const onlineUsers = onlineUserIds.length
+    ? await prisma.user.findMany({ where: { id: { in: onlineUserIds } }, select: { id: true, name: true, email: true } })
+    : [];
+  const onlineUserById = new Map(onlineUsers.map((u) => [u.id, u]));
+  const onlineVisitors = onlineLatest.map((v) => {
+    const user = v.userId ? onlineUserById.get(v.userId) : null;
+    return {
+      userId: v.userId,
+      label: user ? (user.name || user.email || 'Compte') : 'Visiteur anonyme',
+      page: pageLabel(v.path),
+    };
+  });
+  const onlineNow = onlineVisitors.length;
 
   // Quiz drop-off funnel (MBTI personnalite)
   // Note : pas de step "Q10" ici — le tracker de milestones (PersonnaliteClient.tsx)
@@ -462,7 +485,7 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
         <p style={sectionHeading}>Aujourd&apos;hui</p>
         <TodayStatsLive
           initial={{
-            visitsToday, landingToday, newToday, paidToday, onlineNow,
+            visitsToday, landingToday, newToday, paidToday, onlineNow, onlineVisitors,
             visitsSpark, landingSpark, signupsSpark, paidSpark,
             updatedAt: now.toISOString(),
           }}
