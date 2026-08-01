@@ -95,6 +95,13 @@ model User {
   onboardingGoal        String?   // objectif principal, choix unique — voir lib/onboardingFunnel.ts::ONBOARDING_GOALS
   onboardingCompletedAt DateTime?
 
+  // ── Visite guidée (juste après le 1er Journal, avant le hub /decouverte) ──
+  // But produit : personne n'atteint le hub sans avoir déjà essayé Elio, le
+  // test MBTI et le Parcours — voir lib/funnelGate.ts::isTourPending. Même
+  // sémantique que onboardingCompletedAt (nullable, posé une seule fois, ne
+  // se "dépose" jamais) — voir app/decouverte/tour/page.tsx.
+  tourCompletedAt DateTime?
+
   // ── Rappel quotidien (Journal) ──
   // MVP volontairement basé sur l'email (infra déjà éprouvée, voir
   // app/api/cron/journal-reminder/route.ts) plutôt que sur une vraie
@@ -127,6 +134,7 @@ model User {
   questCompletions QuestCompletion[]
   generatedQuests  GeneratedQuest[]
   levelCompletions LevelCompletion[]
+  dailyQuestCompletions DailyQuestCompletion[]
 }
 
 // ── Quêtes ────────────────────────────────────────────────────────────────
@@ -167,6 +175,39 @@ model GeneratedQuest {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+}
+
+// ── Quête du jour ─────────────────────────────────────────────────────────
+// UNE ligne par jour (day = "YYYY-MM-DD" fuseau Paris, voir parisDay()),
+// PARTAGÉE par tous les comptes — contrairement à GeneratedQuest (personnalisée
+// par compte), ici il n'y a qu'une seule quête, générée une fois à minuit par
+// un cron (voir app/api/cron/daily-quest/route.ts) via Mistral, jamais
+// régénérée dans la journée. `actionType` fixe QUELLE action réelle compte
+// comme "faite" (journal | chat | parcours) — texte variable, détection fixe
+// et fiable, jamais une case à cocher manuelle (voir lib/dailyQuest.ts).
+model DailyQuest {
+  id          String   @id @default(cuid())
+  day         String   @unique
+  actionType  String   // 'journal' | 'chat' | 'parcours'
+  title       String
+  description String   @db.Text
+  emoji       String
+  createdAt   DateTime @default(now())
+}
+
+// Une ligne = "userId a rempli la quête du jour `day`" — recalculée en live à
+// chaque affichage du hub à partir de la vraie action sous-jacente (comme
+// QuestCompletion), jamais un flag posé à la main.
+model DailyQuestCompletion {
+  id        String   @id @default(cuid())
+  userId    String
+  day       String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
   @@index([userId])
 }
 

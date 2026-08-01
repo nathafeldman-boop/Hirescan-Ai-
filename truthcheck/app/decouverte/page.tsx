@@ -3,9 +3,10 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
+import { resolveFunnelStep, funnelStepPath, isTourPending } from '@/lib/funnelGate';
 import { QUEST_CATALOG } from '@/lib/quests';
 import { hasPremiumAccess } from '@/lib/plans';
+import { getOrCreateTodayDailyQuest, checkAndRecordDailyQuestCompletion } from '@/lib/dailyQuest';
 import DecouverteClient from './DecouverteClient';
 
 export const metadata: Metadata = {
@@ -28,14 +29,23 @@ export default async function DecouvertePage() {
 
   const pendingStep = await resolveFunnelStep(session.user.id);
   if (pendingStep) redirect(funnelStepPath(pendingStep));
+  // Visite guidée (Elio/Test/Parcours) avant le hub — voir app/decouverte/tour
+  // et le commentaire dans lib/funnelGate.ts sur pourquoi ce n'est PAS fusionné
+  // dans resolveFunnelStep.
+  if (await isTourPending(session.user.id)) redirect('/decouverte/tour');
 
-  const [user, completions, generatedQuests] = await Promise.all([
+  // Récupérée d'abord seule : sa complétion (ci-dessous) dépend de son
+  // actionType/day, donc pas dans le même Promise.all que le reste.
+  const dailyQuest = await getOrCreateTodayDailyQuest();
+
+  const [user, completions, generatedQuests, dailyQuestDone] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: { name: true, mbtiType: true, tier: true, questsLastViewedAt: true },
     }),
     prisma.questCompletion.findMany({ where: { userId: session.user.id }, select: { questKey: true } }),
     prisma.generatedQuest.findMany({ where: { userId: session.user.id }, select: { completedAt: true, createdAt: true } }),
+    checkAndRecordDailyQuestCompletion(session.user.id, dailyQuest),
   ]);
 
   const isPremium = hasPremiumAccess(user?.tier ?? 'free');
@@ -59,12 +69,15 @@ export default async function DecouvertePage() {
   const pendingQuestsCount = pendingCatalogCount + pendingGenerated.length;
   const hasPendingQuests = pendingQuestsCount > 0;
 
+  const dailyQuestHref = dailyQuest.actionType === 'chat' ? '/chat' : dailyQuest.actionType === 'parcours' ? '/parcours' : '/journal';
+
   return (
     <DecouverteClient
       firstName={user?.name?.split(' ')[0] ?? null}
       hasNewQuests={hasNewQuests}
       hasPendingQuests={hasPendingQuests}
       pendingQuestsCount={pendingQuestsCount}
+      dailyQuest={{ title: dailyQuest.title, description: dailyQuest.description, emoji: dailyQuest.emoji, done: dailyQuestDone, href: dailyQuestHref }}
     />
   );
 }
