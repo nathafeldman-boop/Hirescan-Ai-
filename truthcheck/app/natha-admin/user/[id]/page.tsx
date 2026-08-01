@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import { describeVisit, describeAppEvent, describeOrigin, groupSessions, type VisitEvent } from '@/lib/userActivity';
 import RecordConversionForm from './RecordConversionForm';
+import DeletePaymentButton from './DeletePaymentButton';
 
 export const metadata: Metadata = {
   title: 'Fiche utilisateur',
@@ -76,7 +77,7 @@ export default async function UserActivityPage({ params }: { params: { id: strin
     // Lié par email (Conversion n'a pas de userId) : Stripe et NextAuth
     // normalisent tous les deux en minuscules, la correspondance est fiable.
     user.email
-      ? prisma.conversion.findMany({ where: { email: user.email }, select: { amountCents: true, productType: true, createdAt: true }, orderBy: { createdAt: 'asc' } })
+      ? prisma.conversion.findMany({ where: { email: user.email }, select: { id: true, amountCents: true, productType: true, createdAt: true }, orderBy: { createdAt: 'asc' } })
       : Promise.resolve([]),
   ]);
 
@@ -163,14 +164,20 @@ export default async function UserActivityPage({ params }: { params: { id: strin
           </div>
           {payments.length > 0 && (
             <div style={{ flex: 1, minWidth: 220 }}>
-              {payments.map((p, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '5px 0', borderBottom: i < payments.length - 1 ? `1px solid ${C.borderSoft}` : 'none' }}>
-                  <span style={{ fontSize: 12.5, color: C.muted }}>
-                    {fmtDate(p.createdAt)} · {PRODUCT_TYPE_LABEL[p.productType ?? ''] ?? p.productType ?? '—'}
-                  </span>
-                  <span style={{ fontSize: 12.5, fontWeight: 700, color: C.text }}>{euros(p.amountCents)}</span>
-                </div>
-              ))}
+              {payments.map((p, i) => {
+                const typeLabel = PRODUCT_TYPE_LABEL[p.productType ?? ''] ?? p.productType ?? '—';
+                return (
+                  <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '5px 0', borderBottom: i < payments.length - 1 ? `1px solid ${C.borderSoft}` : 'none' }}>
+                    <span style={{ fontSize: 12.5, color: C.muted }}>
+                      {fmtDate(p.createdAt)} · {typeLabel}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: C.text }}>{euros(p.amountCents)}</span>
+                      <DeletePaymentButton id={p.id} summary={`${fmtDate(p.createdAt)} · ${typeLabel} · ${euros(p.amountCents)}`} />
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
           {user.email && <RecordConversionForm email={user.email} defaultAffiliateSlug={originAffiliateSlug} />}
