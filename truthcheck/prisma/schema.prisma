@@ -95,13 +95,6 @@ model User {
   onboardingGoal        String?   // objectif principal, choix unique — voir lib/onboardingFunnel.ts::ONBOARDING_GOALS
   onboardingCompletedAt DateTime?
 
-  // ── Visite guidée (juste après le 1er Journal, avant le hub /decouverte) ──
-  // But produit : personne n'atteint le hub sans avoir déjà essayé Elio, le
-  // test MBTI et le Parcours — voir lib/funnelGate.ts::isTourPending. Même
-  // sémantique que onboardingCompletedAt (nullable, posé une seule fois, ne
-  // se "dépose" jamais) — voir app/decouverte/tour/page.tsx.
-  tourCompletedAt DateTime?
-
   // ── Rappel quotidien (Journal) ──
   // MVP volontairement basé sur l'email (infra déjà éprouvée, voir
   // app/api/cron/journal-reminder/route.ts) plutôt que sur une vraie
