@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { callMistral, dailyLimitFor, parisDay, FREE_DAILY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
+import { callMistral, dailyLimitFor, parisDay, parisMonth, FREE_MONTHLY_LIMIT, MAX_HISTORY, ChatMessage } from '@/lib/chat';
 import { buildCoachContext, coachSystemPrompt, coachSystemPromptFree, coachSystemPromptFreeNoTest } from '@/lib/coach';
 import { summarizeJournalForAnalysis } from '@/lib/advancedAnalysis';
 import { generateQuiz } from '@/lib/customQuiz';
@@ -26,6 +26,18 @@ const DISPLAY_HISTORY = 40;
 // plafonnée pour rester raisonnable en coût/latence (~4,5 Mo décodés).
 const MAX_IMAGE_DATA_URI_LENGTH = 6_000_000;
 
+// Usage gratuit = somme de toutes les lignes ChatUsage du mois courant (Paris),
+// pas juste celle du jour — le compte gratuit a un quota MENSUEL (voir
+// FREE_MONTHLY_LIMIT dans lib/chat.ts), les lignes restent au jour près pour
+// rester compatibles avec le quota journalier des paliers payants.
+async function getFreeMonthlyUsage(userId: string): Promise<number> {
+  const rows = await prisma.chatUsage.findMany({
+    where: { userId, day: { startsWith: parisMonth() } },
+    select: { count: true },
+  }).catch(() => []);
+  return rows.reduce((sum, r) => sum + r.count, 0);
+}
+
 // ── GET : recharge l'historique + l'état (quota, profil présent) ──
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -39,15 +51,19 @@ export async function GET() {
     where: { id: uid },
     select: { mbtiType: true, chatBonusCredits: true, chatBonusDaily: true },
   }).catch(() => null);
-  // Quota journalier pour tout le monde, gratuit compris (voir lib/chat.ts).
+  // Palier payant → quota journalier (voir lib/chat.ts) ; gratuit → quota
+  // MENSUEL, somme de tout le mois courant plutôt qu'une seule journée.
   const day = parisDay();
-  const usage = await prisma.chatUsage.findUnique({ where: { userId_day: { userId: uid, day } } }).catch(() => null);
+  const usage = isPremium
+    ? await prisma.chatUsage.findUnique({ where: { userId_day: { userId: uid, day } } }).catch(() => null)
+    : null;
+  const usedCount = isPremium ? (usage?.count ?? 0) : await getFreeMonthlyUsage(uid);
   // Quota = base (palier) + bonus permanent parrainage — RÉSERVÉ aux abonnés
-  // payants. Un compte gratuit a un mur STRICT à FREE_DAILY_LIMIT (3), sans
+  // payants. Un compte gratuit a un mur STRICT à FREE_MONTHLY_LIMIT (3), sans
   // aucun bonus (parrainage ou récompense de quête) qui le repousserait :
   // demande explicite, le funnel post-MBTI dépend de ce vrai mur pour
   // rediriger vers l'abonnement ou le Parcours (voir ChatClient.tsx).
-  const limit = isPremium ? dailyLimitFor(tier) + (user?.chatBonusDaily ?? 0) : FREE_DAILY_LIMIT;
+  const limit = isPremium ? dailyLimitFor(tier) + (user?.chatBonusDaily ?? 0) : FREE_MONTHLY_LIMIT;
   // Compte gratuit → coach bridé : on ne renvoie NI le type (header) NI l'historique
   // (qui pourrait contenir un ancien message révélant le type). Le résultat payant
   // reste derrière le paiement ; le coach fonctionne mais en version découverte.
@@ -65,7 +81,7 @@ export async function GET() {
     mbtiType: isPremium ? (user?.mbtiType ?? null) : null,
     free: !isPremium,
     messages: rows.reverse(),
-    remaining: Math.max(0, limit - (usage?.count ?? 0)) + (isPremium ? (user?.chatBonusCredits ?? 0) : 0),
+    remaining: Math.max(0, limit - usedCount) + (isPremium ? (user?.chatBonusCredits ?? 0) : 0),
     limit,
     // Lien de parrainage : +3 messages à l'inscription d'un invité, +3/jour s'il paie.
     inviteCode: uid,
@@ -122,21 +138,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ needsTest: true }, { status: 200 });
   }
 
-  // Quota journalier : palier payant + bonus permanent parrainage, mais un
-  // compte GRATUIT a un mur STRICT à FREE_DAILY_LIMIT (3) — aucun bonus
-  // (parrainage ou récompense de quête) ne le repousse. Le funnel post-MBTI
-  // dépend de ce vrai mur pour rediriger vers l'abonnement ou le Parcours
-  // (voir ChatClient.tsx) : au-delà, seuls les abonnés ont des crédits
-  // one-off qui prennent le relais, un par message.
-  const limit = isPremium ? dailyLimitFor(user.tier) + (dbUser.chatBonusDaily ?? 0) : FREE_DAILY_LIMIT;
+  // Quota : palier payant → journalier + bonus permanent parrainage. Compte
+  // GRATUIT → mur STRICT MENSUEL à FREE_MONTHLY_LIMIT (3), somme de tout le
+  // mois courant, aucun bonus (parrainage ou récompense de quête) ne le
+  // repousse. Le funnel post-MBTI dépend de ce vrai mur pour rediriger vers
+  // l'abonnement ou le Parcours (voir ChatClient.tsx) : au-delà, seuls les
+  // abonnés ont des crédits one-off qui prennent le relais, un par message.
+  const limit = isPremium ? dailyLimitFor(user.tier) + (dbUser.chatBonusDaily ?? 0) : FREE_MONTHLY_LIMIT;
   const day = parisDay();
+  // La ligne du JOUR reste la seule à incrémenter (voir plus bas) même pour
+  // un compte gratuit — seule la LECTURE du quota agrège tout le mois.
   const usage = await prisma.chatUsage.upsert({
     where: { userId_day: { userId: user.id, day } },
     create: { userId: user.id, day, count: 0 },
     update: {},
   }).catch(() => null);
+  const usedCount = isPremium ? (usage?.count ?? 0) : await getFreeMonthlyUsage(user.id);
   let useBonusCredit = false;
-  if ((usage?.count ?? 0) >= limit) {
+  if (usedCount >= limit) {
     if (isPremium && (dbUser.chatBonusCredits ?? 0) > 0) {
       useBonusCredit = true;
     } else {
@@ -249,7 +268,8 @@ export async function POST(req: NextRequest) {
     creditsLeft = Math.max(0, u?.chatBonusCredits ?? creditsLeft - 1);
   }
 
-  const remaining = Math.max(0, limit - (updated?.count ?? (usage?.count ?? 0) + 1)) + creditsLeft;
+  const newUsedCount = isPremium ? (updated?.count ?? (usage?.count ?? 0) + 1) : usedCount + 1;
+  const remaining = Math.max(0, limit - newUsedCount) + creditsLeft;
   await logEvent(user.id, EVENTS.NOVA_MESSAGE_SENT);
   const newlyCompletedQuests = await checkAndRecordQuestCompletions(user.id);
   return NextResponse.json({ reply: result.reply, remaining, limit, newlyCompletedQuests });

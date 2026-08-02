@@ -12,7 +12,7 @@ export type Tier = 'free' | 'starter' | 'plus' | 'premium';
 // un "message" a un sens unique et cohérent dans toute l'app.
 //
 // Correspondance avec le langage produit ("Free / Premium 1 / 2 / Max") :
-//   free    = Free       — 3 messages PAR JOUR (générique, sans le profil complet)
+//   free    = Free       — 3 messages PAR MOIS (générique, sans le profil complet)
 //   starter = Premium 1  — 5 messages/jour  (1,99€/mois)
 //   plus    = Premium 2  — 30 messages/jour (5€/mois)
 //   premium = Premium Max — 50 messages/jour (9,99€/mois ou 29,99€/an)
@@ -20,27 +20,34 @@ export type Tier = 'free' | 'starter' | 'plus' | 'premium';
 // utilisés par Stripe/webhook/DB ; les renommer serait un risque inutile pour
 // un simple changement d'étiquette côté produit.
 //
-// FREE_DAILY_LIMIT était FREE_MONTHLY_LIMIT (5/MOIS) — un chiffre qui
-// contredisait frontalement la promesse "coach disponible 24/7" : personne ne
-// construit d'attachement à une relation qu'on ne peut toucher que 5 fois par
-// mois. Passer sur une base quotidienne (même modeste) laisse le temps à la
-// relation de s'installer AVANT toute question d'abonnement — voir la
-// réflexion produit du 28/07 sur la rétention avant la conversion.
+// FREE_MONTHLY_LIMIT — redevenu mensuel (demande explicite, après un essai en
+// quotidien le 28/07) : 3 messages/mois pour un compte gratuit, un vrai mur
+// qui pousse vers l'abonnement ou le Parcours dès qu'il est atteint (voir
+// app/api/chat/route.ts et le funnel post-MBTI dans ChatClient.tsx). Seuls les
+// paliers payants restent sur une base quotidienne (voir DAILY_LIMITS).
 export const DAILY_LIMITS: Record<Exclude<Tier, 'free'>, number> = {
   starter: 5,
   plus: 30,
   premium: 50,
 };
-export const FREE_DAILY_LIMIT = 3;
+export const FREE_MONTHLY_LIMIT = 3;
 
 export function dailyLimitFor(tier: string | undefined): number {
   return DAILY_LIMITS[(tier as Exclude<Tier, 'free'>)] ?? DAILY_LIMITS.starter;
 }
 
 // Jour courant au fuseau Europe/Paris, format "YYYY-MM-DD" — sert de clé de
-// quota. Le quota se réinitialise à minuit, heure de Paris.
+// quota pour les paliers payants (quota journalier). Le quota se réinitialise
+// à minuit, heure de Paris.
 export function parisDay(now: Date = new Date()): string {
   return now.toLocaleDateString('en-CA', { timeZone: 'Europe/Paris' }); // ex: 2026-07-17
+}
+
+// Mois courant au fuseau Europe/Paris, format "YYYY-MM" — préfixe de
+// ChatUsage.day pour additionner l'usage du compte gratuit sur tout le mois
+// (voir app/api/chat/route.ts) plutôt que de ne regarder qu'un seul jour.
+export function parisMonth(now: Date = new Date()): string {
+  return parisDay(now).slice(0, 7); // ex: 2026-07
 }
 
 

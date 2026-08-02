@@ -18,7 +18,7 @@ import Seal from '@/components/Seal';
 const FREE_PERKS = [
   'Une première exploration de ta personnalité',
   'Ton Journal émotionnel, en illimité',
-  'Elio en version découverte — 3 messages par jour',
+  'Elio en version découverte — 3 messages par mois',
 ];
 
 const STARTER_PERKS = [
