@@ -149,6 +149,13 @@ export default function QuetesClient({
     }
   }
 
+  // Le test de personnalité est LA porte d'entrée du funnel juste après le
+  // Journal (voir lib/onboardingSequence.ts) — on le sort du lot avec un
+  // traitement "priorité" pour maximiser les chances qu'il soit fait en
+  // premier, avant même de parcourir le reste du catalogue. Retiré de sa
+  // catégorie normale (Découverte) une fois affiché ici pour ne pas le
+  // montrer deux fois ; redevient une carte normale une fois terminé.
+  const priorityQuest = !hasMbti ? quests.find((q) => q.key === 'first_mbti' && !q.completed) : undefined;
   const categories: Quest['category'][] = ['discovery', 'habit', 'premium'];
   const pendingGenerated = generated.filter((g) => !g.completed);
   const doneGenerated = generated.filter((g) => g.completed);
@@ -202,6 +209,36 @@ export default function QuetesClient({
           />
         </div>
 
+        {/* Quête prioritaire — le test de personnalité, mis en avant tant
+            qu'il n'est pas fait : c'est la porte d'entrée du reste du funnel
+            (Elio, Parcours ne prennent tout leur sens qu'une fois le profil
+            connu). Traitement visuel volontairement plus gros/voyant que les
+            cartes normales, pour qu'il saute aux yeux avant tout le reste. */}
+        {priorityQuest && (
+          <div className="mb-7">
+            <style>{`
+              @keyframes questPriorityPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,162,39,0.45); } 70% { box-shadow: 0 0 0 12px rgba(201,162,39,0); } }
+              .quest-priority { animation: questPriorityPulse 2.2s ease-out infinite; }
+              @media (prefers-reduced-motion: reduce) { .quest-priority { animation: none; } }
+            `}</style>
+            <Link
+              href={priorityQuest.href ?? '/quiz/personnalite'}
+              className="quest-priority elio-hover-lift flex items-center gap-4 rounded-2xl px-5 py-5"
+              style={{ background: 'var(--ink)', border: '1.5px solid var(--gold)' }}
+            >
+              <span className="text-4xl flex-shrink-0">{priorityQuest.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <p className="ur-label text-[10px] font-bold mb-1" style={{ color: 'var(--gold)' }}>🎯 Commence ici</p>
+                <p className="text-sm font-bold" style={{ color: '#FAF6EC' }}>{priorityQuest.title}</p>
+                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(250,246,236,0.6)', lineHeight: 1.4 }}>{priorityQuest.description}</p>
+              </div>
+              <svg className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        )}
+
         {/* Niveau + progression — dérivé du nombre total de quêtes terminées,
             jamais stocké séparément (une seule source de vérité : QuestCompletion). */}
         <div className="rounded-2xl px-5 py-4 mb-7" style={{ background: 'var(--ink)', border: '1px solid var(--gold-line)' }}>
@@ -218,7 +255,7 @@ export default function QuetesClient({
         </div>
 
         {categories.map((cat) => {
-          const inCat = quests.filter((q) => q.category === cat);
+          const inCat = quests.filter((q) => q.category === cat && q.key !== priorityQuest?.key);
           if (inCat.length === 0) return null;
           const meta = CATEGORY_META[cat];
           const doneCount = inCat.filter((q) => q.completed).length;

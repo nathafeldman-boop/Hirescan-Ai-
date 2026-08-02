@@ -681,6 +681,17 @@ export default function ChatClient() {
                   </button>
                 </div>
               )}
+
+              {/* Ne pas payer ici ne doit jamais être une impasse — même
+                  logique que le paywall du test MBTI (voir ResultTeaser) :
+                  un chemin gratuit vers la suite du funnel, le Parcours. */}
+              {isFree && (
+                <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--gold-line)' }}>
+                  <Link href="/parcours" className="text-xs font-semibold" style={{ color: 'var(--gold)' }}>
+                    👉 Continuer vers ton Parcours →
+                  </Link>
+                </div>
+              )}
             </div>
           )}
         </div>
