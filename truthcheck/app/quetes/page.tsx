@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db';
 import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import { QUEST_CATALOG, getQuestStats, checkAndRecordQuestCompletions } from '@/lib/quests';
 import { hasPremiumAccess } from '@/lib/plans';
+import { getOrCreateTodayDailyQuest, checkAndRecordDailyQuestCompletion } from '@/lib/dailyQuest';
 import QuetesClient from './QuetesClient';
 
 export const metadata: Metadata = {
@@ -28,11 +29,17 @@ export default async function QuetesPage() {
   // commentaire en tête de lib/quests.ts.
   await checkAndRecordQuestCompletions(session.user.id);
 
-  const [user, stats, completions, generatedQuests] = await Promise.all([
+  // Quête du jour — voir lib/dailyQuest.ts. Affichée ici comme une VRAIE
+  // quête (carte identique aux autres, via QuestCard côté client), pas comme
+  // un simple bouton de raccourci vers le Journal/Elio/Parcours.
+  const dailyQuest = await getOrCreateTodayDailyQuest();
+
+  const [user, stats, completions, generatedQuests, dailyQuestDone] = await Promise.all([
     prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, tier: true, mbtiType: true } }),
     getQuestStats(session.user.id),
     prisma.questCompletion.findMany({ where: { userId: session.user.id }, orderBy: { completedAt: 'desc' } }),
     prisma.generatedQuest.findMany({ where: { userId: session.user.id }, orderBy: { createdAt: 'desc' } }),
+    checkAndRecordDailyQuestCompletion(session.user.id, dailyQuest),
   ]);
 
   const completedKeys = new Set(completions.map((c) => c.questKey));
@@ -66,6 +73,8 @@ export default async function QuetesPage() {
   // Jamais bloquant : une erreur ici ne doit pas casser l'affichage du hub.
   await prisma.user.update({ where: { id: session.user.id }, data: { questsLastViewedAt: new Date() } }).catch(() => {});
 
+  const dailyQuestHref = dailyQuest.actionType === 'chat' ? '/chat' : dailyQuest.actionType === 'parcours' ? '/parcours' : '/journal';
+
   return (
     <QuetesClient
       firstName={user?.name?.split(' ')[0] ?? null}
@@ -78,6 +87,7 @@ export default async function QuetesPage() {
         completed: !!g.completedAt,
       }))}
       canGenerate={allCatalogDone}
+      dailyQuest={{ title: dailyQuest.title, description: dailyQuest.description, emoji: dailyQuest.emoji, done: dailyQuestDone, href: dailyQuestHref }}
     />
   );
 }
