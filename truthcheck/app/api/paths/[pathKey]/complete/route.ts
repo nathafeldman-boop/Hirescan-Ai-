@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db';
 import { parisDay } from '@/lib/chat';
 import { getPath, getLevel, type ExerciseContent } from '@/lib/paths';
 import { resolveLevelForUser } from '@/lib/pathBranching';
-import { canCompleteLevel } from '@/lib/pathAccess';
+import { canCompleteLevel, getCommittedPathKey } from '@/lib/pathAccess';
 import { generatePathInsight } from '@/lib/pathInsight';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
 import { checkAndRecordQuestCompletions } from '@/lib/quests';
@@ -75,17 +75,22 @@ export async function POST(req: NextRequest, { params }: { params: { pathKey: st
   const level = getLevel(path.key, levelIndex);
   if (!level) return NextResponse.json({ error: 'bad_request' }, { status: 400 });
 
-  const [user, pathCompletions, todayCompletionsCount] = await Promise.all([
+  const [user, pathCompletions, allCompletions, todayCompletionsCount] = await Promise.all([
     prisma.user.findUnique({ where: { id: uid }, select: { name: true, tier: true, mbtiType: true } }),
     prisma.levelCompletion.findMany({ where: { userId: uid, pathKey: path.key }, select: { levelIndex: true, xpEarned: true, insight: true, answer: true } }),
+    prisma.levelCompletion.findMany({ where: { userId: uid }, select: { pathKey: true } }),
     prisma.levelCompletion.count({ where: { userId: uid, day: parisDay() } }),
   ]);
 
   const existing = pathCompletions.find((c) => c.levelIndex === levelIndex);
   const highestCompletedIndex = pathCompletions.reduce((max, c) => Math.max(max, c.levelIndex), -1);
+  const countByPath: Record<string, number> = {};
+  for (const c of allCompletions) countByPath[c.pathKey] = (countByPath[c.pathKey] ?? 0) + 1;
 
   const access = canCompleteLevel({
     tier: user?.tier ?? 'free',
+    pathKey: path.key,
+    committedPathKey: getCommittedPathKey(countByPath),
     levelIndex,
     highestCompletedIndex,
     completionsToday: todayCompletionsCount,

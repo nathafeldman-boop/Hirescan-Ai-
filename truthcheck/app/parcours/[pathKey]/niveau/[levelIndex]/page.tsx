@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db';
 import { parisDay } from '@/lib/chat';
 import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import { getPath, getLevel } from '@/lib/paths';
-import { canCompleteLevel, dailyEnergyFor } from '@/lib/pathAccess';
+import { canCompleteLevel, dailyEnergyFor, getCommittedPathKey } from '@/lib/pathAccess';
 import { resolveLevelForUser } from '@/lib/pathBranching';
 import LevelPlayerClient from './LevelPlayerClient';
 
@@ -27,28 +27,35 @@ export default async function LevelPage({ params }: { params: { pathKey: string;
   const pendingStep = await resolveFunnelStep(session.user.id);
   if (pendingStep) redirect(funnelStepPath(pendingStep));
 
-  const [user, pathCompletions, todayCount] = await Promise.all([
+  const [user, pathCompletions, allCompletions, todayCount] = await Promise.all([
     prisma.user.findUnique({ where: { id: session.user.id }, select: { tier: true } }),
     prisma.levelCompletion.findMany({ where: { userId: session.user.id, pathKey: path.key }, select: { levelIndex: true, answer: true, insight: true, xpEarned: true } }),
+    prisma.levelCompletion.findMany({ where: { userId: session.user.id }, select: { pathKey: true } }),
     prisma.levelCompletion.count({ where: { userId: session.user.id, day: parisDay() } }),
   ]);
 
   const existing = pathCompletions.find((c) => c.levelIndex === levelIndex);
   const highestCompletedIndex = pathCompletions.reduce((max, c) => Math.max(max, c.levelIndex), -1);
+  const countByPath: Record<string, number> = {};
+  for (const c of allCompletions) countByPath[c.pathKey] = (countByPath[c.pathKey] ?? 0) + 1;
 
   const access = canCompleteLevel({
     tier: user?.tier ?? 'free',
+    pathKey: path.key,
+    committedPathKey: getCommittedPathKey(countByPath),
     levelIndex,
     highestCompletedIndex,
     completionsToday: todayCount,
     alreadyCompletedThisLevel: !!existing,
   });
 
-  // Pas encore atteint dans l'ordre, ou réservé aux abonnés : rien d'utile à
-  // montrer ici, on renvoie vers l'endroit qui explique pourquoi (carte ou
-  // pricing) plutôt que d'afficher un niveau inaccessible.
+  // Pas encore atteint dans l'ordre, réservé aux abonnés, ou un AUTRE
+  // parcours a déjà "engagé" ce compte : rien d'utile à montrer ici, on
+  // renvoie vers l'endroit qui explique pourquoi (carte ou pricing) plutôt
+  // que d'afficher un niveau inaccessible.
   if (!access.allowed && access.reason === 'locked_sequence') redirect(`/parcours/${path.key}`);
   if (!access.allowed && access.reason === 'requires_subscription') redirect('/pricing');
+  if (!access.allowed && access.reason === 'other_path_locked') redirect('/pricing');
 
   // Contenu réel de ce niveau pour CE compte — identique au niveau statique
   // sauf si `branch` est défini (voir lib/pathBranching.ts) : dans ce cas,
