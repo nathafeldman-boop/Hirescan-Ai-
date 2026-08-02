@@ -305,7 +305,7 @@ function StatCard({ icon, label, value, suffix, delay, accent }: { icon: string;
   );
 }
 
-export default function JournalClient({ firstName, access, wantsDailyReminder }: { firstName: string | null; access: JournalAccess; wantsDailyReminder: boolean }) {
+export default function JournalClient({ firstName, onboardingGoal, access, wantsDailyReminder }: { firstName: string | null; onboardingGoal: string | null; access: JournalAccess; wantsDailyReminder: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [showReminderPrompt, setShowReminderPrompt] = useState(false);
@@ -410,7 +410,7 @@ export default function JournalClient({ firstName, access, wantsDailyReminder }:
       // EMPILER ça avec la célébration de quête (ex. "premier journal") —
       // un seul moment fort à la fois.
       if (isFirstEver) {
-        setFirstReplyMessage(firstEntryReply(payload.mood, firstName));
+        setFirstReplyMessage(firstEntryReply(payload.mood, firstName, onboardingGoal));
       } else if (Array.isArray(d?.newlyCompletedQuests) && d.newlyCompletedQuests.length > 0) {
         setNewlyCompletedQuests(d.newlyCompletedQuests);
       }

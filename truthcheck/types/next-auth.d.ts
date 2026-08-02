@@ -6,6 +6,7 @@ declare module 'next-auth' {
       id: string;
       rizzScore: number;
       tier: string;
+      onboardingGoal: string | null;
     };
   }
 }

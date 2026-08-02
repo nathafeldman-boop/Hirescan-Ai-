@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import ElioAvatar from '@/components/ElioAvatar';
+import { goalPhrase } from '@/lib/onboardingGoalCopy';
 
 interface GoalEntry {
   goal: string;
@@ -90,6 +91,7 @@ export default function ParcoursHubClient({
 }) {
   const ownGoal = goals.find((g) => g.goal === onboardingGoal);
   const otherGoals = goals.filter((g) => g.goal !== onboardingGoal);
+  const phrase = goalPhrase(onboardingGoal);
 
   return (
     <main className="min-h-screen px-5 py-8 pb-28" style={{ background: 'var(--paper)', color: 'var(--ink)' }}>
@@ -102,10 +104,12 @@ export default function ParcoursHubClient({
           <ElioAvatar size={56} glow />
           <p className="ur-label text-[10px] mt-4 mb-2" style={{ color: 'var(--gold)' }}>Ton Parcours</p>
           <h1 className="font-display text-2xl font-black mb-2">
-            {firstName ? `${firstName}, avance à ton rythme` : 'Avance à ton rythme'}
+            {phrase
+              ? (firstName ? `${firstName}, ton parcours pour ${phrase}` : `Ton parcours pour ${phrase}`)
+              : (firstName ? `${firstName}, avance à ton rythme` : 'Avance à ton rythme')}
           </h1>
           <p className="text-sm max-w-xs leading-relaxed" style={{ color: '#78716c' }}>
-            Une carte de progression, pensée pour toi — chaque niveau te révèle un peu plus qui tu es.
+            Une carte de niveaux, pensée pour ça — chaque étape te rapproche un peu plus de ton objectif.
           </p>
         </div>
 

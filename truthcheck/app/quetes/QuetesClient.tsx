@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import ElioAvatar from '@/components/ElioAvatar';
 import QuestCelebration, { type QuestCelebrationItem } from '@/components/QuestCelebration';
+import { goalTestPitch } from '@/lib/onboardingGoalCopy';
 
 interface Quest {
   key: string;
@@ -97,9 +98,10 @@ function QuestCard({ q, isPremium, hasMbti }: { q: Quest; isPremium: boolean; ha
 }
 
 export default function QuetesClient({
-  firstName, isPremium, hasMbti, quests, totalCompleted, generatedQuests, canGenerate, dailyQuest,
+  firstName, onboardingGoal, isPremium, hasMbti, quests, totalCompleted, generatedQuests, canGenerate, dailyQuest,
 }: {
   firstName: string | null;
+  onboardingGoal: string | null;
   isPremium: boolean;
   hasMbti: boolean;
   quests: Quest[];
@@ -230,7 +232,9 @@ export default function QuetesClient({
               <div className="flex-1 min-w-0">
                 <p className="ur-label text-[10px] font-bold mb-1" style={{ color: 'var(--gold)' }}>🎯 Commence ici</p>
                 <p className="text-sm font-bold" style={{ color: '#FAF6EC' }}>{priorityQuest.title}</p>
-                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(250,246,236,0.6)', lineHeight: 1.4 }}>{priorityQuest.description}</p>
+                <p className="text-[12px] mt-0.5" style={{ color: 'rgba(250,246,236,0.6)', lineHeight: 1.4 }}>
+                  {goalTestPitch(onboardingGoal) ?? priorityQuest.description}
+                </p>
               </div>
               <svg className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />

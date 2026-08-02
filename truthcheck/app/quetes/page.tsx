@@ -35,7 +35,7 @@ export default async function QuetesPage() {
   const dailyQuest = await getOrCreateTodayDailyQuest();
 
   const [user, stats, completions, generatedQuests, dailyQuestDone] = await Promise.all([
-    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, tier: true, mbtiType: true } }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, tier: true, mbtiType: true, onboardingGoal: true } }),
     getQuestStats(session.user.id),
     prisma.questCompletion.findMany({ where: { userId: session.user.id }, orderBy: { completedAt: 'desc' } }),
     prisma.generatedQuest.findMany({ where: { userId: session.user.id }, orderBy: { createdAt: 'desc' } }),
@@ -78,6 +78,7 @@ export default async function QuetesPage() {
   return (
     <QuetesClient
       firstName={user?.name?.split(' ')[0] ?? null}
+      onboardingGoal={user?.onboardingGoal ?? null}
       isPremium={isPremium}
       hasMbti={hasMbti}
       quests={visibleQuests}
