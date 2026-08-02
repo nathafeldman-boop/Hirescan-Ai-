@@ -450,8 +450,8 @@ export default function ChatClient() {
         <Link href={noTestYet ? '/quiz/personnalite' : '/pricing'} className="relative block px-4 py-2 text-center text-[11px] font-semibold"
           style={{ zIndex: 1, background: 'var(--gold-soft)', borderBottom: '1px solid var(--gold-line)', color: 'var(--gold)' }}>
           {noTestYet
-            ? '✦ Version découverte (3 messages/jour) · Fais le test pour des réponses selon TOI →'
-            : '✦ Version découverte (3 messages/jour) · Elio selon TON type dès 1,99 €/mois →'}
+            ? '✦ Version découverte (3 messages/mois) · Fais le test pour des réponses selon TOI →'
+            : '✦ Version découverte (3 messages/mois) · Elio selon TON type dès 1,99 €/mois →'}
         </Link>
       )}
 
@@ -648,11 +648,11 @@ export default function ChatClient() {
           {quotaHit && (
             <div className="mt-6 rounded-2xl p-5 text-center" style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}>
               <p className="text-sm font-bold text-stone-900 mb-1">
-                {isFree ? `Tu as utilisé tes ${limit ?? ''} messages découverte du jour` : `Tu as utilisé tes ${limit ?? ''} messages du jour`}
+                {isFree ? `Tu as utilisé tes ${limit ?? ''} messages découverte du mois` : `Tu as utilisé tes ${limit ?? ''} messages du jour`}
               </p>
               <p className="text-xs mb-4" style={{ color: '#78716c' }}>
                 {isFree
-                  ? 'Dès 1,99 €/mois : ton profil complet + Elio, 5 messages/jour. Ton quota gratuit revient demain (minuit, heure de Paris).'
+                  ? 'Dès 1,99 €/mois : ton profil complet + Elio, 5 messages/jour. Ton quota gratuit revient le mois prochain.'
                   : 'Ton quota se réinitialise demain (minuit, heure de Paris).'}
               </p>
               {isFree && <Link href="/pricing" className="ur-btn-gold inline-flex px-6 py-3 text-sm">Débloquer Elio — dès 1,99 €/mois →</Link>}
