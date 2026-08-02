@@ -6,6 +6,7 @@ import Link from 'next/link';
 import UserMenu from '@/components/UserMenu';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Seal from '@/components/Seal';
+import { goalPricingLine } from '@/lib/onboardingGoalCopy';
 
 // ── Logique émotionnelle, pas une liste de fonctionnalités ──────────────────
 // Personne n'achète "30 messages par jour" — les gens achètent la résolution
@@ -123,6 +124,14 @@ export default function PricingPage() {
           <p className="text-stone-500 text-sm max-w-xs mx-auto" style={{ lineHeight: 1.6 }}>
             Chaque palier n&apos;est pas « plus de fonctionnalités » — c&apos;est la suite logique de ton exploration.
           </p>
+          {/* ── Rappel de l'objectif déclaré à l'inscription (voir
+              lib/onboardingGoalCopy.ts) — l'abonnement devient la suite d'un
+              problème déjà nommé, pas un achat abstrait. ── */}
+          {goalPricingLine(session?.user?.onboardingGoal) && (
+            <p className="text-[13px] font-semibold mt-3 max-w-xs mx-auto" style={{ color: 'var(--gold)', lineHeight: 1.55 }}>
+              {goalPricingLine(session?.user?.onboardingGoal)}
+            </p>
+          )}
         </div>
 
         {/* Plan gratuit */}

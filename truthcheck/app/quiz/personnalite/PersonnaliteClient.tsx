@@ -13,6 +13,7 @@ import { track } from '@/lib/analytics';
 import { hasProfileAccess } from '@/lib/plans';
 import { detectInAppBrowser } from '@/lib/inAppBrowser';
 import { teaserLines } from '@/lib/mbtiTeaser';
+import { goalPaywallLine, goalTransformationPitch, goalHeroLabel, GOAL_CHAPTER_PRIORITY } from '@/lib/onboardingGoalCopy';
 import Seal from '@/components/Seal';
 
 // ─── Short quiz: 8 questions per dimension = 32 total ───────────────────────────
@@ -481,8 +482,21 @@ function Glyph({ name, color = '#131110', size = 20 }: {
 // Auth gate removed: user goes straight to Stripe which collects their email.
 // The success page creates the account automatically from the Stripe email.
 
-function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
-  typeCode: string; lang: string; userEmail?: string | null; isInApp?: boolean;
+// Fait remonter en tête les chapitres qui répondent au problème déclaré à
+// l'inscription (voir GOAL_CHAPTER_PRIORITY dans lib/onboardingGoalCopy.ts) —
+// le reste garde son ordre habituel. Aucune donnée du profil n'est touchée,
+// seulement L'ORDRE dans lequel les titres verrouillés sont listés.
+function reorderChaptersByGoal<T extends { glyph: string }>(chapters: T[], goal: string | null | undefined): T[] {
+  const priority = goal ? GOAL_CHAPTER_PRIORITY[goal] : undefined;
+  if (!priority) return chapters;
+  const byGlyph = new Map(chapters.map((c) => [c.glyph, c]));
+  const promoted = priority.map((g) => byGlyph.get(g)).filter((c): c is T => !!c);
+  const rest = chapters.filter((c) => !priority.includes(c.glyph));
+  return [...promoted, ...rest];
+}
+
+function ResultTeaser({ typeCode, lang, userEmail, isInApp, onboardingGoal }: {
+  typeCode: string; lang: string; userEmail?: string | null; isInApp?: boolean; onboardingGoal?: string | null;
 }) {
   const type = mbtiTypes[typeCode];
   const isFr = lang !== 'en';
@@ -591,11 +605,22 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             ce qui doit donner envie de débloquer, pas une liste de features. ── */}
         <div className="rounded-2xl px-5 py-4 mb-4" style={{ background: 'var(--paper-panel)', border: '1px solid var(--line)' }}>
           {teaserLines(typeCode, isFr ? 'fr' : 'en').map((line, i) => (
-            <div key={i} className={`flex items-start gap-2.5${i < 2 ? ' mb-2.5' : ''}`}>
+            <div key={i} className={`flex items-start gap-2.5${i < 2 || (isFr && goalPaywallLine(onboardingGoal)) ? ' mb-2.5' : ''}`}>
               <span className="flex-shrink-0 font-bold" style={{ color: '#1f7a4d' }}>✔</span>
               <p className="text-[13.5px]" style={{ color: 'var(--ink)', lineHeight: 1.5 }}>{line}</p>
             </div>
           ))}
+          {/* ─── 4e ligne, spécifique à l'objectif déclaré à l'inscription
+              (voir lib/onboardingGoalCopy.ts) — jamais le code à 4 lettres,
+              juste une promesse liée au problème pour lequel la personne est
+              venue. Français uniquement pour l'instant (objectif capturé en
+              français à /bienvenue). ── */}
+          {isFr && goalPaywallLine(onboardingGoal) && (
+            <div className="flex items-start gap-2.5">
+              <span className="flex-shrink-0 font-bold" style={{ color: 'var(--gold)' }}>✔</span>
+              <p className="text-[13.5px]" style={{ color: 'var(--ink)', lineHeight: 1.5 }}>{goalPaywallLine(onboardingGoal)}</p>
+            </div>
+          )}
           <div className="ur-rule my-3" />
           <p className="text-[12.5px] font-semibold text-center" style={{ color: '#78716c' }}>
             {isFr ? 'Mais ton profil complet reste verrouillé.' : 'But your full profile stays locked.'}
@@ -673,7 +698,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               {isFr ? 'verrouillé' : 'locked'}
             </span>
           </div>
-          {(isFr ? [
+          {reorderChaptersByGoal(isFr ? [
             { glyph: 'mirror' as const,  title: 'Qui tu es vraiment', preview: 'Le portrait complet, celui que même tes proches n\'ont jamais mis en mots' },
             { glyph: 'heart' as const,   title: 'Amour & attachement', preview: 'Pourquoi tu t\'investis toujours plus que l\'autre, et le schéma douloureux qui se répète' },
             { glyph: 'compass' as const, title: 'Carrière & superpouvoir', preview: 'La compétence rare que tu as sans le savoir, et comment la transformer en avantage réel' },
@@ -691,7 +716,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
             { glyph: 'moon' as const,    title: 'Shadow side & growth', preview: 'The side of you that only shows under pressure — and how to make it an ally' },
             { glyph: 'key' as const,     title: 'Exact compatibilities', preview: 'The types that truly get you — and the profiles that always drain you' },
             { glyph: 'star' as const,    title: 'Famous people, same profile', preview: 'The public figures who share your exact wiring, and what it says about your ceiling' },
-          ]).map((s, i, arr) => (
+          ], isFr ? onboardingGoal : null).map((s, i, arr) => (
             <div key={s.title} className={`flex items-start gap-3.5 px-5 py-3.5${i < arr.length - 1 ? ' border-b' : ''}`}
                  style={{ borderColor: 'var(--line)' }}>
               <span className="flex-shrink-0 mt-0.5"><Glyph name={s.glyph} color="var(--gold)" size={19} /></span>
@@ -735,6 +760,14 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               ? <>Un bilan de personnalité chez un praticien coûte 150 € ou plus.<br /><span className="font-semibold text-stone-800">Ton profil complet + un coach : 1,99 €/mois, résiliable en 1 clic.</span></>
               : <>A personality assessment with a practitioner costs €150+.<br /><span className="font-semibold text-stone-800">Your full profile + a coach: €1.99/mo, cancel anytime.</span></>}
           </p>
+          {/* ── Vend la transformation, pas la fonctionnalité (voir
+              lib/onboardingGoalCopy.ts) — juste au-dessus des offres, le
+              dernier message avant le prix. ── */}
+          {isFr && goalTransformationPitch(onboardingGoal) && (
+            <p className="text-[13px] font-semibold text-center mt-3" style={{ color: 'var(--ink)', lineHeight: 1.5 }}>
+              {goalTransformationPitch(onboardingGoal)}
+            </p>
+          )}
         </div>
 
         {/* ── Offres — visibles pour TOUT LE MONDE, y compris in-app TikTok.
@@ -751,7 +784,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp }: {
               <Seal size={140} />
             </div>
             <p className="ur-label text-[10px] mb-4 relative" style={{ color: 'rgba(250,246,236,0.45)' }}>
-              {isFr ? 'Ton profil + ton coach' : 'Your profile + your coach'}
+              {isFr ? (goalHeroLabel(onboardingGoal) ?? 'Ton profil + ton coach') : 'Your profile + your coach'}
             </p>
 
             <div className="mb-5 relative">
@@ -1112,7 +1145,7 @@ export default function PersonnaliteClient() {
         </div>
       )}
       {phase === 'result' && (
-        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} isInApp={isInApp} />
+        <ResultTeaser typeCode={mbtiType} lang={lang} userEmail={session?.user?.email} isInApp={isInApp} onboardingGoal={session?.user?.onboardingGoal} />
       )}
       </>
       )}

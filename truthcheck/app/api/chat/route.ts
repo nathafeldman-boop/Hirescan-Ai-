@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { mbtiType: true, mbtiScores: true, name: true, chatBonusCredits: true, chatBonusDaily: true },
+    select: { mbtiType: true, mbtiScores: true, name: true, chatBonusCredits: true, chatBonusDaily: true, onboardingGoal: true },
   }).catch(() => null);
   if (!dbUser) return NextResponse.json({ error: 'assistant_unavailable' }, { status: 502 });
   // Un abonné PAYANT paie justement pour le coach personnalisé selon SON test —
@@ -208,10 +208,10 @@ export async function POST(req: NextRequest) {
   // Gratuit + test fait → coach bridé (générique, aucun type transmis).
   // Gratuit + test PAS fait → coach découverte (rappelle de faire le test).
   const system = isPremium
-    ? coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType as string, scores, journalSummary))
+    ? coachSystemPrompt(firstName, buildCoachContext(dbUser.mbtiType as string, scores, journalSummary), dbUser.onboardingGoal)
     : dbUser.mbtiType
-      ? coachSystemPromptFree(firstName)
-      : coachSystemPromptFreeNoTest(firstName);
+      ? coachSystemPromptFree(firstName, dbUser.onboardingGoal)
+      : coachSystemPromptFreeNoTest(firstName, dbUser.onboardingGoal);
 
   let result: { ok: boolean; reply?: string; error?: string };
   if (isPremium && !imageDataUri && QUIZ_INTENT_RE.test(message)) {

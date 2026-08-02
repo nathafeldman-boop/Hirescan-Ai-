@@ -120,6 +120,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = user.id;
         session.user.rizzScore = (user as { rizzScore?: number }).rizzScore ?? 0;
         session.user.tier = (user as { tier?: string }).tier ?? 'free';
+        session.user.onboardingGoal = (user as { onboardingGoal?: string | null }).onboardingGoal ?? null;
       }
       return session;
     },

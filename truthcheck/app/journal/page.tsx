@@ -19,7 +19,7 @@ export default async function JournalPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, tier: true, createdAt: true, wantsDailyReminder: true, onboardingCompletedAt: true },
+    select: { name: true, tier: true, createdAt: true, wantsDailyReminder: true, onboardingCompletedAt: true, onboardingGoal: true },
   });
 
   if (!user) redirect('/login');
@@ -34,6 +34,7 @@ export default async function JournalPage() {
   return (
     <JournalClient
       firstName={user.name?.split(' ')[0] ?? null}
+      onboardingGoal={user.onboardingGoal}
       access={{ trendInsights: access.trendInsights, history: access.history, inTrial: access.inTrial, trialDaysLeft: access.trialDaysLeft }}
       wantsDailyReminder={user.wantsDailyReminder}
     />
