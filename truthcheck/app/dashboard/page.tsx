@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { hasProfileAccess } from '@/lib/plans';
+import { teaserLines } from '@/lib/mbtiTeaser';
 import DashboardClient from './DashboardClient';
 
 export const metadata: Metadata = {
@@ -31,6 +33,18 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login');
 
+  // Root cause d'une vraie fuite de conversion : DashboardClient est un
+  // Client Component, donc TOUT ce qu'on lui passe en props part dans le
+  // HTML (charge d'hydratation React), même ce que le JSX choisit de ne pas
+  // afficher visuellement. Passer mbtiType en clair pour un compte non payant
+  // et compter sur le composant pour "juste ne pas l'afficher" laissait le
+  // code lisible via un simple clic droit → Afficher le code source — donc
+  // on décide ICI, côté serveur, ce qui a le droit de quitter le serveur :
+  // le code à 4 lettres n'est jamais envoyé au client tant que ce n'est pas
+  // payé (même principe que ResultTeaser dans PersonnaliteClient.tsx).
+  const hasProfile = hasProfileAccess(user.tier);
+  const hasSealedType = !hasProfile && !!user.mbtiType;
+
   return (
     <DashboardClient
       user={{
@@ -38,7 +52,9 @@ export default async function DashboardPage() {
         email: user.email,
         image: user.image,
         tier: user.tier,
-        mbtiType: user.mbtiType,
+        mbtiType: hasProfile ? user.mbtiType : null,
+        hasSealedType,
+        sealedTeaserLines: hasSealedType ? teaserLines(user.mbtiType!) : null,
         mbtiTestCount: user.mbtiTestCount,
         memberSince: user.createdAt.toISOString(),
       }}
