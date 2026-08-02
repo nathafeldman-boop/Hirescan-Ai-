@@ -42,9 +42,12 @@ export async function GET() {
   // Quota journalier pour tout le monde, gratuit compris (voir lib/chat.ts).
   const day = parisDay();
   const usage = await prisma.chatUsage.findUnique({ where: { userId_day: { userId: uid, day } } }).catch(() => null);
-  // Quota = base (palier) + bonus permanent parrainage. Les crédits
-  // one-off s'ajoutent au "restant" affiché (ils prennent le relais après le quota).
-  const limit = (isPremium ? dailyLimitFor(tier) : FREE_DAILY_LIMIT) + (user?.chatBonusDaily ?? 0);
+  // Quota = base (palier) + bonus permanent parrainage — RÉSERVÉ aux abonnés
+  // payants. Un compte gratuit a un mur STRICT à FREE_DAILY_LIMIT (3), sans
+  // aucun bonus (parrainage ou récompense de quête) qui le repousserait :
+  // demande explicite, le funnel post-MBTI dépend de ce vrai mur pour
+  // rediriger vers l'abonnement ou le Parcours (voir ChatClient.tsx).
+  const limit = isPremium ? dailyLimitFor(tier) + (user?.chatBonusDaily ?? 0) : FREE_DAILY_LIMIT;
   // Compte gratuit → coach bridé : on ne renvoie NI le type (header) NI l'historique
   // (qui pourrait contenir un ancien message révélant le type). Le résultat payant
   // reste derrière le paiement ; le coach fonctionne mais en version découverte.
@@ -62,7 +65,7 @@ export async function GET() {
     mbtiType: isPremium ? (user?.mbtiType ?? null) : null,
     free: !isPremium,
     messages: rows.reverse(),
-    remaining: Math.max(0, limit - (usage?.count ?? 0)) + (user?.chatBonusCredits ?? 0),
+    remaining: Math.max(0, limit - (usage?.count ?? 0)) + (isPremium ? (user?.chatBonusCredits ?? 0) : 0),
     limit,
     // Lien de parrainage : +3 messages à l'inscription d'un invité, +3/jour s'il paie.
     inviteCode: uid,
@@ -119,10 +122,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ needsTest: true }, { status: 200 });
   }
 
-  // Quota journalier pour tout le monde (palier payant, ou FREE_DAILY_LIMIT
-  // pour un compte gratuit) + bonus permanent parrainage. Au-delà, les
-  // crédits one-off (parrainage) prennent le relais, un par message.
-  const limit = (isPremium ? dailyLimitFor(user.tier) : FREE_DAILY_LIMIT) + (dbUser.chatBonusDaily ?? 0);
+  // Quota journalier : palier payant + bonus permanent parrainage, mais un
+  // compte GRATUIT a un mur STRICT à FREE_DAILY_LIMIT (3) — aucun bonus
+  // (parrainage ou récompense de quête) ne le repousse. Le funnel post-MBTI
+  // dépend de ce vrai mur pour rediriger vers l'abonnement ou le Parcours
+  // (voir ChatClient.tsx) : au-delà, seuls les abonnés ont des crédits
+  // one-off qui prennent le relais, un par message.
+  const limit = isPremium ? dailyLimitFor(user.tier) + (dbUser.chatBonusDaily ?? 0) : FREE_DAILY_LIMIT;
   const day = parisDay();
   const usage = await prisma.chatUsage.upsert({
     where: { userId_day: { userId: user.id, day } },
@@ -131,7 +137,7 @@ export async function POST(req: NextRequest) {
   }).catch(() => null);
   let useBonusCredit = false;
   if ((usage?.count ?? 0) >= limit) {
-    if ((dbUser.chatBonusCredits ?? 0) > 0) {
+    if (isPremium && (dbUser.chatBonusCredits ?? 0) > 0) {
       useBonusCredit = true;
     } else {
       return NextResponse.json({ error: 'quota_exceeded', limit, tier: user.tier ?? 'free' }, { status: 429 });
@@ -231,8 +237,9 @@ export async function POST(req: NextRequest) {
     where: { userId_day: { userId: user.id, day } },
     data: { count: { increment: 1 } },
   }).catch(() => null);
-  // Message au-delà du quota → consomme un crédit bonus parrainage.
-  let creditsLeft = dbUser.chatBonusCredits ?? 0;
+  // Message au-delà du quota → consomme un crédit bonus parrainage
+  // (abonnés seulement — voir le calcul de `limit` plus haut).
+  let creditsLeft = isPremium ? (dbUser.chatBonusCredits ?? 0) : 0;
   if (useBonusCredit) {
     const u = await prisma.user.update({
       where: { id: user.id },
