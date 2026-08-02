@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { hasProfileAccess } from '@/lib/plans';
+import { hasProfileAccess, hasPaidAccess } from '@/lib/plans';
 import { MbtiTypeFree } from '@/lib/mbti-free';
 import { MbtiTypePremium } from '@/lib/mbti-premium';
 import { mbtiTypesEnFree } from '@/lib/i18n/mbtiTypesEnFree';
@@ -44,7 +44,14 @@ interface Props {
 
 export default function TypeClient({ type }: Props) {
   const { data: session, status } = useSession();
-  const isPremium = hasProfileAccess((session?.user as { tier?: string } | undefined)?.tier);
+  const tier = (session?.user as { tier?: string } | undefined)?.tier;
+  const isPremium = hasProfileAccess(tier);
+  // Abonné réel (Starter/Plus/Premium) vs simple déblocage ponctuel 1,99 €
+  // (tier 'unlocked') — seul l'abonné a déjà Elio personnalisée, donc lui
+  // seul a le CHOIX entre le Hub et Elio juste après son test. Un déblocage
+  // ponctuel n'a pas encore payé pour Elio : on le pousse vers Elio comme
+  // seule prochaine étape (voir CTA plus bas).
+  const isSubscriber = hasPaidAccess(tier);
   const sessionLoading = status === 'loading';
   const { lang } = useLang();
   const t = ui[lang].type;
@@ -237,8 +244,15 @@ export default function TypeClient({ type }: Props) {
             style={{ background: 'var(--gold)', color: 'var(--ink)' }}>
             🔮 Approfondis avec ton coach →
           </a>
+          {/* Abonné : déjà tout débloqué (profil + Elio), donc un vrai choix
+              plutôt qu'un chemin unique — "Explore les 16 types" reste réservé
+              au visiteur qui n'a pas encore d'abonnement (voir plus bas). */}
           <div className="mt-3">
-            <a href="/types" className="text-xs" style={{ color: 'var(--ink-text-muted)' }}>Explore les 16 types →</a>
+            {isSubscriber ? (
+              <a href="/decouverte" className="text-xs" style={{ color: 'var(--ink-text-muted)' }}>← Retourner à mon Hub</a>
+            ) : (
+              <a href="/types" className="text-xs" style={{ color: 'var(--ink-text-muted)' }}>Explore les 16 types →</a>
+            )}
           </div>
         </div>
       </div>

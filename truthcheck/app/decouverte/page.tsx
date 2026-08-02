@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
-import { resolveOnboardingSequenceStep, onboardingSequencePath } from '@/lib/onboardingSequence';
+import { needsMbtiBeforeHub } from '@/lib/onboardingSequence';
 import { QUEST_CATALOG } from '@/lib/quests';
 import { hasPremiumAccess } from '@/lib/plans';
 import DecouverteClient from './DecouverteClient';
@@ -30,8 +30,7 @@ export default async function DecouvertePage() {
   const pendingStep = await resolveFunnelStep(session.user.id);
   if (pendingStep) redirect(funnelStepPath(pendingStep));
 
-  const pendingSequenceStep = await resolveOnboardingSequenceStep(session.user.id);
-  if (pendingSequenceStep) redirect(onboardingSequencePath(pendingSequenceStep));
+  if (await needsMbtiBeforeHub(session.user.id)) redirect('/quetes');
 
   const [user, completions, generatedQuests] = await Promise.all([
     prisma.user.findUnique({
