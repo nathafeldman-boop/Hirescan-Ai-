@@ -118,22 +118,13 @@ function CardVisual({ href }: { href: string }) {
   );
 }
 
-interface DailyQuestInfo {
-  title: string;
-  description: string;
-  emoji: string;
-  done: boolean;
-  href: string;
-}
-
 export default function DecouverteClient({
-  firstName, hasNewQuests, hasPendingQuests, pendingQuestsCount, dailyQuest,
+  firstName, hasNewQuests, hasPendingQuests, pendingQuestsCount,
 }: {
   firstName: string | null;
   hasNewQuests: boolean;
   hasPendingQuests: boolean;
   pendingQuestsCount: number;
-  dailyQuest: DailyQuestInfo;
 }) {
   // Respecte prefers-reduced-motion pour l'animation "flotte" posée en style
   // inline (une media query CSS ne peut pas l'écraser, contrairement aux
@@ -212,32 +203,6 @@ export default function DecouverteClient({
             Choisis ton expérience et commence ton exploration.
           </p>
         </div>
-
-        {/* Quête du jour — une seule, générée à minuit, la même pour tout le
-            monde (voir lib/dailyQuest.ts). Remplace en partie le rôle de
-            rétention des emails désactivés le 01/08 : la première chose vue
-            en arrivant sur le hub, tous les jours. */}
-        <Link
-          href={dailyQuest.href}
-          className="hub-up flex items-center gap-4 rounded-[24px] px-5 py-4 mb-7"
-          style={{
-            animationDelay: '.18s',
-            background: dailyQuest.done ? 'rgba(34,197,94,0.08)' : 'var(--gold-soft)',
-            border: `1px solid ${dailyQuest.done ? 'rgba(34,197,94,0.3)' : 'var(--gold-line)'}`,
-          }}
-        >
-          <span className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 44, height: 44, fontSize: 20, background: 'rgba(250,246,236,0.08)' }}>
-            {dailyQuest.done ? '✅' : dailyQuest.emoji}
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className="ur-label text-[10px] mb-0.5" style={{ color: 'var(--gold)' }}>Quête du jour</p>
-            <p className="text-[13.5px] font-semibold" style={{ color: '#FAF6EC' }}>{dailyQuest.title}</p>
-            {!dailyQuest.done && (
-              <p className="text-[12px] mt-0.5" style={{ color: 'rgba(250,246,236,0.55)', lineHeight: 1.4 }}>{dailyQuest.description}</p>
-            )}
-          </div>
-          {!dailyQuest.done && <span className="flex-shrink-0" style={{ color: 'rgba(250,246,236,0.4)' }}>→</span>}
-        </Link>
 
         {/* Les cartes — "Mes quêtes" (toujours 1ère) a un traitement à part :
             fond plein doré (pas juste un accent), et deux cartouches
