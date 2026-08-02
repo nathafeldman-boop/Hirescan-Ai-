@@ -5,6 +5,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import { PATH_CATALOG } from '@/lib/paths';
+import { getCommittedPathKey } from '@/lib/pathAccess';
+import { hasPaidAccess } from '@/lib/plans';
 import { ONBOARDING_GOALS } from '@/lib/onboardingFunnel';
 import ParcoursHubClient from './ParcoursHubClient';
 
@@ -27,12 +29,15 @@ export default async function ParcoursPage() {
   if (pendingStep) redirect(funnelStepPath(pendingStep));
 
   const [user, completions] = await Promise.all([
-    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, onboardingGoal: true } }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, onboardingGoal: true, tier: true } }),
     prisma.levelCompletion.findMany({ where: { userId: session.user.id }, select: { pathKey: true, levelIndex: true } }),
   ]);
 
   const doneCountByPath = new Map<string, number>();
   for (const c of completions) doneCountByPath.set(c.pathKey, (doneCountByPath.get(c.pathKey) ?? 0) + 1);
+
+  const committedPathKey = getCommittedPathKey(Object.fromEntries(doneCountByPath));
+  const isPaid = hasPaidAccess(user?.tier ?? 'free');
 
   const goals = ONBOARDING_GOALS.map((goal) => {
     const path = PATH_CATALOG.find((p) => p.onboardingGoal === goal);
@@ -46,6 +51,11 @@ export default async function ParcoursPage() {
       emoji: path.emoji,
       totalLevels: path.levels.length,
       doneCount: doneCountByPath.get(path.key) ?? 0,
+      // Un autre parcours a déjà "engagé" ce compte (voir PATH_COMMIT_THRESHOLD
+      // dans lib/pathAccess.ts) — celui-ci reste visible (promesse du
+      // questionnaire d'accueil) mais verrouillé tant que le compte n'est pas
+      // passé sur un tier payant.
+      locked: !!committedPathKey && committedPathKey !== path.key && !isPaid,
     };
   });
 
@@ -54,6 +64,7 @@ export default async function ParcoursPage() {
       firstName={user?.name?.split(' ')[0] ?? null}
       onboardingGoal={user?.onboardingGoal ?? null}
       goals={goals}
+      committedPathTitle={committedPathKey ? PATH_CATALOG.find((p) => p.key === committedPathKey)?.title ?? null : null}
     />
   );
 }

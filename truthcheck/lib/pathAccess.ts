@@ -32,10 +32,29 @@ export function isLevelUnlockedForTier(tier: string | null | undefined, levelInd
   return levelIndex < FREE_LEVEL_LIMIT || hasPaidAccess(tier);
 }
 
-export type AccessDenialReason = 'locked_sequence' | 'requires_subscription' | 'energy_exhausted';
+// Au-delà de ce nombre de niveaux complétés dans UN parcours, ce parcours
+// devient "le sien" et les 6 autres se verrouillent (voir getCommittedPathKey)
+// — évite qu'un compte gratuit picore 10 niveaux gratuits dans chacun des 7
+// parcours (70 niveaux gratuits au lieu de 10) : au 3e niveau, il faut choisir.
+export const PATH_COMMIT_THRESHOLD = 2;
+
+// Premier parcours dans lequel le compte a dépassé PATH_COMMIT_THRESHOLD
+// niveaux complétés — celui-ci reste jouable, tous les autres se verrouillent
+// (sauf abonnement payant, qui débloque tout comme avant). `null` tant
+// qu'aucun parcours n'a été assez entamé pour "engager" le compte.
+export function getCommittedPathKey(completionCountByPath: Record<string, number>): string | null {
+  for (const [key, count] of Object.entries(completionCountByPath)) {
+    if (count > PATH_COMMIT_THRESHOLD) return key;
+  }
+  return null;
+}
+
+export type AccessDenialReason = 'locked_sequence' | 'requires_subscription' | 'energy_exhausted' | 'other_path_locked';
 
 export interface AccessCheckInput {
   tier: string | null | undefined;
+  pathKey: string;
+  committedPathKey: string | null; // résultat de getCommittedPathKey pour ce compte
   levelIndex: number;
   highestCompletedIndex: number; // -1 si aucun niveau complété sur ce parcours
   completionsToday: number; // tous parcours confondus, jour Paris courant
@@ -48,10 +67,13 @@ export interface AccessCheckResult {
 }
 
 // Un niveau déjà complété reste toujours consultable/rejouable (jamais
-// bloqué par l'énergie ou la séquence) — seule une PREMIÈRE complétion est
-// gardée par ces règles.
+// bloqué par l'énergie, la séquence ou l'engagement sur un autre parcours) —
+// seule une PREMIÈRE complétion est gardée par ces règles.
 export function canCompleteLevel(input: AccessCheckInput): AccessCheckResult {
   if (input.alreadyCompletedThisLevel) return { allowed: true };
+  if (input.committedPathKey && input.committedPathKey !== input.pathKey && !hasPaidAccess(input.tier)) {
+    return { allowed: false, reason: 'other_path_locked' };
+  }
   if (input.levelIndex > input.highestCompletedIndex + 1) return { allowed: false, reason: 'locked_sequence' };
   if (!isLevelUnlockedForTier(input.tier, input.levelIndex)) return { allowed: false, reason: 'requires_subscription' };
   if (input.completionsToday >= dailyEnergyFor(input.tier)) return { allowed: false, reason: 'energy_exhausted' };

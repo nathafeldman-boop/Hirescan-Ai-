@@ -12,9 +12,10 @@ interface GoalEntry {
   emoji?: string;
   totalLevels?: number;
   doneCount?: number;
+  locked?: boolean;
 }
 
-function GoalCard({ entry, isOwnGoal }: { entry: GoalEntry; isOwnGoal: boolean }) {
+function GoalCard({ entry, isOwnGoal, committedPathTitle }: { entry: GoalEntry; isOwnGoal: boolean; committedPathTitle: string | null }) {
   if (!entry.available) {
     return (
       <div
@@ -27,6 +28,24 @@ function GoalCard({ entry, isOwnGoal }: { entry: GoalEntry; isOwnGoal: boolean }
           <p className="text-[11.5px] mt-0.5" style={{ color: '#a8a29e' }}>Bientôt disponible</p>
         </div>
       </div>
+    );
+  }
+
+  if (entry.locked) {
+    return (
+      <Link
+        href="/pricing"
+        className="elio-hover-lift flex items-start gap-3.5 rounded-2xl px-4 py-3.5"
+        style={{ background: 'var(--paper)', border: '1px dashed var(--gold-line)' }}
+      >
+        <span className="text-2xl flex-shrink-0 opacity-70">🔒</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold" style={{ color: 'var(--ink)' }}>{entry.title}</p>
+          <p className="text-[11.5px] mt-0.5 leading-relaxed" style={{ color: '#a8a29e' }}>
+            {committedPathTitle ? `Tu avances déjà sur « ${committedPathTitle} » — passe à l'abonnement pour débloquer celui-ci aussi` : "Passe à l'abonnement pour débloquer"}
+          </p>
+        </div>
+      </Link>
     );
   }
 
@@ -62,11 +81,12 @@ function GoalCard({ entry, isOwnGoal }: { entry: GoalEntry; isOwnGoal: boolean }
 }
 
 export default function ParcoursHubClient({
-  firstName, onboardingGoal, goals,
+  firstName, onboardingGoal, goals, committedPathTitle,
 }: {
   firstName: string | null;
   onboardingGoal: string | null;
   goals: GoalEntry[];
+  committedPathTitle: string | null;
 }) {
   const ownGoal = goals.find((g) => g.goal === onboardingGoal);
   const otherGoals = goals.filter((g) => g.goal !== onboardingGoal);
@@ -92,7 +112,7 @@ export default function ParcoursHubClient({
         {ownGoal && (
           <div className="mb-7">
             <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>Ton objectif</p>
-            <GoalCard entry={ownGoal} isOwnGoal />
+            <GoalCard entry={ownGoal} isOwnGoal committedPathTitle={committedPathTitle} />
           </div>
         )}
 
@@ -100,7 +120,7 @@ export default function ParcoursHubClient({
           <div>
             <p className="ur-label text-[10px] mb-3" style={{ color: 'var(--gold)' }}>Les autres parcours</p>
             <div className="flex flex-col gap-2">
-              {otherGoals.map((g) => <GoalCard key={g.goal} entry={g} isOwnGoal={false} />)}
+              {otherGoals.map((g) => <GoalCard key={g.goal} entry={g} isOwnGoal={false} committedPathTitle={committedPathTitle} />)}
             </div>
           </div>
         )}
