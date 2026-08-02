@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Seal from '@/components/Seal';
-import ElioAvatar from '@/components/ElioAvatar';
 
 const CARDS = [
   {
     href: '/quetes',
+    emoji: '🏆',
     title: 'Suis ta progression',
     kicker: 'Mes quêtes',
     desc: 'Débloque des messages, des badges et de nouvelles quêtes au fil de ton parcours.',
@@ -16,14 +16,16 @@ const CARDS = [
   },
   {
     href: '/parcours',
+    emoji: '🗺️',
     title: 'Ton Parcours de progression',
     kicker: 'Nouveau',
     desc: 'Une carte de niveaux, personnalisée selon ton objectif, pour avancer un peu chaque jour.',
-    accent: 'var(--gold)',
-    accentSoft: 'var(--gold-soft)',
+    accent: 'var(--fam-sj)',
+    accentSoft: 'rgba(67, 80, 47, 0.10)',
   },
   {
     href: '/quiz/personnalite',
+    emoji: '🧠',
     title: 'Découvre qui tu es vraiment',
     kicker: 'Quête de découverte',
     desc: 'Comprends ta personnalité, tes forces et ta manière de fonctionner.',
@@ -32,6 +34,7 @@ const CARDS = [
   },
   {
     href: '/chat',
+    emoji: '✨',
     title: 'Parle avec Elio',
     kicker: 'Coach IA',
     desc: 'Ton IA personnelle pour mieux réfléchir et mieux te comprendre.',
@@ -40,6 +43,7 @@ const CARDS = [
   },
   {
     href: '/journal',
+    emoji: '📅',
     title: 'Comprends tes émotions',
     kicker: 'Journal émotionnel',
     desc: 'Note ton humeur, observe tes tendances et découvre tes schémas.',
@@ -48,6 +52,7 @@ const CARDS = [
   },
   {
     href: '/compat',
+    emoji: '💬',
     title: 'Analyse tes relations',
     kicker: 'Relations',
     desc: 'Comprends mieux tes conversations et ta compatibilité avec les autres.',
@@ -56,64 +61,31 @@ const CARDS = [
   },
 ] as const;
 
-// Chaque carte a sa propre identité visuelle — plus un simple emoji dans un
-// carré teinté (les 5 cartes hors "Mes quêtes" étaient auparavant
-// interchangeables, seule la couleur d'accent changeait). Le visuel reflète
-// concrètement ce que la carte propose : le chemin du Parcours, les 4
-// familles MBTI du test, Elio lui-même pour le chat, une tendance d'humeur
-// pour le Journal, deux profils qui se recoupent pour Compat.
-function CardVisual({ href }: { href: string }) {
-  const box = 'hub-card-icon flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden';
+// Retour à un simple emoji par carte (demande explicite — les illustrations
+// vectorielles précédentes ont été jugées inutiles) : l'unicité de chaque
+// bouton vient maintenant de la FORME du cadre (carré, cercle, blob
+// organique, bulle, coin coupé, losange) croisée avec sa couleur d'accent
+// (déjà distincte par carte ci-dessus) — jamais deux cartes avec la même
+// combinaison forme + couleur, donc jamais interchangeables même si
+// certaines partagent une teinte (Quêtes/Test partagent le doré, mais pas
+// la forme).
+const SHAPES: Record<string, React.CSSProperties> = {
+  '/quetes': { borderRadius: 20 }, // carré arrondi — la forme "par défaut"
+  '/parcours': { borderRadius: '50%' }, // cercle plein
+  '/quiz/personnalite': { borderRadius: '42% 58% 61% 39% / 45% 40% 60% 55%' }, // blob organique
+  '/chat': { borderRadius: '22px 22px 22px 4px' }, // bulle de dialogue (un coin pointu)
+  '/journal': { borderRadius: 16, clipPath: 'polygon(0 0, 100% 0, 100% 100%, 22% 100%, 0 78%)' }, // coin coupé
+  '/compat': { borderRadius: 14, transform: 'rotate(45deg)' }, // losange
+};
 
-  if (href === '/quetes') {
-    return <div className={box} style={{ background: 'var(--gold-soft)' }}><span className="text-3xl">🏆</span></div>;
-  }
-
-  if (href === '/parcours') {
-    return (
-      <div className={box} style={{ background: 'var(--ink)' }}>
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden>
-          <path d="M6 26 L12 19 L18 21 L26 7" stroke="var(--gold-line)" strokeWidth="2" strokeLinecap="round" strokeDasharray="1 4.5" />
-          <circle cx="6" cy="26" r="2.5" fill="var(--gold)" />
-          <circle cx="12" cy="19" r="2.5" fill="var(--gold)" opacity="0.75" />
-          <circle cx="18" cy="21" r="2" fill="rgba(250,246,236,0.5)" />
-          <circle cx="26" cy="7" r="3" fill="var(--gold)" />
-        </svg>
-      </div>
-    );
-  }
-
-  if (href === '/quiz/personnalite') {
-    return (
-      <div className={box} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', alignItems: 'stretch', justifyItems: 'stretch', gap: 2, padding: 6, background: 'var(--paper)' }}>
-        <div className="rounded-md" style={{ background: 'var(--fam-nt)' }} />
-        <div className="rounded-md" style={{ background: 'var(--fam-nf)' }} />
-        <div className="rounded-md" style={{ background: 'var(--fam-sj)' }} />
-        <div className="rounded-md" style={{ background: 'var(--fam-sp)' }} />
-      </div>
-    );
-  }
-
-  if (href === '/chat') {
-    return <div className={box} style={{ background: 'rgba(53, 80, 107, 0.10)' }}><ElioAvatar size={38} glow /></div>;
-  }
-
-  if (href === '/journal') {
-    const heights = [10, 17, 13, 24, 19];
-    return (
-      <div className={box} style={{ background: 'rgba(122, 74, 30, 0.10)', alignItems: 'flex-end', gap: 3, paddingBottom: 10 }}>
-        {heights.map((h, i) => (
-          <div key={i} className="rounded-full" style={{ width: 4, height: h, background: i === heights.length - 1 ? 'var(--gold)' : 'var(--fam-sp)', opacity: i === heights.length - 1 ? 1 : 0.55 }} />
-        ))}
-      </div>
-    );
-  }
-
-  // /compat — deux cercles qui se recoupent, l'un plein, l'autre en contour.
+function CardVisual({ card }: { card: (typeof CARDS)[number] }) {
+  const isDiamond = card.href === '/compat';
   return (
-    <div className={box} style={{ background: 'rgba(107, 63, 82, 0.10)', position: 'relative' }}>
-      <div style={{ position: 'absolute', width: 24, height: 24, borderRadius: '50%', background: 'var(--fam-nf)', opacity: 0.6, left: 12, top: 20 }} />
-      <div style={{ position: 'absolute', width: 24, height: 24, borderRadius: '50%', border: '2px solid var(--fam-nf)', left: 24, top: 20 }} />
+    <div
+      className="hub-card-icon flex-shrink-0 w-16 h-16 flex items-center justify-center overflow-hidden"
+      style={{ background: card.accentSoft, border: `1.5px solid ${card.accent}`, ...SHAPES[card.href] }}
+    >
+      <span className="text-3xl" style={isDiamond ? { transform: 'rotate(-45deg)' } : undefined}>{card.emoji}</span>
     </div>
   );
 }
@@ -270,7 +242,7 @@ export default function DecouverteClient({
                 )}
 
                 <div className="relative flex items-center gap-5">
-                  <CardVisual href={card.href} />
+                  <CardVisual card={card} />
 
                   <div className="flex-1 min-w-0">
                     <p className="ur-label text-[10px] mb-1.5" style={{ color: card.accent }}>
