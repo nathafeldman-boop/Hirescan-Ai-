@@ -12,7 +12,17 @@ interface Props {
     email: string | null;
     image: string | null;
     tier: string;
+    // null pour un compte non payant même si un type est calculé côté serveur
+    // (voir app/dashboard/page.tsx) — le code à 4 lettres ne doit JAMAIS
+    // atteindre ce composant client tant que ce n'est pas payé, sinon il
+    // resterait lisible dans le HTML (charge d'hydratation React) même si le
+    // JSX choisit de ne pas l'afficher visuellement.
     mbtiType: string | null;
+    // true si un type existe côté serveur mais reste scellé (non payant) —
+    // distingue "jamais testé" de "testé mais pas débloqué" sans jamais
+    // exposer le code lui-même.
+    hasSealedType: boolean;
+    sealedTeaserLines: string[] | null;
     mbtiTestCount: number;
     memberSince: string;
   };
@@ -51,6 +61,9 @@ export default function DashboardClient({ user }: Props) {
   // 'starter' a déjà accès à Elio mais n'est pas en thème sombre — le badge
   // "Abonnés" doit suivre le vrai accès, pas le thème visuel.
   const isPaidNova = hasPaidAccess(user.tier);
+  // user.mbtiType est déjà null côté serveur pour un compte non payant (voir
+  // app/dashboard/page.tsx) — donc `type` est naturellement null pour lui,
+  // même s'il a réellement un type calculé en base.
   const type = user.mbtiType ? mbtiTypes[user.mbtiType] : null;
   const firstName = user.name?.split(' ')[0] ?? 'toi';
 
@@ -138,6 +151,51 @@ export default function DashboardClient({ user }: Props) {
               >
                 {isPremium ? 'Explorer les profondeurs →' : 'Voir mon profil complet →'}
               </Link>
+              {user.mbtiTestCount > 0 && (
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-xs" style={{ color: theme.muted }}>Test passé {user.mbtiTestCount} fois</p>
+                  <Link href="/quiz/personnalite" className="text-xs transition-colors hover:opacity-80" style={{ color: theme.muted }}>
+                    Repasser le test →
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : user.hasSealedType ? (
+          // Type déjà calculé côté serveur (voir app/api/user/save-mbti) mais
+          // compte non payant : reste SCELLÉ ici, exactement comme au moment
+          // du test (ResultTeaser) — ni le code, ni le nom, ni la rareté, ni
+          // la citation ne sont envoyés à ce composant (voir page.tsx et
+          // lib/mbtiTeaser.ts). sealedTeaserLines est calculé côté serveur.
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{ background: theme.card, border: `1px solid ${theme.cardBorder}` }}
+          >
+            <div className="h-1 w-full" style={{ background: `linear-gradient(to right,${theme.accent},#d17d52)` }} />
+            <div className="p-5">
+              <p className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: theme.muted }}>Ton type de personnalité</p>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-5xl leading-none">🔒</div>
+                <div>
+                  <p className="font-display text-lg font-black leading-tight" style={{ color: theme.text }}>Calculé — encore scellé</p>
+                  <p className="text-xs mt-0.5" style={{ color: theme.muted }}>Débloque ton profil pour le découvrir</p>
+                </div>
+              </div>
+              <div className="mb-5 space-y-1.5">
+                {(user.sealedTeaserLines ?? []).map((line, i) => (
+                  <p key={i} className="text-sm italic leading-relaxed" style={{ color: theme.muted }}>&ldquo;{line}&rdquo;</p>
+                ))}
+              </div>
+              {/* <a> classique, pas <Link> : /api/my-type est une route API qui
+                  redirige server-side vers /types/[code] — une vraie
+                  navigation, jamais une transition client-side. */}
+              <a
+                href="/api/my-type"
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.01]"
+                style={{ background: 'linear-gradient(135deg,#a94e18,#d17d52)', boxShadow: '0 4px 20px rgba(169,78,24,0.3)' }}
+              >
+                Débloquer mon profil complet →
+              </a>
               {user.mbtiTestCount > 0 && (
                 <div className="flex items-center justify-between mt-3">
                   <p className="text-xs" style={{ color: theme.muted }}>Test passé {user.mbtiTestCount} fois</p>
