@@ -27,6 +27,14 @@ interface GeneratedQuestItem {
   completed: boolean;
 }
 
+interface DailyQuestInfo {
+  title: string;
+  description: string;
+  emoji: string;
+  done: boolean;
+  href: string;
+}
+
 const CATEGORY_META: Record<Quest['category'], { title: string; subtitle: string }> = {
   discovery: { title: 'Découverte', subtitle: 'Apprends à connaître UrCecret' },
   habit: { title: 'Habitudes', subtitle: 'Construis un vrai rituel quotidien' },
@@ -89,7 +97,7 @@ function QuestCard({ q, isPremium, hasMbti }: { q: Quest; isPremium: boolean; ha
 }
 
 export default function QuetesClient({
-  firstName, isPremium, hasMbti, quests, totalCompleted, generatedQuests, canGenerate,
+  firstName, isPremium, hasMbti, quests, totalCompleted, generatedQuests, canGenerate, dailyQuest,
 }: {
   firstName: string | null;
   isPremium: boolean;
@@ -98,6 +106,7 @@ export default function QuetesClient({
   totalCompleted: number;
   generatedQuests: GeneratedQuestItem[];
   canGenerate: boolean;
+  dailyQuest: DailyQuestInfo;
 }) {
   const [generated, setGenerated] = useState(generatedQuests);
   const [generating, setGenerating] = useState(false);
@@ -160,6 +169,37 @@ export default function QuetesClient({
           <p className="text-sm max-w-xs leading-relaxed" style={{ color: '#78716c' }}>
             Chaque quête est une étape pour mieux te comprendre — jamais une simple tâche à cocher.
           </p>
+        </div>
+
+        {/* Quête du jour — une vraie quête (même carte, même mécanique que les
+            autres ci-dessous), pas un simple bouton de raccourci : texte
+            différent chaque jour, généré par Mistral, identique pour tout le
+            monde (voir lib/dailyQuest.ts). Toujours en premier : c'est la
+            seule chose à faire aujourd'hui, avant même le reste. */}
+        <div className="mb-7">
+          <div className="flex items-baseline justify-between mb-3">
+            <div>
+              <p className="ur-label text-[10px]" style={{ color: 'var(--gold)' }}>Quête du jour</p>
+              <p className="text-[12px]" style={{ color: '#a8a29e' }}>Nouvelle chaque matin, la même pour tout le monde</p>
+            </div>
+          </div>
+          <QuestCard
+            q={{
+              key: 'daily-quest',
+              category: 'habit',
+              title: dailyQuest.title,
+              description: dailyQuest.description,
+              emoji: dailyQuest.emoji,
+              rewardLabel: 'Revient demain avec une nouvelle quête',
+              requiresPremium: false,
+              requiresMbti: false,
+              href: dailyQuest.href,
+              completed: dailyQuest.done,
+              completedAt: null,
+            }}
+            isPremium={isPremium}
+            hasMbti={hasMbti}
+          />
         </div>
 
         {/* Niveau + progression — dérivé du nombre total de quêtes terminées,
