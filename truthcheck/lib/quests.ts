@@ -49,35 +49,42 @@ export interface QuestDef {
 export const QUEST_CATALOG: QuestDef[] = [
   // ── A) Découverte (gratuit) ──
   {
+    // Pas de rewardCredits : cette quête se complète automatiquement, sans
+    // effort supplémentaire, dès l'onboarding obligatoire déjà fait par tout
+    // le monde — récompenser ça en messages Elio permettait de dépasser le
+    // quota gratuit du mois sans la moindre action motivée (voir l'incident
+    // "plus de 3 messages sans blocage"). Les quêtes qui demandent un vrai
+    // effort (streaks, parrainage...) continuent de récompenser en messages.
     key: 'onboarding_done',
     category: 'discovery',
     title: 'Compléter son profil personnel',
     description: 'Répondre au questionnaire d\'accueil pour qu\'Elio commence à te connaître.',
     emoji: '📝',
-    rewardLabel: '+1 message Elio',
-    rewardCredits: 1,
+    rewardLabel: 'Badge débloqué',
     href: '/decouverte',
     check: (s) => !!s.onboardingCompletedAt,
   },
   {
+    // Idem — première entrée de journal déjà obligatoire dans le funnel de
+    // démarrage, voir le commentaire au-dessus.
     key: 'first_journal',
     category: 'discovery',
     title: 'Faire son premier journal émotionnel',
     description: 'Noter comment tu te sens, un jour à la fois.',
     emoji: '📖',
-    rewardLabel: '+2 messages Elio',
-    rewardCredits: 2,
+    rewardLabel: 'Badge débloqué',
     href: '/journal',
     check: (s) => s.journalCount >= 1,
   },
   {
+    // Idem — récompenser l'ENVOI du 1er message par... un message de plus
+    // annulait directement le quota gratuit dès le premier essai.
     key: 'first_elio_message',
     category: 'discovery',
     title: 'Envoyer son premier message à Elio',
     description: 'Dis-lui ce que tu as en tête — il est là pour ça.',
     emoji: '💬',
-    rewardLabel: '+1 message Elio',
-    rewardCredits: 1,
+    rewardLabel: 'Badge débloqué',
     href: '/chat',
     check: (s) => s.userMessageCount >= 1,
   },
