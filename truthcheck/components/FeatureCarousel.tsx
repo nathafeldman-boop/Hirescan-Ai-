@@ -130,9 +130,7 @@ export default function FeatureCarousel() {
               <div className="fc-float mb-6">
                 <PhoneMockup dark={s.dark}><Demo /></PhoneMockup>
               </div>
-              {/* Vers le test, pas /decouverte : ce hub exige un compte
-                  (redirect login) alors que ces visiteurs sont anonymes. */}
-              <Link href="/quiz/personnalite" className="ur-btn-gold inline-flex px-6 py-3 text-[13px]">
+              <Link href="/decouverte" className="ur-btn-gold inline-flex px-6 py-3 text-[13px]">
                 {s.cta}
               </Link>
             </div>
