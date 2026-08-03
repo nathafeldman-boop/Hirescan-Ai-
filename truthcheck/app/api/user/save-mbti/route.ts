@@ -27,21 +27,32 @@ export async function POST(req: NextRequest) {
 
   const type = mbtiType.toUpperCase();
 
-  await Promise.all([
-    prisma.user.update({
-      where: { id: session.user.id },
-      data: {
-        mbtiType: type,
-        mbtiTestCount: { increment: 1 },
-        ...(validScores ? { mbtiScores: scores as object } : {}),
-      },
-    }),
-    // Snapshot pour l'historique d'évolution (voir MbtiTestHistory) — jamais
-    // écrasé, contrairement à User.mbtiType/mbtiScores.
-    prisma.mbtiTestHistory.create({
-      data: { userId: session.user.id, type, ...(validScores ? { scores: scores as object } : {}) },
-    }),
-  ]);
+  // Root cause d'une vraie fuite de données trouvée en audit : sans ce
+  // try/catch, un échec DB ici renvoyait un 500 générique jamais vérifié côté
+  // client (voir les deux appels dans PersonnaliteClient.tsx, corrigés en
+  // même temps) — l'utilisateur voyait son résultat s'afficher normalement en
+  // croyant que tout avait marché, alors que son type n'était jamais
+  // enregistré (perte invisible, indiscernable d'une vraie conversion).
+  try {
+    await Promise.all([
+      prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          mbtiType: type,
+          mbtiTestCount: { increment: 1 },
+          ...(validScores ? { mbtiScores: scores as object } : {}),
+        },
+      }),
+      // Snapshot pour l'historique d'évolution (voir MbtiTestHistory) — jamais
+      // écrasé, contrairement à User.mbtiType/mbtiScores.
+      prisma.mbtiTestHistory.create({
+        data: { userId: session.user.id, type, ...(validScores ? { scores: scores as object } : {}) },
+      }),
+    ]);
+  } catch (e) {
+    console.error('save-mbti failed:', e);
+    return NextResponse.json({ error: 'save_failed' }, { status: 500 });
+  }
 
   await logEvent(session.user.id, EVENTS.TEST_COMPLETED, { mbtiType: type });
   await checkAndRecordQuestCompletions(session.user.id);
