@@ -14,6 +14,7 @@ import {
 import { dailyReaction, firstEntryReply } from '@/lib/journalReflection';
 import ElioAvatar from '@/components/ElioAvatar';
 import QuestCelebration, { type QuestCelebrationItem } from '@/components/QuestCelebration';
+import ExitIntentSurvey from '@/components/ExitIntentSurvey';
 import type { JournalEntryLite } from '@/lib/journalTypes';
 
 type Entry = JournalEntryLite;
@@ -490,6 +491,8 @@ export default function JournalClient({ firstName, onboardingGoal, access, wants
         @keyframes jCardIn { from { opacity:0; transform:translateY(10px) scale(.96) } to { opacity:1; transform:translateY(0) scale(1) } }
         @keyframes jCellIn { from { opacity:0; transform:scale(.5) } to { opacity:1; transform:scale(1) } }
       `}</style>
+
+      {showOnboarding && <ExitIntentSurvey step="journal_onboarding" />}
 
       <header className="sticky top-0 z-30 px-4 h-14 flex items-center" style={{ background: 'rgba(242,236,222,0.94)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--line)' }}>
         <div className="max-w-lg mx-auto w-full flex items-center justify-between">

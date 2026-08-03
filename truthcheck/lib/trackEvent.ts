@@ -22,6 +22,7 @@ export const EVENTS = {
   DAILY_REMINDER_OPTED_IN: 'daily_reminder_opted_in',
   QUEST_COMPLETED: 'quest_completed',
   PARCOURS_LEVEL_COMPLETED: 'parcours_level_completed',
+  EXIT_FEEDBACK: 'exit_feedback', // note + raison de départ (voir components/ExitIntentSurvey.tsx)
 } as const;
 
 export type EventName = typeof EVENTS[keyof typeof EVENTS];

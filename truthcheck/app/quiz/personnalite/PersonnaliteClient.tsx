@@ -14,6 +14,7 @@ import { hasProfileAccess } from '@/lib/plans';
 import { detectInAppBrowser } from '@/lib/inAppBrowser';
 import { teaserLines } from '@/lib/mbtiTeaser';
 import { goalPaywallLine, goalTransformationPitch, goalHeroLabel, GOAL_CHAPTER_PRIORITY } from '@/lib/onboardingGoalCopy';
+import ExitIntentSurvey from '@/components/ExitIntentSurvey';
 import Seal from '@/components/Seal';
 
 // ─── Short quiz: 8 questions per dimension = 32 total ───────────────────────────
@@ -589,6 +590,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp, onboardingGoal }: {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10" style={{ background: 'var(--paper)', animation: 'paywallReveal 0.45s ease' }}>
+      <ExitIntentSurvey step="mbti_paywall" />
       <style>{`@keyframes paywallReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <div className="w-full max-w-sm">
 
@@ -1131,7 +1133,10 @@ export default function PersonnaliteClient() {
       ) : (
       <>
       {phase === 'quiz' && (
-        <QuizScreen onComplete={handleComplete} questions={questions} t={t} lang={lang} />
+        <>
+          <ExitIntentSurvey step="mbti_quiz" />
+          <QuizScreen onComplete={handleComplete} questions={questions} t={t} lang={lang} />
+        </>
       )}
       {phase === 'analysis' && (
         <AnalysisScreen onDone={handleAnalysisDone} t={t} />

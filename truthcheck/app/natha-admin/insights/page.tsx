@@ -41,6 +41,21 @@ const EVENT_LABELS: Record<string, string> = {
   [EVENTS.QUIZ_CREATED]: 'Tests créés (partage)',
   [EVENTS.ONBOARDING_COMPLETED]: 'Questionnaires d\'accueil complétés',
   [EVENTS.QUEST_COMPLETED]: 'Quêtes complétées',
+  [EVENTS.EXIT_FEEDBACK]: 'Sondages "avant de partir" répondus',
+};
+
+const EXIT_REASON_LABELS: Record<string, string> = {
+  too_complicated: 'Trop compliqué',
+  not_interested: 'Pas intéressé(e)',
+  later: 'Reviendra plus tard',
+  technical: 'Problème technique',
+  other: 'Autre',
+};
+
+const EXIT_STEP_LABELS: Record<string, string> = {
+  journal_onboarding: 'Premier Journal',
+  mbti_quiz: 'Test MBTI (en cours)',
+  mbti_paywall: 'Paywall MBTI',
 };
 
 export default async function InsightsPage() {
@@ -58,6 +73,7 @@ export default async function InsightsPage() {
     cohortUsers,
     events,
     recentEvents,
+    exitFeedbackEvents,
   ] = await Promise.all([
     prisma.user.count({ where: { NOT: { email: { endsWith: '@urcecret.app' } } } }),
     prisma.user.count({ where: { lastActiveAt: { gte: startOfToday } } }),
@@ -74,6 +90,12 @@ export default async function InsightsPage() {
       orderBy: { createdAt: 'desc' },
       take: 50,
       include: { user: { select: { email: true, name: true } } },
+    }),
+    prisma.appEvent.findMany({
+      where: { event: EVENTS.EXIT_FEEDBACK },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+      select: { properties: true, createdAt: true, user: { select: { email: true, name: true } } },
     }),
   ]);
 
@@ -131,6 +153,26 @@ export default async function InsightsPage() {
       uniqueTotal: b.allUsers.size,
     };
   }).sort((a, b) => b.uniqueTotal - a.uniqueTotal);
+
+  // ── Sondage "avant de partir" (voir components/ExitIntentSurvey.tsx) ──────
+  // properties est un Json Prisma non typé — on reste défensif sur chaque champ.
+  type ExitFeedbackProps = { step?: string; rating?: number; reason?: string; reasonText?: string };
+  const exitFeedbacks = exitFeedbackEvents.map((e) => ({
+    ...(e.properties as ExitFeedbackProps ?? {}),
+    createdAt: e.createdAt,
+    who: e.user?.name ?? e.user?.email ?? 'Compte supprimé',
+  }));
+  const ratings = exitFeedbacks.map((f) => f.rating).filter((r): r is number => typeof r === 'number');
+  const avgRating = ratings.length ? ratings.reduce((s, r) => s + r, 0) / ratings.length : null;
+  const reasonCounts = new Map<string, number>();
+  const stepCounts = new Map<string, number>();
+  for (const f of exitFeedbacks) {
+    if (f.reason) reasonCounts.set(f.reason, (reasonCounts.get(f.reason) ?? 0) + 1);
+    if (f.step) stepCounts.set(f.step, (stepCounts.get(f.step) ?? 0) + 1);
+  }
+  const reasonRows = [...reasonCounts.entries()].sort((a, b) => b[1] - a[1]);
+  const stepRows = [...stepCounts.entries()].sort((a, b) => b[1] - a[1]);
+  const recentComments = exitFeedbacks.filter((f) => f.reasonText).slice(0, 20);
 
   // ── Design system — identique à /natha-admin ───────────────────────────────
   const C = {
@@ -240,6 +282,67 @@ export default async function InsightsPage() {
             &quot;Auj./7j/Total&quot; = utilisateurs distincts ayant déclenché l&apos;événement au moins une fois sur la période. &quot;Events&quot; = nombre brut d&apos;occurrences (un même compte peut compter plusieurs fois).
           </p>
         </div>
+
+        {/* ── Sondage "avant de partir" — voir components/ExitIntentSurvey.tsx.
+            Déclenché au bouton retour sur les pages clés du funnel (1er
+            Journal, test MBTI, paywall) — pas de vraie interception à la
+            fermeture d'onglet, techniquement impossible. ── */}
+        <p style={sectionHeading}>Pourquoi ils partent</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Note moyenne</p>
+            <p style={bigNum}>{avgRating === null ? '—' : `${avgRating.toFixed(1)} ⭐`}</p>
+            <p style={sub}>{ratings.length} note{ratings.length > 1 ? 's' : ''}</p>
+          </div>
+          <div style={block(C.surface, C.border)}>
+            <p style={label}>Réponses totales</p>
+            <p style={bigNum}>{exitFeedbacks.length}</p>
+            <p style={sub}>sur les 200 dernières</p>
+          </div>
+        </div>
+        {(reasonRows.length > 0 || stepRows.length > 0) && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, marginBottom: 12 }}>
+            {reasonRows.length > 0 && (
+              <div style={block(C.surface, C.border)}>
+                <p style={{ ...label, marginBottom: 8 }}>Raisons données</p>
+                {reasonRows.map(([reason, count]) => (
+                  <div key={reason} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 13 }}>
+                    <span style={{ color: C.text }}>{EXIT_REASON_LABELS[reason] ?? reason}</span>
+                    <span style={{ color: C.muted, fontWeight: 700 }}>{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {stepRows.length > 0 && (
+              <div style={block(C.surface, C.border)}>
+                <p style={{ ...label, marginBottom: 8 }}>Où ça décroche</p>
+                {stepRows.map(([step, count]) => (
+                  <div key={step} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 13 }}>
+                    <span style={{ color: C.text }}>{EXIT_STEP_LABELS[step] ?? step}</span>
+                    <span style={{ color: C.muted, fontWeight: 700 }}>{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {recentComments.length > 0 && (
+          <div style={{ ...block(C.surface, C.border), marginBottom: 12 }}>
+            <p style={{ ...label, marginBottom: 8 }}>Derniers commentaires</p>
+            {recentComments.map((f, i) => (
+              <div key={i} style={{ padding: '9px 0', borderBottom: i < recentComments.length - 1 ? `1px solid ${C.borderSoft}` : 'none' }}>
+                <p style={{ color: C.text, fontSize: 13, margin: 0, lineHeight: 1.5 }}>&quot;{f.reasonText}&quot;</p>
+                <p style={{ color: C.faint, fontSize: 11, margin: '3px 0 0' }}>
+                  {f.who} · {f.step ? (EXIT_STEP_LABELS[f.step] ?? f.step) : '—'} · {f.createdAt.toLocaleString('fr-FR', { timeZone: TZ, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+        {exitFeedbacks.length === 0 && (
+          <p style={{ color: C.faint, fontSize: 13, marginBottom: 28 }}>Aucune réponse pour l&apos;instant.</p>
+        )}
+        {exitFeedbacks.length > 0 && <div style={{ marginBottom: 16 }} />}
 
         {/* ── Activité récente ── */}
         <p style={sectionHeading}>Activité récente</p>
