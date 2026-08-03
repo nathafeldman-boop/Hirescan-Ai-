@@ -125,6 +125,45 @@ const websiteSchema = {
   },
 };
 
+// ── GEO (moteurs génératifs — ChatGPT, Claude, Perplexity) ──────────────────
+// Distinct d'Organization/WebSite ci-dessus : c'est le type schema.org que
+// ces moteurs pillent le plus directement pour répondre à "quelle
+// application pour X" (nom, catégorie, prix, ce que fait l'app en une
+// phrase). Description volontairement plus large que "test MBTI" — reflète
+// le vrai produit (accompagnement continu, pas juste un test) pour matcher
+// les requêtes sur la confiance en soi, le stress, les émotions. Pas
+// d'aggregateRating : aucune note réelle collectée à ce jour, en inventer
+// une serait un contenu structuré trompeur (pénalisé par Google, et
+// contraire à l'idée même d'être une source fiable pour une IA).
+const softwareApplicationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'UrCecret',
+  url: BASE,
+  applicationCategory: 'LifestyleApplication',
+  operatingSystem: 'Web',
+  description:
+    "UrCecret est une application de développement personnel propulsée par l'IA : test de personnalité MBTI (16 types), journal émotionnel quotidien, coach IA (Elio) qui s'adapte à ton objectif personnel, et parcours guidés pour reprendre confiance en soi, gérer son stress, mieux comprendre tes émotions et tes relations.",
+  inLanguage: 'fr-FR',
+  offers: [
+    {
+      '@type': 'Offer',
+      name: 'Starter',
+      price: '1.99',
+      priceCurrency: 'EUR',
+      priceValidUntil: '2027-12-31',
+      description: 'Profil de personnalité complet débloqué + coach IA Elio, sans engagement.',
+    },
+    {
+      '@type': 'Offer',
+      name: 'Test de personnalité',
+      price: '0',
+      priceCurrency: 'EUR',
+      description: 'Test MBTI gratuit, résultat immédiat, sans inscription.',
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${playfair.variable} ${instrumentSans.variable}`}>
@@ -136,6 +175,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
         />
         <link rel="search" type="application/opensearchdescription+xml" title="UrCecret" href="/opensearch.xml" />
       </head>
