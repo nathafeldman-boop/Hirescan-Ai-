@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
-import { needsMbtiBeforeHub } from '@/lib/onboardingSequence';
 import { QUEST_CATALOG } from '@/lib/quests';
 import { hasPremiumAccess } from '@/lib/plans';
 import DecouverteClient from './DecouverteClient';
@@ -30,8 +29,10 @@ export default async function DecouvertePage() {
   const pendingStep = await resolveFunnelStep(session.user.id);
   if (pendingStep) redirect(funnelStepPath(pendingStep));
 
-  if (await needsMbtiBeforeHub(session.user.id)) redirect('/quetes');
-
+  // Ancien comportement : redirection forcée vers /quetes tant que le test
+  // n'est pas fait. Remplacé par une bannière d'alerte directement sur le hub
+  // (voir hasMbti plus bas) — moins de friction (jamais bloqué hors du hub),
+  // mais toujours un signal fort pour pousser vers le test.
   const [user, completions, generatedQuests] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
@@ -65,6 +66,7 @@ export default async function DecouvertePage() {
   return (
     <DecouverteClient
       firstName={user?.name?.split(' ')[0] ?? null}
+      hasMbti={hasMbti}
       hasNewQuests={hasNewQuests}
       hasPendingQuests={hasPendingQuests}
       pendingQuestsCount={pendingQuestsCount}

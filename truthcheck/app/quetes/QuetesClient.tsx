@@ -152,9 +152,9 @@ export default function QuetesClient({
   }
 
   // Le test de personnalité est LA porte d'entrée du funnel juste après le
-  // Journal (voir lib/onboardingSequence.ts) — on le sort du lot avec un
-  // traitement "priorité" pour maximiser les chances qu'il soit fait en
-  // premier, avant même de parcourir le reste du catalogue. Retiré de sa
+  // Journal (voir la bannière d'alerte sur le hub, DecouverteClient.tsx) — on
+  // le sort du lot avec un traitement "priorité" pour maximiser les chances
+  // qu'il soit fait en premier, avant même de parcourir le reste du catalogue. Retiré de sa
   // catégorie normale (Découverte) une fois affiché ici pour ne pas le
   // montrer deux fois ; redevient une carte normale une fois terminé.
   const priorityQuest = !hasMbti ? quests.find((q) => q.key === 'first_mbti' && !q.completed) : undefined;
