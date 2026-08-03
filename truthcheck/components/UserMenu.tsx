@@ -3,6 +3,7 @@
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { hasPaidAccess } from '@/lib/plans';
 
 export default function UserMenu() {
   const { data: session, status } = useSession();
@@ -36,6 +37,13 @@ export default function UserMenu() {
   const user = session.user;
   const tier = (user as { tier?: string }).tier ?? 'free';
   const isPremium = tier === 'premium' || tier === 'plus';
+  // Distinct de isPremium (thème visuel "Sombre" du badge, réservé à
+  // plus/premium — voir le même distinguo dans DashboardClient.tsx) : un
+  // abonné Starter (1,99€/mois) paye bel et bien et doit voir "Abonné", pas
+  // "Gratuit", et surtout doit pouvoir résilier — sans ce check il n'avait
+  // aucun accès visible au portail Stripe alors que /api/billing-portal le
+  // gère déjà pour n'importe quel tier payant.
+  const isPaid = hasPaidAccess(tier);
   const initials = (user.name?.charAt(0) ?? user.email?.charAt(0) ?? '?').toUpperCase();
 
   async function openBillingPortal() {
@@ -74,19 +82,19 @@ export default function UserMenu() {
               <div className="mt-2">
                 <span
                   className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-bold"
-                  style={isPremium
+                  style={isPaid
                     ? { background: 'rgba(232,169,77,0.12)', color: '#e8a94d', border: '1px solid rgba(232,169,77,0.3)' }
                     : { background: 'rgba(255,255,255,0.05)', color: '#78716c', border: '1px solid rgba(255,255,255,0.1)' }
                   }
                 >
-                  {isPremium ? '🌑 Sombre' : 'Gratuit'}
+                  {isPremium ? '🌑 Sombre' : isPaid ? 'Abonné' : 'Gratuit'}
                 </span>
               </div>
             </div>
 
             {/* Actions */}
             <div className="py-1">
-              {isPremium ? (
+              {isPaid ? (
                 <button
                   onClick={openBillingPortal}
                   disabled={portalLoading}
