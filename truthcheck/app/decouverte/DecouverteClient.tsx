@@ -91,9 +91,10 @@ function CardVisual({ card }: { card: (typeof CARDS)[number] }) {
 }
 
 export default function DecouverteClient({
-  firstName, hasNewQuests, hasPendingQuests, pendingQuestsCount,
+  firstName, hasMbti, hasNewQuests, hasPendingQuests, pendingQuestsCount,
 }: {
   firstName: string | null;
+  hasMbti: boolean;
   hasNewQuests: boolean;
   hasPendingQuests: boolean;
   pendingQuestsCount: number;
@@ -130,6 +131,7 @@ export default function DecouverteClient({
         @keyframes questFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
         @keyframes questPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,163,74,0.45); } 70% { box-shadow: 0 0 0 10px rgba(201,163,74,0); } }
         .quest-badge--pulse { animation: questPulse 2s ease-out infinite; }
+        @keyframes alertPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(200,60,40,0.35); } 70% { box-shadow: 0 0 0 12px rgba(200,60,40,0); } }
         @media (prefers-reduced-motion: reduce) {
           .hub-up { opacity: 1; animation: none; }
           .hub-card, .hub-card-icon, .hub-card-arrow { transition: none; }
@@ -175,6 +177,42 @@ export default function DecouverteClient({
             Choisis ton expérience et commence ton exploration.
           </p>
         </div>
+
+        {/* Alerte profil incomplet — remplace l'ancienne redirection forcée
+            vers /quetes juste après le Journal (voir app/decouverte/page.tsx) :
+            on ne bloque plus jamais l'accès au hub, mais on met un signal fort,
+            impossible à manquer, tant que le test n'est pas fait. Registre
+            volontairement différent des badges dorés "quêtes" (curiosité) —
+            ici c'est une alerte, pas une récompense. Aucun état de chargement
+            : hasMbti vient du même rendu serveur que le reste de la page. */}
+        {!hasMbti && (
+          <Link
+            href="/quiz/personnalite"
+            className="hub-up elio-hover-lift flex items-center gap-4 rounded-[24px] px-5 py-5 mb-8"
+            style={{
+              background: '#FCEEEA', border: '1.5px solid #C8442E',
+              // Deux animations sur le même élément : jamais deux classes CSS
+              // séparées (une seule valeur `animation` gagne, elles ne
+              // fusionnent pas — voir le même piège documenté plus haut pour
+              // `floatingNew`) — donc une seule valeur inline qui combine
+              // l'entrée ET la pulsation.
+              animation: reduceMotion
+                ? undefined
+                : 'hubUp .5s ease forwards .02s, alertPulse 2.4s ease-out infinite 0.5s',
+              opacity: reduceMotion ? 1 : undefined,
+            }}
+          >
+            <span className="text-3xl flex-shrink-0" aria-hidden>🛑</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-wide mb-1" style={{ color: '#C8442E' }}>Profil incomplet</p>
+              <p className="text-sm font-bold" style={{ color: '#3a1712' }}>Ton profil de personnalité n&apos;est pas encore fait</p>
+              <p className="text-[12px] mt-0.5" style={{ color: '#8a5347', lineHeight: 1.4 }}>Termine ton test pour débloquer tout le reste →</p>
+            </div>
+            <svg className="w-5 h-5 flex-shrink-0" style={{ color: '#C8442E' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        )}
 
         {/* Les cartes — "Mes quêtes" (toujours 1ère) a un traitement à part :
             fond plein doré (pas juste un accent), et deux cartouches
