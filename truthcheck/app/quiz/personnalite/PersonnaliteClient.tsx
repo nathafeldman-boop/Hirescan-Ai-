@@ -44,6 +44,28 @@ function diagLog(step: string, meta: Record<string, unknown> = {}) {
   }).catch(() => {});
 }
 
+// Sauvegarde du type MBTI — trouvé en audit : sans vérifier res.ok ni
+// retenter, un échec DB (même transitoire) faisait perdre le type SANS
+// AUCUN signe visible (le résultat s'affichait quand même côté client, qui
+// ne dépend pas de cet appel pour continuer). Un retry suffit pour la grande
+// majorité des échecs transitoires ; l'échec final reste juste tracé via
+// diagLog (déjà le canal de diagnostic de ce funnel) — jamais un blocage du
+// funnel, la personne voit son résultat dans tous les cas.
+async function saveMbtiType(type: string, scores?: unknown): Promise<boolean> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch('/api/user/save-mbti', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mbtiType: type, ...(scores ? { scores } : {}) }),
+      });
+      if (res.ok) return true;
+    } catch {}
+    if (attempt === 0) await new Promise((r) => setTimeout(r, 800));
+  }
+  return false;
+}
+
 type QuizAnswer = 'A' | 'B' | 'C' | 'D' | 'E';
 type Answers = Record<number, QuizAnswer>;
 type QuizT = typeof ui.fr.quiz | typeof ui.en.quiz;
@@ -1057,11 +1079,9 @@ export default function PersonnaliteClient() {
         // pour que le coach IA soit personnalisé dès la première visite.
         let pendingScores: unknown = undefined;
         try { const raw = localStorage.getItem('_mbti_scores'); if (raw) pendingScores = JSON.parse(raw); } catch {}
-        fetch('/api/user/save-mbti', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mbtiType: pending, ...(pendingScores ? { scores: pendingScores } : {}) }),
-        }).catch(() => {});
+        void saveMbtiType(pending, pendingScores).then((ok) => {
+          if (!ok) diagLog('save_mbti_failed', { pending, via: 'pending_restore' });
+        });
         setMbtiType(pending);
         if (isPremium) { router.push(`/types/${pending.toLowerCase()}`); }
         else { setPhase('result'); }
@@ -1102,11 +1122,9 @@ export default function PersonnaliteClient() {
       localStorage.setItem('_mbti_scores', JSON.stringify(profile.scores));
     } catch {}
     if (session?.user) {
-      fetch('/api/user/save-mbti', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mbtiType: type, scores: profile.scores }),
-      }).catch(() => {});
+      void saveMbtiType(type, profile.scores).then((ok) => {
+        if (!ok) diagLog('save_mbti_failed', { type, via: 'analysis_done' });
+      });
       if (isPremium) {
         router.push(`/types/${type.toLowerCase()}`);
         return;

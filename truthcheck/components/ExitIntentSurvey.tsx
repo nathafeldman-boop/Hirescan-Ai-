@@ -27,8 +27,16 @@ export default function ExitIntentSurvey({ step }: { step: string }) {
   const [otherText, setOtherText] = useState('');
   const [sent, setSent] = useState(false);
   const armedRef = useRef(true);
+  // Capturé AVANT le pushState tampon, pour retrouver d'où la personne
+  // venait au moment de vraiment partir (voir leave() — ni history.back() ni
+  // router.back() ne fonctionnent de façon fiable ici : Next.js App Router
+  // patche l'API History pour son propre routing RSC, et un retour
+  // programmatique après notre propre pushState entre en conflit avec ce
+  // patch — la page reste figée sur place, trouvé en QA).
+  const cameFromRef = useRef<string | null>(null);
 
   useEffect(() => {
+    cameFromRef.current = document.referrer || null;
     window.history.pushState({ exitGuard: true }, '');
     function handlePopState() {
       if (!armedRef.current) return;
@@ -41,7 +49,11 @@ export default function ExitIntentSurvey({ step }: { step: string }) {
 
   function leave() {
     setVisible(false);
-    window.history.back();
+    // Navigation "dure" (pas l'API History) : contourne complètement le
+    // routeur de Next, jamais de risque de rester figé sur place.
+    const sameOrigin = cameFromRef.current && cameFromRef.current.startsWith(window.location.origin);
+    const target = sameOrigin ? cameFromRef.current! : '/decouverte';
+    window.location.href = target;
   }
 
   async function submit() {
