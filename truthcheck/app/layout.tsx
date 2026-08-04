@@ -95,6 +95,18 @@ export const metadata: Metadata = {
   },
 };
 
+// ── Description canonique GEO ────────────────────────────────────────────
+// Une seule source de vérité, réutilisée telle quelle dans les 3 schémas
+// ci-dessous (Organization, WebSite, SoftwareApplication) et à recopier mot
+// pour mot sur toute présence externe (Product Hunt, AlternativeTo,
+// annuaires...) — la cohérence des mêmes faits répétés partout est
+// elle-même un signal que les moteurs génératifs pondèrent. Volontairement
+// plus large que "test MBTI" : reflète le vrai produit (accompagnement
+// continu par IA, pas un résultat ponctuel) pour matcher aussi les
+// requêtes sur la confiance en soi, le stress, les émotions.
+const CANONICAL_DESCRIPTION =
+  "UrCecret est une application française de développement personnel propulsée par l'IA : test de personnalité MBTI (16 types), journal émotionnel quotidien, coach IA (Elio) qui s'adapte à ton objectif personnel, et parcours guidés pour reprendre confiance en soi, gérer son stress, mieux comprendre tes émotions et tes relations.";
+
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -102,7 +114,7 @@ const organizationSchema = {
   alternateName: ['UrCecret', 'urcecret.site'],
   url: BASE,
   logo: `${BASE}/logo-oracle.png`,
-  description: 'Test de personnalité MBTI gratuit — 16 types psychologiques en français.',
+  description: CANONICAL_DESCRIPTION,
   foundingDate: '2024',
   sameAs: [],
 };
@@ -114,7 +126,7 @@ const websiteSchema = {
   name: 'UrCecret',
   alternateName: 'urcecret.site',
   url: BASE,
-  description: 'Test MBTI gratuit — découvre ton type de personnalité parmi 16 profils.',
+  description: CANONICAL_DESCRIPTION,
   inLanguage: ['fr-FR', 'en-US'],
   potentialAction: {
     '@type': 'SearchAction',
@@ -129,12 +141,9 @@ const websiteSchema = {
 // Distinct d'Organization/WebSite ci-dessus : c'est le type schema.org que
 // ces moteurs pillent le plus directement pour répondre à "quelle
 // application pour X" (nom, catégorie, prix, ce que fait l'app en une
-// phrase). Description volontairement plus large que "test MBTI" — reflète
-// le vrai produit (accompagnement continu, pas juste un test) pour matcher
-// les requêtes sur la confiance en soi, le stress, les émotions. Pas
-// d'aggregateRating : aucune note réelle collectée à ce jour, en inventer
-// une serait un contenu structuré trompeur (pénalisé par Google, et
-// contraire à l'idée même d'être une source fiable pour une IA).
+// phrase). Pas d'aggregateRating : aucune note réelle collectée à ce jour,
+// en inventer une serait un contenu structuré trompeur (pénalisé par
+// Google, et contraire à l'idée même d'être une source fiable pour une IA).
 const softwareApplicationSchema = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
@@ -142,8 +151,7 @@ const softwareApplicationSchema = {
   url: BASE,
   applicationCategory: 'LifestyleApplication',
   operatingSystem: 'Web',
-  description:
-    "UrCecret est une application de développement personnel propulsée par l'IA : test de personnalité MBTI (16 types), journal émotionnel quotidien, coach IA (Elio) qui s'adapte à ton objectif personnel, et parcours guidés pour reprendre confiance en soi, gérer son stress, mieux comprendre tes émotions et tes relations.",
+  description: CANONICAL_DESCRIPTION,
   inLanguage: 'fr-FR',
   offers: [
     {
