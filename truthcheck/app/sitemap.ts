@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllPairs } from '@/lib/compatibility';
+import { PAIN_SLUGS } from '@/lib/painPages';
+import { COMPARISON_SLUGS } from '@/lib/comparisonPages';
 
 const BASE_URL = 'https://urcecret.site';
 
@@ -29,6 +31,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/quiz/personnalite`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE_URL}/types`,                              lastModified: now, changeFrequency: 'weekly', priority: 0.93 },
     { url: `${BASE_URL}/tests`,                  lastModified: now, changeFrequency: 'weekly', priority: 0.88 },
+    { url: `${BASE_URL}/a-propos`,                lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    ...PAIN_SLUGS.map((pain) => ({
+      url: `${BASE_URL}/comprendre/${pain}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+    })),
+    ...COMPARISON_SLUGS.map((slug) => ({
+      url: `${BASE_URL}/vs/${slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    })),
     ...QUIZ_SLUGS.map((slug) => ({
       url: `${BASE_URL}/quiz/${slug}`,
       lastModified: now,
