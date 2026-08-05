@@ -6,6 +6,21 @@ export const AGE_RANGES = ['-18', '18-24', '25-34', '35-44', '45+'] as const;
 
 export const GENDERS = ['Femme', 'Homme', 'Autre', 'Je préfère ne pas dire'] as const;
 
+// Ce qui a amené la personne aujourd'hui — distinct de ONBOARDING_GOALS
+// (l'objectif de fond, "pourquoi dans la vie") : ici c'est "qu'est-ce qui
+// t'a attiré dans l'appli maintenant", pensé pour le trafic publicitaire à
+// intention précise (ex. Google Ads sur "test MBTI") qui veut une réponse
+// immédiate sur ce qu'il va trouver. Purement déclaratif (comme le reste de
+// /bienvenue) : sert à rassurer tout de suite ("encore quelques étapes et
+// tu y es"), pas encore injecté dans les prompts d'Elio.
+export const ONBOARDING_INTERESTS = [
+  'Mon test de personnalité (MBTI)',
+  'Un coach IA qui me comprend',
+  'Comparer ma compatibilité avec mes proches',
+  'Suivre mes émotions au quotidien',
+  'Un accompagnement pour progresser',
+] as const;
+
 // Objectif principal — UNE seule question, choix unique (pas de "raison" +
 // "focus" séparés : ça allongeait le questionnaire pour un gain marginal).
 export const ONBOARDING_GOALS = [
