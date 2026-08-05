@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { logEvent, EVENTS } from '@/lib/trackEvent';
 import { checkAndRecordQuestCompletions } from '@/lib/quests';
-import { AGE_RANGES, GENDERS, ONBOARDING_GOALS } from '@/lib/onboardingFunnel';
+import { AGE_RANGES, GENDERS, ONBOARDING_GOALS, ONBOARDING_INTERESTS } from '@/lib/onboardingFunnel';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,13 +18,16 @@ export async function POST(req: NextRequest) {
   const uid = (session?.user as { id?: string } | undefined)?.id;
   if (!uid) return NextResponse.json({ error: 'auth_required' }, { status: 401 });
 
-  let body: { name?: string; ageRange?: string; gender?: string; goal?: string };
+  let body: { name?: string; ageRange?: string; gender?: string; goal?: string; interest?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'invalid_body' }, { status: 400 }); }
 
   const name = (body.name ?? '').trim().slice(0, 60) || undefined;
   const ageRange = AGE_RANGES.includes(body.ageRange as typeof AGE_RANGES[number]) ? body.ageRange : undefined;
   const gender = GENDERS.includes(body.gender as typeof GENDERS[number]) ? body.gender : undefined;
   const goal = ONBOARDING_GOALS.includes(body.goal as typeof ONBOARDING_GOALS[number]) ? body.goal : undefined;
+  // Déclaratif uniquement (voir lib/onboardingFunnel.ts) — pas de colonne
+  // User dédiée, juste loggé pour l'admin, comme EXIT_FEEDBACK plus haut.
+  const interest = ONBOARDING_INTERESTS.includes(body.interest as typeof ONBOARDING_INTERESTS[number]) ? body.interest : undefined;
 
   await prisma.user.update({
     where: { id: uid },
@@ -37,7 +40,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  await logEvent(uid, EVENTS.ONBOARDING_COMPLETED, { ageRange, gender, goal });
+  await logEvent(uid, EVENTS.ONBOARDING_COMPLETED, { ageRange, gender, goal, interest });
   // Pas de célébration ici — l'utilisateur enchaîne tout de suite sur le
   // Journal, ce n'est pas le moment d'interrompre. Elle apparaîtra comme
   // badge déjà acquis à la prochaine visite de /quetes.

@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ElioAvatar from '@/components/ElioAvatar';
-import { AGE_RANGES, GENDERS, ONBOARDING_GOALS } from '@/lib/onboardingFunnel';
+import { AGE_RANGES, GENDERS, ONBOARDING_GOALS, ONBOARDING_INTERESTS } from '@/lib/onboardingFunnel';
 
-const STEPS = 4;
+const STEPS = 5;
 
 // Sélecteur en chips — repris du pattern déjà utilisé pour le premier Journal
 // (voir OnboardingFlow dans app/journal/JournalClient.tsx), pour que l'accueil
@@ -34,11 +34,27 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
   const [name, setName] = useState(prefillName ?? '');
   const [ageRange, setAgeRange] = useState<string | null>(null);
   const [gender, setGender] = useState<string | null>(null);
+  const [interest, setInterest] = useState<string | null>(null);
+  const [interestConfirmed, setInterestConfirmed] = useState(false);
   const [goal, setGoal] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const advance = () => setStep((s) => s + 1);
+
+  // Confirmation courte avant d'avancer — pas un vrai palier de progression
+  // (la barre ne bouge qu'à l'advance() final), juste de quoi rassurer
+  // immédiatement le trafic à intention précise (ex. pub Google Ads "test
+  // MBTI") sur le fait qu'il va bien y arriver, sans attendre la fin du
+  // funnel pour le découvrir.
+  function chooseInterest(value: string) {
+    setInterest(value);
+    setInterestConfirmed(true);
+    setTimeout(() => {
+      setInterestConfirmed(false);
+      advance();
+    }, 1400);
+  }
 
   async function finish(selectedGoal: string) {
     setSaving(true);
@@ -47,7 +63,7 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
       const res = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim() || undefined, ageRange, gender, goal: selectedGoal }),
+        body: JSON.stringify({ name: name.trim() || undefined, ageRange, gender, interest, goal: selectedGoal }),
       });
       if (!res.ok) throw new Error();
       // Direct vers le Journal — jamais le Hub ici : la première expérience
@@ -120,6 +136,29 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
           )}
 
           {step === 3 && (
+            <>
+              {!interestConfirmed ? (
+                <>
+                  <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Qu&apos;est-ce qui t&apos;attire le plus dans UrCecret ?</p>
+                  <p className="text-sm mb-4 leading-relaxed" style={{ color: '#6b6055' }}>On te dit tout de suite comment y accéder.</p>
+                  <div className="flex flex-col gap-2">
+                    {ONBOARDING_INTERESTS.map((i) => (
+                      <Chip key={i} label={i} selected={interest === i} onClick={() => chooseInterest(i)} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="py-6 text-center">
+                  <p className="font-display text-base font-black mb-2" style={{ color: 'var(--ink)' }}>Parfait, on garde ça en tête ✓</p>
+                  <p className="text-sm leading-relaxed" style={{ color: '#6b6055' }}>
+                    Encore 2-3 étapes rapides (moins d&apos;une minute) et tu y es — c&apos;est parti 👇
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+
+          {step === 4 && (
             <>
               <p className="font-display text-lg font-black mb-1" style={{ color: 'var(--ink)' }}>Quel est ton objectif principal ?</p>
               <p className="text-sm mb-4 leading-relaxed" style={{ color: '#6b6055' }}>Il n&apos;y a pas de mauvaise réponse.</p>
