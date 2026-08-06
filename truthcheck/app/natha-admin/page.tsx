@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import AccessCodeWidget from './AccessCodeWidget';
+import AffiliateCreateWidget from './AffiliateCreateWidget';
 import TodayStatsLive from './TodayStatsLive';
 import { describeOrigin, pageLabel } from '@/lib/userActivity';
 
@@ -713,6 +714,7 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
 
         {/* ── SECTION 5 : Affiliés ── */}
         <p style={sectionHeading}>Tes affiliés</p>
+        <AffiliateCreateWidget />
         {affiliates.length === 0 ? (
           <div style={{ ...block(C.surface, C.border), marginBottom: 28, color: C.muted, fontSize: 14 }}>
             Aucun affilié pour l&apos;instant.
