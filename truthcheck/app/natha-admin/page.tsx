@@ -99,6 +99,40 @@ function distinctUsersSince(rows: { userId: string; day: string }[], sinceYMD: s
   return set.size;
 }
 
+// "Personnes venues"/"Sur la page d'accueil" doivent compter des VISITEURS
+// distincts, pas des PageView brutes — un seul visiteur qui traverse 7 pages
+// (accueil → login → OTP → bienvenue → journal…) ne doit compter que pour 1,
+// pas pour 7 (bug repéré le 06/08 : le compteur gonflait le vrai trafic de
+// plusieurs fois, faussant toute lecture du dashboard). Identité = compte
+// connecté si présent, sinon visitorId anonyme (lib/visitorId.ts). Même
+// logique que /api/natha-admin/today/route.ts.
+function distinctVisitorsCount(rows: { visitorId: string | null; userId: string | null }[]): number {
+  const set = new Set<string>();
+  for (const r of rows) {
+    const key = r.userId ?? r.visitorId;
+    if (key) set.add(key);
+  }
+  return set.size;
+}
+
+function distinctVisitorsByDay(rows: { createdAt: Date; visitorId: string | null; userId: string | null }[], days: number, todayYMD: string): number[] {
+  const byDay: Record<string, Set<string>> = {};
+  for (const r of rows) {
+    const key = r.userId ?? r.visitorId;
+    if (!key) continue;
+    const day = r.createdAt.toLocaleDateString('en-CA', { timeZone: TZ });
+    if (!byDay[day]) byDay[day] = new Set();
+    byDay[day].add(key);
+  }
+  const base = new Date(todayYMD + 'T00:00:00Z');
+  const out: number[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const key = new Date(base.getTime() - i * 86_400_000).toISOString().slice(0, 10);
+    out.push(byDay[key]?.size ?? 0);
+  }
+  return out;
+}
+
 export default async function NathaAdminPage({ searchParams }: { searchParams?: { q?: string } }) {
   const now = new Date();
   const todayParis  = now.toLocaleDateString('en-CA', { timeZone: TZ }); // "2026-06-12"
@@ -114,8 +148,8 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
   const [
     totalUsers, premiumUsers, newToday, newThisWeek, newLastWeek,
     totalResults, paidResults, paidToday, paidThisWeek, paidLastWeek,
-    visitsToday, visitsWeek, visitsLastWeek, visitsTotal,
-    landingToday, landingTotal,
+    visitsTodayRows, visitsWeekRows, visitsLastWeekRows, visitsTotalRows,
+    landingTodayRows, landingTotalRows,
     topPages, recentUsers, affiliates, quizResults, allConversions,
   ] = await Promise.all([
     prisma.user.count(),
@@ -135,12 +169,15 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: sevenDaysAgo } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
-    prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
-    prisma.pageView.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-    prisma.pageView.count({ where: { createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } } }),
-    prisma.pageView.count(),
-    prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
-    prisma.pageView.count({ where: { path: '/' } }),
+    // findMany + distinctVisitorsCount plutôt que count() brut : un même
+    // visiteur qui traverse plusieurs pages ne doit compter qu'une fois
+    // (voir le commentaire sur distinctVisitorsCount ci-dessus).
+    prisma.pageView.findMany({ where: { createdAt: { gte: startOfToday } }, select: { visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ where: { createdAt: { gte: fourteenAgo, lt: sevenDaysAgo } }, select: { visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ select: { visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: startOfToday } }, select: { visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ where: { path: '/' }, select: { visitorId: true, userId: true } }),
     prisma.pageView.groupBy({ by: ['path'], _count: { path: true }, orderBy: { _count: { path: 'desc' } }, take: 8 }),
     prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 30, select: { id: true, email: true, name: true, tier: true, createdAt: true, onboardingGoal: true } }),
     prisma.affiliate.findMany({ include: { conversions: true }, orderBy: { createdAt: 'desc' } }).then(async (aff) => {
@@ -154,6 +191,12 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
     // ici affichait 0 € dès que les ventes du mois venaient du trafic direct/TikTok.
     prisma.conversion.findMany({ select: { amountCents: true, createdAt: true } }),
   ]);
+  const visitsToday = distinctVisitorsCount(visitsTodayRows);
+  const visitsWeek = distinctVisitorsCount(visitsWeekRows);
+  const visitsLastWeek = distinctVisitorsCount(visitsLastWeekRows);
+  const visitsTotal = distinctVisitorsCount(visitsTotalRows);
+  const landingToday = distinctVisitorsCount(landingTodayRows);
+  const landingTotal = distinctVisitorsCount(landingTotalRows);
 
   // ── Recherche par email/nom — un compte peut payer des jours ou des mois
   // après son inscription (voir la question posée depuis Stripe : "il a payé
@@ -191,13 +234,13 @@ export default async function NathaAdminPage({ searchParams }: { searchParams?: 
   // Connect) — un point par jour, construit à partir des vraies lignes
   // horodatées des 7 derniers jours (bucketByDay), rien d'estimé.
   const [visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
-    prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
-    prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
+    prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true, visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true, visitorId: true, userId: true } }),
     prisma.user.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
     prisma.quizResult.findMany({ where: { paid: true, createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
   ]);
-  const visitsSpark  = bucketByDay(visits7dRows, 7, todayParis);
-  const landingSpark = bucketByDay(landing7dRows, 7, todayParis);
+  const visitsSpark  = distinctVisitorsByDay(visits7dRows, 7, todayParis);
+  const landingSpark = distinctVisitorsByDay(landing7dRows, 7, todayParis);
   const signupsSpark = bucketByDay(signups7dRows, 7, todayParis);
   const paidSpark     = bucketByDay(paid7dRows, 7, todayParis);
 

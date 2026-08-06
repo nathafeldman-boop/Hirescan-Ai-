@@ -30,6 +30,39 @@ function bucketByDay(rows: { createdAt: Date }[], days: number, todayYMD: string
   return out;
 }
 
+// "Personnes venues"/"Sur la page d'accueil" doivent compter des VISITEURS
+// distincts, pas des PageView brutes — un seul visiteur qui traverse 7 pages
+// (accueil → login → OTP → bienvenue → journal…) ne doit compter que pour 1,
+// pas pour 7 (bug repéré le 06/08 : le compteur gonflait le vrai trafic de
+// plusieurs fois, faussant toute lecture du dashboard). Identité = compte
+// connecté si présent, sinon visitorId anonyme (lib/visitorId.ts).
+function distinctVisitorsCount(rows: { visitorId: string | null; userId: string | null }[]): number {
+  const set = new Set<string>();
+  for (const r of rows) {
+    const key = r.userId ?? r.visitorId;
+    if (key) set.add(key);
+  }
+  return set.size;
+}
+
+function distinctVisitorsByDay(rows: { createdAt: Date; visitorId: string | null; userId: string | null }[], days: number, todayYMD: string): number[] {
+  const byDay: Record<string, Set<string>> = {};
+  for (const r of rows) {
+    const key = r.userId ?? r.visitorId;
+    if (!key) continue;
+    const day = r.createdAt.toLocaleDateString('en-CA', { timeZone: TZ });
+    if (!byDay[day]) byDay[day] = new Set();
+    byDay[day].add(key);
+  }
+  const base = new Date(todayYMD + 'T00:00:00Z');
+  const out: number[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const key = new Date(base.getTime() - i * 86_400_000).toISOString().slice(0, 10);
+    out.push(byDay[key]?.size ?? 0);
+  }
+  return out;
+}
+
 // Alimente le rafraîchissement live des 4 cases "Aujourd'hui" du dashboard
 // (/natha-admin) — voir TodayStatsLive.tsx, interrogée toutes les ~20s.
 // Ne reprend QUE les compteurs "aujourd'hui" + 7 jours (indexés sur
@@ -95,9 +128,9 @@ export async function GET() {
   const startOfToday = parisMidnight(todayParis);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const [visitsToday, landingToday, newToday, paidToday, online, visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
-    prisma.pageView.count({ where: { createdAt: { gte: startOfToday } } }),
-    prisma.pageView.count({ where: { path: '/', createdAt: { gte: startOfToday } } }),
+  const [visitsTodayRows, landingTodayRows, newToday, paidToday, online, visits7dRows, landing7dRows, signups7dRows, paid7dRows] = await Promise.all([
+    prisma.pageView.findMany({ where: { createdAt: { gte: startOfToday } }, select: { visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: startOfToday } }, select: { visitorId: true, userId: true } }),
     // "Nouveau compte" = vraie activation (EmailLog de bienvenue, voir
     // lib/notifySignup.ts), pas User.createdAt : un compte peut être créé "à
     // blanc" un autre jour (ex. capture d'email anonyme pendant un quiz via
@@ -106,11 +139,13 @@ export async function GET() {
     prisma.emailLog.count({ where: { type: 'welcome', sentAt: { gte: startOfToday } } }),
     prisma.quizResult.count({ where: { paid: true, createdAt: { gte: startOfToday } } }),
     getOnlineNow(now),
-    prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
-    prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
+    prisma.pageView.findMany({ where: { createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true, visitorId: true, userId: true } }),
+    prisma.pageView.findMany({ where: { path: '/', createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true, visitorId: true, userId: true } }),
     prisma.emailLog.findMany({ where: { type: 'welcome', sentAt: { gte: sevenDaysAgo } }, select: { sentAt: true } }),
     prisma.quizResult.findMany({ where: { paid: true, createdAt: { gte: sevenDaysAgo } }, select: { createdAt: true } }),
   ]);
+  const visitsToday = distinctVisitorsCount(visitsTodayRows);
+  const landingToday = distinctVisitorsCount(landingTodayRows);
 
   return NextResponse.json({
     visitsToday,
@@ -119,8 +154,8 @@ export async function GET() {
     paidToday,
     onlineNow: online.count,
     onlineVisitors: online.visitors,
-    visitsSpark: bucketByDay(visits7dRows, 7, todayParis),
-    landingSpark: bucketByDay(landing7dRows, 7, todayParis),
+    visitsSpark: distinctVisitorsByDay(visits7dRows, 7, todayParis),
+    landingSpark: distinctVisitorsByDay(landing7dRows, 7, todayParis),
     signupsSpark: bucketByDay(signups7dRows.map((r) => ({ createdAt: r.sentAt })), 7, todayParis),
     paidSpark: bucketByDay(paid7dRows, 7, todayParis),
     updatedAt: now.toISOString(),
