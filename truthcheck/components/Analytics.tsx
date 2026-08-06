@@ -7,6 +7,10 @@ import { useEffect } from 'react';
 const TT_PIXEL_ID   = process.env.NEXT_PUBLIC_TT_PIXEL_ID;
 const GA_ID         = process.env.NEXT_PUBLIC_GA_ID;
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+// ID public de la balise Google Ads (pas un secret : il apparaît de toute
+// façon en clair dans le HTML une fois la balise posée) — pas besoin de
+// passer par une variable d'env comme les autres pixels ci-dessus.
+const GOOGLE_ADS_ID = 'AW-18185924200';
 
 /* Fire TikTok page() + GA4 page_view + Meta PageView on soft navigations */
 function RouteChangeTracker() {
@@ -101,6 +105,26 @@ gtag('config','${GA_ID}',{page_path:window.location.pathname});
           {!TT_PIXEL_ID && <RouteChangeTracker />}
         </>
       )}
+
+      {/* ── Google Ads (balise de suivi des conversions) ── */}
+      {/* gtag.js n'est chargé qu'une fois : si GA4 est déjà configuré
+          ci-dessus, on réutilise son script et on ajoute juste un second
+          gtag('config', ...) pour cet ID Ads. */}
+      {!GA_ID && (
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`} strategy="afterInteractive" />
+      )}
+      <Script
+        id="google-ads-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());
+gtag('config','${GOOGLE_ADS_ID}');
+          `,
+        }}
+      />
 
       {/* RouteChangeTracker for Meta when no TikTok/GA */}
       {META_PIXEL_ID && !TT_PIXEL_ID && !GA_ID && <RouteChangeTracker />}
