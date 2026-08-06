@@ -1023,8 +1023,9 @@ export default function PersonnaliteClient() {
   const [isInApp] = useState(() => detectInAppBrowser());
   const baseQuestions = lang === 'en' ? mbtiQuestionsEn : mbtiQuestions;
   // Short, completable quiz for everyone (was 70 questions in browser → huge drop-off).
-  // 6 per dimension (24q) in browser, 5 (20q) in TikTok in-app where patience is lowest.
-  const questions = getBalancedQuestions(baseQuestions, isInApp ? 5 : 6);
+  // 6 par dimension (24q) partout, y compris en in-app (TikTok/Insta) — plus de
+  // version réduite à 20q : le vrai test, pas une version light selon le canal.
+  const questions = getBalancedQuestions(baseQuestions, 6);
   const t = ui[lang].quiz;
 
   // Log initial phase and URL params on first render
