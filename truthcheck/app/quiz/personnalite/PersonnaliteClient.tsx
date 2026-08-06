@@ -223,6 +223,13 @@ function QuizScreen({ onComplete, questions, t, lang }: {
           <p className="text-xs mt-1 leading-snug" style={{ color: 'rgba(21,18,31,0.65)' }}>{milestoneMsg.sub}</p>
         </div>
       )}
+      {/* Identifie clairement l'écran pour quiconque y arrive sans être passé
+          par la hero/SEO (masquée pendant le quiz, voir plus haut) — en
+          particulier les nouveaux inscrits envoyés ici directement depuis
+          /bienvenue, qui n'ont vu aucune page marketing avant. */}
+      <p className="ur-label text-[10px] text-center mb-3" style={{ color: 'var(--gold)' }}>
+        {lang === 'en' ? 'MBTI Personality Test' : 'Test de personnalité MBTI'}
+      </p>
       <ProgressBar current={current + 1} total={questions.length} label={t.questionOf(current + 1, questions.length)} />
 
       {/* Question + réponses centrées verticalement → remplit l'écran, plus de vide */}

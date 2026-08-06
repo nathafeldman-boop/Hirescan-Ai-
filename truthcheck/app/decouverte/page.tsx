@@ -66,7 +66,6 @@ export default async function DecouvertePage() {
   return (
     <DecouverteClient
       firstName={user?.name?.split(' ')[0] ?? null}
-      hasMbti={hasMbti}
       hasNewQuests={hasNewQuests}
       hasPendingQuests={hasPendingQuests}
       pendingQuestsCount={pendingQuestsCount}

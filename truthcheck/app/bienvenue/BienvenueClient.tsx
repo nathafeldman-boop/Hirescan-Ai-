@@ -66,17 +66,14 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
         body: JSON.stringify({ name: name.trim() || undefined, ageRange, gender, interest, goal: selectedGoal }),
       });
       if (!res.ok) throw new Error();
-      // Direct vers le Journal — jamais le Hub ici : la première expérience
-      // doit être "je note comment je me sens", pas un écran de choix.
-      // Exception : si la personne a dit être venue pour le test MBTI (trafic
-      // pub à intention précise, ex. Google Ads "test MBTI"), on tient la
-      // promesse tout de suite plutôt que de la surprendre avec le Journal —
-      // constat du 06/08 : sur les inscrits publicitaires, seule une minorité
-      // s'engageait réellement après avoir atterri directement sur le
-      // Journal. /quiz/personnalite gère déjà elle-même la suite (paywall →
-      // "continuer gratuitement" vers /chat, ou achat → /types/[type]), donc
-      // rien à dupliquer ici.
-      router.push(interest === ONBOARDING_INTERESTS[0] ? '/quiz/personnalite' : '/journal');
+      // Direct vers le test MBTI pour TOUT LE MONDE, plus seulement ceux qui
+      // ont choisi "Mon test de personnalité" à l'étape précédente — décision
+      // du 07/08 après test réel du funnel : atterrir sur le Journal sans être
+      // jamais passé par le test ne montrait à personne ce qui fait l'identité
+      // du produit. /quiz/personnalite gère déjà toute la suite (paywall →
+      // "continuer gratuitement" vers /journal, ou achat → /types/[type]),
+      // donc rien à dupliquer ici — juste le nouveau point d'entrée.
+      router.push('/quiz/personnalite');
     } catch {
       setError('Une erreur est survenue, réessaie.');
       setSaving(false);
