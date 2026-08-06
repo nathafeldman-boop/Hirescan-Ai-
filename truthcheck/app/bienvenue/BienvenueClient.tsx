@@ -68,7 +68,15 @@ export default function BienvenueClient({ prefillName }: { prefillName: string |
       if (!res.ok) throw new Error();
       // Direct vers le Journal — jamais le Hub ici : la première expérience
       // doit être "je note comment je me sens", pas un écran de choix.
-      router.push('/journal');
+      // Exception : si la personne a dit être venue pour le test MBTI (trafic
+      // pub à intention précise, ex. Google Ads "test MBTI"), on tient la
+      // promesse tout de suite plutôt que de la surprendre avec le Journal —
+      // constat du 06/08 : sur les inscrits publicitaires, seule une minorité
+      // s'engageait réellement après avoir atterri directement sur le
+      // Journal. /quiz/personnalite gère déjà elle-même la suite (paywall →
+      // "continuer gratuitement" vers /chat, ou achat → /types/[type]), donc
+      // rien à dupliquer ici.
+      router.push(interest === ONBOARDING_INTERESTS[0] ? '/quiz/personnalite' : '/journal');
     } catch {
       setError('Une erreur est survenue, réessaie.');
       setSaving(false);
