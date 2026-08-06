@@ -15,14 +15,22 @@ export default function SuccessTracker({ paid, amountEur }: Props) {
   const router = useRouter();
   const params = useSearchParams();
   const typeCode = params.get('typeCode')?.toUpperCase();
+  const sessionId = params.get('session_id') ?? undefined;
 
   useEffect(() => {
     // Ne jamais envoyer "purchase" si le paiement Stripe n'a pas été vérifié
     // côté serveur (page.tsx / verifyAndUnlock) — sinon n'importe qui visitant
     // /success sans session Stripe valide gonfle le signal "purchase" envoyé
-    // à TikTok/GA4, ce qui fausse l'optimisation des campagnes publicitaires.
+    // à TikTok/GA4/Google Ads, ce qui fausse l'optimisation des campagnes.
     if (paid) {
-      track('payment_success', { value: amountEur, currency: 'EUR', content_name: 'UrCecret Premium' });
+      track('payment_success', {
+        value: amountEur,
+        currency: 'EUR',
+        content_name: 'UrCecret Premium',
+        // ID de session Stripe : dédup requis par Google Ads pour ne jamais
+        // compter deux fois la même vente (ex. si /success est rechargée).
+        transactionId: sessionId,
+      });
     }
     // Clear the double-payment guard — purchase confirmed, future purchases allowed.
     try { localStorage.removeItem('_urs_co'); } catch {}

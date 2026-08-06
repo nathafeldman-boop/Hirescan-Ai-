@@ -28,6 +28,7 @@ interface TrackProps {
   value?: number;          // monetary value in EUR
   currency?: string;
   content_name?: string;
+  transactionId?: string;  // dedup key for ad-platform purchase conversions (e.g. Stripe session id)
   [key: string]: unknown;
 }
 
@@ -53,6 +54,12 @@ const GA_EVENT: Record<AnalyticsEvent, string> = {
   affiliate_click: 'affiliate_click',
 };
 
+// Label de conversion "Achat" fourni par Google Ads (compte nathafeldman@gmail.com,
+// campagne "UrCecret test ads") — distinct de l'event GA4 'purchase' ci-dessus :
+// sans ce 'send_to' précis, Google Ads ne compte jamais la vente comme
+// conversion et la stratégie d'enchères ne peut pas optimiser dessus.
+const GOOGLE_ADS_PURCHASE_LABEL = 'AW-18185924200/47sICO3QkN0cEOjc3N9D';
+
 export function track(event: AnalyticsEvent, props: TrackProps = {}) {
   if (typeof window === 'undefined') return;
   try {
@@ -61,6 +68,17 @@ export function track(event: AnalyticsEvent, props: TrackProps = {}) {
 
     // — Google Analytics 4
     window.gtag?.('event', GA_EVENT[event], props);
+
+    // — Google Ads conversion (achat réel uniquement — jamais une simple
+    // inscription gratuite, sous peine de fausser l'algo d'enchères)
+    if (event === 'payment_success') {
+      window.gtag?.('event', 'conversion', {
+        send_to: GOOGLE_ADS_PURCHASE_LABEL,
+        value: props.value,
+        currency: props.currency ?? 'EUR',
+        transaction_id: props.transactionId ?? '',
+      });
+    }
 
     // — Internal DB (PageView table)
     const path = `/__evt/${event}${props.quiz ? `/${props.quiz}` : ''}`;
