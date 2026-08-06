@@ -89,10 +89,10 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             {/* Vers /decouverte, pas le test direct : ce hub gère lui-même le
                 mur de connexion (compte requis → OTP email → callbackUrl de
-                retour ici) puis enchaîne le funnel voulu (bienvenue → journal
-                → hub avec alerte "profil incomplet" → test seulement quand on
-                clique dessus). Envoyer directement sur /quiz/personnalite
-                sautait tout ça. */}
+                retour ici) puis enchaîne le funnel voulu (bienvenue → test
+                MBTI → paywall → hub, voir BienvenueClient.tsx). Envoyer
+                directement sur /quiz/personnalite sautait le mur de
+                connexion et l'onboarding. */}
             <UserMenu />
             <Link
               href="/decouverte"
