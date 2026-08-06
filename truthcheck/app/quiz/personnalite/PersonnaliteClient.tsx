@@ -653,10 +653,12 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp, onboardingGoal }: {
 
         {/* ─── L'embranchement — le paywall n'est plus une impasse. Deux choix
             très visibles, tout de suite : débloquer maintenant, ou continuer
-            gratuitement. "Continuer gratuitement" envoie DIRECTEMENT vers
-            Elio en un clic — un ancien écran de confirmation intermédiaire
+            gratuitement. "Continuer gratuitement" envoie DIRECTEMENT vers le
+            Journal en un clic — un ancien écran de confirmation intermédiaire
             ("Pas de problème ❤️...") ajoutait un clic de friction qui faisait
-            partir les gens avant même d'atteindre Elio. ── */}
+            partir les gens avant même d'y arriver. Le Journal, pas Elio : la
+            suite naturelle du funnel gratuit reste "je note comment je me
+            sens", cohérent avec /bienvenue → /journal. ── */}
         <div className="flex flex-col gap-2.5 mb-6">
           <button
             onClick={() => doCheckout('starter')}
@@ -666,7 +668,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp, onboardingGoal }: {
             {loading ? '…' : isFr ? '👉 Débloquer mon profil complet' : '👉 Unlock my full profile'}
           </button>
           <Link
-            href="/chat?from=paywall"
+            href="/journal"
             className="w-full py-3.5 rounded-full text-center text-sm font-semibold transition-all active:scale-[0.98] block"
             style={{ border: '1px solid var(--line)', color: 'var(--ink)', background: 'var(--paper-panel)' }}
           >
@@ -923,7 +925,7 @@ function ResultTeaser({ typeCode, lang, userEmail, isInApp, onboardingGoal }: {
           <p className="text-[12.5px] mb-2" style={{ color: '#a8a29e', lineHeight: 1.5 }}>
             {isFr ? 'Pas prêt à continuer maintenant ?' : 'Not ready to continue right now?'}
           </p>
-          <Link href="/chat?from=paywall" className="text-[12.5px] font-semibold" style={{ color: 'var(--gold)' }}>
+          <Link href="/journal" className="text-[12.5px] font-semibold" style={{ color: 'var(--gold)' }}>
             {isFr ? '👉 Continuer gratuitement →' : '👉 Continue for free →'}
           </Link>
         </div>
