@@ -14,17 +14,21 @@ export const metadata: Metadata = {
 // lib/auth.ts (flux Google/magic-link) et resolvePostAuthDestination dans
 // lib/onboardingFunnel.ts (flux OTP par email). Jamais rejoué une fois
 // répondu (onboardingCompletedAt) : un utilisateur qui revient ici par un
-// vieux lien ou un bouton "retour" repart directement vers le Journal.
+// vieux lien ou un bouton "retour" repart directement vers le test MBTI s'il
+// ne l'a pas encore fait, sinon le Journal — même logique que BienvenueClient
+// .finish() (voir ce fichier) : le test est la vraie porte d'entrée tant
+// qu'il n'est pas fait, pas seulement pour ceux qui viennent de finir
+// l'onboarding à l'instant.
 export default async function BienvenuePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect('/login?callbackUrl=/bienvenue');
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, onboardingCompletedAt: true },
+    select: { name: true, onboardingCompletedAt: true, mbtiType: true },
   });
   if (!user) redirect('/login');
-  if (user.onboardingCompletedAt) redirect('/journal');
+  if (user.onboardingCompletedAt) redirect(user.mbtiType ? '/journal' : '/quiz/personnalite');
 
   return <BienvenueClient prefillName={user.name} />;
 }
