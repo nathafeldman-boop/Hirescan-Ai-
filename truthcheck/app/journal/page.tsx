@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { journalAccessFor } from '@/lib/journalAccess';
+import { resolveFunnelStep, funnelStepPath } from '@/lib/funnelGate';
 import JournalClient from './JournalClient';
 
 export const metadata: Metadata = {
@@ -23,11 +24,14 @@ export default async function JournalPage() {
   });
 
   if (!user) redirect('/login');
-  // Le Journal EST l'étape "journal" du funnel — mais si le questionnaire
-  // d'accueil n'a jamais été fait (lien direct, reconnexion après abandon en
-  // cours de route…), on ne laisse jamais quelqu'un le sauter — voir
-  // lib/funnelGate.ts.
-  if (!user.onboardingCompletedAt) redirect('/bienvenue');
+  // Le Journal EST l'étape "journal" du funnel — mais si une étape d'avant
+  // n'a jamais été faite (lien direct, reconnexion après abandon en cours de
+  // route…), on ne laisse jamais quelqu'un la sauter. 'journal' est exclu
+  // exprès : c'est l'étape que cette page sert elle-même (même raison que le
+  // même exclude sur /quiz/personnalite) — voir lib/funnelGate.ts pour
+  // l'ordre complet (onboarding -> test MBTI -> Journal).
+  const pendingStep = await resolveFunnelStep(session.user.id);
+  if (pendingStep && pendingStep !== 'journal') redirect(funnelStepPath(pendingStep));
 
   const access = journalAccessFor(user.tier, user.createdAt);
 

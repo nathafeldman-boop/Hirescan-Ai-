@@ -118,13 +118,16 @@ const faqSchema = {
 export default async function PersonnalitePage() {
   // Le test reste accessible SANS compte (promesse marketing "gratuit, sans
   // inscription" — voir les FAQ/schema ci-dessus) : on ne gate donc QUE les
-  // comptes déjà connectés dont le parcours de démarrage (questionnaire +
-  // premier Journal) n'est pas terminé — voir lib/funnelGate.ts. Le MBTI ne
-  // doit jamais être l'endroit où on atterrit automatiquement.
+  // comptes déjà connectés dont le parcours de démarrage n'est pas terminé —
+  // voir lib/funnelGate.ts. 'mbti' est exclu exprès : c'est justement l'étape
+  // que cette page sert, donc rediriger dessus créerait une boucle sur
+  // elle-même (repéré le 07/08 : router.push('/quiz/personnalite') depuis
+  // /bienvenue était systématiquement annulé en ~30ms par ce garde-fou avant
+  // le fix, renvoyant tout le monde direct sur le Journal).
   const session = await getServerSession(authOptions);
   if (session?.user?.id) {
     const pendingStep = await resolveFunnelStep(session.user.id);
-    if (pendingStep) redirect(funnelStepPath(pendingStep));
+    if (pendingStep && pendingStep !== 'mbti') redirect(funnelStepPath(pendingStep));
   }
 
   return (
