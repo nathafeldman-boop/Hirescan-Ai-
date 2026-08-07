@@ -587,6 +587,27 @@ export default function JournalClient({ firstName, onboardingGoal, access, wants
                 </div>
               )}
             </button>
+
+            {/* Guide vers la suite — sans ça, quelqu'un qui arrive ici depuis le
+                funnel (test → paywall → "continuer gratuitement") ou qui revient
+                un autre jour après avoir déjà noté sa journée n'a plus aucun
+                bouton pour avancer : seule la barre du bas (Home/Moi) reste,
+                facile à manquer. Uniquement une fois l'entrée du jour faite —
+                sinon "Comment s'est passée ta journée ?" juste au-dessus est
+                déjà la bonne prochaine action. */}
+            {todayEntry && (
+              <Link
+                href="/decouverte"
+                className="w-full rounded-2xl p-4 flex items-center justify-between transition-all active:scale-[0.98]"
+                style={{ background: 'var(--gold-soft)', border: '1px solid var(--gold-line)' }}
+              >
+                <div>
+                  <p className="text-sm font-bold" style={{ color: 'var(--ink)' }}>Continue ton aventure</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#8a7a63' }}>Ton coach IA, tes quêtes, tes autres tests →</p>
+                </div>
+                <span className="text-lg" style={{ color: 'var(--gold)' }}>→</span>
+              </Link>
+            )}
           </>
         )}
 
